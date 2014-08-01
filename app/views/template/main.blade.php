@@ -34,6 +34,7 @@
         </div>
 
         {{ HTML::script('js/jquery_2.1.0.min.js') }}
+        <script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
 		{{ HTML::script('js/jquery.numeric.js') }}
 		{{ HTML::script('js/bootstrap.min.js') }}
 		{{ HTML::script('js/bootstrap-datepicker.js') }}

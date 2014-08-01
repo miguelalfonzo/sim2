@@ -45,15 +45,17 @@
                                 <option value="1">Option one</option>
                                 <option value="2">Option two</option>
                             </select>
+
                             <div class='porcentaje_error' id='tooltip1' data-toggle='tooltip' data-placement='bottom'>
-                                <button type='button' class='btn-delete'><span class='glyphicon glyphicon-remove'></span></button>
+                                <button type='button' class='btn-delete'><span
+                                        class='glyphicon glyphicon-remove'></span></button>
                             </div>
                         </li>
                     </ul>
 
                 </div>
 
-                <button type="button" class="btn btn-default" id="btn-add">Agregar Otro Producto</button>
+                <button type="button" class="btn btn-default" id="btn-add-prod">Agregar Otro Producto</button>
             </div>
 
         </div>
@@ -85,11 +87,17 @@
             <div class="form-group col-sm-12 col-md-12">
                 <label class="col-sm-8 col-md-8 control-label" for="textinput">Cliente</label>
 
-                <div class="col-sm-10 col-md-10">
-                    <input id="textinput" name="textinput" type="text" placeholder=""
-                           class="form-control input-md">
+                <ul id="listclient">
 
-                </div>
+                    <li>
+                        <div class="col-sm-10 col-md-10">
+                            <input id="" name="cliente" type="text" placeholder=""
+                                   class="form-control input-md tags">
+
+                        </div>
+                    </li>
+                </ul>
+                <button type="button" class="btn btn-default" id="btn-add-client">Agregar Otro Cliente</button>
             </div>
 
         </div>
@@ -118,7 +126,6 @@
 </form>
 @stop
 <script>
-
 
 
 </script>

@@ -487,10 +487,50 @@ $(window).click(function (e){
 // });
 
 $().ready(function(){
-
-    $("#btn-add").on('click',function(){
+    var availableTags = [
+        "ActionScript",
+        "AppleScript",
+        "Asp",
+        "BASIC cesar",
+        "C jose",
+        "C++",
+        "Clojure",
+        "COBOL",
+        "ColdFusion",
+        "Erlang",
+        "Fortran",
+        "Groovy",
+        "Haskell",
+        "Java",
+        "JavaScript",
+        "Lisp",
+        "Perl",
+        "PHP",
+        "Python",
+        "Ruby",
+        "Scala",
+        "Scheme"
+    ];
+    $("#btn-add-prod").on('click',function(){
         //console.log('hola');
         $('#listprod>li:first-child').clone(true,true).appendTo('#listprod');
+    });
+
+    $(document).on('click','#btn-add-client',function(){
+
+        $('<input id="" name="cliente" type="text" placeholder="" class="form-control input-md tags">').appendTo('#listclient');
+        $( ".tags" ).autocomplete({
+            source: availableTags
+            //select : function(){($(this).attr('readonly','readonly'))}
+        });
+    });
+    // autocomplet
+    $(function() {
+
+        $( ".tags" ).autocomplete({
+        source: availableTags
+        //select : function(){($(this).attr('readonly','readonly'))}
+        });
     });
 
 	var promotionalTimes = ['prod', 'merch', 'sam', 'contra', 'bode'];
