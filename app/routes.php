@@ -16,4 +16,7 @@ Route::get('/', function()
 	return View::make('hello');
 });
 Route::get('show','SolicitudController@show');
-Route::get('newRequest','SolicitudController@newRequest');
+Route::get('ruc', function (){
+	return View::make('ruc');
+});
+Route::get('test','RucController@show');
