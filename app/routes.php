@@ -11,9 +11,16 @@
 |
 */
 
+/** Descargos  */
+
 Route::get('/', function()
 {
 	return View::make('hello');
 });
 Route::get('show','SolicitudController@show');
 Route::get('newRequest','SolicitudController@newRequest');
+Route::get('ruc','RucController@ruc');
+
+
+
+/**   Gastos */
