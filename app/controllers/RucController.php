@@ -2,9 +2,9 @@
 
 class RucController extends BaseController{
 
-    public function show(){
+    public function show($rucConsultado = ''){
 		$rucClass = new RUC;
-		$data = $rucClass->consultarRUC('2016064181');
+		$data = $rucClass->consultarRUC($rucConsultado);
         var_dump($data);
     }
 }

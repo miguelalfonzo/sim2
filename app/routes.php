@@ -19,13 +19,7 @@ Route::get('/', function()
 });
 Route::get('show','SolicitudController@show');
 Route::get('newRequest','SolicitudController@newRequest');
-Route::get('ruc',function(){
-
-    return View::make('ruc');
-
-});
-
-Route::get('test','RucController@show');
+Route::get('ruc/{rucConsultado?}','RucController@show');
 
 
 
