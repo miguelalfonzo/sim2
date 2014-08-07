@@ -10,6 +10,9 @@ class SolicitudeController extends BaseController{
 
     public function show(){
 
+        $results = DB::select('select * from datos');
+        var_dump($results);
+        die;
         return View::make('RM.show');
 
     }
@@ -18,6 +21,7 @@ class SolicitudeController extends BaseController{
 
         return View::make('RM.registrar_solicitud');
     }
+
 
 
 }
