@@ -6,6 +6,8 @@
  * Time: 02:18 PM
  */
 
+namespace Dmkt;
+use \Eloquent;
 class Client extends Eloquent{
 
     protected $fillable = array('clcodigo', 'clnombre');

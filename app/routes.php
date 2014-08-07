@@ -17,8 +17,8 @@ Route::get('/', function()
 {
 	return View::make('hello');
 });
-Route::get('show','SolicitudeController@show');
-Route::get('newSolicitude','SolicitudeController@newSolicitude');
+Route::get('show','Dmkt\SolicitudeController@show');
+Route::get('newSolicitude','Dmkt\SolicitudeController@newSolicitude');
 Route::get('ruc',function(){
 
     return View::make('ruc');

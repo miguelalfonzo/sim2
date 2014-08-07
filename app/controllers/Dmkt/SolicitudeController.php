@@ -6,20 +6,25 @@
  * Time: 04:35 PM
  */
 
+namespace Dmkt;
+use \BaseController;
+use \View;
 class SolicitudeController extends BaseController{
 
     public function show(){
 
-        $results = DB::select('select * from datos');
-        var_dump($results);
+        $clients = Client::take(30)->get(array('clcodigo','clnombre'));;
+        echo json_encode($clients);
+
         die;
-        return View::make('RM.show');
+        return View::make('Dmkt.show');
 
     }
 
     public function newSolicitude(){
 
-        return View::make('RM.registrar_solicitud');
+        return View::make('Dmkt.registrar_solicitud');
+
     }
 
 
