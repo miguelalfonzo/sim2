@@ -1,27 +1,43 @@
+
 var availableTags = [
-    "ActionScript",
-    "AppleScript",
-    "Asp",
-    "BASIC cesar",
-    "C jose",
-    "C++",
-    "Clojure",
-    "COBOL",
-    "ColdFusion",
-    "Erlang",
-    "Fortran",
-    "Groovy",
-    "Haskell",
-    "Java",
-    "JavaScript",
-    "Lisp",
-    "Perl",
-    "PHP",
-    "Python",
-    "Ruby",
-    "Scala",
-    "Scheme"
+    {
+        rn: "1",
+        clcodigo: "834",
+        clnombre: "FCIA. MEDISUR . SURQUILLO"
+    },
+    {
+        rn: "2",
+        clcodigo: "835",
+        clnombre: "BOT. MEGAFARMA I"
+    },
+    {
+        rn: "3",
+        clcodigo: "836",
+        clnombre: "BOT. CONTINENTA L ATE"
+    },
+    {
+        rn: "4",
+        clcodigo: "3026",
+        clnombre: "RENE HUAMANI CALDERON"
+    },
+    {
+        rn: "5",
+        clcodigo: "2892",
+        clnombre: "FARMACIA FARMA BOLIVAR"
+    },
+    {
+        rn: "6",
+        clcodigo: "2893",
+        clnombre: "BOTICAS BAZAR INTERFARMA"
+    }
 ];
+
+for(var f=0;f<availableTags.length;f++)
+{
+    console.log(availableTags);
+}
+
+
 $("#btn-add-prod").on('click',function(){
     //console.log('hola');
     $(".btn-delete-prod").show();
@@ -56,7 +72,7 @@ $(document).on('click','#btn-add-client',function(){
     $(".btn-delete-client").show();
 
     $( ".tags" ).autocomplete({
-        source: availableTags
+        source: availableTags.clnombre
         //select : function(){($(this).attr('readonly','readonly'))}
     });
 });
