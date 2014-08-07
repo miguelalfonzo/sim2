@@ -6,7 +6,7 @@
  * Time: 04:35 PM
  */
 
-class SolicitudController extends BaseController{
+class SolicitudeController extends BaseController{
 
     public function show(){
 
@@ -14,7 +14,7 @@ class SolicitudController extends BaseController{
 
     }
 
-    public function newRequest(){
+    public function newSolicitude(){
 
         return View::make('RM.registrar_solicitud');
     }
