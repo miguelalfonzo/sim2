@@ -24,7 +24,7 @@ Route::get('ruc',function(){
     return View::make('ruc');
 
 });
-
+Route::get('prueba','Dmkt\SolicitudeController@test');
 Route::get('test','RucController@show');
 
 

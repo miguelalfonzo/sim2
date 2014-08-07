@@ -9,7 +9,9 @@
 		<meta name="description" content="">
 		<meta name="author" content="eSinergy">
 		<title>Test de productos</title>
+
 		{{ HTML::style('css/bootstrap.min.css') }}
+        {{ HTML::style('css/jquery-ui.min.css') }}
 		{{ HTML::style('css/datepicker.css') }}
 		{{ HTML::style('css/datepicker3.css') }}
 		{{ HTML::style('css/ladda-themeless.min.css') }}
@@ -35,7 +37,7 @@
         </div>
 
         {{ HTML::script('js/jquery_2.1.0.min.js') }}
-        <script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+        {{ HTML::script('js/jquery-ui.min.js') }}
 		{{ HTML::script('js/jquery.numeric.js') }}
 		{{ HTML::script('js/bootstrap.min.js') }}
 		{{ HTML::script('js/bootstrap-datepicker.js') }}
