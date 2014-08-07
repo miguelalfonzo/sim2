@@ -535,7 +535,7 @@ $().ready(function(){
 
 	$(".date input[type=text]").change(function (){
 		if ($(this).val() == ''){
-			$("#year").val('');
+			            $("#year").val('');
 			$("#month").val('');
 		}
 	});
