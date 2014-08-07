@@ -1,5 +1,5 @@
 @extends('template.main')
-@section('solicitud')
+@section('solicitude')
 <div class="col-md-12" style="margin-bottom: 10px; margin-top: 10px">
 <form class="form-inline">
 

@@ -28,7 +28,7 @@
             @yield('content')
         </div>
         <div>
-            @yield('solicitud')
+            @yield('solicitude')
         </div>
         <div>
             @yield('actividad')

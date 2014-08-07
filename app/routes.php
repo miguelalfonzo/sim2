@@ -17,9 +17,15 @@ Route::get('/', function()
 {
 	return View::make('hello');
 });
-Route::get('show','SolicitudController@show');
-Route::get('newRequest','SolicitudController@newRequest');
-Route::get('ruc/{rucConsultado?}','RucController@show');
+Route::get('show','SolicitudeController@show');
+Route::get('newSolicitude','SolicitudeController@newSolicitude');
+Route::get('ruc',function(){
+
+    return View::make('ruc');
+
+});
+
+Route::get('test','RucController@show');
 
 
 
