@@ -26,6 +26,10 @@ class SolicitudeController extends BaseController{
         return View::make('Dmkt.registrar_solicitud');
 
     }
+    public function test(){
+
+        return View::make('Dmkt.test');
+    }
 
 
 

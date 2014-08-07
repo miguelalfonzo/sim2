@@ -19,6 +19,7 @@ Route::get('/', function()
 });
 Route::get('show','Dmkt\SolicitudeController@show');
 Route::get('newSolicitude','Dmkt\SolicitudeController@newSolicitude');
+Route::get('prueba','Dmkt\SolicitudeController@test');
 
 // ======================================================================
 

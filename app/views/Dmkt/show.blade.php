@@ -91,6 +91,7 @@
             <th>First Name</th>
             <th>Last Name</th>
             <th>Username</th>
+            <th>Estado</th>
         </tr>
         </thead>
         <tbody>
@@ -99,6 +100,7 @@
             <td>Mark</td>
             <td>Otto</td>
             <td>mdo</td>
+            <td><a href="registrar-gasto">reg_gasto</a></td>
         </tr>
         <tr>
             <td>2</td>

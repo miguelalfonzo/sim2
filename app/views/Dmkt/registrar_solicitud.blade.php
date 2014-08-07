@@ -92,8 +92,8 @@
 
                         <li>
                             <div style="position: relative">
-                            <input id="inputclient" name="cliente" type="text" placeholder="" style="margin-top: 10px"
-                                   class="form-control input-md tags">
+                            <input id="#project" name="cliente" type="text" placeholder="" style="margin-top: 10px"
+                                   class="form-control input-md project">
                             <button type='button' class='btn-delete-client' style="display: none"><span class='glyphicon glyphicon-remove'></span></button>
                             </div>
                         </li>
