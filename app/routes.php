@@ -19,14 +19,13 @@ Route::get('/', function()
 });
 Route::get('show','Dmkt\SolicitudeController@show');
 Route::get('newSolicitude','Dmkt\SolicitudeController@newSolicitude');
-Route::get('ruc',function(){
 
-    return View::make('ruc');
-
-});
-
-Route::get('test','RucController@show');
-
-
+// ======================================================================
 
 /**   Gastos */
+
+Route::get('registrar-gasto','Expense\ExpenseController@show');
+Route::get('test','Expense\RucController@show');
+Route::get('ruc',function(){
+    return View::make('Expense\ruc');
+});

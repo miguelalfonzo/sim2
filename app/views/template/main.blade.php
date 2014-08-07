@@ -23,16 +23,15 @@
         {{ HTML::link('/', '', array('id' => 'logo', 'title' => 'Bagó Perú', 'alt' => 'Bagó Perú')) }}
         <a id="logout" href="#" title="Cerrar sesión" alt="Cerrar sesión"><bdi>Cerrar sesión</bdi><img src="{{URL::to('/')}}/img/user.png"></a>
     </header>
-        <div>
-
+        <section>
             @yield('content')
-        </div>
-        <div>
+        </section>
+        <section>
             @yield('solicitude')
-        </div>
-        <div>
+        </section>
+        <section>
             @yield('actividad')
-        </div>
+        </section>
 
         {{ HTML::script('js/jquery_2.1.0.min.js') }}
         <script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>

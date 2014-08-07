@@ -251,7 +251,23 @@ main.submenu{
 	display: initial;
 }
 
+.title
+{
+	color: #333;
+	font-weight: bold;
+	padding-left: .5em;
+}
 
+.reg-expense
+{
+	padding: 1em;
+}
+
+.inline-block
+{
+	display: inline-block;
+	vertical-align: middle;
+}
 
 .table-gastos
 {
