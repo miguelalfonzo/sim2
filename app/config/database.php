@@ -83,17 +83,27 @@ return array(
 			'prefix'   => '',
 		),
 
-        'oracle' => array(
-            'driver' => 'pdo-via-oci8',
-            'host' => '192.168.1.4',
-            'port' => '1521',
-            'database' => 'BDBAGO',
-            'service_name' => 'sid_alias',
-            'username' => 'outdvp',
-            'password' => 'outdvp',
-            'charset' => 'utf-8',
-            'prefix' => '',
-        )
+       'oracle' => array(
+			'driver' => 'pdo-via-oci8',
+			'host' => '192.168.1.4',
+			'port' => '1521',
+			'database' => 'BDBAGO',
+			'username' => 'outdvp',
+			'password' => 'outdvp',
+			'charset' => 'utf8',
+			'prefix' => '',
+		),
+		
+		'oracle_ms' => array(
+			'driver' => 'pdo-via-oci8',
+			'host' => '192.168.1.4',
+			'port' => '1521',
+			'database' => 'BDBAGO',
+			'username' => 'outdvp',
+			'password' => 'outdvp',
+			'charset' => 'utf8',
+			'prefix' => '',
+		),
 
 	),
 
