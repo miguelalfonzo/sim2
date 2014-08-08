@@ -1,4 +1,13 @@
 function newSolicitude(){
+
+    var clients = [];
+    var clients_select = [];
+    $.getJSON( "http://localhost/BitBucket/bago_dmkt_rg/public/show", function( data ) {
+        clients = data;
+    });
+
+
+
     $("#btn-add-prod").on('click', function () {
         //console.log('hola');
         $(".btn-delete-prod").show();
@@ -26,10 +35,7 @@ function newSolicitude(){
 
 
     function load_client(client){
-        var clients = [];
-        $.getJSON( "http://localhost/BitBucket/bago_dmkt_rg/public/show", function( data ) {
-            clients = data;
-        });
+
         function lightwell(request, response) {
             function hasMatch(s) {
                 return s.toLowerCase().indexOf(request.term.toLowerCase())!==-1;
@@ -42,7 +48,7 @@ function newSolicitude(){
             }
             for  (i = 0, l = clients.length; i<l; i++) {
                 obj = clients[i];
-                if (hasMatch(obj.clcodigo)) {
+                if (hasMatch(obj.clnombre)) {
                     matches.push(obj);
                 }
             }
@@ -52,16 +58,17 @@ function newSolicitude(){
             minLength: 0,
             source: lightwell,
             focus: function( event, ui ) {
-                $( this ).val( ui.item.clnombre );
+                $( this ).val( ui.item.clnombre);
+
                 return false;
             },
             select: function( event, ui ) {
                 // $( "#project" ).val( ui.item.label );
-                $( "#project-id" ).val( ui.item.clcodigo ); // is this needed?
-                $( "#project-title" ).html( ui.item.clcodigo );
-                $( "#project-description" ).html( ui.item.clnombre );
-                // $( "#project-other" ).html( ui.item.other );
-
+                $(this).parent().removeClass('has-error has-feedback');
+                $(this).parent().children('.span-alert').removeClass('glyphicon glyphicon-remove form-control-feedback');
+                $(this).parent().addClass('has-success has-feedback');
+                $(this).parent().children('.span-alert').addClass('glyphicon glyphicon-ok form-control-feedback');
+                $(this).attr('readonly','readonly');
                 return false;
             }
         })
@@ -76,7 +83,7 @@ function newSolicitude(){
     load_client(1);
     var client = 2;
     $(document).on('click', '#btn-add-client', function () {
-        $('<li><div style="position: relative"><input id="project'+client+'" name="cliente" type="text" placeholder="" style="margin-top: 10px" class="form-control input-md project"> <button type="button" class="btn-delete-client" style=""><span class="glyphicon glyphicon-remove"></span></button></div></li>').appendTo('#listclient');
+        $('<li><div style="position: relative"><input id="project'+client+'" name="cliente" type="text" placeholder="" style="margin-top: 10px" class="form-control input-md project"><span class="span-alert"></span><button type="button" class="btn-delete-client" style=""><span class="glyphicon glyphicon-remove"></span></button></div></li>').appendTo('#listclient');
         $(".btn-delete-client").show();
         setTimeout(function(){
             load_client(client);
@@ -98,10 +105,75 @@ function newSolicitude(){
             }
         }
     });
+
+
+    $('.register_solicitude').on('click',function(e){
+        e.preventDefault();
+       // var clientes = [];
+        var aux = 0;
+
+            //clientes = data;
+            var obj = [];
+            var clients_input = [];
+            for  (var i = 0, l = clients.length; i<l; i++) {
+                obj[i] = clients[i].clnombre;
+                //console.log(clients[i].clnombre);
+            }
+
+            setTimeout(function(){
+
+
+                $('.project').each(function(index){
+                    var input = $(this).val();
+                    clients_input[index] = input;
+
+                    var ban = obj.indexOf(input);
+                    if(ban != -1){
+                        console.log(ban);
+
+                    }else{
+                        aux = 1;
+                        $(this).parent().addClass('has-error has-feedback');
+                        $(this).parent().children('.span-alert').addClass('span-alert glyphicon glyphicon-remove form-control-feedback');
+                    }
+
+                });
+
+                if(aux == 0){
+                    alert('datos correctos');
+                }else{
+                    alert('ingrese cliente correcto');
+                }
+            }, 200);
+
+            setTimeout(function(){
+
+                    for(var i=0 ; i<clients_input.length  ; i++){
+                        $('.project').each(function(index){
+
+
+                        if(index!=i &&  clients_input[i] === $(this).val()){
+                            var ind = clients_input.indexOf($(this).val());
+                            clients_input.splice(ind,2);
+                            console.log($(this).val() + ' - '+ index )
+                        }
+
+                        });
+                     }
+            },200)
+
+
+
+
+        });
+
+
+
 }
 
 $(function(){
     var url = window.location.href;
+    console.log("Hola");
     if(url === "http://localhost/BitBucket/bago_dmkt_rg/public/newSolicitude")
     {
         newSolicitude();

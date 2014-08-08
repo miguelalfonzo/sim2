@@ -39,20 +39,20 @@
 		<div class="col-xs-12 col-sm-6 col-md-4">
 			<div class="form-expense">
 				<label>RUC</label>
-				<input id="ruc" type="text" class="form-control">
+				<input id="ruc" type="text" class="form-control" maxlength="11">
 			</div>
 		</div>
 		
 		<div class="col-xs-12 col-sm-6 col-md-4">
 			<div class="form-expense">
-				<label class="inline-block">Número de Comprobante</label>
-				<input type="text" class="form-control inline-block">
+				<label>Razón Social</label>
+				<input id="razon" type="text" class="form-control ladda-button" readonly data-style="expand-left">
 			</div>
 		</div>
 		<div class="col-xs-12 col-sm-6 col-md-4">
 			<div class="form-expense">
-				<label>Razón Social</label>
-				<input type="text" class="form-control" value="Sinergy E.I.R.L" readonly>
+				<label class="inline-block">Número de Comprobante</label>
+				<input type="text" class="form-control inline-block">
 			</div>
 		</div>
 		<div class="col-xs-12 col-sm-6 col-md-4">

@@ -1,8 +1,8 @@
 <?php
 
 class RUC{
-	public function consultarRUC($rucConsultado){
-		$url = 'http://www.sunat.gob.pe/w/wapS01Alias?ruc='.$rucConsultado;
+	public function consultRuc($rucConsult){
+		$url = 'http://www.sunat.gob.pe/w/wapS01Alias?ruc='.$rucConsult;
 		$proxy = 'proxy.bagoperu.com.pe:3128';
 		$proxyauth = 'outinf01:uy349asx';
 

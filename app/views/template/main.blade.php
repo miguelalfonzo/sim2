@@ -8,8 +8,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta name="description" content="">
 		<meta name="author" content="eSinergy">
-		<title>Test de productos</title>
-
+		<title>Descargos Marketing y Registro Gastos</title>
 		{{ HTML::style('css/bootstrap.min.css') }}
         {{ HTML::style('css/jquery-ui.min.css') }}
 		{{ HTML::style('css/datepicker.css') }}
@@ -35,10 +34,6 @@
         <section>
             @yield('actividad')
         </section>
-
-
-
-
 		{{ HTML::script('js/jquery.numeric.js') }}
 		{{ HTML::script('js/bootstrap.min.js') }}
 		{{ HTML::script('js/bootstrap-datepicker.js') }}
