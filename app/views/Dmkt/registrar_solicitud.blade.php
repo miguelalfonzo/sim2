@@ -5,6 +5,7 @@
         text-align: left;
     }
 </style>
+
 <div class="nueva_solicitud">
     <form class="form-horizontal">
         <fieldset>
@@ -92,7 +93,7 @@
 
                         <li>
                             <div style="position: relative">
-                            <input id="#project" name="cliente" type="text" placeholder="" style="margin-top: 10px"
+                            <input id="project" name="cliente" type="text" placeholder="" style="margin-top: 10px"
                                    class="form-control input-md project">
                             <button type='button' class='btn-delete-client' style="display: none"><span class='glyphicon glyphicon-remove'></span></button>
                             </div>

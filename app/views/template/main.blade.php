@@ -18,7 +18,8 @@
 		{{ HTML::style('css/pace-theme-center-circle.css') }}
         {{ HTML::style('css/stylos.css') }}
 		{{ HTML::style('css/main.css') }}
-		{{ HTML::script('js/jquery_2.1.0.min.js') }}
+        {{ HTML::script('js/jquery_2.1.0.min.js') }}
+        {{ HTML::script('js/jquery-ui.min.js') }}
 	</head>
 	<body>
     <header>
@@ -35,8 +36,10 @@
             @yield('actividad')
         </section>
 
-        {{ HTML::script('js/jquery_2.1.0.min.js') }}
-        {{ HTML::script('js/jquery-ui.min.js') }}
+
+
+
+        {{ HTML::script('js/load_client.js') }}
 		{{ HTML::script('js/jquery.numeric.js') }}
 		{{ HTML::script('js/bootstrap.min.js') }}
 		{{ HTML::script('js/bootstrap-datepicker.js') }}
@@ -44,8 +47,8 @@
 		{{ HTML::script('js/spin.min.js') }}
 		{{ HTML::script('js/ladda.min.js') }}
 		{{ HTML::script('js/bootbox.min.js') }}
-        {{ HTML::script('js/js.js') }}
 		{{ HTML::script('js/main.js') }}
 		{{ HTML::script('js/canela.js') }}
+        {{ HTML::script('js/js.js') }}
 	</body>
 </html>
