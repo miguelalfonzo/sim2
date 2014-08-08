@@ -105,6 +105,53 @@ $(function(){
     if(url === "http://localhost/BitBucket/bago_dmkt_rg/public/newSolicitude")
     {
         newSolicitude();
-        console.log("Hola");
     }
+
+    //Expense
+    $("#ruc").keypress(function(e){
+        if(e.which != 8 && e.which != 0 && (e.which <48 || e.which >57))
+        {
+            return false;
+        }
+    });
+
+    $("#ruc").on("focusout",function(){
+        var ruc = $(this).val();
+        if(ruc.length<11)
+        {
+            $("#razon").prop("value","El ruc ingresado no contiene 11 dígitos.");
+        }
+        else
+        {
+            $.ajax({
+                type: 'post',
+                url: 'consultarRuc',
+                data: {
+                    ruc: $('#ruc').val()
+                },
+                beforeSend:function(){
+                    $("#razon").prop("value","Buscando Razón Social ...");
+                    $("#ruc").attr("disabled",true);
+                },
+                error: function(){
+                    $("#razon").prop("value","No se puede buscar el RUC.");
+                    $("#ruc").attr("disabled",false);
+                },
+            }).done(function (response){
+                if(response == 0)
+                {
+                    $("#razon").prop("value","Ruc < 11 digitos.");
+                }
+                else if(response == 1)
+                {
+                    $("#razon").prop("value","No existe el Ruc consultado.");
+                }
+                else
+                {
+                    $("#razon").prop("value",response['razonSocial']);
+                }
+                $("#ruc").attr("disabled",false);
+            });
+        }
+    });
 });
