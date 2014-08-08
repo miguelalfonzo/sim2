@@ -23,14 +23,8 @@ $(document).on("click", ".btn-delete-prod", function () {
     }
 });
 
-var client = 1;
-$(document).on('click', '#btn-add-client', function () {
 
-
-    $('<li><div style="position: relative"><input id="project'+ client +' " name="cliente" type="text" placeholder="" style="margin-top: 10px" class="form-control input-md project"> <button type="button" class="btn-delete-client" style=""><span class="glyphicon glyphicon-remove"></span></button></div></li>').appendTo('#listclient');
-    $(".btn-delete-client").show();
-
-
+function load_client(client){
 
     var clients = [
         {
@@ -64,7 +58,7 @@ $(document).on('click', '#btn-add-client', function () {
             clnombre: "BOTICAS BAZAR INTERFARMA"
         }
     ];
-     console.log('#project'+client);
+
     function lightwell(request, response) {
         function hasMatch(s) {
             return s.toLowerCase().indexOf(request.term.toLowerCase())!==-1;
@@ -85,7 +79,7 @@ $(document).on('click', '#btn-add-client', function () {
         response(matches);
     }
 
-    $('#project1').autocomplete({
+    $('#project'+client).autocomplete({
         minLength: 0,
         source: lightwell,
         focus: function( event, ui ) {
@@ -111,7 +105,24 @@ $(document).on('click', '#btn-add-client', function () {
             .appendTo( ul );
     };
 
-    client++;
+}
+load_client(1);
+var client = 2;
+$(document).on('click', '#btn-add-client', function () {
+
+
+    $('<li><div style="position: relative"><input id="project'+client+'" name="cliente" type="text" placeholder="" style="margin-top: 10px" class="form-control input-md project"> <button type="button" class="btn-delete-client" style=""><span class="glyphicon glyphicon-remove"></span></button></div></li>').appendTo('#listclient');
+    $(".btn-delete-client").show();
+    setTimeout(function(){
+        load_client(client);
+        client++;
+    }, 200);
+
+
+
+
+
+
 
 });
 
