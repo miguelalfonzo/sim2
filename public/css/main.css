@@ -589,16 +589,26 @@ overflow-y: scroll;
 
 .porcentaje_error
 {
-	display: inline;
 	/*background: red;*/
-	position: absolute;
-	width: 60px;	
-	height: 42px;
-	margin-left: 6px;
 	/*border-left: 2px solid rgb(204,0,0);
 	border-right: 2px solid rgb(204,0,0);*/
-	padding-top: 3px;
+	display: inline;
+	height: 42px;
+	margin-left: 6px;
 	margin-top: -4px;
+	padding-top: 3px;
+	position: absolute;
+	width: 60px;	
+}
+
+.form-expense
+{
+	margin-bottom: 1em;
+}
+
+.btn-save-expense
+{
+	margin-top: 1.75em;
 }
 
 /*#list-publi>li:first-child label .porcentaje_error

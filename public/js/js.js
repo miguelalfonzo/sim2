@@ -1,4 +1,3 @@
-
 $("#btn-add-prod").on('click', function () {
     //console.log('hola');
     $(".btn-delete-prod").show();
@@ -135,7 +134,7 @@ $(document).on("click", ".btn-delete-client", function () {
 });
 
 // autocomplet
-/*
+
 $(function () {
 
     $(".tags").autocomplete({
@@ -155,6 +154,3 @@ $(function () {
         //select : function(){($(this).attr('readonly','readonly'))}
     });
 });
-*/
-
-
