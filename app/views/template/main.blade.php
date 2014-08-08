@@ -39,7 +39,6 @@
 
 
 
-        {{ HTML::script('js/load_client.js') }}
 		{{ HTML::script('js/jquery.numeric.js') }}
 		{{ HTML::script('js/bootstrap.min.js') }}
 		{{ HTML::script('js/bootstrap-datepicker.js') }}
