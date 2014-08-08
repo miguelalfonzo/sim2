@@ -27,39 +27,11 @@ $(document).on("click", ".btn-delete-prod", function () {
 
 function load_client(client){
 
-    var clients = [
-        {
-            rn: "1",
-            clcodigo: "834",
-            clnombre: "FCIA. MEDISUR . SURQUILLO"
-        },
-        {
-            rn: "2",
-            clcodigo: "835",
-            clnombre: "BOT. MEGAFARMA I"
-        },
-        {
-            rn: "3",
-            clcodigo: "836",
-            clnombre: "BOT. CONTINENTA L ATE"
-        },
-        {
-            rn: "4",
-            clcodigo: "3026",
-            clnombre: "RENE HUAMANI CALDERON"
-        },
-        {
-            rn: "5",
-            clcodigo: "2892",
-            clnombre: "FARMACIA FARMA BOLIVAR"
-        },
-        {
-            rn: "6",
-            clcodigo: "2893",
-            clnombre: "BOTICAS BAZAR INTERFARMA"
-        }
-    ];
+    var clients = [];
 
+    $.getJSON( "http://localhost/bago_dmkt_rg/public/show", function( data ) {
+        clients = data;
+    });
     function lightwell(request, response) {
         function hasMatch(s) {
             return s.toLowerCase().indexOf(request.term.toLowerCase())!==-1;
@@ -73,7 +45,7 @@ function load_client(client){
 
         for  (i = 0, l = clients.length; i<l; i++) {
             obj = clients[i];
-            if (hasMatch(obj.clnombre)) {
+            if (hasMatch(obj.clcodigo)) {
                 matches.push(obj);
             }
         }
