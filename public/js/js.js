@@ -4,9 +4,10 @@ function newSolicitude(){
         $(".btn-delete-prod").show();
         $('#listprod>li:first-child').clone(true, true).appendTo('#listprod');
     });
-    $(".btn-delete-prod").hide();
-    $(document).on("click", ".btn-delete-prod", function () {
 
+    $(".btn-delete-prod").hide();
+
+    $(document).on("click", ".btn-delete-prod", function () {
         $('#listprod>li .porcentaje_error').css({"border": "0"});
         $('.repeat').hide();
         $(".option-des-1").removeClass('error');
@@ -22,39 +23,13 @@ function newSolicitude(){
             }
         }
     });
+
+
     function load_client(client){
-        var clients = [
-            {
-                rn: "1",
-                clcodigo: "834",
-                clnombre: "FCIA. MEDISUR . SURQUILLO"
-            },
-            {
-                rn: "2",
-                clcodigo: "835",
-                clnombre: "BOT. MEGAFARMA I"
-            },
-            {
-                rn: "3",
-                clcodigo: "836",
-                clnombre: "BOT. CONTINENTA L ATE"
-            },
-            {
-                rn: "4",
-                clcodigo: "3026",
-                clnombre: "RENE HUAMANI CALDERON"
-            },
-            {
-                rn: "5",
-                clcodigo: "2892",
-                clnombre: "FARMACIA FARMA BOLIVAR"
-            },
-            {
-                rn: "6",
-                clcodigo: "2893",
-                clnombre: "BOTICAS BAZAR INTERFARMA"
-            }
-        ];
+        var clients = [];
+        $.getJSON( "http://localhost/BitBucket/bago_dmkt_rg/public/show", function( data ) {
+            clients = data;
+        });
         function lightwell(request, response) {
             function hasMatch(s) {
                 return s.toLowerCase().indexOf(request.term.toLowerCase())!==-1;
@@ -65,10 +40,9 @@ function newSolicitude(){
                 response([]);
                 return;
             }
-
             for  (i = 0, l = clients.length; i<l; i++) {
                 obj = clients[i];
-                if (hasMatch(obj.clnombre)) {
+                if (hasMatch(obj.clcodigo)) {
                     matches.push(obj);
                 }
             }
@@ -91,12 +65,12 @@ function newSolicitude(){
                 return false;
             }
         })
-            .data( "ui-autocomplete" )._renderItem = function( ul, item ) {
-            return $( "<li>" )
-                .append( "<a>" +
-                    "<br><span style='font-size: 80%;'>Codigo: " + item.clcodigo + "</span>" +
-                    "<br><span style='font-size: 60%;'>Cliente: " + item.clnombre + "</span></a>" )
-                .appendTo( ul );
+        .data( "ui-autocomplete" )._renderItem = function( ul, item ) {
+        return $( "<li>" )
+            .append( "<a>" +
+                "<br><span style='font-size: 80%;'>Codigo: " + item.clcodigo + "</span>" +
+                "<br><span style='font-size: 60%;'>Cliente: " + item.clnombre + "</span></a>" )
+            .appendTo( ul );
         };
     }
     load_client(1);
@@ -110,14 +84,12 @@ function newSolicitude(){
         }, 200);
     });
     $(document).on("click", ".btn-delete-client", function () {
-
         $('#listclient>li .porcentaje_error').css({"border": "0"});
         $('.repeat').hide();
         $(".option-des-1").removeClass('error');
         var k = $("#listclient li").size();
         console.log(k);
         if (k > 1) {
-
             var other = $(".btn-delete-client").index(this);
             $("#listclient li").eq(other).remove();
             var p = $("#listclient li").size();
@@ -133,28 +105,6 @@ $(function(){
     if(url === "http://localhost/BitBucket/bago_dmkt_rg/public/newSolicitude")
     {
         newSolicitude();
+        console.log("Hola");
     }
-    console.log("Hola");
 });
-
-// // autocomplet
-
-// $(function () {
-
-//     $(".tags").autocomplete({
-//         source: availableTags2,
-//         minLength: 0,
-//         select: function (event, ui) {
-//             alert("Selected " + ui.item.clnombre);
-//         },
-//         focus: function (event, ui) {
-//             // this is to prevent showing an ID in the textbox instead of name
-//             // when the user tries to select using the up/down arrow of his keyboard
-//             $(".tags").val(ui.item.clnombre);
-//             alert("Selected " + ui.item.clnombre);
-//             return false;
-//         }
-
-//         //select : function(){($(this).attr('readonly','readonly'))}
-//     });
-// });
