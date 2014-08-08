@@ -17,7 +17,7 @@
 
                 <div class="form-group col-sm-12 col-md-12">
 
-                    <label class="col-sm-8 col-md-8 control-label" for="textinput">Nombre Actividad</label>
+                    <label class="col-sm-8 col-md-8 control-label" for="textinput">Nombre Solicitud</label>
 
                     <div class="col-sm-10 col-md-10">
                         <input id="textinput" name="textinput" type="text" placeholder=""
@@ -86,15 +86,16 @@
                     </div>
                 </div>
 
-                <div class="form-group col-sm-12 col-md-12">
+                <div class="form-group col-sm-12 col-md-12 ">
                     <label class="col-sm-8 col-md-8 control-label" for="textinput">Cliente</label>
 
                     <ul id="listclient" class="col-sm-10 col-md-10">
 
                         <li>
-                            <div style="position: relative">
+                            <div style="position: relative" class="">
                             <input id="project1" name="cliente" type="text" placeholder="" style="margin-top: 10px"
                                    class="form-control input-md project">
+                            <span class="span-alert"></span>
                             <button type='button' class='btn-delete-client' style="display: none"><span class='glyphicon glyphicon-remove'></span></button>
                             </div>
                         </li>
@@ -121,7 +122,7 @@
 
 
                 <div class="col-sm-12 col-md-12" style="text-align: center">
-                    <button id="button1id" name="button1id" class="btn btn-primary">Crear</button>
+                    <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">Crear</button>
                     <button id="button2id" name="button2id" class="btn btn-primary">Cancelar</button>
                 </div>
             </div>
