@@ -45,8 +45,10 @@
                             <li>
                                 <div class="form-group col-sm-10 col-md-10">
                                     <select  id="selectproduct" name="selectbasic" class="form-control selectproduct" style="margin-top: 10px">
-                                        <option value="1">Option one</option>
-                                        <option value="2">Option two</option>
+
+                                        @foreach($products as $product)
+                                        <option value="{{$product->foalias}}">{{$product->fodescripcion}}</option>
+                                        @endforeach
                                     </select>
                                     <button type='button' class='btn-delete-prod' style="display: none"><span class='glyphicon glyphicon-remove'></span></button>
                                 </div>
@@ -123,7 +125,7 @@
 
                 <div class="col-sm-12 col-md-12" style="text-align: center">
                     <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">Crear</button>
-                    <button id="button2id" name="button2id" class="btn btn-primary">Cancelar</button>
+                    <a id="button2id" href="{{URL::to('show')}}" name="button2id" class="btn btn-primary">Cancelar</a>
                 </div>
             </div>
 

@@ -9,16 +9,20 @@
 		<meta name="description" content="">
 		<meta name="author" content="eSinergy">
 		<title>Descargos Marketing y Registro Gastos</title>
-		{{ HTML::style('css/bootstrap.min.css') }}
+        {{ HTML::style('css/dataTables.bootstrap.css') }}
+        {{ HTML::style('css/bootstrap.min.css') }}
         {{ HTML::style('css/jquery-ui.min.css') }}
 		{{ HTML::style('css/datepicker.css') }}
 		{{ HTML::style('css/datepicker3.css') }}
+
 		{{ HTML::style('css/ladda-themeless.min.css') }}
 		{{ HTML::style('css/pace-theme-center-circle.css') }}
         {{ HTML::style('css/stylos.css') }}
 		{{ HTML::style('css/main.css') }}
         {{ HTML::script('js/jquery_2.1.0.min.js') }}
         {{ HTML::script('js/jquery-ui.min.js') }}
+        {{ HTML::script('js/jquery.dataTables.min.js') }}
+        {{ HTML::script('js/dataTables.bootstrap.js') }}
 	</head>
 	<body>
     <header>
@@ -34,6 +38,7 @@
         <section>
             @yield('actividad')
         </section>
+
 		{{ HTML::script('js/jquery.numeric.js') }}
 		{{ HTML::script('js/bootstrap.min.js') }}
 		{{ HTML::script('js/bootstrap-datepicker.js') }}

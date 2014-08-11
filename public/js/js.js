@@ -167,7 +167,7 @@ function newSolicitude(){
 
         });
 
-
+    $('#example').dataTable();
 
 }
 
