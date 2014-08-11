@@ -73,8 +73,8 @@
 			</div>
 		</div>
 		<div class="col-xs-12 col-sm-6 col-md-4">
-			<div id="save-expense" class="form-expense btn-save-expense">
-				<button type="button" class="btn btn-primary">Registrar</button>
+			<div class="form-expense btn-save-expense">
+				<button id="save-expense" type="button" class="btn btn-primary">Registrar</button>
 			</div>
 		</div>
 	</section>
@@ -98,10 +98,10 @@
 						<tbody>
 							<tr>
 								<th class="type_voucher">Factura</th>
-								<th class="ruc">104481526279</th>
+								<th class="ruc">10448156279</th>
 								<th class="razon">HUGO FRANCISCO GAMONAL BRAVO</th>
 								<th class="number_voucher">001-2132132</th>
-								<th class="date_movent">01/12/2014</th>
+								<th class="date_movement">01/12/2014</th>
 								<th class="total">200.00</th>
 								<th><a class="edit-expense" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
 								<th><a class="delete-expense" href="#"><span class="glyphicon glyphicon-remove"></span></a></a></th>
@@ -111,7 +111,7 @@
 								<th class="ruc">10461782863</th>
 								<th class="razon">REYES CAMPOS JUAN MANUEL</th>
 								<th class="number_voucher">001-54334</th>
-								<th class="date_d">01/12/2014</th>
+								<th class="date_movement">01/12/2014</th>
 								<th class="total">120.00</th>
 								<th><a class="edit-expense" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
 								<th><a class="delete-expense" href="#"><span class="glyphicon glyphicon-remove"></span></a></a></th>

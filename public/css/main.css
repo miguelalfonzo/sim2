@@ -91,6 +91,11 @@ body > header{
 	padding: 1em;
 }
 
+.select-row
+{
+	background: #D5D6E2;
+}
+
 .title
 {
 	padding-left: .5em;

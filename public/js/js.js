@@ -233,40 +233,67 @@ $(function(){
         }
     });
 
-    $("#save-expense").on("click",function(){
+    $(document).on("click","#save-expense",function(){
+        var type_voucher   = $("#type_voucher").val();
         var ruc            = $("#ruc").val();
         var razon          = $("#razon").text();
-        var type_voucher   = $("#type_voucher").val();
         var number_voucher = $("#number_voucher").val();
         var date           = $("#date").val();
         var total          = $("#total").val();
+        console.log(type_voucher);
         console.log(ruc);
         console.log(razon);
-        console.log(type_voucher);
         console.log(number_voucher);
         console.log(date);
         console.log(total);
+        var row = "<tr>";
+            row+= "<th class='type_voucher'>"+type_voucher+"</th>";
+            row+= "<th class='ruc'>"+ruc+"</th>";
+            row+= "<th class='razon'>"+razon+"</th>";
+            row+= "<th class='number_voucher'>"+number_voucher+"</th>";
+            row+= "<th class='date'>"+date+"</th>";
+            row+= "<th class='total'>"+total+"</th>";
+            row+= "<th><a class='edit-expense' href='#'><span class='glyphicon glyphicon-pencil'></span></a></th>";
+            row+= "<th><a class='edit-expense' href='#'><span class='glyphicon glyphicon-remove'></span></a></th>";
+            row+= "</tr>";
+        $("#table tbody").append(row);
     });
 
-    $(".delete-expense").on("click",function(e){
+    $(document).on("click",".delete-expense",function(){
         e.preventDefault();
-        $(this).parent().parent().remove();
+        var row = $(this).parent().parent();
+        bootbox.confirm("¿Esta seguro que desea eliminar el gasto?", function(result) {
+            if(result)
+            {
+                row.remove();
+            }
+        });       
     });
 
     $(".edit-expense").on("click",function(e){
         e.preventDefault();
+        $("#table tbody tr").removeClass("select-row");
+        $("#type_voucher option").attr("selected",false);
+        $("#save-expense ").html("Actualizar");
         var row = $(this).parent().parent();
+        row.toggleClass("select-row");
         $.each(row,function(){
             var type_voucher_edit   = $(this).find(".type_voucher").html();
             var ruc_edit            = $(this).find(".ruc").html();
             var razon_edit          = $(this).find(".razon").html();
             var number_voucher_edit = $(this).find(".number_voucher").html();
+            var date_edit           = $(this).find(".date_movement").html();
             var total_edit          = $(this).find(".total").html();
+            $("#type_voucher option").filter(function(){
+                return $(this).text() == type_voucher_edit;
+            }).attr('selected', true);
             $("#ruc").val(ruc_edit);
             $("#razon").html(razon_edit).css("color","#5c5c5c");
             $("#number_voucher").val(number_voucher_edit);
-            $("#date").val();
-
+            $("#date").val(date_edit);
+            $("#total").val(total_edit);
         });
     });
+    
+
 });
