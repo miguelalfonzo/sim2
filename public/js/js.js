@@ -173,13 +173,14 @@ function newSolicitude(){
 
 $(function(){
     var url = window.location.href;
-    console.log("Hola");
     if(url === "http://localhost/BitBucket/bago_dmkt_rg/public/newSolicitude")
     {
         newSolicitude();
     }
 
     //Expense
+    
+    //Registro de solo números
     $("#ruc").keypress(function(e){
         if(e.which != 8 && e.which != 0 && (e.which <48 || e.which >57))
         {
@@ -187,11 +188,13 @@ $(function(){
         }
     });
 
+    //Búsqueda de Razón Social en la SUNAT una vez introducido el RUC
     $("#ruc").on("focusout",function(){
         var ruc = $(this).val();
+        var l   = Ladda.create(document.getElementById('razon'));
         if(ruc.length<11)
         {
-            $("#razon").prop("value","El ruc ingresado no contiene 11 dígitos.");
+            $("#razon").html("El ruc ingresado no contiene 11 dígitos.");
         }
         else
         {
@@ -199,31 +202,71 @@ $(function(){
                 type: 'post',
                 url: 'consultarRuc',
                 data: {
-                    ruc: $('#ruc').val()
+                    ruc: ruc
                 },
                 beforeSend:function(){
-                    $("#razon").prop("value","Buscando Razón Social ...");
+                    l.start();
+                    $("#razon").css("color","#5c5c5c");
                     $("#ruc").attr("disabled",true);
                 },
                 error: function(){
-                    $("#razon").prop("value","No se puede buscar el RUC.");
+                    l.stop();
+                    $("#razon").html("No se puede buscar el RUC.");
                     $("#ruc").attr("disabled",false);
-                },
+                }
             }).done(function (response){
                 if(response == 0)
                 {
-                    $("#razon").prop("value","Ruc < 11 digitos.");
+                    $("#razon").html("Ruc menor a 11 digitos.");
                 }
                 else if(response == 1)
                 {
-                    $("#razon").prop("value","No existe el Ruc consultado.");
+                    $("#razon").html("No existe el Ruc consultado.");
                 }
                 else
                 {
-                    $("#razon").prop("value",response['razonSocial']);
+                    $("#razon").html(response['razonSocial']);
                 }
+                l.stop();
                 $("#ruc").attr("disabled",false);
             });
         }
+    });
+
+    $("#save-expense").on("click",function(){
+        var ruc            = $("#ruc").val();
+        var razon          = $("#razon").text();
+        var type_voucher   = $("#type_voucher").val();
+        var number_voucher = $("#number_voucher").val();
+        var date           = $("#date").val();
+        var total          = $("#total").val();
+        console.log(ruc);
+        console.log(razon);
+        console.log(type_voucher);
+        console.log(number_voucher);
+        console.log(date);
+        console.log(total);
+    });
+
+    $(".delete-expense").on("click",function(e){
+        e.preventDefault();
+        $(this).parent().parent().remove();
+    });
+
+    $(".edit-expense").on("click",function(e){
+        e.preventDefault();
+        var row = $(this).parent().parent();
+        $.each(row,function(){
+            var type_voucher_edit   = $(this).find(".type_voucher").html();
+            var ruc_edit            = $(this).find(".ruc").html();
+            var razon_edit          = $(this).find(".razon").html();
+            var number_voucher_edit = $(this).find(".number_voucher").html();
+            var total_edit          = $(this).find(".total").html();
+            $("#ruc").val(ruc_edit);
+            $("#razon").html(razon_edit).css("color","#5c5c5c");
+            $("#number_voucher").val(number_voucher_edit);
+            $("#date").val();
+
+        });
     });
 });

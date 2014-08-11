@@ -43,6 +43,33 @@ body > header{
 	border-radius: 7px;
 }
 
+#razon
+{
+	color: #eee;
+	text-align: left;
+}
+
+#table
+{
+	font-size: .9em;
+}	
+
+#table thead
+{
+	background: #073F70;
+	color: white;
+}
+
+#table thead th, #table th
+{
+	text-align: center;
+}
+
+.align-center
+{
+	text-align: center;
+}
+
 .btn-save-expense
 {
 	margin-top: 1.75em;
@@ -53,7 +80,18 @@ body > header{
 	margin-bottom: 1em;
 }
 
+.inline
+{
+	display: inline;
+	margin: 0 auto;
+}
+
 .reg-expense
 {
 	padding: 1em;
+}
+
+.title
+{
+	padding-left: .5em;
 }
