@@ -1,12 +1,13 @@
 function newSolicitude(){
 
+
     var clients = [];
     var clients_select = [];
-    $.getJSON( "http://localhost/BitBucket/bago_dmkt_rg/public/show", function( data ) {
+    $.getJSON( "http://localhost/BitBucket/bago_dmkt_rg/public/getclients", function( data ) {
         clients = data;
     });
 
-
+    $('.clients_repeat').hide();
 
     $("#btn-add-prod").on('click', function () {
         //console.log('hola');
@@ -18,7 +19,7 @@ function newSolicitude(){
 
     $(document).on("click", ".btn-delete-prod", function () {
         $('#listprod>li .porcentaje_error').css({"border": "0"});
-        $('.repeat').hide();
+
         $(".option-des-1").removeClass('error');
         var k = $("#listprod li").size();
         console.log(k);
@@ -92,7 +93,7 @@ function newSolicitude(){
     });
     $(document).on("click", ".btn-delete-client", function () {
         $('#listclient>li .porcentaje_error').css({"border": "0"});
-        $('.repeat').hide();
+        $('.clients_repeat').hide();
         $(".option-des-1").removeClass('error');
         var k = $("#listclient li").size();
         console.log(k);
@@ -133,6 +134,7 @@ function newSolicitude(){
 
                     }else{
                         aux = 1;
+
                         $(this).parent().addClass('has-error has-feedback');
                         $(this).parent().children('.span-alert').addClass('span-alert glyphicon glyphicon-remove form-control-feedback');
                     }
@@ -154,8 +156,12 @@ function newSolicitude(){
 
                         if(index!=i &&  clients_input[i] === $(this).val()){
                             var ind = clients_input.indexOf($(this).val());
-                            clients_input.splice(ind,2);
+                            clients_input[index]='';
                             console.log($(this).val() + ' - '+ index )
+                            $(this).parent().removeClass('has-success has-feedback');
+                            $(this).parent().addClass('has-error has-feedback');
+                            $(this).parent().children('.span-alert').addClass('span-alert glyphicon glyphicon-remove form-control-feedback');
+                            $(".clients_repeat").show();
                         }
 
                         });
@@ -173,7 +179,7 @@ function newSolicitude(){
 
 $(function(){
     var url = window.location.href;
-    if(url === "http://localhost/BitBucket/bago_dmkt_rg/public/newSolicitude")
+    if(url === "http://localhost/BitBucket/bago_dmkt_rg/public/nueva-solicitud")
     {
         newSolicitude();
     }

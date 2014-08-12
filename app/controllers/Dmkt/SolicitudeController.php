@@ -15,10 +15,17 @@ class SolicitudeController extends BaseController{
 
     public function show(){
 
-        $clients = Client::take(30)->get(array('clcodigo','clnombre'));;
+
 
         return View::make('Dmkt.show');
 
+    }
+
+    public function getclients(){
+
+        $clients = Client::take(30)->get(array('clcodigo','clnombre'));
+
+        return json_encode($clients);
     }
 
     public function newSolicitude(){
@@ -39,6 +46,11 @@ class SolicitudeController extends BaseController{
 
         return View::make('Dmkt.registrar_solicitud')->with('products',$products);
 
+    }
+
+    public function viewSolicitude(){
+
+        return View::make('Dmkt.view_solicitude');
     }
     public function test(){
 

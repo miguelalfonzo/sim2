@@ -6,12 +6,12 @@
     }
 </style>
 
-<div class="nueva_solicitud">
-    <form class="form-horizontal">
-        <fieldset>
+<div class="nueva_solicitud col-sm-12 col-md-12">
 
-            <!-- Form Name -->
-            <legend>Nueva Solicitud</legend>
+    <div class="panel panel-default">
+        <div class="panel-heading"><h4>Nueva Solicitud</h4></div>
+        <div class="panel-body">
+    <form class="form-horizontal">
 
             <div class="col-sm-6 col-md-6" style="">
 
@@ -43,8 +43,8 @@
                         <ul id="listprod" class="col-sm-12 col-md-12">
 
                             <li>
-                                <div class="form-group col-sm-10 col-md-10">
-                                    <select  id="selectproduct" name="selectbasic" class="form-control selectproduct" style="margin-top: 10px">
+                                <div class="form-group col-sm-12 col-md-12">
+                                    <select  id="selectproduct" name="selectbasic" class="form-control selectproduct" style="margin-top: 10px ; margin-left: -15px">
 
                                         @foreach($products as $product)
                                         <option value="{{$product->foalias}}">{{$product->fodescripcion}}</option>
@@ -103,6 +103,7 @@
                         </li>
 
                     </ul>
+                    <span class="clients_repeat col-sm-10 col-md-10" style="color: red">Datos Repetidos</span>
                     <button type="button" class="btn btn-default" id="btn-add-client">Agregar Otro Cliente</button>
 
                 </div>
@@ -131,6 +132,7 @@
 
         </fieldset>
     </form>
+            </div>
 </div>
 @stop
 <script>

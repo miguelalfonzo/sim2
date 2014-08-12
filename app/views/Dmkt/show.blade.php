@@ -36,7 +36,7 @@
 
 <div class="col-md-12" style="">
     <!-- Default panel contents -->
-    <div class="panel panel-primary">
+    <div class="panel panel-default">
     <div class="panel-heading"> <h3 class="panel-title">Solicitudes</h3></div>
 
     <div class="panel-body">
@@ -48,6 +48,7 @@
             <th>First Name</th>
             <th>Last Name</th>
             <th>Username</th>
+            <th>Ver</th>
         </tr>
         </thead>
         <tbody>
@@ -56,18 +57,21 @@
             <td>Mark</td>
             <td>Otto</td>
             <td>mdo</td>
+            <td><a href="{{URL::to('ver-solicitud')}}">ver</a></td>
         </tr>
         <tr>
             <td>2</td>
             <td>Jacob</td>
             <td>Thornton</td>
             <td>fat</td>
+            <td><a href="{{URL::to('ver-solicitud')}}">ver</a></td>
         </tr>
         <tr>
             <td>3</td>
             <td>Larry</td>
             <td>the Bird</td>
             <td>twitter</td>
+            <td><a href="{{URL::to('ver-solicitud')}}">ver</a></td>
         </tr>
         </tbody>
     </table>
@@ -97,7 +101,7 @@
  </div>
  <div class="col-md-12">
      <!-- Default panel contents -->
-    <div class="panel panel-primary">
+    <div class="panel panel-default">
 
     <div class="panel-heading">Actividades</div>
 

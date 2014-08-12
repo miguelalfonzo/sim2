@@ -20,7 +20,9 @@ Route::get('/', function()
 Route::get('show','Dmkt\SolicitudeController@show');
 Route::get('nueva-solicitud','Dmkt\SolicitudeController@newSolicitude');
 Route::get('prueba','Dmkt\SolicitudeController@test');
-
+Route::get('ver-solicitud','Dmkt\SolicitudeController@viewSolicitude');
+Route::get('nueva-actividad','Dmkt\ActivityController@newActivity');
+Route::get('getclients','Dmkt\SolicitudeController@getClients');
 // ======================================================================
 
 /**   Gastos */
