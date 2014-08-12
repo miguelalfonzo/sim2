@@ -45,33 +45,47 @@
         <thead>
         <tr>
             <th>#</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Username</th>
-            <th>Ver</th>
+            <th>Solicitud</th>
+            <th>Presupuesto</th>
+            <th>Estado</th>
+            <th>Observaciones</th>
+            <th>Edicion</th>
         </tr>
         </thead>
         <tbody>
         <tr>
             <td>1</td>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>mdo</td>
-            <td><a href="{{URL::to('ver-solicitud')}}">ver</a></td>
+            <td>Torta de cumpleaños para el  Dr. Mejia</td>
+            <td>50</td>
+            <td><span class="label label-warning">Pendiente</span></td>
+            <td></td>
+            <td><a href="{{URL::to('ver-solicitud')}}"><span class="glyphicon glyphicon-eye-open"></span></a>
+                <a href="{{URL::to('ver-solicitud')}}"><span class="glyphicon glyphicon-pencil"></span></a>
+                <a href="{{URL::to('ver-solicitud')}}"><span class="glyphicon glyphicon-remove"></span></a>
+
+            </td>
         </tr>
         <tr>
             <td>2</td>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>fat</td>
-            <td><a href="{{URL::to('ver-solicitud')}}">ver</a></td>
+            <td>Congreso para Clinica de Stan</td>
+            <td>1000</td>
+            <td><span class="label label-success">Aceptado</span></td>
+            <td></td>
+            <td><a href="{{URL::to('ver-solicitud')}}"><span class="glyphicon glyphicon-eye-open"></span></a>
+                <a href="{{URL::to('ver-solicitud')}}"><span class="glyphicon glyphicon-pencil"></span></a>
+                <a href="{{URL::to('ver-solicitud')}}"><span class="glyphicon glyphicon-remove"></span></a>
+            </td>
         </tr>
         <tr>
             <td>3</td>
-            <td>Larry</td>
-            <td>the Bird</td>
-            <td>twitter</td>
-            <td><a href="{{URL::to('ver-solicitud')}}">ver</a></td>
+            <td>Frazadas para verano</td>
+            <td>50</td>
+            <td><span class="label label-danger">Rechazado</span></td>
+            <td>No se nesecitan en verano</td>
+            <td><a href="{{URL::to('ver-solicitud')}}"><span class="glyphicon glyphicon-eye-open"></span></a>
+                <a href="{{URL::to('ver-solicitud')}}"><span class="glyphicon glyphicon-pencil"></span></a>
+                <a href="{{URL::to('ver-solicitud')}}"><span class="glyphicon glyphicon-remove"></span></a>
+            </td>
         </tr>
         </tbody>
     </table>

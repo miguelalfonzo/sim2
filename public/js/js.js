@@ -35,6 +35,29 @@ function newSolicitude(){
     });
 
 
+    //Selecionar tipo de solocitud
+
+    $('.solicitude_factura').hide();
+    $('.solicitude_monto').hide();
+    $('.selecttypesolicitude').on('change',(function(){
+
+        if($(this).val()==1){
+
+            $('.solicitude_factura').hide()
+            $('.solicitude_monto').hide();
+        }else if($(this).val()==2){
+
+            $('.solicitude_factura').show();
+            $('.solicitude_monto').show();
+
+        }else if($(this).val()==3){
+
+            $('.solicitude_factura').hide();
+            $('.solicitude_monto').hide();
+        }
+
+    }));
+
     function load_client(client){
 
         function lightwell(request, response) {
@@ -84,7 +107,7 @@ function newSolicitude(){
     load_client(1);
     var client = 2;
     $(document).on('click', '#btn-add-client', function () {
-        $('<li><div style="position: relative"><input id="project'+client+'" name="cliente" type="text" placeholder="" style="margin-top: 10px" class="form-control input-md project"><span class="span-alert"></span><button type="button" class="btn-delete-client" style=""><span class="glyphicon glyphicon-remove"></span></button></div></li>').appendTo('#listclient');
+        $('<li><div style="position: relative"><input id="project'+client+'" name="cliente" type="text" placeholder="" style="margin-top: 10px" class="form-control input-md project"><button type="button" class="btn-delete-client" style=""><span class="glyphicon glyphicon-remove"></span></button></div></li>').appendTo('#listclient');
         $(".btn-delete-client").show();
         setTimeout(function(){
             load_client(client);
@@ -116,6 +139,7 @@ function newSolicitude(){
             //clientes = data;
             var obj = [];
             var clients_input = [];
+            var products_input = [];
             for  (var i = 0, l = clients.length; i<l; i++) {
                 obj[i] = clients[i].clnombre;
                 //console.log(clients[i].clnombre);
@@ -149,15 +173,14 @@ function newSolicitude(){
             }, 200);
 
             setTimeout(function(){
-
+                    //validacion de campos duplicados en clientes
                     for(var i=0 ; i<clients_input.length  ; i++){
                         $('.project').each(function(index){
-
 
                         if(index!=i &&  clients_input[i] === $(this).val()){
                             var ind = clients_input.indexOf($(this).val());
                             clients_input[index]='';
-                            console.log($(this).val() + ' - '+ index )
+                           // console.log($(this).val() + ' - '+ index )
                             $(this).parent().removeClass('has-success has-feedback');
                             $(this).parent().addClass('has-error has-feedback');
                             $(this).parent().children('.span-alert').addClass('span-alert glyphicon glyphicon-remove form-control-feedback');
@@ -166,6 +189,30 @@ function newSolicitude(){
 
                         });
                      }
+            },200);
+
+            setTimeout(function(){
+
+                var products = $('.selectproduct');
+                products.each(function(index){
+                    products_input[index] = $(this).val();
+
+                });
+
+
+                    for(var i=0 ; i<products_input.length ; i++){
+                        products.each(function(index){
+
+                            if(index !=i && products_input[i] === $(this).val()){
+                                var ind = products_input.indexOf($(this).val());
+                                products_input[index]='';
+                                console.log($(this).val() + ' - ' + index);
+                                $(this).css('border-color','red');
+                            }
+                        });
+                    }
+
+
             },200)
 
 

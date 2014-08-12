@@ -11,7 +11,17 @@ namespace Dmkt;
 use \BaseController;
 use \View;
 use \DB;
+
+
 class SolicitudeController extends BaseController{
+
+
+    public function test(){
+
+
+        echo 'algo';
+        // return View::make('Dmkt.test');
+    }
 
     public function show(){
 
@@ -48,14 +58,24 @@ class SolicitudeController extends BaseController{
 
     }
 
+    public function registerSolicitude(){
+
+        $solicitude = new Solicitude;
+        $solicitude->idsolicitud = 1;
+        $solicitude->descripcion = 'jdl sadjlsldjs dsada';
+        $solicitude->titulo = 'solicitud1';
+        $solicitude->presupuesto = 50;
+        $solicitude->estado_idestado = 1;
+        $solicitude->save();
+
+    }
+
+
     public function viewSolicitude(){
 
         return View::make('Dmkt.view_solicitude');
     }
-    public function test(){
 
-        return View::make('Dmkt.test');
-    }
 
 
 
