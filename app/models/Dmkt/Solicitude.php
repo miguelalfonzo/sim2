@@ -16,5 +16,9 @@ class Solicitude extends Eloquent{
     protected $table = 'DMKT_RG_SOLICITUD';
     protected $primaryKey = 'IDSOLICITUD';
 
+    function searchId(){
 
+        $lastId = Solicitude::orderBy('idsolicitud', 'DESC')->first();
+        return $lastId->idsolicitud;
+    }
 }

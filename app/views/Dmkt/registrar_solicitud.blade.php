@@ -11,7 +11,7 @@
     <div class="panel panel-default">
         <div class="panel-heading"><h4>Nueva Solicitud</h4></div>
         <div class="panel-body">
-    <form class="form-horizontal" method="post" action="{{URL_::to('registrar-solicitud')}}">
+    <form class="form-horizontal" method="post" action="{{URL::to('registrar-solicitud')}}">
 
             <div class="col-sm-6 col-md-6" style="">
 
@@ -20,7 +20,7 @@
                     <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo Solicitud</label>
 
                     <div class="col-sm-10 col-md-10">
-                        <select id="" name="selectbasic" class="form-control selecttypesolicitude" >
+                        <select id="" name="type" class="form-control selecttypesolicitude" >
                             <option value="1">Actividad</option>
                             <option value="2">Regalos</option>
                             <option value="3">Reembolso</option>
@@ -34,7 +34,7 @@
                     <label class="col-sm-8 col-md-8 control-label" for="textinput">Nombre Solicitud</label>
 
                     <div class="col-sm-10 col-md-10">
-                        <input id="textinput" name="textinput" type="text" placeholder=""
+                        <input id="textinput" name="name" type="text" placeholder=""
                                class="form-control input-md" required>
 
                     </div>
@@ -44,7 +44,7 @@
                     <label class="col-sm-8 col-md-8 control-label" for="textinput">Presupuesto</label>
 
                     <div class="col-sm-10 col-md-10">
-                        <input id="textinput" name="textinput" type="text" placeholder=""
+                        <input id="textinput" name="estimate" type="text" placeholder=""
                                class="form-control input-md">
 
                     </div>
@@ -54,7 +54,7 @@
                     <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto Factura</label>
 
                     <div class="col-sm-10 col-md-10">
-                        <input id="textinput" name="textinput" type="text" placeholder=""
+                        <input id="textinput" name="amount" type="text" placeholder=""
                                class="form-control input-md">
 
                     </div>
@@ -68,7 +68,7 @@
 
                             <li>
                                 <div class="" style="position: relative">
-                                    <select   id="selectproduct" name="selectbasic" class="form-control selectproduct" style="margin-bottom:10px ">
+                                    <select   id="selectproduct" name="products[]" class="form-control selectproduct" style="margin-bottom:10px ">
 
                                         @foreach($products as $product)
                                         <option value="{{$product->foalias}}">{{$product->fodescripcion}}</option>
@@ -95,7 +95,7 @@
                     <label class="col-sm-8 col-md-8 control-label" for="selectbasic">Tipo de Actividad</label>
 
                     <div class="col-sm-10 col-md-10">
-                        <select id="selectbasic" name="selectbasic" class="form-control" >
+                        <select id="selectbasic" name="type_activity" class="form-control" >
                             <option value="1">Option one</option>
                             <option value="2">Option two</option>
                         </select>
@@ -106,7 +106,7 @@
                     <label class="col-sm-8 col-md-8 control-label" for="textinput">Fecha de Entrega</label>
 
                     <div class="col-sm-10 col-md-10">
-                        <input id="textinput" name="textinput" type="date" placeholder=""
+                        <input id="textinput" name="delivery_date" type="date" placeholder=""
                                class="form-control input-md">
 
                     </div>

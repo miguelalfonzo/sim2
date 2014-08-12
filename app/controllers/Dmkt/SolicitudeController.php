@@ -60,9 +60,12 @@ class SolicitudeController extends BaseController{
 
     public function registerSolicitude(){
 
+
+        $inputs = Input::all();
+
         $solicitude = new Solicitude;
-        $solicitude->idsolicitud = 1;
-        $solicitude->descripcion = 'jdl sadjlsldjs dsada';
+        $solicitude->idsolicitud = $solicitude->searchId() + 1 ;
+        $solicitude->descripcion = 'cesar';
         $solicitude->titulo = 'solicitud1';
         $solicitude->presupuesto = 50;
         $solicitude->estado_idestado = 1;
