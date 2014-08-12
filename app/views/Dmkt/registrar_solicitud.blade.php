@@ -11,9 +11,23 @@
     <div class="panel panel-default">
         <div class="panel-heading"><h4>Nueva Solicitud</h4></div>
         <div class="panel-body">
-    <form class="form-horizontal">
+    <form class="form-horizontal" method="post" action="{{URL_::to('registrar-solicitud')}}">
 
             <div class="col-sm-6 col-md-6" style="">
+
+                <div class="form-group col-sm-12 col-md-12">
+
+                    <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo Solicitud</label>
+
+                    <div class="col-sm-10 col-md-10">
+                        <select id="" name="selectbasic" class="form-control selecttypesolicitude" >
+                            <option value="1">Actividad</option>
+                            <option value="2">Regalos</option>
+                            <option value="3">Reembolso</option>
+                        </select>
+
+                    </div>
+                </div>
 
                 <div class="form-group col-sm-12 col-md-12">
 
@@ -21,7 +35,7 @@
 
                     <div class="col-sm-10 col-md-10">
                         <input id="textinput" name="textinput" type="text" placeholder=""
-                               class="form-control input-md">
+                               class="form-control input-md" required>
 
                     </div>
                 </div>
@@ -36,15 +50,25 @@
                     </div>
                 </div>
 
+                <div class="solicitude_monto form-group col-sm-12 col-md-12">
+                    <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto Factura</label>
+
+                    <div class="col-sm-10 col-md-10">
+                        <input id="textinput" name="textinput" type="text" placeholder=""
+                               class="form-control input-md">
+
+                    </div>
+                </div>
+
                 <div class="form-group col-sm-12 col-md-12">
                     <label class="col-sm-8 col-md-8 control-label" for="selectproduct">Producto</label>
 
-                    <div class="col-sm-12 col-md-12">
-                        <ul id="listprod" class="col-sm-12 col-md-12">
+
+                        <ul id="listprod" class="col-sm-10 col-md-10" style="">
 
                             <li>
-                                <div class="form-group col-sm-12 col-md-12">
-                                    <select  id="selectproduct" name="selectbasic" class="form-control selectproduct" style="margin-top: 10px ; margin-left: -15px">
+                                <div class="" style="position: relative">
+                                    <select   id="selectproduct" name="selectbasic" class="form-control selectproduct" style="margin-bottom:10px ">
 
                                         @foreach($products as $product)
                                         <option value="{{$product->foalias}}">{{$product->fodescripcion}}</option>
@@ -57,7 +81,7 @@
                         </ul>
 
                         <button type="button" class="btn btn-default" id="btn-add-prod">Agregar Otro Producto</button>
-                    </div>
+
 
 
                 </div>
@@ -71,7 +95,7 @@
                     <label class="col-sm-8 col-md-8 control-label" for="selectbasic">Tipo de Actividad</label>
 
                     <div class="col-sm-10 col-md-10">
-                        <select id="selectbasic" name="selectbasic" class="form-control">
+                        <select id="selectbasic" name="selectbasic" class="form-control" >
                             <option value="1">Option one</option>
                             <option value="2">Option two</option>
                         </select>
@@ -88,6 +112,15 @@
                     </div>
                 </div>
 
+                <div class="solicitude_factura form-group col-sm-12 col-md-12">
+                    <label class="col-sm-8 col-md-8 control-label" for="textinput">Factura</label>
+
+                    <div class="col-sm-10 col-md-10">
+                        <input id="filebutton" name="filebutton" class="input-file" type="file">
+
+                    </div>
+                </div>
+
                 <div class="form-group col-sm-12 col-md-12 ">
                     <label class="col-sm-8 col-md-8 control-label" for="textinput">Cliente</label>
 
@@ -95,9 +128,9 @@
 
                         <li>
                             <div style="position: relative" class="">
-                            <input id="project1" name="cliente" type="text" placeholder="" style="margin-top: 10px"
+                            <input id="project1" name="cliente" type="text" placeholder="" style=""
                                    class="form-control input-md project">
-                            <span class="span-alert"></span>
+
                             <button type='button' class='btn-delete-client' style="display: none"><span class='glyphicon glyphicon-remove'></span></button>
                             </div>
                         </li>

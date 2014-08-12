@@ -9,7 +9,7 @@ ul li{
 
     margin-bottom: 10px;
 }
-#selectproduct{
+selectproduct{
     margin-bottom: -13px;
 
 }
@@ -18,8 +18,9 @@ ul li{
     margin-left: 16px;
 }
 #btn-add-prod{
+    margin-left: 16px;
+    margin-top: -10px;
 
-    margin-top: 10px;
 }
 .nueva_solicitud{
 
