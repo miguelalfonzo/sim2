@@ -6,25 +6,51 @@
  * Time: 04:35 PM
  */
 
+
 namespace Dmkt;
 use \BaseController;
 use \View;
+use \DB;
 class SolicitudeController extends BaseController{
 
     public function show(){
 
-        $clients = Client::take(30)->get(array('clcodigo','clnombre'));;
-        echo json_encode($clients);
 
-        die;
+
         return View::make('Dmkt.show');
 
     }
 
+    public function getclients(){
+
+        $clients = Client::take(30)->get(array('clcodigo','clnombre'));
+
+        return json_encode($clients);
+    }
+
     public function newSolicitude(){
 
-        return View::make('Dmkt.registrar_solicitud');
+        $productos = DB::table('vta.equiv_unif')
+            ->where('tipo', '=', 'B')
+            ->lists('codprod_bag');
 
+
+        $products = DB::table('vta.foprte')
+            ->select('foalias', 'fodescripcion')
+            ->where('fotipo', '=', 1)
+            ->where('foestado', '=', 1)
+            ->whereNotIn('foalias', $productos)
+            ->orderBy('fodescripcion', 'asc')
+            ->get();
+
+
+        return View::make('Dmkt.registrar_solicitud')->with('products',$products);
+
+    }
+
+    public function viewSolicitude(){
+
+        return View::make('Dmkt.view_solicitude');
     }
     public function test(){
 

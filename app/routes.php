@@ -18,9 +18,11 @@ Route::get('/', function()
 	return View::make('hello');
 });
 Route::get('show','Dmkt\SolicitudeController@show');
-Route::get('newSolicitude','Dmkt\SolicitudeController@newSolicitude');
+Route::get('nueva-solicitud','Dmkt\SolicitudeController@newSolicitude');
 Route::get('prueba','Dmkt\SolicitudeController@test');
-
+Route::get('ver-solicitud','Dmkt\SolicitudeController@viewSolicitude');
+Route::get('nueva-actividad','Dmkt\ActivityController@newActivity');
+Route::get('getclients','Dmkt\SolicitudeController@getClients');
 // ======================================================================
 
 /**   Gastos */
