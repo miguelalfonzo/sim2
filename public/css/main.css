@@ -75,6 +75,16 @@ body > header{
 	margin-top: 1.75em;
 }
 
+.error-incomplete
+{
+	border-color: #a94442;
+}
+
+.error-incomplete::-webkit-input-placeholder
+{
+	color: #a94442;
+}
+
 .form-expense
 {
 	margin-bottom: 1em;

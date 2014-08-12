@@ -194,6 +194,7 @@ $(function(){
         }
     });
 
+    
     //Búsqueda de Razón Social en la SUNAT una vez introducido el RUC
     $("#ruc").on("focusout",function(){
         var ruc        = $(this).val();
@@ -201,6 +202,7 @@ $(function(){
         $("#razon").val(0);
         if(ruc.length<11)
         {
+            $("#ruc").addClass("error-incomplete");
             $("#razon").css("color","#5c5c5c");
             $("#razon").html("El ruc ingresado no contiene 11 dígitos.");
         }
@@ -229,6 +231,7 @@ $(function(){
                 }
                 else if(response == 1)
                 {
+                    $("#ruc").addClass("error-incomplete");
                     $("#razon").val(1);
                     $("#razon").html("No existe el Ruc consultado.");
                 }
@@ -242,7 +245,33 @@ $(function(){
             });
         }
     });
+    
+    //Removiendo las clases de errores
+    $("#ruc").on("focus",function(){
+        $(this).removeClass("error-incomplete");
+        $(this).attr("placeholder",'');
+        $(this).val('');
+    });
 
+    $("#number_voucher").on("focus",function(){
+        $(this).removeClass("error-incomplete");
+        $(this).attr("placeholder",'');
+        $(this).val('');
+    });
+
+    $("#date").on("focus",function(){
+        $(this).removeClass("error-incomplete");
+        $(this).attr("placeholder",'');
+        $(this).val('');
+    });
+
+    $("#total").on("focus",function(){
+        $(this).removeClass("error-incomplete");
+        $(this).attr("placeholder",'');
+        $(this).val('');
+    });
+
+    var balance;
     $("#save-expense").on("click",function(){
         var type_voucher   = $("#type_voucher").val();
         var ruc            = $("#ruc").val();
@@ -251,29 +280,52 @@ $(function(){
         var number_voucher = $("#number_voucher").val();
         var date           = $("#date").val();
         var total          = $("#total").val();
+        var error          = 0;
+        var deposit        = $("#deposit").val();
+        
         if(!ruc)
         {
-            console.log("No se ha ingresado el RUC.");
+            $("#ruc").attr("placeholder","No se ha ingresado el RUC.");
+            $("#ruc").addClass("error-incomplete");
+            error = 1;
         }
-        else if(razon_hide == 0)
+        if(razon_hide == 0)
         {
-            console.log("El ruc ingresado no contiene 11 dígitos.");
+            $("#razon").html("El ruc ingresado no contiene 11 dígitos.");
+            error = 1;
         }
         else if(razon_hide == 1)
         {
-            console.log("La Razón Social no Existe.");
+            $("#razon").removeClass("error-incomplete");
+            error = 1;
         }
-        else if(!number_voucher)
+        if(!number_voucher)
         {
-            console.log("No se ha ingresado el Número de Comprobante.");
+            $("#number_voucher").attr("placeholder","No se ha ingresado el Número de Comprobante.");
+            $("#number_voucher").addClass("error-incomplete");
+            error = 1;
         }
-        else if(!date)
+        if(!date)
         {
-            console.log("No se ha ingresado la Fecha de Movimiento.");
+            $("#date").attr("placeholder","No se ha ingresado la Fecha de Movimiento.");
+            $("#date").addClass("error-incomplete");
+            error = 1;
         }
-        else if(!total)
+        if(!total)
         {
-            console.log("No se ha ingresado el monto total.");
+            $("#total").attr("placeholder","No se ha ingresado el monto total.");
+            $("#total").addClass("error-incomplete");
+            error = 1;
+        }
+
+        deposit = parseInt(deposit.substring(2,deposit.length));
+        balance = deposit - total;
+        console.log(balance);
+
+
+
+        if(error!=0)
+        {
             return false;
         }
         else
@@ -290,8 +342,12 @@ $(function(){
                 row+= "</tr>";
             $("#table tbody").append(row);
         }
-    });
 
+
+
+
+    });
+    
     $(document).on("click","#table .delete-expense",function(e){
         e.preventDefault();
         var row = $(this).parent().parent();

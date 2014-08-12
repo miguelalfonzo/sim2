@@ -23,7 +23,7 @@
 		<div class="col-xs-12 col-sm-6 col-md-4">
 			<div class="form-expense">
 				<label>Monto Depositado</label>
-				<input type="text" class="form-control" value="S/50.00" readonly>
+				<input id="deposit" type="text" class="form-control" value="S/50.00" readonly>
 			</div>
 		</div>
 		<div class="col-xs-12 col-sm-6 col-md-4">
@@ -51,7 +51,7 @@
 		<div class="col-xs-12 col-sm-6 col-md-4">
 			<div class="form-expense">
 				<label class="inline-block">Número de Comprobante</label>
-				<input id="number_voucher" type="text" class="form-control inline-block" required>
+				<input id="number_voucher" type="text" class="form-control inline-block">
 			</div>
 		</div>
 		<div class="col-xs-12 col-sm-6 col-md-4">
