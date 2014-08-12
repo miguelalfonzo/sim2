@@ -180,7 +180,7 @@ $(function(){
 
     //Expense
     
-    //Registro de solo números
+    //Registro de solo números en el campo RUC
     $("#ruc").keypress(function(e){
         if(e.which != 8 && e.which != 0 && (e.which <48 || e.which >57))
         {
@@ -190,10 +190,12 @@ $(function(){
 
     //Búsqueda de Razón Social en la SUNAT una vez introducido el RUC
     $("#ruc").on("focusout",function(){
-        var ruc = $(this).val();
-        var l   = Ladda.create(document.getElementById('razon'));
+        var ruc        = $(this).val();
+        var l          = Ladda.create(document.getElementById('razon'));
+        $("#razon").val(0);
         if(ruc.length<11)
         {
+            $("#razon").css("color","#5c5c5c");
             $("#razon").html("El ruc ingresado no contiene 11 dígitos.");
         }
         else
@@ -221,10 +223,12 @@ $(function(){
                 }
                 else if(response == 1)
                 {
+                    $("#razon").val(1);
                     $("#razon").html("No existe el Ruc consultado.");
                 }
                 else
                 {
+                    $("#razon").val(2);
                     $("#razon").html(response['razonSocial']);
                 }
                 l.stop();
@@ -233,33 +237,56 @@ $(function(){
         }
     });
 
-    $(document).on("click","#save-expense",function(){
+    $("#save-expense").on("click",function(){
         var type_voucher   = $("#type_voucher").val();
         var ruc            = $("#ruc").val();
         var razon          = $("#razon").text();
+        var razon_hide     = $("#razon").val();
         var number_voucher = $("#number_voucher").val();
         var date           = $("#date").val();
         var total          = $("#total").val();
-        console.log(type_voucher);
-        console.log(ruc);
-        console.log(razon);
-        console.log(number_voucher);
-        console.log(date);
-        console.log(total);
-        var row = "<tr>";
-            row+= "<th class='type_voucher'>"+type_voucher+"</th>";
-            row+= "<th class='ruc'>"+ruc+"</th>";
-            row+= "<th class='razon'>"+razon+"</th>";
-            row+= "<th class='number_voucher'>"+number_voucher+"</th>";
-            row+= "<th class='date'>"+date+"</th>";
-            row+= "<th class='total'>"+total+"</th>";
-            row+= "<th><a class='edit-expense' href='#'><span class='glyphicon glyphicon-pencil'></span></a></th>";
-            row+= "<th><a class='edit-expense' href='#'><span class='glyphicon glyphicon-remove'></span></a></th>";
-            row+= "</tr>";
-        $("#table tbody").append(row);
+        if(!ruc)
+        {
+            console.log("No se ha ingresado el RUC.");
+        }
+        else if(razon_hide == 0)
+        {
+            console.log("El ruc ingresado no contiene 11 dígitos.");
+        }
+        else if(razon_hide == 1)
+        {
+            console.log("La Razón Social no Existe.");
+        }
+        else if(!number_voucher)
+        {
+            console.log("No se ha ingresado el Número de Comprobante.");
+        }
+        else if(!date)
+        {
+            console.log("No se ha ingresado la Fecha de Movimiento.");
+        }
+        else if(!total)
+        {
+            console.log("No se ha ingresado el monto total.");
+            return false;
+        }
+        else
+        {
+            var row = "<tr>";
+                row+= "<th class='type_voucher'>"+type_voucher+"</th>";
+                row+= "<th class='ruc'>"+ruc+"</th>";
+                row+= "<th class='razon'>"+razon+"</th>";
+                row+= "<th class='number_voucher'>"+number_voucher+"</th>";
+                row+= "<th class='date'>"+date+"</th>";
+                row+= "<th class='total'>"+total+"</th>";
+                row+= "<th><a class='edit-expense' href='#'><span class='glyphicon glyphicon-pencil'></span></a></th>";
+                row+= "<th><a class='delete-expense' href='#'><span class='glyphicon glyphicon-remove'></span></a></th>";
+                row+= "</tr>";
+            $("#table tbody").append(row);
+        }
     });
 
-    $(document).on("click",".delete-expense",function(){
+    $(document).on("click","#table .delete-expense",function(e){
         e.preventDefault();
         var row = $(this).parent().parent();
         bootbox.confirm("¿Esta seguro que desea eliminar el gasto?", function(result) {
@@ -267,10 +294,10 @@ $(function(){
             {
                 row.remove();
             }
-        });       
+        });
     });
 
-    $(".edit-expense").on("click",function(e){
+    $(document).on("click","#table .edit-expense",function(e){
         e.preventDefault();
         $("#table tbody tr").removeClass("select-row");
         $("#type_voucher option").attr("selected",false);
@@ -294,6 +321,4 @@ $(function(){
             $("#total").val(total_edit);
         });
     });
-    
-
 });

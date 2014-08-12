@@ -45,13 +45,13 @@
 		<div class="col-xs-12 col-sm-6 col-md-4">
 			<div class="form-expense">
 				<label>Razón Social</label>
-				<button id="razon" type="button" class="form-control ladda-button" data-style="expand-left" data-spinner-color="#5c5c5c" readonly>Buscando Razon Social ...
+				<button id="razon" type="button" class="form-control ladda-button" data-style="expand-left" data-spinner-color="#5c5c5c" value=0 readonly>Buscando Razon Social ...
 			</div>
 		</div>
 		<div class="col-xs-12 col-sm-6 col-md-4">
 			<div class="form-expense">
 				<label class="inline-block">Número de Comprobante</label>
-				<input id="number_voucher" type="text" class="form-control inline-block">
+				<input id="number_voucher" type="text" class="form-control inline-block" required>
 			</div>
 		</div>
 		<div class="col-xs-12 col-sm-6 col-md-4">
