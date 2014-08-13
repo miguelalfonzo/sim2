@@ -17,7 +17,7 @@ selectproduct{
 
     margin-left: 16px;
 }
-#btn-add-prod{
+#btn-add-family{
     margin-left: 16px;
     margin-top: -10px;
 
@@ -27,7 +27,7 @@ selectproduct{
     margin-top: 50px;
 
 }
-.btn-delete-prod
+.btn-delete-family
 {
     color: rgb(185, 33, 33);
     font-size: 16px;

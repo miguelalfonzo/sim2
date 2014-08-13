@@ -61,26 +61,26 @@
                 </div>
 
                 <div class="form-group col-sm-12 col-md-12">
-                    <label class="col-sm-8 col-md-8 control-label" for="selectproduct">Producto</label>
+                    <label class="col-sm-8 col-md-8 control-label" for="selectfamily">Familia</label>
 
 
-                        <ul id="listprod" class="col-sm-10 col-md-10" style="">
+                        <ul id="listfamily" class="col-sm-10 col-md-10" style="">
 
                             <li>
                                 <div class="" style="position: relative">
-                                    <select   id="selectproduct" name="products[]" class="form-control selectproduct" style="margin-bottom:10px ">
+                                    <select   id="selectfamily" name="families[]" class="form-control selectfamily" style="margin-bottom:10px ">
 
-                                        @foreach($products as $product)
-                                        <option value="{{$product->foalias}}">{{$product->fodescripcion}}</option>
+                                        @foreach($families as $family)
+                                        <option value="{{$family->id}}">{{$family->descripcion}}</option>
                                         @endforeach
                                     </select>
-                                    <button type='button' class='btn-delete-prod' style="display: none"><span class='glyphicon glyphicon-remove'></span></button>
+                                    <button type='button' class='btn-delete-family' style="display: none"><span class='glyphicon glyphicon-remove'></span></button>
                                 </div>
 
                             </li>
                         </ul>
 
-                        <button type="button" class="btn btn-default" id="btn-add-prod">Agregar Otro Producto</button>
+                        <button type="button" class="btn btn-default" id="btn-add-family">Agregar Otra Familia</button>
 
 
 

@@ -18,7 +18,7 @@
         <td>@if($solicitude->estado_idestado == 1)
             <span class="label label-warning">Pendiente</span>
             @endif
-            @if($solicitude->estado_idestado == 3)
+            @if($solicitude->estado_idestado == 2)
             <span class="label label-danger">Rechazado</span>
             @endif
         </td>

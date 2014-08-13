@@ -1,37 +1,7 @@
 @extends('template.main')
 @section('solicitude')
 <div class="col-md-11" style="margin-bottom: 10px; margin-top: 10px">
-    <div class="form-inline">
-
-
-        <!-- Select Basic -->
-        <div class="form-group">
-
-            <div class="col-md-4">
-                <select id="selectestate" name="selectbasic" class="form-control selectestate">
-                    <option value="1">Pendiente</option>
-                    <option value="2">Aceptado</option>
-                    <option value="3">Rechazado</option>
-                    <option value="4">Cancelado</option>
-                    <option value="5">Entregado</option>
-
-                </select>
-            </div>
-        </div>
-
-        <div class="form-group">
-
-            <div class="col-md-4">
-                <a href="{{URL::to('nueva-solicitud')}}" id="singlebutton" name="singlebutton" class="btn btn-primary">Nueva
-                    Solicitud</a>
-            </div>
-
-        </div>
-
-    </div>
-
 </div>
-
 
 <div class="col-md-12" style="">
     <!-- Default panel contents -->
@@ -39,12 +9,54 @@
         <div class="panel-heading"><h3 class="panel-title">Solicitudes</h3></div>
 
         <div class="panel-body table-solicituds">
+            <div class="form-inline col-xs-6" style="padding: 0">
+
+
+                <!-- Select Basic -->
+                <div class="form-group">
+
+                    <div class="col-md-4" style="padding: 0">
+                        <select id="selectestate" name="selectbasic" class="form-control selectestate">
+
+                            @foreach($states as $state)
+                            <option value="{{$state->idestado}}">{{$state->nombre}}</option>
+                            @endforeach
+
+
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+
+                    <div class="col-md-4">
+                        <a href="{{URL::to('nueva-solicitud')}}" id="singlebutton" name="singlebutton" class="btn btn-primary">Nueva
+                            Solicitud</a>
+                    </div>
+
+                </div>
+
+            </div>
             <!-- Table -->
 
         </div>
     </div>
 </div>
 <script type="application/javascript" class="init">
+
+    $.ajax({
+        url: 'http://localhost/BitBucket/bago_dmkt_rg/public/listar-solicitudes/'+1,
+        type: 'GET',
+        dataType: 'html'
+
+    }).done(function ( data ) {
+        $('.table-solicituds').append(data);
+        $('#table_solicitude').dataTable({
+                "bLengthChange": false,
+                'iDisplayLength': 5
+            }
+        );
+    });
 
     $('#selectestate').on('change',function(){
         var idstate = $(this).val();
@@ -59,38 +71,8 @@
             }).done(function ( data ) {
                 $('.table-solicituds').append(data);
                 $('#table_solicitude').dataTable({
-
-                        /* "ajax": {
-                         "url": "http://localhost/BitBucket/bago_dmkt_rg/public/listar-solicitudes",
-                         "dataSrc": ""
-                         },
-                         "columns": [
-                         { "data": "idsolicitud" },
-                         { "data": "titulo" },
-                         { "data": "presupuesto" },
-                         { "data": "estado_idestado" },
-                         {
-                         "aTargets": [3],
-                         "mRender": function () {
-                         return 'adsa';
-                         }
-                         },
-                         {
-                         "aTargets": [4],
-                         "mRender": function (full) {
-                         return 'ols';
-                         }
-                         }
-
-                         ],
-                         "columnDefs": [
-                         {
-                         "aTargets": [0],
-                         "visible": false,
-                         "searchable": false
-                         }
-                         ]
-                         */
+                        "bLengthChange": false,
+                        'iDisplayLength': 5
                     }
                 );
             });
