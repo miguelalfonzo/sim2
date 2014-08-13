@@ -11,7 +11,8 @@ namespace Dmkt;
 use \BaseController;
 use \View;
 use \DB;
-
+use \Input;
+use \Redirect;
 
 class SolicitudeController extends BaseController{
 
@@ -63,17 +64,28 @@ class SolicitudeController extends BaseController{
 
         $inputs = Input::all();
 
+
         $solicitude = new Solicitude;
         $solicitude->idsolicitud = $solicitude->searchId() + 1 ;
-        $solicitude->descripcion = 'cesar';
-        $solicitude->titulo = 'solicitud1';
-        $solicitude->presupuesto = 50;
+        $solicitude->descripcion = $inputs['description'] ;
+        $solicitude->titulo = $inputs['titulo'];
+        $solicitude->presupuesto = $inputs['estimate'];
         $solicitude->estado_idestado = 1;
+        $solicitude->tipo_solicitud = $inputs['type_solicitude'];
+        $solicitude->tipo_actividad = $inputs['type_activity'];
         $solicitude->save();
 
+        return Redirect::to('show');
     }
 
+    public function listSolicitude($idstate){
 
+        $solicitudes = Solicitude::where('estado_idestado','=',$idstate)->get();
+
+        $view = View::make('Dmkt.view_solicituds')->with('solicituds',$solicitudes);
+
+        return $view;
+    }
     public function viewSolicitude(){
 
         return View::make('Dmkt.view_solicitude');

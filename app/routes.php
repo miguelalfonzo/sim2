@@ -23,8 +23,11 @@ Route::get('prueba','Dmkt\SolicitudeController@test');
 Route::get('ver-solicitud','Dmkt\SolicitudeController@viewSolicitude');
 Route::get('nueva-actividad','Dmkt\ActivityController@newActivity');
 Route::get('getclients','Dmkt\SolicitudeController@getClients');
-Route::get('registrar-solicitud','Dmkt\SolicitudeController@registerSolicitude');
+Route::post('registrar-solicitud','Dmkt\SolicitudeController@registerSolicitude');
+Route::get('listar-solicitudes/{id}','Dmkt\SolicitudeController@listSolicitude');
+
 Route::get('test2','Dmkt\SolicitudeController@test');
+
 // ======================================================================
 
 /**   Gastos */

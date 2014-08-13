@@ -33,6 +33,7 @@ function newSolicitude(){
             }
         }
     });
+    //Seleccionar estado (filtrar)
 
 
     //Selecionar tipo de solocitud
@@ -107,7 +108,7 @@ function newSolicitude(){
     load_client(1);
     var client = 2;
     $(document).on('click', '#btn-add-client', function () {
-        $('<li><div style="position: relative"><input id="project'+client+'" name="cliente" type="text" placeholder="" style="margin-top: 10px" class="form-control input-md project"><button type="button" class="btn-delete-client" style=""><span class="glyphicon glyphicon-remove"></span></button></div></li>').appendTo('#listclient');
+        $('<li><div style="position: relative"><input id="project'+client+'" name="clients[]" type="text" placeholder="" style="margin-top: 10px" class="form-control input-md project"><button type="button" class="btn-delete-client" style=""><span class="glyphicon glyphicon-remove"></span></button></div></li>').appendTo('#listclient');
         $(".btn-delete-client").show();
         setTimeout(function(){
             load_client(client);
