@@ -30,8 +30,8 @@ Route::get('test2','Dmkt\SolicitudeController@test');
 /**   Gastos */
 
 Route::get('registrar-gasto','Expense\ExpenseController@show');
-Route::get('test','Expense\RucController@show');
 Route::post('consultarRuc','Expense\RucController@show');
+// Route::get('test','Expense\RucController@show');
 // Route::get('ruc',function(){
 //     return View::make('Expense\ruc');
 // });

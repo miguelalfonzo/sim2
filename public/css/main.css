@@ -75,6 +75,11 @@ body > header{
 	margin-top: 1.75em;
 }
 
+.content
+{
+	padding: .75em;
+}
+
 .error-incomplete
 {
 	border-color: #a94442;
@@ -109,4 +114,11 @@ body > header{
 .title
 {
 	padding-left: .5em;
+}
+
+@media screen and (max-width:920px){
+	#table
+	{
+		font-size: .85em;
+	}	
 }

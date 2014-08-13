@@ -224,6 +224,16 @@ function newSolicitude(){
 
 }
 
+
+function onlyNumber(input){
+    $(input).keypress(function(e){
+        if(e.which != 8 && e.which != 0 && (e.which <48 || e.which >57))
+        {
+            return false;
+        }
+    });
+}
+
 $(function(){
     var url = window.location.href;
     if(url === "http://localhost/BitBucket/bago_dmkt_rg/public/nueva-solicitud")
@@ -234,13 +244,17 @@ $(function(){
     //Expense
     
     //Registro de solo números en el campo RUC
-    $("#ruc").keypress(function(e){
-        if(e.which != 8 && e.which != 0 && (e.which <48 || e.which >57))
-        {
-            return false;
-        }
-    });
+    onlyNumber("#ruc");
 
+
+    // $("#ruc").keypress(function(e){
+    //     if(e.which != 8 && e.which != 0 && (e.which <48 || e.which >57))
+    //     {
+    //         return false;
+    //     }
+    // });
+
+    // onlyNumber(ruc);
     
     //Búsqueda de Razón Social en la SUNAT una vez introducido el RUC
     $("#ruc").on("focusout",function(){
