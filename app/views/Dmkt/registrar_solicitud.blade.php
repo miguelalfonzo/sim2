@@ -20,7 +20,7 @@
                     <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo Solicitud</label>
 
                     <div class="col-sm-10 col-md-10">
-                        <select id="" name="type" class="form-control selecttypesolicitude" >
+                        <select id="" name="type_solicitude" class="form-control selecttypesolicitude" >
                             <option value="1">Actividad</option>
                             <option value="2">Regalos</option>
                             <option value="3">Reembolso</option>
@@ -34,7 +34,7 @@
                     <label class="col-sm-8 col-md-8 control-label" for="textinput">Nombre Solicitud</label>
 
                     <div class="col-sm-10 col-md-10">
-                        <input id="textinput" name="name" type="text" placeholder=""
+                        <input id="textinput" name="titulo" type="text" placeholder=""
                                class="form-control input-md" required>
 
                     </div>
@@ -61,26 +61,26 @@
                 </div>
 
                 <div class="form-group col-sm-12 col-md-12">
-                    <label class="col-sm-8 col-md-8 control-label" for="selectproduct">Producto</label>
+                    <label class="col-sm-8 col-md-8 control-label" for="selectfamily">Familia</label>
 
 
-                        <ul id="listprod" class="col-sm-10 col-md-10" style="">
+                        <ul id="listfamily" class="col-sm-10 col-md-10" style="">
 
                             <li>
                                 <div class="" style="position: relative">
-                                    <select   id="selectproduct" name="products[]" class="form-control selectproduct" style="margin-bottom:10px ">
+                                    <select   id="selectfamily" name="families[]" class="form-control selectfamily" style="margin-bottom:10px ">
 
-                                        @foreach($products as $product)
-                                        <option value="{{$product->foalias}}">{{$product->fodescripcion}}</option>
+                                        @foreach($families as $family)
+                                        <option value="{{$family->id}}">{{$family->descripcion}}</option>
                                         @endforeach
                                     </select>
-                                    <button type='button' class='btn-delete-prod' style="display: none"><span class='glyphicon glyphicon-remove'></span></button>
+                                    <button type='button' class='btn-delete-family' style="display: none"><span class='glyphicon glyphicon-remove'></span></button>
                                 </div>
 
                             </li>
                         </ul>
 
-                        <button type="button" class="btn btn-default" id="btn-add-prod">Agregar Otro Producto</button>
+                        <button type="button" class="btn btn-default" id="btn-add-family">Agregar Otra Familia</button>
 
 
 
@@ -96,8 +96,10 @@
 
                     <div class="col-sm-10 col-md-10">
                         <select id="selectbasic" name="type_activity" class="form-control" >
-                            <option value="1">Option one</option>
-                            <option value="2">Option two</option>
+                            <option value="Eventos Farmacias">Eventos Farmacias</option>
+                            <option value="Plan 300">Plan 300</option>
+                            <option value="Medios Interactivos">Medios Interactivos</option>
+                            <option value="Micromarketing">Micromarketing</option>
                         </select>
                     </div>
                 </div>
@@ -116,7 +118,7 @@
                     <label class="col-sm-8 col-md-8 control-label" for="textinput">Factura</label>
 
                     <div class="col-sm-10 col-md-10">
-                        <input id="filebutton" name="filebutton" class="input-file" type="file">
+                        <input id="filebutton" name="filefac" class="input-file" type="file">
 
                     </div>
                 </div>
@@ -128,7 +130,7 @@
 
                         <li>
                             <div style="position: relative" class="">
-                            <input id="project1" name="cliente" type="text" placeholder="" style=""
+                            <input id="project1" name="clients[]" type="text" placeholder="" style=""
                                    class="form-control input-md project">
 
                             <button type='button' class='btn-delete-client' style="display: none"><span class='glyphicon glyphicon-remove'></span></button>
@@ -147,7 +149,7 @@
                     <label class="col-sm-8 col-md-8 control-label" for="textarea">Descripcion de la Solicitud</label>
 
                     <div class="col-sm-11 col-md-11">
-                        <textarea class="form-control" id="textarea" name="textarea"></textarea>
+                        <textarea class="form-control" id="textarea" name="description"></textarea>
                     </div>
                 </div>
             </div>
@@ -158,7 +160,7 @@
 
 
                 <div class="col-sm-12 col-md-12" style="text-align: center">
-                    <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">Crear</button>
+                    <button id="button1id" name="button1id" class="btn btn-primary register_solicitudee">Crear</button>
                     <a id="button2id" href="{{URL::to('show')}}" name="button2id" class="btn btn-primary">Cancelar</a>
                 </div>
             </div>

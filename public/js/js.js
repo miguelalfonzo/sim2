@@ -9,30 +9,31 @@ function newSolicitude(){
 
     $('.clients_repeat').hide();
 
-    $("#btn-add-prod").on('click', function () {
+    $("#btn-add-family").on('click', function () {
         //console.log('hola');
-        $(".btn-delete-prod").show();
-        $('#listprod>li:first-child').clone(true, true).appendTo('#listprod');
+        $(".btn-delete-family").show();
+        $('#listfamily>li:first-child').clone(true, true).appendTo('#listfamily');
     });
 
-    $(".btn-delete-prod").hide();
+    $(".btn-delete-family").hide();
 
-    $(document).on("click", ".btn-delete-prod", function () {
-        $('#listprod>li .porcentaje_error').css({"border": "0"});
+    $(document).on("click", ".btn-delete-family", function () {
+        $('#listfamily>li .porcentaje_error').css({"border": "0"});
 
         $(".option-des-1").removeClass('error');
-        var k = $("#listprod li").size();
+        var k = $("#listfamily li").size();
         console.log(k);
         if (k > 1) {
 
-            var other = $(".btn-delete-prod").index(this);
-            $("#listprod li").eq(other).remove();
-            var p = $("#listprod li").size();
+            var other = $(".btn-delete-family").index(this);
+            $("#listfamily li").eq(other).remove();
+            var p = $("#listfamily li").size();
             if (p == 1) {
-                $(".btn-delete-prod").hide();
+                $(".btn-delete-family").hide();
             }
         }
     });
+    //Seleccionar estado (filtrar)
 
 
     //Selecionar tipo de solocitud
@@ -82,7 +83,7 @@ function newSolicitude(){
             minLength: 0,
             source: lightwell,
             focus: function( event, ui ) {
-                $( this ).val( ui.item.clnombre);
+                $( this ).val(ui.item.clcodigo +' - '+ ui.item.clnombre);
 
                 return false;
             },
@@ -107,7 +108,7 @@ function newSolicitude(){
     load_client(1);
     var client = 2;
     $(document).on('click', '#btn-add-client', function () {
-        $('<li><div style="position: relative"><input id="project'+client+'" name="cliente" type="text" placeholder="" style="margin-top: 10px" class="form-control input-md project"><button type="button" class="btn-delete-client" style=""><span class="glyphicon glyphicon-remove"></span></button></div></li>').appendTo('#listclient');
+        $('<li><div style="position: relative"><input id="project'+client+'" name="clients[]" type="text" placeholder="" style="margin-top: 10px" class="form-control input-md project"><button type="button" class="btn-delete-client" style=""><span class="glyphicon glyphicon-remove"></span></button></div></li>').appendTo('#listclient');
         $(".btn-delete-client").show();
         setTimeout(function(){
             load_client(client);
@@ -139,7 +140,7 @@ function newSolicitude(){
             //clientes = data;
             var obj = [];
             var clients_input = [];
-            var products_input = [];
+            var families_input = [];
             for  (var i = 0, l = clients.length; i<l; i++) {
                 obj[i] = clients[i].clnombre;
                 //console.log(clients[i].clnombre);
@@ -193,19 +194,19 @@ function newSolicitude(){
 
             setTimeout(function(){
 
-                var products = $('.selectproduct');
-                products.each(function(index){
-                    products_input[index] = $(this).val();
+                var families = $('.selectfamily');
+                families.each(function(index){
+                    families_input[index] = $(this).val();
 
                 });
 
 
-                    for(var i=0 ; i<products_input.length ; i++){
-                        products.each(function(index){
+                    for(var i=0 ; i<families_input.length ; i++){
+                        families.each(function(index){
 
-                            if(index !=i && products_input[i] === $(this).val()){
-                                var ind = products_input.indexOf($(this).val());
-                                products_input[index]='';
+                            if(index !=i && familes_input[i] === $(this).val()){
+                                var ind = families_input.indexOf($(this).val());
+                                families_input[index]='';
                                 console.log($(this).val() + ' - ' + index);
                                 $(this).css('border-color','red');
                             }
