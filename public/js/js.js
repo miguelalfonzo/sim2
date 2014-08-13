@@ -242,7 +242,7 @@ $(function(){
         newSolicitude();
     }
 
-    //Expense
+    //Expense - s
     
     //Registro de solo números en el campo RUC
     onlyNumber("#ruc");
