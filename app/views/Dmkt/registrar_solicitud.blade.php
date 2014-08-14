@@ -8,166 +8,218 @@
 
 <div class="nueva_solicitud col-sm-12 col-md-12">
 
-    <div class="panel panel-default">
-        <div class="panel-heading"><h4>Nueva Solicitud</h4></div>
-        <div class="panel-body">
-    <form class="form-horizontal" method="post" action="{{URL::to('registrar-solicitud')}}">
+<div class="panel panel-default">
+<div class="panel-heading">
+    <h4>Nueva Solicitud</h4>
+</div>
+<div class="panel-body">
+<form id="form-register-solicitude" class="form-horizontal" method="post"
+      action="{{ URL::to( isset($solicitude) ? 'editar-solicitud' : 'registrar-solicitud' )}}">
 
-            <div class="col-sm-6 col-md-6" style="">
+@if(isset($solicitude))
+<input value="{{$solicitude->idsolicitud}}" name="idsolicitude" type="hidden">
+@endif
+<div class="form-group col-sm-6 col-md-4">
 
-                <div class="form-group col-sm-12 col-md-12">
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Nombre Solicitud</label>
 
-                    <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo Solicitud</label>
+    <div class="col-sm-12 col-md-12">
+        <input id="idtitle" name="titulo" type="text" placeholder=""
+               value="{{isset($solicitude->titulo)? $solicitude->titulo : null }}"
+               class="form-control input-md" required>
 
-                    <div class="col-sm-10 col-md-10">
-                        <select id="" name="type_solicitude" class="form-control selecttypesolicitude" >
-                            <option value="1">Actividad</option>
-                            <option value="2">Regalos</option>
-                            <option value="3">Reembolso</option>
-                        </select>
+    </div>
+</div>
+<div class="form-group col-sm-6 col-md-4">
 
-                    </div>
-                </div>
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Fecha del Sistema</label>
 
-                <div class="form-group col-sm-12 col-md-12">
+    <div class="col-sm-12 col-md-12">
+        <input id="idtitle" name="date_system" type="text" placeholder=""
+               value=""
+               class="form-control input-md" required>
 
-                    <label class="col-sm-8 col-md-8 control-label" for="textinput">Nombre Solicitud</label>
+    </div>
+</div>
 
-                    <div class="col-sm-10 col-md-10">
-                        <input id="textinput" name="titulo" type="text" placeholder=""
-                               class="form-control input-md" required>
+<div class="form-group col-sm-6 col-md-4">
 
-                    </div>
-                </div>
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo Solicitud</label>
 
-                <div class="form-group col-sm-12 col-md-12">
-                    <label class="col-sm-8 col-md-8 control-label" for="textinput">Presupuesto</label>
+    <div class="col-sm-12 col-md-12">
+        <select id="" name="type_solicitude" class="form-control selecttypesolicitude">
+            <option value="1">Actividad</option>
+            <option value="2">Regalos</option>
+            <option value="3">Reembolso</option>
+        </select>
 
-                    <div class="col-sm-10 col-md-10">
-                        <input id="textinput" name="estimate" type="text" placeholder=""
-                               class="form-control input-md">
+    </div>
+</div>
+<div class="form-group col-sm-6 col-md-4">
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Presupuesto</label>
 
-                    </div>
-                </div>
+    <div class="col-sm-12 col-md-12">
+        <input id="idestimate" name="estimate" type="text" placeholder=""
+               value="{{isset($solicitude->presupuesto) ? $solicitude->presupuesto : null }}"
+               class="form-control input-md">
 
-                <div class="solicitude_monto form-group col-sm-12 col-md-12">
-                    <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto Factura</label>
+    </div>
+</div>
+<div class="solicitude_monto form-group col-sm-6 col-md-4">
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto Factura</label>
 
-                    <div class="col-sm-10 col-md-10">
-                        <input id="textinput" name="amount" type="text" placeholder=""
-                               class="form-control input-md">
+    <div class="col-sm-12 col-md-12">
+        <input id="idfactura" name="amount" type="text" placeholder=""
+               value="{{isset($solicitude->monto) ? $solicitude->monto : null }}"
+               class="form-control input-md">
 
-                    </div>
-                </div>
+    </div>
+</div>
 
-                <div class="form-group col-sm-12 col-md-12">
-                    <label class="col-sm-8 col-md-8 control-label" for="selectfamily">Familia</label>
+<div class="form-group col-sm-6 col-md-4">
+    <label class="col-sm-8 col-md-8 control-label" for="selectbasic">Tipo de Actividad</label>
+
+    <div class="col-sm-12 col-md-12">
+        <select id="selectbasic" name="type_activity" class="form-control">
+            <option value="Eventos Farmacias">Eventos Farmacias</option>
+            <option value="Plan 300">Plan 300</option>
+            <option value="Medios Interactivos">Medios Interactivos</option>
+            <option value="Micromarketing">Micromarketing</option>
+        </select>
+    </div>
+</div>
+<div class="form-group col-sm-6 col-md-4">
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Fecha de Entrega</label>
+
+    <div class="col-sm-12 col-md-12">
+        <input id="iddatedelivery" name="delivery_date" type="date" placeholder="" value="{{isset($solicitude)? $solicitude->fecha_entrega : null }}"
+               class="form-control input-md">
+
+    </div>
+</div>
+<div class="solicitude_factura form-group col-sm-6 col-md-4">
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Factura</label>
+
+    <div class="col-sm-10 col-md-10">
+        <input id="filebutton" name="filefac" class="input-file" type="file">
+
+    </div>
+</div>
+
+<div class="form-group col-sm-6 col-md-4 ">
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Cliente</label>
+
+    <ul id="listclient" class="col-sm-12 col-md-12">
+
+        @if(isset($clients))
+        @foreach($clients as $client)
+        <li>
+            <div style="position: relative" class="">
+                <input id="project1" name="clients[]" type="text" placeholder="" style="margin-bottom: 10px"
+                       class="form-control input-md project"
+                       value="{{isset($client->clnombre) ? $client->clcodigo.' - '.$client->clnombre : null }}">
+
+                <button type='button' class='btn-delete-client' style="z-index: 2"><span
+                        class='glyphicon glyphicon-remove'></span></button>
+            </div>
+        </li>
+        @endforeach
+        @else
+        <li>
+            <div style="position: relative" class="">
+                <input id="project1" name="clients[]" type="text" placeholder="" style="margin-bottom: 10px"
+                       class="form-control input-md project"
+                       value="{{isset($client->clnombre) ? $client->clcodigo.' - '.$client->clnombre : null }}">
+
+                <button type='button' class='btn-delete-client' style="display: none; z-index: 2"><span
+                        class='glyphicon glyphicon-remove'></span></button>
+            </div>
+        </li>
+
+        @endif
+    </ul>
+    <span class="clients_repeat col-sm-10 col-md-10" style="color: red">Datos Repetidos</span>
+    <button type="button" class="btn btn-default" id="btn-add-client">Agregar Otro Cliente</button>
+
+</div>
+<div class="form-group col-sm-6 col-md-4">
+    <label class="col-sm-8 col-md-8 control-label" for="selectfamily">Familia</label>
 
 
-                        <ul id="listfamily" class="col-sm-10 col-md-10" style="">
+    <ul id="listfamily" class="col-sm-10 col-md-10" style="">
 
-                            <li>
-                                <div class="" style="position: relative">
-                                    <select   id="selectfamily" name="families[]" class="form-control selectfamily" style="margin-bottom:10px ">
+        @if(isset($families2))
+        @foreach($families2 as $family2)
+        <li>
+            <div class="" style="position: relative">
 
-                                        @foreach($families as $family)
-                                        <option value="{{$family->id}}">{{$family->descripcion}}</option>
-                                        @endforeach
-                                    </select>
-                                    <button type='button' class='btn-delete-family' style="display: none"><span class='glyphicon glyphicon-remove'></span></button>
-                                </div>
-
-                            </li>
-                        </ul>
-
-                        <button type="button" class="btn btn-default" id="btn-add-family">Agregar Otra Familia</button>
-
-
-
-                </div>
-
+                <select id="selectfamily" name="families[]" class="form-control selectfamily"
+                        style="margin-bottom:10px ">
+                    @foreach($families as $family)
+                    @if($family->id == $family2->id)
+                    <option value="{{$family->id}}" selected>{{$family->descripcion}}</option>
+                    @else
+                    <option value="{{$family->id}}">{{$family->descripcion}}</option>
+                    @endif
+                    @endforeach
+                </select>
+                <button type='button' class='btn-delete-family' style=""><span
+                        class='glyphicon glyphicon-remove'></span></button>
             </div>
 
+        </li>
+        @endforeach
+        @else
+        <li>
+            <div class="" style="position: relative">
 
-            <div class="col-sm-6 col-md-6" style="">
-
-                <div class="form-group col-sm-12 col-md-12">
-                    <label class="col-sm-8 col-md-8 control-label" for="selectbasic">Tipo de Actividad</label>
-
-                    <div class="col-sm-10 col-md-10">
-                        <select id="selectbasic" name="type_activity" class="form-control" >
-                            <option value="Eventos Farmacias">Eventos Farmacias</option>
-                            <option value="Plan 300">Plan 300</option>
-                            <option value="Medios Interactivos">Medios Interactivos</option>
-                            <option value="Micromarketing">Micromarketing</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group col-sm-12 col-md-12">
-                    <label class="col-sm-8 col-md-8 control-label" for="textinput">Fecha de Entrega</label>
-
-                    <div class="col-sm-10 col-md-10">
-                        <input id="textinput" name="delivery_date" type="date" placeholder=""
-                               class="form-control input-md">
-
-                    </div>
-                </div>
-
-                <div class="solicitude_factura form-group col-sm-12 col-md-12">
-                    <label class="col-sm-8 col-md-8 control-label" for="textinput">Factura</label>
-
-                    <div class="col-sm-10 col-md-10">
-                        <input id="filebutton" name="filefac" class="input-file" type="file">
-
-                    </div>
-                </div>
-
-                <div class="form-group col-sm-12 col-md-12 ">
-                    <label class="col-sm-8 col-md-8 control-label" for="textinput">Cliente</label>
-
-                    <ul id="listclient" class="col-sm-10 col-md-10">
-
-                        <li>
-                            <div style="position: relative" class="">
-                            <input id="project1" name="clients[]" type="text" placeholder="" style=""
-                                   class="form-control input-md project">
-
-                            <button type='button' class='btn-delete-client' style="display: none"><span class='glyphicon glyphicon-remove'></span></button>
-                            </div>
-                        </li>
-
-                    </ul>
-                    <span class="clients_repeat col-sm-10 col-md-10" style="color: red">Datos Repetidos</span>
-                    <button type="button" class="btn btn-default" id="btn-add-client">Agregar Otro Cliente</button>
-
-                </div>
-
-            </div>
-            <div class="col-sm-12 col-md-12" style="margin-top: 10px">
-                <div class="form-group col-sm-12 col-md-12">
-                    <label class="col-sm-8 col-md-8 control-label" for="textarea">Descripcion de la Solicitud</label>
-
-                    <div class="col-sm-11 col-md-11">
-                        <textarea class="form-control" id="textarea" name="description"></textarea>
-                    </div>
-                </div>
+                <select id="selectfamily" name="families[]" class="form-control selectfamily"
+                        style="margin-bottom:10px ">
+                    @foreach($families as $family)
+                    <option value="{{$family->id}}">{{$family->descripcion}}</option>
+                    @endforeach
+                </select>
+                <button type='button' class='btn-delete-family' style="display: none"><span
+                        class='glyphicon glyphicon-remove'></span></button>
             </div>
 
+        </li>
+        @endif
 
-            <!-- Button (Double) -->
-            <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
+
+    </ul>
+
+    <button type="button" class="btn btn-default" id="btn-add-family">Agregar Otra Familia</button>
 
 
-                <div class="col-sm-12 col-md-12" style="text-align: center">
-                    <button id="button1id" name="button1id" class="btn btn-primary register_solicitudee">Crear</button>
-                    <a id="button2id" href="{{URL::to('show')}}" name="button2id" class="btn btn-primary">Cancelar</a>
-                </div>
-            </div>
+</div>
 
-        </fieldset>
-    </form>
-            </div>
+
+<div class="col-sm-12 col-md-12" style="margin-top: 10px">
+    <div class="form-group col-sm-12 col-md-12">
+        <label class="col-sm-8 col-md-8 control-label" for="textarea">Descripcion de la Solicitud</label>
+
+        <div class="col-sm-11 col-md-11">
+            <textarea class="form-control" id="iddescriptionsolicitude" name="description"></textarea>
+        </div>
+    </div>
+</div>
+
+
+<!-- Button (Double) -->
+<div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
+
+
+    <div class="col-sm-12 col-md-12" style="text-align: center">
+        <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">{{isset($solicitude) ? 'Actualizar' : 'Crear'}}</button>
+        <a id="button2id" href="{{URL::to('show')}}" name="button2id" class="btn btn-primary">Cancelar</a>
+    </div>
+</div>
+
+
+</form>
+</div>
+</div>
 </div>
 @stop
 <script>

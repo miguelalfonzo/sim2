@@ -13,15 +13,32 @@ use \View;
 use \DB;
 use \Input;
 use \Redirect;
+use \Illuminate\Database\Query\Builder;
 
 class SolicitudeController extends BaseController{
 
 
+    function objectToArray($object)
+    {
+        $array=array();
+        foreach($object as $member=>$data)
+        {
+            $array[$member]=$data;
+        }
+        return $array;
+    }
+
     public function test(){
 
 
-        echo 'algo';
-        // return View::make('Dmkt.test');
+
+        $sol = Solicitude::where('idSolicitud',1);
+        // var_dump($sol);
+        $sol->presupuesto = 1111;
+        $data = $this->objectToArray($sol);
+        //$sol->update( (array) $sol);
+        $sol->update($data);
+
     }
 
     public function show(){
@@ -57,6 +74,7 @@ class SolicitudeController extends BaseController{
         $solicitude->titulo = $inputs['titulo'];
         $solicitude->presupuesto = $inputs['estimate'];
         $solicitude->estado_idestado = 1;
+        $solicitude->fecha_entrega = $inputs['delivery_date'];
         $solicitude->tipo_solicitud = $inputs['type_solicitude'];
         $solicitude->tipo_actividad = $inputs['type_activity'];
         $solicitude->save();
@@ -65,7 +83,8 @@ class SolicitudeController extends BaseController{
         foreach($clients as $client){
             $cod = explode(' ',$client);
             $solicitude_clients = new SolicitudeClient;
-            $solicitude_clients->idsolicitud_clientes = 1;
+
+            $solicitude_clients->idsolicitud_clientes = $solicitude_clients->searchId()+1;
             $solicitude_clients->idsolicitud = $solicitude->searchId();
             $solicitude_clients->idcliente = $cod[0];
             $solicitude_clients->save();
@@ -74,7 +93,7 @@ class SolicitudeController extends BaseController{
         foreach($families as $family){
 
             $solicitude_families = new SolicitudeFamily;
-            $solicitude_families->idsolicitud_familia = 1;
+            $solicitude_families->idsolicitud_familia = $solicitude_families->searchId()+1;
             $solicitude_families->idsolicitud = $solicitude->searchId();
             $solicitude_families->idfamilia = $family;
             $solicitude_families->save();
@@ -83,13 +102,12 @@ class SolicitudeController extends BaseController{
         return Redirect::to('show');
     }
 
-    public function listSolicitude($idstate){
+    public function listSolicitude($id){
 
-        if($idstate == 0){
-
+        if($id == 0){
             $solicituds = Solicitude::all();
         }else{
-            $solicituds = Solicitude::where('estado_idestado','=',$idstate)->get();
+            $solicituds = Solicitude::where('estado_idestado','=',$id)->get();
         }
 
 
@@ -97,12 +115,83 @@ class SolicitudeController extends BaseController{
 
         return $view;
     }
-    public function viewSolicitude(){
+    public function viewSolicitude($id){
 
-        return View::make('Dmkt.view_solicitude');
+        $solicitude = Solicitude::find($id);
+        $clients = DB::table('DMKT_RG_SOLICITUD_CLIENTES')->where('idsolicitud', $id)->lists('idcliente');
+        $clients = Client::whereIn('clcodigo',$clients)->get(array('clcodigo','clnombre'));
+        $families = DB::table('DMKT_RG_SOLICITUD_FAMILIA')->where('idsolicitud', $id)->lists('idfamilia');
+        $families= Marca::whereIn('id',$families)->get(array('id','descripcion'));
+
+        $data = [
+
+            'solicitude' => $solicitude,
+            'clients' => $clients,
+            'families' => $families
+        ];
+        //echo json_encode($data);
+
+        return View::make('Dmkt.view_solicitude',$data);
     }
+    public function editSolicitude($id){
 
+        $families = Marca::all();
+        $solicitude = Solicitude::find($id);
+        $clients = DB::table('DMKT_RG_SOLICITUD_CLIENTES')->where('idsolicitud', $id)->lists('idcliente');
+        $clients = Client::whereIn('clcodigo',$clients)->get(array('clcodigo','clnombre'));
+        $families2 = DB::table('DMKT_RG_SOLICITUD_FAMILIA')->where('idsolicitud', $id)->lists('idfamilia');
+        $families2= Marca::whereIn('id',$families2)->get(array('id','descripcion'));
 
+        $data = [
 
+            'solicitude' => $solicitude,
+            'clients' => $clients,
+            'families' => $families,
+            'families2' => $families2
+        ];
+        //echo json_encode($data);
+
+        return View::make('Dmkt.registrar_solicitud',$data);
+    }
+    public function formEditSolicitude(){
+
+        $inputs = Input::all();
+        $id = $inputs['idsolicitude'];
+        $solicitude = Solicitude::where('idsolicitud',$id);
+        $solicitude->idsolicitud = $id ;
+        $solicitude->descripcion = $inputs['description'] ;
+        $solicitude->titulo = $inputs['titulo'];
+        $solicitude->presupuesto = $inputs['estimate'];
+        $solicitude->estado_idestado = 1;
+        $solicitude->tipo_solicitud = $inputs['type_solicitude'];
+        $solicitude->tipo_actividad = $inputs['type_activity'];
+        $data = $this->objectToArray($solicitude);
+        $solicitude->update($data);
+
+        SolicitudeClient::where('idsolicitud','=' , $id)->delete();
+        SolicitudeFamily::where('idsolicitud','=' , $id)->delete();
+
+        $clients = $inputs['clients'];
+        foreach($clients as $client){
+            $cod = explode(' ',$client);
+            $solicitude_clients = new SolicitudeClient;
+            $solicitude_clients->idsolicitud_clientes = 1;
+            $solicitude_clients->idsolicitud = $id;
+            $solicitude_clients->idcliente = $cod[0];
+            $solicitude_clients->save();
+        }
+        $families = $inputs['families'];
+        foreach($families as $family){
+
+            $solicitude_families = new SolicitudeFamily;
+            $solicitude_families->idsolicitud_familia = 1;
+            $solicitude_families->idsolicitud = $id;
+            $solicitude_families->idfamilia = $family;
+            $solicitude_families->save();
+        }
+
+        return Redirect::to('show');
+
+    }
 
 }

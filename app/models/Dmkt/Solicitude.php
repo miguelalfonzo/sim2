@@ -19,6 +19,12 @@ class Solicitude extends Eloquent{
     function searchId(){
 
         $lastId = Solicitude::orderBy('idsolicitud', 'DESC')->first();
-        return $lastId->idsolicitud;
+         if($lastId == null){
+             return 0;
+         }else{
+             return $lastId->idsolicitud;
+         }
+
     }
+
 }

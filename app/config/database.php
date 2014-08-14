@@ -92,8 +92,9 @@ return array(
 			'password' => 'outdvp',
 			'charset' => 'utf8',
 			'prefix' => '',
+            'schema' => 'public'
 		),
-		
+		/*
 		'oracle_ms' => array(
 			'driver' => 'pdo-via-oci8',
 			'host' => '192.168.1.4',
@@ -103,7 +104,7 @@ return array(
 			'password' => 'outdvp',
 			'charset' => 'utf8',
 			'prefix' => '',
-		),
+		),*/
 
 	),
 

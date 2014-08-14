@@ -17,11 +17,23 @@
 
                     <div class="form-group col-sm-12 col-md-12">
 
+                        <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo Solicitud</label>
+
+                        <div class="col-sm-12 col-md-12">
+                            <input id="textinput" name="textinput" type="text" placeholder=""
+                                   value="{{$solicitude->tipo_solicitud}}" readonly
+                                   class="form-control input-md">
+
+                        </div>
+                    </div>
+
+                    <div class="form-group col-sm-12 col-md-12">
+
                         <label class="col-sm-8 col-md-8 control-label" for="textinput">Nombre Solicitud</label>
 
                         <div class="col-sm-12 col-md-12">
                             <input id="textinput" name="textinput" type="text" placeholder=""
-                                   value="Torta de cumpleaños para el Dr. Mejia" readonly
+                                   value="{{$solicitude->titulo}}" readonly
                                    class="form-control input-md">
 
                         </div>
@@ -31,7 +43,7 @@
                         <label class="col-sm-8 col-md-8 control-label" for="textinput">Presupuesto</label>
 
                         <div class="col-sm-12 col-md-12">
-                            <input id="textinput" name="textinput" type="text" placeholder="" value="50.00" readonly
+                            <input id="textinput" name="textinput" type="text" placeholder="" value="{{$solicitude->presupuesto}}" readonly
                                    class="form-control input-md">
 
                         </div>
@@ -46,26 +58,18 @@
                                 </div>
                                 <div class="panel-body">
 
+                                    @foreach($families as $family)
                                     <div class="form-group col-sm-12 col-md-12">
 
 
                                         <div class="col-sm-12 col-md-12">
                                             <input id="textinput" name="textinput" type="text" placeholder=""
-                                                   value="50.00" readonly
+                                                   value="{{$family->descripcion}}" readonly
                                                    class="form-control input-md">
 
                                         </div>
                                     </div>
-                                    <div class="form-group col-sm-12 col-md-12">
-
-
-                                        <div class="col-sm-12 col-md-12">
-                                            <input id="textinput" name="textinput" type="text" placeholder=""
-                                                   value="50.00" readonly
-                                                   class="form-control input-md">
-
-                                        </div>
-                                    </div>
+                                    @endforeach
                                 </div>
                             </div>
                         </div>
@@ -80,11 +84,12 @@
                     <div class="form-group col-sm-12 col-md-12">
                         <label class="col-sm-8 col-md-8 control-label" for="selectbasic">Tipo de Actividad</label>
 
+
                         <div class="col-sm-12 col-md-12">
-                            <select id="selectbasic" name="selectbasic" class="form-control">
-                                <option value="1">Option one</option>
-                                <option value="2">Option two</option>
-                            </select>
+                            <input id="textinput" name="textinput" type="text" placeholder=""
+                                   value="{{$solicitude->tipo_actividad}}" readonly
+                                   class="form-control input-md">
+
                         </div>
                     </div>
 
@@ -107,26 +112,18 @@
                                 </div>
                                 <div class="panel-body">
 
+                                    @foreach($clients as $client)
                                     <div class="form-group col-sm-12 col-md-12">
 
 
                                         <div class="col-sm-12 col-md-12">
                                             <input id="textinput" name="textinput" type="text" placeholder=""
-                                                   value="50.00" readonly
+                                                   value="{{$client->clnombre}}" readonly
                                                    class="form-control input-md">
 
                                         </div>
                                     </div>
-                                    <div class="form-group col-sm-12 col-md-12">
-
-
-                                        <div class="col-sm-12 col-md-12">
-                                            <input id="textinput" name="textinput" type="text" placeholder=""
-                                                   value="50.00" readonly
-                                                   class="form-control input-md">
-
-                                        </div>
-                                    </div>
+                                   @endforeach
                                 </div>
                             </div>
                         </div>
@@ -139,7 +136,7 @@
                             Solicitud</label>
 
                         <div class="col-sm-12 col-md-12">
-                            <textarea class="form-control" id="textarea" name="textarea"></textarea>
+                            <textarea class="form-control" id="textarea" name="textarea" readonly>{{$solicitude->descripcion}}</textarea>
                         </div>
                     </div>
                 </div>

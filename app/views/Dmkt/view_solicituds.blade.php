@@ -23,7 +23,10 @@
             @endif
         </td>
         <td></td>
-        <td><a href="registrar-gasto">reg_gasto</a></td>
+        <td><a href="{{URL::to('ver-solicitud').'/'.$solicitude->idsolicitud}}"><span class="glyphicon glyphicon-eye-open"></span></a>
+            <a href="{{URL::to('editar-solicitud').'/'.$solicitude->idsolicitud}}"><span class="glyphicon glyphicon-pencil"></span></a>
+            <a href="{{URL::to('eliminar-solicitud')}}"><span class="glyphicon glyphicon-remove"></span></a>
+        </td>
     </tr>
     @endforeach
     </tbody>
