@@ -28,7 +28,7 @@
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Monto Depositado</label>
-						<input id="deposit" type="text" class="form-control" value="S/50.00" readonly>
+						<input id="deposit" type="text" class="form-control" value="S/500.00" readonly>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
@@ -50,7 +50,7 @@
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Razón Social</label>
-						<button id="razon" type="button" class="form-control ladda-button" data-style="expand-left" data-spinner-color="#5c5c5c" value=0 readonly>Buscando Razon Social ...
+						<button id="razon" type="button" class="form-control ladda-button" data-style="expand-left" data-spinner-color="#5c5c5c" value=0 data-edit=0 readonly>Buscando Razon Social ...
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
@@ -74,7 +74,7 @@
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label class="inline-block">Monto Restante</label>
-						<input type="text" class="form-control" value="S/30.00" readonly>
+						<input id="balance" type="text" class="form-control" value="S/180.00" readonly>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
