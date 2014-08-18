@@ -26,7 +26,7 @@ Route::get('nueva-actividad','Dmkt\ActivityController@newActivity');
 Route::get('getclients','Dmkt\SolicitudeController@getClients');
 Route::post('registrar-solicitud','Dmkt\SolicitudeController@registerSolicitude');
 Route::get('listar-solicitudes/{id}','Dmkt\SolicitudeController@listSolicitude');
-
+Route::get('getsubtypeactivities/{id}','Dmkt\SolicitudeController@subtypeactivity');
 Route::get('test2','Dmkt\SolicitudeController@test');
 
 // ======================================================================

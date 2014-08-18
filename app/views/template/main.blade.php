@@ -49,5 +49,6 @@
 		{{ HTML::script('js/main.js') }}
 		{{ HTML::script('js/canela.js') }}
         {{ HTML::script('js/js.js') }}
+        {{ HTML::script('js/jsdmkt.js') }}
 	</body>
 </html>

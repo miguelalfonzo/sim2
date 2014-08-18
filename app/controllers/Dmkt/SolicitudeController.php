@@ -30,15 +30,8 @@ class SolicitudeController extends BaseController{
 
     public function test(){
 
-
-
-        $sol = Solicitude::where('idSolicitud',1);
-        // var_dump($sol);
-        $sol->presupuesto = 1111;
-        $data = $this->objectToArray($sol);
-        //$sol->update( (array) $sol);
-        $sol->update($data);
-
+        $var = SubTypeActivity::find(30);
+        echo json_encode($var->type);
     }
 
     public function show(){
@@ -59,7 +52,16 @@ class SolicitudeController extends BaseController{
     public function newSolicitude(){
 
         $families = Marca::all();
-        return View::make('Dmkt.registrar_solicitud')->with('families',$families);
+        $typeActivity = TypeActivity::all();
+        $subtypeactivities = SubTypeActivity::where('idtipoactividad',1)->get();
+        $data = [
+
+            'families' => $families,
+            'typeactivities' => $typeActivity,
+            'subtypeactivities' => $subtypeactivities
+        ];
+
+        return View::make('Dmkt.registrar_solicitud',$data);
 
     }
 
@@ -76,7 +78,7 @@ class SolicitudeController extends BaseController{
         $solicitude->estado_idestado = 1;
         $solicitude->fecha_entrega = $inputs['delivery_date'];
         $solicitude->tipo_solicitud = $inputs['type_solicitude'];
-        $solicitude->tipo_actividad = $inputs['type_activity'];
+        $solicitude->sub_tipo_actividad = $inputs['sub_type_activity'];
         $solicitude->save();
 
         $clients = $inputs['clients'];
@@ -141,13 +143,21 @@ class SolicitudeController extends BaseController{
         $clients = Client::whereIn('clcodigo',$clients)->get(array('clcodigo','clnombre'));
         $families2 = DB::table('DMKT_RG_SOLICITUD_FAMILIA')->where('idsolicitud', $id)->lists('idfamilia');
         $families2= Marca::whereIn('id',$families2)->get(array('id','descripcion'));
+        $typeactivities = TypeActivity::all();
+
+        $subtypeactivities= SubTypeActivity::where('idtipoactividad',$solicitude->subtype->idtipoactividad)->get();
+        //echo json_encode($solicitude->subtype);
+        //echo json_encode($subtypeactivities);
+
 
         $data = [
 
             'solicitude' => $solicitude,
             'clients' => $clients,
             'families' => $families,
-            'families2' => $families2
+            'families2' => $families2,
+            'typeactivities' => $typeactivities,
+            'subtypeactivities' => $subtypeactivities
         ];
         //echo json_encode($data);
 
@@ -158,13 +168,13 @@ class SolicitudeController extends BaseController{
         $inputs = Input::all();
         $id = $inputs['idsolicitude'];
         $solicitude = Solicitude::where('idsolicitud',$id);
-        $solicitude->idsolicitud = $id ;
+        $solicitude->idsolicitud = (int) $id ;
         $solicitude->descripcion = $inputs['description'] ;
         $solicitude->titulo = $inputs['titulo'];
         $solicitude->presupuesto = $inputs['estimate'];
         $solicitude->estado_idestado = 1;
         $solicitude->tipo_solicitud = $inputs['type_solicitude'];
-        $solicitude->tipo_actividad = $inputs['type_activity'];
+        $solicitude->sub_tipo_actividad = $inputs['sub_type_activity'];
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
 
@@ -191,6 +201,12 @@ class SolicitudeController extends BaseController{
         }
 
         return Redirect::to('show');
+
+    }
+    public function subtypeactivity($id){
+
+        $subtypeactivities = SubTypeActivity::where('idtipoactividad',$id)->get();
+        return json_encode($subtypeactivities);
 
     }
 

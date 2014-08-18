@@ -30,17 +30,7 @@
 
     </div>
 </div>
-<div class="form-group col-sm-6 col-md-4">
 
-    <label class="col-sm-8 col-md-8 control-label" for="textinput">Fecha del Sistema</label>
-
-    <div class="col-sm-12 col-md-12">
-        <input id="idtitle" name="date_system" type="text" placeholder=""
-               value=""
-               class="form-control input-md" required>
-
-    </div>
-</div>
 
 <div class="form-group col-sm-6 col-md-4">
 
@@ -48,13 +38,15 @@
 
     <div class="col-sm-12 col-md-12">
         <select id="" name="type_solicitude" class="form-control selecttypesolicitude">
-            <option value="1">Actividad</option>
-            <option value="2">Regalos</option>
-            <option value="3">Reembolso</option>
+            <option value="Actividad">Actividad</option>
+            <option value="Regalos">Regalos</option>
+            <option value="Reembolso">Reembolso</option>
         </select>
 
     </div>
 </div>
+
+
 <div class="form-group col-sm-6 col-md-4">
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Presupuesto</label>
 
@@ -80,19 +72,43 @@
     <label class="col-sm-8 col-md-8 control-label" for="selectbasic">Tipo de Actividad</label>
 
     <div class="col-sm-12 col-md-12">
-        <select id="selectbasic" name="type_activity" class="form-control">
-            <option value="Eventos Farmacias">Eventos Farmacias</option>
-            <option value="Plan 300">Plan 300</option>
-            <option value="Medios Interactivos">Medios Interactivos</option>
-            <option value="Micromarketing">Micromarketing</option>
+        <select id="type_activity" name="type_activity" class="form-control">
+            @foreach($typeactivities as $type)
+            @if(isset($solicitude) && $type->idtipoactividad == $solicitude->subtype->idtipoactividad)
+            <option selected value="{{$type->idtipoactividad}}">{{$type->nombre}}</option>
+            @else
+            <option value="{{$type->idtipoactividad}}">{{$type->nombre}}</option>
+            @endif
+            @endforeach
         </select>
     </div>
 </div>
+
+<div class="form-group col-sm-6 col-md-4">
+
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Sub Tipo Actividad</label>
+
+    <div class="col-sm-12 col-md-12">
+        <select id="sub_type_activity" name="sub_type_activity" class="form-control">
+            @foreach($subtypeactivities as $sub)
+            @if(isset($solicitude) && $sub->idsubtipoactividad == $solicitude->subtype->idsubtipoactividad)
+            <option selected value="{{$type->idsubtipoactividad}}">{{$sub->nombre}}</option>
+            @else
+            <option value="{{$sub->idsubtipoactividad}}">{{$sub->nombre}}</option>
+            @endif
+            @endforeach
+        </select>
+
+    </div>
+</div>
+
+
 <div class="form-group col-sm-6 col-md-4">
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Fecha de Entrega</label>
 
     <div class="col-sm-12 col-md-12">
-        <input id="iddatedelivery" name="delivery_date" type="date" placeholder="" value="{{isset($solicitude)? $solicitude->fecha_entrega : null }}"
+        <input id="iddatedelivery" name="delivery_date" type="date" placeholder=""
+               value="{{isset($solicitude)? $solicitude->fecha_entrega : null }}"
                class="form-control input-md">
 
     </div>
@@ -211,7 +227,9 @@
 
 
     <div class="col-sm-12 col-md-12" style="text-align: center">
-        <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">{{isset($solicitude) ? 'Actualizar' : 'Crear'}}</button>
+        <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">{{isset($solicitude) ?
+            'Actualizar' : 'Crear'}}
+        </button>
         <a id="button2id" href="{{URL::to('show')}}" name="button2id" class="btn btn-primary">Cancelar</a>
     </div>
 </div>

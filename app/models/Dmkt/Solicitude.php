@@ -9,6 +9,7 @@
 
 namespace Dmkt;
 use \Eloquent;
+use \Dmkt\SubTypeActivity;
 
 class Solicitude extends Eloquent{
 
@@ -26,5 +27,13 @@ class Solicitude extends Eloquent{
          }
 
     }
+    function subtype(){
 
+       return  $this->hasOne('Dmkt\SubTypeActivity','idsubtipoactividad','sub_tipo_actividad');
+    }
+
+    function state(){
+
+        return $this->hasOne('Dmkt\State','idestado','estado_idestado');
+    }
 }
