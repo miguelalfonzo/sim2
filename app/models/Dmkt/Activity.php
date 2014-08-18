@@ -17,11 +17,11 @@ class Activity extends Eloquent{
 
     function searchId(){
 
-        $lastId = Solicitude::orderBy('idsolicitud', 'DESC')->first();
+        $lastId = Activity::orderBy('idactividad', 'DESC')->first();
         if($lastId == null){
             return 0;
         }else{
-            return $lastId->idsolicitud;
+            return $lastId->idactividad;
         }
 
     }
@@ -32,7 +32,7 @@ class Activity extends Eloquent{
 
     function state(){
 
-        return $this->hasOne('Dmkt\State','idestado','estado_idestado');
+        return $this->hasOne('Dmkt\State','idestado','idestado');
     }
 
 

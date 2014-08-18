@@ -34,6 +34,6 @@ class Solicitude extends Eloquent{
 
     function state(){
 
-        return $this->hasOne('Dmkt\State','idestado','estado_idestado');
+        return $this->hasOne('Dmkt\State','idestado','idestado');
     }
 }

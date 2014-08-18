@@ -10,6 +10,9 @@ namespace Dmkt;
 use \BaseController;
 use \View;
 use \DB;
+use \Input;
+use \Redirect;
+
 
 class ActivityController extends BaseController{
 
@@ -19,5 +22,20 @@ class ActivityController extends BaseController{
         return View::make('Dmkt.new_activity');
     }
 
+    public function registerActivity(){
+
+
+        $inputs = Input::all();
+        $activity = new Activity;
+        $activity->idactividad  = $activity->searchId() + 1;
+        $activity->estado = 1;
+        $activity->idsolicitud = $inputs['idsolicitude'];
+        $activity->titulo = $inputs['titulo'];
+        $activity->save();
+
+        return Redirect::to('show_sup');
+
+
+    }
 
 }

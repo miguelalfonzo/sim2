@@ -11,7 +11,7 @@
     <div class="panel panel-default">
         <div class="panel-heading"><h4>Solicitud Sup</h4></div>
         <div class="panel-body">
-            <form class="form-horizontal" method="post" action="{{URL::to('rechazar-solicitud')}}">
+            <form id="form_make_activity" class="form-horizontal" method="post" action="">
                 <input id="textinput" name="idsolicitude" type="hidden" placeholder="" value="{{$solicitude->idsolicitud}}">
                 <div class="col-sm-6 col-md-6" style="">
 
@@ -32,7 +32,7 @@
                         <label class="col-sm-8 col-md-8 control-label" for="textinput">Nombre Solicitud</label>
 
                         <div class="col-sm-12 col-md-12">
-                            <input id="textinput" name="textinput" type="text" placeholder=""
+                            <input id="textinput" name="titulo" type="text" placeholder=""
                                    value="{{$solicitude->titulo}}" readonly
                                    class="form-control input-md">
 
@@ -47,7 +47,7 @@
                             <input id="textinput" name="textinput" type="text" placeholder="" value="{{$solicitude->presupuesto}}"
                                    class="form-control input-md">
                             @else
-                            <input id="textinput" name="textinput" type="text" placeholder="" value="{{$solicitude->presupuesto}}"
+                            <input id="textinput" name="estimate" type="text" placeholder="" value="{{$solicitude->presupuesto}}"
                                    class="form-control input-md" readonly>
                             @endif
 
@@ -171,9 +171,9 @@
                         @if($solicitude->estado == 1)
                         <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">Editar
                         </button>
-                        <a href="{{URL::to('nueva-actividad')}}" id="button1id" name="button1id" class="btn btn-primary register_solicitude">Crear Actividad
-                        </a>
-                        <button  id="button1id" name="button1id" class="btn btn-primary deny_solicitude">Rechazar
+                        <button  id="register_activity" name="button1id" class="btn btn-primary register_solicitude">Crear Actividad
+                        </button>
+                        <button  id="deny_solicitude" name="button1id" class="btn btn-primary deny_solicitude">Rechazar
                         </button>
                         <a id="button2id" href="{{URL::to('show_sup')}}" name="button2id"
                            class="btn btn-primary">Cancelar</a>
@@ -183,8 +183,6 @@
                         @endif
                     </div>
                 </div>
-
-
             </form>
         </div>
     </div>

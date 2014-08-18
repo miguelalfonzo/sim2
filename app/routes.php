@@ -36,6 +36,7 @@ Route::get('show_sup','Dmkt\SolicitudeController@show_sup');
 Route::get('ver-solicitud-sup/{id}','Dmkt\SolicitudeController@viewSolicitudeSup');
 Route::get('listar-solicitudes-sup/{id}','Dmkt\SolicitudeController@listSolicitudeSup');
 Route::post('rechazar-solicitud','Dmkt\SolicitudeController@denySolicitude');
+Route::post('crear-actividad','Dmkt\ActivityController@registerActivity');
 
 // ======================================================================
 

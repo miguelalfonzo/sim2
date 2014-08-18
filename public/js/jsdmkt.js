@@ -3,7 +3,7 @@ function newSolicitude(){
 
     var clients = [];
 
-    $.getJSON( "http://localhost/BitBucket/bago_dmkt_rg/public/getclients", function( data ) {
+    $.getJSON( server + "getclients", function( data ) {
         clients = data;
     });
 
@@ -140,7 +140,7 @@ function newSolicitude(){
         var id = $(this).val();
         var sel = $('#sub_type_activity');
         $("#sub_type_activity option").remove();
-        $.getJSON( "http://localhost/BitBucket/bago_dmkt_rg/public/getsubtypeactivities/"+id, function( data ) {
+        $.getJSON( server + "getsubtypeactivities/"+id, function( data ) {
 
             $.each(data,function(index,value){
                 console.log(value);
@@ -239,8 +239,100 @@ function newSolicitude(){
         e.preventDefault();
     }));
 
+
+    $.ajax({
+        url: server + 'listar-solicitudes/'+1,
+        type: 'GET',
+        dataType: 'html'
+
+    }).done(function ( data ) {
+        $('.table-solicituds').append(data);
+        $('#table_solicitude').dataTable({
+                "bLengthChange": false,
+                'iDisplayLength': 5
+            }
+        );
+    });
+
+    $('#selectestate').on('change',function(){
+        var idstate = $(this).val();
+        $('#table_solicitude_wrapper').remove();
+        setTimeout(function(){
+
+            $.ajax({
+                url: server + 'listar-solicitudes/'+idstate,
+                type: 'GET',
+                dataType: 'html'
+
+            }).done(function ( data ) {
+                $('.table-solicituds').append(data);
+                $('#table_solicitude').dataTable({
+                        "bLengthChange": false,
+                        'iDisplayLength': 5
+                    }
+                );
+            });
+        },200)
+
+    });
+
+
 /** Supervisor */
 
+$.ajax({
+    url: server + 'listar-solicitudes-sup/'+1,
+    type: 'GET',
+    dataType: 'html'
 
+}).done(function ( data ) {
+    $('.table-solicituds-sup').append(data);
+    $('#table_solicitude_sup').dataTable({
+            "bLengthChange": false,
+            'iDisplayLength': 5
+        }
+    );
+});
+
+    $('#selectestate').on('change',function(){
+        var idstate = $(this).val();
+        $('#table_solicitude_sup').remove();
+        setTimeout(function(){
+
+            $.ajax({
+                url:  server + 'listar-solicitudes-sup/'+idstate,
+                type: 'GET',
+                dataType: 'html'
+
+            }).done(function ( data ) {
+                $('.table-solicituds-sup').append(data);
+                $('#table_solicitude-sup').dataTable({
+                        "bLengthChange": false,
+                        'iDisplayLength': 5
+                    }
+                );
+            });
+        },200)
+
+    });
+
+
+
+var form_acepted_solicitude = $('#form_make_activity');
+$('#register_activity').on('click',function(){
+
+    form_acepted_solicitude.attr('action', server + 'crear-actividad');
+    form_acepted_solicitude.submit();
+
+});
+
+$('#deny_solicitude').on('click',function(e){
+   // e.preventDefault();
+
+    var url = server + 'rechazar-solicitud';
+    console.log(url);
+    form_acepted_solicitude.attr('action', url);
+    form_acepted_solicitude.submit();
+
+});
 
 }

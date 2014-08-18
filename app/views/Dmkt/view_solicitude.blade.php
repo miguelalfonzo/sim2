@@ -96,9 +96,13 @@
                     <div class="form-group col-sm-12 col-md-12">
                         <label class="col-sm-8 col-md-8 control-label" for="textinput">Fecha de Entrega</label>
 
+
                         <div class="col-sm-12 col-md-12">
-                            <input id="textinput" name="textinput" type="date" placeholder=""
-                                   class="form-control input-md">
+
+                            <div class="input-group date">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                <input id="date" type="text" class="form-control" maxlength="10" disabled placeholder="">
+                            </div>
 
                         </div>
                     </div>

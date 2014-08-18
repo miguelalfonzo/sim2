@@ -42,47 +42,7 @@
         </div>
     </div>
 </div>
-<script type="application/javascript" class="init">
 
-    $.ajax({
-        url: 'http://localhost/BitBucket/bago_dmkt_rg/public/listar-solicitudes/'+1,
-        type: 'GET',
-        dataType: 'html'
-
-    }).done(function ( data ) {
-        $('.table-solicituds').append(data);
-        $('#table_solicitude').dataTable({
-                "bLengthChange": false,
-                'iDisplayLength': 5
-            }
-        );
-    });
-
-    $('#selectestate').on('change',function(){
-        var idstate = $(this).val();
-        $('#table_solicitude_wrapper').remove();
-        setTimeout(function(){
-
-            $.ajax({
-                url: 'http://localhost/BitBucket/bago_dmkt_rg/public/listar-solicitudes/'+idstate,
-                type: 'GET',
-                dataType: 'html'
-
-            }).done(function ( data ) {
-                $('.table-solicituds').append(data);
-                $('#table_solicitude').dataTable({
-                        "bLengthChange": false,
-                        'iDisplayLength': 5
-                    }
-                );
-            });
-        },200)
-
-    })
-
-
-
-</script>
 @stop
 @section('actividad')
 <div class="col-md-12" style="margin-bottom: 10px; margin-top: 10px">
