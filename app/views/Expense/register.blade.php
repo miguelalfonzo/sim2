@@ -62,7 +62,10 @@
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Fecha de Movimiento</label>
-						<input id="date" type="date" class="form-control">
+						<div class="input-group date">
+							<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+							<input id="date" type="text" class="form-control" maxlength="10" readonly>
+						</div>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
@@ -126,6 +129,7 @@
 						</div>
 					</div>
 				</div>
+				<input id="tot-edit-hidden" type="hidden" value="">
 			</section>
 			<section class="row reg-expense align-center" style="margin:0">
 				<div class="col-xs-12 col-sm-12 col-md-12">
