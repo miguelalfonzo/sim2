@@ -1,3 +1,4 @@
+newSolicitude();
 function newSolicitude(){
 
     var clients = [];
@@ -6,7 +7,7 @@ function newSolicitude(){
         clients = data;
     });
 
-    $('.clients_repeat').hide();
+    //$('.clients_repeat').hide();
 
     $("#btn-add-family").on('click', function () {
         //console.log('hola');
@@ -79,6 +80,8 @@ function newSolicitude(){
             }
             response(matches);
         }
+
+        if($('#project'+client).length){
         $('#project'+client).autocomplete({
             minLength: 0,
             source: lightwell,
@@ -104,6 +107,7 @@ function newSolicitude(){
                     "<br><span style='font-size: 60%;'>Cliente: " + item.clnombre + "</span></a>" )
                 .appendTo( ul );
         };
+        }
     }
     load_client(1);
     var client = 2;
@@ -117,7 +121,7 @@ function newSolicitude(){
     });
     $(document).on("click", ".btn-delete-client", function () {
         $('#listclient>li .porcentaje_error').css({"border": "0"});
-        $('.clients_repeat').hide();
+        $('.clients_repeat').text('');
         $(".option-des-1").removeClass('error');
         var k = $("#listclient li").size();
         console.log(k);
@@ -195,7 +199,7 @@ function newSolicitude(){
                         $(this).parent().removeClass('has-success has-feedback');
                         $(this).parent().addClass('has-error has-feedback');
                         $(this).parent().children('.span-alert').addClass('span-alert glyphicon glyphicon-remove form-control-feedback');
-                        $(".clients_repeat").show();
+                        $(".clients_repeat").text('Datos Repetidos').css('color','red');
                     }
 
                 });
@@ -234,6 +238,8 @@ function newSolicitude(){
         },300);
         e.preventDefault();
     }));
+
+/** Supervisor */
 
 
 

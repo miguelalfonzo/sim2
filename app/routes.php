@@ -16,7 +16,9 @@ Route::get('/', function()
 {
 	return View::make('hello');
 });
-Route::get('show','Dmkt\SolicitudeController@show');
+
+/** Rep. Medico */
+Route::get('show_rm','Dmkt\SolicitudeController@show_rm');
 Route::get('nueva-solicitud','Dmkt\SolicitudeController@newSolicitude');
 Route::get('prueba','Dmkt\SolicitudeController@test');
 Route::get('ver-solicitud/{id}','Dmkt\SolicitudeController@viewSolicitude');
@@ -28,6 +30,12 @@ Route::post('registrar-solicitud','Dmkt\SolicitudeController@registerSolicitude'
 Route::get('listar-solicitudes/{id}','Dmkt\SolicitudeController@listSolicitude');
 Route::get('getsubtypeactivities/{id}','Dmkt\SolicitudeController@subtypeactivity');
 Route::get('test2','Dmkt\SolicitudeController@test');
+
+/** Supervisor */
+Route::get('show_sup','Dmkt\SolicitudeController@show_sup');
+Route::get('ver-solicitud-sup/{id}','Dmkt\SolicitudeController@viewSolicitudeSup');
+Route::get('listar-solicitudes-sup/{id}','Dmkt\SolicitudeController@listSolicitudeSup');
+Route::post('rechazar-solicitud','Dmkt\SolicitudeController@denySolicitude');
 
 // ======================================================================
 

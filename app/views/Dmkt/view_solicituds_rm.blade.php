@@ -14,11 +14,17 @@
     @foreach($solicituds as $solicitude)
     <tr>
         <td>{{$solicitude->titulo}}</td>
-        <td>{{$solicitude->presupuesto}}</td>
-        <td>@if($solicitude->estado_idestado == 1)
+        <td>
+            @if($solicitude->tipo_moneda == 1)
+            S/.{{$solicitude->presupuesto}}
+            @else
+            $ {{$solicitude->presupuesto}}
+            @endif
+        </td>
+        <td>@if($solicitude->estado == 1)
             <span class="label label-warning">Pendiente</span>
             @endif
-            @if($solicitude->estado_idestado == 2)
+            @if($solicitude->estado == 2)
             <span class="label label-danger">Rechazado</span>
             @endif
         </td>

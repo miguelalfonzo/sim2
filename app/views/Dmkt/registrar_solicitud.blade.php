@@ -57,6 +57,21 @@
 
     </div>
 </div>
+
+<div class="form-group col-sm-6 col-md-4">
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Moneda</label>
+
+    <div class="col-sm-12 col-md-12">
+        <select id="money" name="money" class="form-control">
+
+            <option value="1">Soles</option>
+            <option value="2">Dolares</option>
+
+        </select>
+
+    </div>
+</div>
+
 <div class="solicitude_monto form-group col-sm-6 col-md-4">
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto Factura</label>
 
@@ -92,7 +107,7 @@
         <select id="sub_type_activity" name="sub_type_activity" class="form-control">
             @foreach($subtypeactivities as $sub)
             @if(isset($solicitude) && $sub->idsubtipoactividad == $solicitude->subtype->idsubtipoactividad)
-            <option selected value="{{$type->idsubtipoactividad}}">{{$sub->nombre}}</option>
+            <option selected value="{{$sub->idsubtipoactividad}}">{{$sub->nombre}}</option>
             @else
             <option value="{{$sub->idsubtipoactividad}}">{{$sub->nombre}}</option>
             @endif
@@ -154,7 +169,8 @@
 
         @endif
     </ul>
-    <span class="clients_repeat col-sm-10 col-md-10" style="color: red">Datos Repetidos</span>
+    <span class="
+    col-sm-10 col-md-10 clients_repeat" style=""></span>
     <button type="button" class="btn btn-default" id="btn-add-client">Agregar Otro Cliente</button>
 
 </div>
@@ -230,7 +246,7 @@
         <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">{{isset($solicitude) ?
             'Actualizar' : 'Crear'}}
         </button>
-        <a id="button2id" href="{{URL::to('show')}}" name="button2id" class="btn btn-primary">Cancelar</a>
+        <a id="button2id" href="{{URL::to('show_rm')}}" name="button2id" class="btn btn-primary">Cancelar</a>
     </div>
 </div>
 

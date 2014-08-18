@@ -1,0 +1,38 @@
+<table class="table table-striped table-bordered dataTable" id="table_solicitude_sup" style="width: 100%">
+    <thead>
+    <tr>
+        <th>Solicitud</th>
+        <th>Presupuesto</th>
+        <th>Estado</th>
+        <th>Observaciones</th>
+        <th>Edicion</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach($solicituds as $solicitude)
+    <tr>
+        <td>{{$solicitude->titulo}}</td>
+        <td>
+            @if($solicitude->tipo_moneda == 1)
+            S/.{{$solicitude->presupuesto}}
+            @else
+            $ {{$solicitude->presupuesto}}
+            @endif
+        </td>
+        <td>@if($solicitude->estado == 1)
+            <span class="label label-warning">Pendiente</span>
+            @endif
+            @if($solicitude->estado == 2)
+            <span class="label label-danger">Rechazado</span>
+            @endif
+        </td>
+        <td>{{$solicitude->observacion}}</td>
+        <td><a href="{{URL::to('ver-solicitud-sup').'/'.$solicitude->idsolicitud}}"><span class="glyphicon glyphicon-eye-open"></span></a>
+            <a href="{{URL::to('editar-solicitud-sup').'/'.$solicitude->idsolicitud}}"><span class="glyphicon glyphicon-pencil"></span></a>
+            <a href="{{URL::to('eliminar-solicitud-sup')}}"><span class="glyphicon glyphicon-remove"></span></a>
+        </td>
+    </tr>
+    @endforeach
+    </tbody>
+
+</table>
