@@ -10,19 +10,26 @@ function onlyNumber(input){
 var server = "http://localhost/BitBucket/bago_dmkt_rg/public/";
 
 $(function(){
-    var url = window.location.href;
-    if(url === (server+"nueva-solicitud"))
-    {
-        newSolicitude();
-    }
-    
+    //Botón cancelar de la vista registro-gasto
+    $("#cancel-expense").on("click",function(){
+        window.location.href = server+"show_rm";
+    });
+        
     //Expense
     $(".date").on("click",function(){
         $(this).datepicker({
             language: 'es',
-            startDate: '01-01-2014',
+            startDate: "{{$date['toDay']}}",
+            endDate: $("#lastDate").val(),
             format: 'dd/mm/yyyy'
         });
+    });
+    
+    // $(".message-form span").addClass("glyphicon glyphicon-ok");
+
+
+    $(".date").on("change",function(){
+        $(this).datepicker('hide');
     });
     
     //Registro de solo números en el campo RUC

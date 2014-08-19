@@ -10,25 +10,31 @@
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Nombre de Actividad</label>
-						<input type="text" class="form-control" value="Refrigeradora para dueño" readonly>
+						<input type="text" class="form-control" value="Refrigeradora para dueño" disabled>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Tipo de Actividad</label>
-						<input type="text" class="form-control" value="Campaña" readonly>
+						<input type="text" class="form-control" value="Campaña" disabled>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Código de Depósito</label>
-						<input type="text" class="form-control" value="001" readonly>
+						<input type="text" class="form-control" value="001" disabled>
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-4">
+					<div class="form-expense">
+						<label>Tipo de Moneda</label>
+						<input id="type-money" type="text" class="form-control" value="Nuevos Soles" disabled>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Monto Depositado</label>
-						<input id="deposit" type="text" class="form-control" value="S/500.00" readonly>
+						<input id="deposit" type="text" class="form-control" value="S/500.00" disabled>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
@@ -64,7 +70,8 @@
 						<label>Fecha de Movimiento</label>
 						<div class="input-group date">
 							<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-							<input id="date" type="text" class="form-control" maxlength="10" readonly>
+							<input id="date" type="text" class="form-control" maxlength="10" value="{{$date['toDay']}}" readonly>
+							<input id="lastDate" type="hidden" value="{{$date['lastDay']}}">
 						</div>
 					</div>
 				</div>
@@ -81,8 +88,15 @@
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
+					<div class="form-expense">
+						<label class="inline-block">Descripición</label>
+						<textarea id="descripction" class="form-control" rows="3" maxlength="100"/></textarea>
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense btn-save-expense">
 						<button id="save-expense" type="button" class="btn btn-primary">Registrar</button>
+						<div class="message-form"><span class=""></span>&nbsp;&nbsp;Hola Hola</div>
 					</div>
 				</div>
 			</section>
@@ -134,7 +148,7 @@
 			<section class="row reg-expense align-center" style="margin:0">
 				<div class="col-xs-12 col-sm-12 col-md-12">
 					<button type="button" class="btn btn-success inline" style="margin:-2em 2em .5em 0">Terminar</button>
-					<button type="button" class="btn btn-danger inline" style="margin:-2em 0em .5em 0">Cancelar</button>
+					<button id="cancel-expense" type="button" class="btn btn-danger inline" style="margin:-2em 0em .5em 0">Cancelar</button>
 				</div>
 			</section>
 		</div>
