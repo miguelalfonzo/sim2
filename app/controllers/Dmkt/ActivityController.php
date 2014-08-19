@@ -37,7 +37,13 @@ class ActivityController extends BaseController{
 
         return Redirect::to('show_sup');
 
+    }
+    public function listActivities($id){
 
+        $activities = Activity::all();
+
+        $view = view::make('Dmkt.Rm.view_activities')->with('activities',$activities);
+        return $view;
     }
 
 }

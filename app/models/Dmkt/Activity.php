@@ -25,9 +25,10 @@ class Activity extends Eloquent{
         }
 
     }
-    function subtype(){
 
-        return  $this->hasOne('Common\SubTypeActivity','idsubtipoactividad','sub_tipo_actividad');
+    function solicitude(){
+
+        return $this->hasOne('Dmkt\Solicitude','idsolicitud','idsolicitud');
     }
 
     function state(){

@@ -10,7 +10,6 @@ use \Dmkt\Solicitude;
 class ExpenseController extends BaseController{
 
 	public function show(){
-		
 		$id = 1;
 
 		$activity = Activity::find($id);
