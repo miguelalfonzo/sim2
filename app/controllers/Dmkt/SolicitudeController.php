@@ -8,6 +8,9 @@
 
 
 namespace Dmkt;
+use \Common\State;
+use \Common\SubTypeActivity;
+use \Common\TypeMoney;
 use \BaseController;
 use \View;
 use \DB;

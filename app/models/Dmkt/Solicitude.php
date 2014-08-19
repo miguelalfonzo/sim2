@@ -9,13 +9,14 @@
 
 namespace Dmkt;
 use \Eloquent;
-use \Dmkt\SubTypeActivity;
+
 
 class Solicitude extends Eloquent{
 
 
     protected $table = 'DMKT_RG_SOLICITUD';
     protected $primaryKey = 'IDSOLICITUD';
+
 
     function searchId(){
 
@@ -29,17 +30,17 @@ class Solicitude extends Eloquent{
     }
     function subtype(){
 
-       return  $this->hasOne('Dmkt\SubTypeActivity','idsubtipoactividad','idsubtipoactividad');
+       return  $this->hasOne('Common\SubTypeActivity','idsubtipoactividad','idsubtipoactividad');
     }
 
     function state(){
 
-        return $this->hasOne('Dmkt\State','idestado','idestado');
+        return $this->hasOne('Common\State','idestado','idestado');
     }
 
     function typemoney(){
 
-        return $this->hasOne('Dmkt\TypeMoney','idtipomoneda','tipo_moneda');
+        return $this->hasOne('Common\TypeMoney','idtipomoneda','tipo_moneda');
     }
 
 }

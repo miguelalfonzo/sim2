@@ -7,6 +7,8 @@
  */
 
 namespace Dmkt;
+use \Common\SubTypeActivity;
+
 use \BaseController;
 use \View;
 use \DB;

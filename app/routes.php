@@ -10,7 +10,7 @@
 | and give it the Closure to execute when that URI is requested.
 |
 */
-use \Dmkt\Solicitude;
+
 /** Descargos  */
 Route::get('/', function()
 {

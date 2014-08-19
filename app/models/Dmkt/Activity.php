@@ -27,7 +27,7 @@ class Activity extends Eloquent{
     }
     function subtype(){
 
-        return  $this->hasOne('Dmkt\SubTypeActivity','idsubtipoactividad','sub_tipo_actividad');
+        return  $this->hasOne('Common\SubTypeActivity','idsubtipoactividad','sub_tipo_actividad');
     }
 
     function state(){
