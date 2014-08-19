@@ -45,21 +45,6 @@
 
 @stop
 @section('actividad')
-<div class="col-md-12" style="margin-bottom: 10px; margin-top: 10px">
-    <form class="form-inline">
-
-        <!-- Select Basic -->
-        <div class="form-group">
-            <!--  <label class="col-md-6 control-label" for="selectbasic">Select Basic</label>-->
-            <div class="col-md-4">
-                <select id="selectbasic" name="selectbasic" class="form-control">
-                    <option value="1">Option one</option>
-                    <option value="2">Option two</option>
-                </select>
-            </div>
-        </div>
-    </form>
-</div>
 
 <div class="col-md-12" style="">
     <!-- Default panel contents -->

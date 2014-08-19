@@ -10,7 +10,7 @@
 namespace Dmkt;
 use \Common\State;
 use \Common\SubTypeActivity;
-use \Common\TypeMoney;
+use \Common\TypeActivity;
 use \BaseController;
 use \View;
 use \DB;
@@ -78,7 +78,7 @@ class SolicitudeController extends BaseController{
         $solicitude->descripcion = $inputs['description'] ;
         $solicitude->titulo = $inputs['titulo'];
         $solicitude->monto = $inputs['estimate'];
-        $solicitude->estado = 1;
+        $solicitude->estado = 2;
         $solicitude->fecha_entrega = $inputs['delivery_date'];
 
         $solicitude->idsubtipoactividad = $inputs['sub_type_activity'];
@@ -249,7 +249,7 @@ class SolicitudeController extends BaseController{
         $solicitude = Solicitude::where('idsolicitud',$id);
         $solicitude->idsolicitud = (int) $id ;
         $solicitude->observacion = $inputs['observacion'];
-        $solicitude->estado = 2;
+        $solicitude->estado = 3;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
         return Redirect::to('show_sup');

@@ -43,11 +43,11 @@
                         <label class="col-sm-8 col-md-8 control-label" for="textinput">Presupuesto</label>
 
                         <div class="col-sm-12 col-md-12">
-                            @if($solicitude->estado == 1)
-                            <input id="textinput" name="textinput" type="text" placeholder="" value="{{$solicitude->presupuesto}}"
+                            @if($solicitude->estado == 2)
+                            <input id="textinput" name="textinput" type="text" placeholder="" value="{{$solicitude->monto}}"
                                    class="form-control input-md">
                             @else
-                            <input id="textinput" name="estimate" type="text" placeholder="" value="{{$solicitude->presupuesto}}"
+                            <input id="textinput" name="estimate" type="text" placeholder="" value="{{$solicitude->monto}}"
                                    class="form-control input-md" readonly>
                             @endif
 
@@ -139,7 +139,7 @@
                         <label class="col-sm-8 col-md-8 control-label" for="textinput">Observacion</label>
 
                         <div class="col-sm-12 col-md-12">
-                            @if($solicitude->estado == 1)
+                            @if($solicitude->estado == 2)
                             <textarea id="textinput" name="observacion"  placeholder=""
                                    class="form-control"></textarea>
                             @else
@@ -168,7 +168,7 @@
 
 
                     <div class="col-sm-12 col-md-12" style="text-align: center">
-                        @if($solicitude->estado == 1)
+                        @if($solicitude->estado == 2)
                         <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">Editar
                         </button>
                         <button  id="register_activity" name="button1id" class="btn btn-primary register_solicitude">Crear Actividad
