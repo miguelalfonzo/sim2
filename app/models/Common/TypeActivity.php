@@ -6,8 +6,9 @@
  * Time: 05:51 PM
  */
 
-namespace Dmkt;
+namespace Common;
 use \Eloquent;
+use \Common\SubTypeActivity;
 
 class TypeActivity extends Eloquent{
 
@@ -16,6 +17,6 @@ class TypeActivity extends Eloquent{
 
     public function subtype(){
 
-        return $this->hasMany('Dmkt\SubTypeActivity','idtipoactividad','idtipoactividad');
+        return $this->hasMany('\Common\SubTypeActivity','idtipoactividad','idtipoactividad');
     }
 }

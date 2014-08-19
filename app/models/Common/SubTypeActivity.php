@@ -5,9 +5,9 @@
  * Date: 15/08/14
  * Time: 09:37 AM
  */
-namespace Dmkt;
+namespace Common;
 use \Eloquent;
-use \Dmkt\TypeActivity;
+use \Common\TypeActivity;
 
 class SubTypeActivity extends Eloquent{
 
@@ -16,6 +16,6 @@ class SubTypeActivity extends Eloquent{
     protected $primaryKey = 'IDSUBTIPOACTIVIDAD';
 
     public function type(){
-        return $this->belongsTo('Dmkt\TypeActivity','idtipoactividad','idtipoactividad');
+        return $this->belongsTo('Common\TypeActivity','idtipoactividad','idtipoactividad');
     }
 }

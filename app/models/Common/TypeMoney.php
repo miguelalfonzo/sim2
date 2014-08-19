@@ -7,7 +7,7 @@
  */
 
 
-namespace Dmkt;
+namespace Common;
 use \Eloquent;
 class TypeMoney extends Eloquent{
 

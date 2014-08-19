@@ -5,7 +5,7 @@
  * Date: 12/08/14
  * Time: 03:11 PM
  */
-namespace Dmkt;
+namespace Common;
 use \Eloquent;
 
 class State extends Eloquent{
