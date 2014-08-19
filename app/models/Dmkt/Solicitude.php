@@ -29,11 +29,17 @@ class Solicitude extends Eloquent{
     }
     function subtype(){
 
-       return  $this->hasOne('Dmkt\SubTypeActivity','idsubtipoactividad','sub_tipo_actividad');
+       return  $this->hasOne('Dmkt\SubTypeActivity','idsubtipoactividad','idsubtipoactividad');
     }
 
     function state(){
 
         return $this->hasOne('Dmkt\State','idestado','idestado');
     }
+
+    function typemoney(){
+
+        return $this->hasOne('Dmkt\TypeMoney','idtipomoneda','tipo_moneda');
+    }
+
 }

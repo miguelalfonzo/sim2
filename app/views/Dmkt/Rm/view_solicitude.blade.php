@@ -21,7 +21,7 @@
 
                         <div class="col-sm-12 col-md-12">
                             <input id="textinput" name="textinput" type="text" placeholder=""
-                                   value="{{$solicitude->tipo_solicitud}}" readonly
+                                   value="{{$solicitude->subtype->nombre}}" readonly
                                    class="form-control input-md">
 
                         </div>
@@ -40,10 +40,10 @@
                     </div>
 
                     <div class="form-group col-sm-12 col-md-12">
-                        <label class="col-sm-8 col-md-8 control-label" for="textinput">Presupuesto</label>
+                        <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto</label>
 
                         <div class="col-sm-12 col-md-12">
-                            <input id="textinput" name="textinput" type="text" placeholder="" value="{{$solicitude->presupuesto}}" readonly
+                            <input id="textinput" name="textinput" type="text" placeholder="" value="{{$solicitude->monto}}" readonly
                                    class="form-control input-md">
 
                         </div>
@@ -101,7 +101,7 @@
 
                             <div class="input-group date">
                                 <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-                                <input id="date" type="text" class="form-control" maxlength="10" disabled placeholder="">
+                                <input id="date" type="text" class="form-control" maxlength="10" disabled placeholder="" value="{{$solicitude->fecha_entrega}}">
                             </div>
 
                         </div>
@@ -157,7 +157,7 @@
                         </a>
                         <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">Rechazar
                         </button>
-                        <a id="button2id" href="{{URL::to('show')}}" name="button2id"
+                        <a id="button2id" href="{{URL::to('show_rm')}}" name="button2id"
                            class="btn btn-primary">Cancelar</a>
                     </div>
                 </div>

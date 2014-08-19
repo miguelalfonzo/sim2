@@ -38,7 +38,7 @@ class SolicitudeController extends BaseController{
 
        $states = State::all();
 
-        return View::make('Dmkt.show_rm')->with('states',$states);
+        return View::make('Dmkt.Rm.show_rm')->with('states',$states);
 
     }
 
@@ -61,7 +61,7 @@ class SolicitudeController extends BaseController{
             'subtypeactivities' => $subtypeactivities
         ];
 
-        return View::make('Dmkt.registrar_solicitud',$data);
+        return View::make('Dmkt.Rm.register_solicitude',$data);
 
     }
 
@@ -74,11 +74,11 @@ class SolicitudeController extends BaseController{
         $solicitude->idsolicitud = $solicitude->searchId() + 1 ;
         $solicitude->descripcion = $inputs['description'] ;
         $solicitude->titulo = $inputs['titulo'];
-        $solicitude->presupuesto = $inputs['estimate'];
+        $solicitude->monto = $inputs['estimate'];
         $solicitude->estado = 1;
         $solicitude->fecha_entrega = $inputs['delivery_date'];
-        $solicitude->tipo_solicitud = $inputs['type_solicitude'];
-        $solicitude->sub_tipo_actividad = $inputs['sub_type_activity'];
+
+        $solicitude->idsubtipoactividad = $inputs['sub_type_activity'];
         $solicitude->tipo_moneda = $inputs['money'];
         $solicitude->save();
 
@@ -102,7 +102,7 @@ class SolicitudeController extends BaseController{
             $solicitude_families->save();
         }
 
-        return Redirect::to('show');
+        return Redirect::to('show_rm');
     }
 
     public function listSolicitude($id){
@@ -114,7 +114,7 @@ class SolicitudeController extends BaseController{
         }
 
 
-        $view = View::make('Dmkt.view_solicituds_rm')->with('solicituds',$solicituds);
+        $view = View::make('Dmkt.Rm.view_solicituds_rm')->with('solicituds',$solicituds);
 
         return $view;
     }
@@ -134,7 +134,7 @@ class SolicitudeController extends BaseController{
         ];
         //echo json_encode($data);
 
-        return View::make('Dmkt.view_solicitude',$data);
+        return View::make('Dmkt.Rm.view_solicitude',$data);
     }
     public function editSolicitude($id){
 
@@ -162,7 +162,7 @@ class SolicitudeController extends BaseController{
         ];
         //echo json_encode($data);
 
-        return View::make('Dmkt.registrar_solicitud',$data);
+        return View::make('Dmkt.Rm.register_solicitude',$data);
     }
     public function formEditSolicitude(){
 
@@ -172,10 +172,10 @@ class SolicitudeController extends BaseController{
         $solicitude->idsolicitud = (int) $id ;
         $solicitude->descripcion = $inputs['description'] ;
         $solicitude->titulo = $inputs['titulo'];
-        $solicitude->presupuesto = $inputs['estimate'];
+        $solicitude->monto= $inputs['estimate'];
         $solicitude->estado = 1;
-        $solicitude->tipo_solicitud = $inputs['type_solicitude'];
-        $solicitude->sub_tipo_actividad = $inputs['sub_type_activity'];
+
+        $solicitude->idsubtipoactividad = $inputs['sub_type_activity'];
         $solicitude->tipo_moneda = $inputs['money'];
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
@@ -202,7 +202,7 @@ class SolicitudeController extends BaseController{
             $solicitude_families->save();
         }
 
-        return Redirect::to('show');
+        return Redirect::to('show_rm');
 
     }
     public function subtypeactivity($id){
@@ -217,7 +217,7 @@ class SolicitudeController extends BaseController{
     public function show_sup(){
 
         $states = State::all();
-        return View::make('Dmkt.show_sup')->with('states',$states);
+        return View::make('Dmkt.Sup.show_sup')->with('states',$states);
 
     }
     public function viewSolicitudeSup($id){
@@ -236,7 +236,7 @@ class SolicitudeController extends BaseController{
         ];
         //echo json_encode($data);
 
-        return View::make('Dmkt.view_solicitude_sup',$data);
+        return View::make('Dmkt.Sup.view_solicitude_sup',$data);
 
     }
     public function denySolicitude(){
@@ -261,7 +261,7 @@ class SolicitudeController extends BaseController{
         }
 
 
-        $view = View::make('Dmkt.view_solicituds_sup')->with('solicituds',$solicituds);
+        $view = View::make('Dmkt.Sup.view_solicituds_sup')->with('solicituds',$solicituds);
 
         return $view;
     }

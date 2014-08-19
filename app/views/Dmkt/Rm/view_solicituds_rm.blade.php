@@ -15,11 +15,7 @@
     <tr>
         <td>{{$solicitude->titulo}}</td>
         <td>
-            @if($solicitude->tipo_moneda == 1)
-            S/.{{$solicitude->presupuesto}}
-            @else
-            $ {{$solicitude->presupuesto}}
-            @endif
+            {{$solicitude->typemoney->simbolo.$solicitude->monto }}
         </td>
         <td>@if($solicitude->estado == 1)
             <span class="label label-warning">Pendiente</span>
