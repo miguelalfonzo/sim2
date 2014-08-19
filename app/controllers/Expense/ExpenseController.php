@@ -4,11 +4,32 @@ namespace Expense;
 
 use \BaseController;
 use \View;
+use \Dmkt\Activity;
+use \Dmkt\Solicitude;
 
 class ExpenseController extends BaseController{
 
 	public function show(){
-		return View::make('Expense.register')->with('date',$this->getDay());
+		
+		$id = 1;
+
+		$activity = Activity::find($id);
+		$solicitude = Solicitude::find($activity->idsolicitud);
+
+		var_dump($activity->iddeposito);
+		// var_dump($solicitude->descripcion);
+		return;
+		die;
+
+
+
+		$date = $this->getDay();
+		$dataActivity['type'] = 'Dólares';
+		$dataActivity['simbolo'] = '$';
+
+		$data = ['date'=>$date,'activity'=>$dataActivity];
+
+		return View::make('Expense.register')->with('data',$data);
 	}
 
 	private function getDay(){

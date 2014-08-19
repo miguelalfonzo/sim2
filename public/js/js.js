@@ -19,26 +19,29 @@ $(function(){
     $(".date").on("click",function(){
         $(this).datepicker({
             language: 'es',
-            startDate: "{{$date['toDay']}}",
+            startDate: "{{$data['date']['toDay']}}",
             endDate: $("#lastDate").val(),
             format: 'dd/mm/yyyy'
         });
     });
     
-    // $(".message-form span").addClass("glyphicon glyphicon-ok");
-
-
+    //Escoge una fecha y desaparece el datepicker
     $(".date").on("change",function(){
         $(this).datepicker('hide');
     });
     
-    //Registro de solo números en el campo RUC
+    // $(".message-form span").addClass("glyphicon glyphicon-ok");
+
+    //Registro de solo números enteros en el campo RUC
     onlyNumber("#ruc");
+
+    //Registro de solo números en el campo total
+    $("#total").numeric();
 
     //Búsqueda de Razón Social en la SUNAT una vez introducido el RUC
     $("#ruc").on("focusout",function(){
-        var ruc        = $(this).val();
-        var l          = Ladda.create(document.getElementById('razon'));
+        var ruc = $(this).val();
+        var l   = Ladda.create(document.getElementById('razon'));
         $("#razon").val(0);
         if(ruc.length<11)
         {

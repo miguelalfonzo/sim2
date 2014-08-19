@@ -28,7 +28,7 @@
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Tipo de Moneda</label>
-						<input id="type-money" type="text" class="form-control" value="Nuevos Soles" disabled>
+						<input id="type-money" type="text" class="form-control" value="{{$data['activity']['type']}}" disabled>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
@@ -70,8 +70,8 @@
 						<label>Fecha de Movimiento</label>
 						<div class="input-group date">
 							<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-							<input id="date" type="text" class="form-control" maxlength="10" value="{{$date['toDay']}}" readonly>
-							<input id="lastDate" type="hidden" value="{{$date['lastDay']}}">
+							<input id="date" type="text" class="form-control" maxlength="10" value="{{$data['date']['toDay']}}" readonly>
+							<input id="lastDate" type="hidden" value="{{$data['date']['lastDay']}}">
 						</div>
 					</div>
 				</div>
