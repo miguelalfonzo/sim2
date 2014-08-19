@@ -239,9 +239,8 @@ function newSolicitude(){
         e.preventDefault();
     }));
 
-
     $.ajax({
-        url: server + 'listar-solicitudes/'+1,
+        url: server + 'listar-solicitudes/'+2,
         type: 'GET',
         dataType: 'html'
 
@@ -254,9 +253,24 @@ function newSolicitude(){
         );
     });
 
-    $('#selectestate').on('change',function(){
+    $.ajax({
+        url: server + 'listar-actividades/'+2,
+        type: 'GET',
+        dataType: 'html'
+
+    }).done(function ( data ) {
+        $('.table-activities').append(data);
+        $('#table_activity').dataTable({
+                "bLengthChange": false,
+                'iDisplayLength': 5
+            }
+        );
+    });
+
+
+    $('#selectestatesolicitude').on('change',function(){
         var idstate = $(this).val();
-        $('#table_solicitude_wrapper').remove();
+        $('#table_solicitude').remove();
         setTimeout(function(){
 
             $.ajax({
@@ -275,7 +289,27 @@ function newSolicitude(){
         },200)
 
     });
+    $('#selectestateactivity').on('change',function(){
+        var idstate = $(this).val();
+        $('#table_solicitude_wrapper').remove();
+        setTimeout(function(){
 
+            $.ajax({
+                url: server + 'listar-actividades/'+idstate,
+                type: 'GET',
+                dataType: 'html'
+
+            }).done(function ( data ) {
+                $('.table-activity').append(data);
+                $('#table_activity').dataTable({
+                        "bLengthChange": false,
+                        'iDisplayLength': 5
+                    }
+                );
+            });
+        },200)
+
+    });
 
 /** Supervisor */
 

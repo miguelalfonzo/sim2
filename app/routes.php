@@ -24,12 +24,16 @@ Route::get('prueba','Dmkt\SolicitudeController@test');
 Route::get('ver-solicitud/{id}','Dmkt\SolicitudeController@viewSolicitude');
 Route::get('editar-solicitud/{id}','Dmkt\SolicitudeController@editSolicitude');
 Route::post('editar-solicitud','Dmkt\SolicitudeController@formEditSolicitude');
-Route::get('nueva-actividad','Dmkt\ActivityController@newActivity');
 Route::get('getclients','Dmkt\SolicitudeController@getClients');
 Route::post('registrar-solicitud','Dmkt\SolicitudeController@registerSolicitude');
 Route::get('listar-solicitudes/{id}','Dmkt\SolicitudeController@listSolicitude');
 Route::get('getsubtypeactivities/{id}','Dmkt\SolicitudeController@subtypeactivity');
+Route::get('nueva-actividad','Dmkt\ActivityController@newActivity');
+
+/*activities*/
+Route::get('listar-activities/{id}','Dmkt\ActivityController@listActivities');
 Route::get('test2','Dmkt\SolicitudeController@test');
+
 
 /** Supervisor */
 Route::get('show_sup','Dmkt\SolicitudeController@show_sup');

@@ -1,8 +1,6 @@
 <table class="table table-striped table-bordered dataTable" id="table_solicitude" style="width: 100%">
     <thead>
     <tr>
-
-
         <th>Solicitud</th>
         <th>Presupuesto</th>
         <th>Estado</th>
@@ -17,10 +15,10 @@
         <td>
             {{$solicitude->typemoney->simbolo.$solicitude->monto }}
         </td>
-        <td>@if($solicitude->estado == 1)
+        <td>@if($solicitude->estado == 2)
             <span class="label label-warning">Pendiente</span>
             @endif
-            @if($solicitude->estado == 2)
+            @if($solicitude->estado == 3)
             <span class="label label-danger">Rechazado</span>
             @endif
         </td>
