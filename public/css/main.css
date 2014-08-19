@@ -12,6 +12,11 @@ body > header{
 	background: #a51984;
 }
 
+textarea
+{
+	resize: none;
+}
+
 #logo{
 	background: url('../img/bkgr_logo.png') no-repeat center center;
 	display: inline-block;
@@ -101,6 +106,12 @@ body > header{
 	margin: 0 auto;
 }
 
+.message-form
+{
+	display: none;
+	margin-top: 1em;
+}
+
 .reg-expense
 {
 	padding: 1em;
@@ -109,6 +120,11 @@ body > header{
 .select-row
 {
 	background: #D5D6E2;
+}
+
+.succes
+{
+	color: #3c763d;
 }
 
 .title
