@@ -16,7 +16,7 @@
                 <div class="form-group">
 
                     <div class="col-md-4" style="padding: 0">
-                        <select id="selectestate" name="selectbasic" class="form-control selectestate">
+                        <select id="selectestatesolicitude_sup" name="selectbasic" class="form-control selectestate">
 
                             @foreach($states as $state)
                             <option value="{{$state->idestado}}">{{$state->nombre}}</option>
@@ -30,7 +30,8 @@
                 <div class="form-group">
 
                     <div class="col-md-4">
-                        <a href="{{URL::to('nueva-solicitud')}}" id="singlebutton" name="singlebutton" class="btn btn-primary">Nueva
+                        <a href="{{URL::to('nueva-solicitud')}}" id="singlebutton" name="singlebutton"
+                           class="btn btn-primary">Nueva
                             Solicitud</a>
                     </div>
 
@@ -45,62 +46,34 @@
 
 @stop
 @section('actividad')
-<div class="col-md-12" style="margin-bottom: 10px; margin-top: 10px">
-    <form class="form-inline">
-
-        <!-- Select Basic -->
-        <div class="form-group">
-            <!--  <label class="col-md-6 control-label" for="selectbasic">Select Basic</label>-->
-            <div class="col-md-4">
-                <select id="selectbasic" name="selectbasic" class="form-control">
-                    <option value="1">Option one</option>
-                    <option value="2">Option two</option>
-                </select>
-            </div>
-        </div>
-    </form>
-</div>
-<div class="col-md-12">
+<div class="col-md-12" style="">
     <!-- Default panel contents -->
     <div class="panel panel-default">
+        <div class="panel-heading"><h3 class="panel-title">Actividades</h3></div>
 
-        <div class="panel-heading">Actividades</div>
+        <div class="panel-body table-activities-sup">
+            <div class="form-inline col-xs-6" style="padding: 0">
 
-        <div class="panel-body">
-            <table class="table table-striped table-bordered dataTable" id="table_activity" style="">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Username</th>
-                    <th>Estado</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>mdo</td>
-                    <td><a href="registrar-gasto">reg_gasto</a></td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>fat</td>
-                    <td><a href="registrar-gasto">reg_gasto</a></td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>Larry</td>
-                    <td>the Bird</td>
-                    <td>twitter</td>
-                    <td><a href="registrar-gasto">reg_gasto</a></td>
-                </tr>
-                </tbody>
-            </table>
+
+                <!-- Select Basic -->
+                <div class="form-group">
+
+                    <div class="col-md-4" style="padding: 0">
+                        <select id="selectestateactivity_sup" name="selectbasic" class="form-control selectestateactivity">
+
+                            @foreach($states as $state)
+                            <option value="{{$state->idestado}}">{{$state->nombre}}</option>
+                            @endforeach
+
+
+                        </select>
+                    </div>
+                </div>
+
+
+            </div>
+            <!-- Table -->
+
         </div>
     </div>
 </div>

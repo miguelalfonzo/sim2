@@ -270,7 +270,7 @@ function newSolicitude(){
 
     $('#selectestatesolicitude').on('change',function(){
         var idstate = $(this).val();
-        $('#table_solicitude').remove();
+        $('#table_solicitude_wrapper').remove();
         setTimeout(function(){
 
             $.ajax({
@@ -291,7 +291,7 @@ function newSolicitude(){
     });
     $('#selectestateactivity').on('change',function(){
         var idstate = $(this).val();
-        $('#table_solicitude_wrapper').remove();
+        $('#table_activity_wrapper').remove();
         setTimeout(function(){
 
             $.ajax({
@@ -314,7 +314,7 @@ function newSolicitude(){
 /** Supervisor */
 
 $.ajax({
-    url: server + 'listar-solicitudes-sup/'+1,
+    url: server + 'listar-solicitudes-sup/'+2,
     type: 'GET',
     dataType: 'html'
 
@@ -327,7 +327,7 @@ $.ajax({
     );
 });
 
-    $('#selectestate').on('change',function(){
+    $('#selectestatesolicitude_sup').on('change',function(){
         var idstate = $(this).val();
         $('#table_solicitude_sup').remove();
         setTimeout(function(){
@@ -340,6 +340,28 @@ $.ajax({
             }).done(function ( data ) {
                 $('.table-solicituds-sup').append(data);
                 $('#table_solicitude-sup').dataTable({
+                        "bLengthChange": false,
+                        'iDisplayLength': 5
+                    }
+                );
+            });
+        },200)
+
+    });
+    $('#selectestateactivity_sup').on('change',function(){
+
+        var idstate = $(this).val();
+        $('#table_activity_sup').remove();
+        setTimeout(function(){
+
+            $.ajax({
+                url: server + 'listar-actividades-sup/'+idstate,
+                type: 'GET',
+                dataType: 'html'
+
+            }).done(function ( data ) {
+                $('.table-activities-sup').append(data);
+                $('#table_activity_sup').dataTable({
                         "bLengthChange": false,
                         'iDisplayLength': 5
                     }

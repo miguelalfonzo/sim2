@@ -2,6 +2,9 @@ ul{
   list-style-type: none;
 
 }
+a{
+    text-decoration: none;
+}
 ul li{
     padding: 0;
 }

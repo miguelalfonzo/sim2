@@ -7,6 +7,7 @@
  */
 
 namespace Dmkt;
+
 use \Common\SubTypeActivity;
 
 use \BaseController;
@@ -16,20 +17,23 @@ use \Input;
 use \Redirect;
 
 
-class ActivityController extends BaseController{
+class ActivityController extends BaseController
+{
 
 
-    public function newActivity(){
+    public function newActivity()
+    {
 
-        return View::make('Dmkt.new_activity');
+        return View::make('Dmkt.Rm.new_activity');
     }
 
-    public function registerActivity(){
+    public function registerActivity()
+    {
 
 
         $inputs = Input::all();
         $activity = new Activity;
-        $activity->idactividad  = $activity->searchId() + 1;
+        $activity->idactividad = $activity->searchId() + 1;
         $activity->estado = 1;
         $activity->idsolicitud = $inputs['idsolicitude'];
         $activity->titulo = $inputs['titulo'];
@@ -38,12 +42,18 @@ class ActivityController extends BaseController{
         return Redirect::to('show_sup');
 
     }
-    public function listActivities($id){
 
-        $activities = Activity::all();
+    public function listActivities($id)
+    {
 
-        $view = view::make('Dmkt.Rm.view_activities')->with('activities',$activities);
+        if ($id == 0) {
+            $activities = Activity::all();
+        } else {
+            $activities = Activity::where('estado', $id);
+        }
+        $view = view::make('Dmkt.Rm.view_activities_rm')->with('activities', $activities);
         return $view;
     }
+
 
 }
