@@ -3,6 +3,8 @@
 namespace Expense;
 use \Eloquent;
 use \Common\State;
+use \Common\TypeMoney;
+use \Common\SubTypeActivity;
 
 class Expense extends Eloquent {
 

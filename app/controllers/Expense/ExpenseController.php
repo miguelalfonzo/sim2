@@ -14,17 +14,23 @@ class ExpenseController extends BaseController{
 
 		$activity = Activity::find($id);
 		$solicitude = Solicitude::find($activity->idsolicitud);
+		
+		$dataActivity['description'] = mb_convert_case($solicitude->descripcion, MB_CASE_TITLE, "UTF-8");
+		$dataActivity['typeActivity'] = mb_convert_case($solicitude->subtype->nombre, MB_CASE_TITLE, "UTF-8");
+		$dataActivity['idDeposit'] = $activity->deposit->num_transferencia;
+		$dataActivity['typeMoney'] = mb_convert_case($solicitude->typemoney->descripcion, MB_CASE_TITLE, "UTF-8");
+		$dataActivity['totalDeposit'] = $activity->deposit->total;
+		$dataActivity['simbolMoney'] = mb_convert_case($solicitude->typemoney->simbolo, MB_CASE_UPPER, "UTF-8");
 
-		var_dump($activity->iddeposito);
+
+		// var_dump($activity->iddeposito);
 		// var_dump($solicitude->descripcion);
-		return;
-		die;
-
-
+		// var_dump($dataActivity['codDeposito']);
+		// var_dump($dataActivity);
+		// return;
+		// die;
 
 		$date = $this->getDay();
-		$dataActivity['type'] = 'Dólares';
-		$dataActivity['simbolo'] = '$';
 
 		$data = ['date'=>$date,'activity'=>$dataActivity];
 

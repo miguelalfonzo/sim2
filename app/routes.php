@@ -50,6 +50,6 @@ Route::post('crear-actividad','Dmkt\ActivityController@registerActivity');
 Route::get('registrar-gasto','Expense\ExpenseController@show');
 Route::post('consultarRuc','Expense\RucController@show');
 // Route::get('test','Expense\RucController@show');
-// Route::get('ruc',function(){
-//     return View::make('Expense\ruc');
-// });
+Route::get('ruc',function(){
+    return View::make('Expense\ruc');
+});

@@ -8,6 +8,9 @@
 
 namespace Dmkt;
 use \Eloquent;
+use \Dmkt\Solicitude;
+use \Common\State;
+use \Expense\Deposit;
 
 class Activity extends Eloquent{
 
@@ -33,7 +36,11 @@ class Activity extends Eloquent{
 
     function state(){
 
-        return $this->hasOne('Dmkt\State','idestado','idestado');
+        return $this->hasOne('Common\State','idestado','idestado');
+    }
+
+    function deposit(){
+        return $this->hasOne('Expense\Deposit','iddeposito','iddeposito');
     }
 
 

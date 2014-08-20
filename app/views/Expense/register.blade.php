@@ -10,31 +10,34 @@
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Nombre de Actividad</label>
-						<input type="text" class="form-control" value="Refrigeradora para dueño" disabled>
+						<input type="text" class="form-control" value="{{$data['activity']['description']}}" disabled>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Tipo de Actividad</label>
-						<input type="text" class="form-control" value="Campaña" disabled>
+						<input type="text" class="form-control" value="{{$data['activity']['typeActivity']}}" disabled>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Código de Depósito</label>
-						<input type="text" class="form-control" value="001" disabled>
+						<input type="text" class="form-control" value="{{$data['activity']['idDeposit']}}" disabled>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Tipo de Moneda</label>
-						<input id="type-money" type="text" class="form-control" value="{{$data['activity']['type']}}" disabled>
+						<input id="type-money" type="text" class="form-control" value="{{$data['activity']['typeMoney']}}" disabled>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Monto Depositado</label>
-						<input id="deposit" type="text" class="form-control" value="S/500.00" disabled>
+						<div class="input-group">
+					    	<div class="input-group-addon">{{$data['activity']['simbolMoney']}}</div>
+					      	<input id="deposit" class="form-control" type="text" value="{{$data['activity']['totalDeposit']}}" disabled>
+					    </div>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
