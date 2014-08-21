@@ -12,6 +12,7 @@ use \Common\State;
 use \Common\SubTypeActivity;
 use \Common\TypeActivity;
 use \BaseController;
+use Symfony\Component\Finder\Comparator\DateComparator;
 use \View;
 use \DB;
 use \Input;
@@ -73,13 +74,16 @@ class SolicitudeController extends BaseController{
 
         $inputs = Input::all();
         $solicitude = new Solicitude;
-
+        $date = $inputs['delivery_date'];
+        list($d,$m,$y) = explode('/',$date);
+        $d=mktime(11, 14, 54, $m, $d, $y);
+        $date =  date("Y/m/d", $d);
         $solicitude->idsolicitud = $solicitude->searchId() + 1 ;
         $solicitude->descripcion = $inputs['description'] ;
         $solicitude->titulo = $inputs['titulo'];
-        $solicitude->monto = $inputs['estimate'];
+        $solicitude->monto = $inputs['monto'];
         $solicitude->estado = 2;
-        $solicitude->fecha_entrega = $inputs['delivery_date'];
+        $solicitude->fecha_entrega = $date;
 
         $solicitude->idsubtipoactividad = $inputs['sub_type_activity'];
         $solicitude->tipo_moneda = $inputs['money'];
@@ -170,13 +174,18 @@ class SolicitudeController extends BaseController{
     public function formEditSolicitude(){
 
         $inputs = Input::all();
+        $date = $inputs['delivery_date'];
+        list($d,$m,$y) = explode('/',$date);
+        $d=mktime(11, 14, 54, $m, $d, $y);
+        $date =  date("Y/m/d", $d);
         $id = $inputs['idsolicitude'];
         $solicitude = Solicitude::where('idsolicitud',$id);
-        $solicitude->idsolicitud = (int) $id ;
+        //$solicitude->idsolicitud = (int) $id ;
         $solicitude->descripcion = $inputs['description'] ;
         $solicitude->titulo = $inputs['titulo'];
-        $solicitude->monto= $inputs['estimate'];
-        $solicitude->estado = 1;
+        $solicitude->monto= $inputs['monto'];
+        $solicitude->estado = 2;
+        $solicitude->fecha_entrega = $date;
 
         $solicitude->idsubtipoactividad = $inputs['sub_type_activity'];
         $solicitude->tipo_moneda = $inputs['money'];
@@ -187,19 +196,21 @@ class SolicitudeController extends BaseController{
         SolicitudeFamily::where('idsolicitud','=' , $id)->delete();
 
         $clients = $inputs['clients'];
+        //var_dump($clients);die;
         foreach($clients as $client){
             $cod = explode(' ',$client);
             $solicitude_clients = new SolicitudeClient;
-            $solicitude_clients->idsolicitud_clientes = 1;
+            $solicitude_clients->idsolicitud_clientes = $solicitude_clients->searchId() + 1;
             $solicitude_clients->idsolicitud = $id;
             $solicitude_clients->idcliente = $cod[0];
             $solicitude_clients->save();
+
         }
         $families = $inputs['families'];
         foreach($families as $family){
 
             $solicitude_families = new SolicitudeFamily;
-            $solicitude_families->idsolicitud_familia = 1;
+            $solicitude_families->idsolicitud_familia = $solicitude_families->searchId() + 1;
             $solicitude_families->idsolicitud = $id;
             $solicitude_families->idfamilia = $family;
             $solicitude_families->save();
@@ -263,9 +274,7 @@ class SolicitudeController extends BaseController{
             $solicituds = Solicitude::where('estado','=',$id)->get();
         }
 
-
         $view = View::make('Dmkt.Sup.view_solicituds_sup')->with('solicituds',$solicituds);
-
         return $view;
     }
 

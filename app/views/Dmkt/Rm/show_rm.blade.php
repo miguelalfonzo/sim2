@@ -10,13 +10,12 @@
 
         <div class="panel-body table-solicituds">
             <div class="form-inline col-xs-6" style="padding: 0">
-
-
                 <!-- Select Basic -->
                 <div class="form-group">
 
                     <div class="col-md-4" style="padding: 0">
-                        <select id="selectestatesolicitude" name="selectbasic" class="form-control selectestatesolicitude">
+                        <select id="selectestatesolicitude" name="selectbasic"
+                                class="form-control selectestatesolicitude">
 
                             @foreach($states as $state)
                             <option value="{{$state->idestado}}">{{$state->nombre}}</option>
@@ -30,7 +29,8 @@
                 <div class="form-group">
 
                     <div class="col-md-4">
-                        <a href="{{URL::to('nueva-solicitud')}}" id="singlebutton" name="singlebutton" class="btn btn-primary">Nueva
+                        <a href="{{URL::to('nueva-solicitud')}}" id="singlebutton" name="singlebutton"
+                           class="btn btn-primary">Nueva
                             Solicitud</a>
                     </div>
 

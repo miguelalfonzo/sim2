@@ -21,6 +21,16 @@ class ActivityController extends BaseController
 {
 
 
+    function objectToArray($object)
+    {
+        $array=array();
+        foreach($object as $member=>$data)
+        {
+            $array[$member]=$data;
+        }
+        return $array;
+    }
+
     public function newActivity()
     {
 
@@ -32,28 +42,43 @@ class ActivityController extends BaseController
 
 
         $inputs = Input::all();
+        $idSol =  $inputs['idsolicitude'];
         $activity = new Activity;
+        $solicitude = Solicitude::where('idsolicitud',$idSol) ;
         $activity->idactividad = $activity->searchId() + 1;
-        $activity->estado = 1;
-        $activity->idsolicitud = $inputs['idsolicitude'];
-        $activity->titulo = $inputs['titulo'];
+        $activity->estado = 1;//pending
+        $activity->idsolicitud = $idSol;
+        $solicitude->monto = $inputs['monto'];
+        $solicitude->estado = 4; //approved
+        $data = $this->objectToArray($solicitude);
+        $solicitude->update($data);
         $activity->save();
 
         return Redirect::to('show_sup');
 
     }
 
-    public function listActivities($id)
+    public function listActivitiesSup($id)
     {
 
         if ($id == 0) {
             $activities = Activity::all();
         } else {
-            $activities = Activity::where('estado', $id);
+            $activities = Activity::where('estado', $id)->get();
+        }
+        $view = view::make('Dmkt.Sup.view_activities_sup')->with('activities', $activities);
+        return $view;
+    }
+
+    public function listActivitiesRM($id)
+    {
+
+        if ($id == 0) {
+            $activities = Activity::all();
+        } else {
+            $activities = Activity::where('estado', $id)->get();
         }
         $view = view::make('Dmkt.Rm.view_activities_rm')->with('activities', $activities);
         return $view;
     }
-
-
 }

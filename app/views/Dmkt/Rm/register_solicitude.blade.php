@@ -51,8 +51,8 @@
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Presupuesto</label>
 
     <div class="col-sm-12 col-md-12">
-        <input id="idestimate" name="estimate" type="text" placeholder=""
-               value="{{isset($solicitude->presupuesto) ? $solicitude->presupuesto : null }}"
+        <input id="idestimate" name="monto" type="text" placeholder=""
+               value="{{isset($solicitude->monto) ? $solicitude->monto : null }}"
                class="form-control input-md">
 
     </div>
@@ -125,7 +125,7 @@
 
         <div class="input-group date">
             <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-            <input id="date" type="text" name="delivery_date" value="{{isset($solicitude)? $solicitude->fecha_entrega : null }}" class="form-control" maxlength="10" readonly placeholder="">
+            <input id="date" type="text" name="delivery_date" value="{{isset($solicitude)? date_format(date_create($solicitude->fecha_entrega), 'd/m/Y' ) : null }}" class="form-control" maxlength="10" readonly placeholder="">
         </div>
 
     </div>

@@ -10,19 +10,13 @@
 
         <div class="panel-body table-solicituds-sup">
             <div class="form-inline col-xs-6" style="padding: 0">
-
-
-                <!-- Select Basic -->
+              <!-- Select Basic -->
                 <div class="form-group">
-
                     <div class="col-md-4" style="padding: 0">
                         <select id="selectestatesolicitude_sup" name="selectbasic" class="form-control selectestate">
-
                             @foreach($states as $state)
                             <option value="{{$state->idestado}}">{{$state->nombre}}</option>
                             @endforeach
-
-
                         </select>
                     </div>
                 </div>
@@ -53,9 +47,7 @@
 
         <div class="panel-body table-activities-sup">
             <div class="form-inline col-xs-6" style="padding: 0">
-
-
-                <!-- Select Basic -->
+           <!-- Select Basic -->
                 <div class="form-group">
 
                     <div class="col-md-4" style="padding: 0">
@@ -77,8 +69,5 @@
         </div>
     </div>
 </div>
-<script type="application/javascript" class="init">
 
-    $('#table_activity').dataTable();
-</script>
 @stop

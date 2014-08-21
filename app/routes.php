@@ -31,8 +31,8 @@ Route::get('getsubtypeactivities/{id}','Dmkt\SolicitudeController@subtypeactivit
 Route::get('nueva-actividad','Dmkt\ActivityController@newActivity');
 
 /*activities*/
-Route::get('listar-actividades/{id}','Dmkt\ActivityController@listActivities');
-Route::get('listar-actividades-sup/{id}','Dmkt\ActivityController@listActivities');
+Route::get('listar-actividades-rm/{id}','Dmkt\ActivityController@listActivitiesRM');
+Route::get('listar-actividades-sup/{id}','Dmkt\ActivityController@listActivitiesSup');
 Route::get('test2','Dmkt\SolicitudeController@test');
 
 

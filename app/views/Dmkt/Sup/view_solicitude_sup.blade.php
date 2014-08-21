@@ -40,14 +40,14 @@
                     </div>
 
                     <div class="form-group col-sm-12 col-md-12">
-                        <label class="col-sm-8 col-md-8 control-label" for="textinput">Presupuesto</label>
+                        <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto</label>
 
                         <div class="col-sm-12 col-md-12">
                             @if($solicitude->estado == 2)
-                            <input id="textinput" name="textinput" type="text" placeholder="" value="{{$solicitude->monto}}"
+                            <input id="textinput" name="monto" type="text" placeholder="" value="{{$solicitude->monto}}"
                                    class="form-control input-md">
                             @else
-                            <input id="textinput" name="estimate" type="text" placeholder="" value="{{$solicitude->monto}}"
+                            <input id="textinput" name="monto" type="text" placeholder="" value="{{$solicitude->monto}}"
                                    class="form-control input-md" readonly>
                             @endif
 
@@ -102,8 +102,10 @@
                         <label class="col-sm-8 col-md-8 control-label" for="textinput">Fecha de Entrega</label>
 
                         <div class="col-sm-12 col-md-12">
-                            <input id="textinput" name="textinput" type="date" placeholder=""
-                                   class="form-control input-md">
+                            <div class="input-group date">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                <input id="date" type="text" name="delivery_date" value="{{isset($solicitude)? $solicitude->fecha_entrega : null }}" class="form-control" maxlength="10" readonly placeholder="">
+                            </div>
 
                         </div>
                     </div>
