@@ -35,7 +35,7 @@ class Solicitude extends Eloquent{
 
     function state(){
 
-        return $this->hasOne('Common\State','idestado','idestado');
+        return $this->hasOne('Common\State','idestado','estado');
     }
 
     function typemoney(){
@@ -43,4 +43,7 @@ class Solicitude extends Eloquent{
         return $this->hasOne('Common\TypeMoney','idtipomoneda','tipo_moneda');
     }
 
+    function typesolicitude(){
+        return $this->hasOne('Dmkt\TypeSolicitude','idtypesolicitude','idtypesolicitude');
+    }
 }

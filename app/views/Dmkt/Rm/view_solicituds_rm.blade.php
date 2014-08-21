@@ -15,12 +15,9 @@
         <td>
             {{$solicitude->typemoney->simbolo.$solicitude->monto }}
         </td>
-        <td>@if($solicitude->estado == 2)
-            <span class="label label-warning">Pendiente</span>
-            @endif
-            @if($solicitude->estado == 3)
-            <span class="label label-danger">Rechazado</span>
-            @endif
+        <td>
+            <span class="label" style="background-color: {{$solicitude->state->color}}">{{$solicitude->state->nombre}}</span>
+
         </td>
         <td></td>
         <td><a href="{{URL::to('ver-solicitud').'/'.$solicitude->idsolicitud}}"><span class="glyphicon glyphicon-eye-open"></span></a>

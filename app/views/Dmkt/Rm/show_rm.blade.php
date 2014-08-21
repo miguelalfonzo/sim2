@@ -45,9 +45,9 @@
 
 @stop
 @section('actividad')
-
+<!--
 <div class="col-md-12" style="">
-    <!-- Default panel contents -->
+    <!-- Default panel contents
     <div class="panel panel-default">
         <div class="panel-heading"><h3 class="panel-title">Actividades</h3></div>
 
@@ -55,7 +55,7 @@
             <div class="form-inline col-xs-6" style="padding: 0">
 
 
-                <!-- Select Basic -->
+                <!-- Select Basic
                 <div class="form-group">
 
                     <div class="col-md-4" style="padding: 0">
@@ -72,11 +72,11 @@
 
 
             </div>
-            <!-- Table -->
+            <!-- Table
 
         </div>
     </div>
-</div>
+</div>-->
 <script type="application/javascript" class="init">
 
     $('#table_activity').dataTable();

@@ -137,20 +137,6 @@ function newSolicitude() {
         }
     });
 
-    $('#type_activity').on('change', function () {
-
-        var id = $(this).val();
-        var sel = $('#sub_type_activity');
-        $("#sub_type_activity option").remove();
-        $.getJSON(server + "getsubtypeactivities/" + id, function (data) {
-
-            $.each(data, function (index, value) {
-                console.log(value);
-                $('<option>').text(value.nombre).val(value.idsubtipoactividad).appendTo(sel);
-            });
-        });
-    });
-
     $('.project').on('focus',function(){
         $(this).parent().removeClass('has-error');
     });
@@ -264,7 +250,7 @@ function newSolicitude() {
 
 
     /* Listar actividades pendientes */
-
+/*
     $.ajax({
         url: server + 'listar-actividades-rm/' + 2,
         type: 'GET',
@@ -279,7 +265,7 @@ function newSolicitude() {
         );
     });
 
-
+*/
 
 
     $('#selectestatesolicitude').on('change', function () {
@@ -303,6 +289,7 @@ function newSolicitude() {
         }, 200)
 
     });
+    /*
     $('#selectestateactivity').on('change', function () {
 
         var idstate = $(this).val();
@@ -325,7 +312,7 @@ function newSolicitude() {
         }, 200)
 
     });
-
+*/
     /** Supervisor */
 
     /* listar solicitudes pendientes */
@@ -345,7 +332,7 @@ function newSolicitude() {
     });
 
     /* listar actividades pendientes */
-    $.ajax({
+   /* $.ajax({
         url: server + 'listar-actividades-sup/' + 2,
         type: 'GET',
         dataType: 'html'
@@ -357,7 +344,7 @@ function newSolicitude() {
                 'iDisplayLength': 5
             }
         );
-    });
+    });*/
 
     $('#selectestatesolicitude_sup').on('change', function () {
         var idstate = $(this).val();
@@ -380,6 +367,7 @@ function newSolicitude() {
         }, 200)
 
     });
+    /*
     $('#selectestateactivity_sup').on('change', function () {
 
         var idstate = $(this).val();
@@ -402,12 +390,12 @@ function newSolicitude() {
         }, 200)
 
     });
-
+*/
 
     var form_acepted_solicitude = $('#form_make_activity');
     $('#register_activity').on('click', function () {
 
-        form_acepted_solicitude.attr('action', server + 'crear-actividad');
+        form_acepted_solicitude.attr('action', server + 'aceptar-solicitud');
         form_acepted_solicitude.submit();
 
     });

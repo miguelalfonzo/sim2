@@ -56,13 +56,14 @@ class SolicitudeController extends BaseController{
     public function newSolicitude(){
 
         $families = Marca::all();
-        $typeActivity = TypeActivity::all();
-        $subtypeactivities = SubTypeActivity::where('idtipoactividad',1)->get();
+
+        $subtypeactivities = SubTypeActivity::all();
+        $typesolicituds = TypeSolicitude::all();
         $data = [
 
             'families' => $families,
-            'typeactivities' => $typeActivity,
-            'subtypeactivities' => $subtypeactivities
+            'subtypeactivities' => $subtypeactivities,
+            'typesolicituds'=> $typesolicituds
         ];
 
         return View::make('Dmkt.Rm.register_solicitude',$data);
@@ -151,9 +152,10 @@ class SolicitudeController extends BaseController{
         $clients = Client::whereIn('clcodigo',$clients)->get(array('clcodigo','clnombre'));
         $families2 = DB::table('DMKT_RG_SOLICITUD_FAMILIA')->where('idsolicitud', $id)->lists('idfamilia');
         $families2= Marca::whereIn('id',$families2)->get(array('id','descripcion'));
-        $typeactivities = TypeActivity::all();
 
-        $subtypeactivities= SubTypeActivity::where('idtipoactividad',$solicitude->subtype->idtipoactividad)->get();
+        $typesolicituds = TypeSolicitude::all();
+
+        $subtypeactivities= SubTypeActivity::all();
         //echo json_encode($solicitude->subtype);
         //echo json_encode($subtypeactivities);
 
@@ -164,7 +166,7 @@ class SolicitudeController extends BaseController{
             'clients' => $clients,
             'families' => $families,
             'families2' => $families2,
-            'typeactivities' => $typeactivities,
+            'typesolicituds' => $typesolicituds,
             'subtypeactivities' => $subtypeactivities
         ];
         //echo json_encode($data);
@@ -261,6 +263,18 @@ class SolicitudeController extends BaseController{
         $solicitude->idsolicitud = (int) $id ;
         $solicitude->observacion = $inputs['observacion'];
         $solicitude->estado = 3;
+        $data = $this->objectToArray($solicitude);
+        $solicitude->update($data);
+        return Redirect::to('show_sup');
+
+    }
+    public function aceptedSolicitude(){
+
+        $inputs = Input::all();
+        $idSol =  $inputs['idsolicitude'];
+        $solicitude = Solicitude::where('idsolicitud',$idSol) ;
+        $solicitude->estado = 8;
+        $solicitude->monto = $inputs['monto'];
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
         return Redirect::to('show_sup');

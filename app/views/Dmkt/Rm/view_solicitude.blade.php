@@ -151,12 +151,6 @@
 
 
                     <div class="col-sm-12 col-md-12" style="text-align: center">
-                        <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">Editar
-                        </button>
-                        <a href="{{URL::to('nueva-actividad')}}" id="button1id" name="button1id" class="btn btn-primary register_solicitude">Crear Actividad
-                        </a>
-                        <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">Rechazar
-                        </button>
                         <a id="button2id" href="{{URL::to('show_rm')}}" name="button2id"
                            class="btn btn-primary">Cancelar</a>
                     </div>
