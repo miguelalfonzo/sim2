@@ -21,4 +21,8 @@ class Expense extends Eloquent {
 	public function idActivity(){
 		return $this->hasOne('\Common\SubTypeActivity','idsubtipoactividad','actividad_idactividad');
 	}
+
+	public function idTypeProof(){
+		return $this->hasOne('TypeProof','idcomprobante','tipo_comprobante');
+	}
 }
