@@ -17,11 +17,6 @@ table thead th, table th
 	text-align: center;
 }
 
-textarea
-{
-	resize: none;
-}
-
 #logo{
 	background: url('../img/bkgr_logo.png') no-repeat center center;
 	display: inline-block;
@@ -59,12 +54,12 @@ textarea
 	text-align: left;
 }
 
-#table
+#table-expense
 {
 	font-size: .9em;
 }	
 
-#table thead
+#table-expense thead
 {
 	background: #073F70;
 	color: white;
@@ -73,11 +68,6 @@ textarea
 #table-items thead
 {
 	background: #f5f5f5;
-}
-
-#table-items tbody
-{
-	font-size: 1em;
 }
 
 .align-center
@@ -95,7 +85,7 @@ textarea
 	padding: .75em;
 }
 
-.delete-expense
+.delete-item
 {
 	line-height: 2.5em;
 }
@@ -121,10 +111,14 @@ textarea
 	margin: 0 auto;
 }
 
-.message-form
+.message-expense
 {
 	display: none;
-	margin-top: 1em;
+}
+
+.quantity input
+{
+	text-align: center;
 }
 
 .reg-expense
@@ -132,34 +126,37 @@ textarea
 	padding: 0.3em 1em;
 }
 
-.select-row
+.total-item input
 {
-	background: #D5D6E2;
+	text-align: center;
 }
 
-.succes
+.w-quantity
 {
-	color: #3c763d;
+	width: 7%;
 }
 
-.title
+.w-total-item
 {
-	padding-left: .5em;
+	width: 8%;
+}
+
+.w-type-expense
+{
+	width: 20%;
 }
 
 @media screen and (max-width:920px){
-	#table
+	#table-expense
 	{
 		font-size: .85em;
 	}
-
-	.table-responsive
+	.w-total-item
 	{
-	    overflow-x: auto;
+		width: 15%;
 	}
-	.middle-table
+	.w-type-expense
 	{
-		line-height: 5em;
+		width: 25%;
 	}
-
 }
