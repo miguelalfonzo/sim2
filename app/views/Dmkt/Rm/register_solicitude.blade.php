@@ -248,7 +248,3 @@
 </div>
 </div>
 @stop
-<script>
-
-
-</script>

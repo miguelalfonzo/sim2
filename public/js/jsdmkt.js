@@ -268,7 +268,7 @@ function newSolicitude() {
 */
 
 
-    $('#selectestatesolicitude').on('change', function () {
+    $('#idstate').on('change', function () {
         var idstate = $(this).val();
         $('#table_solicitude_wrapper').remove();
         setTimeout(function () {
@@ -410,4 +410,39 @@ function newSolicitude() {
 
     });
 
+    var search_solicitude = $('#search_solicitude');
+    $('#search-solicitude').on('click',function(){
+        var l = Ladda.create(this);
+        l.start();
+
+        var jqxhr = $.post( server + "buscar-solicitudes", { idstate: $('#idstate').val() ,date_start: $('#date_start').val() ,date_end: $('#date_end').val() } )
+            .done(function(data) {
+                $('#table_solicitude_wrapper').remove();
+                $('.table-solicituds').append(data);
+                $('#table_solicitude').dataTable({
+                        "bLengthChange": false,
+                        'iDisplayLength': 5
+                    }
+                );
+                l.stop();
+            })
+            .fail(function() {
+                alert( "error" );
+            })
+
+    });
+    $("#date_start").datepicker({
+        language: 'es',
+        format: 'dd/mm/yyyy'
+    });
+
+
+    $("#date_end").datepicker({
+
+
+        //startDate: new Date($.datepicker.formatDate('dd, mm, yy', new Date($('#date_start').val()))),
+        language: 'es',
+        endDate: new Date(),
+        format: 'dd/mm/yyyy'
+    });
 }

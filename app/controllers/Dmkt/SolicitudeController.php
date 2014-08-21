@@ -227,6 +227,19 @@ class SolicitudeController extends BaseController{
         return json_encode($subtypeactivities);
 
     }
+    public function searchSolicituds(){
+
+        $inputs = Input::all();
+        $estado = $inputs['idstate'];
+        $start = $inputs['date_start'];
+        $end = $inputs['date_end'];
+        /*$solicituds = Solicitude::where('estado',$estado)
+        ->where('created_at', $start)
+        ->get();*/
+        $solicituds = Solicitude::select('*')->where('estado',$estado)->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")->get();
+        $view = View::make('Dmkt.Rm.view_solicituds_rm')->with('solicituds',$solicituds);
+        return $view;
+    }
 
     /** Supervisor */
 

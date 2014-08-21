@@ -20,9 +20,13 @@
 
         </td>
         <td></td>
-        <td><a href="{{URL::to('ver-solicitud').'/'.$solicitude->idsolicitud}}"><span class="glyphicon glyphicon-eye-open"></span></a>
-            <a href="{{URL::to('editar-solicitud').'/'.$solicitude->idsolicitud}}"><span class="glyphicon glyphicon-pencil"></span></a>
-            <a href="{{URL::to('eliminar-solicitud')}}"><span class="glyphicon glyphicon-remove"></span></a>
+        <td><div class="div-icons-solicituds" style="text-align: center">
+
+                <a href="{{URL::to('ver-solicitud').'/'.$solicitude->idsolicitud}}"><span style="padding: 0 5px; font-size: 1.5em" class="glyphicon glyphicon-eye-open"></span></a>
+                <a href="{{URL::to('editar-solicitud').'/'.$solicitude->idsolicitud}}"><span style="padding: 0 5px; font-size: 1.5em" class="glyphicon glyphicon-pencil"></span></a>
+                <a href="{{URL::to('eliminar-solicitud')}}"><span style="padding: 0 5px; font-size: 1.5em" class="glyphicon glyphicon-remove"></span></a>
+        </div>
+
         </td>
     </tr>
     @endforeach
