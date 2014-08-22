@@ -6,11 +6,11 @@
     }
 </style>
 
-<div class="nueva_solicitud col-sm-12 col-md-12">
+<div class="content">
 
 <div class="panel panel-default">
 <div class="panel-heading">
-    <h4>Nueva Solicitud</h4>
+    <h4 class="panel-title">Nueva Solicitud</h4>
 </div>
 <div class="panel-body">
 <form id="form-register-solicitude" class="" method="post"
@@ -26,7 +26,7 @@
     <div class="col-sm-12 col-md-12">
         <input id="idtitle" name="titulo" type="text" placeholder=""
                value="{{isset($solicitude->titulo)? $solicitude->titulo : null }}"
-               class="form-control input-md" required>
+               class="form-control input-md" >
 
     </div>
 </div>
@@ -80,7 +80,7 @@
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto Factura</label>
 
     <div class="col-sm-12 col-md-12">
-        <input id="idfactura" name="amount" type="text" placeholder=""
+        <input id="amountfac" name="amount" type="text" placeholder=""
                value="{{isset($solicitude->monto) ? $solicitude->monto : null }}"
                class="form-control input-md">
 
@@ -113,7 +113,7 @@
 
         <div class="input-group date">
             <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-            <input id="date" type="text" name="delivery_date"
+            <input id="delivery_date" type="text" name="delivery_date"
                    value="{{isset($solicitude)? date_format(date_create($solicitude->fecha_entrega), 'd/m/Y' ) : null }}"
                    class="form-control" maxlength="10" readonly placeholder="">
         </div>
@@ -150,8 +150,8 @@
         @else
         <li>
             <div style="position: relative" class="">
-                <input id="project1" name="clients[]" type="text" placeholder="" style="margin-bottom: 10px"
-                       class="form-control input-md project"
+                <input id="idclient1" name="clients[]" type="text" placeholder="" style="margin-bottom: 10px"
+                       class="form-control input-md input-client"
                        value="{{isset($client->clnombre) ? $client->clcodigo.' - '.$client->clnombre : null }}">
 
                 <button type='button' class='btn-delete-client' style="display: none; z-index: 2"><span
