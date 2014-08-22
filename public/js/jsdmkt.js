@@ -15,7 +15,6 @@ function newSolicitude() {
         $('#listfamily>li:first-child').clone(true, true).appendTo('#listfamily');
     });
 
-    //$(".btn-delete-family").hide();
 
     $(document).on("click", ".btn-delete-family", function () {
         $('#listfamily>li .porcentaje_error').css({"border": "0"});
@@ -35,6 +34,7 @@ function newSolicitude() {
     });
     //Validaciones
     $('#idestimate').numeric();
+    $('#idamount').numeric();
 
 
     //Selecionar tipo de solocitud
@@ -82,8 +82,8 @@ function newSolicitude() {
             response(matches);
         }
 
-        if ($('#project' + client).length) {
-            $('#project' + client).autocomplete({
+        if ($('#idclient' + client).length) {
+            $('#idclient' + client).autocomplete({
                 minLength: 0,
                 source: lightwell,
                 focus: function (event, ui) {
@@ -92,7 +92,7 @@ function newSolicitude() {
                     return false;
                 },
                 select: function (event, ui) {
-                    // $( "#project" ).val( ui.item.label );
+                    // $( "#input-client" ).val( ui.item.label );
                     $(this).parent().removeClass('has-error has-feedback');
                     $(this).parent().children('.span-alert').removeClass('glyphicon glyphicon-remove form-control-feedback');
                     $(this).parent().addClass('has-success has-feedback');
@@ -114,7 +114,7 @@ function newSolicitude() {
     load_client(1);
     var client = 2;
     $(document).on('click', '#btn-add-client', function () {
-        $('<li><div style="position: relative"><input id="project' + client + '" name="clients[]" type="text" placeholder="" style="margin-bottom: 10px" class="form-control input-md project"><button type="button" class="btn-delete-client" style="z-index: 2"><span class="glyphicon glyphicon-remove"></span></button></div></li>').appendTo('#listclient');
+        $('<li><div style="position: relative"><input id="idclient' + client + '" name="clients[]" type="text" placeholder="" style="margin-bottom: 10px" class="form-control input-md input-client"><button type="button" class="btn-delete-client" style="z-index: 2"><span class="glyphicon glyphicon-remove"></span></button></div></li>').appendTo('#listclient');
         $(".btn-delete-client").show();
         setTimeout(function () {
             load_client(client);
@@ -137,15 +137,30 @@ function newSolicitude() {
         }
     });
 
-    $('.project').on('focus',function(){
+    //Removiendo Errores
+    var title = $('#idtitle');
+    var amount = $('#idestimate');
+    var delivery_date = $('#delivery_date');
+    var amountfac = $('#amountfac');
+    var input_client = $('.input-client');
+
+    title.on('focus',function(){
         $(this).parent().removeClass('has-error');
+    });
+    amount.on('focus',function(){
+        $(this).parent().removeClass('has-error');
+    });
+    delivery_date.on('focus',function(){
+       $(this).parent().removeClass('has-error');
+    });
+    input_client.on('focus',function(){
+       $(this).parent().removeClass('has-error')
     });
 
 
 
+//validamos el envio del registro
     $('.register_solicitude').on('click', (function (e) {
-
-
         var aux = 0;
         var validate = 0; // si cambia  a 1 hay errores
         var obj = [];
@@ -153,13 +168,35 @@ function newSolicitude() {
         var families_input = [];
         for (var i = 0, l = clients.length; i < l; i++) {
             obj[i] = clients[i].clcodigo + ' - ' + clients[i].clnombre;
-            //console.log(clients[i].clnombre);
+        }
+
+
+
+        if(!title.val()) {
+            title.parent().addClass('has-error');
+            title.attr('placeholder','Ingrese nombre de la solicitud');
+            title.addClass('input-placeholder-error');
+        }
+        if(!amount.val()) {
+            amount.parent().addClass('has-error');
+            amount.attr('placeholder','Ingrese monto');
+            amount.addClass('input-placeholder-error');
+        }
+        if(!delivery_date.val()) {
+            delivery_date.parent().addClass('has-error');
+            delivery_date.attr('placeholder','Ingrese Fecha');
+            delivery_date.addClass('input-placeholder-error');
+        }
+        if(!input_client.val()) {
+            input_client.parent().addClass('has-error');
+            input_client.attr('placeholder','Ingrese Cliente');
+            input_client.addClass('input-placeholder-error');
         }
 
         setTimeout(function () {
 
 
-            $('.project').each(function (index) {
+            $('.input-client').each(function (index) {
                 var input = $(this).val();
                 clients_input[index] = input;
 
@@ -183,7 +220,7 @@ function newSolicitude() {
         setTimeout(function () {
             //validacion de campos duplicados en clientes
             for (var i = 0; i < clients_input.length; i++) {
-                $('.project').each(function (index) {
+                $('.input-client').each(function (index) {
 
                     if (index != i && clients_input[i] === $(this).val()) {
                         validate = 1;
@@ -249,25 +286,6 @@ function newSolicitude() {
     });
 
 
-    /* Listar actividades pendientes */
-/*
-    $.ajax({
-        url: server + 'listar-actividades-rm/' + 2,
-        type: 'GET',
-        dataType: 'html'
-
-    }).done(function (data) {
-        $('.table-activities').append(data);
-        $('#table_activity_rm').dataTable({
-                "bLengthChange": false,
-                'iDisplayLength': 5
-            }
-        );
-    });
-
-*/
-
-
     $('#idstate').on('change', function () {
         var idstate = $(this).val();
         $('#table_solicitude_wrapper').remove();
@@ -289,31 +307,47 @@ function newSolicitude() {
         }, 200)
 
     });
-    /*
-    $('#selectestateactivity').on('change', function () {
 
-        var idstate = $(this).val();
-        $('#table_activity_rm_wrapper').remove();
-        setTimeout(function () {
-
-            $.ajax({
-                url: server + 'listar-actividades-rm/' + idstate,
-                type: 'GET',
-                dataType: 'html'
-
-            }).done(function (data) {
-                $('.table-activities').append(data);
-                $('#table_activity_rm').dataTable({
+    /* Filtramos todas las solicitudes */
+    var search_solicitude = $('#search-solicitude');
+    search_solicitude.on('click',function(){
+        var l = Ladda.create(this);
+        l.start();
+        var jqxhr = $.post( server + "buscar-solicitudes", { idstate: $('#idstate').val() ,date_start: $('#date_start').val() ,date_end: $('#date_end').val() } )
+            .done(function(data) {
+                $('#table_solicitude_wrapper').remove();
+                $('.table-solicituds').append(data);
+                $('#table_solicitude').dataTable({
                         "bLengthChange": false,
                         'iDisplayLength': 5
                     }
                 );
-            });
-        }, 200)
+                l.stop();
+            })
+            .fail(function() {
+                alert( "error" );
+            })
 
     });
-*/
-    /** Supervisor */
+
+    /* Cancelar una solicitud */
+    var cancel_solicitude = $('.cancel');
+    cancel_solicitude.on('click',function(e){
+        e.preventDefault();
+        alert('dsads');
+        $.post(server + 'cancelar-solicitud-rm',{idsolicitude : $(this).attr('data-idsolicitude')})
+            .done(function(data){
+                $('#table_solicitude_wrapper').remove();
+                $('.table-solicituds').append(data);
+                $('#table_solicitude').dataTable({
+                        "bLengthChange": false,
+                        'iDisplayLength': 5
+                    }
+                );
+            })
+    });
+
+    /** SUPERVISOR */
 
     /* listar solicitudes pendientes */
     $.ajax({
@@ -331,22 +365,7 @@ function newSolicitude() {
         );
     });
 
-    /* listar actividades pendientes */
-   /* $.ajax({
-        url: server + 'listar-actividades-sup/' + 2,
-        type: 'GET',
-        dataType: 'html'
-
-    }).done(function (data) {
-        $('.table-activities-sup').append(data);
-        $('#table_activity_sup').dataTable({
-                "bLengthChange": false,
-                'iDisplayLength': 5
-            }
-        );
-    });*/
-
-    $('#selectestatesolicitude_sup').on('change', function () {
+    $('#select_state_solicitude_sup').on('change', function () {
         var idstate = $(this).val();
        $('#table_solicitude_sup_wrapper').remove();
         setTimeout(function () {
@@ -367,30 +386,6 @@ function newSolicitude() {
         }, 200)
 
     });
-    /*
-    $('#selectestateactivity_sup').on('change', function () {
-
-        var idstate = $(this).val();
-        $('#table_activity_sup_wrapper').remove();
-        setTimeout(function () {
-
-            $.ajax({
-                url: server + 'listar-actividades-sup/' + idstate,
-                type: 'GET',
-                dataType: 'html'
-
-            }).done(function (data) {
-                $('.table-activities-sup').append(data);
-                $('#table_activity_sup').dataTable({
-                        "bLengthChange": false,
-                        'iDisplayLength': 5
-                    }
-                );
-            });
-        }, 200)
-
-    });
-*/
 
     var form_acepted_solicitude = $('#form_make_activity');
     $('#register_activity').on('click', function () {
@@ -410,20 +405,24 @@ function newSolicitude() {
 
     });
 
-    var search_solicitude = $('#search_solicitude');
-    $('#search-solicitude').on('click',function(){
-        var l = Ladda.create(this);
-        l.start();
 
-        var jqxhr = $.post( server + "buscar-solicitudes", { idstate: $('#idstate').val() ,date_start: $('#date_start').val() ,date_end: $('#date_end').val() } )
+
+    var search_solicitude_sup = $('#search_solicitude_sup');
+    search_solicitude_sup.on('click',function(){
+        var l = Ladda.create(this);
+        var idstate = $('#select_state_solicitude_sup').val();
+        l.start();
+        var jqxhr = $.post( server + "buscar-solicitudes-sup",
+            { idstate: idstate ,date_start: $('#date_start').val() ,date_end: $('#date_end').val() } )
             .done(function(data) {
-                $('#table_solicitude_wrapper').remove();
-                $('.table-solicituds').append(data);
-                $('#table_solicitude').dataTable({
-                        "bLengthChange": false,
-                        'iDisplayLength': 5
-                    }
-                );
+                $('#table_solicitude_sup_wrapper').remove();
+                $('.table-solicituds-sup').append(data);
+                $('#table_solicitude_sup').dataTable({
+                            "bLengthChange": false,
+                            'iDisplayLength': 5
+                        }
+                    );
+
                 l.stop();
             })
             .fail(function() {
@@ -431,6 +430,7 @@ function newSolicitude() {
             })
 
     });
+
     $("#date_start").datepicker({
         language: 'es',
         format: 'dd/mm/yyyy'
@@ -438,8 +438,6 @@ function newSolicitude() {
 
 
     $("#date_end").datepicker({
-
-
         //startDate: new Date($.datepicker.formatDate('dd, mm, yy', new Date($('#date_start').val()))),
         language: 'es',
         endDate: new Date(),

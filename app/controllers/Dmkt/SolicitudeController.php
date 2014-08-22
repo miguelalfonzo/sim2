@@ -85,6 +85,7 @@ class SolicitudeController extends BaseController{
         $solicitude->monto = $inputs['monto'];
         $solicitude->estado = 2;
         $solicitude->fecha_entrega = $date;
+        $solicitude->idtiposolicitud = $inputs['type_solicitude'];
 
         $solicitude->idsubtipoactividad = $inputs['sub_type_activity'];
         $solicitude->tipo_moneda = $inputs['money'];
@@ -156,9 +157,6 @@ class SolicitudeController extends BaseController{
         $typesolicituds = TypeSolicitude::all();
 
         $subtypeactivities= SubTypeActivity::all();
-        //echo json_encode($solicitude->subtype);
-        //echo json_encode($subtypeactivities);
-
 
         $data = [
 
@@ -221,6 +219,20 @@ class SolicitudeController extends BaseController{
         return Redirect::to('show_rm');
 
     }
+
+    public function cancelSolicitude(){
+
+        $inputs = Input::all();
+        $id = $inputs['idsolicitude'];
+        $solicitude = Solicitude::where('idsolicitud',$id);
+        $solicitude->estado = 1;
+        $data = $this->objectToArray($solicitude);
+        $solicitude->update($data);
+
+        return $this->listSolicitude(2);
+
+
+    }
     public function subtypeactivity($id){
 
         $subtypeactivities = SubTypeActivity::where('idtipoactividad',$id)->get();
@@ -233,10 +245,10 @@ class SolicitudeController extends BaseController{
         $estado = $inputs['idstate'];
         $start = $inputs['date_start'];
         $end = $inputs['date_end'];
-        /*$solicituds = Solicitude::where('estado',$estado)
-        ->where('created_at', $start)
-        ->get();*/
-        $solicituds = Solicitude::select('*')->where('estado',$estado)->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")->get();
+        $solicituds = Solicitude::select('*')
+            ->where('estado',$estado)
+            ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+            ->get();
         $view = View::make('Dmkt.Rm.view_solicituds_rm')->with('solicituds',$solicituds);
         return $view;
     }
@@ -256,18 +268,15 @@ class SolicitudeController extends BaseController{
         $clients = Client::whereIn('clcodigo',$clients)->get(array('clcodigo','clnombre'));
         $families = DB::table('DMKT_RG_SOLICITUD_FAMILIA')->where('idsolicitud', $id)->lists('idfamilia');
         $families= Marca::whereIn('id',$families)->get(array('id','descripcion'));
-
         $data = [
 
             'solicitude' => $solicitude,
             'clients' => $clients,
             'families' => $families
         ];
-        //echo json_encode($data);
-
         return View::make('Dmkt.Sup.view_solicitude_sup',$data);
-
     }
+
     public function denySolicitude(){
 
         $inputs = Input::all();
@@ -305,4 +314,17 @@ class SolicitudeController extends BaseController{
         return $view;
     }
 
+    public function searchSolicitudsSup(){
+
+        $inputs = Input::all();
+        $estado = $inputs['idstate'];
+        $start = $inputs['date_start'];
+        $end = $inputs['date_end'];
+        $solicituds = Solicitude::select('*')
+            ->where('estado',$estado)
+            ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+            ->get();
+        $view = View::make('Dmkt.Sup.view_solicituds_sup')->with('solicituds',$solicituds);
+        return $view;
+    }
 }

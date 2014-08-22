@@ -6,30 +6,30 @@
     }
 </style>
 
-<div class="nueva_solicitud col-sm-12 col-md-12">
+<div class="content">
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">Solicitud Supervisor</h3>
+            <h3 class="panel-title">Ver Solicitud Supervisor</h3>
         </div>
         <div class="panel-body">
             <form id="form_make_activity" class="form-horizontal" method="post" action="">
                 <input id="textinput" name="idsolicitude" type="hidden" placeholder="" value="{{$solicitude->idsolicitud}}">
-                <div class="col-sm-6 col-md-6" style="">
 
-                    <div class="form-group col-sm-12 col-md-12">
+
+                    <div class="form-group col-sm-6 col-md-4">
 
                         <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo Solicitud</label>
 
                         <div class="col-sm-12 col-md-12">
                             <input id="textinput" name="textinput" type="text" placeholder=""
-                                   value="{{$solicitude->tipo_solicitud}}" readonly
+                                   value="{{$solicitude->typesolicitude->nombre}}" readonly
                                    class="form-control input-md">
 
                         </div>
                     </div>
 
-                    <div class="form-group col-sm-12 col-md-12">
+                    <div class="form-group col-sm-6 col-md-4">
 
                         <label class="col-sm-8 col-md-8 control-label" for="textinput">Nombre Solicitud</label>
 
@@ -41,22 +41,22 @@
                         </div>
                     </div>
 
-                    <div class="form-group col-sm-12 col-md-12">
+                    <div class="form-group col-sm-6 col-md-4">
                         <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto</label>
 
                         <div class="col-sm-12 col-md-12">
                             @if($solicitude->estado == 2)
-                            <input id="textinput" name="monto" type="text" placeholder="" value="{{$solicitude->monto}}"
+                            <input id="idamount" name="monto" type="text" placeholder="" value="{{$solicitude->monto}}"
                                    class="form-control input-md">
                             @else
-                            <input id="textinput" name="monto" type="text" placeholder="" value="{{$solicitude->monto}}"
+                            <input id="idamount" name="monto" type="text" placeholder="" value="{{$solicitude->monto}}"
                                    class="form-control input-md" readonly>
                             @endif
 
                         </div>
                     </div>
 
-                    <div class="form-group col-sm-12 col-md-12">
+                    <div class="form-group col-sm-6 col-md-4">
 
                         <div class=col-md-12>
                             <div class="panel panel-default">
@@ -83,12 +83,11 @@
                     </div>
 
 
-                </div>
 
 
-                <div class="col-sm-6 col-md-6" style="">
 
-                    <div class="form-group col-sm-12 col-md-12">
+
+                    <div class="form-group col-sm-6 col-md-4">
                         <label class="col-sm-8 col-md-8 control-label" for="selectbasic">Tipo de Actividad</label>
 
 
@@ -100,7 +99,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group col-sm-12 col-md-12">
+                    <div class="form-group col-sm-6 col-md-4">
                         <label class="col-sm-8 col-md-8 control-label" for="textinput">Fecha de Entrega</label>
 
                         <div class="col-sm-12 col-md-12">
@@ -112,7 +111,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group col-sm-12 col-md-12">
+                    <div class="form-group col-sm-6 col-md-4">
 
                         <div class=col-md-12>
                             <div class="panel panel-default">
@@ -138,7 +137,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group col-sm-12 col-md-12">
+                    <div class="form-group col-sm-6 col-md-4">
 
                         <label class="col-sm-8 col-md-8 control-label" for="textinput">Observacion</label>
 
@@ -154,7 +153,10 @@
                     </div>
 
 
-                </div>
+
+
+
+
                 <div class="col-sm-12 col-md-12" style="margin-top: 10px">
                     <div class="form-group col-sm-12 col-md-12">
                         <label class="col-sm-8 col-md-8 control-label" for="textarea">Descripcion de la
@@ -172,10 +174,10 @@
 
                     <div class="col-sm-12 col-md-12" style="text-align: center">
                         @if($solicitude->estado == 2)
-                        <a href="{{URL::to('aceptar_solicitud')}}" id="register_activity" name="button1id" class="btn btn-primary register_solicitude">Aceptar
+                        <a href="{{URL::to('aceptfar_solicitud')}}" id="register_activity" name="button1id" class="btn btn-primary register_solicitude">Aceptar
                         </a>
-                        <button  id="deny_solicitude" name="button1id" class="btn btn-primary deny_solicitude">Rechazar
-                        </button>
+                        <a  id="deny_solicitude" name="button1id" class="btn btn-primary deny_solicitude">Rechazar
+                        </a>
                         <a id="button2id" href="{{URL::to('show_sup')}}" name="button2id"
                            class="btn btn-primary">Cancelar</a>
                         @else

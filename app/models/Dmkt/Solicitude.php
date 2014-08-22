@@ -44,6 +44,6 @@ class Solicitude extends Eloquent{
     }
 
     function typesolicitude(){
-        return $this->hasOne('Dmkt\TypeSolicitude','idtypesolicitude','idtypesolicitude');
+        return $this->hasOne('Dmkt\TypeSolicitude','idtiposolicitud','idtiposolicitud');
     }
 }

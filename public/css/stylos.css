@@ -19,7 +19,7 @@ selectproduct{
 #btn-add-client{
 
     margin-left: 16px;
-    margin-top: -10px;
+    margin-top: -20px;
 }
 #btn-add-family{
     margin-left: 16px;
@@ -73,6 +73,9 @@ selectproduct{
     .div-icons-solicituds {
         width: 100px;
     }
+}
+.input-placeholder-error::-webkit-input-placeholder { /* WebKit browsers */
+    color:    red !important;
 }
 
 
