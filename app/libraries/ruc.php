@@ -2,6 +2,7 @@
 
 class RUC{
 	public function consultRuc($rucConsult){
+		set_time_limit(60);
 		$url = 'http://www.sunat.gob.pe/w/wapS01Alias?ruc='.$rucConsult;
 		$proxy = 'proxy.bagoperu.com.pe:3128';
 		$proxyauth = 'outinf01:uy349asx';
@@ -48,7 +49,7 @@ class RUC{
 			$data['dependencia'] = trim($dependencia[1]);
 			preg_match("(<br/>(.*))", $salida[1][$i++], $tipo);
 			$data['tipo'] = trim($tipo[1]);
-			
+
 			return $data;
 		}
 	}

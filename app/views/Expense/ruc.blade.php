@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 	<head>
 		<meta charset="utf8">
@@ -6,8 +6,10 @@
 	</head>
 	<body>
 		<?php
+			set_time_limit(60);
 			// $rucConsultado='10461782863';
-			$rucConsultado= '20160641810';
+			// $rucConsultado= '20160641810';
+			$rucConsultado= '20556820628';
 			$url = 'http://www.sunat.gob.pe/w/wapS01Alias?ruc='.$rucConsultado;
 			$proxy = 'proxy.bagoperu.com.pe:3128';
 			$proxyauth = 'outinf01:uy349asx';

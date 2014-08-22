@@ -121,6 +121,22 @@ table thead th, table th
 	padding: 0.3em 1em;
 }
 
+.search-ruc
+{
+	background: #428bca;
+	color: white;
+}
+
+.search-ruc:hover
+{
+	cursor: pointer;
+}
+
+.search-ruc span
+{
+	font-size: 1.3em;
+}
+
 .tot-document
 {
 	display: none;

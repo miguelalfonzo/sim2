@@ -11,6 +11,7 @@
 					<div class="form-expense">
 						<label>Solicitud</label>
 						<input type="text" class="form-control" value="{{$data['activity']['solicitude']}}" disabled>
+						<input type="hidden" id="idsolicitude" value="{{$data['activity']['id']}}">
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
@@ -62,13 +63,16 @@
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>RUC</label>
-						<input id="ruc" type="text" class="form-control" maxlength="11">
+						<div class="input-group">
+							<input id="ruc" type="text" class="form-control" maxlength="11">
+							<div class="input-group-addon search-ruc"><span class="glyphicon glyphicon-search"></span></div>
+						</div>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Razón Social</label>
-						<button id="razon" type="button" class="form-control ladda-button" data-style="expand-left" data-spinner-color="#5c5c5c" value=0 data-edit=0 readonly>Buscando Razon Social ...
+						<button id="razon" type="button" class="form-control ladda-button" data-style="expand-left" data-spinner-color="#5c5c5c" value=0 data-edit=0 readonly>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
@@ -112,61 +116,55 @@
 									</thead>
 									<tbody>
 										<tr>
-											<th class="quantity"><input type="text" class="form-control" value=1></th>
+											<th class="quantity"><input type="text" class="form-control" value=1 maxlength="3"></th>
 											<th class="description"><input type="text" class="form-control" value="Pizza Mediana"></th>
 											<th>
 												<select class="form-control type-expense">
-													<option value="">Movilidad</option>
-													<option value="">Viajes</option>
-													<option value="">Comida</option>
-													<option value="">Viáticos</option>
-													<option value="">Otros Gastos</option>
+													@foreach($data['activity']['expenseType'] as $val)
+														<option value="{{$val['cod']}}">{{$val['descripcion']}}</option>
+													@endforeach
 												</select>
 											</th>
 											<th class="total-item">
 												<div class="input-group">
 											    	<div class="input-group-addon">{{$data['activity']['simbolMoney']}}</div>
-											      	<input class="form-control" type="text" value="29">
+											      	<input class="form-control" type="text" value="29" maxlength="8">
 											    </div>
 											</th>
 											<th><a class="delete-item" href="#"><span class="glyphicon glyphicon-remove"></span></a></th>
 										</tr>
 										<tr>
-											<th class="quantity"><input type="text" class="form-control" value=3></th>
+											<th class="quantity"><input type="text" class="form-control" value=3 maxlength="3"></th>
 											<th class="description"><input type="text" class="form-control" value="Vinos"></th>
 											<th>
 												<select class="form-control type-expense">
-													<option value="">Movilidad</option>
-													<option value="">Viajes</option>
-													<option value="">Comida</option>
-													<option value="">Viaticos</option>
-													<option value="">Otros Gastos</option>
+													@foreach($data['activity']['expenseType'] as $val)
+														<option value="{{$val['cod']}}">{{$val['descripcion']}}</option>
+													@endforeach
 												</select>
 											</th>
 											<th class="total-item">
 												<div class="input-group">
 											    	<div class="input-group-addon">{{$data['activity']['simbolMoney']}}</div>
-											      	<input class="form-control" type="text" value="21">
+											      	<input class="form-control" type="text" value="21" maxlength="8">
 											    </div>
 											</th>
 											<th><a class="delete-item" href="#"><span class="glyphicon glyphicon-remove"></span></a></th>
 										</tr>
 										<tr>
-											<th class="quantity"><input type="text" class="form-control" value=1></th>
+											<th class="quantity"><input type="text" class="form-control" value=1 maxlength="3"></th>
 											<th class="description"><input type="text" class="form-control" value="Agua"></th>
 											<th>
 												<select class="form-control type-expense">
-													<option value="">Movilidad</option>
-													<option value="">Viajes</option>
-													<option value="">Comida</option>
-													<option value="">Viaticos</option>
-													<option value="">Otros Gastos</option>
+													@foreach($data['activity']['expenseType'] as $val)
+														<option value="{{$val['cod']}}">{{$val['descripcion']}}</option>
+													@endforeach
 												</select>
 											</th>
 											<th class="total-item">
 												<div class="input-group">
 											    	<div class="input-group-addon">{{$data['activity']['simbolMoney']}}</div>
-											      	<input class="form-control" type="text" value="3">
+											      	<input class="form-control" type="text" maxlength="8" value="3">
 											    </div>
 											</th>
 											<th><a class="delete-item" href="#"><span class="glyphicon glyphicon-remove"></span></a></th>
@@ -253,7 +251,7 @@
 										<th class="razon">MENDOZA BARREDA WALTER ISRAEL</th>
 										<th class="voucher_number">002-002335</th>
 										<th class="date_movement">18/07/2014</th>
-										<th class="total"><span>{{$data['activity']['simbolMoney']}}</span>&nbsp;95</th>
+										<th class="total">{{$data['activity']['simbolMoney']}}&nbsp;<span>95</span></th>
 										<th><a class="edit-expense" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
 										<th><a class="delete-expense" href="#"><span class="glyphicon glyphicon-remove"></span></a></a></th>
 									</tr>
@@ -263,7 +261,7 @@
 										<th class="razon">AEDO ANTEZANA RUTH IDALIA</th>
 										<th class="voucher_number">001-02192</th>
 										<th class="date_movement">18/07/2014</th>
-										<th class="total"><span>{{$data['activity']['simbolMoney']}}</span>&nbsp;71</th>
+										<th class="total">{{$data['activity']['simbolMoney']}}&nbsp;<span>71</span></th>
 										<th><a class="edit-expense" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
 										<th><a class="delete-expense" href="#"><span class="glyphicon glyphicon-remove"></span></a></a></th>
 									</tr>

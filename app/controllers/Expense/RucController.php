@@ -16,9 +16,13 @@ class RucController extends BaseController{
     	{
 			$rucClass = new RUC;
 			$data     = $rucClass->consultRUC($rucConsult);
+			$reg = array();
 			if(is_array($data))
 			{
-				return $data;
+				foreach ($data as $key => $value) {
+					$reg [$key] = $this->encodingString($value);
+				}
+				return $reg;
 			}
 			else
 			{
@@ -26,4 +30,13 @@ class RucController extends BaseController{
 			}
     	}
     }
+    
+    public function encodingString($stringData)
+    {
+    	foreach (mb_list_encodings() as $val) {
+    		$stringUTF8 = mb_convert_encoding($stringData, 'UTF-8');
+    	}
+    	return $stringUTF8;
+    }
+
 }
