@@ -9,7 +9,9 @@
 <div class="nueva_solicitud col-sm-12 col-md-12">
 
     <div class="panel panel-default">
-        <div class="panel-heading"><h4>Solicitud Sup</h4></div>
+        <div class="panel-heading">
+            <h3 class="panel-title">Solicitud Supervisor</h3>
+        </div>
         <div class="panel-body">
             <form id="form_make_activity" class="form-horizontal" method="post" action="">
                 <input id="textinput" name="idsolicitude" type="hidden" placeholder="" value="{{$solicitude->idsolicitud}}">
@@ -104,7 +106,7 @@
                         <div class="col-sm-12 col-md-12">
                             <div class="input-group date">
                                 <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-                                <input id="date" type="text" name="delivery_date" value="{{isset($solicitude)? $solicitude->fecha_entrega : null }}" class="form-control" maxlength="10" readonly placeholder="">
+                                <input id="date" type="text" name="delivery_date" value="{{ date_format(date_create($solicitude->fecha_entrega), 'd/m/Y' )}}" class="form-control" maxlength="10" readonly placeholder="">
                             </div>
 
                         </div>
@@ -168,13 +170,10 @@
                 <!-- Button (Double) -->
                 <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
 
-
                     <div class="col-sm-12 col-md-12" style="text-align: center">
                         @if($solicitude->estado == 2)
-                        <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">Editar
-                        </button>
-                        <button  id="register_activity" name="button1id" class="btn btn-primary register_solicitude">Crear Actividad
-                        </button>
+                        <a href="{{URL::to('aceptar_solicitud')}}" id="register_activity" name="button1id" class="btn btn-primary register_solicitude">Aceptar
+                        </a>
                         <button  id="deny_solicitude" name="button1id" class="btn btn-primary deny_solicitude">Rechazar
                         </button>
                         <a id="button2id" href="{{URL::to('show_sup')}}" name="button2id"

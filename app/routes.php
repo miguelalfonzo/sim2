@@ -29,7 +29,7 @@ Route::post('registrar-solicitud','Dmkt\SolicitudeController@registerSolicitude'
 Route::get('listar-solicitudes/{id}','Dmkt\SolicitudeController@listSolicitude');
 Route::get('getsubtypeactivities/{id}','Dmkt\SolicitudeController@subtypeactivity');
 Route::get('nueva-actividad','Dmkt\ActivityController@newActivity');
-
+Route::post('buscar-solicitudes','Dmkt\SolicitudeController@searchSolicituds');
 /*activities*/
 Route::get('listar-actividades-rm/{id}','Dmkt\ActivityController@listActivitiesRM');
 Route::get('listar-actividades-sup/{id}','Dmkt\ActivityController@listActivitiesSup');
@@ -41,7 +41,7 @@ Route::get('show_sup','Dmkt\SolicitudeController@show_sup');
 Route::get('ver-solicitud-sup/{id}','Dmkt\SolicitudeController@viewSolicitudeSup');
 Route::get('listar-solicitudes-sup/{id}','Dmkt\SolicitudeController@listSolicitudeSup');
 Route::post('rechazar-solicitud','Dmkt\SolicitudeController@denySolicitude');
-Route::post('crear-actividad','Dmkt\ActivityController@registerActivity');
+Route::post('aceptar-solicitud','Dmkt\SolicitudeController@aceptedSolicitude');
 
 // ======================================================================
 

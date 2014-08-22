@@ -33,9 +33,9 @@
         <section>
             @yield('solicitude')
         </section>
-        <section>
+       <!-- <section>
             @yield('actividad')
-        </section>
+        </section>-->
 		{{ HTML::script('js/jquery.numeric.js') }}
 		{{ HTML::script('js/bootstrap.min.js') }}
 		{{ HTML::script('js/bootstrap-datepicker.js') }}

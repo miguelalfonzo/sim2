@@ -13,7 +13,7 @@
     <h4>Nueva Solicitud</h4>
 </div>
 <div class="panel-body">
-<form id="form-register-solicitude" class="form-horizontal" method="post"
+<form id="form-register-solicitude" class="" method="post"
       action="{{ URL::to( isset($solicitude) ? 'editar-solicitud' : 'registrar-solicitud' )}}">
 
 @if(isset($solicitude))
@@ -38,9 +38,13 @@
 
     <div class="col-sm-12 col-md-12">
         <select id="" name="type_solicitude" class="form-control selecttypesolicitude">
-            <option value="Actividad">Actividad</option>
-            <option value="Regalos">Regalos</option>
-            <option value="Reembolso">Reembolso</option>
+            @foreach($typesolicituds as $type)
+            @if(isset($solicitude) && $solicitude->idtiposolicitud == $type->idtiposolicitud)
+            <option selected value="{{$type->idtiposolicitud}}">{{$type->nombre}}</option>
+            @else
+            <option value="{{$type->idtiposolicitud}}">{{$type->nombre}}</option>
+            @endif
+            @endforeach
         </select>
 
     </div>
@@ -84,24 +88,8 @@
 </div>
 
 <div class="form-group col-sm-6 col-md-4">
-    <label class="col-sm-8 col-md-8 control-label" for="selectbasic">Tipo de Actividad</label>
 
-    <div class="col-sm-12 col-md-12">
-        <select id="type_activity" name="type_activity" class="form-control">
-            @foreach($typeactivities as $type)
-            @if(isset($solicitude) && $type->idtipoactividad == $solicitude->subtype->idtipoactividad)
-            <option selected value="{{$type->idtipoactividad}}">{{$type->nombre}}</option>
-            @else
-            <option value="{{$type->idtipoactividad}}">{{$type->nombre}}</option>
-            @endif
-            @endforeach
-        </select>
-    </div>
-</div>
-
-<div class="form-group col-sm-6 col-md-4">
-
-    <label class="col-sm-8 col-md-8 control-label" for="textinput">Sub Tipo Actividad</label>
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Fondo</label>
 
     <div class="col-sm-12 col-md-12">
         <select id="sub_type_activity" name="sub_type_activity" class="form-control">
@@ -125,7 +113,9 @@
 
         <div class="input-group date">
             <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-            <input id="date" type="text" name="delivery_date" value="{{isset($solicitude)? date_format(date_create($solicitude->fecha_entrega), 'd/m/Y' ) : null }}" class="form-control" maxlength="10" readonly placeholder="">
+            <input id="date" type="text" name="delivery_date"
+                   value="{{isset($solicitude)? date_format(date_create($solicitude->fecha_entrega), 'd/m/Y' ) : null }}"
+                   class="form-control" maxlength="10" readonly placeholder="">
         </div>
 
     </div>
@@ -258,7 +248,3 @@
 </div>
 </div>
 @stop
-<script>
-
-
-</script>

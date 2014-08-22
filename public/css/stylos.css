@@ -61,8 +61,19 @@ selectproduct{
     background: 0;
 
 }
+@media screen and (max-width: 780px){
 
+    .button-new-solicitude{
+        text-align: left !important;
+    }
+    .div-icons-solicituds span{
 
+        font-size: 1em !important;
+    }
+    .div-icons-solicituds {
+        width: 100px;
+    }
+}
 
 
 
