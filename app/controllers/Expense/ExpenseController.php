@@ -6,42 +6,35 @@ use \BaseController;
 use \View;
 use \Dmkt\Activity;
 use \Dmkt\Solicitude;
-use \Expense\TypeProof;
+use \Expense\ProofType;
 
 class ExpenseController extends BaseController{
 
 	public function show(){
-		$id = 1;
-
-		$activity = Activity::find($id);
-		$solicitude = Solicitude::find($activity->idsolicitud);
-		$typeProof = TypeProof::all();
+		$id = 2;
+		//depositado es 5
+		
+		$solicitude = Solicitude::find($id);
+		$typeProof = ProofType::all();
 		$proof = array();
 
 		foreach ($typeProof as $key => $value) {
 			$proof[$key] = ['cod'=>$value->idcomprobante,'descripcion'=>mb_convert_case($value->descripcion, MB_CASE_TITLE, "UTF-8")];
 		}
 		
-		$dataActivity['description'] = mb_convert_case($solicitude->descripcion, MB_CASE_TITLE, "UTF-8");
+		$dataActivity['solicitude'] = mb_convert_case($solicitude->descripcion, MB_CASE_TITLE, "UTF-8");
 		$dataActivity['typeActivity'] = mb_convert_case($solicitude->subtype->nombre, MB_CASE_TITLE, "UTF-8");
-		$dataActivity['idDeposit'] = $activity->deposit->num_transferencia;
+		// $dataActivity['idDeposit'] = $activity->deposit->num_transferencia;
 		$dataActivity['typeMoney'] = mb_convert_case($solicitude->typemoney->descripcion, MB_CASE_TITLE, "UTF-8");
-		$dataActivity['totalDeposit'] = $activity->deposit->total;
+		// $dataActivity['totalDeposit'] = $activity->deposit->total;
 		$dataActivity['simbolMoney'] = mb_convert_case($solicitude->typemoney->simbolo, MB_CASE_UPPER, "UTF-8");
-		$dataActivity['typeProof'] = $proof;
-
-		// var_dump($activity->iddeposito);
-		// var_dump($solicitude->descripcion);
-		// var_dump($dataActivity['codDeposito']);
-		// var_dump($dataActivity);
-		// return;
-		// die;
+		$dataActivity['proofType'] = $proof;
 
 		$date = $this->getDay();
 
 		$data = ['date'=>$date,'activity'=>$dataActivity];
 
-		// var_dump($data['activity']['typeProof']['0']);
+		// var_dump($data['activity']['solicitude']);
 		// return;
 		// die;
 

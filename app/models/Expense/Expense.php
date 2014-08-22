@@ -9,6 +9,7 @@ use \Common\SubTypeActivity;
 class Expense extends Eloquent {
 
 	protected $table= 'DMKT_RG_GASTOS';
+	protected $primaryKey = 'idgasto';
 
 	public function idEstado(){
 		return $this->hasOne('\Common\State','idestado','estado_idestado');
@@ -18,11 +19,7 @@ class Expense extends Eloquent {
 		return $this->hasOne('\Common\TypeMoney','idtipomoneda','tipo_moneda');
 	}
 
-	public function idActivity(){
-		return $this->hasOne('\Common\SubTypeActivity','idsubtipoactividad','actividad_idactividad');
-	}
-
-	public function idTypeProof(){
-		return $this->hasOne('TypeProof','idcomprobante','tipo_comprobante');
+	public function idProofType(){
+		return $this->hasOne('ProofType','idcomprobante','tipo_comprobante');
 	}
 }

@@ -19,11 +19,7 @@ $(function(){
         $(".total-item input").numeric();
         $(".quantity input").numeric();
 
-    //Evento de Botones
-        //Botón cancelar de la vista registro-gasto
-        $("#cancel-expense").on("click",function(){
-            window.location.href = server+"show_rm";
-        });
+    //Evento  Datepicker, Botones, Keyup.
         //Datepicker a todas las clases date
         $(".date").datepicker({
             language: 'es',
@@ -36,10 +32,36 @@ $(function(){
             $(this).datepicker('hide');
         });
 
-        //Escoge eliminar un documento ya registrado
-        $(document).on("click","#table .delete-expense",function(e){
+        $("#proof-type").on("change",function(){
+            if($(this).val()==='2')
+            {
+                $(".tot-document").show();
+            }
+            else
+            {
+                $(".tot-document").hide();   
+            }
+        });
+
+        //Botón cancelar de la vista registro-gasto
+        $("#cancel-expense").on("click",function(){
+            window.location.href = server+"show_rm";
+        });
+
+        //Eliminar un item del documento a registrar
+        $(document).on("click","#table-items .delete-item",function(e){
             e.preventDefault();
-            var tot_del  = $(this).parent().parent().find(".total").html();
+            var row_item = $(this).parent().parent();
+            if($("#table-items .delete-item").length>1)
+            {
+                row_item.remove();
+            }
+        });
+
+        //Eliminar un documento ya registrado
+        $(document).on("click","#table-expense .delete-expense",function(e){
+            e.preventDefault();
+            var tot_del  = $(this).parent().parent().html();
             var row_del  = $(this).parent().parent();
             var deposit  = $("#deposit").val();
             var tot_rows = 0;
@@ -61,6 +83,14 @@ $(function(){
             });
         });
 
+        //Agregar un item al momento de registrar el gasto
+        $("#add-item").on("click",function(e){
+            e.preventDefault();
+            var rowItem = $("#table-items").find('.quantity:eq(0)').parent().clone(true,true);
+            rowItem.find('input').val("");
+            $("#table-items tbody").append(rowItem);
+        });
+
         //Escoge editar un documento ya registrado
         $(document).on("click","#table .edit-expense",function(e){
             e.preventDefault();
@@ -68,10 +98,8 @@ $(function(){
             $("#type_voucher option").attr("selected",false);
             $("#save-expense ").html("Actualizar");
             $("#razon").attr("data-edit",1);
-
             var deposit  = $("#deposit").val();
             deposit = parseInt(deposit.substring(2,deposit.length),10);
-
             var tot=0;
             var rows = $(".total").parent();
             $.each(rows,function(){
@@ -259,17 +287,10 @@ $(function(){
     
     //Ajax
         //Búsqueda de Razón Social en la SUNAT una vez introducido el RUC
-        $("#ruc").on("focusout",function(){
+        $("#ruc").on("keyup",function(){
             var ruc = $(this).val();
             var l   = Ladda.create(document.getElementById('razon'));
-            $("#razon").val(0);
-            if(ruc.length<11)
-            {
-                $("#ruc").addClass("error-incomplete");
-                $("#razon").css("color","#5c5c5c");
-                $("#razon").html("El ruc ingresado no contiene 11 dígitos.");
-            }
-            else
+            if($(this).val().length === 11)
             {
                 $.ajax({
                     type: 'post',
@@ -316,6 +337,23 @@ $(function(){
             $(this).attr("placeholder",'');
         });
 
+        //Agrega errores si el Ruc es 0 o menor a 11 digitos
+        $("#ruc").on("focusout",function(){
+            var ruc = $(this).val();
+            $("#razon").val(0);
+            if(ruc.length===0)
+            {
+                $("#ruc").addClass("error-incomplete");
+                $("#razon").css("color","#5c5c5c");
+                $("#razon").html("No ha ingresado el RUC.");
+            }
+            if(ruc.length>0 && ruc.length<11)
+            {
+                $("#ruc").addClass("error-incomplete");
+                $("#razon").css("color","#5c5c5c");
+                $("#razon").html("El RUC ingresado no contiene 11 dígitos.");
+            }
+        });
 
     //Funciones
         //Validación de RUC en los documentos ya registrados
