@@ -16,6 +16,8 @@ function newSolicitude() {
     });
 
 
+
+
     $(document).on("click", ".btn-delete-family", function () {
         $('#listfamily>li .porcentaje_error').css({"border": "0"});
 
@@ -280,7 +282,13 @@ function newSolicitude() {
         $('.table-solicituds').append(data);
         $('#table_solicitude').dataTable({
                 "bLengthChange": false,
-                'iDisplayLength': 5
+                'iDisplayLength': 5,
+                "oLanguage": {
+                    "sSearch": "Buscar: ",
+                    "sZeroRecords": "No hay solicitudes",
+                    "sInfoEmpty": "No hay solicitudes",
+                    "sInfo":'Mostrando _END_ de _TOTAL_'
+                }
             }
         );
     });
@@ -300,7 +308,13 @@ function newSolicitude() {
                 $('.table-solicituds').append(data);
                 $('#table_solicitude').dataTable({
                         "bLengthChange": false,
-                        'iDisplayLength': 5
+                        'iDisplayLength': 5,
+                        "oLanguage": {
+                            "sSearch": "Buscar: ",
+                            "sZeroRecords": "No hay solicitudes",
+                            "sInfoEmpty": "No hay solicitudes",
+                            "sInfo":'Mostrando _END_ de _TOTAL_'
+                        }
                     }
                 );
             });
@@ -308,7 +322,7 @@ function newSolicitude() {
 
     });
 
-    /* Filtramos todas las solicitudes */
+    /* Filtramos todas las solicitudes por fecha*/
     var search_solicitude = $('#search-solicitude');
     search_solicitude.on('click',function(){
         var l = Ladda.create(this);
@@ -319,7 +333,13 @@ function newSolicitude() {
                 $('.table-solicituds').append(data);
                 $('#table_solicitude').dataTable({
                         "bLengthChange": false,
-                        'iDisplayLength': 5
+                        'iDisplayLength': 5,
+                        "oLanguage": {
+                            "sSearch": "Buscar: ",
+                            "sZeroRecords": "No hay solicitudes",
+                            "sInfoEmpty": "No hay solicitudes",
+                            "sInfo":'Mostrando _END_ de _TOTAL_'
+                        }
                     }
                 );
                 l.stop();
@@ -330,22 +350,30 @@ function newSolicitude() {
 
     });
 
+
     /* Cancelar una solicitud */
-    var cancel_solicitude = $('.cancel');
-    cancel_solicitude.on('click',function(e){
+    var cancel_solicitude = '.cancel-solicitude';
+    $(document).on('click',cancel_solicitude,function(e){
         e.preventDefault();
-        alert('dsads');
         $.post(server + 'cancelar-solicitud-rm',{idsolicitude : $(this).attr('data-idsolicitude')})
-            .done(function(data){
-                $('#table_solicitude_wrapper').remove();
-                $('.table-solicituds').append(data);
-                $('#table_solicitude').dataTable({
-                        "bLengthChange": false,
-                        'iDisplayLength': 5
-                    }
-                );
-            })
+         .done(function(data){
+         $('#table_solicitude_wrapper').remove();
+         $('.table-solicituds').append(data);
+         $('#table_solicitude').dataTable({
+         "bLengthChange": false,
+         'iDisplayLength': 5,
+                 "oLanguage": {
+                     "sSearch": "Buscar: ",
+                     "sZeroRecords": "No hay solicitudes",
+                     "sInfoEmpty": "No hay solicitudes",
+                     "sInfo":'Mostrando _END_ de _TOTAL_'
+                 }
+         }
+         );
+         })
+
     });
+
 
     /** SUPERVISOR */
 
@@ -360,7 +388,13 @@ function newSolicitude() {
         $('.table-solicituds-sup').append(data);
         $('#table_solicitude_sup').dataTable({
                 "bLengthChange": false,
-                'iDisplayLength': 5
+                'iDisplayLength': 5,
+                "oLanguage": {
+                    "sSearch": "Buscar: ",
+                    "sZeroRecords": "No hay solicitudes",
+                    "sInfoEmpty": "No hay solicitudes",
+                    "sInfo":'Mostrando _END_ de _TOTAL_'
+                }
             }
         );
     });
@@ -379,7 +413,13 @@ function newSolicitude() {
                 $('.table-solicituds-sup').append(data);
                 $('#table_solicitude_sup').dataTable({
                         "bLengthChange": false,
-                        'iDisplayLength': 5
+                        'iDisplayLength': 5,
+                        "oLanguage": {
+                            "sSearch": "Buscar: ",
+                            "sZeroRecords": "No hay solicitudes",
+                            "sInfoEmpty": "No hay solicitudes",
+                            "sInfo":'Mostrando _END_ de _TOTAL_'
+                        }
                     }
                 );
             });
@@ -387,11 +427,43 @@ function newSolicitude() {
 
     });
 
-    var form_acepted_solicitude = $('#form_make_activity');
-    $('#register_activity').on('click', function () {
 
-        form_acepted_solicitude.attr('action', server + 'aceptar-solicitud');
-        form_acepted_solicitude.submit();
+    var amount_families = $('.amount_families');
+    amount_families.numeric({negative:false});
+    amount_families.keyup(function(){
+        console.log($(this).val()+ ' ' + $('#idamount').val());
+        if(parseInt($(this).val()) > parseInt($('#idamount').val())){
+            alert('el monto supera el monto total');
+        }
+    });
+
+    var amount_error_families =   $('#amount_error_families');
+
+    amount_families.on('focus',function(){
+        amount_error_families.text('');
+    });
+    var form_acepted_solicitude = $('#form_make_activity');
+    $('.accepted_solicitude_sup').on('click', function (e) {
+        var total = 0;
+        var idamount = $('#idamount');
+        e.preventDefault();
+        amount_families.each(function(index,value){
+            console.log(index + ' ' + $(this).val());
+            total += parseFloat($(this).val());
+        });
+
+        if(idamount.val()== Math.round(total)){
+            form_acepted_solicitude.attr('action', server + 'aceptar-solicitud');
+            form_acepted_solicitude.submit();
+        }else if(idamount.val() < Math.round(total)){
+            amount_error_families.text('El monto distribuido superan el monto total').css('color','red');
+            console.log('el monto distribuido superan el monto total')
+        }else{
+            amount_error_families.text('El monto distribuido es menor al monto total').css('color','red');
+            console.log(total);
+            console.log('el monto distribuido es menor al monto total')
+        }
+
 
     });
 
@@ -419,7 +491,13 @@ function newSolicitude() {
                 $('.table-solicituds-sup').append(data);
                 $('#table_solicitude_sup').dataTable({
                             "bLengthChange": false,
-                            'iDisplayLength': 5
+                            'iDisplayLength': 5,
+                            "oLanguage": {
+                            "sSearch": "Buscar: ",
+                            "sZeroRecords": "No hay solicitudes",
+                            "sInfoEmpty": "No hay solicitudes",
+                            "sInfo":'Mostrando _END_ de _TOTAL_'
+                        }
                         }
                     );
 
@@ -443,4 +521,6 @@ function newSolicitude() {
         endDate: new Date(),
         format: 'dd/mm/yyyy'
     });
+
+
 }

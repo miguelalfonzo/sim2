@@ -17,6 +17,7 @@ use \View;
 use \DB;
 use \Input;
 use \Redirect;
+use \Mail;
 use \Illuminate\Database\Query\Builder;
 
 class SolicitudeController extends BaseController{
@@ -34,8 +35,12 @@ class SolicitudeController extends BaseController{
 
     public function test(){
 
-        $var = SubTypeActivity::find(30);
-        echo json_encode($var->type);
+        $data = array('mensaje'=>'hola');
+        Mail::send('emails.template', $data, function ($message){
+            $message->to('cesarhm1687@gmail.com');
+            $message->subject('Aqui va el mensaje del asunto del email ');
+
+        });
     }
 
     public function show_rm(){
@@ -111,6 +116,21 @@ class SolicitudeController extends BaseController{
             $solicitude_families->save();
         }
 
+        $data = array(
+
+            'name'=> $inputs['titulo'],
+            'description' =>$inputs['description'],
+            'monto'=>$inputs['monto'],
+            'money'=>$inputs['money']
+
+        );
+        Mail::send('emails.template', $data, function ($message){
+            $message->to('cesarhm1687@gmail.com');
+            $message->subject('Nueva Solicitud');
+
+        });
+
+
         return Redirect::to('show_rm');
     }
 
@@ -140,6 +160,7 @@ class SolicitudeController extends BaseController{
             'solicitude' => $solicitude,
             'clients' => $clients,
             'families' => $families
+
         ];
         //echo json_encode($data);
 
@@ -231,8 +252,8 @@ class SolicitudeController extends BaseController{
 
         return $this->listSolicitude(2);
 
-
     }
+
     public function subtypeactivity($id){
 
         $subtypeactivities = SubTypeActivity::where('idtipoactividad',$id)->get();
@@ -268,11 +289,13 @@ class SolicitudeController extends BaseController{
         $clients = Client::whereIn('clcodigo',$clients)->get(array('clcodigo','clnombre'));
         $families = DB::table('DMKT_RG_SOLICITUD_FAMILIA')->where('idsolicitud', $id)->lists('idfamilia');
         $families= Marca::whereIn('id',$families)->get(array('id','descripcion'));
+        $managers = Manager::all();
         $data = [
 
             'solicitude' => $solicitude,
             'clients' => $clients,
-            'families' => $families
+            'families' => $families,
+            'managers' => $managers
         ];
         return View::make('Dmkt.Sup.view_solicitude_sup',$data);
     }

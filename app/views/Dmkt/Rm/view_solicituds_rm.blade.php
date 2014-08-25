@@ -26,7 +26,7 @@
 
                 @if($solicitude->estado == 2)
                 <a href="{{URL::to('editar-solicitud').'/'.$solicitude->idsolicitud}}"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-pencil"></span></a>
-                <a href="#" class="cancel" data-idsolicitude = "{{$solicitude->idsolicitud}}"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-remove"></span></a>
+                <a href="#" class="cancel-solicitude" data-idsolicitude = "{{$solicitude->idsolicitud}}"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-remove"></span></a>
                 @endif
 
         </div>
