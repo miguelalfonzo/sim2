@@ -52,7 +52,7 @@
 
 
 <div class="form-group col-sm-6 col-md-4">
-    <label class="col-sm-8 col-md-8 control-label" for="textinput">Presupuesto</label>
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto</label>
 
     <div class="col-sm-12 col-md-12">
         <input id="idestimate" name="monto" type="text" placeholder=""
@@ -123,8 +123,17 @@
 <div class="solicitude_factura form-group col-sm-6 col-md-4">
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Factura</label>
 
-    <div class="col-sm-10 col-md-10">
-        <input id="filebutton" name="filefac" class="input-file" type="file">
+    <div class="col-sm-12 col-md-12">
+
+        <div class="input-group">
+                <span class="input-group-btn">
+                    <span class="btn btn-primary btn-file">
+                        <i class="glyphicon glyphicon-folder-open"></i> <input type="file" multiple="">
+                    </span>
+                </span>
+            <input type="text" id="input-file-factura" class="form-control" readonly="">
+        </div>
+
 
     </div>
 </div>

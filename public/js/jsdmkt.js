@@ -143,7 +143,7 @@ function newSolicitude() {
     var title = $('#idtitle');
     var amount = $('#idestimate');
     var delivery_date = $('#delivery_date');
-    var amountfac = $('#amountfac');
+    var amountfac = $('#amount-fac');
     var input_client = $('.input-client');
 
     title.on('focus',function(){
@@ -158,6 +158,9 @@ function newSolicitude() {
     input_client.on('focus',function(){
        $(this).parent().removeClass('has-error')
     });
+    amountfac.on('focus',function(){
+        $(this).parent().removeClass('has-error')
+    })
 
 
 
@@ -193,6 +196,11 @@ function newSolicitude() {
             input_client.parent().addClass('has-error');
             input_client.attr('placeholder','Ingrese Cliente');
             input_client.addClass('input-placeholder-error');
+        }
+        if(!amountfac.val()) {
+            amountfac.parent().addClass('has-error');
+            amountfac.attr('placeholder','Ingrese Cliente');
+            amountfac.addClass('input-placeholder-error');
         }
 
         setTimeout(function () {
@@ -438,7 +446,6 @@ function newSolicitude() {
     });
 
     var amount_error_families =   $('#amount_error_families');
-
     amount_families.on('focus',function(){
         amount_error_families.text('');
     });
@@ -456,8 +463,8 @@ function newSolicitude() {
             form_acepted_solicitude.attr('action', server + 'aceptar-solicitud');
             form_acepted_solicitude.submit();
         }else if(idamount.val() < Math.round(total)){
-            amount_error_families.text('El monto distribuido superan el monto total').css('color','red');
-            console.log('el monto distribuido superan el monto total')
+            amount_error_families.text('El monto distribuido supera el monto total').css('color','red');
+            console.log('el monto distribuido supera el monto total')
         }else{
             amount_error_families.text('El monto distribuido es menor al monto total').css('color','red');
             console.log(total);
@@ -522,5 +529,17 @@ function newSolicitude() {
         format: 'dd/mm/yyyy'
     });
 
+    $('.btn-file :file').on('fileselect', function(event, numFiles, label) {
+        console.log(numFiles);
+        console.log(label);
+        $('#input-file-factura').val(label);
+    });
+
+    $(document).on('change', '.btn-file :file', function() {
+        var input = $(this),
+            numFiles = input.get(0).files ? input.get(0).files.length : 1,
+            label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+        input.trigger('fileselect', [numFiles, label]);
+    });
 
 }

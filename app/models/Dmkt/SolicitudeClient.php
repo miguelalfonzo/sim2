@@ -20,4 +20,9 @@ class SolicitudeClient extends Eloquent{
 
     }
 
+    function client(){
+
+        return $this->hasOne('Dmkt\Client','clcodigo','idcliente');
+    }
+
 }

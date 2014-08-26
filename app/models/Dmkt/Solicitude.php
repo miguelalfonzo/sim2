@@ -46,4 +46,11 @@ class Solicitude extends Eloquent{
     function typesolicitude(){
         return $this->hasOne('Dmkt\TypeSolicitude','idtiposolicitud','idtiposolicitud');
     }
+
+    function families(){
+        return $this->hasMany('Dmkt\SolicitudeFamily','idsolicitud','idsolicitud');
+    }
+    function clients(){
+        return $this->hasMany('Dmkt\SolicitudeClient','idsolicitud','idsolicitud');
+    }
 }

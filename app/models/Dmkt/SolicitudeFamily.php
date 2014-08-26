@@ -25,4 +25,9 @@ class SolicitudeFamily extends Eloquent{
         }
 
     }
+
+    public function marca(){
+
+        return $this->hasOne('Dmkt\Marca','id','idfamilia');
+    }
 }

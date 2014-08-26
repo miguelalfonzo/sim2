@@ -33,14 +33,22 @@ class SolicitudeController extends BaseController{
         return $array;
     }
 
+    function decrypt($string, $key) {
+        $result = '';
+        $string = base64_decode($string);
+        for($i=0; $i<strlen($string); $i++) {
+            $char = substr($string, $i, 1);
+            $keychar = substr($key, ($i % strlen($key))-1, 1);
+            $char = chr(ord($char)-ord($keychar));
+            $result.=$char;
+        }
+        return $result;
+    }
+
     public function test(){
 
-        $data = array('mensaje'=>'hola');
-        Mail::send('emails.template', $data, function ($message){
-            $message->to('cesarhm1687@gmail.com');
-            $message->subject('Aqui va el mensaje del asunto del email ');
-
-        });
+        $token = md5(sha1(uniqid(2, true)));
+        var_dump($token);
     }
 
     public function show_rm(){
@@ -91,7 +99,7 @@ class SolicitudeController extends BaseController{
         $solicitude->estado = 2;
         $solicitude->fecha_entrega = $date;
         $solicitude->idtiposolicitud = $inputs['type_solicitude'];
-
+        $solicitude->token = sha1(md5(uniqid($solicitude->idsolicitud, true)));
         $solicitude->idsubtipoactividad = $inputs['sub_type_activity'];
         $solicitude->tipo_moneda = $inputs['money'];
         $solicitude->save();
@@ -147,9 +155,12 @@ class SolicitudeController extends BaseController{
 
         return $view;
     }
-    public function viewSolicitude($id){
+    public function viewSolicitude($token){
 
-        $solicitude = Solicitude::find($id);
+        $solicitude = Solicitude::where('token','=',$token)->get();
+        var_dump($solicitude->titulo);die;
+        //echo json_encode($solicitude);die;
+        $id = $solicitude->idsolicitud;
         $clients = DB::table('DMKT_RG_SOLICITUD_CLIENTES')->where('idsolicitud', $id)->lists('idcliente');
         $clients = Client::whereIn('clcodigo',$clients)->get(array('clcodigo','clnombre'));
         $families = DB::table('DMKT_RG_SOLICITUD_FAMILIA')->where('idsolicitud', $id)->lists('idfamilia');
@@ -253,7 +264,6 @@ class SolicitudeController extends BaseController{
         return $this->listSolicitude(2);
 
     }
-
     public function subtypeactivity($id){
 
         $subtypeactivities = SubTypeActivity::where('idtipoactividad',$id)->get();
@@ -285,21 +295,19 @@ class SolicitudeController extends BaseController{
     public function viewSolicitudeSup($id){
 
         $solicitude = Solicitude::find($id);
-        $clients = DB::table('DMKT_RG_SOLICITUD_CLIENTES')->where('idsolicitud', $id)->lists('idcliente');
-        $clients = Client::whereIn('clcodigo',$clients)->get(array('clcodigo','clnombre'));
-        $families = DB::table('DMKT_RG_SOLICITUD_FAMILIA')->where('idsolicitud', $id)->lists('idfamilia');
-        $families= Marca::whereIn('id',$families)->get(array('id','descripcion'));
+
+        //$clients = DB::table('DMKT_RG_SOLICITUD_CLIENTES')->where('idsolicitud', $id)->lists('idcliente');
+        //$clients = Client::whereIn('clcodigo',$clients)->get(array('clcodigo','clnombre'));
+        //$families = DB::table('DMKT_RG_SOLICITUD_FAMILIA')->where('idsolicitud', $id)->lists('idfamilia');
+        //$families= Marca::whereIn('id',$families)->get(array('id','descripcion'));
         $managers = Manager::all();
         $data = [
 
             'solicitude' => $solicitude,
-            'clients' => $clients,
-            'families' => $families,
             'managers' => $managers
         ];
         return View::make('Dmkt.Sup.view_solicitude_sup',$data);
     }
-
     public function denySolicitude(){
 
         $inputs = Input::all();
@@ -316,12 +324,25 @@ class SolicitudeController extends BaseController{
     public function aceptedSolicitude(){
 
         $inputs = Input::all();
+        $amount_assigned = $inputs['amount_assigned'];
         $idSol =  $inputs['idsolicitude'];
         $solicitude = Solicitude::where('idsolicitud',$idSol) ;
         $solicitude->estado = 8;
         $solicitude->monto = $inputs['monto'];
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
+
+        $amount_assigned = $inputs['amount_assigned'];
+        $families = SolicitudeFamily::where('idsolicitud',$idSol)->get();
+        $i=0;
+        foreach($families as $fam){
+            $family = SolicitudeFamily::where('idsolicitud_familia',$fam->idsolicitud_familia);
+            $family->monto_asignado = $amount_assigned[$i];
+            $data = $this->objectToArray($family);
+            $family->update($data);
+            $i++;
+        }
+        //echo json_encode($families);die;
         return Redirect::to('show_sup');
 
     }
