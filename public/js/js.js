@@ -1,23 +1,21 @@
-function onlyNumber(input){
-    $(input).keypress(function(e){
-        if(e.which != 8 && e.which != 0 && (e.which <48 || e.which >57))
-        {
-            return false;
-        }
-    });
-}
 var server = "http://localhost/BitBucket/bago_dmkt_rg/public/";
 
 $(function(){
+
+    //Eventos por default
+        //calcula el IGV ni bien carga la página
+        calcularIGV();
+
     //Restricciónes en la entrada de datos en los formularios
         //Registro de solo números enteros
-        onlyNumber("#ruc");
-        onlyNumber("#number-proof-one");
-        onlyNumber("#number-proof-two");
+        $("#ruc").numeric({negative:false,decimal:false});
+        $("#number-proof-one").numeric({negative:false,decimal:false});
+        $("#number-proof-two").numeric({negative:false,decimal:false});
 
         //Registro de números flotantes
-        $(".total-item input").numeric();
-        $(".quantity input").numeric();
+        $("#imp-ser").numeric({negative:false});
+        $(".total-item input").numeric({negative:false});
+        $(".quantity input").numeric({negative:false});
 
     //Evento  Datepicker, Botones, Keyup.
         //Datepicker a todas las clases date
@@ -37,8 +35,10 @@ $(function(){
             window.location.href = server+"show_rm";
         });
 
+
         //Mostrar IGV, Imp. Servicio si marca factura
         $("#proof-type").on("change",function(){
+            calcularIGV();
             if($(this).val()==='2')
             {
                 $(".tot-document").show();
@@ -75,12 +75,12 @@ $(function(){
             var deposit  = $("#deposit").val();
             var tot_rows = 0;
             var balance;
-            deposit = parseInt(deposit,10);
-            tot_del = parseInt(tot_del,10);
+            deposit = parseFloat(deposit);
+            tot_del = parseFloat(tot_del);
 
-            rows = $(".total").parent();
+            var rows = $(".total").parent();
             $.each(rows,function(){
-                tot_rows += parseInt($(this).find(".total span").html(),10);
+                tot_rows += parseFloat($(this).find(".total span").html());
             });
             bootbox.confirm("¿Esta seguro que desea eliminar el gasto?", function(result) {
                 if(result)
@@ -100,7 +100,7 @@ $(function(){
             $("#save-expense ").html("Actualizar");
             $("#razon").attr("data-edit",1);
             var deposit  = $("#deposit").val();
-            deposit = parseInt(deposit.substring(2,deposit.length),10);
+            deposit = parseFloat(deposit.substring(2,deposit.length));
             var tot=0;
             var rows = $(".total").parent();
             $.each(rows,function(){
@@ -130,11 +130,21 @@ $(function(){
                 $("#total").val(total_edit);
             });
         });
+    
+        //Calcula el IGV una vez digitado el monto total por item
+        $(document).on("focusout",".total-item input",function(e){
+           calcularIGV();
+        });
+
+        //Calcula el IGV una vez digitado el impuest de servicio
+        $("#imp-ser").on("focusout",function(e){
+           calcularIGV();
+        });
         
         //Validación del botón registrar gasto
-        var rows;
         $("#save-expense").on("click",function(){
-            //Variables de cabecera
+            
+            //Variables de la cabecera del documento
             var idsolicitude     = parseInt($("#idsolicitude").val(),10);
             var proof_type       = $("#proof-type").val();
             var ruc              = $("#ruc").val();
@@ -145,22 +155,11 @@ $(function(){
             var number_proof_two = $("#number-proof-two").val();
             var date             = $("#date").val();
 
+            //Datos JSON para pasar al formulario
+            var data = {};
 
-            var quantity = $(".quantity input");
-
-            $.each(quantity,function(index){
-                if(!($(this).val()))
-                {
-                    $(this).addClass("error-incomplete");
-                    $(this).attr("placeholder","Vacío");
-                }
-            });
-
-            var total    = $("#total").val();
-            var deposit  = $("#deposit").val();
-            var error    = 0;
-            var btn_save = $(this).html();
-
+            //Validación de errores de cabeceras
+            var error = 0;
             if(!ruc)
             {
                 $("#ruc").attr("placeholder","No se ha ingresado el RUC.");
@@ -169,7 +168,8 @@ $(function(){
             }
             if(razon_hide == 0 && razon_edit == 0)
             {
-                $("#razon").html("El ruc ingresado no contiene 11 dígitos.");
+                $("#razon").addClass("error-incomplete");
+                $("#razon").html("No ha buscado la Razón Social.");
                 error = 1;
             }
             else if(razon_hide == 1 && razon_edit == 0)
@@ -196,29 +196,168 @@ $(function(){
                 error = 1;
             }
 
-            deposit = parseInt(deposit,10);
-            rows = $(".total").parent();
+            //Mostrando errores de cabeceras si es que existen
+            if(error !== 0)
+            {
+                return false;
+            }
+            else
+            {
+                data.idsolicitude     = JSON.stringify(idsolicitude);
+                data.proof_type       = JSON.stringify(proof_type);
+                data.ruc              = JSON.stringify(ruc);
+                data.razon            = JSON.stringify(razon);
+                data.number_proof_one = JSON.stringify(number_proof_one);
+                data.number_proof_two = JSON.stringify(number_proof_two);
+                data.date_movement    = JSON.stringify(date);
+
+                // console.log("No hay error de cabeceras");
+                // console.log(data);
+                var error_json = 0;
+                
+                //Variables del detalle de items
+                var quantity    = $(".quantity input");
+                var description = $(".description input");
+                var total_item  = $(".total-item input");
+
+                //Datos del detalle gastos por items
+                var data_quantity    = validateEmpty(quantity);
+                var data_description = validateEmpty(description);
+                var data_total_item  = validateEmpty(total_item);
+
+                //Validación de gastos detallados
+                var index;
+                var aux = [];
+                var total_expense = 0;
+                
+                if(data_quantity)
+                {
+                    for(index = 0; index<data_quantity.length;index++)
+                    {
+                        if(!$.isNumeric(data_quantity[index]))
+                        {
+                            $(".quantity input:eq("+index+")").addClass("error-incomplete");
+                            $(".quantity input:eq("+index+")").val("Vacío");
+                            error_json = 1;
+                            return;
+                        }
+                        else
+                        {
+                            if(data_quantity[index]<=0)
+                            {
+                                $(".quantity input:eq("+index+")").addClass("error-incomplete");
+                                $(".quantity input:eq("+index+")").val("> a 0");
+                                error_json = 1;
+                                return;
+                            }
+                            else
+                            {
+                                aux[index] = parseFloat(data_quantity[index]);
+                            }
+                        }
+                    }
+                    if(aux)
+                    {
+                        data.quantity = JSON.stringify(aux);
+                    }
+                }
+                else
+                {
+                    error_json = 1;
+                }
+
+                if(data_description)
+                {
+                    data.description = JSON.stringify(data_description);
+                }
+                else
+                {
+                     error_json = 1;
+                }
+
+                var arr_type_expense = [];
+                $.each($(".type-expense"),function(index){
+                    arr_type_expense[index] = $(this).val();
+                });
+                data.type_expense = JSON.stringify(arr_type_expense);
+
+                if(data_total_item)
+                {
+                    for(index = 0; index<data_total_item.length;index++)
+                    {
+                        if(!$.isNumeric(data_total_item[index]))
+                        {
+                            $(".total-item input:eq("+index+")").addClass("error-incomplete");
+                            $(".total-item input:eq("+index+")").val("Vacío");
+                            error_json = 1;
+                            return;
+                        }
+                        else
+                        {
+                            if(data_total_item[index]<=0)
+                            {
+                                $(".total-item input:eq("+index+")").addClass("error-incomplete");
+                                $(".total-item input:eq("+index+")").val("> a 0");
+                                error_json = 1;
+                                return;
+                            }
+                            else
+                            {
+                                aux[index] = parseFloat(data_total_item[index]);
+                                total_expense += parseFloat(data_total_item[index]);
+                            }
+                        }
+                    }
+                    if(aux)
+                    {
+                        data.total_item = JSON.stringify(aux);
+                    }
+                }
+                else
+                {
+                    error_json = 1;
+                }
+
+                if(error_json === 0)
+                {
+                    var sub_total_expense = $("#sub-tot").val();
+                    var imp_service       = $("#imp-ser").val();
+                    var igv               = $("#igv").val();
+                    
+                    data.sub_total_expense = JSON.stringify(sub_total_expense);
+                    data.imp_service = JSON.stringify(imp_service);
+                    data.igv = JSON.stringify(igv);
+                    data.total_expense = JSON.stringify(total_expense);
+                    console.log(data);
+                }
+            }
+            return false;
+
+            /**
+             * [total description]
+             * @type {[type]}
+             */
+            
+
+            var deposit  = parseFloat($("#deposit").val());
+            var btn_save = $(this).html();
+            var rows = $(".total").parent();
 
             var balance  = 0;
             var tot_rows = 0;
             if(rows)
             {
                 $.each(rows,function(){
-                    tot_rows += parseInt($(this).find(".total").html(),10);
+                    tot_rows += parseFloat($(this).find(".total").html());
                 });
             }
 
-
-            if(error!=0)
-            {
-                return false;
-            }
             else
             {
                 validateRuc(ruc);
                 if(validateRuc(ruc) === true)
                 {
-                    balance = deposit - tot_rows - parseInt(total,10);
+                    balance = deposit - tot_rows - parseFloat(total);
                     console.log(balance);
                     if(balance<0)
                     {
@@ -242,7 +381,7 @@ $(function(){
                 {
                     if(validateVoucher(ruc,number_voucher) === true)
                     {
-                        balance = deposit - tot_rows - parseInt(total,10);
+                        balance = deposit - tot_rows - parseFloat(total);
                         console.log(balance);
                         if(balance<0)
                         {
@@ -274,7 +413,7 @@ $(function(){
                                 if($(this).find(".number_voucher").html()===number_voucher)
                                 {
                                     console.log("total filas"+tot_rows);
-                                    balance = parseInt($("#balance").val(),10);
+                                    balance = parseFloat($("#balance").val());
                                     console.log(balance);
                                     if(total>balance)
                                     {
@@ -285,7 +424,7 @@ $(function(){
                                     {
                                         $(".date_movement:eq("+index+")").html(date);
                                         $(".total:eq("+index+")").html(total);
-                                        balance = deposit - tot_rows + parseInt($("#tot-edit-hidden").val(),10) - total;
+                                        balance = deposit - tot_rows + parseFloat($("#tot-edit-hidden").val()) - total;
                                         $("#save-expense").html("Registrar");
                                         $("#table tbody tr").removeClass("select-row");
                                         $("#balance").val(balance);
@@ -303,6 +442,7 @@ $(function(){
     //Ajax
         //Búsqueda de Razón Social en la SUNAT una vez introducido el RUC
         $(".search-ruc").on("click",function(){
+            $("#razon").removeClass('error-incomplete');
             var ruc = $("#ruc").val();
             $("#razon").html("Buscando Razón Social...");
             $("#razon").val(0);
@@ -351,6 +491,7 @@ $(function(){
                     else
                     {
                         $("#razon").val(2);
+            
                         $("#razon").html(response['razonSocial']);
                     }
                     l.stop();
@@ -367,6 +508,34 @@ $(function(){
         });
 
     //Funciones
+        
+        //Calculo del IGV
+        function calcularIGV()
+        {
+            //Variables totales del comprobante
+            var total_item = $(".total-item input");
+            var sub_total_expense = 0;
+            var imp_service = parseFloat($("#imp-ser").val());
+            var igv = 0;
+            var total_expense = 0;
+
+            $.each(total_item,function(index){
+                total_expense += parseFloat($(this).val());
+            });
+
+            if($("#proof-type").val()==='2')
+            {
+                igv = sub_total_expense*0.18;
+                if(!imp_service)
+                    imp_service = 0;
+                sub_total_expense = total_expense/1.18;
+                total_expense += sub_total_expense + igv + imp_service;
+            }
+            $("#sub-tot").val(sub_total_expense.toFixed(2));
+            $("#igv").val(igv.toFixed(2));
+            $("#total-expense").val(total_expense.toFixed(2));
+        }
+
         //Validación de RUC en los documentos ya registrados
         function validateRuc(ruc)
         {
@@ -396,5 +565,27 @@ $(function(){
                 return false;
             else
                 return true;
+        }
+
+        //Valida que los datos de un selector no esten vacíos.
+        function validateEmpty(selector){
+            var data = [];
+            var error = 0;
+            $.each(selector,function(index){
+                if(!($(this).val()))
+                {
+                    $(this).addClass("error-incomplete");
+                    $(this).attr("placeholder","Vacío");
+                    error = 1;
+                }
+                else
+                {
+                    data[index] = $(this).val();
+                }
+            });
+            if(error === 0)
+            {
+                return data;
+            }
         }
 });

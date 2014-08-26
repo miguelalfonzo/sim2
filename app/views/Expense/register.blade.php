@@ -116,7 +116,7 @@
 									</thead>
 									<tbody>
 										<tr>
-											<th class="quantity"><input type="text" class="form-control" value=1 maxlength="3"></th>
+											<th class="quantity"><input type="text" class="form-control" value=1 maxlength="4"></th>
 											<th class="description"><input type="text" class="form-control" value="Pizza Mediana"></th>
 											<th>
 												<select class="form-control type-expense">
@@ -134,7 +134,7 @@
 											<th><a class="delete-item" href="#"><span class="glyphicon glyphicon-remove"></span></a></th>
 										</tr>
 										<tr>
-											<th class="quantity"><input type="text" class="form-control" value=3 maxlength="3"></th>
+											<th class="quantity"><input type="text" class="form-control" value=3 maxlength="4"></th>
 											<th class="description"><input type="text" class="form-control" value="Vinos"></th>
 											<th>
 												<select class="form-control type-expense">
@@ -152,7 +152,7 @@
 											<th><a class="delete-item" href="#"><span class="glyphicon glyphicon-remove"></span></a></th>
 										</tr>
 										<tr>
-											<th class="quantity"><input type="text" class="form-control" value=1 maxlength="3"></th>
+											<th class="quantity"><input type="text" class="form-control" value=1 maxlength="4"></th>
 											<th class="description"><input type="text" class="form-control" value="Agua"></th>
 											<th>
 												<select class="form-control type-expense">
@@ -185,7 +185,7 @@
 						<label>Sub Total</label>
 						<div class="input-group">
 					    	<div class="input-group-addon">{{$data['activity']['simbolMoney']}}</div>
-					      	<input id="sub-tot" class="form-control" type="text" value="41.41" disabled>
+					      	<input id="sub-tot" class="form-control" type="text" value=0 disabled>
 					    </div>
 					</div>
 				</div>
@@ -194,7 +194,7 @@
 						<label>Impuesto por Servicio</label>
 						<div class="input-group">
 					    	<div class="input-group-addon">{{$data['activity']['simbolMoney']}}</div>
-					      	<input id="imp-ser" class="form-control" type="text" value="4.14" disabled>
+					      	<input id="imp-ser" class="form-control" type="text" value=0>
 					    </div>
 					</div>
 				</div>
@@ -203,7 +203,7 @@
 						<label>IGV</label>
 						<div class="input-group">
 					    	<div class="input-group-addon">{{$data['activity']['simbolMoney']}}</div>
-					      	<input id="igv" class="form-control" type="text" value="7.45" disabled>
+					      	<input id="igv" class="form-control" type="text" value=0 disabled>
 					    </div>
 					</div>
 				</div>
@@ -212,7 +212,7 @@
 						<label>Monto Total</label>
 						<div class="input-group">
 					    	<div class="input-group-addon">{{$data['activity']['simbolMoney']}}</div>
-					      	<input id="total-expense" class="form-control" type="text" value="53" disabled>
+					      	<input id="total-expense" class="form-control" type="text" disabled>
 					    </div>
 					</div>
 				</div>

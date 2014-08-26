@@ -50,7 +50,6 @@ table thead th, table th
 
 #razon
 {
-	color: #eee;
 	text-align: left;
 }
 
@@ -87,12 +86,14 @@ table thead th, table th
 
 .error-incomplete
 {
+	color: #a94442;
 	border-color: #a94442;
 }
 
 .error-incomplete::-webkit-input-placeholder
 {
 	color: #a94442;
+	font-weight: 200;
 }
 
 .form-expense
