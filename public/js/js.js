@@ -3,8 +3,8 @@ var server = "http://localhost/BitBucket/bago_dmkt_rg/public/";
 $(function(){
     $(document).on("click","#token-a",function(e){
         e.preventDefault();
-
-        $("#form-token").submit();
+        console.log($(this).parent());
+        // $("#form-token").submit();
     });
     //Eventos por default
         //calcula el IGV ni bien carga la página
