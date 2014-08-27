@@ -46,15 +46,16 @@ Route::post('aceptar-solicitud','Dmkt\SolicitudeController@aceptedSolicitude');
 Route::post('buscar-solicitudes-sup','Dmkt\SolicitudeController@searchSolicitudsSup');
 // ======================================================================
 
-App::error(function(ModelNotFoundException $e)
-{
+// App::error(function(ModelNotFoundException $e)
+// {
 
-    return View::make('notfound');
-});
+//     return View::make('notfound');
+// });
 /**   Gastos */
 
-Route::post('consultarRuc','Expense\RucController@show');
-Route::get('registrar-gasto','Expense\ExpenseController@show');
+Route::get('registrar-gasto/{token}','Expense\ExpenseController@show');
+// Route::get('registrar-gasto','Expense\ExpenseController@show');
+Route::get('consultarRuc/{ruc}','Expense\RucController@show');
 Route::post('register-expense','Expense\ExpenseController@registerExpense');
 // Route::get('test','Expense\RucController@show');
 Route::get('ruc',function(){

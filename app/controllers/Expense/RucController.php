@@ -6,9 +6,10 @@ use \ruc;
 use \Input;
 
 class RucController extends BaseController{
-    public function show(){
-    	$rucConsult = Input::get('ruc');
-    	if(strlen($rucConsult)<11)
+    public function show($ruc){
+    	// $rucConsult = Input::get('ruc');
+    	// if(strlen($rucConsult)<11)
+        if(strlen($ruc)<11) 
     	{
     		return 0;
     	}

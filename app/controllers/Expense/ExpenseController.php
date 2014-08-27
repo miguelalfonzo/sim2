@@ -12,11 +12,11 @@ use \Input;
 
 class ExpenseController extends BaseController{
 
-	public function show(){
-		$id = 2;
+	public function show($token){
 		//depositado es 5
 		
-		$solicitude  = Solicitude::find($id);
+		$solicitude  = Solicitude::where('token',$token)->firstOrFail();
+		// $solicitude  = Solicitude::find('5');
 		$typeProof   = ProofType::all();
 		$typeExpense = ExpenseType::orderBy('idtipogasto','asc')->get();
 		
@@ -31,8 +31,8 @@ class ExpenseController extends BaseController{
 			$expense[$key] = ['cod'=>$value->idtipogasto,'descripcion'=>mb_convert_case($value->descripcion, MB_CASE_TITLE, "UTF-8")];
 		}
 		
-		$dataActivity['solicitude'] = mb_convert_case($solicitude->descripcion, MB_CASE_TITLE, "UTF-8");
-		$dataActivity['id'] = $id;
+		$dataActivity['solicitude'] = mb_convert_case($solicitude->titulo, MB_CASE_TITLE, "UTF-8");
+		$dataActivity['id'] = $solicitude->idsolicitude;
 		$dataActivity['typeActivity'] = mb_convert_case($solicitude->subtype->nombre, MB_CASE_TITLE, "UTF-8");
 		// $dataActivity['idDeposit'] = $activity->deposit->num_transferencia;
 		$dataActivity['typeMoney'] = mb_convert_case($solicitude->typemoney->descripcion, MB_CASE_TITLE, "UTF-8");

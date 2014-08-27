@@ -1,7 +1,16 @@
 var server = "http://localhost/BitBucket/bago_dmkt_rg/public/";
 
 $(function(){
-
+    $(document).on("click","#token-a",function(e){
+        e.preventDefault();
+        var token = $("#token").val();
+        $.ajax({
+            type: 'post',
+            data: {
+                ruc
+            }
+        });
+    });
     //Eventos por default
         //calcula el IGV ni bien carga la página
         if(parseFloat($(".total-item").val()))
@@ -379,17 +388,21 @@ $(function(){
                                     }
                                     else
                                     {
-                                        1(data);
-                                        var new_row = $(row).clone(true,true);
-                                        $(new_row).find(".proof-type").text(proof_type);
-                                        $(new_row).find(".ruc").text(ruc);
-                                        $(new_row).find(".razon").text(razon);
-                                        $(new_row).find(".voucher_number").text(number_voucher);
-                                        $(new_row).find(".date_movement").text(date);
-                                        $(new_row).find(".type_money").text(type_money);
-                                        $(new_row).find(".total_expense").text(total_expense);
-                                        $("#table-expense tbody").append(new_row);
-                                        $("#balance").val(balance);
+                                        ajaxExpense(data).done(function(result){
+                                            console.log(result);
+                                            var new_row = $(row).clone(true,true);
+                                            $(new_row).find(".proof-type").text(proof_type);
+                                            $(new_row).find(".ruc").text(ruc);
+                                            $(new_row).find(".razon").text(razon);
+                                            $(new_row).find(".voucher_number").text(number_voucher);
+                                            $(new_row).find(".date_movement").text(date);
+                                            $(new_row).find(".type_money").text(type_money);
+                                            $(new_row).find(".total_expense").text(total_expense);
+                                            $("#table-expense tbody").append(new_row);
+                                            $("#balance").val(balance);
+                                        }).fail(function(){
+                                            console.log("error");
+                                        });
                                     }
                                 }
                                 else
