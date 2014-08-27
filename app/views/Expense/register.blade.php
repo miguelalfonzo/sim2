@@ -36,7 +36,7 @@
 					<div class="form-expense">
 						<label>Monto Depositado</label>
 						<div class="input-group">
-					    	<div class="input-group-addon">{{$data['activity']['simbolMoney']}}</div>
+					    	<div id="type-money" class="input-group-addon">{{$data['activity']['simbolMoney']}}</div>
 					      	<input id="deposit" class="form-control" type="text" value="200" disabled>
 					    </div>
 					</div>
@@ -46,7 +46,7 @@
 						<label>Monto Restante</label>
 						<div class="input-group">
 					    	<div class="input-group-addon">{{$data['activity']['simbolMoney']}}</div>
-					      	<input id="balance" class="form-control" type="text" value="34" disabled>
+					      	<input id="balance" class="form-control" type="text" value="200" disabled>
 					    </div>
 					</div>
 				</div>
@@ -66,6 +66,7 @@
 						<div class="input-group">
 							<input id="ruc" type="text" class="form-control" maxlength="11">
 							<div class="input-group-addon search-ruc"><span class="glyphicon glyphicon-search"></span></div>
+							<input id="ruc-hide" type="hidden">
 						</div>
 					</div>
 				</div>
@@ -116,8 +117,8 @@
 									</thead>
 									<tbody>
 										<tr>
-											<th class="quantity"><input type="text" class="form-control" value=1 maxlength="4"></th>
-											<th class="description"><input type="text" class="form-control" value="Pizza Mediana"></th>
+											<th class="quantity"><input type="text" class="form-control" maxlength="4"></th>
+											<th class="description"><input type="text" class="form-control"></th>
 											<th>
 												<select class="form-control type-expense">
 													@foreach($data['activity']['expenseType'] as $val)
@@ -128,12 +129,12 @@
 											<th class="total-item">
 												<div class="input-group">
 											    	<div class="input-group-addon">{{$data['activity']['simbolMoney']}}</div>
-											      	<input class="form-control" type="text" value="29" maxlength="8">
+											      	<input class="form-control" type="text" maxlength="8">
 											    </div>
 											</th>
 											<th><a class="delete-item" href="#"><span class="glyphicon glyphicon-remove"></span></a></th>
 										</tr>
-										<tr>
+										<!-- <tr>
 											<th class="quantity"><input type="text" class="form-control" value=3 maxlength="4"></th>
 											<th class="description"><input type="text" class="form-control" value="Vinos"></th>
 											<th>
@@ -168,7 +169,7 @@
 											    </div>
 											</th>
 											<th><a class="delete-item" href="#"><span class="glyphicon glyphicon-remove"></span></a></th>
-										</tr>
+										</tr> -->
 									</tbody>
 								</table>
 								<aside class="col-xs-12 col-sm-6 col-md-4" style="padding:0;">
@@ -179,7 +180,7 @@
 					</div>
 				</div>
 			</section>
-			<section class="row reg-expense" style="margin:-1em 0">
+			<section class="row reg-expense" style="margin:0">
 				<div class="col-xs-12 col-sm-6 col-md-4 tot-document">
 					<div class="form-expense">
 						<label>Sub Total</label>
@@ -203,7 +204,7 @@
 						<label>IGV</label>
 						<div class="input-group">
 					    	<div class="input-group-addon">{{$data['activity']['simbolMoney']}}</div>
-					      	<input id="igv" class="form-control" type="text" value=0 disabled>
+					      	<input id="igv" class="form-control" type="text" value=0>
 					    </div>
 					</div>
 				</div>
@@ -221,9 +222,7 @@
 				<div class="col-xs-12 col-sm-12 col-md-12">
 					<div class="form-expense">
 						<button id="save-expense" type="button" class="btn btn-primary">Registrar</button>
-						<div class="message-expense">
-							<span></span>&nbsp;&nbsp;Hola Hola
-						</div>
+						<div class="inline"><p class="inline message-expense"></p></div>
 					</div>
 				</div>
 			</section>
@@ -235,7 +234,7 @@
 								<thead>
 									<tr>
 										<th>Comprobante</th>
-										<!-- <th>RUC</th> -->
+										<th>RUC</th>
 										<th>Razón Social</th>
 										<th>Nro. Comprobante</th>
 										<th>Fecha</th>
@@ -245,26 +244,26 @@
 									</tr>
 								</thead>
 								<tbody>
-									<tr>
+									<!-- <tr>
 										<th class="proof-type">Boleta</th>
-										<!-- <th class="ruc">10429709844</th> -->
+										<th class="ruc">10429709844</th>
 										<th class="razon">MENDOZA BARREDA WALTER ISRAEL</th>
 										<th class="voucher_number">002-002335</th>
 										<th class="date_movement">18/07/2014</th>
-										<th class="total">{{$data['activity']['simbolMoney']}}&nbsp;<span>95</span></th>
+										<th class="total"><span class="type_moeny">{{$data['activity']['simbolMoney']}}&nbsp;<span class="total_expense">95</span></th>
 										<th><a class="edit-expense" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
 										<th><a class="delete-expense" href="#"><span class="glyphicon glyphicon-remove"></span></a></a></th>
 									</tr>
 									<tr>
 										<th class="proof-type">Factura</th>
-										<!-- <th class="ruc">10238174835</th> -->
+										<th class="ruc">10238174835</th>
 										<th class="razon">AEDO ANTEZANA RUTH IDALIA</th>
 										<th class="voucher_number">001-02192</th>
 										<th class="date_movement">18/07/2014</th>
-										<th class="total">{{$data['activity']['simbolMoney']}}&nbsp;<span>71</span></th>
+										<th class="total"><span class="type_money">{{$data['activity']['simbolMoney']}}</span>&nbsp;<span class="total_expense">71</span></th>
 										<th><a class="edit-expense" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
 										<th><a class="delete-expense" href="#"><span class="glyphicon glyphicon-remove"></span></a></a></th>
-									</tr>
+									</tr> -->
 								</tbody>
 							</table>
 						</div>

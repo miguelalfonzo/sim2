@@ -53,8 +53,9 @@ App::error(function(ModelNotFoundException $e)
 });
 /**   Gastos */
 
-Route::get('registrar-gasto','Expense\ExpenseController@show');
 Route::post('consultarRuc','Expense\RucController@show');
+Route::get('registrar-gasto','Expense\ExpenseController@show');
+Route::post('register-expense','Expense\ExpenseController@registerExpense');
 // Route::get('test','Expense\RucController@show');
 Route::get('ruc',function(){
     return View::make('Expense\ruc');

@@ -8,11 +8,12 @@ use \Dmkt\Activity;
 use \Dmkt\Solicitude;
 use \Expense\ProofType;
 use \Expense\ExpenseType;
+use \Input;
 
 class ExpenseController extends BaseController{
 
 	public function show(){
-		$id = 3;
+		$id = 2;
 		//depositado es 5
 		
 		$solicitude  = Solicitude::find($id);
@@ -49,6 +50,11 @@ class ExpenseController extends BaseController{
 		// die;
 
 		return View::make('Expense.register')->with('data',$data);
+	}
+
+	public function registerExpense(){
+		$data = Input::get('data');
+		return "OK";
 	}
 
 	private function getDay(){
