@@ -1,10 +1,5 @@
 @extends('template.main')
 @section('content')
-<style>
-    .form-horizontal .control-label {
-        text-align: left;
-    }
-</style>
 
 <div class="content">
 
@@ -13,10 +8,9 @@
             <h3 class="panel-title">Ver Solicitud Supervisor</h3>
         </div>
         <div class="panel-body">
-            <form id="form_make_activity" class="form-horizontal" method="post" action="">
+            <form id="form_make_activity" class="" method="post" action="">
                 <input id="textinput" name="idsolicitude" type="hidden" placeholder=""
                        value="{{$solicitude->idsolicitud}}">
-
 
                 <div class="form-group col-sm-6 col-md-4">
 
@@ -104,7 +98,6 @@
                     </div>
                 </div>
 
-
                 <div class="form-group col-sm-6 col-md-4">
                     <label class="col-sm-8 col-md-8 control-label" for="selectbasic">Fondo</label>
 
@@ -171,7 +164,6 @@
                         @endif
                     </div>
                 </div>
-
 
                 <div class="col-sm-12 col-md-12" style="margin-top: 10px">
                     <div class="form-group col-sm-12 col-md-12">
@@ -245,7 +237,7 @@
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                 <button type="button" class="btn btn-primary">Derivar</button>
             </div>
         </div>

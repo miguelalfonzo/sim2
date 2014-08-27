@@ -10,7 +10,7 @@
 | and give it the Closure to execute when that URI is requested.
 |
 */
-
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 /** Descargos  */
 Route::get('/', function()
 {
@@ -46,6 +46,11 @@ Route::post('aceptar-solicitud','Dmkt\SolicitudeController@aceptedSolicitude');
 Route::post('buscar-solicitudes-sup','Dmkt\SolicitudeController@searchSolicitudsSup');
 // ======================================================================
 
+App::error(function(ModelNotFoundException $e)
+{
+
+    return View::make('notfound');
+});
 /**   Gastos */
 
 Route::get('registrar-gasto','Expense\ExpenseController@show');

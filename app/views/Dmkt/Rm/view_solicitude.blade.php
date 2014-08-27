@@ -11,7 +11,7 @@
     <div class="panel panel-default">
         <div class="panel-heading"><h3 class="panel-title">Solicitud</h3></div>
         <div class="panel-body">
-            <form class="form-horizontal">
+
 
 
 
@@ -151,7 +151,7 @@
                 </div>
 
 
-            </form>
+
         </div>
     </div>
 </div>
