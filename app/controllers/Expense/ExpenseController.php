@@ -12,10 +12,12 @@ use \Input;
 
 class ExpenseController extends BaseController{
 
-	public function show($token){
+	public function show(){
 		//depositado es 5
-		
+		$token = Input::get('token');
+
 		$solicitude  = Solicitude::where('token',$token)->firstOrFail();
+
 		// $solicitude  = Solicitude::find('5');
 		$typeProof   = ProofType::all();
 		$typeExpense = ExpenseType::orderBy('idtipogasto','asc')->get();
@@ -31,8 +33,8 @@ class ExpenseController extends BaseController{
 			$expense[$key] = ['cod'=>$value->idtipogasto,'descripcion'=>mb_convert_case($value->descripcion, MB_CASE_TITLE, "UTF-8")];
 		}
 		
-		$dataActivity['solicitude'] = mb_convert_case($solicitude->titulo, MB_CASE_TITLE, "UTF-8");
-		$dataActivity['id'] = $solicitude->idsolicitude;
+		$dataActivity['titulo'] = mb_convert_case($solicitude->titulo, MB_CASE_TITLE, "UTF-8");
+		$dataActivity['id'] = $solicitude->idsolicitud;
 		$dataActivity['typeActivity'] = mb_convert_case($solicitude->subtype->nombre, MB_CASE_TITLE, "UTF-8");
 		// $dataActivity['idDeposit'] = $activity->deposit->num_transferencia;
 		$dataActivity['typeMoney'] = mb_convert_case($solicitude->typemoney->descripcion, MB_CASE_TITLE, "UTF-8");
@@ -45,16 +47,14 @@ class ExpenseController extends BaseController{
 
 		$data = ['date'=>$date,'activity'=>$dataActivity];
 
-		// var_dump($data['activity']['solicitude']);
-		// return;
-		// die;
-
 		return View::make('Expense.register')->with('data',$data);
 	}
 
 	public function registerExpense(){
 		$data = Input::get('data');
-		return "OK";
+
+
+		return $data;
 	}
 
 	private function getDay(){

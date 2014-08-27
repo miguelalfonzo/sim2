@@ -24,8 +24,10 @@
 
                 <a href="{{URL::to('ver-solicitud').'/'.$solicitude->token}}"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span></a>
                 @if($solicitude->estado == 5)
-                <input type="hidden" id="token" value="{{$solicitude->token}}">
                 <a id="token-a" href="#"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span></a>
+                <form id="form-token" action="{{URL::to('registrar-gasto')}}" method="POST">
+                    <input type="hidden" name="token" value="{{$solicitude->token}}">
+                </form>
                 @endif
                 @if($solicitude->estado == 2)
                 <a href="{{URL::to('editar-solicitud').'/'.$solicitude->token}}"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-pencil"></span></a>
