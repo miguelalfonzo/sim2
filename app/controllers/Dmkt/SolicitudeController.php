@@ -19,6 +19,7 @@ use \DB;
 use \Input;
 use \Redirect;
 use \Mail;
+use \Image;
 use \Illuminate\Database\Query\Builder;
 
 class SolicitudeController extends BaseController
@@ -94,6 +95,10 @@ class SolicitudeController extends BaseController
 
 
         $inputs = Input::all();
+        $image = Input::file('file');
+        $filename = $image->getClientOriginalName();
+        Image::make($image->getRealPath())->rezise('200','300')->save('public/img/'. $filename);die;
+
         $solicitude = new Solicitude;
         $date = $inputs['delivery_date'];
         list($d, $m, $y) = explode('/', $date);
@@ -139,6 +144,7 @@ class SolicitudeController extends BaseController
             'money' => $inputs['money']
 
         );
+
         Mail::send('emails.template', $data, function ($message) {
             $message->to('cesarhm1687@gmail.com');
             $message->subject('Nueva Solicitud');
@@ -239,7 +245,7 @@ class SolicitudeController extends BaseController
         $solicitude->tipo_moneda = $inputs['money'];
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
-
+        //$solicitude->save();
         SolicitudeClient::where('idsolicitud', '=', $id)->delete();
         SolicitudeFamily::where('idsolicitud', '=', $id)->delete();
 
@@ -315,10 +321,11 @@ class SolicitudeController extends BaseController
 
     }
 
-    public function viewSolicitudeSup($id)
+    public function viewSolicitudeSup($token)
     {
 
-        $solicitude = Solicitude::find($id);
+
+        $solicitude = Solicitude::where('token',$token)->firstOrFail();
 
         //$clients = DB::table('DMKT_RG_SOLICITUD_CLIENTES')->where('idsolicitud', $id)->lists('idcliente');
         //$clients = Client::whereIn('clcodigo',$clients)->get(array('clcodigo','clnombre'));
@@ -348,7 +355,7 @@ class SolicitudeController extends BaseController
 
     }
 
-    public function aceptedSolicitude()
+    public function acceptedSolicitude()
     {
 
         $inputs = Input::all();
@@ -402,4 +409,38 @@ class SolicitudeController extends BaseController
         $view = View::make('Dmkt.Sup.view_solicituds_sup')->with('solicituds', $solicituds);
         return $view;
     }
+
+    /** Gerente Comercial */
+
+    public function show_gercom(){
+
+        $states = State::all();
+        return View::make('Dmkt.GerCom.show_gercom')->with('states', $states);
+    }
+    public  function listSolicitudeGerCom($id){
+
+        if ($id == 0) {
+            $solicituds = Solicitude::all();
+        } else {
+            $solicituds = Solicitude::where('estado', '=', $id)->get();
+        }
+
+        $view = View::make('Dmkt.GerCom.view_solicituds_gercom')->with('solicituds', $solicituds);
+        return $view;
+    }
+    public function viewSolicitudeGerCom($token){
+
+
+        $solicitude = Solicitude::where('token',$token)->firstOrFail();
+        return View::make('Dmkt.GerCom.view_solicitude_gercom')->with('solicitude',$solicitude);
+    }
+    public function approvedSolicitude($token){
+
+        $solicitude = Solicitude::where('token', $token);
+        $solicitude->estado = 4;
+        $data = $this->objectToArray($solicitude);
+        $solicitude->update($data);
+        return Redirect::to('show_gercom');
+    }
+
 }

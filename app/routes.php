@@ -42,15 +42,21 @@ Route::get('show_sup','Dmkt\SolicitudeController@show_sup');
 Route::get('ver-solicitud-sup/{id}','Dmkt\SolicitudeController@viewSolicitudeSup');
 Route::get('listar-solicitudes-sup/{id}','Dmkt\SolicitudeController@listSolicitudeSup');
 Route::post('rechazar-solicitud','Dmkt\SolicitudeController@denySolicitude');
-Route::post('aceptar-solicitud','Dmkt\SolicitudeController@aceptedSolicitude');
+Route::post('aceptar-solicitud','Dmkt\SolicitudeController@acceptedSolicitude');
 Route::post('buscar-solicitudes-sup','Dmkt\SolicitudeController@searchSolicitudsSup');
+
+/** Gerente Comercial */
+Route::get('show_gercom','Dmkt\SolicitudeController@show_gercom');
+Route::get('listar-solicitudes-gercom/{id}','Dmkt\SolicitudeController@listSolicitudeGerCom');
+Route::get('ver-solicitud-gercom/{id}','Dmkt\SolicitudeController@viewSolicitudeGerCom');
+Route::get('aprobar-solicitud/{token}','Dmkt\SolicitudeController@approvedSolicitude');
 // ======================================================================
 
-// App::error(function(ModelNotFoundException $e)
-// {
+ App::error(function(ModelNotFoundException $e)
+ {
 
-//     return View::make('notfound');
-// });
+     return View::make('notfound');
+ });
 /**   Gastos */
 
 Route::get('registrar-gasto/{token}','Expense\ExpenseController@show');

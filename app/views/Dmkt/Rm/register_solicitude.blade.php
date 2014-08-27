@@ -9,7 +9,7 @@
         </div>
     <div class="panel-body">
         <form id="form-register-solicitude" class="" method="post"
-      action="{{ URL::to( isset($solicitude) ? 'editar-solicitud' : 'registrar-solicitud' )}}">
+      action="{{ URL::to( isset($solicitude) ? 'editar-solicitud' : 'registrar-solicitud' )}}" enctype="multipart/form-data">
 
         @if(isset($solicitude))
         <input value="{{$solicitude->idsolicitud}}" name="idsolicitude" type="hidden">
@@ -123,10 +123,10 @@
         <div class="input-group">
                 <span class="input-group-btn">
                     <span class="btn btn-primary btn-file">
-                        <i class="glyphicon glyphicon-folder-open"></i> <input type="file" multiple="">
+                        <i class="glyphicon glyphicon-folder-open"></i> <input type="file" multiple="" name="file">
                     </span>
                 </span>
-            <input type="text" id="input-file-factura" class="form-control" readonly="">
+            <input type="text" id="input-file-factura"  class="form-control" readonly="">
         </div>
 
 
@@ -224,10 +224,10 @@
 
 
         <div class="col-sm-12 col-md-12" style="margin-top: 10px">
-    <div class="form-group col-sm-12 col-md-12">
+    <div class="form-group ">
         <label class="col-sm-8 col-md-8 control-label" for="textarea">Descripcion de la Solicitud</label>
 
-        <div class="col-sm-11 col-md-11">
+        <div class="col-sm-12 col-md-12">
             <textarea class="form-control" id="iddescriptionsolicitude" name="description"></textarea>
         </div>
     </div>

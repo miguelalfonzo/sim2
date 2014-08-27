@@ -1,7 +1,7 @@
 var server = "http://localhost/BitBucket/bago_dmkt_rg/public/";
 
 $(function(){
-    $(document).on("click","#token-a",function(e){
+    /*$(document).on("click","#token-a",function(e){
         e.preventDefault();
         var token = $("#token").val();
         $.ajax({
@@ -10,7 +10,7 @@ $(function(){
                 ruc
             }
         });
-    });
+    });*/
     //Eventos por default
         //calcula el IGV ni bien carga la página
         if(parseFloat($(".total-item").val()))
