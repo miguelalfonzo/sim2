@@ -542,4 +542,53 @@ function newSolicitude() {
         input.trigger('fileselect', [numFiles, label]);
     });
 
+    /** GERENTE COMERCIAL */
+
+    $.ajax({
+        url: server + 'listar-solicitudes-gercom/' +8,
+        type: 'GET',
+        dataType: 'html'
+
+
+    }).done(function (data) {
+        $('.table-solicituds-gercom').append(data);
+        $('#table_solicitude_gercom').dataTable({
+                "bLengthChange": false,
+                'iDisplayLength': 5,
+                "oLanguage": {
+                    "sSearch": "Buscar: ",
+                    "sZeroRecords": "No hay solicitudes",
+                    "sInfoEmpty": "No hay solicitudes",
+                    "sInfo":'Mostrando _END_ de _TOTAL_'
+                }
+            }
+        );
+    });
+
+    $('.select_state_solicitude_gercom').on('change',function(){
+        var idstate = $(this).val();
+        $('#table_solicitude_gercom_wrapper').remove();
+        setTimeout(function () {
+
+            $.ajax({
+                url: server + 'listar-solicitudes-gercom/' + idstate,
+                type: 'GET',
+                dataType: 'html'
+
+            }).done(function (data) {
+                $('.table-solicituds-gercom').append(data);
+                $('#table_solicitude_gercom').dataTable({
+                        "bLengthChange": false,
+                        'iDisplayLength': 5,
+                        "oLanguage": {
+                            "sSearch": "Buscar: ",
+                            "sZeroRecords": "No hay solicitudes",
+                            "sInfoEmpty": "No hay solicitudes",
+                            "sInfo":'Mostrando _END_ de _TOTAL_'
+                        }
+                    }
+                );
+            });
+        }, 200)
+    })
 }
