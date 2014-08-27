@@ -379,7 +379,7 @@ $(function(){
                                     }
                                     else
                                     {
-                                        ajaxExpense(data);
+                                        1(data);
                                         var new_row = $(row).clone(true,true);
                                         $(new_row).find(".proof-type").text(proof_type);
                                         $(new_row).find(".ruc").text(ruc);
@@ -405,17 +405,21 @@ $(function(){
                                         }
                                         else
                                         {
-                                            ajaxExpense(data);
-                                            var new_row = $(row).clone(true,true);
-                                            $(new_row).find(".proof-type").text(proof_type);
-                                            $(new_row).find(".ruc").text(ruc);
-                                            $(new_row).find(".razon").text(razon);
-                                            $(new_row).find(".voucher_number").text(number_voucher);
-                                            $(new_row).find(".date_movement").text(date);
-                                            $(new_row).find(".type_money").text(type_money);
-                                            $(new_row).find(".total_expense").text(total_expense);
-                                            $("#table-expense tbody").append(new_row);
-                                            $("#balance").val(balance);
+                                            ajaxExpense(data).done(function(result){
+                                                console.log(result);
+                                                var new_row = $(row).clone(true,true);
+                                                $(new_row).find(".proof-type").text(proof_type);
+                                                $(new_row).find(".ruc").text(ruc);
+                                                $(new_row).find(".razon").text(razon);
+                                                $(new_row).find(".voucher_number").text(number_voucher);
+                                                $(new_row).find(".date_movement").text(date);
+                                                $(new_row).find(".type_money").text(type_money);
+                                                $(new_row).find(".total_expense").text(total_expense);
+                                                $("#table-expense tbody").append(new_row);
+                                                $("#balance").val(balance);
+                                            }).fail(function(){
+                                                console.log("error");
+                                            });
                                         }
                                     }
                                     else
@@ -467,18 +471,22 @@ $(function(){
                             }
                             else
                             {
-                                console.log(ajaxExpense(data));
-                                var new_row = $(row).clone(true,true);
-                                balance = deposit - total_expense;
-                                $(new_row).find(".proof-type").text(proof_type);
-                                $(new_row).find(".ruc").text(ruc);
-                                $(new_row).find(".razon").text(razon);
-                                $(new_row).find(".voucher_number").text(number_voucher);
-                                $(new_row).find(".date_movement").text(date);
-                                $(new_row).find(".type_money").text(type_money);
-                                $(new_row).find(".total_expense").text(total_expense);
-                                $("#table-expense tbody").append(new_row);
-                                $("#balance").val(balance);
+                                ajaxExpense(data).done(function(result){
+                                    console.log(result);
+                                    var new_row = $(row).clone(true,true);
+                                    balance = deposit - total_expense;
+                                    $(new_row).find(".proof-type").text(proof_type);
+                                    $(new_row).find(".ruc").text(ruc);
+                                    $(new_row).find(".razon").text(razon);
+                                    $(new_row).find(".voucher_number").text(number_voucher);
+                                    $(new_row).find(".date_movement").text(date);
+                                    $(new_row).find(".type_money").text(type_money);
+                                    $(new_row).find(".total_expense").text(total_expense);
+                                    $("#table-expense tbody").append(new_row);
+                                    $("#balance").val(balance);
+                                }).fail(function(){
+                                    console.log("error");
+                                });
                             }
                         }
                     }
@@ -559,8 +567,7 @@ $(function(){
         //Grabado de datos en el controlador de Gastos
         function ajaxExpense(jsonExpense)
         {
-            // var response = 0;
-            var response = $.ajax({
+            return $.ajax({
                 type: 'post',
                 url: 'register-expense',
                 datatype: 'json',
@@ -573,11 +580,8 @@ $(function(){
                 },
                 error:function(){
                     alert("No se pueden grabar los datos.");
-                },
-            }).done(function (response){
-                console.log("Se realizó el ajax");
+                }
             });
-            return response.responseText;
         }
         
         //Calculo del IGV
