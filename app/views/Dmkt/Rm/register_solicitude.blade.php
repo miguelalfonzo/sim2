@@ -1,38 +1,33 @@
 @extends('template.main')
 @section('content')
-<style>
-    .form-horizontal .control-label {
-        text-align: left;
-    }
-</style>
 
 <div class="content">
 
-<div class="panel panel-default">
-<div class="panel-heading">
-    <h4 class="panel-title">Nueva Solicitud</h4>
-</div>
-<div class="panel-body">
-<form id="form-register-solicitude" class="" method="post"
+    <div class="panel panel-default">
+        <div class="panel-heading">
+             <h4 class="panel-title">Nueva Solicitud</h4>
+        </div>
+    <div class="panel-body">
+        <form id="form-register-solicitude" class="" method="post"
       action="{{ URL::to( isset($solicitude) ? 'editar-solicitud' : 'registrar-solicitud' )}}">
 
-@if(isset($solicitude))
-<input value="{{$solicitude->idsolicitud}}" name="idsolicitude" type="hidden">
-@endif
-<div class="form-group col-sm-6 col-md-4">
+        @if(isset($solicitude))
+        <input value="{{$solicitude->idsolicitud}}" name="idsolicitude" type="hidden">
+        @endif
+
+        <div class="form-group col-sm-6 col-md-4">
 
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Nombre Solicitud</label>
 
     <div class="col-sm-12 col-md-12">
         <input id="idtitle" name="titulo" type="text" placeholder=""
                value="{{isset($solicitude->titulo)? $solicitude->titulo : null }}"
-               class="form-control input-md" >
+               class="form-control input-md">
 
     </div>
 </div>
 
-
-<div class="form-group col-sm-6 col-md-4">
+        <div class="form-group col-sm-6 col-md-4">
 
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo Solicitud</label>
 
@@ -51,7 +46,7 @@
 </div>
 
 
-<div class="form-group col-sm-6 col-md-4">
+        <div class="form-group col-sm-6 col-md-4">
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto</label>
 
     <div class="col-sm-12 col-md-12">
@@ -62,7 +57,7 @@
     </div>
 </div>
 
-<div class="form-group col-sm-6 col-md-4">
+        <div class="form-group col-sm-6 col-md-4">
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Moneda</label>
 
     <div class="col-sm-12 col-md-12">
@@ -76,7 +71,7 @@
     </div>
 </div>
 
-<div class="solicitude_monto form-group col-sm-6 col-md-4">
+        <div class="solicitude_monto form-group col-sm-6 col-md-4">
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto Factura</label>
 
     <div class="col-sm-12 col-md-12">
@@ -87,7 +82,7 @@
     </div>
 </div>
 
-<div class="form-group col-sm-6 col-md-4">
+        <div class="form-group col-sm-6 col-md-4">
 
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Fondo</label>
 
@@ -105,8 +100,7 @@
     </div>
 </div>
 
-
-<div class="form-group col-sm-6 col-md-4">
+        <div class="form-group col-sm-6 col-md-4">
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Fecha de Entrega</label>
 
     <div class="col-sm-12 col-md-12">
@@ -120,7 +114,8 @@
 
     </div>
 </div>
-<div class="solicitude_factura form-group col-sm-6 col-md-4">
+
+        <div class="solicitude_factura form-group col-sm-6 col-md-4">
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Factura</label>
 
     <div class="col-sm-12 col-md-12">
@@ -138,7 +133,7 @@
     </div>
 </div>
 
-<div class="form-group col-sm-6 col-md-4 ">
+        <div class="form-group col-sm-6 col-md-4 ">
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Cliente</label>
 
     <ul id="listclient" class="col-sm-12 col-md-12">
@@ -175,7 +170,7 @@
     <button type="button" class="btn btn-default" id="btn-add-client">Agregar Otro Cliente</button>
 
 </div>
-<div class="form-group col-sm-6 col-md-4">
+        <div class="form-group col-sm-6 col-md-4">
     <label class="col-sm-8 col-md-8 control-label" for="selectfamily">Familia</label>
 
 
@@ -228,7 +223,7 @@
 </div>
 
 
-<div class="col-sm-12 col-md-12" style="margin-top: 10px">
+        <div class="col-sm-12 col-md-12" style="margin-top: 10px">
     <div class="form-group col-sm-12 col-md-12">
         <label class="col-sm-8 col-md-8 control-label" for="textarea">Descripcion de la Solicitud</label>
 
@@ -240,16 +235,16 @@
 
 
 <!-- Button (Double) -->
-<div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
+        <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
 
 
-    <div class="col-sm-12 col-md-12" style="text-align: center">
-        <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">{{isset($solicitude) ?
-            'Actualizar' : 'Crear'}}
-        </button>
-        <a id="button2id" href="{{URL::to('show_rm')}}" name="button2id" class="btn btn-primary">Cancelar</a>
-    </div>
-</div>
+              <div class="col-sm-12 col-md-12" style="text-align: center">
+                  <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">{{isset($solicitude) ?
+                    'Actualizar' : 'Crear'}}
+                  </button>
+                    <a id="button2id" href="{{URL::to('show_rm')}}" name="button2id" class="btn btn-primary">Cancelar</a>
+             </div>
+        </div>
 
 
 </form>
