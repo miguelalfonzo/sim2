@@ -96,8 +96,10 @@ class SolicitudeController extends BaseController
 
         $inputs = Input::all();
         $image = Input::file('file');
-        $filename = $image->getClientOriginalName();
-        Image::make($image->getRealPath())->rezise('200','300')->save('public/img/'. $filename);die;
+        $filename  = uniqid(). '.' . $image->getClientOriginalExtension();
+        //$filename = $image->getClientOriginalName();
+        $path = public_path('img/reembolso/' . $filename);
+        Image::make($image->getRealPath())->resize(800, 600)->save($path);
 
         $solicitude = new Solicitude;
         $date = $inputs['delivery_date'];
@@ -151,8 +153,8 @@ class SolicitudeController extends BaseController
 
         });
 
-
-        return Redirect::to('show_rm');
+        return 'Registro Completado';
+        //return Redirect::to('show_rm');
     }
 
     public function listSolicitude($id)

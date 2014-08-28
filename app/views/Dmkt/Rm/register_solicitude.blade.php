@@ -9,7 +9,7 @@
         </div>
     <div class="panel-body">
         <form id="form-register-solicitude" class="" method="post"
-      action="{{ URL::to( isset($solicitude) ? 'editar-solicitud' : 'registrar-solicitud' )}}" enctype="multipart/form-data">
+       enctype="multipart/form-data">
 
         @if(isset($solicitude))
         <input value="{{$solicitude->idsolicitud}}" name="idsolicitude" type="hidden">
@@ -251,4 +251,5 @@
 </div>
 </div>
 </div>
+
 @stop

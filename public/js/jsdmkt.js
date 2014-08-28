@@ -271,7 +271,27 @@ function newSolicitude() {
 
             if (validate == 0) {
 
-                $('#form-register-solicitude').submit();
+                    var formData = new FormData($('#form-register-solicitude')[0]);
+
+                    $.ajax({
+                        url: server + 'registrar-solicitud',
+                        type: 'POST',
+                        data: formData,
+                        async: false,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        beforeSend: function(){
+
+                        }
+                    }).done(function(){
+                        alert('registro completado')
+                    }).fail(function(){
+
+                    });
+
+                    return false;
+
             } else {
                 alert('datos incorrectos');
             }
@@ -308,11 +328,16 @@ function newSolicitude() {
         setTimeout(function () {
 
             $.ajax({
+
                 url: server + 'listar-solicitudes/' + idstate,
                 type: 'GET',
-                dataType: 'html'
+                dataType: 'html',
+                beforeSend:function(){
+                   $('#loading').show()
+                }
 
             }).done(function (data) {
+                $('#loading').hide();
                 $('.table-solicituds').append(data);
                 $('#table_solicitude').dataTable({
                         "bLengthChange": false,
@@ -591,4 +616,6 @@ function newSolicitude() {
             });
         }, 200)
     })
+
+
 }

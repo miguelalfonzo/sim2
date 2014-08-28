@@ -61,6 +61,19 @@ selectproduct{
     background: 0;
 
 }
+#loading
+{
+    position: absolute;
+    margin: auto;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100px;
+    height: 100px;
+
+    opacity: 1.4;
+}
 @media screen and (max-width: 780px){
 
     .button-new-solicitude{
