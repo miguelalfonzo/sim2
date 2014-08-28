@@ -70,8 +70,6 @@
     </div>
 </div>
 </div>
-<div id="loading" style="display: none">
-    <img src="{{URL::to('/')}}/img/ajax-loader.gif">
-</div>
+
 @stop
 

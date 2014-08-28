@@ -36,9 +36,14 @@
 <section>
     @yield('solicitude')
 </section>
+
+<div id="loading" style="display: none">
+    <img src="{{URL::to('/')}}/img/spiffygif.gif">
+</div>
 <!-- <section>
      @yield('actividad')
  </section>-->
+{{ HTML::script('js/jquery.blockUI.js') }}
 {{ HTML::script('js/jquery.numeric.js') }}
 {{ HTML::script('js/bootstrap.min.js') }}
 {{ HTML::script('js/bootstrap-datepicker.js') }}
@@ -48,14 +53,5 @@
 {{ HTML::script('js/bootbox.min.js') }}
 {{ HTML::script('js/js.js') }}
 {{ HTML::script('js/jsdmkt.js') }}
-{{ HTML::script('js/pace.js') }}
-<script type="text/javascript">
-    paceOptions = {
-        startOnPageLoad: false,
-        eventLag: false,
-        document: false,
-        elements: false
-    }
-</script>
 </body>
 </html>
