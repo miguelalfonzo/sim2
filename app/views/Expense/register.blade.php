@@ -37,7 +37,7 @@
 						<label>Monto Depositado</label>
 						<div class="input-group">
 					    	<div id="type-money" class="input-group-addon">{{$data['activity']['simbolMoney']}}</div>
-					      	<input id="deposit" class="form-control" type="text" value="200" disabled>
+					      	<input id="deposit" class="form-control" type="text" value="{{$data['activity']['monto']}}" disabled>
 					    </div>
 					</div>
 				</div>

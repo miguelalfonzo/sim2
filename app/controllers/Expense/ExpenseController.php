@@ -6,6 +6,7 @@ use \BaseController;
 use \View;
 use \Dmkt\Activity;
 use \Dmkt\Solicitude;
+use \Expense\Expense;
 use \Expense\ProofType;
 use \Expense\ExpenseType;
 use \Input;
@@ -34,6 +35,7 @@ class ExpenseController extends BaseController{
 		}
 		
 		$dataActivity['titulo'] = mb_convert_case($solicitude->titulo, MB_CASE_TITLE, "UTF-8");
+		$dataActivity['monto'] = $solicitude->monto;
 		$dataActivity['id'] = $solicitude->idsolicitud;
 		$dataActivity['typeActivity'] = mb_convert_case($solicitude->subtype->nombre, MB_CASE_TITLE, "UTF-8");
 		// $dataActivity['idDeposit'] = $activity->deposit->num_transferencia;
@@ -51,10 +53,44 @@ class ExpenseController extends BaseController{
 	}
 
 	public function registerExpense(){
-		$data = Input::get('data');
+		$expense = Input::get('data');
+		$expenseJson = json_decode($expense);
 
+		$row_expense = Expense::find($expenseJson->idsolicitude);
 
-		return $data;
+		$row_solicitude = Solicitude::find($expenseJson->idsolicitude);
+
+		if($row_expense)
+		{
+			return 1;
+		}
+		else
+		{
+			$expense = new Expense;
+			$expense->idgasto = $expense->lastId()+1;
+			// $expense->idgasto = 1;
+			$expense->idresponse = 1;
+			$expense->num_comprobante = $expenseJson->number_proof;
+			$expense->ruc = $expenseJson->ruc;
+			$expense->razon = $expenseJson->razon;
+			$expense->monto = $expenseJson->total_expense;
+			if($expense->proof_type == '2')
+			{
+				$expense->igv = $expenseJson->igv;
+				$expense->imp_serv = $expenseJson->imp_serv;
+				$expense->sub_tot = $expenseJson->sub_total_expense;
+			}
+			$expense->estado_idestado = $row_solicitude->estado;
+			$date = $expenseJson->date_movement;
+	        list($d, $m, $y) = explode('/', $date);
+	        $d = mktime(11, 14, 54, $m, $d, $y);
+	        $date = date("Y/m/d", $d);
+	        $expense->fecha_movimiento = $date;
+			$expense->tipo_moneda = $row_solicitude->tipo_moneda;
+			$expense->tipo_comprobante = $expenseJson->proof_type;
+			$expense->save();
+			return "Nuevo";
+		}
 	}
 
 	private function getDay(){

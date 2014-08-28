@@ -3,8 +3,7 @@ var server = "http://localhost/BitBucket/bago_dmkt_rg/public/";
 $(function(){
     $(document).on("click","#token-a",function(e){
         e.preventDefault();
-        console.log($(this).parent());
-        // $("#form-token").submit();
+        $(this).parent().parent().find('#form-token').submit();
     });
     //Eventos por default
         //calcula el IGV ni bien carga la página
@@ -224,13 +223,12 @@ $(function(){
             }
             else
             {
-                data.idsolicitude     = JSON.stringify(idsolicitude);
-                data.proof_type       = JSON.stringify(proof_type);
-                data.ruc              = JSON.stringify(ruc);
-                data.razon            = JSON.stringify(razon);
-                data.number_proof_one = JSON.stringify(number_proof_one);
-                data.number_proof_two = JSON.stringify(number_proof_two);
-                data.date_movement    = JSON.stringify(date);
+                data.idsolicitude     = idsolicitude;
+                data.proof_type       = proof_type;
+                data.ruc              = ruc;
+                data.razon            = razon;
+                data.number_proof     = number_proof_one+'-'+number_proof_two;
+                data.date_movement    = date;
 
                 var error_json = 0;
                 
@@ -276,7 +274,7 @@ $(function(){
                     }
                     if(aux)
                     {
-                        data.quantity = JSON.stringify(aux);
+                        data.quantity = aux;
                     }
                 }
                 else
@@ -286,7 +284,7 @@ $(function(){
 
                 if(data_description)
                 {
-                    data.description = JSON.stringify(data_description);
+                    data.description = data_description;
                 }
                 else
                 {
@@ -297,7 +295,7 @@ $(function(){
                 $.each($(".type-expense"),function(index){
                     arr_type_expense[index] = $(this).val();
                 });
-                data.type_expense = JSON.stringify(arr_type_expense);
+                data.type_expense = arr_type_expense;
 
                 if(data_total_item)
                 {
@@ -327,7 +325,7 @@ $(function(){
                     }
                     if(aux)
                     {
-                        data.total_item = JSON.stringify(aux);
+                        data.total_item = aux;
                     }
                 }
                 else
@@ -351,11 +349,11 @@ $(function(){
                         var igv               = parseFloat($("#igv").val());
                         var total_expense     = parseFloat($("#total-expense").val());
                         
-                        data.sub_total_expense = JSON.stringify(sub_total_expense);
-                        data.imp_service = JSON.stringify(imp_service);
-                        data.igv = JSON.stringify(igv);
-                        data.total_expense = JSON.stringify(total_expense);
-                        
+                        data.sub_total_expense = sub_total_expense;
+                        data.imp_service = imp_service;
+                        data.igv = igv;
+                        data.total_expense = total_expense;
+
                         //Validando los documentos registrados.
                         var deposit  = parseFloat($("#deposit").val());
                         var rows_val = $(".total").val();
@@ -383,7 +381,7 @@ $(function(){
                                     }
                                     else
                                     {
-                                        ajaxExpense(data).done(function(result){
+                                        ajaxExpense(JSON.stringify(data)).done(function(result){
                                             console.log(result);
                                             var new_row = $(row).clone(true,true);
                                             $(new_row).find(".proof-type").text(proof_type);
@@ -413,7 +411,7 @@ $(function(){
                                         }
                                         else
                                         {
-                                            ajaxExpense(data).done(function(result){
+                                            ajaxExpense(JSON.stringify(data)).done(function(result){
                                                 console.log(result);
                                                 var new_row = $(row).clone(true,true);
                                                 $(new_row).find(".proof-type").text(proof_type);
@@ -479,7 +477,7 @@ $(function(){
                             }
                             else
                             {
-                                ajaxExpense(data).done(function(result){
+                                ajaxExpense(JSON.stringify(data)).done(function(result){
                                     console.log(result);
                                     var new_row = $(row).clone(true,true);
                                     balance = deposit - total_expense;

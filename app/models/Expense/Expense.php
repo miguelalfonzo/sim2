@@ -22,4 +22,13 @@ class Expense extends Eloquent {
 	public function idProofType(){
 		return $this->hasOne('ProofType','idcomprobante','tipo_comprobante');
 	}
+
+	public function lastId(){
+		$lastId = Expense::orderBy('idgasto','desc')->first();
+		if($lastId == null){
+            return 0;
+        }else{
+            return $lastId->idgasto;
+        }
+	}
 }
