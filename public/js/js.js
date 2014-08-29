@@ -1,10 +1,13 @@
 var server = "http://localhost/BitBucket/bago_dmkt_rg/public/";
 
 $(function(){
+
+    //Eventos Submit
     $(document).on("click","#token-a",function(e){
         e.preventDefault();
         $(this).parent().parent().find('#form-token').submit();
     });
+
     //Eventos por default
         //calcula el IGV ni bien carga la página
         if(parseFloat($(".total-item").val()))
@@ -22,6 +25,7 @@ $(function(){
         $("#imp-ser").numeric({negative:false});
         $(".total-item input").numeric({negative:false});
         $(".quantity input").numeric({negative:false});
+        $("#igv").numeric({negative:false});
 
         //Calcula el IGV una vez digitado el monto total por item
         $(document).on("focusout",".total-item input",function(e){
@@ -87,6 +91,8 @@ $(function(){
         $(document).on("click","#table-expense .delete-expense",function(e){
             e.preventDefault();
             var tot_del  = $(this).parent().parent().find('.total_expense').html();
+            var ruc  = $(this).parent().parent().find('.ruc').html();
+            var voucher_number  = $(this).parent().parent().find('.voucher_number').html();
             var row_del  = $(this).parent().parent();
             var deposit  = $("#deposit").val();
             var tot_rows = 0;
@@ -102,9 +108,27 @@ $(function(){
             bootbox.confirm("¿Esta seguro que desea eliminar el gasto?", function(result) {
                 if(result)
                 {
-                    balance = deposit - tot_rows + tot_del;
-                    $("#balance").val(balance);
-                    row_del.remove();
+                    var data = {};
+                    data.ruc  = ruc;
+                    data.voucher_number  = voucher_number;
+                    data = JSON.stringify(data);
+                    console.log(data);
+                    $.ajax({
+                        type: 'post',
+                        dataType: 'json',
+                        url: 'delete-expense',
+                        data: {
+                            data: data
+                        },
+                        error:function(){
+                            console.log("No se puede eliminar el gasto");
+                        }
+                    }).done(function (response){
+                        console.log("se borro");
+                        balance = deposit - tot_rows + tot_del;
+                        $("#balance").val(balance);
+                        row_del.remove();
+                    });
                 }
             });
         });
@@ -244,8 +268,9 @@ $(function(){
 
                 //Validación de gastos detallados
                 var index;
-                var aux = [];
-                
+                var auxq = [];
+                var auxt = [];
+
                 if(data_quantity)
                 {
                     for(index = 0; index<data_quantity.length;index++)
@@ -268,13 +293,13 @@ $(function(){
                             }
                             else
                             {
-                                aux[index] = parseFloat(data_quantity[index]);
+                                auxq[index] = parseFloat(data_quantity[index]);
                             }
                         }
                     }
-                    if(aux)
+                    if(auxq)
                     {
-                        data.quantity = aux;
+                        data.quantity = auxq;
                     }
                 }
                 else
@@ -319,13 +344,13 @@ $(function(){
                             }
                             else
                             {
-                                aux[index] = parseFloat(data_total_item[index]);
+                                auxt[index] = parseFloat(data_total_item[index]);
                             }
                         }
                     }
-                    if(aux)
+                    if(auxt)
                     {
-                        data.total_item = aux;
+                        data.total_item = auxt;
                     }
                 }
                 else

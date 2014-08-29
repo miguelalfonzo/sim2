@@ -10,7 +10,7 @@ namespace Dmkt;
 class Marca extends \Eloquent {
 
     public $timestamps = false;
-
+    
 
 
 

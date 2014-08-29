@@ -9,12 +9,14 @@ use \Dmkt\Solicitude;
 use \Expense\Expense;
 use \Expense\ProofType;
 use \Expense\ExpenseType;
+use \Expense\ExpenseDetail;
 use \Input;
+use \DB;
 
 class ExpenseController extends BaseController{
 
 	public function show(){
-		//depositado es 5
+		//deposit is 5
 		$token = Input::get('token');
 
 		$solicitude  = Solicitude::where('token',$token)->firstOrFail();
@@ -55,20 +57,28 @@ class ExpenseController extends BaseController{
 	public function registerExpense(){
 		$expense = Input::get('data');
 		$expenseJson = json_decode($expense);
+		// var_dump($expenseJson->quantity);die;
 
 		$row_expense = Expense::find($expenseJson->idsolicitude);
-
 		$row_solicitude = Solicitude::find($expenseJson->idsolicitude);
 
 		if($row_expense)
 		{
-			return 1;
+			$save_expense = 1;
 		}
 		else
 		{
 			$expense = new Expense;
-			$expense->idgasto = $expense->lastId()+1;
-			// $expense->idgasto = 1;
+			
+			//Detail Expense
+			$idgasto = $expense->lastId()+1;
+			$quantity = $expenseJson->quantity;
+			$description = $expenseJson->description;
+			$type_expense = $expenseJson->type_expense;
+			$total_item = $expenseJson->total_item;
+
+			//Header Expense
+			$expense->idgasto = $idgasto;
 			$expense->idresponse = 1;
 			$expense->num_comprobante = $expenseJson->number_proof;
 			$expense->ruc = $expenseJson->ruc;
@@ -89,7 +99,48 @@ class ExpenseController extends BaseController{
 			$expense->tipo_moneda = $row_solicitude->tipo_moneda;
 			$expense->tipo_comprobante = $expenseJson->proof_type;
 			$expense->save();
-			return "Nuevo";
+
+			if($expense->save())
+			{
+				try {
+					DB::transaction (function() use ($idgasto,$quantity,$description,$type_expense,$total_item){
+						for($i=0;$i<count($quantity);$i++)
+						{
+							$expense_detail = new ExpenseDetail;
+							$expense_detail->idgasto = $idgasto;
+							$expense_detail->cantidad = $quantity[$i];
+							$expense_detail->descripcion = $description[$i];
+							$expense_detail->tipo_gasto = $type_expense[$i];
+							$expense_detail->importe = $total_item[$i];
+							$expense_detail->save();	
+						}
+					});
+				} catch (Exception $e) {
+					$save_expense = "Error al grabar el detalle de gastos";
+				}
+				return "OK";
+			}
+		}
+	}
+
+	public function deleteExpense(){
+		$expense = Input::get('data');
+		$expenseJson = json_decode($expense);
+
+		$expense_row = Expense::where('ruc',$expenseJson->ruc)->where('num_comprobante',$expenseJson->voucher_number)->firstOrFail();
+
+		echo json_encode($expense_row->idgasto);
+		return 1;
+		
+		$delete_row = Expense::where('idgasto',$expense_row->idgasto)->delete();
+
+		if(count($delete_row)==1)
+		{
+			return "OK";
+		}
+		else
+		{
+			return "No borrado";
 		}
 	}
 
