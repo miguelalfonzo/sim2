@@ -96,10 +96,15 @@ class SolicitudeController extends BaseController
 
         $inputs = Input::all();
         $image = Input::file('file');
-        $filename  = uniqid(). '.' . $image->getClientOriginalExtension();
-        //$filename = $image->getClientOriginalName();
-        $path = public_path('img/reembolso/' . $filename);
-        Image::make($image->getRealPath())->resize(800, 600)->save($path);
+        if (isset($image)) {
+
+            $filename = uniqid() . '.' . $image->getClientOriginalExtension();
+            //$filename = $image->getClientOriginalName();
+            $path = public_path('img/reembolso/' . $filename);
+            Image::make($image->getRealPath())->resize(800, 600)->save($path);
+
+        }
+
 
         $solicitude = new Solicitude;
         $date = $inputs['delivery_date'];
@@ -116,45 +121,44 @@ class SolicitudeController extends BaseController
         $solicitude->token = sha1(md5(uniqid($solicitude->idsolicitud, true)));
         $solicitude->idsubtipoactividad = $inputs['sub_type_activity'];
         $solicitude->tipo_moneda = $inputs['money'];
-        $solicitude->save();
+        if ($solicitude->save()) {
+            $data = array(
 
-        $clients = $inputs['clients'];
-        foreach ($clients as $client) {
-            $cod = explode(' ', $client);
-            $solicitude_clients = new SolicitudeClient;
+                'name' => $inputs['titulo'],
+                'description' => $inputs['description'],
+                'monto' => $inputs['monto'],
+                'money' => $inputs['money']
 
-            $solicitude_clients->idsolicitud_clientes = $solicitude_clients->searchId() + 1;
-            $solicitude_clients->idsolicitud = $solicitude->searchId();
-            $solicitude_clients->idcliente = $cod[0];
-            $solicitude_clients->save();
+            );
+
+
+            Mail::send('emails.template', $data, function ($message) {
+                $message->to('cesarhm1687@gmail.com');
+                $message->subject('Nueva Solicitud');
+
+            });
+            $clients = $inputs['clients'];
+            foreach ($clients as $client) {
+                $cod = explode(' ', $client);
+                $solicitude_clients = new SolicitudeClient;
+
+                $solicitude_clients->idsolicitud_clientes = $solicitude_clients->searchId() + 1;
+                $solicitude_clients->idsolicitud = $solicitude->searchId();
+                $solicitude_clients->idcliente = $cod[0];
+                $solicitude_clients->save();
+            }
+            $families = $inputs['families'];
+            foreach ($families as $family) {
+
+                $solicitude_families = new SolicitudeFamily;
+                $solicitude_families->idsolicitud_familia = $solicitude_families->searchId() + 1;
+                $solicitude_families->idsolicitud = $solicitude->searchId();
+                $solicitude_families->idfamilia = $family;
+                $solicitude_families->save();
+            }
+            echo true;
         }
-        $families = $inputs['families'];
-        foreach ($families as $family) {
 
-            $solicitude_families = new SolicitudeFamily;
-            $solicitude_families->idsolicitud_familia = $solicitude_families->searchId() + 1;
-            $solicitude_families->idsolicitud = $solicitude->searchId();
-            $solicitude_families->idfamilia = $family;
-            $solicitude_families->save();
-        }
-
-        $data = array(
-
-            'name' => $inputs['titulo'],
-            'description' => $inputs['description'],
-            'monto' => $inputs['monto'],
-            'money' => $inputs['money']
-
-        );
-
-        Mail::send('emails.template', $data, function ($message) {
-            $message->to('cesarhm1687@gmail.com');
-            $message->subject('Nueva Solicitud');
-
-        });
-
-        return 'Registro Completado';
-        //return Redirect::to('show_rm');
     }
 
     public function listSolicitude($id)
@@ -175,22 +179,14 @@ class SolicitudeController extends BaseController
     public function viewSolicitude($token)
     {
 
-        $solicitude = Solicitude::where('token', '=', $token)->firstOrFail();
 
-        $id = $solicitude->idsolicitud;
-        $clients = DB::table('DMKT_RG_SOLICITUD_CLIENTES')->where('idsolicitud', $id)->lists('idcliente');
-        $clients = Client::whereIn('clcodigo', $clients)->get(array('clcodigo', 'clnombre'));
-        $families = DB::table('DMKT_RG_SOLICITUD_FAMILIA')->where('idsolicitud', $id)->lists('idfamilia');
-        $families = Marca::whereIn('id', $families)->get(array('id', 'descripcion'));
-
+        $solicitude = Solicitude::where('token', $token)->firstOrFail();
+        $managers = Manager::all();
         $data = [
 
             'solicitude' => $solicitude,
-            'clients' => $clients,
-            'families' => $families
-
+            'managers' => $managers
         ];
-        //echo json_encode($data);
 
         return View::make('Dmkt.Rm.view_solicitude', $data);
 
@@ -201,7 +197,7 @@ class SolicitudeController extends BaseController
     {
 
         $families = Marca::all();
-        $solicitude = Solicitude::where('token',$token)->firstOrFail();
+        $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $id = $solicitude->idsolicitud;
         $clients = DB::table('DMKT_RG_SOLICITUD_CLIENTES')->where('idsolicitud', $id)->lists('idcliente');
         $clients = Client::whereIn('clcodigo', $clients)->get(array('clcodigo', 'clnombre'));
@@ -305,10 +301,28 @@ class SolicitudeController extends BaseController
         $estado = $inputs['idstate'];
         $start = $inputs['date_start'];
         $end = $inputs['date_end'];
-        $solicituds = Solicitude::select('*')
-            ->where('estado', $estado)
-            ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
-            ->get();
+        $today = getdate();
+        $m = $today['mday'].'-'.$today['mon'].'-'.$today['year'];
+        $lastday = date('t-m-Y', strtotime($m));
+        $firstday = date('01-m-Y', strtotime($m));
+
+        if($start!=null && $end!=null){
+
+            $solicituds = Solicitude::select('*')
+                ->where('estado', $estado)
+                ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                ->get();
+
+        }else{
+
+            $solicituds = Solicitude::select('*')
+                ->where('estado', $estado)
+                ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                ->get();
+
+        }
+
+
         $view = View::make('Dmkt.Rm.view_solicituds_rm')->with('solicituds', $solicituds);
         return $view;
     }
@@ -327,7 +341,7 @@ class SolicitudeController extends BaseController
     {
 
 
-        $solicitude = Solicitude::where('token',$token)->firstOrFail();
+        $solicitude = Solicitude::where('token', $token)->firstOrFail();
 
         //$clients = DB::table('DMKT_RG_SOLICITUD_CLIENTES')->where('idsolicitud', $id)->lists('idcliente');
         //$clients = Client::whereIn('clcodigo',$clients)->get(array('clcodigo','clnombre'));
@@ -414,12 +428,15 @@ class SolicitudeController extends BaseController
 
     /** Gerente Comercial */
 
-    public function show_gercom(){
+    public function show_gercom()
+    {
 
         $states = State::all();
         return View::make('Dmkt.GerCom.show_gercom')->with('states', $states);
     }
-    public  function listSolicitudeGerCom($id){
+
+    public function listSolicitudeGerCom($id)
+    {
 
         if ($id == 0) {
             $solicituds = Solicitude::all();
@@ -430,13 +447,17 @@ class SolicitudeController extends BaseController
         $view = View::make('Dmkt.GerCom.view_solicituds_gercom')->with('solicituds', $solicituds);
         return $view;
     }
-    public function viewSolicitudeGerCom($token){
+
+    public function viewSolicitudeGerCom($token)
+    {
 
 
-        $solicitude = Solicitude::where('token',$token)->firstOrFail();
-        return View::make('Dmkt.GerCom.view_solicitude_gercom')->with('solicitude',$solicitude);
+        $solicitude = Solicitude::where('token', $token)->firstOrFail();
+        return View::make('Dmkt.GerCom.view_solicitude_gercom')->with('solicitude', $solicitude);
     }
-    public function approvedSolicitude($token){
+
+    public function approvedSolicitude($token)
+    {
 
         $solicitude = Solicitude::where('token', $token);
         $solicitude->estado = 4;

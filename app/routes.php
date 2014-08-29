@@ -21,7 +21,7 @@ Route::get('/', function()
 Route::get('show_rm','Dmkt\SolicitudeController@show_rm');
 Route::get('nueva-solicitud','Dmkt\SolicitudeController@newSolicitude');
 Route::get('prueba','Dmkt\SolicitudeController@test');
-Route::get('ver-solicitud/{id}','Dmkt\SolicitudeController@viewSolicitude');
+Route::get('ver-solicitud/{token}','Dmkt\SolicitudeController@viewSolicitude');
 Route::get('editar-solicitud/{id}','Dmkt\SolicitudeController@editSolicitude');
 Route::post('editar-solicitud','Dmkt\SolicitudeController@formEditSolicitude');
 Route::get('getclients','Dmkt\SolicitudeController@getClients');

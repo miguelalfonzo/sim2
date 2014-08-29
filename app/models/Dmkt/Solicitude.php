@@ -52,4 +52,6 @@ class Solicitude extends Eloquent{
     function clients(){
         return $this->hasMany('Dmkt\SolicitudeClient','idsolicitud','idsolicitud');
     }
+
+
 }

@@ -109,7 +109,11 @@ selectproduct{
     cursor: inherit;
     display: block;
 }
+#loading{
 
+    opacity: 0.5;
+
+}
 
 
 

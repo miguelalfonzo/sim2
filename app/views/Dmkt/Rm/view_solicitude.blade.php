@@ -58,16 +58,24 @@
                                 </div>
                                 <div class="panel-body">
 
-                                    @foreach($families as $family)
-                                    <div class="form-group col-sm-12 col-md-12">
+                                    @foreach($solicitude->families as $family)
+                                    <div class="form-group col-sm-12 col-md-12" style="padding: 0">
 
 
-                                        <div class="col-sm-12 col-md-12">
+                                        <div class="col-sm-8 col-md-8">
+
                                             <input id="textinput" name="textinput" type="text" placeholder=""
-                                                   value="{{$family->descripcion}}" readonly
+                                                   value="{{$family->marca->descripcion}}" readonly
                                                    class="form-control input-md">
 
                                         </div>
+                                        <div class="col-sm-4 col-md-4" style="padding: 0">
+                                            <div class="input-group">
+                                                <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
+                                                <input id="" disabled name="amount_assigned[]" type="text" class="form-control input-md amount_families" value="{{isset($family->monto_asignado)? $family->monto_asignado : round($solicitude->monto/count($solicitude->families),2)}}">
+                                            </div>
+                                        </div>
+
                                     </div>
                                     @endforeach
                                 </div>
@@ -110,13 +118,13 @@
                                 </div>
                                 <div class="panel-body">
 
-                                    @foreach($clients as $client)
-                                    <div class="form-group col-sm-12 col-md-12">
+                                    @foreach($solicitude->clients as $client)
+                                    <div class="form-group ">
 
 
-                                        <div class="col-sm-12 col-md-12">
+                                        <div class="">
                                             <input id="textinput" name="textinput" type="text" placeholder=""
-                                                   value="{{$client->clnombre}}" readonly
+                                                   value="{{$client->client->clnombre}}" readonly
                                                    class="form-control input-md ">
 
                                         </div>
