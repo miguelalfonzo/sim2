@@ -51,8 +51,11 @@ class SolicitudeController extends BaseController
     public function test()
     {
 
-        $token = md5(sha1(uniqid(2, true)));
-        var_dump($token);
+        $solicitude = Solicitude::find(1);
+        foreach($solicitude->gastos as $gastos){
+            echo json_encode($gastos->items);
+        }
+
     }
 
     public function show_rm()
@@ -96,17 +99,18 @@ class SolicitudeController extends BaseController
 
         $inputs = Input::all();
         $image = Input::file('file');
+        $solicitude = new Solicitude;
         if (isset($image)) {
 
             $filename = uniqid() . '.' . $image->getClientOriginalExtension();
             //$filename = $image->getClientOriginalName();
             $path = public_path('img/reembolso/' . $filename);
             Image::make($image->getRealPath())->resize(800, 600)->save($path);
-
+            $solicitude->image = $filename;
         }
 
 
-        $solicitude = new Solicitude;
+
         $date = $inputs['delivery_date'];
         list($d, $m, $y) = explode('/', $date);
         $d = mktime(11, 14, 54, $m, $d, $y);
@@ -178,19 +182,14 @@ class SolicitudeController extends BaseController
 
     public function viewSolicitude($token)
     {
-
-
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $managers = Manager::all();
         $data = [
-
             'solicitude' => $solicitude,
             'managers' => $managers
         ];
 
         return View::make('Dmkt.Rm.view_solicitude', $data);
-
-
     }
 
     public function editSolicitude($token)
@@ -232,6 +231,17 @@ class SolicitudeController extends BaseController
         $date = date("Y/m/d", $d);
         $id = $inputs['idsolicitude'];
         $solicitude = Solicitude::where('idsolicitud', $id);
+        $image = Input::file('file');
+
+        if (isset($image)) {
+
+            $filename = uniqid() . '.' . $image->getClientOriginalExtension();
+            //$filename = $image->getClientOriginalName();
+            $path = public_path('img/reembolso/' . $filename);
+            Image::make($image->getRealPath())->resize(800, 600)->save($path);
+            $solicitude->image = $filename;
+        }
+
         //$solicitude->idsolicitud = (int) $id ;
         $solicitude->descripcion = $inputs['description'];
         $solicitude->titulo = $inputs['titulo'];
@@ -268,7 +278,7 @@ class SolicitudeController extends BaseController
             $solicitude_families->save();
         }
 
-        return Redirect::to('show_rm');
+        echo true;
 
     }
 
@@ -350,14 +360,7 @@ class SolicitudeController extends BaseController
 
     public function viewSolicitudeSup($token)
     {
-
-
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
-
-        //$clients = DB::table('DMKT_RG_SOLICITUD_CLIENTES')->where('idsolicitud', $id)->lists('idcliente');
-        //$clients = Client::whereIn('clcodigo',$clients)->get(array('clcodigo','clnombre'));
-        //$families = DB::table('DMKT_RG_SOLICITUD_FAMILIA')->where('idsolicitud', $id)->lists('idfamilia');
-        //$families= Marca::whereIn('id',$families)->get(array('id','descripcion'));
         $managers = Manager::all();
         $data = [
 

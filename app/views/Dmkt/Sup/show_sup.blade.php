@@ -20,7 +20,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group col-sm-4 col-md-3">
+                    <div class="form-group col-sm-4 col-md-3" style="padding-right: 0">
                         <div class="" style="padding: 0">
                             <div class="input-group ">
                                 <span class="input-group-addon">Desde</span>
@@ -32,7 +32,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group col-sm-4 col-md-3">
+                    <div class="form-group col-sm-4 col-md-3" style="padding-right: 0">
                         <div class="" style="padding: 0">
                             <div class="input-group ">
                                 <span class="input-group-addon">Hasta</span>

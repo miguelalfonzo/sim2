@@ -22,15 +22,15 @@
         <td></td>
         <td><div class="div-icons-solicituds" style="text-align: center">
 
-                <a href="{{URL::to('ver-solicitud').'/'.$solicitude->token}}"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span></a>
+                <a target="_blank" href="{{URL::to('ver-solicitud').'/'.$solicitude->token}}"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span></a>
                 @if($solicitude->estado == 5)
-                <a id="token-a" href="#"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span></a>
+                <a target="_blank" id="token-a" href="#"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span></a>
                 <form id="form-token" action="{{URL::to('registrar-gasto')}}" method="POST">
                     <input type="hidden" name="token" value="{{$solicitude->token}}">
                 </form>
                 @endif
                 @if($solicitude->estado == 2)
-                <a href="{{URL::to('editar-solicitud').'/'.$solicitude->token}}"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-pencil"></span></a>
+                <a target="_blank" href="{{URL::to('editar-solicitud').'/'.$solicitude->token}}"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-pencil"></span></a>
                 <a href="#" class="cancel-solicitude" data-idsolicitude = "{{$solicitude->idsolicitud}}"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-remove"></span></a>
                 @endif
 

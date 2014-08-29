@@ -32,7 +32,13 @@ class Expense extends Eloquent {
             return $lastId->idgasto;
         }
 	}
+
 	public function idSolicitude(){
 		return $this->hasOne('Dmkt\Activity','idsolicitud','idsolicitud');
 	}
+
+    public function items(){
+        return $this->hasMany('Expense\ExpenseItem','idgasto','idgasto');
+    }
+
 }

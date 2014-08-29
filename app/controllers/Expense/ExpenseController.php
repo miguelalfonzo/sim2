@@ -73,8 +73,10 @@ class ExpenseController extends BaseController{
 	}
 
 	public function registerExpense(){
+
 		$expense = Input::get('data');
 		$expenseJson = json_decode($expense);
+
 		// var_dump($expenseJson->quantity);die;
 
 		$row_solicitude = Solicitude::find($expenseJson->idsolicitude);
@@ -94,6 +96,10 @@ class ExpenseController extends BaseController{
 		$expense->razon = $expenseJson->razon;
 		$expense->monto = $expenseJson->total_expense;
 		if($expense->proof_type == '2')
+
+		$row_expense = Expense::find($expenseJson->idsolicitude);
+		$row_solicitude = Solicitude::find($expenseJson->idsolicitude);
+		if($row_expense)
 		{
 			$expense->igv = $expenseJson->igv;
 			$expense->imp_serv = $expenseJson->imp_serv;
