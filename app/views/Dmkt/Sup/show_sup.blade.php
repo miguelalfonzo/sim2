@@ -48,7 +48,7 @@
 
                         <div class="" style="padding: 0">
                             <a id="search_solicitude_sup" class="btn btn-sm btn-primary ladda-button"
-                               data-style="expand-right" data-size="l"><i class="glyphicon glyphicon-search"></i></a>
+                               data-style="zoom-in" data-size="l"><i class="glyphicon glyphicon-search"></i></a>
                         </div>
 
                     </div>
