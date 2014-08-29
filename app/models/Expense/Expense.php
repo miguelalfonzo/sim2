@@ -31,4 +31,8 @@ class Expense extends Eloquent {
             return $lastId->idgasto;
         }
 	}
+
+    public function items(){
+        return $this->hasMany('Expense\ExpenseItem','idgasto','idgasto');
+    }
 }

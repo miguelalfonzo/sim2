@@ -53,13 +53,11 @@ class ExpenseController extends BaseController{
 	}
 
 	public function registerExpense(){
+
 		$expense = Input::get('data');
 		$expenseJson = json_decode($expense);
-
 		$row_expense = Expense::find($expenseJson->idsolicitude);
-
 		$row_solicitude = Solicitude::find($expenseJson->idsolicitude);
-
 		if($row_expense)
 		{
 			return 1;

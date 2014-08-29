@@ -11,6 +11,7 @@
     <meta name="author" content="eSinergy">
     <title>Descargos Marketing y Registro Gastos</title>
     {{ HTML::style('css/dataTables.bootstrap.css') }}
+    {{ HTML::style('css/bootstrap-lightbox.css')}}
     {{ HTML::style('css/bootstrap.min.css') }}
     {{ HTML::style('css/jquery-ui.min.css') }}
     {{ HTML::style('css/datepicker.css') }}
@@ -21,6 +22,7 @@
     {{ HTML::script('js/jquery-ui.min.js') }}
     {{ HTML::script('js/jquery.dataTables.min.js') }}
     {{ HTML::script('js/dataTables.bootstrap.js') }}
+
 
 </head>
 <body>
@@ -53,5 +55,6 @@
 {{ HTML::script('js/bootbox.min.js') }}
 {{ HTML::script('js/js.js') }}
 {{ HTML::script('js/jsdmkt.js') }}
+{{ HTML::script('js/bootstrap-lightbox.js') }}
 </body>
 </html>
