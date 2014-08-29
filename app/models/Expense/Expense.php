@@ -5,6 +5,7 @@ use \Eloquent;
 use \Common\State;
 use \Common\TypeMoney;
 use \Common\SubTypeActivity;
+use \Dmkt\Activity;
 
 class Expense extends Eloquent {
 
@@ -30,5 +31,8 @@ class Expense extends Eloquent {
         }else{
             return $lastId->idgasto;
         }
+	}
+	public function idSolicitude(){
+		return $this->hasOne('Dmkt\Activity','idsolicitud','idsolicitud');
 	}
 }

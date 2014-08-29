@@ -68,3 +68,14 @@ Route::post('consultarRuc','Expense\RucController@show');
 Route::get('ruc',function(){
     return View::make('Expense\ruc');
 });
+
+//PDF
+Route::get('a', function()
+{
+    $html = '<html><body>'
+    		.'<header><img src="img/bkgr_logo.png"></header>'
+            . '<p>Put your html here, or generate it with your favourite '
+            . 'templating system.</p>'
+            . '</body></html>';
+    return PDF::load($html, 'A4', 'portrait')->show();
+});

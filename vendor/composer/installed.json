@@ -155,44 +155,6 @@
         ]
     },
     {
-        "name": "yajra/laravel-pdo-via-oci8",
-        "version": "0.2.15",
-        "version_normalized": "0.2.15.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/yajra/laravel-pdo-via-oci8.git",
-            "reference": "cc4b93e6c620961d318cec18730c22febfe61923"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/yajra/laravel-pdo-via-oci8/zipball/cc4b93e6c620961d318cec18730c22febfe61923",
-            "reference": "cc4b93e6c620961d318cec18730c22febfe61923",
-            "shasum": ""
-        },
-        "require-dev": {
-            "phpunit/phpunit": "3.7.*"
-        },
-        "time": "2014-08-22 01:47:21",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "yajra\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "yajra - Arjay Angeles",
-                "email": "aqangeles@gmail.com"
-            }
-        ],
-        "description": "PDO userspace driver proxying calls to PHP OCI8 driver"
-    },
-    {
         "name": "symfony/translation",
         "version": "v2.5.3",
         "version_normalized": "2.5.3.0",
@@ -1822,6 +1784,89 @@
             "oci8",
             "oracle",
             "pdo_oci"
+        ]
+    },
+    {
+        "name": "yajra/laravel-pdo-via-oci8",
+        "version": "0.3.0",
+        "version_normalized": "0.3.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/yajra/laravel-pdo-via-oci8.git",
+            "reference": "d13d5f2e3770105e07f0d02c3cc4a54eda5c063d"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/yajra/laravel-pdo-via-oci8/zipball/d13d5f2e3770105e07f0d02c3cc4a54eda5c063d",
+            "reference": "d13d5f2e3770105e07f0d02c3cc4a54eda5c063d",
+            "shasum": ""
+        },
+        "require-dev": {
+            "phpunit/phpunit": "3.7.*"
+        },
+        "time": "2014-08-29 16:39:58",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "yajra\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "yajra - Arjay Angeles",
+                "email": "aqangeles@gmail.com"
+            }
+        ],
+        "description": "PDO userspace driver proxying calls to PHP OCI8 driver"
+    },
+    {
+        "name": "thujohn/pdf",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/thujohn/pdf-l4.git",
+            "reference": "d939972c69c4ab5546f999247fec0173095e8361"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/thujohn/pdf-l4/zipball/d939972c69c4ab5546f999247fec0173095e8361",
+            "reference": "d939972c69c4ab5546f999247fec0173095e8361",
+            "shasum": ""
+        },
+        "require": {
+            "illuminate/support": "4.x",
+            "php": ">=5.3.0"
+        },
+        "time": "2014-08-04 20:00:35",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Thujohn\\Pdf": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "thujohn",
+                "email": "jonathan.thuau@gmail.com"
+            }
+        ],
+        "description": "dompdf for Laravel 4",
+        "keywords": [
+            "dompdf",
+            "laravel",
+            "laravel4",
+            "pdf"
         ]
     }
 ]

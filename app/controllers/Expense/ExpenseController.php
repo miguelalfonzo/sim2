@@ -15,16 +15,34 @@ use \DB;
 
 class ExpenseController extends BaseController{
 
+	private function getDay(){
+		$currentDate = getdate();
+		$toDay = $currentDate['mday']."/".str_pad($currentDate['mon'],2,'0',STR_PAD_LEFT)."/".$currentDate['year'];
+		$lastDay = '06/'.str_pad(($currentDate['mon']+1),2,'0',STR_PAD_LEFT).'/'.$currentDate['year'];
+		$date = ['toDay'=>$toDay,'lastDay'=> $lastDay];
+		return $date;
+	}
+
 	public function show(){
 		//deposit is 5
 		$token = Input::get('token');
-
 		$solicitude  = Solicitude::where('token',$token)->firstOrFail();
-
-		// $solicitude  = Solicitude::find('5');
 		$typeProof   = ProofType::all();
 		$typeExpense = ExpenseType::orderBy('idtipogasto','asc')->get();
 		
+		if($solicitude->idgasto)
+		{
+			$rows_expense = Expense::where('idsolicitud','=',$solicitude->idgasto)->get();
+			foreach ($rows_expense as $key => $value) {
+				$dataActivity['regProof'][$key] = $value->idProofType->descripcion;
+				$dataActivity['regRuc'][$key] = $value->ruc; 
+				$dataActivity['regRazon'][$key] = $value->razon; 
+				$dataActivity['regNumberProof'][$key] = $value->num_comprobante;
+				$dataActivity['regDate'][$key] = $value->fecha_movimiento;
+				$dataActivity['regTotal'][$key] = $value->monto;
+			}
+		}
+
 		$proof   = array();
 		$expense = array();
 
@@ -59,67 +77,57 @@ class ExpenseController extends BaseController{
 		$expenseJson = json_decode($expense);
 		// var_dump($expenseJson->quantity);die;
 
-		$row_expense = Expense::find($expenseJson->idsolicitude);
 		$row_solicitude = Solicitude::find($expenseJson->idsolicitude);
 
-		if($row_expense)
+		$expense = new Expense;
+		//Detail Expense
+		$idgasto = $expense->lastId()+1;
+		$quantity = $expenseJson->quantity;
+		$description = $expenseJson->description;
+		$type_expense = $expenseJson->type_expense;
+		$total_item = $expenseJson->total_item;
+		//Header Expense
+		$expense->idgasto = $idgasto;
+		$expense->idresponse = 1;
+		$expense->num_comprobante = $expenseJson->number_proof;
+		$expense->ruc = $expenseJson->ruc;
+		$expense->razon = $expenseJson->razon;
+		$expense->monto = $expenseJson->total_expense;
+		if($expense->proof_type == '2')
 		{
-			$save_expense = 1;
+			$expense->igv = $expenseJson->igv;
+			$expense->imp_serv = $expenseJson->imp_serv;
+			$expense->sub_tot = $expenseJson->sub_total_expense;
 		}
-		else
+		$expense->estado_idestado = $row_solicitude->estado;
+		$date = $expenseJson->date_movement;
+        list($d, $m, $y) = explode('/', $date);
+        $d = mktime(11, 14, 54, $m, $d, $y);
+        $date = date("Y/m/d", $d);
+        $expense->fecha_movimiento = $date;
+		$expense->tipo_moneda = $row_solicitude->tipo_moneda;
+		$expense->tipo_comprobante = $expenseJson->proof_type;
+		$expense->idsolicitud = $row_solicitude->idsolicitud;
+		
+		if($expense->save())
 		{
-			$expense = new Expense;
-			
-			//Detail Expense
-			$idgasto = $expense->lastId()+1;
-			$quantity = $expenseJson->quantity;
-			$description = $expenseJson->description;
-			$type_expense = $expenseJson->type_expense;
-			$total_item = $expenseJson->total_item;
-
-			//Header Expense
-			$expense->idgasto = $idgasto;
-			$expense->idresponse = 1;
-			$expense->num_comprobante = $expenseJson->number_proof;
-			$expense->ruc = $expenseJson->ruc;
-			$expense->razon = $expenseJson->razon;
-			$expense->monto = $expenseJson->total_expense;
-			if($expense->proof_type == '2')
-			{
-				$expense->igv = $expenseJson->igv;
-				$expense->imp_serv = $expenseJson->imp_serv;
-				$expense->sub_tot = $expenseJson->sub_total_expense;
+			try {
+				DB::transaction (function() use ($idgasto,$quantity,$description,$type_expense,$total_item){
+					for($i=0;$i<count($quantity);$i++)
+					{
+						$expense_detail = new ExpenseDetail;
+						$expense_detail->idgasto = $idgasto;
+						$expense_detail->cantidad = $quantity[$i];
+						$expense_detail->descripcion = $description[$i];
+						$expense_detail->tipo_gasto = $type_expense[$i];
+						$expense_detail->importe = $total_item[$i];
+						$expense_detail->save();	
+					}
+				});
+			} catch (Exception $e) {
+				$save_expense = "Error al grabar el detalle de gastos";
 			}
-			$expense->estado_idestado = $row_solicitude->estado;
-			$date = $expenseJson->date_movement;
-	        list($d, $m, $y) = explode('/', $date);
-	        $d = mktime(11, 14, 54, $m, $d, $y);
-	        $date = date("Y/m/d", $d);
-	        $expense->fecha_movimiento = $date;
-			$expense->tipo_moneda = $row_solicitude->tipo_moneda;
-			$expense->tipo_comprobante = $expenseJson->proof_type;
-			$expense->save();
-
-			if($expense->save())
-			{
-				try {
-					DB::transaction (function() use ($idgasto,$quantity,$description,$type_expense,$total_item){
-						for($i=0;$i<count($quantity);$i++)
-						{
-							$expense_detail = new ExpenseDetail;
-							$expense_detail->idgasto = $idgasto;
-							$expense_detail->cantidad = $quantity[$i];
-							$expense_detail->descripcion = $description[$i];
-							$expense_detail->tipo_gasto = $type_expense[$i];
-							$expense_detail->importe = $total_item[$i];
-							$expense_detail->save();	
-						}
-					});
-				} catch (Exception $e) {
-					$save_expense = "Error al grabar el detalle de gastos";
-				}
-				return "OK";
-			}
+			return "OK";
 		}
 	}
 
@@ -129,26 +137,7 @@ class ExpenseController extends BaseController{
 
 		$expense_row = Expense::where('ruc',$expenseJson->ruc)->where('num_comprobante',$expenseJson->voucher_number)->firstOrFail();
 
-		echo json_encode($expense_row->idgasto);
-		return 1;
-		
 		$delete_row = Expense::where('idgasto',$expense_row->idgasto)->delete();
-
-		if(count($delete_row)==1)
-		{
-			return "OK";
-		}
-		else
-		{
-			return "No borrado";
-		}
-	}
-
-	private function getDay(){
-		$currentDate = getdate();
-		$toDay = $currentDate['mday']."/".str_pad($currentDate['mon'],2,'0',STR_PAD_LEFT)."/".$currentDate['year'];
-		$lastDay = '06/'.str_pad(($currentDate['mon']+1),2,'0',STR_PAD_LEFT).'/'.$currentDate['year'];
-		$date = ['toDay'=>$toDay,'lastDay'=> $lastDay];
-		return $date;
+		return "OK";
 	}
 }

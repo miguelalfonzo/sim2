@@ -6,7 +6,7 @@ use \Eloquent;
 
 class ExpenseDetail extends Eloquent{
 
-	protected $table = "DMKT_RG_DETALLE_GASTOS";
+	protected $table = "DMKT_RG_GASTOS_ITEM";
 	protected $primaryKey = null;
 	public $incrementing = false;
 

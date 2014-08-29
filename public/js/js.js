@@ -112,19 +112,9 @@ $(function(){
                     data.ruc  = ruc;
                     data.voucher_number  = voucher_number;
                     data = JSON.stringify(data);
-                    console.log(data);
-                    $.ajax({
-                        type: 'post',
-                        dataType: 'json',
-                        url: 'delete-expense',
-                        data: {
-                            data: data
-                        },
-                        error:function(){
-                            console.log("No se puede eliminar el gasto");
-                        }
-                    }).done(function (response){
-                        console.log("se borro");
+
+                    $.post(server + 'delete-expense', {data: data})
+                    .done(function (data) {
                         balance = deposit - tot_rows + tot_del;
                         $("#balance").val(balance);
                         row_del.remove();

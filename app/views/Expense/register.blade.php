@@ -46,7 +46,7 @@
 						<label>Monto Restante</label>
 						<div class="input-group">
 					    	<div class="input-group-addon">{{$data['activity']['simbolMoney']}}</div>
-					      	<input id="balance" class="form-control" type="text" value="200" disabled>
+					      	<input id="balance" class="form-control" type="text" value="{{$data['activity']['monto']}}" disabled>
 					    </div>
 					</div>
 				</div>
@@ -244,6 +244,20 @@
 									</tr>
 								</thead>
 								<tbody>
+								@if(isset($data['activity']['regProof']))
+									@for($i = 0; $i< count($data['activity']['regProof']); $i++)
+										<tr>
+											<th class="proof-type">{{$data['activity']['regProof'][$i]}}</th>
+											<th class="ruc">{{$data['activity']['regRuc'][$i]}}</th>
+											<th class="razon">{{$data['activity']['regRazon'][$i]}}</th>
+											<th class="voucher_number">{{$data['activity']['regRazon'][$i]}}</th>
+											<th class="date_movement">{{$data['activity']['regDate'][$i]}}</th>
+											<th class="total"><span class="type_moeny">{{$data['activity']['simbolMoney']}}&nbsp;<span class="total_expense">{{$data['activity']['regTotal'][$i]}}</span></th>
+											<th><a class="edit-expense" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
+											<th><a class="delete-expense" href="#"><span class="glyphicon glyphicon-remove"></span></a></a></th>
+										</tr>	
+									@endfor
+								@endif
 									<!-- <tr>
 										<th class="proof-type">Boleta</th>
 										<th class="ruc">10429709844</th>

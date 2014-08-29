@@ -9,6 +9,7 @@ return array(
     'yajra\\Oci8' => array($vendorDir . '/yajra/laravel-oci8/src'),
     'yajra\\' => array($vendorDir . '/yajra/laravel-pdo-via-oci8/src'),
     'Whoops' => array($vendorDir . '/filp/whoops/src'),
+    'Thujohn\\Pdf' => array($vendorDir . '/thujohn/pdf/src'),
     'System' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),
     'Symfony\\Component\\Translation\\' => array($vendorDir . '/symfony/translation'),
     'Symfony\\Component\\Security\\Core\\' => array($vendorDir . '/symfony/security-core'),
