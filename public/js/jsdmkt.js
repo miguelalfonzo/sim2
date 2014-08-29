@@ -358,7 +358,7 @@ function newSolicitude() {
         );
     });
 
-
+/*
     $('#idstate').on('change', function () {
         var idstate = $(this).val();
         $('#date_start').val();
@@ -419,11 +419,11 @@ function newSolicitude() {
              }
              }
              );
-             });*/
+             });
         }, 200)
 
     });
-
+*/
     /* Filter all solicitude by date */
     var search_solicitude = $('#search-solicitude');
     search_solicitude.on('click', function () {
@@ -509,6 +509,7 @@ function newSolicitude() {
     });
 
     /* change state solicitude supervisor */
+    /*
     $('#select_state_solicitude_sup').on('change', function () {
         var idstate = $(this).val();
         $('#table_solicitude_sup_wrapper').remove();
@@ -535,7 +536,7 @@ function newSolicitude() {
             });
         }, 200)
 
-    });
+    });*/
 
 
     var amount_families = $('.amount_families');
@@ -570,8 +571,13 @@ function newSolicitude() {
         });
 
         if (idamount.val() == Math.round(total)) {
+
+            bootbox.confirm("¿Esta seguro de aceptar esta solicitud?", function (result) {
+                if (result) {
             form_acepted_solicitude.attr('action', server + 'aceptar-solicitud');
-            form_acepted_solicitude.submit();
+            form_acepted_solicitude.submit();}});
+
+
         } else if (idamount.val() < Math.round(total)) {
             amount_error_families.text('El monto distribuido supera el monto total').css('color', 'red');
 

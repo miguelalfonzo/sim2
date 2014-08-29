@@ -82,7 +82,13 @@
                                     <div class="col-sm-4 col-md-4" style="padding: 0">
                                         <div class="input-group">
                                             <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
+                                            @if($solicitude->estado == 2)
+
                                             <input id="" name="amount_assigned[]" type="text" class="form-control input-md amount_families" value="{{isset($family->monto_asignado)? $family->monto_asignado : round($solicitude->monto/count($solicitude->families),2)}}">
+                                            @else
+                                            <input disabled id="" name="amount_assigned[]" type="text" class="form-control input-md amount_families" value="{{isset($family->monto_asignado)? $family->monto_asignado : round($solicitude->monto/count($solicitude->families),2)}}">
+
+                                            @endif
                                         </div>
                                     </div>
 

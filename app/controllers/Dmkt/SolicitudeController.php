@@ -307,19 +307,30 @@ class SolicitudeController extends BaseController
         $firstday = date('01-m-Y', strtotime($m));
 
         if($start!=null && $end!=null){
+            if($estado !=0){
+                $solicituds = Solicitude::select('*')
+                    ->where('estado', $estado)
+                    ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                    ->get();
 
-            $solicituds = Solicitude::select('*')
-                ->where('estado', $estado)
-                ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
-                ->get();
+            }else{
+                $solicituds = Solicitude::select('*')
+                    ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                    ->get();
+            }
+
 
         }else{
-
-            $solicituds = Solicitude::select('*')
-                ->where('estado', $estado)
-                ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                ->get();
-
+            if($estado!=0){
+                $solicituds = Solicitude::select('*')
+                    ->where('estado', $estado)
+                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                    ->get();
+            }else{
+                $solicituds = Solicitude::select('*')
+                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                    ->get();
+            }
         }
 
 
@@ -418,10 +429,38 @@ class SolicitudeController extends BaseController
         $estado = $inputs['idstate'];
         $start = $inputs['date_start'];
         $end = $inputs['date_end'];
-        $solicituds = Solicitude::select('*')
-            ->where('estado', $estado)
-            ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
-            ->get();
+        $today = getdate();
+        $m = $today['mday'].'-'.$today['mon'].'-'.$today['year'];
+        $lastday = date('t-m-Y', strtotime($m));
+        $firstday = date('01-m-Y', strtotime($m));
+
+        if($start!=null && $end!=null){
+            if($estado !=0){
+                $solicituds = Solicitude::select('*')
+                    ->where('estado', $estado)
+                    ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                    ->get();
+
+            }else{
+                $solicituds = Solicitude::select('*')
+                    ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                    ->get();
+            }
+
+
+        }else{
+            if($estado!=0){
+                $solicituds = Solicitude::select('*')
+                    ->where('estado', $estado)
+                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                    ->get();
+            }else{
+                $solicituds = Solicitude::select('*')
+                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                    ->get();
+            }
+        }
+
         $view = View::make('Dmkt.Sup.view_solicituds_sup')->with('solicituds', $solicituds);
         return $view;
     }
