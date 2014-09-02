@@ -153,6 +153,8 @@ function newSolicitude() {
     var amountfac = $('#amount-fac');
     var input_client = $('.input-client');
     var selectfamily = $('.selectfamily');
+    var data_start = $('#date_start');
+    var data_end = $('#date_end');
 
     title.on('focus', function () {
         $(this).parent().removeClass('has-error');
@@ -171,6 +173,12 @@ function newSolicitude() {
     });
     selectfamily.on('click', function () {
         $(this).css('border-color', 'none')
+    });
+    data_start.on('focus',function(){
+        $(this).parent().removeClass('has-error');
+    });
+    data_end.on('focus',function(){
+        $(this).parent().removeClass('has-error');
     });
     /* End Removing Errors */
 
@@ -632,32 +640,56 @@ function newSolicitude() {
 
     var search_solicitude_sup = $('#search_solicitude_sup');
     search_solicitude_sup.on('click', function () {
-        var l = Ladda.create(this);
-        var idstate = $('#select_state_solicitude_sup').val();
-        l.start();
-        var jqxhr = $.post(server + "buscar-solicitudes-sup",
-            { idstate: idstate, date_start: $('#date_start').val(), date_end: $('#date_end').val() })
-            .done(function (data) {
-                $('#table_solicitude_sup_wrapper').remove();
-                $('.table-solicituds-sup').append(data);
-                $('#table_solicitude_sup').dataTable({
-                        "bLengthChange": false,
-                        'iDisplayLength': 7,
-                        "oLanguage": {
-                            "sSearch": "Buscar: ",
-                            "sZeroRecords": "No hay solicitudes",
-                            "sInfoEmpty": "No hay solicitudes",
-                            "sInfo": 'Mostrando _END_ de _TOTAL_'
+        var date_start = $('#date_start');
+        var date_end = $('#date_end');
+        var validate = 0 ;
+        if(!date_start.val() && date_end.val()){
+            validate = 1;
+            date_start.parent().addClass('has-error');
+            date_start.attr('placeholder', 'Ingrese Fecha');
+            date_start.addClass('input-placeholder-error');
+
+        }
+        if (!date_end.val() && date_start.val()){
+            validate = 1;
+            date_end.parent().addClass('has-error');
+            date_end.attr('placeholder', 'Ingrese Fecha');
+            date_end.addClass('input-placeholder-error');
+        }
+        if (validate == 0){
+
+            date_start.parent().removeClass('has-error');
+            date_start.attr('placeholder','');
+            date_end.parent().removeClass('has-error');
+            date_end.attr('placeholder','');
+
+            var l = Ladda.create(this);
+            var idstate = $('#select_state_solicitude_sup').val();
+            l.start();
+            var jqxhr = $.post(server + "buscar-solicitudes-sup",
+                { idstate: idstate, date_start: date_start.val(), date_end: date_end.val() })
+                .done(function (data) {
+                    $('#table_solicitude_sup_wrapper').remove();
+                    $('.table-solicituds-sup').append(data);
+                    $('#table_solicitude_sup').dataTable({
+                            "bLengthChange": false,
+                            'iDisplayLength': 7,
+                            "oLanguage": {
+                                "sSearch": "Buscar: ",
+                                "sZeroRecords": "No hay solicitudes",
+                                "sInfoEmpty": "No hay solicitudes",
+                                "sInfo": 'Mostrando _END_ de _TOTAL_'
+                            }
                         }
-                    }
-                );
+                    );
 
-                l.stop();
-            })
-            .fail(function () {
-                alert("error");
-            })
+                    l.stop();
+                })
+                .fail(function () {
+                    alert("error");
+                })
 
+        }
     });
 
     $("#date_start").datepicker({
@@ -678,11 +710,20 @@ function newSolicitude() {
         $('#input-file-factura').val(label);
     });
 
-    $(document).on('change', '.btn-file :file', function () {
-        var input = $(this),
-            numFiles = input.get(0).files ? input.get(0).files.length : 1,
-            label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
-        input.trigger('fileselect', [numFiles, label]);
+    $(document).on('change', '.btn-file :file', function (e) {
+
+        var file = e.target.files[0],
+            imageType = /image.*/;
+        if (!file.type.match(imageType)){
+            alert('ingrese solo imagenes');
+        }else{
+            var input = $(this),
+                numFiles = input.get(0).files ? input.get(0).files.length : 1,
+                label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+            input.trigger('fileselect', [numFiles, label]);
+        }
+
+
     });
 
     /** GERENTE COMERCIAL */

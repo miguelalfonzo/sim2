@@ -147,7 +147,7 @@
                     </div>
                 </div>
             </div>
-
+            @if(isset($solicitude) && $solicitude->idtiposolicitud == 2)
             <div class="form-group col-sm-6 col-md-4">
                 <div class="col-sm-12 col-md-12">
                     <button class="btn btn-primary btn-md" data-toggle="modal" data-target="#myFac">
@@ -190,7 +190,7 @@
                     </div>
                 </div>
             </div>
-
+            @endif
 
             <!-- Button (Double) -->
             <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
