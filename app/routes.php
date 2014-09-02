@@ -63,11 +63,15 @@ Route::get('aprobar-solicitud/{token}','Dmkt\SolicitudeController@approvedSolici
 Route::post('registrar-gasto','Expense\ExpenseController@show');
 Route::post('register-expense','Expense\ExpenseController@registerExpense');
 Route::post('delete-expense','Expense\ExpenseController@deleteExpense');
+Route::get('edit-expense','Expense\ExpenseController@editExpense');
 // Ruc
 Route::post('consultarRuc','Expense\RucController@show');
 Route::get('ruc',function(){
     return View::make('Expense\ruc');
 });
+
+//test
+Route::get('hola','Expense\ExpenseController@test');
 
 //PDF
 Route::get('a', function()

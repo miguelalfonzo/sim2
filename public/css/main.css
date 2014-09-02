@@ -126,6 +126,11 @@ table thead th, table th
 	padding: 0.3em 1em;
 }
 
+.select-row
+{
+	background: #D5E0EB;
+}
+
 .search-ruc
 {
 	background: #428bca;

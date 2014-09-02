@@ -10,14 +10,14 @@
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Solicitud</label>
-						<input type="text" class="form-control" value="{{$data['activity']['titulo']}}" disabled>
-						<input type="hidden" id="idsolicitude" value="{{$data['activity']['id']}}">
+						<input type="text" class="form-control" value="{{mb_convert_case($solicitude->titulo, MB_CASE_TITLE, 'UTF-8')}}" disabled>
+						<input type="hidden" id="idsolicitude" value="{{$solicitude->idsolicitud}}">
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Fondo</label>
-						<input type="text" class="form-control" value="{{$data['activity']['typeActivity']}}" disabled>
+						<input type="text" class="form-control" value="{{mb_convert_case($solicitude->subtype->nombre, MB_CASE_TITLE, 'UTF-8')}}" disabled>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
@@ -36,8 +36,8 @@
 					<div class="form-expense">
 						<label>Monto Depositado</label>
 						<div class="input-group">
-					    	<div id="type-money" class="input-group-addon">{{$data['activity']['simbolMoney']}}</div>
-					      	<input id="deposit" class="form-control" type="text" value="{{$data['activity']['monto']}}" disabled>
+					    	<div id="type-money" class="input-group-addon">{{$solicitude->typemoney->simbolo}}</div>
+					      	<input id="deposit" class="form-control" type="text" value="{{$solicitude->monto}}" disabled>
 					    </div>
 					</div>
 				</div>
@@ -45,8 +45,8 @@
 					<div class="form-expense">
 						<label>Monto Restante</label>
 						<div class="input-group">
-					    	<div class="input-group-addon">{{$data['activity']['simbolMoney']}}</div>
-					      	<input id="balance" class="form-control" type="text" value="{{$data['activity']['monto']}}" disabled>
+					    	<div class="input-group-addon">{{$solicitude->typemoney->simbolo}}</div>
+					      	<input id="balance" class="form-control" type="text" value="{{$balance}}" disabled>
 					    </div>
 					</div>
 				</div>
@@ -54,8 +54,8 @@
 					<div class="form-expense">
 						<label>Tipo de Comprobante</label>
 						<select name="" id="proof-type" class="form-control">
-							@foreach($data['activity']['proofType'] as $val)
-								<option value="{{$val['cod']}}">{{$val['descripcion']}}</option>
+							@foreach($typeProof as $val)
+								<option value="{{$val->idcomprobante}}">{{mb_convert_case($val->descripcion,MB_CASE_TITLE,'utf-8')}}</option>
 							@endforeach
 						</select>
 					</div>
@@ -91,8 +91,8 @@
 						<label>Fecha de Movimiento</label>
 						<div class="input-group date">
 							<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-							<input id="date" type="text" class="form-control" maxlength="10" value="{{$data['date']['toDay']}}" readonly>
-							<input id="last-date" type="hidden" value="{{$data['date']['lastDay']}}">
+							<input id="date" type="text" class="form-control" maxlength="10" value="{{$date['toDay']}}" readonly>
+							<input id="last-date" type="hidden" value="{{$date['lastDay']}}">
 						</div>
 					</div>
 				</div>
@@ -121,55 +121,20 @@
 											<th class="description"><input type="text" class="form-control"></th>
 											<th>
 												<select class="form-control type-expense">
-													@foreach($data['activity']['expenseType'] as $val)
-														<option value="{{$val['cod']}}">{{$val['descripcion']}}</option>
+													@foreach($typeExpense as $val)
+														<option value="{{$val->idtipogasto}}">{{mb_convert_case($val->descripcion,MB_CASE_TITLE, 'UTF-8')}}</option>
 													@endforeach
 												</select>
 											</th>
 											<th class="total-item">
 												<div class="input-group">
-											    	<div class="input-group-addon">{{$data['activity']['simbolMoney']}}</div>
+											    	<div class="input-group-addon">{{$solicitude->typemoney->simbolo}}</div>
 											      	<input class="form-control" type="text" maxlength="8">
 											    </div>
 											</th>
 											<th><a class="delete-item" href="#"><span class="glyphicon glyphicon-remove"></span></a></th>
 										</tr>
-										<!-- <tr>
-											<th class="quantity"><input type="text" class="form-control" value=3 maxlength="4"></th>
-											<th class="description"><input type="text" class="form-control" value="Vinos"></th>
-											<th>
-												<select class="form-control type-expense">
-													@foreach($data['activity']['expenseType'] as $val)
-														<option value="{{$val['cod']}}">{{$val['descripcion']}}</option>
-													@endforeach
-												</select>
-											</th>
-											<th class="total-item">
-												<div class="input-group">
-											    	<div class="input-group-addon">{{$data['activity']['simbolMoney']}}</div>
-											      	<input class="form-control" type="text" value="21" maxlength="8">
-											    </div>
-											</th>
-											<th><a class="delete-item" href="#"><span class="glyphicon glyphicon-remove"></span></a></th>
-										</tr>
-										<tr>
-											<th class="quantity"><input type="text" class="form-control" value=1 maxlength="4"></th>
-											<th class="description"><input type="text" class="form-control" value="Agua"></th>
-											<th>
-												<select class="form-control type-expense">
-													@foreach($data['activity']['expenseType'] as $val)
-														<option value="{{$val['cod']}}">{{$val['descripcion']}}</option>
-													@endforeach
-												</select>
-											</th>
-											<th class="total-item">
-												<div class="input-group">
-											    	<div class="input-group-addon">{{$data['activity']['simbolMoney']}}</div>
-											      	<input class="form-control" type="text" maxlength="8" value="3">
-											    </div>
-											</th>
-											<th><a class="delete-item" href="#"><span class="glyphicon glyphicon-remove"></span></a></th>
-										</tr> -->
+										
 									</tbody>
 								</table>
 								<aside class="col-xs-12 col-sm-6 col-md-4" style="padding:0;">
@@ -185,7 +150,7 @@
 					<div class="form-expense">
 						<label>Sub Total</label>
 						<div class="input-group">
-					    	<div class="input-group-addon">{{$data['activity']['simbolMoney']}}</div>
+					    	<div class="input-group-addon">{{$solicitude->typemoney->simbolo}}</div>
 					      	<input id="sub-tot" class="form-control" type="text" value=0 disabled>
 					    </div>
 					</div>
@@ -194,7 +159,7 @@
 					<div class="form-expense">
 						<label>Impuesto por Servicio</label>
 						<div class="input-group">
-					    	<div class="input-group-addon">{{$data['activity']['simbolMoney']}}</div>
+					    	<div class="input-group-addon">{{$solicitude->typemoney->simbolo}}</div>
 					      	<input id="imp-ser" class="form-control" type="text" value=0>
 					    </div>
 					</div>
@@ -203,7 +168,7 @@
 					<div class="form-expense">
 						<label>IGV</label>
 						<div class="input-group">
-					    	<div class="input-group-addon">{{$data['activity']['simbolMoney']}}</div>
+					    	<div class="input-group-addon">{{$solicitude->typemoney->simbolo}}</div>
 					      	<input id="igv" class="form-control" type="text" value=0>
 					    </div>
 					</div>
@@ -212,7 +177,7 @@
 					<div class="form-expense">
 						<label>Monto Total</label>
 						<div class="input-group">
-					    	<div class="input-group-addon">{{$data['activity']['simbolMoney']}}</div>
+					    	<div class="input-group-addon">{{$solicitude->typemoney->simbolo}}</div>
 					      	<input id="total-expense" class="form-control" type="text" disabled>
 					    </div>
 					</div>
@@ -244,40 +209,20 @@
 									</tr>
 								</thead>
 								<tbody>
-								@if(isset($data['activity']['regProof']))
-									@for($i = 0; $i< count($data['activity']['regProof']); $i++)
-										<tr>
-											<th class="proof-type">{{$data['activity']['regProof'][$i]}}</th>
-											<th class="ruc">{{$data['activity']['regRuc'][$i]}}</th>
-											<th class="razon">{{$data['activity']['regRazon'][$i]}}</th>
-											<th class="voucher_number">{{$data['activity']['regRazon'][$i]}}</th>
-											<th class="date_movement">{{$data['activity']['regDate'][$i]}}</th>
-											<th class="total"><span class="type_moeny">{{$data['activity']['simbolMoney']}}&nbsp;<span class="total_expense">{{$data['activity']['regTotal'][$i]}}</span></th>
-											<th><a class="edit-expense" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
-											<th><a class="delete-expense" href="#"><span class="glyphicon glyphicon-remove"></span></a></a></th>
-										</tr>	
-									@endfor
-								@endif
-									<!-- <tr>
-										<th class="proof-type">Boleta</th>
-										<th class="ruc">10429709844</th>
-										<th class="razon">MENDOZA BARREDA WALTER ISRAEL</th>
-										<th class="voucher_number">002-002335</th>
-										<th class="date_movement">18/07/2014</th>
-										<th class="total"><span class="type_moeny">{{$data['activity']['simbolMoney']}}&nbsp;<span class="total_expense">95</span></th>
-										<th><a class="edit-expense" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
-										<th><a class="delete-expense" href="#"><span class="glyphicon glyphicon-remove"></span></a></a></th>
-									</tr>
-									<tr>
-										<th class="proof-type">Factura</th>
-										<th class="ruc">10238174835</th>
-										<th class="razon">AEDO ANTEZANA RUTH IDALIA</th>
-										<th class="voucher_number">001-02192</th>
-										<th class="date_movement">18/07/2014</th>
-										<th class="total"><span class="type_money">{{$data['activity']['simbolMoney']}}</span>&nbsp;<span class="total_expense">71</span></th>
-										<th><a class="edit-expense" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
-										<th><a class="delete-expense" href="#"><span class="glyphicon glyphicon-remove"></span></a></a></th>
-									</tr> -->
+									@if(isset($expense))
+										@foreach($expense as $val)
+											<tr>
+												<th class="proof-type">{{mb_convert_case($val->idProofType->descripcion,MB_CASE_TITLE,'UTF-8')}}</th>
+												<th class="ruc">{{$val->ruc}}</th>
+												<th class="razon">{{$val->razon}}</th>
+												<th class="voucher_number">{{$val->num_comprobante}}</th>
+												<th class="date_movement">{{date('d/m/Y',strtotime($val->fecha_movimiento))}}</th>
+												<th class="total"><span class="type_moeny">{{$solicitude->typemoney->simbolo}}&nbsp;<span class="total_expense">{{$val->monto}}</span></th>
+												<th><a class="edit-expense" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
+												<th><a class="delete-expense" href="#"><span class="glyphicon glyphicon-remove"></span></a></a></th>
+											</tr>	
+										@endforeach
+									@endif
 								</tbody>
 							</table>
 						</div>

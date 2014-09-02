@@ -1,6 +1,7 @@
 <?php
 
 namespace Expense;
+
 use \Eloquent;
 
 class ExpenseType extends Eloquent{

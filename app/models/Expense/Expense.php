@@ -1,30 +1,30 @@
 <?php 
 
 namespace Expense;
+
 use \Eloquent;
-use \Common\State;
-use \Common\TypeMoney;
-use \Common\SubTypeActivity;
 use \Dmkt\Activity;
+use \Expense\ProofType;
+use \Expense\ExpenseItem;
 
 class Expense extends Eloquent {
 
 	protected $table= 'DMKT_RG_GASTOS';
 	protected $primaryKey = 'idgasto';
 
-	public function idEstado(){
-		return $this->hasOne('\Common\State','idestado','estado_idestado');
-	}
-
-	public function idMoney(){
-		return $this->hasOne('\Common\TypeMoney','idtipomoneda','tipo_moneda');
+	public function idSolicitude(){
+		return $this->hasOne('Dmkt\Activity','idsolicitud','idsolicitud');
 	}
 
 	public function idProofType(){
-		return $this->hasOne('ProofType','idcomprobante','tipo_comprobante');
+		return $this->hasOne('Expense\ProofType','idcomprobante','tipo_comprobante');
 	}
 
-	public function lastId(){
+    public function items(){
+        return $this->hasMany('Expense\ExpenseItem','idgasto','idgasto');
+    }
+
+    public function lastId(){
 		$lastId = Expense::orderBy('idgasto','desc')->first();
 		if($lastId == null){
             return 0;
@@ -32,13 +32,5 @@ class Expense extends Eloquent {
             return $lastId->idgasto;
         }
 	}
-
-	public function idSolicitude(){
-		return $this->hasOne('Dmkt\Activity','idsolicitud','idsolicitud');
-	}
-
-    public function items(){
-        return $this->hasMany('Expense\ExpenseItem','idgasto','idgasto');
-    }
 
 }

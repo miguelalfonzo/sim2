@@ -9,7 +9,7 @@ use \Dmkt\Solicitude;
 use \Expense\Expense;
 use \Expense\ProofType;
 use \Expense\ExpenseType;
-use \Expense\ExpenseDetail;
+use \Expense\ExpenseItem;
 use \Input;
 use \DB;
 
@@ -28,48 +28,32 @@ class ExpenseController extends BaseController{
 		$token = Input::get('token');
 		$solicitude  = Solicitude::where('token',$token)->firstOrFail();
 		$typeProof   = ProofType::all();
-		$typeExpense = ExpenseType::orderBy('idtipogasto','asc')->get();
-		
-		if($solicitude->idgasto)
-		{
-			$rows_expense = Expense::where('idsolicitud','=',$solicitude->idgasto)->get();
-			foreach ($rows_expense as $key => $value) {
-				$dataActivity['regProof'][$key] = $value->idProofType->descripcion;
-				$dataActivity['regRuc'][$key] = $value->ruc; 
-				$dataActivity['regRazon'][$key] = $value->razon; 
-				$dataActivity['regNumberProof'][$key] = $value->num_comprobante;
-				$dataActivity['regDate'][$key] = $value->fecha_movimiento;
-				$dataActivity['regTotal'][$key] = $value->monto;
-			}
-		}
-
-		$proof   = array();
-		$expense = array();
-
-		foreach ($typeProof as $key => $value) {
-			$proof[$key] = ['cod'=>$value->idcomprobante,'descripcion'=>mb_convert_case($value->descripcion, MB_CASE_TITLE, "UTF-8")];
-		}
-
-		foreach ($typeExpense as $key => $value) {
-			$expense[$key] = ['cod'=>$value->idtipogasto,'descripcion'=>mb_convert_case($value->descripcion, MB_CASE_TITLE, "UTF-8")];
-		}
-		
-		$dataActivity['titulo'] = mb_convert_case($solicitude->titulo, MB_CASE_TITLE, "UTF-8");
-		$dataActivity['monto'] = $solicitude->monto;
-		$dataActivity['id'] = $solicitude->idsolicitud;
-		$dataActivity['typeActivity'] = mb_convert_case($solicitude->subtype->nombre, MB_CASE_TITLE, "UTF-8");
-		// $dataActivity['idDeposit'] = $activity->deposit->num_transferencia;
-		$dataActivity['typeMoney'] = mb_convert_case($solicitude->typemoney->descripcion, MB_CASE_TITLE, "UTF-8");
-		// $dataActivity['totalDeposit'] = $activity->deposit->total;
-		$dataActivity['simbolMoney'] = mb_convert_case($solicitude->typemoney->simbolo, MB_CASE_UPPER, "UTF-8");
-		$dataActivity['expenseType'] = $expense;
-		$dataActivity['proofType'] = $proof;
-
 		$date = $this->getDay();
+		$typeExpense = ExpenseType::orderBy('idtipogasto','asc')->get();
 
-		$data = ['date'=>$date,'activity'=>$dataActivity];
+		$data = [
+			'solicitude' => $solicitude,
+			'typeProof' => $typeProof,
+			'typeExpense' => $typeExpense,
+			'date' => $date
+		];
 
-		return View::make('Expense.register')->with('data',$data);
+		$expense = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
+
+		$balance = $solicitude->monto;
+		if(count($expense)>0)
+		{
+			$data['expense'] = $expense;
+			$balance = 0;
+			foreach ($expense as $key => $value) {
+				$balance += $value->monto;
+			}
+			$balance= $solicitude->monto - $balance;
+ 		}
+ 		
+ 		$data['balance'] = $balance;
+
+		return View::make('Expense.register',$data);
 	}
 
 	public function registerExpense(){
@@ -82,39 +66,34 @@ class ExpenseController extends BaseController{
 		$row_solicitude = Solicitude::find($expenseJson->idsolicitude);
 
 		$expense = new Expense;
-		//Detail Expense
-		$idgasto = $expense->lastId()+1;
-		$quantity = $expenseJson->quantity;
-		$description = $expenseJson->description;
-		$type_expense = $expenseJson->type_expense;
-		$total_item = $expenseJson->total_item;
 		//Header Expense
-		$expense->idgasto = $idgasto;
 		$expense->idresponse = 1;
 		$expense->num_comprobante = $expenseJson->number_proof;
 		$expense->ruc = $expenseJson->ruc;
 		$expense->razon = $expenseJson->razon;
 		$expense->monto = $expenseJson->total_expense;
 		if($expense->proof_type == '2')
-
-		$row_expense = Expense::find($expenseJson->idsolicitude);
-		$row_solicitude = Solicitude::find($expenseJson->idsolicitude);
-		if($row_expense)
 		{
 			$expense->igv = $expenseJson->igv;
 			$expense->imp_serv = $expenseJson->imp_serv;
 			$expense->sub_tot = $expenseJson->sub_total_expense;
 		}
-		$expense->estado_idestado = $row_solicitude->estado;
 		$date = $expenseJson->date_movement;
         list($d, $m, $y) = explode('/', $date);
         $d = mktime(11, 14, 54, $m, $d, $y);
         $date = date("Y/m/d", $d);
         $expense->fecha_movimiento = $date;
-		$expense->tipo_moneda = $row_solicitude->tipo_moneda;
-		$expense->tipo_comprobante = $expenseJson->proof_type;
+        $expense->tipo_comprobante = $expenseJson->proof_type;
+		$idgasto = $expense->lastId()+1;
+		$expense->idgasto = $idgasto;
 		$expense->idsolicitud = $row_solicitude->idsolicitud;
-		
+
+		//Detail Expense
+		$quantity = $expenseJson->quantity;
+		$description = $expenseJson->description;
+		$type_expense = $expenseJson->type_expense;
+		$total_item = $expenseJson->total_item;
+
 		if($expense->save())
 		{
 			try {
@@ -135,6 +114,7 @@ class ExpenseController extends BaseController{
 			}
 			return "OK";
 		}
+
 	}
 
 	public function deleteExpense(){
@@ -144,6 +124,27 @@ class ExpenseController extends BaseController{
 		$expense_row = Expense::where('ruc',$expenseJson->ruc)->where('num_comprobante',$expenseJson->voucher_number)->firstOrFail();
 
 		$delete_row = Expense::where('idgasto',$expense_row->idgasto)->delete();
+
 		return "OK";
 	}
+
+	public function editExpense(){
+		$expense = Input::get('data');
+		$expenseJson = json_decode($expense);
+
+		$idExpense = Expense::where('ruc',$expenseJson->ruc)->where('num_comprobante',$expenseJson->number_voucher)->firstOrFail();
+		
+		$data = ExpenseItem::where('idgasto',$idExpense->idsolicitud)->get();
+
+		return json_decode($data);
+	}
+
+	public function test(){
+ 		
+ 		$expense = Expense::get();
+ 		var_dump($expense);
+ 		echo json_decode($expense);
+
+	}
+
 }

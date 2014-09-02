@@ -124,42 +124,75 @@ $(function(){
         });
 
         //Escoge editar un documento ya registrado
-        $(document).on("click","#table .edit-expense",function(e){
+        $(document).on("click","#table-expense .edit-expense",function(e){
             e.preventDefault();
-            $("#table tbody tr").removeClass("select-row");
-            $("#type_voucher option").attr("selected",false);
+            $("#table-expense tbody tr").removeClass("select-row");
+            $(this).parent().parent().removeClass("select-row");
+            $("#proof-type").attr("disabled",true);
             $("#save-expense ").html("Actualizar");
             $("#razon").attr("data-edit",1);
-            var deposit  = $("#deposit").val();
-            deposit = parseFloat(deposit.substring(2,deposit.length));
-            var tot=0;
-            var rows = $(".total").parent();
-            $.each(rows,function(){
-                tot += parseInt($(this).find(".total").html(),10);
+         
+            var ruc_edit = $(this).parent().parent().find(".ruc").html();
+            var voucher_number_edit = $(this).parent().parent().find(".voucher_number").html();
+            data = {"ruc":ruc_edit,"number_voucher":voucher_number_edit};
+            console.log(data);
+            $.ajax({
+                type: 'get',
+                url: 'edit-expense',
+                dataType: 'json',
+                data: {
+                    data : JSON.stringify(data)
+                },
+                error:function(){
+                    console.log("error");
+                }
+            }).done(function (response){
+                var row = $("#table-items tbody tr:eq(0)").clone();
+                $("#table-items tbody tr:eq(0)").remove();
+                var data = JSON.parse(JSON.stringify(response));
+                console.log(data);
+                // $.each(data,function(index,value){
+                //     var row_add = row.clone();
+                //     row_add.find('.quantity input').val(value.cantidad);
+                //     row_add.find('.description input').val(value.descripcion);
+                //     row_add.find('.type-expense').val(value.idgasto);
+                //     row_add.find('.total-item input').val(value.importe);
+                //     $("#table-items tbody").append(row_add);
+                // });
             });
 
-            var row = $(this).parent().parent();
-            row.toggleClass("select-row");
-            $.each(row,function(){
-                var type_voucher_edit   = $(this).find(".type_voucher").html();
-                var ruc_edit            = $(this).find(".ruc").html();
-                var razon_edit          = $(this).find(".razon").html();
-                var number_voucher_edit = $(this).find(".number_voucher").html();
-                var date_edit           = $(this).find(".date_movement").html();
-                var total_edit          = $(this).find(".total").html();
-                $("#tot-edit-hidden").val(parseInt(total_edit,10));
-                var balance = deposit - tot + parseInt(total_edit,10);
-                $("#balance").val(balance);
-                $("#type_voucher option").filter(function(){
-                    return $(this).text() == type_voucher_edit;
-                }).attr('selected', true);
-                $("#type_voucher").attr("readonly",true);
-                $("#ruc").val(ruc_edit).attr("readonly",true);
-                $("#razon").html(razon_edit).css("color","#5c5c5c");
-                $("#number_voucher").val(number_voucher_edit);
-                $("#date").val(date_edit);
-                $("#total").val(total_edit);
-            });
+            // var row = $(this).parent().parent();
+            // row.addClass("select-row");
+            
+            // var deposit  = $("#deposit").val();
+            // deposit = parseFloat(deposit);
+            // var tot=0;
+            // var rows = $(".total").parent();
+            // $.each(rows,function(){
+            //     tot += parseFloat($(this).find(".total_expense").html());
+            // });
+
+           
+            // $.each(row,function(){
+            //     var type_voucher_edit   = $(this).find(".type_voucher").html();
+            //     var ruc_edit            = $(this).find(".ruc").html();
+            //     var razon_edit          = $(this).find(".razon").html();
+            //     var number_voucher_edit = $(this).find(".number_voucher").html();
+            //     var date_edit           = $(this).find(".date_movement").html();
+            //     var total_edit          = $(this).find(".total").html();
+            //     $("#tot-edit-hidden").val(parseInt(total_edit,10));
+            //     var balance = deposit - tot + parseInt(total_edit,10);
+            //     $("#balance").val(balance);
+            //     $("#type_voucher option").filter(function(){
+            //         return $(this).text() == type_voucher_edit;
+            //     }).attr('selected', true);
+            //     $("#type_voucher").attr("readonly",true);
+            //     $("#ruc").val(ruc_edit).attr("readonly",true);
+            //     $("#razon").html(razon_edit).css("color","#5c5c5c");
+            //     $("#number_voucher").val(number_voucher_edit);
+            //     $("#date").val(date_edit);
+            //     $("#total").val(total_edit);
+            // });
         });
     
         //Validación del botón registrar gasto
@@ -180,6 +213,7 @@ $(function(){
             //Variables de la cabecera del documento
             var idsolicitude     = parseInt($("#idsolicitude").val(),10);
             var proof_type       = $("#proof-type").val();
+            var proof_type_sel   = $("#proof-type option:selected").text();
             var ruc              = $("#ruc").val();
             var razon            = $("#razon").text();
             var razon_hide       = $("#razon").val();
@@ -397,9 +431,8 @@ $(function(){
                                     else
                                     {
                                         ajaxExpense(JSON.stringify(data)).done(function(result){
-                                            console.log(result);
                                             var new_row = $(row).clone(true,true);
-                                            $(new_row).find(".proof-type").text(proof_type);
+                                            $(new_row).find(".proof-type").text(proof_type_sel);
                                             $(new_row).find(".ruc").text(ruc);
                                             $(new_row).find(".razon").text(razon);
                                             $(new_row).find(".voucher_number").text(number_voucher);
@@ -429,7 +462,7 @@ $(function(){
                                             ajaxExpense(JSON.stringify(data)).done(function(result){
                                                 console.log(result);
                                                 var new_row = $(row).clone(true,true);
-                                                $(new_row).find(".proof-type").text(proof_type);
+                                                $(new_row).find(".proof-type").text(proof_type_sel);
                                                 $(new_row).find(".ruc").text(ruc);
                                                 $(new_row).find(".razon").text(razon);
                                                 $(new_row).find(".voucher_number").text(number_voucher);
@@ -496,7 +529,7 @@ $(function(){
                                     console.log(result);
                                     var new_row = $(row).clone(true,true);
                                     balance = deposit - total_expense;
-                                    $(new_row).find(".proof-type").text(proof_type);
+                                    $(new_row).find(".proof-type").text(proof_type_sel);
                                     $(new_row).find(".ruc").text(ruc);
                                     $(new_row).find(".razon").text(razon);
                                     $(new_row).find(".voucher_number").text(number_voucher);

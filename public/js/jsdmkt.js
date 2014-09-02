@@ -356,7 +356,7 @@ function newSolicitude() {
 
     /* List solicitude pending */
     $.ajax({
-        url: server + 'listar-solicitudes/' + 2,
+        url: server + 'listar-solicitudes/' + 5,
         type: 'GET',
         dataType: 'html'
 
