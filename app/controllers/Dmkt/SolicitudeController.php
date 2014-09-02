@@ -232,9 +232,13 @@ class SolicitudeController extends BaseController
         $id = $inputs['idsolicitude'];
         $solicitude = Solicitude::where('idsolicitud', $id);
         $image = Input::file('file');
-
+        $path = public_path('img/reembolso/'.$solicitude->image);
+        echo $path;die;
         if (isset($image)) {
 
+            $path = public_path('img/reembolso/'.$solicitude->image);
+            unlink('public/img/reembolso'.$solicitude->image);
+            //unlink($path);
             $filename = uniqid() . '.' . $image->getClientOriginalExtension();
             //$filename = $image->getClientOriginalName();
             $path = public_path('img/reembolso/' . $filename);
@@ -316,14 +320,18 @@ class SolicitudeController extends BaseController
         $lastday = date('t-m-Y', strtotime($m));
         $firstday = date('01-m-Y', strtotime($m));
 
+
+
         if($start!=null && $end!=null){
             if($estado !=0){
+
                 $solicituds = Solicitude::select('*')
                     ->where('estado', $estado)
                     ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
                     ->get();
 
             }else{
+
                 $solicituds = Solicitude::select('*')
                     ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
                     ->get();
@@ -332,16 +340,19 @@ class SolicitudeController extends BaseController
 
         }else{
             if($estado!=0){
+
                 $solicituds = Solicitude::select('*')
                     ->where('estado', $estado)
                     ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
                     ->get();
             }else{
+
                 $solicituds = Solicitude::select('*')
                     ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
                     ->get();
             }
         }
+
 
 
         $view = View::make('Dmkt.Rm.view_solicituds_rm')->with('solicituds', $solicituds);

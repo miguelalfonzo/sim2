@@ -342,7 +342,7 @@ function newSolicitude() {
 
                     }
 
-                }).fail(function () {
+                }).fail(function (e) {
                     $.unblockUI();
                     alert('error');
                 });
@@ -356,7 +356,7 @@ function newSolicitude() {
 
     /* List solicitude pending */
     $.ajax({
-        url: server + 'listar-solicitudes/' + 5,
+        url: server + 'listar-solicitudes/' + 2,
         type: 'GET',
         dataType: 'html'
 

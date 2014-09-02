@@ -115,7 +115,25 @@
 
     </div>
 </div>
+@if(!isset($solicitude))
+<div class="solicitude_factura form-group col-sm-6 col-md-8">
 
+        <label class="col-sm-8 col-md-8 control-label" for="textinput">Factura</label>
+
+        <div class="col-sm-12 col-md-6">
+
+                <div class="input-group">
+                    <span class="input-group-btn">
+                         <span class="btn btn-primary btn-file">
+                             <i class="glyphicon glyphicon-folder-open"></i> <input type="file" multiple="" name="file">
+                         </span>
+                    </span>
+                        <input type="text" id="input-file-factura"  class="form-control" readonly="">
+                </div>
+
+         </div>
+</div>
+@endif
 <div class="form-group col-sm-6 col-md-4 ">
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Cliente</label>
 
@@ -205,7 +223,7 @@
 
 </div>
 
-@if($solicitude->estado == 2)
+@if(isset($solicitude) && $solicitude->estado == 2)
 
 <div class="form-group col-sm-6 col-md-4">
     <div class="col-sm-12 col-md-12">
@@ -236,13 +254,13 @@
 
                         <div class="input-group">
 
-                            <input type="file" id="input-file-factura" class="form-control" readonly="">
+                            <input type="file" id="input-file-factura" name="file" class="form-control" readonly="">
                         </div>
 
                     </div>
                 </div>
                 <div class="form-group col-sm-2 col-md-2">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
                 </div>
 
 
