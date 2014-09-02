@@ -167,10 +167,22 @@ class SolicitudeController extends BaseController
     public function listSolicitude($id)
     {
 
+        $today = getdate();
+        $m = $today['mday'].'-'.$today['mon'].'-'.$today['year'];
+        $lastday = date('t-m-Y', strtotime($m));
+        $firstday = date('01-m-Y', strtotime($m));
         if ($id == 0) {
-            $solicituds = Solicitude::all();
+
+            $solicituds = Solicitude::select('*')
+                ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                ->get();
+
         } else {
-            $solicituds = Solicitude::where('estado', '=', $id)->get();
+            $solicituds = Solicitude::select('*')
+                ->where('estado', $id)
+                ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                ->get();
+
         }
 
 
@@ -236,7 +248,7 @@ class SolicitudeController extends BaseController
         if (isset($image)) {
 
              $path = public_path('img/reembolso/'.$sol->image);
-             unlink($path);
+             @unlink($path);
             $filename = uniqid() . '.' . $image->getClientOriginalExtension();
             //$filename = $image->getClientOriginalName();
             $path = public_path('img/reembolso/' . $filename);
@@ -317,8 +329,6 @@ class SolicitudeController extends BaseController
         $m = $today['mday'].'-'.$today['mon'].'-'.$today['year'];
         $lastday = date('t-m-Y', strtotime($m));
         $firstday = date('01-m-Y', strtotime($m));
-
-
 
         if($start!=null && $end!=null){
             if($estado !=0){
@@ -403,6 +413,7 @@ class SolicitudeController extends BaseController
         $solicitude = Solicitude::where('idsolicitud', $idSol);
         $solicitude->estado = 8;
         $solicitude->monto = $inputs['monto'];
+        $solicitude->observacion = $inputs['observacion'];
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
 
@@ -424,10 +435,22 @@ class SolicitudeController extends BaseController
     public function listSolicitudeSup($id)
     {
 
+        $today = getdate();
+        $m = $today['mday'].'-'.$today['mon'].'-'.$today['year'];
+        $lastday = date('t-m-Y', strtotime($m));
+        $firstday = date('01-m-Y', strtotime($m));
+
         if ($id == 0) {
-            $solicituds = Solicitude::all();
+
+            $solicituds = Solicitude::select('*')
+                ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                ->get();
         } else {
-            $solicituds = Solicitude::where('estado', '=', $id)->get();
+
+            $solicituds = Solicitude::select('*')
+                ->where('estado', $id)
+                ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                ->get();
         }
 
         $view = View::make('Dmkt.Sup.view_solicituds_sup')->with('solicituds', $solicituds);

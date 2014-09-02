@@ -117,7 +117,7 @@
 @if(!isset($solicitude))
 <div class="solicitude_factura form-group col-sm-6 col-md-8">
 
-        <label class="col-sm-8 col-md-8 control-label" for="textinput">Factura</label>
+        <label class="col-sm-8 col-md-8 control-label" for="textinput">Factura <small>(solo imagenes)</small></label>
 
         <div class="col-sm-12 col-md-6">
 
@@ -222,7 +222,7 @@
 
 </div>
 
-@if(isset($solicitude) && $solicitude->estado == 2)
+@if(isset($solicitude) && $solicitude->idtiposolicitud == 2)
 
 <div class="form-group col-sm-6 col-md-4">
     <div class="col-sm-12 col-md-12">
@@ -247,7 +247,7 @@
             <div class="modal-footer">
 
                 <div class="solicitude_factura form-group col-sm-6 col-md-10">
-                    <label class="col-sm-8 col-md-2 control-label" for="textinput">Factura</label>
+                    <label class="col-sm-8 col-md-2 control-label" for="textinput">Factura <small>(solo imagenes)</small></label>
 
                     <div class="col-sm-12 col-md-10">
 
@@ -275,7 +275,7 @@
         <label class="col-sm-8 col-md-8 control-label" for="textarea">Descripcion de la Solicitud</label>
 
         <div class="col-sm-12 col-md-12">
-            <textarea class="form-control" id="iddescriptionsolicitude" name="description"></textarea>
+            <textarea class="form-control" id="iddescriptionsolicitude" name="description">{{isset($solicitude->descripcion) ? $solicitude->descripcion : null}}</textarea>
         </div>
     </div>
 </div>

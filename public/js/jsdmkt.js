@@ -347,7 +347,6 @@ function newSolicitude() {
                     alert('error');
                 });
 
-
             }
 
         }, 300);
@@ -591,8 +590,22 @@ function newSolicitude() {
 
             bootbox.confirm("¿Esta seguro de aceptar esta solicitud?", function (result) {
                 if (result) {
-                    form_acepted_solicitude.attr('action', server + 'aceptar-solicitud');
-                    form_acepted_solicitude.submit();
+                    var message = 'Validando Solicitud..';
+                    $.blockUI({ css: {
+                        border: 'none',
+                        padding: '15px',
+                        backgroundColor: '#000',
+                        '-webkit-border-radius': '10px',
+                        '-moz-border-radius': '10px',
+                        opacity: .5,
+                        color: '#fff'
+                    }, message: '<h2><img style="margin-right: 30px" src="' + server + 'img/spiffygif.gif" >' + message + '</h2>'});
+                    setTimeout(function(){
+
+                        form_acepted_solicitude.attr('action', server + 'aceptar-solicitud');
+                        form_acepted_solicitude.submit();
+                    },1200);
+
                 }
             });
 
@@ -733,12 +746,14 @@ function newSolicitude() {
         var file = e.target.files[0],
             imageType = /image.*/;
 
-        if (!file.type.match(imageType))
-            return;
+        if (!file.type.match(imageType)){
+            alert('ingrese solo imagenes');
+        }else{
+            var reader = new FileReader();
+            reader.onload = fileOnload;
+            reader.readAsDataURL(file);
+        }
 
-        var reader = new FileReader();
-        reader.onload = fileOnload;
-        reader.readAsDataURL(file);
     }
 
     function fileOnload(e) {
