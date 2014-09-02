@@ -126,16 +126,18 @@ $(function(){
         //Escoge editar un documento ya registrado
         $(document).on("click","#table-expense .edit-expense",function(e){
             e.preventDefault();
+            var rowEdit = $(this).parent().parent();
             $("#table-expense tbody tr").removeClass("select-row");
-            $(this).parent().parent().removeClass("select-row");
+            $(this).parent().parent().addClass("select-row");
+            var row = $("#table-items tbody tr:eq(0)").clone();
+            $("#table-items tbody tr").remove();
             $("#proof-type").attr("disabled",true);
+            $("#date").attr("disabled",true);
             $("#save-expense ").html("Actualizar");
-            $("#razon").attr("data-edit",1);
-         
+
             var ruc_edit = $(this).parent().parent().find(".ruc").html();
             var voucher_number_edit = $(this).parent().parent().find(".voucher_number").html();
             data = {"ruc":ruc_edit,"number_voucher":voucher_number_edit};
-            console.log(data);
             $.ajax({
                 type: 'get',
                 url: 'edit-expense',
@@ -143,56 +145,72 @@ $(function(){
                 data: {
                     data : JSON.stringify(data)
                 },
+                beforeSend:function(){
+                    $.blockUI({ css: {
+                            border: 'none',
+                            padding: '15px',
+                            backgroundColor: '#000',
+                            '-webkit-border-radius': '10px',
+                            '-moz-border-radius': '10px',
+                            opacity: 0.5,
+                            color: '#fff'
+                        }, message: '<h2><img style="margin-right: 30px" src="' + server + 'img/spiffygif.gif" >' + 'Cargando' + '</h2>'});
+                },
                 error:function(){
                     console.log("error");
                 }
             }).done(function (response){
-                var row = $("#table-items tbody tr:eq(0)").clone();
-                $("#table-items tbody tr:eq(0)").remove();
-                var data = JSON.parse(JSON.stringify(response));
-                console.log(data);
-                // $.each(data,function(index,value){
-                //     var row_add = row.clone();
-                //     row_add.find('.quantity input').val(value.cantidad);
-                //     row_add.find('.description input').val(value.descripcion);
-                //     row_add.find('.type-expense').val(value.idgasto);
-                //     row_add.find('.total-item input').val(value.importe);
-                //     $("#table-items tbody").append(row_add);
-                // });
+                console.log(response);
+                setTimeout(function(){
+                    $.unblockUI();
+                    var data = JSON.parse(JSON.stringify(response));
+                    $.each(data.data,function(index,value){
+                        var row_add = row.clone();
+                        row_add.find('.quantity input').val(value.cantidad);
+                        row_add.find('.description input').val(value.descripcion);
+                        row_add.find('.type-expense').val(value.tipo_gasto);
+                        row_add.find('.total-item input').val(value.importe);
+                        $("#table-items tbody").append(row_add);
+                    });
+                    var arr = data.expense.num_comprobante.split('-');
+                    $("#number-proof-one").val(arr[0]);
+                    $("#number-proof-two").val(arr[1]);
+                    $("#ruc").val(data.expense.ruc);
+                    $("#razon").text(data.expense.razon).css("color","#5c5c5c");
+                    $("#razon").attr("data-edit",1);
+                    $("#total-expense").val(data.expense.monto);
+                    $("#proof-type").val(data.expense.tipo_comprobante);
+                    var date = data.date.split('-');
+                    date = date[2].substring(0,2)+'/'+date[1]+'/'+date[0];
+                    $("#date").val(date);
+                    if(data.expense.tipo_comprobante == '2')
+                    {
+                        $(".tot-document").show();
+                        $("#sub-tot").val(data.expense.sub_tot);
+                        $("#imp-ser").val(data.expense.imp_serv);
+                        $("#igv").val(data.expense.igv);
+                    }
+                    else
+                    {
+                        $(".tot-document").hide();
+                        $("#sub-tot").val(0);
+                        $("#imp-ser").val(0);
+                        $("#igv").val(0);
+                    }
+                    $("html, body").animate({scrollTop:200},'500','swing');
+                    var deposit  = $("#deposit").val();
+                    deposit = parseFloat(deposit);
+                    var tot=0;
+                    var rows = $(".total").parent();
+                    $.each(rows,function(){
+                        tot += parseFloat($(this).find(".total_expense").html());
+                    });
+                    var total_edit = rowEdit.find('.total_expense').text();
+                    var balance = deposit - tot + parseFloat(total_edit);
+                    $("#balance").val(balance);
+                    $("#tot-edit-hidden").val(parseFloat(total_edit));
+                },1000);
             });
-
-            // var row = $(this).parent().parent();
-            // row.addClass("select-row");
-            
-            // var deposit  = $("#deposit").val();
-            // deposit = parseFloat(deposit);
-            // var tot=0;
-            // var rows = $(".total").parent();
-            // $.each(rows,function(){
-            //     tot += parseFloat($(this).find(".total_expense").html());
-            // });
-
-           
-            // $.each(row,function(){
-            //     var type_voucher_edit   = $(this).find(".type_voucher").html();
-            //     var ruc_edit            = $(this).find(".ruc").html();
-            //     var razon_edit          = $(this).find(".razon").html();
-            //     var number_voucher_edit = $(this).find(".number_voucher").html();
-            //     var date_edit           = $(this).find(".date_movement").html();
-            //     var total_edit          = $(this).find(".total").html();
-            //     $("#tot-edit-hidden").val(parseInt(total_edit,10));
-            //     var balance = deposit - tot + parseInt(total_edit,10);
-            //     $("#balance").val(balance);
-            //     $("#type_voucher option").filter(function(){
-            //         return $(this).text() == type_voucher_edit;
-            //     }).attr('selected', true);
-            //     $("#type_voucher").attr("readonly",true);
-            //     $("#ruc").val(ruc_edit).attr("readonly",true);
-            //     $("#razon").html(razon_edit).css("color","#5c5c5c");
-            //     $("#number_voucher").val(number_voucher_edit);
-            //     $("#date").val(date_edit);
-            //     $("#total").val(total_edit);
-            // });
         });
     
         //Validación del botón registrar gasto
@@ -389,18 +407,25 @@ $(function(){
                     if(ruc != ruc_hide)
                     {
                         $(".message-expense").html("Busque el RUC otra vez.");
-                        // alert("Busque el RUC otra vez.");
                     }
                     else
                     {
-                        var sub_total_expense = parseFloat($("#sub-tot").val());
-                        var imp_service       = parseFloat($("#imp-ser").val());
-                        var igv               = parseFloat($("#igv").val());
-                        var total_expense     = parseFloat($("#total-expense").val());
+                        if(proof_type == '2')
+                        {
+                            var sub_total_expense = parseFloat($("#sub-tot").val());
+                            var imp_service       = parseFloat($("#imp-ser").val());
+                            var igv               = parseFloat($("#igv").val());
+
+                            if(isNaN(sub_total_expense)) sub_total_expense = 0;
+                            if(isNaN(imp_service)) imp_service = 0;
+                            if(isNaN(igv)) igv = 0;
+
+                            data.sub_total_expense = sub_total_expense;
+                            data.imp_service = imp_service;
+                            data.igv = igv;
+                        }
                         
-                        data.sub_total_expense = sub_total_expense;
-                        data.imp_service = imp_service;
-                        data.igv = igv;
+                        var total_expense = parseFloat($("#total-expense").val());
                         data.total_expense = total_expense;
 
                         //Validando los documentos registrados.
@@ -481,7 +506,6 @@ $(function(){
                                         if(btn_save === 'Registrar')
                                         {
                                             $(".message-expense").html("El documento ya se encuentra registrado.");
-                                            //alert("El documento ya se encuentra registrado.");
                                         }
                                         else
                                         {

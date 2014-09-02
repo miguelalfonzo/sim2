@@ -60,11 +60,9 @@ class ExpenseController extends BaseController{
 
 		$expense = Input::get('data');
 		$expenseJson = json_decode($expense);
-
-		// var_dump($expenseJson->quantity);die;
+		// var_dump($expenseJson->imp_service);die;
 
 		$row_solicitude = Solicitude::find($expenseJson->idsolicitude);
-
 		$expense = new Expense;
 		//Header Expense
 		$expense->idresponse = 1;
@@ -72,10 +70,10 @@ class ExpenseController extends BaseController{
 		$expense->ruc = $expenseJson->ruc;
 		$expense->razon = $expenseJson->razon;
 		$expense->monto = $expenseJson->total_expense;
-		if($expense->proof_type == '2')
+		if($expenseJson->proof_type == '2')
 		{
 			$expense->igv = $expenseJson->igv;
-			$expense->imp_serv = $expenseJson->imp_serv;
+			$expense->imp_serv = $expenseJson->imp_service;
 			$expense->sub_tot = $expenseJson->sub_total_expense;
 		}
 		$date = $expenseJson->date_movement;
@@ -100,7 +98,7 @@ class ExpenseController extends BaseController{
 				DB::transaction (function() use ($idgasto,$quantity,$description,$type_expense,$total_item){
 					for($i=0;$i<count($quantity);$i++)
 					{
-						$expense_detail = new ExpenseDetail;
+						$expense_detail = new ExpenseItem;
 						$expense_detail->idgasto = $idgasto;
 						$expense_detail->cantidad = $quantity[$i];
 						$expense_detail->descripcion = $description[$i];
@@ -133,10 +131,12 @@ class ExpenseController extends BaseController{
 		$expenseJson = json_decode($expense);
 
 		$idExpense = Expense::where('ruc',$expenseJson->ruc)->where('num_comprobante',$expenseJson->number_voucher)->firstOrFail();
-		
-		$data = ExpenseItem::where('idgasto',$idExpense->idsolicitud)->get();
 
-		return json_decode($data);
+		$data = ExpenseItem::where('idgasto','=',intval($idExpense->idgasto))->get();
+
+		$response = ['data'=>$data, 'expense'=>$idExpense, 'date'=>$idExpense->fecha_movimiento];
+
+		return $response;
 	}
 
 	public function test(){
