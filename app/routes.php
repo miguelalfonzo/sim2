@@ -23,7 +23,7 @@ Route::get('nueva-solicitud','Dmkt\SolicitudeController@newSolicitude');
 Route::get('prueba','Dmkt\SolicitudeController@test');
 Route::get('ver-solicitud/{token}','Dmkt\SolicitudeController@viewSolicitude');
 Route::get('editar-solicitud/{id}','Dmkt\SolicitudeController@editSolicitude');
-Route::put('editar-solicitud','Dmkt\SolicitudeController@formEditSolicitude');
+Route::post('editar-solicitud','Dmkt\SolicitudeController@formEditSolicitude');
 Route::get('getclients','Dmkt\SolicitudeController@getClients');
 Route::post('registrar-solicitud','Dmkt\SolicitudeController@registerSolicitude');
 Route::get('listar-solicitudes/{id}','Dmkt\SolicitudeController@listSolicitude');
