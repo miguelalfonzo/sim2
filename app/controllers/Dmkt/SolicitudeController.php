@@ -52,9 +52,8 @@ class SolicitudeController extends BaseController
     {
 
         $solicitude = Solicitude::find(1);
-        foreach($solicitude->gastos as $gastos){
-            echo json_encode($gastos->items);
-        }
+        $solicitude->MONTO = 344;
+        var_dump($solicitude->save());
 
     }
 
@@ -230,15 +229,14 @@ class SolicitudeController extends BaseController
         $d = mktime(11, 14, 54, $m, $d, $y);
         $date = date("Y/m/d", $d);
         $id = $inputs['idsolicitude'];
-        $solicitude = Solicitude::where('idsolicitud', $id);
+        $sol = Solicitude::find($id);
+        $solicitude = Solicitude::where('idsolicitud',$id);
         $image = Input::file('file');
-        $path = public_path('img/reembolso/'.$solicitude->image);
-        echo $path;die;
+
         if (isset($image)) {
 
-            $path = public_path('img/reembolso/'.$solicitude->image);
-            unlink('public/img/reembolso'.$solicitude->image);
-            //unlink($path);
+             $path = public_path('img/reembolso/'.$sol->image);
+             unlink($path);
             $filename = uniqid() . '.' . $image->getClientOriginalExtension();
             //$filename = $image->getClientOriginalName();
             $path = public_path('img/reembolso/' . $filename);
@@ -257,7 +255,7 @@ class SolicitudeController extends BaseController
         $solicitude->tipo_moneda = $inputs['money'];
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
-        //$solicitude->save();
+
         SolicitudeClient::where('idsolicitud', '=', $id)->delete();
         SolicitudeFamily::where('idsolicitud', '=', $id)->delete();
 

@@ -12,13 +12,13 @@
     @foreach($solicituds as $solicitude)
     <tr>
         <td>{{$solicitude->titulo}}</td>
-        <td>{{$solicitude->typemoney->simbolo.$solicitude->monto}}
+        <td style="text-align: center">{{$solicitude->typemoney->simbolo.$solicitude->monto}}
         </td>
-        <td>
+        <td style="text-align: center">
             <span class="label" style='background-color: {{$solicitude->state->color}}'>{{$solicitude->state->nombre}}</span>
 
         </td>
-        <td>{{$solicitude->observacion}}</td>
+        <td style="text-align: center">{{isset($solicitude->observacion)? $solicitude->observacion : '---'}}</td>
         <td><div style="text-align: center">
 
             <a target="_blank" href="{{URL::to('ver-solicitud-sup').'/'.$solicitude->token}}"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span></a>

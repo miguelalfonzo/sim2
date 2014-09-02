@@ -11,7 +11,7 @@
 <form id="form-register-solicitude" class="" method="post"
       action="{{ isset($solicitude) ? 'editar-solicitud' : 'registrar-solicitud' }}"
       enctype="multipart/form-data">
-
+<input name="_method" type="hidden" value="PUT">
 @if(isset($solicitude))
 <input value="{{$solicitude->idsolicitud}}" name="idsolicitude" type="hidden">
 @endif
