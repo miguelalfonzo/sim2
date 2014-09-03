@@ -131,8 +131,6 @@ $(function(){
             $(this).parent().parent().addClass("select-row");
             var row = $("#table-items tbody tr:eq(0)").clone();
             $("#table-items tbody tr").remove();
-            $("#proof-type").attr("disabled",true);
-            $("#date").attr("disabled",true);
             $("#save-expense ").html("Actualizar");
 
             var ruc_edit = $(this).parent().parent().find(".ruc").html();
@@ -160,7 +158,6 @@ $(function(){
                     console.log("error");
                 }
             }).done(function (response){
-                console.log(response);
                 setTimeout(function(){
                     $.unblockUI();
                     var data = JSON.parse(JSON.stringify(response));
@@ -176,6 +173,7 @@ $(function(){
                     $("#number-proof-one").val(arr[0]);
                     $("#number-proof-two").val(arr[1]);
                     $("#ruc").val(data.expense.ruc);
+                    $("#ruc-hide").val(data.expense.ruc);
                     $("#razon").text(data.expense.razon).css("color","#5c5c5c");
                     $("#razon").attr("data-edit",1);
                     $("#total-expense").val(data.expense.monto);
@@ -219,6 +217,7 @@ $(function(){
             var btn_save = $(this).html();
             var row = "<tr>";
                 row+= "<th class='proof-type'></th>";
+                row+= "<input class='idgasto' type='hidden'>";
                 row+= "<th class='ruc'></th>";
                 row+= "<th class='razon'></th>";
                 row+= "<th class='voucher_number'></th>";
@@ -450,22 +449,29 @@ $(function(){
                                     if(balance<0)
                                     {
                                         $(".message-expense").html("El monto ingresado supera el monto depositado.");
-                                        // alert("El monto ingresado supera el monto depositado");
                                         return;
                                     }
                                     else
                                     {
                                         ajaxExpense(JSON.stringify(data)).done(function(result){
                                             var new_row = $(row).clone(true,true);
-                                            $(new_row).find(".proof-type").text(proof_type_sel);
-                                            $(new_row).find(".ruc").text(ruc);
-                                            $(new_row).find(".razon").text(razon);
-                                            $(new_row).find(".voucher_number").text(number_voucher);
-                                            $(new_row).find(".date_movement").text(date);
-                                            $(new_row).find(".type_money").text(type_money);
-                                            $(new_row).find(".total_expense").text(total_expense);
-                                            $("#table-expense tbody").append(new_row);
-                                            $("#balance").val(balance);
+                                            if(result != 1)
+                                            {
+                                                $(new_row).find(".idgasto").val(result);
+                                                $(new_row).find(".proof-type").text(proof_type_sel);
+                                                $(new_row).find(".ruc").text(ruc);
+                                                $(new_row).find(".razon").text(razon);
+                                                $(new_row).find(".voucher_number").text(number_voucher);
+                                                $(new_row).find(".date_movement").text(date);
+                                                $(new_row).find(".type_money").text(type_money);
+                                                $(new_row).find(".total_expense").text(total_expense);
+                                                $("#table-expense tbody").append(new_row);
+                                                $("#balance").val(balance);
+                                            }
+                                            else
+                                            {
+                                                alert("errror al registrar el detalle de gastos");
+                                            }
                                         }).fail(function(){
                                             console.log("error");
                                         });
@@ -479,23 +485,30 @@ $(function(){
                                         if(balance<0)
                                         {
                                             $(".message-expense").html("El monto ingresado supera el monto depositado.");
-                                            // alert("El monto ingresado supera el monto depositado");
                                             return;
                                         }
                                         else
                                         {
                                             ajaxExpense(JSON.stringify(data)).done(function(result){
-                                                console.log(result);
                                                 var new_row = $(row).clone(true,true);
-                                                $(new_row).find(".proof-type").text(proof_type_sel);
-                                                $(new_row).find(".ruc").text(ruc);
-                                                $(new_row).find(".razon").text(razon);
-                                                $(new_row).find(".voucher_number").text(number_voucher);
-                                                $(new_row).find(".date_movement").text(date);
-                                                $(new_row).find(".type_money").text(type_money);
-                                                $(new_row).find(".total_expense").text(total_expense);
-                                                $("#table-expense tbody").append(new_row);
-                                                $("#balance").val(balance);
+                                                if(result != 1)
+                                                {
+                                                    $(new_row).find(".idgasto").val(result);
+                                                    $(new_row).find(".proof-type").text(proof_type_sel);
+                                                    $(new_row).find(".ruc").text(ruc);
+                                                    $(new_row).find(".razon").text(razon);
+                                                    $(new_row).find(".voucher_number").text(number_voucher);
+                                                    $(new_row).find(".date_movement").text(date);
+                                                    $(new_row).find(".type_money").text(type_money);
+                                                    $(new_row).find(".total_expense").text(total_expense);
+                                                    $("#table-expense tbody").append(new_row);
+                                                    $("#balance").val(balance);
+                                                }
+                                                else
+                                                {
+                                                    alert("error al registrar el detalle de gastos");
+                                                }
+
                                             }).fail(function(){
                                                 console.log("error");
                                             });
@@ -509,27 +522,51 @@ $(function(){
                                         }
                                         else
                                         {
+                                            var rows = $(".total").parent();
                                             $.each(rows,function(index){
-                                                if($(this).find(".number_voucher").html()===number_voucher)
+                                                if($(this).find(".voucher_number").html()===number_voucher)
                                                 {
                                                     balance = parseFloat($("#balance").val());
                                                     if(total_expense>balance)
                                                     {
                                                         $(".message-expense").html("El monto ingresado supera el monto depositado.");
-                                                        // alert("El monto ingresado supera el monto depositado");
                                                         return;
                                                     }
                                                     else
                                                     {
-                                                        $(".date_movement:eq("+index+")").html(date);
-                                                        $(".total:eq("+index+")").html(total_expense);
-                                                        balance = deposit - tot_rows + parseFloat($("#tot-edit-hidden").val()) - total_expense;
-                                                        $("#save-expense").html("Registrar");
-                                                        $("#table tbody tr").removeClass("select-row");
-                                                        $("#balance").val(balance);
-                                                        $("#number_proof_one").attr("readonly",false);
-                                                        $("#number_proof_two").attr("readonly",false);
-                                                        $("#ruc").attr("readonly",false);
+                                                        data.idgasto = $(".idgasto").val();
+                                                        // console.log(JSON.stringify(data));
+                                                        $.ajax({
+                                                            type: 'post',
+                                                            url: 'update-expense',
+                                                            data: {
+                                                                data: JSON.stringify(data)
+                                                            },
+                                                            beforeSend: function(){
+                                                                $.blockUI({css: {
+                                                                        border: 'none',
+                                                                        padding: '15px',
+                                                                        backgroundColor: '#000',
+                                                                        '-webkit-border-radius': '10px',
+                                                                        '-moz-border-radius': '10px',
+                                                                        opacity: 0.5,
+                                                                        color: '#fff'
+                                                                    },message: '<h2><img style="margin-right: 30px" src="' + server + 'img/spiffygif.gif" >' + 'Actulizando' + '</h2>'});
+                                                            },
+                                                            error: function(){
+                                                                console.log("error");
+                                                            }
+                                                        }).done( function (data) {
+                                                            setTimeout(function(){
+                                                                $.unblockUI();
+                                                                $(".date_movement:eq("+index+")").html(date);
+                                                                $(".total:eq("+index+")").html(total_expense);
+                                                                balance = deposit - tot_rows + parseFloat($("#tot-edit-hidden").val()) - total_expense;
+                                                                $("#save-expense").html("Registrar");
+                                                                $("#table-expense tbody tr").removeClass("select-row");
+                                                                $("#balance").val(balance);    
+                                                            },1000);                                                            
+                                                        });
                                                     }
                                                 }
                                             });
@@ -544,24 +581,30 @@ $(function(){
                             if(total_expense>balance)
                             {
                                 $(".message-expense").html("El monto ingresado supera el monto depositado.");
-                                // alert("El monto ingresado supera el monto depositado");
                                 return;
                             }
                             else
                             {
                                 ajaxExpense(JSON.stringify(data)).done(function(result){
-                                    console.log(result);
                                     var new_row = $(row).clone(true,true);
-                                    balance = deposit - total_expense;
-                                    $(new_row).find(".proof-type").text(proof_type_sel);
-                                    $(new_row).find(".ruc").text(ruc);
-                                    $(new_row).find(".razon").text(razon);
-                                    $(new_row).find(".voucher_number").text(number_voucher);
-                                    $(new_row).find(".date_movement").text(date);
-                                    $(new_row).find(".type_money").text(type_money);
-                                    $(new_row).find(".total_expense").text(total_expense);
-                                    $("#table-expense tbody").append(new_row);
-                                    $("#balance").val(balance);
+                                    if(result != 1)
+                                    {
+                                        $(new_row).find(".idgasto").val(result);
+                                        balance = deposit - total_expense;
+                                        $(new_row).find(".proof-type").text(proof_type_sel);
+                                        $(new_row).find(".ruc").text(ruc);
+                                        $(new_row).find(".razon").text(razon);
+                                        $(new_row).find(".voucher_number").text(number_voucher);
+                                        $(new_row).find(".date_movement").text(date);
+                                        $(new_row).find(".type_money").text(type_money);
+                                        $(new_row).find(".total_expense").text(total_expense);
+                                        $("#table-expense tbody").append(new_row);
+                                        $("#balance").val(balance);
+                                    }
+                                    else
+                                    {
+                                        alert("error al registrar el detalle de gastos");
+                                    }
                                 }).fail(function(){
                                     console.log("error");
                                 });

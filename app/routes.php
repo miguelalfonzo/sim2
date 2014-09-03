@@ -63,6 +63,7 @@ Route::get('aprobar-solicitud/{token}','Dmkt\SolicitudeController@approvedSolici
 Route::post('registrar-gasto','Expense\ExpenseController@show');
 Route::post('register-expense','Expense\ExpenseController@registerExpense');
 Route::post('delete-expense','Expense\ExpenseController@deleteExpense');
+Route::post('update-expense','Expense\ExpenseController@updateExpense');
 Route::get('edit-expense','Expense\ExpenseController@editExpense');
 // Ruc
 Route::post('consultarRuc','Expense\RucController@show');

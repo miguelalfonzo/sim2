@@ -213,6 +213,7 @@
 										@foreach($expense as $val)
 											<tr>
 												<th class="proof-type">{{mb_convert_case($val->idProofType->descripcion,MB_CASE_TITLE,'UTF-8')}}</th>
+												<input class='idgasto' type='hidden' value="{{$val->idgasto}}">;
 												<th class="ruc">{{$val->ruc}}</th>
 												<th class="razon">{{$val->razon}}</th>
 												<th class="voucher_number">{{$val->num_comprobante}}</th>
