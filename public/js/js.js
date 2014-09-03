@@ -453,27 +453,34 @@ $(function(){
                                     }
                                     else
                                     {
-                                        ajaxExpense(JSON.stringify(data)).done(function(result){
-                                            var new_row = $(row).clone(true,true);
-                                            if(result != 1)
-                                            {
-                                                $(new_row).find(".idgasto").val(result);
-                                                $(new_row).find(".proof-type").text(proof_type_sel);
-                                                $(new_row).find(".ruc").text(ruc);
-                                                $(new_row).find(".razon").text(razon);
-                                                $(new_row).find(".voucher_number").text(number_voucher);
-                                                $(new_row).find(".date_movement").text(date);
-                                                $(new_row).find(".type_money").text(type_money);
-                                                $(new_row).find(".total_expense").text(total_expense);
-                                                $("#table-expense tbody").append(new_row);
-                                                $("#balance").val(balance);
-                                            }
-                                            else
-                                            {
-                                                alert("errror al registrar el detalle de gastos");
-                                            }
+                                        ajaxExpense(JSON.stringify(data))
+                                        .done(function(result){
+                                            setTimeout(function(){
+                                                $.unblockUI();
+                                                var new_row = $(row).clone(true,true);
+                                                if(result != 0)
+                                                {
+                                                    $(new_row).find(".idgasto").val(result);
+                                                    $(new_row).find(".proof-type").text(proof_type_sel);
+                                                    $(new_row).find(".ruc").text(ruc);
+                                                    $(new_row).find(".razon").text(razon);
+                                                    $(new_row).find(".voucher_number").text(number_voucher);
+                                                    $(new_row).find(".date_movement").text(date);
+                                                    $(new_row).find(".type_money").text(type_money);
+                                                    $(new_row).find(".total_expense").text(total_expense);
+                                                    $("#table-expense tbody").append(new_row);
+                                                    $("#balance").val(balance);
+                                                }
+                                                else
+                                                {
+                                                    $(".message-expense").html("El documento ya se encuentra registrado.");
+                                                }
+                                            },1000);
                                         }).fail(function(){
-                                            console.log("error");
+                                            setTimeout(function(){
+                                                $.unblockUI();
+                                                $(".message-expense").html("Ocurrió un error al registrar los gastos");
+                                            },1000);
                                         });
                                     }
                                 }
@@ -489,28 +496,35 @@ $(function(){
                                         }
                                         else
                                         {
-                                            ajaxExpense(JSON.stringify(data)).done(function(result){
-                                                var new_row = $(row).clone(true,true);
-                                                if(result != 1)
-                                                {
-                                                    $(new_row).find(".idgasto").val(result);
-                                                    $(new_row).find(".proof-type").text(proof_type_sel);
-                                                    $(new_row).find(".ruc").text(ruc);
-                                                    $(new_row).find(".razon").text(razon);
-                                                    $(new_row).find(".voucher_number").text(number_voucher);
-                                                    $(new_row).find(".date_movement").text(date);
-                                                    $(new_row).find(".type_money").text(type_money);
-                                                    $(new_row).find(".total_expense").text(total_expense);
-                                                    $("#table-expense tbody").append(new_row);
-                                                    $("#balance").val(balance);
-                                                }
-                                                else
-                                                {
-                                                    alert("error al registrar el detalle de gastos");
-                                                }
-
-                                            }).fail(function(){
-                                                console.log("error");
+                                            ajaxExpense(JSON.stringify(data))
+                                            .done(function(result){
+                                                setTimeout(function(){
+                                                    $.unblockUI();
+                                                    var new_row = $(row).clone(true,true);
+                                                    if(result != 0)
+                                                    {
+                                                        $(new_row).find(".idgasto").val(result);
+                                                        $(new_row).find(".proof-type").text(proof_type_sel);
+                                                        $(new_row).find(".ruc").text(ruc);
+                                                        $(new_row).find(".razon").text(razon);
+                                                        $(new_row).find(".voucher_number").text(number_voucher);
+                                                        $(new_row).find(".date_movement").text(date);
+                                                        $(new_row).find(".type_money").text(type_money);
+                                                        $(new_row).find(".total_expense").text(total_expense);
+                                                        $("#table-expense tbody").append(new_row);
+                                                        $("#balance").val(balance);
+                                                    }
+                                                    else
+                                                    {
+                                                        $(".message-expense").html("El documento ya se encuentra registrado.");
+                                                    }
+                                                },1000);
+                                            })
+                                            .fail(function(){
+                                                setTimeout(function(){
+                                                    $.unblockUI();
+                                                    $(".message-expense").html("Ocurrió un error al registrar los gastos");
+                                                },1000);
                                             });
                                         }
                                     }
@@ -564,8 +578,8 @@ $(function(){
                                                                 balance = deposit - tot_rows + parseFloat($("#tot-edit-hidden").val()) - total_expense;
                                                                 $("#save-expense").html("Registrar");
                                                                 $("#table-expense tbody tr").removeClass("select-row");
-                                                                $("#balance").val(balance);    
-                                                            },1000);                                                            
+                                                                $("#balance").val(balance);
+                                                            },1000);
                                                         });
                                                     }
                                                 }
@@ -585,28 +599,36 @@ $(function(){
                             }
                             else
                             {
-                                ajaxExpense(JSON.stringify(data)).done(function(result){
-                                    var new_row = $(row).clone(true,true);
-                                    if(result != 1)
-                                    {
-                                        $(new_row).find(".idgasto").val(result);
-                                        balance = deposit - total_expense;
-                                        $(new_row).find(".proof-type").text(proof_type_sel);
-                                        $(new_row).find(".ruc").text(ruc);
-                                        $(new_row).find(".razon").text(razon);
-                                        $(new_row).find(".voucher_number").text(number_voucher);
-                                        $(new_row).find(".date_movement").text(date);
-                                        $(new_row).find(".type_money").text(type_money);
-                                        $(new_row).find(".total_expense").text(total_expense);
-                                        $("#table-expense tbody").append(new_row);
-                                        $("#balance").val(balance);
-                                    }
-                                    else
-                                    {
-                                        alert("error al registrar el detalle de gastos");
-                                    }
-                                }).fail(function(){
-                                    console.log("error");
+                                ajaxExpense(JSON.stringify(data))
+                                .done(function(result){
+                                    setTimeout(function(){
+                                        $.unblockUI();
+                                        var new_row = $(row).clone(true,true);
+                                        if(result != 0)
+                                        {
+                                            $(new_row).find(".idgasto").val(result);
+                                            balance = deposit - total_expense;
+                                            $(new_row).find(".proof-type").text(proof_type_sel);
+                                            $(new_row).find(".ruc").text(ruc);
+                                            $(new_row).find(".razon").text(razon);
+                                            $(new_row).find(".voucher_number").text(number_voucher);
+                                            $(new_row).find(".date_movement").text(date);
+                                            $(new_row).find(".type_money").text(type_money);
+                                            $(new_row).find(".total_expense").text(total_expense);
+                                            $("#table-expense tbody").append(new_row);
+                                            $("#balance").val(balance);
+                                        }
+                                        else
+                                        {
+                                            $(".message-expense").html("El documento ya se encuentra registrado.");
+                                        }
+                                    },1000);
+                                })
+                                .fail(function(){
+                                    setTimeout(function(){
+                                        $.unblockUI();
+                                        $(".message-expense").html("Ocurrió un error al momento de registrar los gastos");
+                                    },1000);
                                 });
                             }
                         }
@@ -696,8 +718,16 @@ $(function(){
                 data: {
                     data : jsonExpense
                 },
-                beforeSend:function(){
-                    console.log("Antes de ir al ajax");
+                beforeSend: function(){
+                    $.blockUI({css: {
+                            border: 'none',
+                            padding: '15px',
+                            backgroundColor: '#000',
+                            '-webkit-border-radius': '10px',
+                            '-moz-border-radius': '10px',
+                            opacity: 0.5,
+                            color: '#fff'
+                        },message: '<h2><img style="margin-right: 30px" src="' + server + 'img/spiffygif.gif" >' + 'Registrando' + '</h2>'});
                 },
                 error:function(){
                     alert("No se pueden grabar los datos.");
