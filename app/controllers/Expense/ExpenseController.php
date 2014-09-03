@@ -91,6 +91,12 @@ class ExpenseController extends BaseController{
 				$expense->imp_serv = $expenseJson->imp_service;
 				$expense->sub_tot = $expenseJson->sub_total_expense;
 			}
+			else
+			{
+				$expenseEdit->igv = null;
+				$expenseEdit->imp_serv = null;
+				$expenseEdit->sub_tot = null;	
+			}
 			$date = $expenseJson->date_movement;
 	        list($d, $m, $y) = explode('/', $date);
 	        $d = mktime(11, 14, 54, $m, $d, $y);
@@ -167,6 +173,12 @@ class ExpenseController extends BaseController{
 			$expenseEdit->imp_serv = $expenseJson->imp_service;
 			$expenseEdit->sub_tot = $expenseJson->sub_total_expense;
 		}
+		else
+		{
+			$expenseEdit->igv = null;
+			$expenseEdit->imp_serv = null;
+			$expenseEdit->sub_tot = null;	
+		}
 		$expenseEdit->tipo_comprobante = $expenseJson->proof_type;
 		$date = $expenseJson->date_movement;
         list($d, $m, $y) = explode('/', $date);
@@ -181,8 +193,6 @@ class ExpenseController extends BaseController{
 		$description = $expenseJson->description;
 		$type_expense = $expenseJson->type_expense;
 		$total_item = $expenseJson->total_item;
-
-		var_dump($quantity);die;return;
 
 		if($expenseEdit->update($data))
 		{
