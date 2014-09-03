@@ -482,7 +482,7 @@ function newSolicitude() {
     $(document).on('click', cancel_solicitude, function (e) {
         e.preventDefault();
         var aux = $(this);
-        bootbox.confirm("¿Esta seguro que desea eliminar esta solicitud?", function (result) {
+        bootbox.confirm("¿Esta seguro que desea cancelar esta solicitud?", function (result) {
             if (result) {
 
                 $.post(server + 'cancelar-solicitud-rm', {idsolicitude: $(aux).attr('data-idsolicitude')})
@@ -631,9 +631,14 @@ function newSolicitude() {
 
     $('#deny_solicitude').on('click', function (e) {
 
-        var url = server + 'rechazar-solicitud';
-        form_acepted_solicitude.attr('action', url);
-        form_acepted_solicitude.submit();
+        bootbox.confirm("¿Esta seguro que desea rechazar esta solicitud?", function (result) {
+            if (result) {
+                var url = server + 'rechazar-solicitud';
+                form_acepted_solicitude.attr('action', url);
+                form_acepted_solicitude.submit();
+            }
+        });
+
 
     });
 

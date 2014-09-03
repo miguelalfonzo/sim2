@@ -171,6 +171,51 @@
                     </div>
                 </div>
 
+                @if(isset($solicitude) && $solicitude->idtiposolicitud == 2)
+                <div class="form-group col-sm-6 col-md-4">
+                    <div class="col-sm-12 col-md-12">
+                        <a class="btn btn-primary btn-md" data-toggle="modal" data-target="#myFac">
+                            Ver Comprobante
+                        </a>
+                    </div>
+
+                </div>
+                <div class="modal fade" id="myFac" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                <h4 class="modal-title" id="myModalLabel">Comprobante</h4>
+                            </div>
+                            <div class="modal-body">
+                                <img class="img-responsive" src="{{URL::to('img').'/reembolso/'.$solicitude->image}}">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="demoLightbox" class="lightbox hide fade"  tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class='lightbox-content'>
+                        <img src="{{URL::to('/')}}/img/reembolso/{{$solicitude->image}}">
+                        <div class="lightbox-caption"><p>Your caption here</p></div>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-12" style="margin-top: 10px">
+                    <div class="form-group col-sm-12 col-md-12">
+                        <label class="col-sm-8 col-md-8 control-label" for="textarea">Descripcion de la
+                            Solicitud</label>
+
+                        <div class="col-sm-12 col-md-12">
+                            <textarea class="form-control" id="textarea" name="textarea" readonly>{{$solicitude->descripcion}}</textarea>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
                 <div class="col-sm-12 col-md-12" style="margin-top: 10px">
                     <div class="form-group col-sm-12 col-md-12">
                         <label class="col-sm-8 col-md-8 control-label" for="textarea">Descripcion de la
