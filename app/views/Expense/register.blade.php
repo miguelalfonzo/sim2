@@ -111,7 +111,7 @@
 											<th class="w-quantity">Cantidad</th>
 											<th class="w-desc-item">Descripción</th>
 											<th class="w-type-expense">Tipo de Gasto</th>
-											<th class="w-total-item">Importe</th>
+											<th class="w-total-item">Valor de Venta</th>
 											<th>Eliminar</th>
 										</tr>
 									</thead>

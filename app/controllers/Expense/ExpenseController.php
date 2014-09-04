@@ -70,7 +70,7 @@ class ExpenseController extends BaseController{
 		$expenseJson = json_decode($expense);
 		// var_dump($expense);die;
 		$row_solicitude = Solicitude::find($expenseJson->idsolicitude);
-		$row_expense = Expense::where('num_comprobante',$expenseJson->number_proof)->where('ruc',$expenseJson->ruc)->get();
+		$row_expense = Expense::where('num_comprobante',$expenseJson->voucher_number)->where('ruc',$expenseJson->ruc)->get();
 
 		if(count($row_expense)>0)
 		{
@@ -81,7 +81,7 @@ class ExpenseController extends BaseController{
 			$expense = new Expense;
 			//Header Expense
 			$expense->idresponse = 1;
-			$expense->num_comprobante = $expenseJson->number_proof;
+			$expense->num_comprobante = $expenseJson->voucher_number;
 			$expense->ruc = $expenseJson->ruc;
 			$expense->razon = $expenseJson->razon;
 			$expense->monto = $expenseJson->total_expense;
@@ -93,9 +93,9 @@ class ExpenseController extends BaseController{
 			}
 			else
 			{
-				$expenseEdit->igv = null;
-				$expenseEdit->imp_serv = null;
-				$expenseEdit->sub_tot = null;	
+				$expense->igv = null;
+				$expense->imp_serv = null;
+				$expense->sub_tot = null;	
 			}
 			$date = $expenseJson->date_movement;
 	        list($d, $m, $y) = explode('/', $date);
@@ -163,7 +163,7 @@ class ExpenseController extends BaseController{
 
 		$idgasto = intval($expenseJson->idgasto);
 		$expenseEdit = Expense::where('idgasto',$idgasto);
-		$expenseEdit->num_comprobante = $expenseJson->number_proof;
+		$expenseEdit->num_comprobante = $expenseJson->voucher_number;
 		$expenseEdit->ruc = $expenseJson->ruc;
 		$expenseEdit->razon = $expenseJson->razon;
 		$expenseEdit->monto = $expenseJson->total_expense;
