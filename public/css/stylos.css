@@ -81,7 +81,7 @@ selectproduct{
     }
     .div-icons-solicituds span{
 
-        font-size: 1em !important;
+        font-size: 1.6em !important;
     }
     .div-icons-solicituds {
         width: 100px;
@@ -90,7 +90,7 @@ selectproduct{
 }
 @media screen and (min-width: 780px){
     .edition{
-        width: 102px;
+        width: 112px;
     }
 }
 

@@ -1,6 +1,19 @@
 newSolicitude();
 function newSolicitude() {
 
+    /* Declare Variables */
+    var title = $('#idtitle');
+    var amount = $('#idestimate');
+    var delivery_date = $('#delivery_date');
+    var amountfac = $('#amount-fac');
+    var input_client = $('.input-client');
+    var selectfamily = $('.selectfamily');
+    var data_start = $('#date_start');
+    var data_end = $('#date_end');
+    var amount_fac = $('#amountfac');
+    var solicitude_factura = $('.solicitude_factura');
+    var solicitude_monto =  $('.solicitude_monto');
+    var idamount = $('#idamount');
     var clients = [];
 
     // get clients
@@ -35,35 +48,35 @@ function newSolicitude() {
     });
 
     //Validations
-    $('#idestimate').numeric();
-    $('#idamount').numeric();
-    $('#amountfac').numeric();
+   amount.numeric();
+    idamount.numeric();
+   amount_fac.numeric();
 
 
     // Select type de solicitude
-    $('.solicitude_factura').hide();
-    $('.solicitude_monto').hide();
+    solicitude_factura.hide();
+    solicitude_monto.hide();
 
     var select_type_solicitude = $('.selecttypesolicitude');
     if (select_type_solicitude.val() == 2) {
-        $('.solicitude_factura').show();
-        $('.solicitude_monto').show();
+        solicitude_factura.show();
+        solicitude_monto.show();
     }
     select_type_solicitude.on('change', (function () {
 
         if ($(this).val() == 1) {
 
-            $('.solicitude_factura').hide()
-            $('.solicitude_monto').hide();
+            solicitude_factura.hide()
+            solicitude_monto.hide();
         } else if ($(this).val() == 2) {
 
-            $('.solicitude_factura').show();
-            $('.solicitude_monto').show();
+            solicitude_factura.show();
+            solicitude_monto.show();
 
         } else if ($(this).val() == 3) {
 
-            $('.solicitude_factura').hide();
-            $('.solicitude_monto').hide();
+            solicitude_factura.hide();
+            solicitude_monto.hide();
         }
 
     }));
@@ -147,14 +160,7 @@ function newSolicitude() {
 
     /* Removing Errors */
 
-    var title = $('#idtitle');
-    var amount = $('#idestimate');
-    var delivery_date = $('#delivery_date');
-    var amountfac = $('#amount-fac');
-    var input_client = $('.input-client');
-    var selectfamily = $('.selectfamily');
-    var data_start = $('#date_start');
-    var data_end = $('#date_end');
+
 
     title.on('focus', function () {
         $(this).parent().removeClass('has-error');
@@ -346,7 +352,7 @@ function newSolicitude() {
 
     /* List solicitude pending */
     $.ajax({
-        url: server + 'listar-solicitudes/' + 2,
+        url: server + 'listar-solicitudes/' + 1,
         type: 'GET',
         dataType: 'html'
 
@@ -461,7 +467,7 @@ function newSolicitude() {
 
     /* list solicitude pending */
     $.ajax({
-        url: server + 'listar-solicitudes-sup/' + 2,
+        url: server + 'listar-solicitudes-sup/' + 1,
         type: 'GET',
         dataType: 'html'
 
@@ -487,11 +493,21 @@ function newSolicitude() {
 
     var amount_families = $('.amount_families');
     amount_families.numeric({negative: false});
+
     /* validate amount families no more than amount total*/
 
-    amount_families.keyup(function (e) {
 
-        if (parseInt($(this).val()) > parseInt($('#idamount').val())) {
+    amount_families.keyup(function (e) {
+        var sum_total =0;
+        amount_families.each(function(i,v){
+            sum_total += parseFloat($(this).val());
+            console.log(Math.round(sum_total));
+        });
+
+        if(sum_total > parseInt(idamount.val())){
+            amount_error_families.text('La suma supera al monto total').css('color', 'red');
+        }
+        if (parseInt($(this).val()) > parseInt(idamount.val())) {
             amount_error_families.text('El monto supera al monto total').css('color', 'red');
         } else {
             if (e.keyCode == 8) {
@@ -511,7 +527,7 @@ function newSolicitude() {
     var form_acepted_solicitude = $('#form_make_activity');
     $('.accepted_solicitude_sup').on('click', function (e) {
         var total = 0;
-        var idamount = $('#idamount');
+
         e.preventDefault();
         amount_families.each(function (index, value) {
 

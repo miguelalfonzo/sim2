@@ -47,7 +47,7 @@
 
 
 <div class="form-group col-sm-6 col-md-4">
-    <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto</label>
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto Solicitado</label>
 
     <div class="col-sm-12 col-md-12">
         <input id="idestimate" name="monto" type="text" placeholder=""

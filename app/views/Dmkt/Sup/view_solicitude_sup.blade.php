@@ -37,10 +37,10 @@
 </div>
 
 <div class="form-group col-sm-6 col-md-4 col-lg-4">
-    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Monto</label>
+    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Monto Solicitado</label>
 
     <div class="col-sm-12 col-md-12 col-lg-12">
-        @if($solicitude->estado == 2)
+        @if($solicitude->estado == PENDIENTE)
         <div class="input-group">
             <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
             <input id="idamount" name="monto" type="text" placeholder="" value="{{$solicitude->monto}}"
@@ -114,7 +114,7 @@
     <label class="col-sm-8 col-md-8 ol-lg-8 control-label" for="textinput">Observacion</label>
 
     <div class="col-sm-12 col-md-12 col-lg-12">
-        @if($solicitude->estado == 2)
+        @if($solicitude->estado == PENDIENTE)
         <textarea id="textinput" name="observacion" placeholder=""
                   class="form-control"></textarea>
         @else
@@ -185,7 +185,7 @@
                     <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" style="padding: 0">
                         <div class="input-group">
                             <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                            @if($solicitude->estado == 2)
+                            @if($solicitude->estado == PENDIENTE)
 
                             <input id="" name="amount_assigned[]" type="text"
                                    class="form-control input-md amount_families"
@@ -253,7 +253,7 @@
 <div class="form-group col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px">
 
     <div class="col-sm-12 col-md-12 col-lg-12" style="text-align: center">
-        @if($solicitude->estado == 2)
+        @if($solicitude->estado == PENDIENTE)
         <a href="{{URL::to('aceptar_solicitud')}}" id="test" name="button1id"
            class="btn btn-primary accepted_solicitude_sup">Aceptar
         </a>

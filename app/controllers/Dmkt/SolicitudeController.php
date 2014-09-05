@@ -52,15 +52,17 @@ class SolicitudeController extends BaseController
     {
 
         $solicitude = Solicitude::find(1);
-        $solicitude->MONTO = 344;
-        var_dump($solicitude->save());
+        foreach($solicitude->families as $v){
+            echo json_encode($v->marca->manager->descripcion);
+        }
+
 
     }
 
     public function show_rm()
     {
 
-        $states = State::all();
+        $states = State::orderBy('idestado','ASC')->get();
 
         return View::make('Dmkt.Rm.show_rm')->with('states', $states);
 
@@ -118,7 +120,7 @@ class SolicitudeController extends BaseController
         $solicitude->descripcion = $inputs['description'];
         $solicitude->titulo = $inputs['titulo'];
         $solicitude->monto = $inputs['monto'];
-        $solicitude->estado = 2;
+        $solicitude->estado = PENDIENTE;
         $solicitude->monto_factura = $inputs['amount_fac'];
         $solicitude->fecha_entrega = $date;
         $solicitude->idtiposolicitud = $inputs['type_solicitude'];
@@ -261,7 +263,7 @@ class SolicitudeController extends BaseController
         $solicitude->descripcion = $inputs['description'];
         $solicitude->titulo = $inputs['titulo'];
         $solicitude->monto = $inputs['monto'];
-        $solicitude->estado = 2;
+        $solicitude->estado = PENDIENTE;
         $solicitude->fecha_entrega = $date;
         $solicitude->monto_factura = $inputs['amount_fac'];
         $solicitude->idsubtipoactividad = $inputs['sub_type_activity'];
@@ -303,7 +305,7 @@ class SolicitudeController extends BaseController
         $inputs = Input::all();
         $id = $inputs['idsolicitude'];
         $solicitude = Solicitude::where('idsolicitud', $id);
-        $solicitude->estado = 1;
+        $solicitude->estado = CANCELADO;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
 
@@ -373,7 +375,7 @@ class SolicitudeController extends BaseController
     public function show_sup()
     {
 
-        $states = State::all();
+        $states = State::orderBy('idestado','ASC')->get();
         return View::make('Dmkt.Sup.show_sup')->with('states', $states);
 
     }
@@ -398,7 +400,7 @@ class SolicitudeController extends BaseController
         $solicitude = Solicitude::where('idsolicitud', $id);
         $solicitude->idsolicitud = (int)$id;
         $solicitude->observacion = $inputs['observacion'];
-        $solicitude->estado = 3;
+        $solicitude->estado = RECHAZADO;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
         return Redirect::to('show_sup');
@@ -412,7 +414,7 @@ class SolicitudeController extends BaseController
         $amount_assigned = $inputs['amount_assigned'];
         $idSol = $inputs['idsolicitude'];
         $solicitude = Solicitude::where('idsolicitud', $idSol);
-        $solicitude->estado = 8;
+        $solicitude->estado = ACEPTADO;
         $solicitude->monto = $inputs['monto'];
         $solicitude->observacion = $inputs['observacion'];
         $data = $this->objectToArray($solicitude);
@@ -506,7 +508,7 @@ class SolicitudeController extends BaseController
     public function show_gercom()
     {
 
-        $states = State::all();
+        $states = State::orderBy('idestado','ASC')->get();
         return View::make('Dmkt.GerCom.show_gercom')->with('states', $states);
     }
 
@@ -535,7 +537,7 @@ class SolicitudeController extends BaseController
     {
 
         $solicitude = Solicitude::where('token', $token);
-        $solicitude->estado = 4;
+        $solicitude->estado = APROBADO;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
         return Redirect::to('show_gercom');

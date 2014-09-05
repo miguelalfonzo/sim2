@@ -10,7 +10,12 @@ namespace Dmkt;
 class Marca extends \Eloquent {
 
     public $timestamps = false;
-    
+
+
+    function manager(){
+
+        return $this->hasOne('Dmkt\Manager','id','gerente_id');
+    }
 
 
 
