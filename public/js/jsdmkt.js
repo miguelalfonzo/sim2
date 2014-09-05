@@ -320,16 +320,16 @@ function newSolicitude() {
 
                 }).done(function (data) {
 
-                    $.unblockUI();
+                   // $.unblockUI();
 
                     if (data == true) {
 
-                            responseUI(message2,'green');
+                        responseUI(message2, 'green');
                         setTimeout(
                             function () {
                                 window.location.href = server + 'show_rm'
                             }
-                            , 2000);
+                            , 200);
 
                     }
 

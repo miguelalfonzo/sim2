@@ -23,7 +23,7 @@ function responseUI(message,color){
         '-moz-border-radius': '10px',
         opacity: 0.5,
         color: '#fff'
-    }, message: '<h2><img style="margin-right: 30px" src="' + server + 'img/spiffygif.gif" >' + message + '</h2>'});
+    }, message: '<h2>' + message + '</h2>'});
     setTimeout(function(){
         $.unblockUI();
     },500);
