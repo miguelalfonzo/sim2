@@ -86,7 +86,14 @@ selectproduct{
     .div-icons-solicituds {
         width: 100px;
     }
+
 }
+@media screen and (min-width: 780px){
+    .edition{
+        width: 102px;
+    }
+}
+
 .input-placeholder-error::-webkit-input-placeholder { /* WebKit browsers */
     color:    red !important;
 }

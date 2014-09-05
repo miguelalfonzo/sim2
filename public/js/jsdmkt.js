@@ -174,10 +174,10 @@ function newSolicitude() {
     selectfamily.on('click', function () {
         $(this).css('border-color', 'none')
     });
-    data_start.on('focus',function(){
+    data_start.on('focus', function () {
         $(this).parent().removeClass('has-error');
     });
-    data_end.on('focus',function(){
+    data_end.on('focus', function () {
         $(this).parent().removeClass('has-error');
     });
     /* End Removing Errors */
@@ -370,6 +370,9 @@ function newSolicitude() {
     }).done(function (data) {
         $('.table-solicituds').append(data);
         $('#table_solicitude').dataTable({
+                "order": [
+                    [ 3, "desc" ]
+                ],
                 "bLengthChange": false,
                 'iDisplayLength': 7,
                 "oLanguage": {
@@ -382,98 +385,58 @@ function newSolicitude() {
         );
     });
 
-    /*
-     $('#idstate').on('change', function () {
-     var idstate = $(this).val();
-     $('#date_start').val();
-     $('#date_end').val();
-     $('#table_solicitude_wrapper').remove();
-     setTimeout(function () {
-
-     var jqxhr = $.post(server + "buscar-solicitudes", { idstate: $('#idstate').val(), date_start: $('#date_start').val(), date_end: $('#date_end').val() })
-     .done(function (data) {
-     $('#table_solicitude_wrapper').remove();
-     $('.table-solicituds').append(data);
-     $('#table_solicitude').dataTable({
-     "bLengthChange": false,
-     'iDisplayLength': 5,
-     "oLanguage": {
-     "sSearch": "Buscar: ",
-     "sZeroRecords": "No hay solicitudes",
-     "sInfoEmpty": "No hay solicitudes",
-     "sInfo": 'Mostrando _END_ de _TOTAL_'
-     }
-     }
-     );
-     l.stop();
-     })
-     .fail(function () {
-     alert("error");
-     })
-
-     /*$.ajax({
-
-     url: server + 'listar-solicitudes/' + idstate,
-     type: 'GET',
-     dataType: 'html',
-     beforeSend:function(){
-     $.blockUI({css: {
-     border: 'none',
-     padding: '15px',
-     backgroundColor: 'invisible',
-     '-webkit-border-radius': '10px',
-     '-moz-border-radius': '10px',
-     opacity: .7,
-     color: '#fff'
-
-     },  message: $('#loading') });
-     }
-
-     }).done(function (data) {
-     $.unblockUI();
-     $('.table-solicituds').append(data);
-     $('#table_solicitude').dataTable({
-     "bLengthChange": false,
-     'iDisplayLength': 5,
-     "oLanguage": {
-     "sSearch": "Buscar: ",
-     "sZeroRecords": "No hay solicitudes",
-     "sInfoEmpty": "No hay solicitudes",
-     "sInfo":'Mostrando _END_ de _TOTAL_'
-     }
-     }
-     );
-     });
-     }, 200)
-
-     });
-     */
     /* Filter all solicitude by date */
     var search_solicitude = $('#search-solicitude');
     search_solicitude.on('click', function () {
-        var l = Ladda.create(this);
-        l.start();
-        var jqxhr = $.post(server + "buscar-solicitudes", { idstate: $('#idstate').val(), date_start: $('#date_start').val(), date_end: $('#date_end').val() })
-            .done(function (data) {
-                $('#table_solicitude_wrapper').remove();
-                $('.table-solicituds').append(data);
-                $('#table_solicitude').dataTable({
-                        "bLengthChange": false,
-                        'iDisplayLength': 7,
-                        "oLanguage": {
-                            "sSearch": "Buscar: ",
-                            "sZeroRecords": "No hay solicitudes",
-                            "sInfoEmpty": "No hay solicitudes",
-                            "sInfo": 'Mostrando _END_ de _TOTAL_'
-                        }
-                    }
-                );
-                l.stop();
-            })
-            .fail(function () {
-                alert("error");
-            })
+        var date_start = $('#date_start');
+        var date_end = $('#date_end');
+        var validate = 0;
+        if (!date_start.val() && date_end.val()) {
+            validate = 1;
+            date_start.parent().addClass('has-error');
+            date_start.attr('placeholder', 'Ingrese Fecha');
+            date_start.addClass('input-placeholder-error');
 
+        }
+        if (!date_end.val() && date_start.val()) {
+            validate = 1;
+            date_end.parent().addClass('has-error');
+            date_end.attr('placeholder', 'Ingrese Fecha');
+            date_end.addClass('input-placeholder-error');
+        }
+        if (validate == 0) {
+
+            date_start.parent().removeClass('has-error');
+            date_start.attr('placeholder', '');
+            date_end.parent().removeClass('has-error');
+            date_end.attr('placeholder', '');
+            var l = Ladda.create(this);
+            l.start();
+            var jqxhr = $.post(server + "buscar-solicitudes", { idstate: $('#idstate').val(), date_start: $('#date_start').val(), date_end: $('#date_end').val() })
+                .done(function (data) {
+                    $('#table_solicitude_wrapper').remove();
+                    $('.table-solicituds').append(data);
+                    $('#table_solicitude').dataTable({
+                            "order": [
+                                [ 3, "desc" ]
+                            ],
+                            "bLengthChange": false,
+                            'iDisplayLength': 7,
+                            "oLanguage": {
+                                "sSearch": "Buscar: ",
+                                "sZeroRecords": "No hay solicitudes",
+                                "sInfoEmpty": "No hay solicitudes",
+                                "sInfo": 'Mostrando _END_ de _TOTAL_'
+                            }
+                        }
+                    );
+                    l.stop();
+                })
+                .fail(function () {
+                    alert("error");
+                })
+
+        }
     });
 
 
@@ -490,6 +453,9 @@ function newSolicitude() {
                         $('#table_solicitude_wrapper').remove();
                         $('.table-solicituds').append(data);
                         $('#table_solicitude').dataTable({
+                                "order": [
+                                    [ 3, "desc" ]
+                                ],
                                 "bLengthChange": false,
                                 'iDisplayLength': 7,
                                 "oLanguage": {
@@ -520,6 +486,10 @@ function newSolicitude() {
     }).done(function (data) {
         $('.table-solicituds-sup').append(data);
         $('#table_solicitude_sup').dataTable({
+                "order": [
+                    [ 3, "desc" ]
+                ],
+
                 "bLengthChange": false,
                 'iDisplayLength': 7,
                 "oLanguage": {
@@ -531,37 +501,6 @@ function newSolicitude() {
             }
         );
     });
-
-    /* change state solicitude supervisor */
-    /*
-     $('#select_state_solicitude_sup').on('change', function () {
-     var idstate = $(this).val();
-     $('#table_solicitude_sup_wrapper').remove();
-     setTimeout(function () {
-
-     $.ajax({
-     url: server + 'listar-solicitudes-sup/' + idstate,
-     type: 'GET',
-     dataType: 'html'
-
-     }).done(function (data) {
-     $('.table-solicituds-sup').append(data);
-     $('#table_solicitude_sup').dataTable({
-     "bLengthChange": false,
-     'iDisplayLength': 5,
-     "oLanguage": {
-     "sSearch": "Buscar: ",
-     "sZeroRecords": "No hay solicitudes",
-     "sInfoEmpty": "No hay solicitudes",
-     "sInfo": 'Mostrando _END_ de _TOTAL_'
-     }
-     }
-     );
-     });
-     }, 200)
-
-     });*/
-
 
     var amount_families = $('.amount_families');
     amount_families.numeric({negative: false});
@@ -583,6 +522,7 @@ function newSolicitude() {
     amount_families.on('focus', function () {
         amount_error_families.text('');
     });
+
     /* solicitude accepted */
     var form_acepted_solicitude = $('#form_make_activity');
     $('.accepted_solicitude_sup').on('click', function (e) {
@@ -608,11 +548,11 @@ function newSolicitude() {
                         opacity: .5,
                         color: '#fff'
                     }, message: '<h2><img style="margin-right: 30px" src="' + server + 'img/spiffygif.gif" >' + message + '</h2>'});
-                    setTimeout(function(){
+                    setTimeout(function () {
 
                         form_acepted_solicitude.attr('action', server + 'aceptar-solicitud');
                         form_acepted_solicitude.submit();
-                    },1200);
+                    }, 1200);
 
                 }
             });
@@ -647,26 +587,26 @@ function newSolicitude() {
     search_solicitude_sup.on('click', function () {
         var date_start = $('#date_start');
         var date_end = $('#date_end');
-        var validate = 0 ;
-        if(!date_start.val() && date_end.val()){
+        var validate = 0;
+        if (!date_start.val() && date_end.val()) {
             validate = 1;
             date_start.parent().addClass('has-error');
             date_start.attr('placeholder', 'Ingrese Fecha');
             date_start.addClass('input-placeholder-error');
 
         }
-        if (!date_end.val() && date_start.val()){
+        if (!date_end.val() && date_start.val()) {
             validate = 1;
             date_end.parent().addClass('has-error');
             date_end.attr('placeholder', 'Ingrese Fecha');
             date_end.addClass('input-placeholder-error');
         }
-        if (validate == 0){
+        if (validate == 0) {
 
             date_start.parent().removeClass('has-error');
-            date_start.attr('placeholder','');
+            date_start.attr('placeholder', '');
             date_end.parent().removeClass('has-error');
-            date_end.attr('placeholder','');
+            date_end.attr('placeholder', '');
 
             var l = Ladda.create(this);
             var idstate = $('#select_state_solicitude_sup').val();
@@ -677,6 +617,9 @@ function newSolicitude() {
                     $('#table_solicitude_sup_wrapper').remove();
                     $('.table-solicituds-sup').append(data);
                     $('#table_solicitude_sup').dataTable({
+                            "order": [
+                                [ 3, "desc" ]
+                            ],
                             "bLengthChange": false,
                             'iDisplayLength': 7,
                             "oLanguage": {
@@ -699,9 +642,9 @@ function newSolicitude() {
 
     $("#date_start").datepicker({
         language: 'es',
+        endDate: new Date(),
         format: 'dd/mm/yyyy'
     });
-
 
     $("#date_end").datepicker({
         //startDate: new Date($.datepicker.formatDate('dd, mm, yy', new Date($('#date_start').val()))),
@@ -710,7 +653,7 @@ function newSolicitude() {
         format: 'dd/mm/yyyy'
     });
 
-   $('.btn-file :file').on('fileselect', function (event, numFiles, label) {
+    $('.btn-file :file').on('fileselect', function (event, numFiles, label) {
 
         $('#input-file-factura').val(label);
     });
@@ -719,9 +662,9 @@ function newSolicitude() {
 
         var file = e.target.files[0],
             imageType = /image.*/;
-        if (!file.type.match(imageType)){
+        if (!file.type.match(imageType)) {
             alert('ingrese solo imagenes');
-        }else{
+        } else {
             var input = $(this),
                 numFiles = input.get(0).files ? input.get(0).files.length : 1,
                 label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
@@ -742,6 +685,9 @@ function newSolicitude() {
     }).done(function (data) {
         $('.table-solicituds-gercom').append(data);
         $('#table_solicitude_gercom').dataTable({
+                "order": [
+                    [ 3, "desc" ]
+                ],
                 "bLengthChange": false,
                 'iDisplayLength': 7,
                 "oLanguage": {
@@ -767,6 +713,9 @@ function newSolicitude() {
             }).done(function (data) {
                 $('.table-solicituds-gercom').append(data);
                 $('#table_solicitude_gercom').dataTable({
+                        "order": [
+                            [ 3, "desc" ]
+                        ],
                         "bLengthChange": false,
                         'iDisplayLength': 7,
                         "oLanguage": {
@@ -782,19 +731,19 @@ function newSolicitude() {
     })
 
 
-    /* previsualizar imagen */
-    $('#input-file-factura').change(function(e) {
+    /* preview image */
+    $('#input-file-factura').change(function (e) {
 
         addImage(e);
     });
 
-    function addImage(e){
+    function addImage(e) {
         var file = e.target.files[0],
             imageType = /image.*/;
 
-        if (!file.type.match(imageType)){
+        if (!file.type.match(imageType)) {
             alert('ingrese solo imagenes');
-        }else{
+        } else {
             var reader = new FileReader();
             reader.onload = fileOnload;
             reader.readAsDataURL(file);
@@ -803,8 +752,9 @@ function newSolicitude() {
     }
 
     function fileOnload(e) {
-        var result=e.target.result;
-        $('#imgSalida').attr("src",result);
+        var result = e.target.result;
+        $('#imgSalida').attr("src", result);
     }
 
+    /* end preview image */
 }

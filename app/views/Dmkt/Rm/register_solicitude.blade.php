@@ -76,7 +76,7 @@
 
     <div class="col-sm-12 col-md-12">
         <input id="amountfac" name="amount" type="text" placeholder=""
-               value="{{isset($solicitude->monto) ? $solicitude->monto : null }}"
+               value="{{isset($solicitude->monto_factura) ? $solicitude->monto_factura : null }}"
                class="form-control input-md">
 
     </div>
@@ -119,7 +119,7 @@
 
         <label class="col-sm-8 col-md-8 control-label" for="textinput">Factura <small>(solo imagenes)</small></label>
 
-        <div class="col-sm-12 col-md-6">
+        <div class="col-sm-12 col-md-6" style="padding-right: 30px">
 
                 <div class="input-group">
                     <span class="input-group-btn">
@@ -246,7 +246,7 @@
             </div>
             <div class="modal-footer">
 
-                <div class="solicitude_factura form-group col-sm-6 col-md-10">
+                <div class="solicitude_factura form-group col-sm-6 col-md-10" style="padding-right: 30px">
                     <label class="col-sm-8 col-md-2 control-label" for="textinput">Factura <small>(solo imagenes)</small></label>
 
                     <div class="col-sm-12 col-md-10">
