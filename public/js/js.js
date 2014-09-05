@@ -1,6 +1,5 @@
 var server = "http://localhost/BitBucket/bago_dmkt_rg/public/";
 //Funciones
-
 function loadingUI(message){
     $.blockUI({ css: {
         border: 'none',
@@ -28,6 +27,7 @@ function responseUI(message,color){
         $.unblockUI();
     },500);
 }
+
 $(function(){
     //Vars
     var idsolicitude   = parseInt($("#idsolicitude").val(),10);
@@ -51,15 +51,15 @@ $(function(){
     var tot_items = 0;
     var row_expense;
     var tot_expense = 0;
-    var row_expenses = $(".total").parent();
+    var row_expenses;
     var tot_expenses = 0;
-    var quantity          = $(".quantity input");
-    var description       = $(".description input");
-    var total_item        = $(".total-item input");
-    var row_item_first    = $("#table-items tbody tr:eq(0)").clone();
-    var row_expense_first = $("#table-expense tbody tr:eq(0)").clone();
-    var data              = {};
-    var data_response     = {};
+    var quantity;
+    var description;
+    var total_item;
+    var row_item_first = $("#table-items tbody tr:eq(0)").clone();
+    var row_expense_first;
+    var data          = {};
+    var data_response = {};
    
     //Submit Event
     $(document).on("click","#token-a",function(e){
@@ -153,7 +153,7 @@ $(function(){
                     $.post(server + 'delete-expense', {data: JSON.stringify(data)})
                     .done(function (data) {
                         row_expense.remove();
-                        tot_expenses = calculateTot(row_expenses,'.total_expense');
+                        tot_expenses = calculateTot($(".total").parent(),'.total_expense');
                         balance = parseFloat(deposit - tot_expenses);
                         balance = balance.toFixed(2);
                         $("#balance").val(balance);
@@ -327,16 +327,21 @@ $(function(){
 
                 var error_json = 0;
                 //Datos del detalle gastos por items
+                quantity = $(".quantity input");
+                total_item = $(".total-item input");
                 var data_quantity    = validateEmpty(quantity);
-                var data_description = validateEmpty(description);
                 var data_total_item  = validateEmpty(total_item);
                 var arr_type_expense = [];
+                var arr_description = [];
                 $.each($(".type-expense"),function(index){
                     arr_type_expense[index] = $(this).val();
                 });
+                $.each($(".description input"),function(index){
+                    arr_description[index] = $(this).val();
+                });
 
                 (data_quantity.length>0) ? data.quantity = data_quantity : error_json = 1;
-                (data_description.length>0) ? data.description = data_description : error_json = 1;
+                data.description = arr_description;
                 (data_total_item.length>0) ? data.total_item = data_total_item : error_json = 1;
                 data.type_expense = arr_type_expense;
 
