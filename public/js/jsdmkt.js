@@ -488,6 +488,7 @@ function newSolicitude() {
     var amount_families = $('.amount_families');
     amount_families.numeric({negative: false});
     /* validate amount families no more than amount total*/
+
     amount_families.keyup(function (e) {
 
         if (parseInt($(this).val()) > parseInt($('#idamount').val())) {

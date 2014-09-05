@@ -136,7 +136,7 @@
             </div>
 
             @endif
-
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding: 0">
             <div class="form-group col-sm-12 col-md-6 col-lg-6">
 
                 <div style="padding-left: 15px">
@@ -172,8 +172,6 @@
                     </div>
                 </div>
             </div>
-
-
             <div class="form-group col-sm-12 col-md-6 col-lg-6">
 
                 <div style="padding:0 15px" >
@@ -198,6 +196,7 @@
                         </div>
                     </div>
                 </div>
+            </div>
             </div>
             <div class="col-sm-12 col-md-12 col-lg-12" style="margin-top: 10px">
                 <div class="form-group col-sm-12 col-md-12 col-lg-12">

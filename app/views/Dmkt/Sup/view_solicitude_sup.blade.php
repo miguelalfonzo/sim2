@@ -58,6 +58,7 @@
 
     </div>
 </div>
+@if(isset($solicitude->monto_factura))
 <div class="form-group col-sm-6 col-md-4 col-lg-4">
 
     <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Monto Factura</label>
@@ -69,7 +70,7 @@
 
     </div>
 </div>
-
+@endif
 
 <div class="form-group col-sm-6 col-md-4 col-lg-4">
     <label class="col-sm-8 col-md-8 control-label" for="selectbasic">Fondo</label>
@@ -160,6 +161,7 @@
     </div>
 </div>
 @endif
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 <div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6" >
 
     <div style="padding: 0 15px">
@@ -233,7 +235,7 @@
         </div>
     </div>
 </div>
-
+</div>
 <div class="col-sm-12 col-md-12 col-lg-12" style="margin-top: 10px">
     <div class="form-group col-sm-12 col-md-12 col-lg-12">
         <label class="col-sm-8 col-md-8 control-label" for="textarea">Descripcion de la
