@@ -148,7 +148,7 @@ class ExpenseController extends BaseController{
 		$expense = Input::get('data');
 		$expenseJson = json_decode($expense);
 
-		$idExpense = Expense::where('ruc',$expenseJson->ruc)->where('num_comprobante',$expenseJson->number_voucher)->firstOrFail();
+		$idExpense = Expense::where('ruc',$expenseJson->ruc)->where('num_comprobante',$expenseJson->voucher_number)->firstOrFail();
 
 		$data = ExpenseItem::where('idgasto','=',intval($idExpense->idgasto))->get();
 
