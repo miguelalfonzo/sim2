@@ -1,5 +1,33 @@
 var server = "http://localhost/BitBucket/bago_dmkt_rg/public/";
+//Funciones
 
+function loadingUI(message){
+    $.blockUI({ css: {
+        border: 'none',
+        padding: '15px',
+        backgroundColor: '#000',
+        '-webkit-border-radius': '10px',
+        '-moz-border-radius': '10px',
+        opacity: 0.5,
+        color: '#fff'
+    }, message: '<h2><img style="margin-right: 30px" src="' + server + 'img/spiffygif.gif" >' + message + '</h2>'});
+}
+
+function responseUI(message,color){
+    $.unblockUI();
+    $.blockUI({ css: {
+        border: 'none',
+        padding: '15px',
+        backgroundColor: color,
+        '-webkit-border-radius': '10px',
+        '-moz-border-radius': '10px',
+        opacity: 0.5,
+        color: '#fff'
+    }, message: '<h2><img style="margin-right: 30px" src="' + server + 'img/spiffygif.gif" >' + message + '</h2>'});
+    setTimeout(function(){
+        $.unblockUI();
+    },500);
+}
 $(function(){
     //Vars
     var idsolicitude   = parseInt($("#idsolicitude").val(),10);
@@ -655,35 +683,7 @@ $(function(){
             $(this).attr("placeholder",'');
         });
 
-    //Funciones
-         
-        function loadingUI(message){
-            $.blockUI({ css: {
-                border: 'none',
-                padding: '15px',
-                backgroundColor: '#000',
-                '-webkit-border-radius': '10px',
-                '-moz-border-radius': '10px',
-                opacity: 0.5,
-                color: '#fff'
-            }, message: '<h2><img style="margin-right: 30px" src="' + server + 'img/spiffygif.gif" >' + message + '</h2>'});
-        }
 
-        function responseUI(message,color){
-            $.unblockUI();
-            $.blockUI({ css: {
-                border: 'none',
-                padding: '15px',
-                backgroundColor: color,
-                '-webkit-border-radius': '10px',
-                '-moz-border-radius': '10px',
-                opacity: 0.5,
-                color: '#fff'
-            }, message: '<h2><img style="margin-right: 30px" src="' + server + 'img/spiffygif.gif" >' + message + '</h2>'});
-            setTimeout(function(){
-                $.unblockUI();
-            },500);
-        }    
 
         //Grabado de datos en el controlador de Gastos
         function ajaxExpense(jsonExpense)
