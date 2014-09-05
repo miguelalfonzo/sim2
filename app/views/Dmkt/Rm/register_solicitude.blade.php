@@ -75,7 +75,7 @@
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto Factura</label>
 
     <div class="col-sm-12 col-md-12">
-        <input id="amountfac" name="amount" type="text" placeholder=""
+        <input id="amountfac" name="amount_fac" type="text" placeholder=""
                value="{{isset($solicitude->monto_factura) ? $solicitude->monto_factura : null }}"
                class="form-control input-md">
 

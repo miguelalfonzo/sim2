@@ -119,6 +119,7 @@ class SolicitudeController extends BaseController
         $solicitude->titulo = $inputs['titulo'];
         $solicitude->monto = $inputs['monto'];
         $solicitude->estado = 2;
+        $solicitude->monto_factura = $inputs['amount_fac'];
         $solicitude->fecha_entrega = $date;
         $solicitude->idtiposolicitud = $inputs['type_solicitude'];
         $solicitude->token = sha1(md5(uniqid($solicitude->idsolicitud, true)));
@@ -262,7 +263,7 @@ class SolicitudeController extends BaseController
         $solicitude->monto = $inputs['monto'];
         $solicitude->estado = 2;
         $solicitude->fecha_entrega = $date;
-
+        $solicitude->monto_factura = $inputs['amount_fac'];
         $solicitude->idsubtipoactividad = $inputs['sub_type_activity'];
         $solicitude->tipo_moneda = $inputs['money'];
         $data = $this->objectToArray($solicitude);

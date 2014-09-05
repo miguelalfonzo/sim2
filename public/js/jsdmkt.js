@@ -315,38 +315,21 @@ function newSolicitude() {
                     contentType: false,
                     processData: false,
                     beforeSend: function () {
-                        $.blockUI({ css: {
-                            border: 'none',
-                            padding: '15px',
-                            backgroundColor: '#000',
-                            '-webkit-border-radius': '10px',
-                            '-moz-border-radius': '10px',
-                            opacity: .5,
-                            color: '#fff'
-                        }, message: '<h2><img style="margin-right: 30px" src="' + server + 'img/spiffygif.gif" >' + message1 + '</h2>'});
+                        loadingUI(message1);
                     }
 
                 }).done(function (data) {
 
-                    $.unblockUI();
+                   // $.unblockUI();
 
                     if (data == true) {
 
-                        $.blockUI({ css: {
-                            border: 'none',
-                            padding: '15px',
-                            backgroundColor: '#28DA60',
-                            '-webkit-border-radius': '10px',
-                            '-moz-border-radius': '10px',
-                            opacity: .7,
-                            color: '#fff'
-                        }, message: '<h2>' + message2 + '</h2>' });
-
+                        responseUI(message2, 'green');
                         setTimeout(
                             function () {
                                 window.location.href = server + 'show_rm'
                             }
-                            , 2000);
+                            , 200);
 
                     }
 
@@ -539,15 +522,7 @@ function newSolicitude() {
             bootbox.confirm("¿Esta seguro de aceptar esta solicitud?", function (result) {
                 if (result) {
                     var message = 'Validando Solicitud..';
-                    $.blockUI({ css: {
-                        border: 'none',
-                        padding: '15px',
-                        backgroundColor: '#000',
-                        '-webkit-border-radius': '10px',
-                        '-moz-border-radius': '10px',
-                        opacity: .5,
-                        color: '#fff'
-                    }, message: '<h2><img style="margin-right: 30px" src="' + server + 'img/spiffygif.gif" >' + message + '</h2>'});
+                    loadingUI(message);
                     setTimeout(function () {
 
                         form_acepted_solicitude.attr('action', server + 'aceptar-solicitud');
