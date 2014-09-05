@@ -330,8 +330,7 @@ $(function(){
                     tot_expense = parseFloat($("#total-expense").val());
                     data.total_expense = tot_expense;
 
-                    tot_expenses = calculateTot(row_expenses,'.total_expense');
-                    console.log(tot_expenses);
+                    tot_expenses = calculateTot($(".total").parent(),'.total_expense');
                     if(tot_expenses >0)
                     {
                         validateRuc(ruc);
