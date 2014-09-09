@@ -33,6 +33,7 @@ App::after(function($request, $response)
 |
 */
 
+
 Route::filter('auth', function()
 {
 	if (Auth::guest())
@@ -46,6 +47,32 @@ Route::filter('auth', function()
 			return Redirect::guest('login');
 		}
 	}
+});
+
+Route::filter('rm', function()
+{
+    if (Auth::check())
+    {
+        if(Auth::user()->type != 'R')
+        return Redirect::to('show_sup');
+
+    }else{
+
+        return Redirect::to('login');
+    }
+});
+
+Route::filter('sup', function()
+{
+    if (Auth::check())
+    {
+        if(Auth::user()->type != 'S')
+            return Redirect::to('show_rm');
+
+    }else{
+
+        return Redirect::to('login');
+    }
 });
 
 

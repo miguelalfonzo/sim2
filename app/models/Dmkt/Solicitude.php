@@ -59,4 +59,5 @@ class Solicitude extends Eloquent{
     function user(){
         return $this->belongsTo('User','iduser');
     }
+
 }

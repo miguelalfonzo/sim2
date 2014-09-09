@@ -26,35 +26,62 @@ Route::get('/', function()
 	return View::make('hello');
 });
 
-/** Rep. Medico */
-Route::get('show_rm','Dmkt\SolicitudeController@show_rm');
-Route::get('nueva-solicitud','Dmkt\SolicitudeController@newSolicitude');
+/** Auth */
+
+Route::group(array('before' => 'rm'), function()
+{
+    /** Rep. Medico */
+
+
+        Route::get('show_rm','Dmkt\SolicitudeController@show_rm');
+        Route::get('nueva-solicitud','Dmkt\SolicitudeController@newSolicitude');
+
+        Route::get('ver-solicitud/{token}','Dmkt\SolicitudeController@viewSolicitude');
+        Route::get('editar-solicitud/{id}','Dmkt\SolicitudeController@editSolicitude');
+        Route::post('editar-solicitud','Dmkt\SolicitudeController@formEditSolicitude');
+        Route::get('getclients','Dmkt\SolicitudeController@getClients');
+        Route::post('registrar-solicitud','Dmkt\SolicitudeController@registerSolicitude');
+        Route::get('listar-solicitudes/{id}','Dmkt\SolicitudeController@listSolicitude');
+        Route::get('getsubtypeactivities/{id}','Dmkt\SolicitudeController@subtypeactivity');
+        Route::post('buscar-solicitudes','Dmkt\SolicitudeController@searchSolicituds');
+        Route::post('cancelar-solicitud-rm','Dmkt\SolicitudeController@cancelSolicitude');
+
+
+});
+
+Route::group(array('before' => 'sup'), function()
+{
+    /** Supervisor */
+
+    Route::get('show_sup','Dmkt\SolicitudeController@show_sup');
+    Route::get('ver-solicitud-sup/{id}','Dmkt\SolicitudeController@viewSolicitudeSup');
+    Route::get('listar-solicitudes-sup/{id}','Dmkt\SolicitudeController@listSolicitudeSup');
+    Route::post('rechazar-solicitud','Dmkt\SolicitudeController@denySolicitude');
+    Route::post('aceptar-solicitud','Dmkt\SolicitudeController@acceptedSolicitude');
+    Route::post('buscar-solicitudes-sup','Dmkt\SolicitudeController@searchSolicitudsSup');
+    Route::get('derivar-solicitud/{token}','Dmkt\SolicitudeController@derivedSolicitude');
+
+});
+
+/*------------------ Test --------------**/
 Route::get('prueba','Dmkt\SolicitudeController@test');
-Route::get('ver-solicitud/{token}','Dmkt\SolicitudeController@viewSolicitude');
-Route::get('editar-solicitud/{id}','Dmkt\SolicitudeController@editSolicitude');
-Route::post('editar-solicitud','Dmkt\SolicitudeController@formEditSolicitude');
-Route::get('getclients','Dmkt\SolicitudeController@getClients');
-Route::post('registrar-solicitud','Dmkt\SolicitudeController@registerSolicitude');
-Route::get('listar-solicitudes/{id}','Dmkt\SolicitudeController@listSolicitude');
-Route::get('getsubtypeactivities/{id}','Dmkt\SolicitudeController@subtypeactivity');
-Route::get('nueva-actividad','Dmkt\ActivityController@newActivity');
-Route::post('buscar-solicitudes','Dmkt\SolicitudeController@searchSolicituds');
-Route::post('cancelar-solicitud-rm','Dmkt\SolicitudeController@cancelSolicitude');
-/*activities*/
-Route::get('listar-actividades-rm/{id}','Dmkt\ActivityController@listActivitiesRM');
-Route::get('listar-actividades-sup/{id}','Dmkt\ActivityController@listActivitiesSup');
-Route::get('test2','Dmkt\SolicitudeController@test');
+
+/*
+|-------------------------------------------------------------------------------------------- |
+	                            | Gerente de Producto |
+|-------------------------------------------------------------------------------------------- |
+*/
+Route::get('show_gerprod','Dmkt\SolicitudeController@show_gerprod');
+Route::get('listar-solicitudes-gerprod/{id}','Dmkt\SolicitudeController@listSolicitudeGerProd');
+Route::get('ver-solicitud-gerprod/{id}','Dmkt\SolicitudeController@viewSolicitudeGerProd');
+Route::get('aprobar-solicitud/{token}','Dmkt\SolicitudeController@approvedSolicitude');
 
 
-/** Supervisor */
-Route::get('show_sup','Dmkt\SolicitudeController@show_sup');
-Route::get('ver-solicitud-sup/{id}','Dmkt\SolicitudeController@viewSolicitudeSup');
-Route::get('listar-solicitudes-sup/{id}','Dmkt\SolicitudeController@listSolicitudeSup');
-Route::post('rechazar-solicitud','Dmkt\SolicitudeController@denySolicitude');
-Route::post('aceptar-solicitud','Dmkt\SolicitudeController@acceptedSolicitude');
-Route::post('buscar-solicitudes-sup','Dmkt\SolicitudeController@searchSolicitudsSup');
-
-/** Gerente Comercial */
+/*
+|-------------------------------------------------------------------------------------------- |
+	                            | Gerente Comercial |
+|-------------------------------------------------------------------------------------------- |
+*/
 Route::get('show_gercom','Dmkt\SolicitudeController@show_gercom');
 Route::get('listar-solicitudes-gercom/{id}','Dmkt\SolicitudeController@listSolicitudeGerCom');
 Route::get('ver-solicitud-gercom/{id}','Dmkt\SolicitudeController@viewSolicitudeGerCom');

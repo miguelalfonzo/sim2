@@ -282,7 +282,7 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
                         class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="myModalLabel">Escoja Gerente</h4>
+                <h4 class="modal-title" id="myModalLabel">La solicitud será derivado a :</h4>
             </div>
             <div class="modal-body">
                 <form class="form-horizontal">
@@ -296,11 +296,11 @@
                             <label class="col-md-4 col-lg-4 control-label" for="selectbasic"></label>
 
                             <div class="col-md-5 col-lg-5">
-                                <select id="selectbasic" name="selectbasic" class="form-control">
-                                    @foreach($managers as $manager)
-                                    <option value="{{$manager->id}}"> {{ $manager->descripcion }}</option>
+                               <ul>
+                                    @foreach($solicitude->families as $v)
+                                    <li>{{ $v->marca->manager->descripcion }}</li>
                                     @endforeach
-                                </select>
+                                </ul>
                             </div>
                         </div>
 
@@ -310,7 +310,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary">Derivar</button>
+                <a href="{{URL::to('derivar-solicitud').'/'.$solicitude->token}}" type="button" class="btn btn-primary">Derivar</a>
             </div>
         </div>
     </div>

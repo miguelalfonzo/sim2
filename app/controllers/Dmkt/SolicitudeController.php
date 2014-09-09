@@ -53,7 +53,7 @@ class SolicitudeController extends BaseController
 
     public function test()
     {
-
+        /*
         $today = getdate();
         $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
         $lastday = date('t-m-Y', strtotime($m));
@@ -79,8 +79,12 @@ class SolicitudeController extends BaseController
             }
             //echo json_encode($solicituds);
 
-        }
+        }*/
 
+        $solicitude = Solicitude::find(9);
+
+        foreach($solicitude->families as $v)
+            echo json_encode($v->marca->manager->id);
     }
 
 
@@ -475,6 +479,20 @@ class SolicitudeController extends BaseController
         return Redirect::to('show_sup');
 
     }
+    public function derivedSolicitude($token){
+
+        $solicitude = Solicitude::where('token', $token)->firstOrFail();
+        $id = $solicitude->idsolicitud;
+        $sol = Solicitude::find($id);
+        foreach($sol->families as $v){
+            $solGer = new SolicitudeGer;
+            $solGer->idsolicitud_gerente = $solGer->searchId()+1;
+            $solGer->idsolicitud = $id;
+            $solGer->idgerprod = $v->marca->manager->id;
+            $solGer->save();
+        }
+        return Redirect::to('show_sup');
+    }
 
     public function listSolicitudeSup($id)
     {
@@ -559,7 +577,33 @@ class SolicitudeController extends BaseController
         }
     }
 
-    /** Gerente Comercial */
+    /** --------------------------------------------- Gerente de  Producto ----------------------------------------------- */
+
+    public function show_gerprod()
+    {
+
+        $states = State::orderBy('idestado', 'ASC')->get();
+        return View::make('Dmkt.GerProd.show_gerprod')->with('states', $states);
+    }
+
+
+    public function listSolicitudeGerPro($id)
+    {
+
+        if ($id == 0) {
+            $solicituds = Solicitude::all();
+        } else {
+            $solicituds = Solicitude::where('estado', '=', $id)->get();
+        }
+
+        $view = View::make('Dmkt.GerProd.view_solicituds_gerprod')->with('solicituds', $solicituds);
+        return $view;
+    }
+
+
+
+
+    /** ---------------------------------------------  Gerente Comercial  -------------------------------------------------*/
 
     public function show_gercom()
     {
