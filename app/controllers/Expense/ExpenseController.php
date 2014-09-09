@@ -74,7 +74,7 @@ class ExpenseController extends BaseController{
 
 		if(count($row_expense)>0)
 		{
-			return 0;
+			return -1;
 		}
 		else
 		{
@@ -161,67 +161,84 @@ class ExpenseController extends BaseController{
 		$expense = Input::get('data');
 		$expenseJson = json_decode($expense);
 
-		$idgasto = intval($expenseJson->idgasto);
-		$expenseEdit = Expense::where('idgasto',$idgasto);
-		$expenseEdit->num_comprobante = $expenseJson->voucher_number;
-		$expenseEdit->ruc = $expenseJson->ruc;
-		$expenseEdit->razon = $expenseJson->razon;
-		$expenseEdit->monto = $expenseJson->total_expense;
-		if($expenseJson->proof_type == '2')
-		{
-			$expenseEdit->igv = $expenseJson->igv;
-			$expenseEdit->imp_serv = $expenseJson->imp_service;
-			$expenseEdit->sub_tot = $expenseJson->sub_total_expense;
-		}
-		else
-		{
-			$expenseEdit->igv = null;
-			$expenseEdit->imp_serv = null;
-			$expenseEdit->sub_tot = null;	
-		}
-		$expenseEdit->tipo_comprobante = $expenseJson->proof_type;
-		$date = $expenseJson->date_movement;
-        list($d, $m, $y) = explode('/', $date);
-        $d = mktime(11, 14, 54, $m, $d, $y);
-        $date = date("Y/m/d", $d);
-        $expenseEdit->fecha_movimiento = $date;
-        
-        $data = $this->objectToArray($expenseEdit);
+		$expenseUpdate = Expense::where('ruc',$expenseJson->ruc)->where('num_comprobante',$expenseJson->voucher_number)->get();
 
-        //Detail Expense
-		$quantity = $expenseJson->quantity;
-		$description = $expenseJson->description;
-		$type_expense = $expenseJson->type_expense;
-		$total_item = $expenseJson->total_item;
-
-		if($expenseEdit->update($data))
+		if(count($expenseUpdate)>0)
 		{
-			$expense_detail_edit = ExpenseItem::where('idgasto',$idgasto)->delete();
-			try {
-				DB::transaction (function() use ($idgasto,$quantity,$description,$type_expense,$total_item){
-					for($i=0;$i<count($quantity);$i++)
-					{
-						$expense_detail = new ExpenseItem;
-						$expense_detail->idgasto = $idgasto;
-						$expense_detail->cantidad = $quantity[$i];
-						$expense_detail->descripcion = $description[$i];
-						$expense_detail->tipo_gasto = $type_expense[$i];
-						$expense_detail->importe = $total_item[$i];
-						$expense_detail->save();	
-					}
-				});
-			} catch (Exception $e) {
-				return 1;
+			foreach ($expenseUpdate as $key => $value) {
+				$idgasto = $value->idgasto;
 			}
-			return $idgasto;
+			$expenseEdit = Expense::where('idgasto',$idgasto);
+			$expenseEdit->num_comprobante = $expenseJson->voucher_number;
+			$expenseEdit->ruc = $expenseJson->ruc;
+			$expenseEdit->razon = $expenseJson->razon;
+			$expenseEdit->monto = $expenseJson->total_expense;
+			if($expenseJson->proof_type == '2')
+			{
+				$expenseEdit->igv = $expenseJson->igv;
+				$expenseEdit->imp_serv = $expenseJson->imp_service;
+				$expenseEdit->sub_tot = $expenseJson->sub_total_expense;
+			}
+			else
+			{
+				$expenseEdit->igv = null;
+				$expenseEdit->imp_serv = null;
+				$expenseEdit->sub_tot = null;	
+			}
+			$expenseEdit->tipo_comprobante = $expenseJson->proof_type;
+			$date = $expenseJson->date_movement;
+	        list($d, $m, $y) = explode('/', $date);
+	        $d = mktime(11, 14, 54, $m, $d, $y);
+	        $date = date("Y/m/d", $d);
+	        $expenseEdit->fecha_movimiento = $date;
+	        $data = $this->objectToArray($expenseEdit);
+
+	        //Detail Expense
+			$quantity = $expenseJson->quantity;
+			$description = $expenseJson->description;
+			$type_expense = $expenseJson->type_expense;
+			$total_item = $expenseJson->total_item;
+
+			if($expenseEdit->update($data))
+			{
+				$expense_detail_edit = ExpenseItem::where('idgasto',$idgasto)->delete();
+				try {
+					DB::transaction (function() use ($idgasto,$quantity,$description,$type_expense,$total_item){
+						for($i=0;$i<count($quantity);$i++)
+						{
+							$expense_detail = new ExpenseItem;
+							$expense_detail->idgasto = $idgasto;
+							$expense_detail->cantidad = $quantity[$i];
+							$expense_detail->descripcion = $description[$i];
+							$expense_detail->tipo_gasto = $type_expense[$i];
+							$expense_detail->importe = $total_item[$i];
+							$expense_detail->save();	
+						}
+					});
+				} catch (Exception $e) {
+					return 0;
+				}
+				return $idgasto;
+			}
 		}
 	}
 
 	public function test(){
  		
- 		$expense = Expense::get();
- 		var_dump($expense);
- 		echo json_decode($expense);
+ 		$expenseUpdate = Expense::where('ruc',"20422488198")->where('num_comprobante',"1-23")->get();
+
+		if(count($expenseUpdate)>0)
+		{
+			foreach ($expenseUpdate as $key => $value) {
+				var_dump($value->idgasto);
+			}
+			// json_encode($expenseUpdate->idgasto);
+			// var_dump("OK ".$expenseUpdate->idgasto);
+		}
+		else
+		{
+			var_dump("ERROR");
+		}
 
 	}
 
