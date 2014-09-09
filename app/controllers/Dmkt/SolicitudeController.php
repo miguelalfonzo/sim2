@@ -20,6 +20,9 @@ use \Input;
 use \Redirect;
 use \Mail;
 use \Image;
+use \Hash;
+use \User;
+use \Auth;
 use \Illuminate\Database\Query\Builder;
 
 class SolicitudeController extends BaseController
@@ -51,18 +54,41 @@ class SolicitudeController extends BaseController
     public function test()
     {
 
-        $solicitude = Solicitude::find(1);
-        foreach($solicitude->families as $v){
-            echo json_encode($v->marca->manager->descripcion);
+        $today = getdate();
+        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
+        $lastday = date('t-m-Y', strtotime($m));
+        $firstday = date('01-m-Y', strtotime($m));
+
+        if (Auth::user()->type == 'R') {
+
+            $solicituds = Solicitude::where('iduser', Auth::user()->Rm->iduser)->get();
+            echo json_encode($solicituds);
+        } else {
+            $sup = Sup::find(Auth::user()->Sup->idsup);
+            $reps = Auth::user()->Sup->Reps;
+            $users_ids = [];
+            foreach ($reps as $rm)
+                $users_ids[] = $rm->iduser;
+            //echo json_encode($users_ids);die;
+
+            $solicituds = Solicitude::whereIn('iduser', $users_ids)
+                ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                ->get();
+            foreach($solicituds as $sol){
+                echo json_encode($sol->user->type);
+            }
+            //echo json_encode($solicituds);
+
         }
 
-
     }
+
 
     public function show_rm()
     {
 
-        $states = State::orderBy('idestado','ASC')->get();
+
+        $states = State::orderBy('idestado', 'ASC')->get();
 
         return View::make('Dmkt.Rm.show_rm')->with('states', $states);
 
@@ -111,7 +137,6 @@ class SolicitudeController extends BaseController
         }
 
 
-
         $date = $inputs['delivery_date'];
         list($d, $m, $y) = explode('/', $date);
         $d = mktime(11, 14, 54, $m, $d, $y);
@@ -121,6 +146,7 @@ class SolicitudeController extends BaseController
         $solicitude->titulo = $inputs['titulo'];
         $solicitude->monto = $inputs['monto'];
         $solicitude->estado = PENDIENTE;
+        $solicitude->iduser = Auth::user()->id;
         $solicitude->monto_factura = $inputs['amount_fac'];
         $solicitude->fecha_entrega = $date;
         $solicitude->idtiposolicitud = $inputs['type_solicitude'];
@@ -162,7 +188,11 @@ class SolicitudeController extends BaseController
                 $solicitude_families->idfamilia = $family;
                 $solicitude_families->save();
             }
-            echo true;
+            $typeUser = Auth::user()->type;
+            if($typeUser == 'R')
+            return 'R';
+            if($typeUser == 'S')
+            return 'S';
         }
 
     }
@@ -171,27 +201,31 @@ class SolicitudeController extends BaseController
     {
 
         $today = getdate();
-        $m = $today['mday'].'-'.$today['mon'].'-'.$today['year'];
+        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
         $lastday = date('t-m-Y', strtotime($m));
         $firstday = date('01-m-Y', strtotime($m));
-        if ($id == 0) {
 
-            $solicituds = Solicitude::select('*')
-                ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                ->get();
+        if (Auth::user()->type == 'R') {
 
-        } else {
-            $solicituds = Solicitude::select('*')
-                ->where('estado', $id)
-                ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                ->get();
 
+            if ($id == 0) {
+
+                $solicituds = Solicitude::where('iduser', Auth::user()->Rm->iduser)
+                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                    ->get();
+
+            } else {
+                $solicituds = Solicitude::where('iduser', Auth::user()->Rm->iduser)
+                    ->where('estado', $id)
+                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                    ->get();
+
+            }
+
+            $view = View::make('Dmkt.Rm.view_solicituds_rm')->with('solicituds', $solicituds);
+
+            return $view;
         }
-
-
-        $view = View::make('Dmkt.Rm.view_solicituds_rm')->with('solicituds', $solicituds);
-
-        return $view;
     }
 
     public function viewSolicitude($token)
@@ -245,13 +279,13 @@ class SolicitudeController extends BaseController
         $date = date("Y/m/d", $d);
         $id = $inputs['idsolicitude'];
         $sol = Solicitude::find($id);
-        $solicitude = Solicitude::where('idsolicitud',$id);
+        $solicitude = Solicitude::where('idsolicitud', $id);
         $image = Input::file('file');
 
         if (isset($image)) {
 
-             $path = public_path('img/reembolso/'.$sol->image);
-             @unlink($path);
+            $path = public_path('img/reembolso/' . $sol->image);
+            @unlink($path);
             $filename = uniqid() . '.' . $image->getClientOriginalExtension();
             //$filename = $image->getClientOriginalName();
             $path = public_path('img/reembolso/' . $filename);
@@ -295,7 +329,11 @@ class SolicitudeController extends BaseController
             $solicitude_families->save();
         }
 
-        echo true;
+        $typeUser = Auth::user()->type;
+         if($typeUser == 'R')
+            return 'R';
+         if($typeUser == 'S')
+            return 'S';
 
     }
 
@@ -329,41 +367,43 @@ class SolicitudeController extends BaseController
         $start = $inputs['date_start'];
         $end = $inputs['date_end'];
         $today = getdate();
-        $m = $today['mday'].'-'.$today['mon'].'-'.$today['year'];
+        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
         $lastday = date('t-m-Y', strtotime($m));
         $firstday = date('01-m-Y', strtotime($m));
-
-        if($start!=null && $end!=null){
-            if($estado !=0){
+        $idUser = Auth::user()->id;
+        if ($start != null && $end != null) {
+            if ($estado != 0) {
 
                 $solicituds = Solicitude::select('*')
                     ->where('estado', $estado)
+                    ->where('iduser',$idUser)
                     ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
                     ->get();
 
-            }else{
+            } else {
 
                 $solicituds = Solicitude::select('*')
+                    ->where('iduser',$idUser)
                     ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
                     ->get();
             }
 
-
-        }else{
-            if($estado!=0){
+        } else {
+            if ($estado != 0) {
 
                 $solicituds = Solicitude::select('*')
                     ->where('estado', $estado)
+                    ->where('iduser',$idUser)
                     ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
                     ->get();
-            }else{
+            } else {
 
                 $solicituds = Solicitude::select('*')
+                    ->where('iduser',$idUser)
                     ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
                     ->get();
             }
         }
-
 
 
         $view = View::make('Dmkt.Rm.view_solicituds_rm')->with('solicituds', $solicituds);
@@ -375,7 +415,7 @@ class SolicitudeController extends BaseController
     public function show_sup()
     {
 
-        $states = State::orderBy('idestado','ASC')->get();
+        $states = State::orderBy('idestado', 'ASC')->get();
         return View::make('Dmkt.Sup.show_sup')->with('states', $states);
 
     }
@@ -415,6 +455,7 @@ class SolicitudeController extends BaseController
         $idSol = $inputs['idsolicitude'];
         $solicitude = Solicitude::where('idsolicitud', $idSol);
         $solicitude->estado = ACEPTADO;
+        $solicitude->idaproved = Auth::user()->id;
         $solicitude->monto = $inputs['monto'];
         $solicitude->observacion = $inputs['observacion'];
         $data = $this->objectToArray($solicitude);
@@ -439,25 +480,34 @@ class SolicitudeController extends BaseController
     {
 
         $today = getdate();
-        $m = $today['mday'].'-'.$today['mon'].'-'.$today['year'];
+        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
         $lastday = date('t-m-Y', strtotime($m));
         $firstday = date('01-m-Y', strtotime($m));
 
-        if ($id == 0) {
+        if (Auth::user()->type == 'S') {
+            $reps = Auth::user()->Sup->Reps;
+            $users_ids = [];
+            foreach ($reps as $rm)
+                $users_ids[] = $rm->iduser;
+            $users_ids[] = Auth::user()->id;
+            if ($id == 0) {
 
-            $solicituds = Solicitude::select('*')
-                ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                ->get();
-        } else {
+                $solicituds = Solicitude::whereIn('iduser', $users_ids)
+                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                    ->get();
+            } else {
 
-            $solicituds = Solicitude::select('*')
-                ->where('estado', $id)
-                ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                ->get();
+                $solicituds = Solicitude::whereIn('iduser', $users_ids)
+                    ->where('estado', $id)
+                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                    ->get();
+            }
+
+
+            $view = View::make('Dmkt.Sup.view_solicituds_sup')->with('solicituds', $solicituds);
+            return $view;
         }
 
-        $view = View::make('Dmkt.Sup.view_solicituds_sup')->with('solicituds', $solicituds);
-        return $view;
     }
 
     public function searchSolicitudsSup()
@@ -468,39 +518,45 @@ class SolicitudeController extends BaseController
         $start = $inputs['date_start'];
         $end = $inputs['date_end'];
         $today = getdate();
-        $m = $today['mday'].'-'.$today['mon'].'-'.$today['year'];
+        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
         $lastday = date('t-m-Y', strtotime($m));
         $firstday = date('01-m-Y', strtotime($m));
 
-        if($start!=null && $end!=null){
-            if($estado !=0){
-                $solicituds = Solicitude::select('*')
-                    ->where('estado', $estado)
-                    ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
-                    ->get();
+        if (Auth::user()->type == 'S') {
+            $reps = Auth::user()->Sup->Reps;
+            $users_ids = [];
+            foreach ($reps as $rm)
+                $users_ids[] = $rm->iduser;
+            if ($start != null && $end != null) {
+                if ($estado != 0) {
+                    $solicituds = Solicitude::whereIn('iduser', $users_ids)
+                        ->where('estado', $estado)
+                        ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                        ->get();
 
-            }else{
-                $solicituds = Solicitude::select('*')
-                    ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
-                    ->get();
+                } else {
+                    $solicituds = Solicitude::whereIn('iduser', $users_ids)
+                        ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                        ->get();
+                }
+
+
+            } else {
+                if ($estado != 0) {
+                    $solicituds = Solicitude::whereIn('iduser', $users_ids)
+                        ->where('estado', $estado)
+                        ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                        ->get();
+                } else {
+                    $solicituds = Solicitude::whereIn('iduser', $users_ids)
+                        ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                        ->get();
+                }
             }
 
-
-        }else{
-            if($estado!=0){
-                $solicituds = Solicitude::select('*')
-                    ->where('estado', $estado)
-                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                    ->get();
-            }else{
-                $solicituds = Solicitude::select('*')
-                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                    ->get();
-            }
+            $view = View::make('Dmkt.Sup.view_solicituds_sup')->with('solicituds', $solicituds);
+            return $view;
         }
-
-        $view = View::make('Dmkt.Sup.view_solicituds_sup')->with('solicituds', $solicituds);
-        return $view;
     }
 
     /** Gerente Comercial */
@@ -508,7 +564,7 @@ class SolicitudeController extends BaseController
     public function show_gercom()
     {
 
-        $states = State::orderBy('idestado','ASC')->get();
+        $states = State::orderBy('idestado', 'ASC')->get();
         return View::make('Dmkt.GerCom.show_gercom')->with('states', $states);
     }
 

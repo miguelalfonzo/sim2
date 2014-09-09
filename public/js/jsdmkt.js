@@ -328,7 +328,7 @@ function newSolicitude() {
 
                    // $.unblockUI();
 
-                    if (data == true) {
+                    if (data == 'R') {
 
                         responseUI(message2, 'green');
                         setTimeout(
@@ -337,6 +337,14 @@ function newSolicitude() {
                             }
                             , 200);
 
+                    }
+                    if(data == 'S'){
+                        responseUI(message2, 'green');
+                        setTimeout(
+                            function () {
+                                window.location.href = server + 'show_sup'
+                            }
+                            , 200);
                     }
 
                 }).fail(function (e) {

@@ -11,6 +11,15 @@
 |
 */
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+
+/** Login */
+// route to show the login form
+Route::get('login', array('uses' => 'Dmkt\LoginController@showLogin'));
+
+// route to process the form
+Route::post('login', array('uses' => 'Dmkt\LoginController@doLogin'));
+Route::get('logout',array('uses' => 'Dmkt\LoginController@doLogout'));
+
 /** Descargos  */
 Route::get('/', function()
 {

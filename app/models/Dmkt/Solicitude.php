@@ -56,5 +56,7 @@ class Solicitude extends Eloquent{
         return $this->hasMany('Expense\Expense','idsolicitud','idsolicitud');
     }
 
-
+    function user(){
+        return $this->belongsTo('User','iduser');
+    }
 }
