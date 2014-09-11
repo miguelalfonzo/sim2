@@ -12,6 +12,7 @@
 						<label>Solicitud</label>
 						<input type="text" class="form-control" value="{{mb_convert_case($solicitude->titulo, MB_CASE_TITLE, 'UTF-8')}}" disabled>
 						<input type="hidden" id="idsolicitude" value="{{$solicitude->idsolicitud}}">
+						<input type="hidden" id="token" value="{{$solicitude->token}}">
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
@@ -97,7 +98,7 @@
 					</div>
 				</div>
 			</section>
-			<section class="row reg-expense" style="margin:0">
+			<section class="row reg-expense detail-expense" style="margin:0">
 				<div style="padding:0 15px">
 					<div class="panel panel-info">
 						<div class="panel-heading">
@@ -145,7 +146,7 @@
 					</div>
 				</div>
 			</section>
-			<section class="row reg-expense" style="margin:0">
+			<section class="row reg-expense detail-expense" style="margin:0">
 				<div class="col-xs-12 col-sm-6 col-md-4 tot-document">
 					<div class="form-expense">
 						<label>Sub Total</label>
@@ -183,7 +184,7 @@
 					</div>
 				</div>
 			</section>
-			<section class="row reg-expense" style="margin:0">
+			<section class="row reg-expense detail-expense" style="margin:0">
 				<div class="col-xs-12 col-sm-12 col-md-12">
 					<div class="form-expense">
 						<button id="save-expense" type="button" class="btn btn-primary">Registrar</button>
@@ -213,7 +214,6 @@
 										@foreach($expense as $val)
 											<tr>
 												<th class="proof-type">{{mb_convert_case($val->idProofType->descripcion,MB_CASE_TITLE,'UTF-8')}}</th>
-												<input class='idgasto' type='hidden' value="{{$val->idgasto}}">
 												<th class="ruc">{{$val->ruc}}</th>
 												<th class="razon">{{$val->razon}}</th>
 												<th class="voucher_number">{{$val->num_comprobante}}</th>
@@ -233,8 +233,8 @@
 			</section>
 			<section class="row reg-expense align-center" style="margin-top:2em">
 				<div class="col-xs-12 col-sm-12 col-md-12">
-					<button type="button" class="btn btn-success inline" style="margin:-2em 2em .5em 0">Terminar</button>
-					<button id="cancel-expense" type="button" class="btn btn-danger inline" style="margin:-2em 0em .5em 0">Cancelar</button>
+					<a href="{{URL::to('end-expense').'/'.$solicitude->token}}" id="finish-expense" class="btn btn-success" style="margin:-2em 2em .5em 0">Terminar</a>
+					<a href="#" id="cancel-expense" class="btn btn-danger" style="margin:-2em 2em .5em 0">Cancelar</a>
 				</div>
 			</section>
 		</div>

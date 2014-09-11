@@ -69,6 +69,10 @@ $(function(){
     //Default events
         //Calculate the IGV loading
         if(parseFloat($(".total-item").val())) calcularIGV();
+        if(parseFloat($("#balance").val()) === 0)
+        {
+            $(".detail-expense").hide();
+        }
 
     //Restrictions on data entry forms
         //only numbers integers
@@ -82,19 +86,17 @@ $(function(){
         $(".quantity input").numeric({negative:false});
         $("#igv").numeric({negative:false});
 
-        //Calcule the IGV and Balance once typed the total amount per item
-        $(document).on("focusout",".total-item input",function(e){
-           calcularIGV();
-           calcularBalance();
-        });
-
-        //Calcule the IGV and Balance once typed the imp service
-        $("#imp-ser").on("focusout",function(e){
-           calcularIGV();
-           calcularBalance();
-        });
-
     //Events: Datepicker, Buttons, Keyup.
+        //Calcule the IGV and Balance once typed the total amount per item
+        $(document).on("keyup",".total-item input",function(){
+           calcularIGV();
+           calcularBalance();
+        });
+        //Calcule the IGV and Balance once typed the imp service
+        $(document).on("keyup","#imp-ser",function(){
+            calcularIGV();
+            calcularBalance();
+        });
         //Datepicker date all classes
         $(".date").datepicker({
             language: 'es',
@@ -111,6 +113,26 @@ $(function(){
         $("#cancel-expense").on("click",function(e){
             e.preventDefault();
             window.location.href = server+"show_rm";
+        });
+
+        //Record end Solicitude
+        $("#finish-expense").on("click",function(e){
+            e.preventDefault();
+            var token = $("#token").val();
+            var balance = parseFloat($("#balance").val());
+            if(balance === 0)
+            {
+                bootbox.confirm("¿Esta seguro que desea Finalizar el registro del gasto?", function(result) {
+                    if(result)
+                    {
+                        window.location.href = server+'end-expense/'+token;
+                    }
+                });
+            }
+            else
+            {
+                bootbox.alert("No puede finalizar el registro de este gasto, aún tiene saldo pendiente por registrar.");
+            }
         });
 
         //IGV, Imp. Service show if you check Factura
@@ -161,8 +183,9 @@ $(function(){
                         balance = balance.toFixed(2);
                         deleteItems();
                         deleteExpense();
-                        $("#balance").val(balance);
+                        $("#balance").val(balance.toFixed(2));
                         $("#save-expense").html("Registrar");
+                        $(".detail-expense").show();
                     });
                 }
             });
@@ -178,8 +201,8 @@ $(function(){
             ruc            = $(this).parent().parent().find(".ruc").html();
             voucher_number = $(this).parent().parent().find(".voucher_number").html();
             var total_edit = parseFloat($(this).parent().parent().find(".total_expense").html());
-            $("#total-expense").val(total_edit);
-            $("#tot-edit-hidden").val(total_edit);
+            $("#total-expense").val(total_edit.toFixed(2));
+            $("#tot-edit-hidden").val(total_edit.toFixed(2));
             
             $("#table-expense tbody tr").removeClass("select-row");
             $(this).parent().parent().addClass("select-row");
@@ -244,7 +267,8 @@ $(function(){
                     var row_expenses = $(".total").parent();
                     tot_expenses = calculateTot(row_expenses,'.total_expense');
                     balance = deposit - tot_expenses;
-                    $("#balance").val(balance);
+                    $("#balance").val(balance.toFixed(2));
+                    $(".detail-expense").show();
                 },1000);
             });
         });
@@ -256,7 +280,6 @@ $(function(){
             var btn_save = $(this).html();
             var row = "<tr>";
                 row+= "<th class='proof-type'></th>";
-                row+= "<input class='idgasto' type='hidden'>";
                 row+= "<th class='ruc'></th>";
                 row+= "<th class='razon'></th>";
                 row+= "<th class='voucher_number'></th>";
@@ -406,7 +429,7 @@ $(function(){
                                 else if(result > 0)
                                 {
                                     var new_row = $(row).clone(true,true);
-                                    var arr_expense = [result,proof_type_sel,ruc,razon,voucher_number,date,type_money,tot_expense];
+                                    var arr_expense = [proof_type_sel,ruc,razon,voucher_number,date,type_money,tot_expense];
                                     newRowExpense(new_row,arr_expense);
                                     deleteItems();
                                     deleteExpense();
@@ -437,7 +460,7 @@ $(function(){
                                     else if(result > 0)
                                     {
                                         var new_row = $(row).clone(true,true);
-                                        var arr_expense = [result,proof_type_sel,ruc,razon,voucher_number,date,type_money,tot_expense];
+                                        var arr_expense = [proof_type_sel,ruc,razon,voucher_number,date,type_money,tot_expense];
                                         newRowExpense(new_row,arr_expense);
                                         deleteItems();
                                         deleteExpense();
@@ -519,7 +542,7 @@ $(function(){
                             else if(result > 0)
                             {
                                 var new_row = $(row).clone(true,true);
-                                var arr_expense = [result,proof_type_sel,ruc,razon,voucher_number,date,type_money,tot_expense];
+                                var arr_expense = [proof_type_sel,ruc,razon,voucher_number,date,type_money,tot_expense];
                                 newRowExpense(new_row,arr_expense);
                                 deleteItems();
                                 deleteExpense();
@@ -541,6 +564,10 @@ $(function(){
                 {
                     $("html, body").animate({scrollTop:200},'500','swing');
                 }
+            }
+            if(balance === 0)
+            {
+                $(".detail-expense").hide();
             }
             $(".search-ruc").show();
             $("#ruc-hide").siblings().parent().addClass('input-group');
@@ -648,14 +675,13 @@ $(function(){
         //Add Expense
         function newRowExpense(row,arr)
         {
-            row.find(".idgasto").val(arr[0]);
-            row.find(".proof-type").text(arr[1]);
-            row.find(".ruc").text(arr[2]);
-            row.find(".razon").text(arr[3]);
-            row.find(".voucher_number").text(arr[4]);
-            row.find(".date_movement").text(arr[5]);
-            row.find(".type_money").text(arr[6]);
-            row.find(".total_expense").text(arr[7]);
+            row.find(".proof-type").text(arr[0]);
+            row.find(".ruc").text(arr[1]);
+            row.find(".razon").text(arr[2]);
+            row.find(".voucher_number").text(arr[3]);
+            row.find(".date_movement").text(arr[4]);
+            row.find(".type_money").text(arr[5]);
+            row.find(".total_expense").text(arr[6]);
             $("#table-expense tbody").append(row);
         }
 
@@ -689,33 +715,33 @@ $(function(){
         //Calculate Balance
         function calcularBalance()
         {
-            var deposit = parseFloat($("#deposit").val());
-            var tot_items = 0;
-            var rows_items = $(".total-item input");
-            var tot_expenses = calculateTot($(".total").parent(),'.total_expense');
-            $.each(rows_items,function(){
-                tot_items += parseFloat($(this).val());
-            });
             var balance;
+            var deposit = parseFloat($("#deposit").val());
+            var tot_expenses = calculateTot($(".total").parent(),'.total_expense');
             var btn_save = $("#save-expense").html();
+            var tot_expense = parseFloat($("#total-expense").val());
+            var imp_serv = parseFloat($("#imp-ser").val());
+            if(!$.isNumeric(imp_serv)) imp_serv = 0;
             if(btn_save === "Registrar")
             {
-                balance = deposit - tot_expenses - tot_items;
-                $("#balance").val(balance);    
+                balance = deposit - tot_expenses - tot_expense;
+                $("#balance").val(balance.toFixed(2));
             }
             else
             {
-                var tot_expense = parseFloat($("#total-expense").val());
                 balance = deposit - tot_expense - tot_expenses + parseFloat($("#tot-edit-hidden").val());
-                $("#balance").val(balance);
+                $("#balance").val(balance.toFixed(2));
             }
             if(balance<0)
             {
-                $(".message-expense").html('El monto ingresado supera el depositado.').show();
+                $(".message-expense").html('El monto ingresado supera el depositado.').css("color","red").show();
+                $("#balance").css("color","red");
             }
             else
             {
                 $("#balance").removeClass('error-incomplete');
+                $(".message-expense").hide().css("color","black");
+                $("#balance").css("color","black");
             }
         }
         //Calculate the IGV
@@ -730,6 +756,8 @@ $(function(){
             $.each(total_item,function(){
                 if($(this).val())
                     total_expense += parseFloat($(this).val());
+                else
+                    total_expense += 0;
             });
             if(total_expense>0)
             {
@@ -751,6 +779,8 @@ $(function(){
             else
             {
                 $("#total-expense").val('');
+                $("#sub-tot").val(0);
+                $("#igv").val(0);
             }
         }
 

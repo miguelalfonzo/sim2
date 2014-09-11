@@ -93,6 +93,8 @@ Route::get('aprobar-solicitud/{token}','Dmkt\SolicitudeController@approvedSolici
 
      return View::make('notfound');
  });
+
+
 /**   Gastos */
 
 // Expense
@@ -101,6 +103,9 @@ Route::post('register-expense','Expense\ExpenseController@registerExpense');
 Route::post('delete-expense','Expense\ExpenseController@deleteExpense');
 Route::post('update-expense','Expense\ExpenseController@updateExpense');
 Route::get('edit-expense','Expense\ExpenseController@editExpense');
+Route::get('end-expense/{token}','Expense\ExpenseController@finishExpense');
+Route::get('ver-gasto/{token}','Expense\ExpenseController@viewExpense');
+
 // Ruc
 Route::post('consultarRuc','Expense\RucController@show');
 Route::get('ruc',function(){

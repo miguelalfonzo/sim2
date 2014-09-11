@@ -10,8 +10,10 @@ use \Expense\Expense;
 use \Expense\ProofType;
 use \Expense\ExpenseType;
 use \Expense\ExpenseItem;
+use \Common\State;
 use \Input;
 use \DB;
+use \Redirect;
 
 class ExpenseController extends BaseController{
 
@@ -33,7 +35,6 @@ class ExpenseController extends BaseController{
     }
 
 	public function show(){
-		//deposit is 5
 		$token = Input::get('token');
 		$solicitude  = Solicitude::where('token',$token)->firstOrFail();
 		$typeProof   = ProofType::all();
@@ -41,10 +42,10 @@ class ExpenseController extends BaseController{
 		$typeExpense = ExpenseType::orderBy('idtipogasto','asc')->get();
 
 		$data = [
-			'solicitude' => $solicitude,
-			'typeProof' => $typeProof,
+			'solicitude'  => $solicitude,
+			'typeProof'   => $typeProof,
 			'typeExpense' => $typeExpense,
-			'date' => $date
+			'date'        => $date
 		];
 
 		$expense = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
@@ -53,7 +54,7 @@ class ExpenseController extends BaseController{
 		if(count($expense)>0)
 		{
 			$data['expense'] = $expense;
-			$balance = 0;
+			$balance         = 0;
 			foreach ($expense as $key => $value) {
 				$balance += $value->monto;
 			}
@@ -66,11 +67,10 @@ class ExpenseController extends BaseController{
 	}
 
 	public function registerExpense(){
-		$expense = Input::get('data');
-		$expenseJson = json_decode($expense);
-		// var_dump($expense);die;
+		$expense        = Input::get('data');
+		$expenseJson    = json_decode($expense);
 		$row_solicitude = Solicitude::find($expenseJson->idsolicitude);
-		$row_expense = Expense::where('num_comprobante',$expenseJson->voucher_number)->where('ruc',$expenseJson->ruc)->get();
+		$row_expense    = Expense::where('num_comprobante',$expenseJson->voucher_number)->where('ruc',$expenseJson->ruc)->get();
 
 		if(count($row_expense)>0)
 		{
@@ -130,35 +130,30 @@ class ExpenseController extends BaseController{
 				} catch (Exception $e) {
 					return 0;
 				}
-				return $idgasto;
+				return 1;
 			}
 		}
 	}
 
 	public function deleteExpense(){
-		$expense = Input::get('data');
+		$expense     = Input::get('data');
 		$expenseJson = json_decode($expense);
-
 		$expense_row = Expense::where('ruc',$expenseJson->ruc)->where('num_comprobante',$expenseJson->voucher_number)->firstOrFail();
-		$delete_row = Expense::where('idgasto',$expense_row->idgasto)->delete();
+		$delete_row  = Expense::where('idgasto',$expense_row->idgasto)->delete();
 		return "OK";
 	}
 
 	public function editExpense(){
-		$expense = Input::get('data');
+		$expense     = Input::get('data');
 		$expenseJson = json_decode($expense);
-
-		$idExpense = Expense::where('ruc',$expenseJson->ruc)->where('num_comprobante',$expenseJson->voucher_number)->firstOrFail();
-
-		$data = ExpenseItem::where('idgasto','=',intval($idExpense->idgasto))->get();
-
+		$idExpense   = Expense::where('ruc',$expenseJson->ruc)->where('num_comprobante',$expenseJson->voucher_number)->firstOrFail();
+		$data        = ExpenseItem::where('idgasto','=',intval($idExpense->idgasto))->get();
 		$response = ['data'=>$data, 'expense'=>$idExpense, 'date'=>$idExpense->fecha_movimiento];
-
 		return $response;
 	}
 
 	public function updateExpense(){
-		$expense = Input::get('data');
+		$expense     = Input::get('data');
 		$expenseJson = json_decode($expense);
 
 		$expenseUpdate = Expense::where('ruc',$expenseJson->ruc)->where('num_comprobante',$expenseJson->voucher_number)->get();
@@ -192,13 +187,11 @@ class ExpenseController extends BaseController{
 	        $date = date("Y/m/d", $d);
 	        $expenseEdit->fecha_movimiento = $date;
 	        $data = $this->objectToArray($expenseEdit);
-
 	        //Detail Expense
 			$quantity = $expenseJson->quantity;
 			$description = $expenseJson->description;
 			$type_expense = $expenseJson->type_expense;
 			$total_item = $expenseJson->total_item;
-
 			if($expenseEdit->update($data))
 			{
 				$expense_detail_edit = ExpenseItem::where('idgasto',$idgasto)->delete();
@@ -218,28 +211,32 @@ class ExpenseController extends BaseController{
 				} catch (Exception $e) {
 					return 0;
 				}
-				return $idgasto;
+				return 1;
 			}
 		}
 	}
 
-	public function test(){
- 		
- 		$expenseUpdate = Expense::where('ruc',"20422488198")->where('num_comprobante',"1-23")->get();
+	public function finishExpense($token){
+		$solicitude  = Solicitude::where('token',$token)->update(array('estado'=>REGISTRADO));
+		if(count($solicitude) == 1)
+		{
+			$states = State::orderBy('idestado', 'ASC')->get();
+        	return Redirect::to('show_rm')->with('states', $states);
+		}
+	}
 
+	public function test(){
+ 		$expenseUpdate = Expense::where('ruc',"20422488198")->where('num_comprobante',"1-23")->get();
 		if(count($expenseUpdate)>0)
 		{
 			foreach ($expenseUpdate as $key => $value) {
 				var_dump($value->idgasto);
 			}
-			// json_encode($expenseUpdate->idgasto);
-			// var_dump("OK ".$expenseUpdate->idgasto);
 		}
 		else
 		{
 			var_dump("ERROR");
 		}
-
 	}
 
 }
