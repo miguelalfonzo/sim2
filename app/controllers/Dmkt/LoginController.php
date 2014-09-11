@@ -60,6 +60,9 @@ class LoginController extends BaseController{
                 if($typeUser == 'S'){
                     return Redirect::to('show_sup');
                 }
+                if($typeUser == 'P'){
+                    return Redirect::to('show_gerprod');
+                }
 
 
             } else {

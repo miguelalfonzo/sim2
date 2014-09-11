@@ -21,7 +21,7 @@
         <td>{{$solicitude->observacion}}</td>
         <td><div style="text-align: center">
 
-                <a href="{{URL::to('ver-solicitud-gercom').'/'.$solicitude->token}}"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span></a>
+                <a href="{{URL::to('ver-solicitud-gerprod').'/'.$solicitude->token}}"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span></a>
 
             </div>
         </td>
