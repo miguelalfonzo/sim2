@@ -674,7 +674,33 @@ function newSolicitude() {
 
     });
 
-    /** GERENTE COMERCIAL */
+    /** --------------------------------- GERENTE PRODUCTO -------------------------------------- **/
+
+    $.ajax({
+        url: server + 'listar-solicitudes-gerprod/' + 1,
+        type: 'GET',
+        dataType: 'html'
+
+
+    }).done(function (data) {
+        $('.table-solicituds-gerprod').append(data);
+        $('#table_solicitude_gerprod').dataTable({
+                "order": [
+                    [ 3, "desc" ]
+                ],
+
+                "bLengthChange": false,
+                'iDisplayLength': 7,
+                "oLanguage": {
+                    "sSearch": "Buscar: ",
+                    "sZeroRecords": "No hay solicitudes",
+                    "sInfoEmpty": "No hay solicitudes",
+                    "sInfo": 'Mostrando _END_ de _TOTAL_'
+                }
+            }
+        );
+    });
+    /** --------------------------------- GERENTE COMERCIAL -------------------------------------- **/
 
     $.ajax({
         url: server + 'listar-solicitudes-gercom/' + 8,

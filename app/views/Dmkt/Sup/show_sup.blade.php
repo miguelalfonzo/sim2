@@ -4,7 +4,7 @@
 <div class="col-md-12" style="">
     <!-- Default panel contents -->
     <div class="panel panel-default">
-        <div class="panel-heading"><h3 class="panel-title">Solicitudes Supervisor</h3></div>
+        <div class="panel-heading"><h3 class="panel-title">Solicitudes Supervisor</h3><small style="float: right; margin-top: -10px"><strong>Usuario : {{Auth::user()->Sup->nombres}}</strong></small></div>
 
         <div class="panel-body table-solicituds-sup">
             <div class="col-md-12" style="padding: 0">

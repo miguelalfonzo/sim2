@@ -4,14 +4,14 @@
     <div class="col-md-12" style="">
         <!-- Default panel contents -->
         <div class="panel panel-default">
-            <div class="panel-heading"><h3 class="panel-title">Solicitudes Gerente Producto</h3></div>
+            <div class="panel-heading"><h3 class="panel-title">Solicitudes Gerente Producto</h3><small style="float: right; margin-top: -10px"><strong>Usuario : {{Auth::user()->Gerprod->descripcion}}</strong></small></div>
 
-            <div class="panel-body table-solicituds-sup">
+            <div class="panel-body table-solicituds-gerprod">
                 <div class="col-md-12" style="padding: 0">
                     <form method="post" action="" class="">
                         <div class="form-group col-sm-3 col-md-2" style="padding: 0">
                             <div class="">
-                                <select id="select_state_solicitude_sup" name="idstate"
+                                <select id="select_state_solicitude_gerprod" name="idstate"
                                         class="form-control selectestatesolicitude">
                                     @foreach($states as $state)
                                     <option value="{{$state->idestado}}">{{$state->nombre}}</option>
@@ -47,7 +47,7 @@
                         <div class="form-group col-sm-1 col-md-2">
 
                             <div class="" style="padding: 0">
-                                <a id="search_solicitude_sup" class="btn btn-sm btn-primary ladda-button"
+                                <a id="search_solicitude_gerprod" class="btn btn-sm btn-primary ladda-button"
                                    data-style="zoom-in" data-size="l"><i class="glyphicon glyphicon-search"></i></a>
                             </div>
 

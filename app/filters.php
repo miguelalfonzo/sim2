@@ -53,8 +53,10 @@ Route::filter('rm', function()
 {
     if (Auth::check())
     {
-        if(Auth::user()->type != 'R')
+        if(Auth::user()->type != 'R' && Auth::user()->type=='S')
         return Redirect::to('show_sup');
+        if(Auth::user()->type != 'R' && Auth::user()->type=='P')
+            return Redirect::to('show_gerprod');
 
     }else{
 
@@ -66,14 +68,33 @@ Route::filter('sup', function()
 {
     if (Auth::check())
     {
-        if(Auth::user()->type != 'S')
+        if(Auth::user()->type != 'S' && Auth::user()->type == 'R')
             return Redirect::to('show_rm');
+        if(Auth::user()->type != 'S' && Auth::user()->type == 'P')
+            return Redirect::to('show_gerprod');
 
     }else{
 
         return Redirect::to('login');
     }
 });
+
+Route::filter('gerprod', function()
+{
+    if (Auth::check())
+    {
+        if(Auth::user()->type != 'P' && Auth::user()->type == 'R')
+            return Redirect::to('show_rm');
+        if(Auth::user()->type != 'P' && Auth::user()->type == 'S')
+            return Redirect::to('show_sup');
+
+    }else{
+
+        return Redirect::to('login');
+    }
+});
+
+
 
 
 Route::filter('auth.basic', function()

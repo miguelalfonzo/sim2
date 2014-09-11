@@ -52,7 +52,12 @@ class SolicitudeController extends BaseController
     }
 
     public function test()
+
     {
+        $user = Auth::user();
+        $var = $user->GerProd->solicituds;
+        echo json_encode($var);
+
         /*
         $today = getdate();
         $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
@@ -81,12 +86,15 @@ class SolicitudeController extends BaseController
 
         }*/
 
+        /*
         $solicitude = Solicitude::find(9);
 
         foreach($solicitude->families as $v)
-            echo json_encode($v->marca->manager->id);
+            echo json_encode($v->marca->manager->id);*/
+
     }
 
+    /** ----------------------------------  Representante Medico ---------------------------------- */
 
     public function show_rm()
     {
@@ -193,10 +201,10 @@ class SolicitudeController extends BaseController
                 $solicitude_families->save();
             }
             $typeUser = Auth::user()->type;
-            if($typeUser == 'R')
-            return 'R';
-            if($typeUser == 'S')
-            return 'S';
+            if ($typeUser == 'R')
+                return 'R';
+            if ($typeUser == 'S')
+                return 'S';
         }
 
     }
@@ -334,9 +342,9 @@ class SolicitudeController extends BaseController
         }
 
         $typeUser = Auth::user()->type;
-         if($typeUser == 'R')
+        if ($typeUser == 'R')
             return 'R';
-         if($typeUser == 'S')
+        if ($typeUser == 'S')
             return 'S';
 
     }
@@ -380,14 +388,14 @@ class SolicitudeController extends BaseController
 
                 $solicituds = Solicitude::select('*')
                     ->where('estado', $estado)
-                    ->where('iduser',$idUser)
+                    ->where('iduser', $idUser)
                     ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
                     ->get();
 
             } else {
 
                 $solicituds = Solicitude::select('*')
-                    ->where('iduser',$idUser)
+                    ->where('iduser', $idUser)
                     ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
                     ->get();
             }
@@ -397,13 +405,13 @@ class SolicitudeController extends BaseController
 
                 $solicituds = Solicitude::select('*')
                     ->where('estado', $estado)
-                    ->where('iduser',$idUser)
+                    ->where('iduser', $idUser)
                     ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
                     ->get();
             } else {
 
                 $solicituds = Solicitude::select('*')
-                    ->where('iduser',$idUser)
+                    ->where('iduser', $idUser)
                     ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
                     ->get();
             }
@@ -479,14 +487,16 @@ class SolicitudeController extends BaseController
         return Redirect::to('show_sup');
 
     }
-    public function derivedSolicitude($token){
+
+    public function derivedSolicitude($token)
+    {
 
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $id = $solicitude->idsolicitud;
         $sol = Solicitude::find($id);
-        foreach($sol->families as $v){
+        foreach ($sol->families as $v) {
             $solGer = new SolicitudeGer;
-            $solGer->idsolicitud_gerente = $solGer->searchId()+1;
+            $solGer->idsolicitud_gerente = $solGer->searchId() + 1;
             $solGer->idsolicitud = $id;
             $solGer->idgerprod = $v->marca->manager->id;
             $solGer->save();
@@ -587,20 +597,37 @@ class SolicitudeController extends BaseController
     }
 
 
-    public function listSolicitudeGerPro($id)
+    public function listSolicitudeGerProd($id)
     {
 
+        $today = getdate();
+        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
+        $lastday = date('t-m-Y', strtotime($m));
+        $firstday = date('01-m-Y', strtotime($m));
+        $user = Auth::user();
+        if($user->type == 'P'){
+            $solicitud_ids=[];
+            $solicituds = $user->GerProd->solicituds;
+            foreach($solicituds as $sol){
+                $solicitud_ids[] = $sol->idsolicitud;
+            }
+
+
         if ($id == 0) {
-            $solicituds = Solicitude::all();
+            $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
+                ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                ->get();
         } else {
-            $solicituds = Solicitude::where('estado', '=', $id)->get();
+            $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
+                ->where('estado', $id)
+                ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                ->get();
         }
 
         $view = View::make('Dmkt.GerProd.view_solicituds_gerprod')->with('solicituds', $solicituds);
         return $view;
+        }
     }
-
-
 
 
     /** ---------------------------------------------  Gerente Comercial  -------------------------------------------------*/
@@ -615,14 +642,16 @@ class SolicitudeController extends BaseController
     public function listSolicitudeGerCom($id)
     {
 
-        if ($id == 0) {
-            $solicituds = Solicitude::all();
-        } else {
-            $solicituds = Solicitude::where('estado', '=', $id)->get();
-        }
+        if (Auth::user()->type == 'P') {
+            if ($id == 0) {
+                $solicituds = Solicitude::all();
+            } else {
+                $solicituds = Solicitude::where('estado', '=', $id)->get();
+            }
 
-        $view = View::make('Dmkt.GerCom.view_solicituds_gercom')->with('solicituds', $solicituds);
-        return $view;
+            $view = View::make('Dmkt.GerCom.view_solicituds_gercom')->with('solicituds', $solicituds);
+            return $view;
+        }
     }
 
     public function viewSolicitudeGerCom($token)
