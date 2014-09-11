@@ -5,7 +5,7 @@
 
 <div class="panel panel-default">
 <div class="panel-heading">
-    <h3 class="panel-title">Ver Solicitud Gerente Producto</h3>
+    <h3 class="panel-title">Ver Solicitud Gerente Producto</h3><small style="float: right; margin-top: -10px"><strong>Usuario : {{Auth::user()->Gerprod->descripcion}}</strong></small>
 </div>
 <div class="panel-body">
 <form id="form_make_activity" class="" method="post" action="">
@@ -255,7 +255,7 @@
     <div class="col-sm-12 col-md-12 col-lg-12" style="text-align: center">
         @if($solicitude->estado == PENDIENTE)
         <a href="{{URL::to('aceptar_solicitud')}}" id="test" name="button1id"
-           class="btn btn-primary accepted_solicitude_sup">Aceptar
+           class="btn btn-primary accepted_solicitude_sup">Aceptar</a>
         <a id="deny_solicitude" name="button1id" class="btn btn-primary deny_solicitude">Rechazar
         </a>
         <a id="button2id" href="{{URL::to('show_sup')}}" name="button2id"

@@ -31,6 +31,9 @@
                     <input type="hidden" name="token" value="{{$solicitude->token}}">
                 </form>
                 @endif
+                @if($solicitude->estado == REGISTRADO)
+                <a  href="{{URL::to('ver-gasto'.'/'.$solicitude->token)}}"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span></a>
+                @endif
                 @if($solicitude->estado == PENDIENTE)
                 <a href="{{URL::to('editar-solicitud').'/'.$solicitude->token}}"><span style="font-size: 1.3em; padding: 0 6px" class="glyphicon glyphicon-pencil"></span></a>
                 <a href="#" class="cancel-solicitude" data-idsolicitude = "{{$solicitude->idsolicitud}}"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-remove"></span></a>

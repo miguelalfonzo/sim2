@@ -629,7 +629,21 @@ class SolicitudeController extends BaseController
         }
     }
 
+    public function viewSolicitudeGerProd($token)
+    {
 
+        $user = Auth::user()->gerprod->id;
+        echo $user;die;
+        $solicitude = Solicitude::where('token', $token)->firstOrFail();
+        $solicitudeGerProd = SolicitudeGer::where('idsolicitud',$solicitude->idsolicitud)
+            -> where()
+            ->update(array('blocked'=> 1));
+        $data = [
+            'solicitude' => $solicitude,
+
+        ];
+        return View::make('Dmkt.GerProd.view_solicitude_gerprod', $data);
+    }
     /** ---------------------------------------------  Gerente Comercial  -------------------------------------------------*/
 
     public function show_gercom()
