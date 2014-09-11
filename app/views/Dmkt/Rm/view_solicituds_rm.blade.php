@@ -32,6 +32,7 @@
                 </form>
                 @endif
                 @if($solicitude->estado == REGISTRADO)
+                <a target="_blank" href="{{URL::to('a'.'/'.$solicitude->token)}}"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-print"></span></a>
                 <a  href="{{URL::to('ver-gasto'.'/'.$solicitude->token)}}"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span></a>
                 @endif
                 @if($solicitude->estado == PENDIENTE)

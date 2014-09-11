@@ -491,7 +491,9 @@ class SolicitudeController extends BaseController
     public function derivedSolicitude($token)
     {
 
+        Solicitude::where('token', $token)->update(array('derived'=>1));
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
+
         $id = $solicitude->idsolicitud;
         $sol = Solicitude::find($id);
         foreach ($sol->families as $v) {
@@ -632,18 +634,102 @@ class SolicitudeController extends BaseController
     public function viewSolicitudeGerProd($token)
     {
 
-        $user = Auth::user()->gerprod->id;
-        echo $user;die;
+        $block = false;
+        $userid = Auth::user()->gerprod->id;
+
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
-        $solicitudeGerProd = SolicitudeGer::where('idsolicitud',$solicitude->idsolicitud)
-            -> where()
-            ->update(array('blocked'=> 1));
+
+        $solicitudeBlocked  = SolicitudeGer::where('idsolicitud',$solicitude->idsolicitud)->where ('idgerprod',$userid)->firstOrFail();//vemos si la solicitud esta blokeada
+        if($solicitudeBlocked->blocked == 0){
+            SolicitudeGer::where('idsolicitud',$solicitude->idsolicitud) // blockeamos la solicitud para que el otro gerente no lo pueda editar
+                ->where('idgerprod','<>',$userid)
+                ->update(array('blocked'=> 1));
+        }else{
+            $block = true;
+        }
+
+
         $data = [
             'solicitude' => $solicitude,
+            'block' => $block
 
         ];
         return View::make('Dmkt.GerProd.view_solicitude_gerprod', $data);
     }
+    public function acceptedSolicitudeGerProd()
+    {
+
+        $inputs = Input::all();
+        $amount_assigned = $inputs['amount_assigned'];
+        $idSol = $inputs['idsolicitude'];
+        $solicitude = Solicitude::where('idsolicitud', $idSol);
+        $solicitude->estado = ACEPTADO;
+        $solicitude->idaproved = Auth::user()->id;
+        $solicitude->monto = $inputs['monto'];
+        $solicitude->observacion = $inputs['observacion'];
+        $data = $this->objectToArray($solicitude);
+        $solicitude->update($data);
+
+        $amount_assigned = $inputs['amount_assigned'];
+        $families = SolicitudeFamily::where('idsolicitud', $idSol)->get();
+        $i = 0;
+        foreach ($families as $fam) {
+            $family = SolicitudeFamily::where('idsolicitud_familia', $fam->idsolicitud_familia);
+            $family->monto_asignado = $amount_assigned[$i];
+            $data = $this->objectToArray($family);
+            $family->update($data);
+            $i++;
+        }
+        //echo json_encode($families);die;
+        return Redirect::to('show_gerprod');
+
+    }
+    public function searchSolicitudsGerProd()
+    {
+
+        $inputs = Input::all();
+        $estado = $inputs['idstate'];
+        $start = $inputs['date_start'];
+        $end = $inputs['date_end'];
+        $today = getdate();
+        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
+        $lastday = date('t-m-Y', strtotime($m));
+        $firstday = date('01-m-Y', strtotime($m));
+        $user = Auth::user();
+        if ($user->type == 'P') {
+
+            if ($start != null && $end != null) {
+                if ($estado != 0) {
+                    $solicituds = Solicitude::where('idaproved', $user->id)
+                        ->where('estado',$estado)
+                        ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                        ->get();
+
+                } else {
+                    $solicituds = Solicitude::where('idaproved', $user->id)
+                        ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                        ->get();
+                }
+
+
+            } else {
+                if ($estado != 0) {
+                    $solicituds = Solicitude::whereIn('iduser', $users_ids)
+                        ->where('estado', $estado)
+                        ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                        ->get();
+                } else {
+                    $solicituds = Solicitude::whereIn('iduser', $users_ids)
+                        ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                        ->get();
+                }
+            }
+
+            $view = View::make('Dmkt.Sup.view_solicituds_sup')->with('solicituds', $solicituds);
+            return $view;
+        }
+    }
+
     /** ---------------------------------------------  Gerente Comercial  -------------------------------------------------*/
 
     public function show_gercom()

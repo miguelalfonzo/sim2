@@ -475,7 +475,7 @@ function newSolicitude() {
 
     /* list solicitude pending */
     $.ajax({
-        url: server + 'listar-solicitudes-sup/' + 1,
+        url: server + 'listar-solicitudes-sup/' + $('#state_view').val(),
         type: 'GET',
         dataType: 'html'
 
@@ -565,8 +565,6 @@ function newSolicitude() {
             amount_error_families.text('El monto distribuido es menor al monto total').css('color', 'red');
 
         }
-
-
     });
 
     $('#deny_solicitude').on('click', function (e) {
@@ -700,6 +698,44 @@ function newSolicitude() {
             }
         );
     });
+
+    /* solicitude accepted */
+    var form_acepted_solicitude = $('#form_make_activity');
+    $('.accepted_solicitude_gerprod').on('click', function (e) {
+        var total = 0;
+
+        e.preventDefault();
+        amount_families.each(function (index, value) {
+
+            total += parseFloat($(this).val());
+        });
+
+        if (idamount.val() == Math.round(total)) {
+
+            bootbox.confirm("¿Esta seguro de aceptar esta solicitud?", function (result) {
+                if (result) {
+                    var message = 'Validando Solicitud..';
+                    loadingUI(message);
+                    setTimeout(function () {
+
+                        form_acepted_solicitude.attr('action', server + 'aceptar-solicitud-gerprod');
+                        form_acepted_solicitude.submit();
+                    }, 1200);
+
+                }
+            });
+
+
+        } else if (idamount.val() < Math.round(total)) {
+            amount_error_families.text('El monto distribuido supera el monto total').css('color', 'red');
+
+        } else {
+            amount_error_families.text('El monto distribuido es menor al monto total').css('color', 'red');
+
+        }
+    });
+
+
     /** --------------------------------- GERENTE COMERCIAL -------------------------------------- **/
 
     $.ajax({

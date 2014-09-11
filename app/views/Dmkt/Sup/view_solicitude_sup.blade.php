@@ -253,7 +253,7 @@
 <div class="form-group col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px">
 
     <div class="col-sm-12 col-md-12 col-lg-12" style="text-align: center">
-        @if($solicitude->estado == PENDIENTE)
+        @if($solicitude->estado == PENDIENTE && $solicitude->derived == 0)
         <a href="{{URL::to('aceptar_solicitud')}}" id="test" name="button1id"
            class="btn btn-primary accepted_solicitude_sup">Aceptar
         </a>
@@ -296,10 +296,15 @@
                             <label class="col-md-4 col-lg-4 control-label" for="selectbasic"></label>
 
                             <div class="col-md-5 col-lg-5">
+                                @foreach($solicitude->families as $v)
+                                <?php $gerentes[] = $v->marca->manager->descripcion ?>
+                                @endforeach
+                                <?php  $gerentes = array_unique($gerentes) ?>
+
                                <ul>
-                                    @foreach($solicitude->families as $v)
-                                    <li>{{ $v->marca->manager->descripcion }}</li>
-                                    @endforeach
+                                   @foreach($gerentes as  $gerente)
+                                   <li>{{ $gerente }}</li>
+                                   @endforeach
                                 </ul>
                             </div>
                         </div>
