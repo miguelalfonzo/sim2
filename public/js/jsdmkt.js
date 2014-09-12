@@ -445,22 +445,25 @@ function newSolicitude() {
 
                 $.post(server + 'cancelar-solicitud-rm', {idsolicitude: $(aux).attr('data-idsolicitude')})
                     .done(function (data) {
-                        $('#table_solicitude_wrapper').remove();
-                        $('.table-solicituds').append(data);
-                        $('#table_solicitude').dataTable({
-                                "order": [
-                                    [ 3, "desc" ]
-                                ],
-                                "bLengthChange": false,
-                                'iDisplayLength': 7,
-                                "oLanguage": {
-                                    "sSearch": "Buscar: ",
-                                    "sZeroRecords": "No hay solicitudes",
-                                    "sInfoEmpty": "No hay solicitudes",
-                                    "sInfo": 'Mostrando _END_ de _TOTAL_'
+                        console.log(data);
+
+                            $('#table_solicitude_wrapper').remove();
+                            $('.table-solicituds').append(data);
+                            $('#table_solicitude').dataTable({
+                                    "order": [
+                                        [ 3, "desc" ]
+                                    ],
+                                    "bLengthChange": false,
+                                    'iDisplayLength': 7,
+                                    "oLanguage": {
+                                        "sSearch": "Buscar: ",
+                                        "sZeroRecords": "No hay solicitudes",
+                                        "sInfoEmpty": "No hay solicitudes",
+                                        "sInfo": 'Mostrando _END_ de _TOTAL_'
+                                    }
                                 }
-                            }
-                        );
+                            );
+
                     })
             }
         });
@@ -575,6 +578,41 @@ function newSolicitude() {
                 form_acepted_solicitude.submit();
             }
         });
+
+    });
+
+    var cancel_solicitude_sup = '.cancel-solicitude-sup';
+    $(document).on('click', cancel_solicitude_sup, function (e) {
+        e.preventDefault();
+        var aux = $(this);
+        bootbox.confirm("¿Esta seguro que desea cancelar esta solicitud?", function (result) {
+            if (result) {
+
+                $.post(server + 'cancelar-solicitud-sup', {idsolicitude: aux.attr('data-idsolicitude')})
+                    .done(function (data) {
+                        console.log(data);
+
+                        $('#table_solicitude_sup_wrapper').remove();
+                        $('.table-solicituds-sup').append(data);
+                        $('#table_solicitude_sup').dataTable({
+                                "order": [
+                                    [ 3, "desc" ]
+                                ],
+                                "bLengthChange": false,
+                                'iDisplayLength': 7,
+                                "oLanguage": {
+                                    "sSearch": "Buscar: ",
+                                    "sZeroRecords": "No hay solicitudes",
+                                    "sInfoEmpty": "No hay solicitudes",
+                                    "sInfo": 'Mostrando _END_ de _TOTAL_'
+                                }
+                            }
+                        );
+
+                    })
+            }
+        });
+
 
     });
 

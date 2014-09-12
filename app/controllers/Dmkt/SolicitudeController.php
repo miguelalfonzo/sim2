@@ -361,7 +361,7 @@ class SolicitudeController extends BaseController
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
 
-        return $this->listSolicitude(2);
+        return $this->listSolicitude(PENDIENTE);
 
     }
 
@@ -675,6 +675,21 @@ class SolicitudeController extends BaseController
             return $view;
         }
     }
+
+    public function cancelSolicitudeSup()
+    {
+
+        $inputs = Input::all();
+        $id = $inputs['idsolicitude'];
+        $solicitude = Solicitude::where('idsolicitud', $id);
+        $solicitude->estado = CANCELADO;
+        $data = $this->objectToArray($solicitude);
+        $solicitude->update($data);
+
+        return $this->listSolicitude(PENDIENTE);
+
+    }
+
 
     /** --------------------------------------------- Gerente de  Producto ----------------------------------------------- */
 
