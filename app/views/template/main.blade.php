@@ -22,8 +22,6 @@
     {{ HTML::script('js/jquery-ui.min.js') }}
     {{ HTML::script('js/jquery.dataTables.min.js') }}
     {{ HTML::script('js/dataTables.bootstrap.js') }}
-
-
 </head>
 <body>
 <header>

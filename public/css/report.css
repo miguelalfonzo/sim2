@@ -1,0 +1,38 @@
+.background
+{
+	background: url(../img/logo-report.png);
+}
+header
+{
+	margin-left: 5em;
+}
+header p, header img
+{
+	display: inline-block;
+	vertical-align: middle;
+	font-size: 1.25em;
+}
+p
+{
+	margin-left: 1.5em;
+}
+
+table thead th, table tbody th
+{
+	text-align: center;
+	padding: .5em;
+}
+table thead
+{
+	border-bottom: 1px solid black;
+}
+table tbody th
+{
+	color: #494545;
+}
+
+.table
+{
+	margin: 0 auto;
+	text-align: center;
+}

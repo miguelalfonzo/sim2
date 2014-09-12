@@ -30,7 +30,7 @@ function responseUI(message,color){
 
 $(function(){
     //Vars
-    var idsolicitude   = parseInt($("#idsolicitude").val(),10);
+    var token          = $("#token").val();
     var deposit        = parseFloat($("#deposit").val());
     var type_money     = $("#type-money").html();
     var proof_type;
@@ -59,13 +59,11 @@ $(function(){
     var row_expense_first;
     var data          = {};
     var data_response = {};
-   
     //Submit Events
     $(document).on("click","#token-a",function(e){
         e.preventDefault();
         $(this).parent().parent().find('#form-token').submit();
     });
-
     //Default events
         //Calculate the IGV loading
         if(parseFloat($(".total-item").val())) calcularIGV();
@@ -73,19 +71,16 @@ $(function(){
         {
             $(".detail-expense").hide();
         }
-
     //Restrictions on data entry forms
         //only numbers integers
         $("#ruc").numeric({negative:false,decimal:false});
         $("#number-proof-one").numeric({negative:false,decimal:false});
         $("#number-proof-two").numeric({negative:false,decimal:false});
-
         //only numbers floats
         $("#imp-ser").numeric({negative:false});
         $(".total-item input").numeric({negative:false});
         $(".quantity input").numeric({negative:false});
         $("#igv").numeric({negative:false});
-
     //Events: Datepicker, Buttons, Keyup.
         //Calcule the IGV and Balance once typed the total amount per item
         $(document).on("keyup",".total-item input",function(){
@@ -114,7 +109,6 @@ $(function(){
             e.preventDefault();
             window.location.href = server+"show_rm";
         });
-
         //Record end Solicitude
         $("#finish-expense").on("click",function(e){
             e.preventDefault();
@@ -134,13 +128,11 @@ $(function(){
                 bootbox.alert("No puede finalizar el registro de este gasto, aún tiene saldo pendiente por registrar.");
             }
         });
-
         //IGV, Imp. Service show if you check Factura
         $("#proof-type").on("change",function(){
             calcularIGV();
             ($(this).val()==='2') ? $(".tot-document").show() : $(".tot-document").hide();
         });
-
         //Add an element of expense detail
         $("#add-item").on("click",function(e){
             e.preventDefault();
@@ -148,7 +140,6 @@ $(function(){
             row_item.find('input').val("");
             $("#table-items tbody").append(row_item);
         });
-
         //Remove an item from the document register
         $(document).on("click","#table-items .delete-item",function(e){
             e.preventDefault();
@@ -160,7 +151,6 @@ $(function(){
                 calcularBalance();
             }
         });
-
         //Delete a document already registered
         $(document).on("click","#table-expense .delete-expense",function(e){
             e.preventDefault();
@@ -183,14 +173,13 @@ $(function(){
                         balance = balance.toFixed(2);
                         deleteItems();
                         deleteExpense();
-                        $("#balance").val(balance.toFixed(2));
+                        $("#balance").val(balance);
                         $("#save-expense").html("Registrar");
                         $(".detail-expense").show();
                     });
                 }
             });
         });
-
         //Edit a document already registered
         $(document).on("click","#table-expense .edit-expense",function(e){
             e.preventDefault();
@@ -203,13 +192,11 @@ $(function(){
             var total_edit = parseFloat($(this).parent().parent().find(".total_expense").html());
             $("#total-expense").val(total_edit.toFixed(2));
             $("#tot-edit-hidden").val(total_edit.toFixed(2));
-            
             $("#table-expense tbody tr").removeClass("select-row");
             $(this).parent().parent().addClass("select-row");
             $(".message-expense").text('').hide();
             $("#table-items tbody tr").remove();
             $("#save-expense ").html("Actualizar");
-            
             data = {"ruc":ruc,"voucher_number":voucher_number};
             $.ajax({
                 type: 'get',
@@ -272,7 +259,6 @@ $(function(){
                 },1000);
             });
         });
-    
         //Validation spending record button
         $("#save-expense").on("click",function(e){
             e.preventDefault();
@@ -301,7 +287,6 @@ $(function(){
             voucher_number   = number_proof_one+'-'+number_proof_two;
             date             = $("#date").val();
             var balance      = parseFloat($("#balance").val());
-
             //Validación de errores de cabeceras
             var error = 0;
             if(!ruc)
@@ -351,7 +336,6 @@ $(function(){
                 $("#balance").addClass("error-incomplete");
                 error = 1;
             }
-
             //Mostrando errores de cabeceras si es que existen
             if(error !== 0)
             {
@@ -360,7 +344,7 @@ $(function(){
             }
             else
             {
-                data.idsolicitude   = idsolicitude;
+                data.token          = token;
                 data.proof_type     = proof_type;
                 data.ruc            = ruc;
                 data.razon          = razon;
@@ -395,7 +379,6 @@ $(function(){
                 data.description = arr_description;
                 (data_total_item.length>0) ? data.total_item = data_total_item : error_json = 1;
                 data.type_expense = arr_type_expense;
-
                 //Validando el Objeto JSON
                 if(error_json === 0)
                 {
@@ -413,7 +396,6 @@ $(function(){
                     }
                     tot_expense = parseFloat($("#total-expense").val());
                     data.total_expense = tot_expense;
-
                     var tot_expenses = calculateTot($(".total").parent(),'.total_expense');
                     if(tot_expenses >0)
                     {
@@ -572,7 +554,6 @@ $(function(){
             $(".search-ruc").show();
             $("#ruc-hide").siblings().parent().addClass('input-group');
         });
-
     //Ajax
         //Search Social Reason in SUNAT once introduced the RUC
         $(".search-ruc").on("click",function(){
@@ -634,7 +615,6 @@ $(function(){
                 });
             }
         });
-
         //Save data to the controller Expense
         function ajaxExpense(jsonExpense)
         {
@@ -654,14 +634,12 @@ $(function(){
                 }
             });
         }
-
     //Handling Classes
         //Removing errros
         $(document).on("focus","input",function(){
             $(this).removeClass("error-incomplete").attr("placeholder",'');
             $(".message-expense").hide();
         });
-
         //Calculating sum of rows
         function calculateTot(rows,clas){
             var sum = 0;
@@ -670,7 +648,6 @@ $(function(){
             });
             return sum;
         }
-
     //Functions
         //Add Expense
         function newRowExpense(row,arr)
@@ -783,7 +760,6 @@ $(function(){
                 $("#igv").val(0);
             }
         }
-
         //Validation and RUC in recorded documents
         function validateRuc(ruc)
         {
@@ -798,7 +774,6 @@ $(function(){
             else
                 return true;
         }
-
         //Validation RUC and voucher number already registered documents
         function validateVoucher(ruc,voucher_number)
         {
@@ -814,7 +789,6 @@ $(function(){
             else
                 return true;
         }
-
         //Validation RUC and voucher number already registered documents
         function validateEmpty(selector){
             var data = [];
