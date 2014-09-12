@@ -49,7 +49,7 @@ function newSolicitude() {
 
     //Validations
    amount.numeric();
-    idamount.numeric();
+   idamount.numeric();
    amount_fac.numeric();
 
 
@@ -159,8 +159,6 @@ function newSolicitude() {
     });
 
     /* Removing Errors */
-
-
 
     title.on('focus', function () {
         $(this).parent().removeClass('has-error');
@@ -473,7 +471,7 @@ function newSolicitude() {
 
     /** SUPERVISOR */
 
-    /* list solicitude pending */
+    /* list solicitude pending or depending of type state */
     $.ajax({
         url: server + 'listar-solicitudes-sup/' + $('#state_view').val(),
         type: 'GET',
@@ -497,6 +495,7 @@ function newSolicitude() {
                 }
             }
         );
+
     });
 
     var amount_families = $('.amount_families');
@@ -576,7 +575,6 @@ function newSolicitude() {
                 form_acepted_solicitude.submit();
             }
         });
-
 
     });
 
@@ -675,7 +673,7 @@ function newSolicitude() {
     /** --------------------------------- GERENTE PRODUCTO -------------------------------------- **/
 
     $.ajax({
-        url: server + 'listar-solicitudes-gerprod/' + 1,
+        url: server + 'listar-solicitudes-gerprod/' +  $('#state_view').val(),
         type: 'GET',
         dataType: 'html'
 
@@ -705,12 +703,13 @@ function newSolicitude() {
         var total = 0;
 
         e.preventDefault();
+        //almacenamos el monto total por cada familia
         amount_families.each(function (index, value) {
 
             total += parseFloat($(this).val());
         });
 
-        if (idamount.val() == Math.round(total)) {
+        if (idamount.val() == Math.round(total)) { // si la suma total es igual al monto
 
             bootbox.confirm("¿Esta seguro de aceptar esta solicitud?", function (result) {
                 if (result) {
@@ -735,7 +734,75 @@ function newSolicitude() {
         }
     });
 
+    $('#deny_solicitude_gerprod').on('click', function (e) {
 
+        bootbox.confirm("¿Esta seguro que desea rechazar esta solicitud?", function (result) {
+            if (result) {
+                var url = server + 'rechazar-solicitud-gerprod';
+                form_acepted_solicitude.attr('action', url);
+                form_acepted_solicitude.submit();
+            }
+        });
+
+    });
+
+    var search_solicitude_gerprod = $('#search_solicitude_gerprod');
+    search_solicitude_gerprod.on('click', function () {
+        var date_start = $('#date_start');
+        var date_end = $('#date_end');
+        var validate = 0;
+        if (!date_start.val() && date_end.val()) {
+            validate = 1;
+            date_start.parent().addClass('has-error');
+            date_start.attr('placeholder', 'Ingrese Fecha');
+            date_start.addClass('input-placeholder-error');
+
+        }
+        if (!date_end.val() && date_start.val()) {
+            validate = 1;
+            date_end.parent().addClass('has-error');
+            date_end.attr('placeholder', 'Ingrese Fecha');
+            date_end.addClass('input-placeholder-error');
+        }
+        if (validate == 0) {
+
+            date_start.parent().removeClass('has-error');
+            date_start.attr('placeholder', '');
+            date_end.parent().removeClass('has-error');
+            date_end.attr('placeholder', '');
+
+            var l = Ladda.create(this);
+            var idstate = $('#select_state_solicitude_gerprod').val();
+            l.start();
+            var jqxhr = $.post(server + "buscar-solicitudes-gerprod",
+                { idstate: idstate, date_start: date_start.val(), date_end: date_end.val() })
+                .done(function (data) {
+                    console.log(data);
+                    $('#table_solicitude_gerprod_wrapper').remove();
+                    $('.table-solicituds-gerprod').append(data);
+                    $('#table_solicitude_gerprod').dataTable({
+                            "order": [
+                                [ 3, "desc" ]
+                            ],
+                            "bLengthChange": false,
+                            'iDisplayLength': 7,
+                            "oLanguage": {
+                                "sSearch": "Buscar: ",
+                                "sZeroRecords": "No hay solicitudes",
+                                "sInfoEmpty": "No hay solicitudes",
+                                "sInfo": 'Mostrando _END_ de _TOTAL_'
+                            }
+                        }
+                    );
+
+                    l.stop();
+                })
+                .fail(function () {
+                    alert("error");
+                })
+
+        }
+    });
     /** --------------------------------- GERENTE COMERCIAL -------------------------------------- **/
 
     $.ajax({
