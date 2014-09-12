@@ -11,7 +11,6 @@
 					<div class="form-expense">
 						<label>Solicitud</label>
 						<input type="text" class="form-control" value="{{mb_convert_case($solicitude->titulo, MB_CASE_TITLE, 'UTF-8')}}" disabled>
-						<input type="hidden" id="idsolicitude" value="{{$solicitude->idsolicitud}}">
 						<input type="hidden" id="token" value="{{$solicitude->token}}">
 					</div>
 				</div>

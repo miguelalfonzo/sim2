@@ -10,10 +10,12 @@ use \Expense\Expense;
 use \Expense\ProofType;
 use \Expense\ExpenseType;
 use \Expense\ExpenseItem;
+use \User;
 use \Common\State;
 use \Input;
 use \DB;
 use \Redirect;
+use \PDF;
 
 class ExpenseController extends BaseController{
 
@@ -35,41 +37,37 @@ class ExpenseController extends BaseController{
     }
 
 	public function show(){
-		$token = Input::get('token');
-		$solicitude  = Solicitude::where('token',$token)->firstOrFail();
+		$date        = $this->getDay();
 		$typeProof   = ProofType::all();
-		$date = $this->getDay();
 		$typeExpense = ExpenseType::orderBy('idtipogasto','asc')->get();
-
-		$data = [
-			'solicitude'  => $solicitude,
-			'typeProof'   => $typeProof,
-			'typeExpense' => $typeExpense,
-			'date'        => $date
-		];
-
-		$expense = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
-
-		$balance = $solicitude->monto;
+		$token       = Input::get('token');
+		$solicitude  = Solicitude::where('token',$token)->firstOrFail();
+		$expense     = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
+		$balance     = $solicitude->monto;
 		if(count($expense)>0)
 		{
-			$data['expense'] = $expense;
 			$balance         = 0;
 			foreach ($expense as $key => $value) {
 				$balance += $value->monto;
 			}
 			$balance= $solicitude->monto - $balance;
+			$data = [
+				'solicitude'  => $solicitude,
+				'typeProof'   => $typeProof,
+				'typeExpense' => $typeExpense,
+				'date'        => $date,
+				'balance'     => $balance,
+				'expense'     => $expense
+			];
+			return View::make('Expense.register',$data);
  		}
- 		
- 		$data['balance'] = $balance;
-
-		return View::make('Expense.register',$data);
 	}
 
 	public function registerExpense(){
 		$expense        = Input::get('data');
 		$expenseJson    = json_decode($expense);
-		$row_solicitude = Solicitude::find($expenseJson->idsolicitude);
+		$row_solicitude = Solicitude::where('token',$expenseJson->token)->firstOrFail();
+		// $row_solicitude = Solicitude::find($expenseJson->idsolicitude);
 		$row_expense    = Expense::where('num_comprobante',$expenseJson->voucher_number)->where('ruc',$expenseJson->ruc)->get();
 
 		if(count($row_expense)>0)
@@ -153,11 +151,9 @@ class ExpenseController extends BaseController{
 	}
 
 	public function updateExpense(){
-		$expense     = Input::get('data');
-		$expenseJson = json_decode($expense);
-
+		$expense       = Input::get('data');
+		$expenseJson   = json_decode($expense);
 		$expenseUpdate = Expense::where('ruc',$expenseJson->ruc)->where('num_comprobante',$expenseJson->voucher_number)->get();
-
 		if(count($expenseUpdate)>0)
 		{
 			foreach ($expenseUpdate as $key => $value) {
@@ -225,18 +221,44 @@ class ExpenseController extends BaseController{
 		}
 	}
 
-	public function test(){
- 		$expenseUpdate = Expense::where('ruc',"20422488198")->where('num_comprobante',"1-23")->get();
-		if(count($expenseUpdate)>0)
+	public function viewExpense($token){
+		$solicitude = Solicitude::where('token',$token)->firstOrFail();
+		if(count($solicitude)>0)
 		{
-			foreach ($expenseUpdate as $key => $value) {
-				var_dump($value->idgasto);
-			}
+			$expense = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
 		}
-		else
-		{
-			var_dump("ERROR");
-		}
+		$data = [
+			'solicitude' => $solicitude,
+			'expense' => $expense
+		];
+		return View::make('Expense.view',$data);
 	}
 
+	public function reportExpense($token){
+		$solicitude = Solicitude::where('token',$token)->firstOrFail();
+		$aproved_user = User::where('id',$solicitude->idaproved)->firstOrFail();
+		if($aproved_user->type === 'P')
+		{
+			$name_aproved = $aproved_user->gerprod->descripcion;
+			$charge = "Gerente de Producto";
+		}
+		if($aproved_user->type === 'S')
+		{
+			$name_aproved = $aproved_user->sup->nombres;
+			$charge = "Supervisor";
+		}
+		$data = [
+			'solicitude' => $solicitude,
+			'date' => $this->getDay(),
+			'name' => $name_aproved,
+			'charge' => $charge
+		];
+		$html = View::make('Expense.report',$data);
+		return PDF::load($html, 'A4', 'landscape')->show();
+	}
+
+	public function test(){
+ 		$html = View::make('Expense.report');
+		return PDF::load($html, 'A4', 'landscape')->show();
+	}
 }
