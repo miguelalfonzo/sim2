@@ -2,7 +2,7 @@
     <thead>
     <tr>
         <th>Solicitud</th>
-        <th>Presupuesto</th>
+        <th>Monto Solicitado</th>
         <th>Estado</th>
         <th>Fecha</th>
         <th>Tipo de Solicitud</th>

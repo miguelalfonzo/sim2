@@ -85,6 +85,7 @@ Route::group(array('before' => 'gerprod'), function () {
     Route::post('aceptar-solicitud-gerprod', 'Dmkt\SolicitudeController@acceptedSolicitudeGerProd');
     Route::post('rechazar-solicitud-gerprod', 'Dmkt\SolicitudeController@denySolicitudeGerProd');
     Route::post('buscar-solicitudes-gerprod', 'Dmkt\SolicitudeController@searchSolicitudsGerProd');
+    Route::get('cancelar-solicitud-gerprod/{token}','Dmkt\SolicitudeController@cancelSolicitudeGerProd');
 
 });
 /**

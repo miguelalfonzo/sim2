@@ -5,7 +5,7 @@
 
 <div class="panel panel-default">
 <div class="panel-heading">
-    <h3 class="panel-title">Ver Solicitud Supervisor</h3>
+    <h3 class="panel-title">Ver Solicitud Supervisor</h3> <small style="float: right; margin-top: -10px"><strong>Usuario : {{Auth::user()->Sup->nombres}}</strong></small>
 </div>
 <div class="panel-body">
 <form id="form_make_activity" class="" method="post" action="">
@@ -268,7 +268,7 @@
 <div class="form-group col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px">
 
     <div class="col-sm-12 col-md-12 col-lg-12" style="text-align: center">
-        @if($solicitude->estado == PENDIENTE && $solicitude->derived == 0)
+        @if($solicitude->estado == PENDIENTE && $solicitude->derived == 0 && $solicitude->user->type == 'R')
         <a href="{{URL::to('aceptar_solicitud')}}" id="test" name="button1id"
            class="btn btn-primary accepted_solicitude_sup">Aceptar
         </a>

@@ -28,7 +28,7 @@ function newSolicitude() {
         $('#listfamily>li:first-child').clone(true, true).appendTo('#listfamily');
     });
 
-
+    $('.selectestatesolicitude option[value=1]').attr('selected','selected');
     //delete a family
     $(document).on("click", ".btn-delete-family", function () {
         $('#listfamily>li .porcentaje_error').css({"border": "0"});

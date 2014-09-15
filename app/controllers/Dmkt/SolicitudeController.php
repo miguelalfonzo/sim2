@@ -119,12 +119,11 @@ class SolicitudeController extends BaseController
     public function newSolicitude()
     {
 
-        $families = Marca::all();
+        $families = Marca::orderBy('descripcion','Asc')->get();
 
         $subtypeactivities = SubTypeActivity::all();
         $typesolicituds = TypeSolicitude::all();
         $data = [
-
             'families' => $families,
             'subtypeactivities' => $subtypeactivities,
             'typesolicituds' => $typesolicituds
@@ -764,6 +763,15 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.GerProd.view_solicitude_gerprod', $data);
     }
 
+    public function cancelSolicitudeGerProd($token){
+
+        $solicitude = Solicitude::where('token', $token)->firstOrFail();
+        SolicitudeGer::where('idsolicitud',$solicitude->idsolicitud) // desblockeamos la solicitud para que el otro gerente no lo pueda editar
+                ->update(array('blocked'=> 0));
+        return Redirect::to('show_gerprod');
+
+    }
+
     public function acceptedSolicitudeGerProd()
     {
 
@@ -808,15 +816,21 @@ class SolicitudeController extends BaseController
 
         if ($user->type == 'P') {
 
+            $solicitud_ids=[];
+            $solicituds = $user->GerProd->solicituds;
+            foreach($solicituds as $sol){
+                $solicitud_ids[] = $sol->idsolicitud;
+            }
+
             if ($start != null && $end != null) {
                 if ($estado != 0) {
-                    $solicituds = Solicitude::where('idaproved', $user->id)
+                    $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
                         ->where('estado',$estado)
                         ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
                         ->get();
 
                 } else {
-                    $solicituds = Solicitude::where('idaproved', $user->id)
+                    $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
                         ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
                         ->get();
                 }
@@ -824,12 +838,12 @@ class SolicitudeController extends BaseController
 
             } else {
                 if ($estado != 0) {
-                    $solicituds = Solicitude::where('idaproved', $user->id)
+                    $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
                         ->where('estado', $estado)
                         ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
                         ->get();
                 } else {
-                    $solicituds = Solicitude::where('idaproved', $user->id)
+                    $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
                         ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
                         ->get();
                 }

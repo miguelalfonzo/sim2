@@ -5,7 +5,7 @@
 
 <div class="panel panel-default">
 <div class="panel-heading">
-    <h4 class="panel-title">Nueva Solicitud</h4>
+    <h3 class="panel-title">Nueva Solicitud</h3><small style="float: right; margin-top: -10px"><strong>Usuario : @if(Auth::user()->type == 'R') {{Auth::user()->rm->nombres}}@else {{Auth::user()->Sup->nombres}} @endif</strong></small>
 </div>
 <div class="panel-body">
 <form id="form-register-solicitude" class="" method="post"

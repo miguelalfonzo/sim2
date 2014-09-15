@@ -294,12 +294,17 @@
            class="btn btn-primary accepted_solicitude_gerprod">Aceptar</a>
         <a id="deny_solicitude_gerprod" name="button1id" class="btn btn-primary deny_solicitude_gerprod">Rechazar
         </a>
-        @endif
-        <a id="button2id" href="{{URL::to('show_sup')}}" name="button2id"
+        <a id="button2id" href="{{URL::to('cancelar-solicitud-gerprod').'/'.$solicitude->token}}" name="button2id"
+           class="btn btn-primary">Cancelar</a>
+        @else
+        <a id="button2id" href="{{URL::to('show_gerprod')}}" name="button2id"
            class="btn btn-primary">Cancelar</a>
 
+        @endif
+
+
         @else
-        <a id="button2id" href="{{URL::to('show_sup')}}" name="button2id"
+        <a id="button2id" href="{{URL::to('show_gerprod')}}" name="button2id"
            class="btn btn-primary">Cancelar</a>
         @endif
     </div>
