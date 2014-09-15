@@ -1,36 +1,106 @@
-.background
+footer
 {
-	background: url(../img/logo-report.png);
+	bottom: -3em;
+	font-size: 14px;
+	left: 0;
+	margin-left: 1em;
+	overflow: hidden;
+	position: absolute;
+	width: 95%;
+}
+footer div
+{
+	margin: .5em 4em;
+}
+footer p
+{
+	display: inline;
 }
 header
 {
 	margin-left: 5em;
 }
+header p
+{
+	margin-left: 3em;
+	margin-top: .85em;
+}
 header p, header img
 {
 	display: inline-block;
-	vertical-align: middle;
 	font-size: 1.25em;
+	vertical-align: middle;
+}
+main p
+{
+	margin-left: 3.5em;
 }
 p
 {
-	margin-left: 1.5em;
+	margin-left: 2em;
 }
-
-table thead th, table tbody th
+table
 {
-	text-align: center;
-	padding: .5em;
+	border-spacing: 0;
+	font-size: .9em;
 }
 table thead
 {
-	border-bottom: 1px solid black;
+	background: rgb(238, 238, 238);
+}
+table th, table td
+{
+	text-align: center;
+	padding: .5em;
+	border: 1px solid black;
 }
 table tbody th
 {
-	color: #494545;
+	color: rgb(65, 62, 62);
 }
-
+tfoot td
+{
+	border: 1px solid white;
+	font-size: 14px;
+	padding: 0.25em;
+}
+.align-left
+{
+	text-align: left !important;
+	padding-left: 1em;
+}
+.background
+{
+	background: url('../img/logo-report.png');
+}
+.border
+{
+	border: 1px solid black;
+	text-align: center;
+}
+.border-white
+{
+	border-top: 1px solid black;
+}
+.bottom
+{
+	border-bottom: 2px solid black;
+}
+.firma
+{
+	display: inline;
+	border-top: 1px solid black;
+	margin-left: 10em;
+	padding: .25em;
+}
+.firma:nth-child(1)
+{
+	margin-left: 4em;
+}
+.other
+{
+	border-right: 1px solid black;	
+}
 .table
 {
 	margin: 0 auto;

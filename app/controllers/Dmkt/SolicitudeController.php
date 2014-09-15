@@ -10,7 +10,7 @@
 namespace Dmkt;
 
 use \Common\State;
-use \Common\SubTypeActivity;
+use \Common\SubTypeActivity
 use \Common\TypeActivity;
 use \BaseController;
 use Symfony\Component\Finder\Comparator\DateComparator;

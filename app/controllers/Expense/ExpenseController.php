@@ -16,6 +16,7 @@ use \Input;
 use \DB;
 use \Redirect;
 use \PDF;
+use \Dmkt\Client;
 
 class ExpenseController extends BaseController{
 
@@ -51,16 +52,16 @@ class ExpenseController extends BaseController{
 				$balance += $value->monto;
 			}
 			$balance= $solicitude->monto - $balance;
-			$data = [
-				'solicitude'  => $solicitude,
-				'typeProof'   => $typeProof,
-				'typeExpense' => $typeExpense,
-				'date'        => $date,
-				'balance'     => $balance,
-				'expense'     => $expense
-			];
-			return View::make('Expense.register',$data);
  		}
+ 		$data = [
+			'solicitude'  => $solicitude,
+			'typeProof'   => $typeProof,
+			'typeExpense' => $typeExpense,
+			'date'        => $date,
+			'balance'     => $balance,
+			'expense'     => $expense
+		];
+ 		return View::make('Expense.register',$data);
 	}
 
 	public function registerExpense(){
@@ -236,6 +237,7 @@ class ExpenseController extends BaseController{
 
 	public function reportExpense($token){
 		$solicitude = Solicitude::where('token',$token)->firstOrFail();
+		$expense = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
 		$aproved_user = User::where('id',$solicitude->idaproved)->firstOrFail();
 		if($aproved_user->type === 'P')
 		{
@@ -251,7 +253,8 @@ class ExpenseController extends BaseController{
 			'solicitude' => $solicitude,
 			'date' => $this->getDay(),
 			'name' => $name_aproved,
-			'charge' => $charge
+			'charge' => $charge,
+			'expense' => $expense
 		];
 		$html = View::make('Expense.report',$data);
 		return PDF::load($html, 'A4', 'landscape')->show();
