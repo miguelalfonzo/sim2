@@ -110,7 +110,7 @@ class SolicitudeController extends BaseController
     public function getclients()
     {
 
-        $clients = Client::take(30)->get(array('clcodigo', 'clnombre'));
+        $clients = Client::take(1030)->get(array('clcodigo', 'clnombre'));
 
         return json_encode($clients);
     }
