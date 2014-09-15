@@ -23,13 +23,13 @@
         </td>
         <td style="text-align: center">{{ date_format(date_create($solicitude->created_at), 'd/m/Y' )}}</td>
         <td style="text-align: center">{{$solicitude->typesolicitude->nombre}}</td>
-        <td><div class="div-icons-solicituds" style="text-align: center">
-
-            <a  href="{{URL::to('ver-solicitud-sup').'/'.$solicitude->token}}"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span></a>
-           @if($solicitude->estado == PENDIENTE && $solicitude->user->type == 'S')
-            <a  href="{{URL::to('editar-solicitud').'/'.$solicitude->token}}"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-pencil"></span></a>
-                <a href="#" class="cancel-solicitude-sup" data-idsolicitude = "{{$solicitude->idsolicitud}}"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-remove"></span></a>
-           @endif
+        <td>
+            <div class="div-icons-solicituds">
+            <a  href="{{URL::to('ver-solicitud-sup').'/'.$solicitude->token}}"><span class="glyphicon glyphicon-eye-open"></span></a>
+            @if($solicitude->estado == PENDIENTE && $solicitude->user->type == 'S')
+                <a  href="{{URL::to('editar-solicitud').'/'.$solicitude->token}}"><span class="glyphicon glyphicon-pencil"></span></a>
+                <a href="#" class="cancel-solicitude-sup" data-idsolicitude = "{{$solicitude->idsolicitud}}"><span class="glyphicon glyphicon-remove"></span></a>
+            @endif
             </div>
         </td>
     </tr>
