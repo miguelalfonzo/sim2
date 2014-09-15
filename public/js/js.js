@@ -44,6 +44,7 @@ $(function(){
     var number_proof_two;
     var voucher_number;
     var date;
+    var desc_expense;
     var row_item;
     var tot_item = 0;
     var row_items;
@@ -227,6 +228,7 @@ $(function(){
                     date = data_response.date.split('-');
                     date = date[2].substring(0,2)+'/'+date[1]+'/'+date[0];
                     $("#date").val(date);
+                    $("#desc-expense").val(data_response.expense.descripcion);
                     $.each(data_response.data,function(index,value){
                         var row_add = row_item_first.clone();
                         row_add.find('.quantity input').val(value.cantidad);
@@ -286,6 +288,7 @@ $(function(){
             number_proof_two = $("#number-proof-two").val();
             voucher_number   = number_proof_one+'-'+number_proof_two;
             date             = $("#date").val();
+            desc_expense     = $("#desc-expense").val();
             var balance      = parseFloat($("#balance").val());
             //Validación de errores de cabeceras
             var error = 0;
@@ -331,6 +334,12 @@ $(function(){
                 $("#date").addClass("error-incomplete");
                 error = 1;
             }
+            if(!desc_expense)
+            {
+                $("#desc-expense").attr("placeholder","No se ha ingresado el RUC.");
+                $("#desc-expense").addClass("error-incomplete");
+                error = 1;
+            }
             if(balance < 0)
             {
                 $("#balance").addClass("error-incomplete");
@@ -350,6 +359,7 @@ $(function(){
                 data.razon          = razon;
                 data.voucher_number = voucher_number;
                 data.date_movement  = date;
+                data.desc_expense   = desc_expense;
 
                 var error_json = 0;
                 //Datos del detalle gastos por items
@@ -688,6 +698,7 @@ $(function(){
             $(".tot-document").hide();
             $("#total-expense").val('');
             $("#tot-edit-hidden").val('');
+            $("#desc-expense").val('');
         }
         //Calculate Balance
         function calcularBalance()

@@ -68,7 +68,6 @@ class ExpenseController extends BaseController{
 		$expense        = Input::get('data');
 		$expenseJson    = json_decode($expense);
 		$row_solicitude = Solicitude::where('token',$expenseJson->token)->firstOrFail();
-		// $row_solicitude = Solicitude::find($expenseJson->idsolicitude);
 		$row_expense    = Expense::where('num_comprobante',$expenseJson->voucher_number)->where('ruc',$expenseJson->ruc)->get();
 
 		if(count($row_expense)>0)
@@ -100,6 +99,7 @@ class ExpenseController extends BaseController{
 	        list($d, $m, $y) = explode('/', $date);
 	        $d = mktime(11, 14, 54, $m, $d, $y);
 	        $date = date("Y/m/d", $d);
+	        $expense->descripcion = $expenseJson->desc_expense;
 	        $expense->fecha_movimiento = $date;
 	        $expense->tipo_comprobante = $expenseJson->proof_type;
 			$idgasto = $expense->lastId()+1;

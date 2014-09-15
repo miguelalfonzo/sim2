@@ -1,3 +1,18 @@
+.div-icons-solicituds
+{
+    text-align: center;
+}
+
+.div-icons-solicituds a
+{
+    font-size: 1.25em;
+    padding-left: .75em;
+}
+.div-icons-solicituds a:first-child
+{
+    padding: 0;
+}
+
 ul{
   list-style-type: none;
 
@@ -80,8 +95,7 @@ selectproduct{
         text-align: left !important;
     }
     .div-icons-solicituds span{
-
-        font-size: 1.6em !important;
+        font-size: 1.1em !important;
     }
     .div-icons-solicituds {
         width: 100px;

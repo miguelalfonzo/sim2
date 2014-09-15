@@ -99,7 +99,7 @@
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Descripción del Gasto</label>
-						<input id="desc_expense" type="text" class="form-control">
+						<input id="desc-expense" type="text" class="form-control">
 					</div>
 				</div>
 			</section>
