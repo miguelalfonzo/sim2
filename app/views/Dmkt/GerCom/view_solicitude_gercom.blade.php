@@ -165,6 +165,28 @@
                 </div>
             </div>
 
+            <div class="form-group col-sm-6 col-md-4 col-lg-4">
+
+                <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Solicitante</label>
+
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                    <div class="input-group">
+                        @if($solicitude->user->type == 'R')
+                        <span class="input-group-addon">R</span>
+                        <input id="textinput" name="titulo" type="text" placeholder=""
+                               value="{{$solicitude->user->rm->nombres}}" readonly
+                               class="form-control input-md">
+                        @else
+                        <span class="input-group-addon">S</span>
+                        <input id="textinput" name="titulo" type="text" placeholder=""
+                               value="{{$solicitude->user->sup->nombres}}" readonly
+                               class="form-control input-md">
+                        @endif
+                    </div>
+
+                </div>
+            </div>
+
             <div class="col-sm-12 col-md-12" style="margin-top: 10px">
                 <div class="form-group col-sm-12 col-md-12">
                     <label class="col-sm-8 col-md-8 control-label" for="textarea">Descripcion de la

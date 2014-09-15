@@ -14,7 +14,7 @@
 @if(isset($solicitude))
 <input value="{{$solicitude->idsolicitud}}" name="idsolicitude" type="hidden">
 @endif
-
+<input id="typeUser" type="hidden" value="{{Auth::user()->type}}">
 <div class="form-group col-sm-6 col-md-4">
 
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Nombre Solicitud</label>

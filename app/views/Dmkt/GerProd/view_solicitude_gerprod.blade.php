@@ -7,15 +7,16 @@
 <div class="panel-heading">
 
 
-        <h3 class="panel-title">Ver Solicitud Gerente Producto</h3>
+    <h3 class="panel-title">Ver Solicitud Gerente Producto</h3>
 
 
     @if($block == true)
 
-    <h4 class="" style="color: darkred">LA  SOLICITUD ESTA SIENDO EVALUADA</h4>
+    <h4 class="" style="color: darkred">LA SOLICITUD ESTA SIENDO EVALUADA</h4>
 
     @endif
-   <small style="float: right; margin-top: -10px"><strong>Usuario : {{Auth::user()->Gerprod->descripcion}}</strong></small>
+    <small style="float: right; margin-top: -10px"><strong>Usuario : {{Auth::user()->Gerprod->descripcion}}</strong>
+    </small>
 </div>
 <div class="panel-body">
 <form id="form_make_activity" class="" method="post" action="">
@@ -119,6 +120,29 @@
 
     </div>
 </div>
+
+<!--------------------------   Solicitante    ------------------------->
+<div class="form-group col-sm-6 col-md-4 col-lg-4">
+
+    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Solicitante</label>
+
+    <div class="col-sm-12 col-md-12 col-lg-12">
+        <div class="input-group">
+            @if($solicitude->user->type == 'R')
+            <span class="input-group-addon">R</span>
+            <input id="textinput" name="titulo" type="text" placeholder=""
+                   value="{{$solicitude->user->rm->nombres}}" readonly
+                   class="form-control input-md">
+            @else
+            <span class="input-group-addon">S</span>
+            <input id="textinput" name="titulo" type="text" placeholder=""
+                   value="{{$solicitude->user->sup->nombres}}" readonly
+                   class="form-control input-md">
+            @endif
+        </div>
+
+    </div>
+</div>
 <div class="form-group col-sm-6 col-md-4 col-lg-4">
 
     <label class="col-sm-8 col-md-8 ol-lg-8 control-label" for="textinput">Observacion</label>
@@ -137,6 +161,7 @@
 @if(isset($solicitude) && $solicitude->idtiposolicitud == 2)
 <div class="form-group col-sm-6 col-md-4 col-lg-4">
     <label class="col-sm-8 col-md-8 ol-lg-8 control-label" for="textinput">&nbsp;</label>
+
     <div class="col-sm-12 col-md-12 col-lg-12">
         <a class="btn btn-primary btn-md" data-toggle="modal" data-target="#myFac">
             Ver Comprobante
@@ -172,7 +197,7 @@
 </div>
 @endif
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-    <div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6" >
+    <div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6">
 
         <div style="padding: 0 15px">
             <div class="panel panel-default">
@@ -267,7 +292,7 @@
         @if($block == false)
         <a id="test" name="button1id"
            class="btn btn-primary accepted_solicitude_gerprod">Aceptar</a>
-        <a id="deny_solicitude" name="button1id" class="btn btn-primary deny_solicitude">Rechazar
+        <a id="deny_solicitude_gerprod" name="button1id" class="btn btn-primary deny_solicitude_gerprod">Rechazar
         </a>
         @endif
         <a id="button2id" href="{{URL::to('show_sup')}}" name="button2id"

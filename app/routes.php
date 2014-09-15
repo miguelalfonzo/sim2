@@ -25,6 +25,8 @@ Route::get('/', function () {
     return View::make('hello');
 });
 
+Route::get('getclients', 'Dmkt\SolicitudeController@getClients');
+
 /** Auth */
 
 Route::group(array('before' => 'rm'), function () {
@@ -33,17 +35,20 @@ Route::group(array('before' => 'rm'), function () {
 
     Route::get('show_rm', 'Dmkt\SolicitudeController@show_rm');
     Route::get('nueva-solicitud', 'Dmkt\SolicitudeController@newSolicitude');
-
     Route::get('ver-solicitud/{token}', 'Dmkt\SolicitudeController@viewSolicitude');
-    Route::get('editar-solicitud/{id}', 'Dmkt\SolicitudeController@editSolicitude');
-    Route::post('editar-solicitud', 'Dmkt\SolicitudeController@formEditSolicitude');
-    Route::get('getclients', 'Dmkt\SolicitudeController@getClients');
-    Route::post('registrar-solicitud', 'Dmkt\SolicitudeController@registerSolicitude');
+    Route::post('cancelar-solicitud-rm', 'Dmkt\SolicitudeController@cancelSolicitude');
     Route::get('listar-solicitudes/{id}', 'Dmkt\SolicitudeController@listSolicitude');
     Route::get('getsubtypeactivities/{id}', 'Dmkt\SolicitudeController@subtypeactivity');
     Route::post('buscar-solicitudes', 'Dmkt\SolicitudeController@searchSolicituds');
-    Route::post('cancelar-solicitud-rm', 'Dmkt\SolicitudeController@cancelSolicitude');
 
+
+
+});
+Route::group(array('before' => 'auth') ,function(){
+
+    Route::post('registrar-solicitud', 'Dmkt\SolicitudeController@registerSolicitude');
+    Route::get('editar-solicitud/{id}', 'Dmkt\SolicitudeController@editSolicitude');
+    Route::post('editar-solicitud', 'Dmkt\SolicitudeController@formEditSolicitude');
 
 });
 
@@ -51,13 +56,15 @@ Route::group(array('before' => 'sup'), function () {
     /** Supervisor */
 
     Route::get('show_sup', 'Dmkt\SolicitudeController@show_sup');
+    Route::get('nueva-solicitud-sup', 'Dmkt\SolicitudeController@newSolicitude');
     Route::get('ver-solicitud-sup/{id}', 'Dmkt\SolicitudeController@viewSolicitudeSup');
     Route::get('listar-solicitudes-sup/{id}', 'Dmkt\SolicitudeController@listSolicitudeSup');
     Route::post('rechazar-solicitud', 'Dmkt\SolicitudeController@denySolicitude');
+    Route::post('registrar-solicitud-gerprod', 'Dmkt\SolicitudeController@registerSolicitude');
     Route::post('aceptar-solicitud', 'Dmkt\SolicitudeController@acceptedSolicitude');
     Route::post('buscar-solicitudes-sup', 'Dmkt\SolicitudeController@searchSolicitudsSup');
     Route::get('derivar-solicitud/{token}', 'Dmkt\SolicitudeController@derivedSolicitude');
-
+    Route::post('cancelar-solicitud-sup', 'Dmkt\SolicitudeController@cancelSolicitudeSup');
 });
 
 /*------------------ Test --------------**/
@@ -76,6 +83,8 @@ Route::group(array('before' => 'gerprod'), function () {
     Route::get('ver-solicitud-gerprod/{id}', 'Dmkt\SolicitudeController@viewSolicitudeGerProd');
     Route::get('aprobar-solicitud/{token}', 'Dmkt\SolicitudeController@approvedSolicitude');
     Route::post('aceptar-solicitud-gerprod', 'Dmkt\SolicitudeController@acceptedSolicitudeGerProd');
+    Route::post('rechazar-solicitud-gerprod', 'Dmkt\SolicitudeController@denySolicitudeGerProd');
+    Route::post('buscar-solicitudes-gerprod', 'Dmkt\SolicitudeController@searchSolicitudsGerProd');
 
 });
 /**

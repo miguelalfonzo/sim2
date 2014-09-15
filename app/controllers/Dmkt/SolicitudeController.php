@@ -23,6 +23,7 @@ use \Image;
 use \Hash;
 use \User;
 use \Auth;
+use \Session;
 use \Illuminate\Database\Query\Builder;
 
 class SolicitudeController extends BaseController
@@ -109,7 +110,7 @@ class SolicitudeController extends BaseController
     public function getclients()
     {
 
-        $clients = Client::take(30)->get(array('clcodigo', 'clnombre'));
+        $clients = Client::take(1030)->get(array('clcodigo', 'clnombre'));
 
         return json_encode($clients);
     }
@@ -175,12 +176,12 @@ class SolicitudeController extends BaseController
 
             );
 
-
+            /*
             Mail::send('emails.template', $data, function ($message) {
                 $message->to('cesarhm1687@gmail.com');
                 $message->subject('Nueva Solicitud');
 
-            });
+            });*/
             $clients = $inputs['clients'];
             foreach ($clients as $client) {
                 $cod = explode(' ', $client);
@@ -205,6 +206,7 @@ class SolicitudeController extends BaseController
                 return 'R';
             if ($typeUser == 'S')
                 return 'S';
+
         }
 
     }
@@ -359,7 +361,7 @@ class SolicitudeController extends BaseController
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
 
-        return $this->listSolicitude(2);
+        return $this->listSolicitude(PENDIENTE);
 
     }
 
@@ -422,13 +424,19 @@ class SolicitudeController extends BaseController
         return $view;
     }
 
-    /** Supervisor */
+    /** -----------------------------------------------  Supervisor -------------------------------------------------------*/
 
     public function show_sup()
     {
 
+        $state = Session::get('state');
         $states = State::orderBy('idestado', 'ASC')->get();
-        return View::make('Dmkt.Sup.show_sup')->with('states', $states);
+        $data = [
+
+            'states' => $states,
+            'state' => $state
+        ];
+        return View::make('Dmkt.Sup.show_sup', $data);
 
     }
 
@@ -444,6 +452,82 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.Sup.view_solicitude_sup', $data);
     }
 
+    public function registerSolicitudeGerProd()
+    {
+
+
+        $inputs = Input::all();
+        $image = Input::file('file');
+        $solicitude = new Solicitude;
+        if (isset($image)) {
+
+            $filename = uniqid() . '.' . $image->getClientOriginalExtension();
+            //$filename = $image->getClientOriginalName();
+            $path = public_path('img/reembolso/' . $filename);
+            Image::make($image->getRealPath())->resize(800, 600)->save($path);
+            $solicitude->image = $filename;
+        }
+
+
+        $date = $inputs['delivery_date'];
+        list($d, $m, $y) = explode('/', $date);
+        $d = mktime(11, 14, 54, $m, $d, $y);
+        $date = date("Y/m/d", $d);
+        $solicitude->idsolicitud = $solicitude->searchId() + 1;
+        $solicitude->descripcion = $inputs['description'];
+        $solicitude->titulo = $inputs['titulo'];
+        $solicitude->monto = $inputs['monto'];
+        $solicitude->estado = PENDIENTE;
+        $solicitude->iduser = Auth::user()->id;
+        $solicitude->monto_factura = $inputs['amount_fac'];
+        $solicitude->fecha_entrega = $date;
+        $solicitude->idtiposolicitud = $inputs['type_solicitude'];
+        $solicitude->token = sha1(md5(uniqid($solicitude->idsolicitud, true)));
+        $solicitude->idsubtipoactividad = $inputs['sub_type_activity'];
+        $solicitude->tipo_moneda = $inputs['money'];
+        if ($solicitude->save()) {
+            $data = array(
+
+                'name' => $inputs['titulo'],
+                'description' => $inputs['description'],
+                'monto' => $inputs['monto'],
+                'money' => $inputs['money']
+
+            );
+
+            /*
+            Mail::send('emails.template', $data, function ($message) {
+                $message->to('cesarhm1687@gmail.com');
+                $message->subject('Nueva Solicitud');
+
+            });*/
+            $clients = $inputs['clients'];
+            foreach ($clients as $client) {
+                $cod = explode(' ', $client);
+                $solicitude_clients = new SolicitudeClient;
+
+                $solicitude_clients->idsolicitud_clientes = $solicitude_clients->searchId() + 1;
+                $solicitude_clients->idsolicitud = $solicitude->searchId();
+                $solicitude_clients->idcliente = $cod[0];
+                $solicitude_clients->save();
+            }
+            $families = $inputs['families'];
+            foreach ($families as $family) {
+
+                $solicitude_families = new SolicitudeFamily;
+                $solicitude_families->idsolicitud_familia = $solicitude_families->searchId() + 1;
+                $solicitude_families->idsolicitud = $solicitude->searchId();
+                $solicitude_families->idfamilia = $family;
+                $solicitude_families->save();
+            }
+            $typeUser = Auth::user()->type;
+
+            if ($typeUser == 'S')
+                return 'S';
+        }
+
+    }
+
     public function denySolicitude()
     {
 
@@ -455,7 +539,7 @@ class SolicitudeController extends BaseController
         $solicitude->estado = RECHAZADO;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
-        return Redirect::to('show_sup');
+        return Redirect::to('show_sup')->with('state',RECHAZADO);
 
     }
 
@@ -484,7 +568,8 @@ class SolicitudeController extends BaseController
             $i++;
         }
         //echo json_encode($families);die;
-        return Redirect::to('show_sup');
+
+        return Redirect::to('show_sup')->with('state',ACEPTADO);
 
     }
 
@@ -552,11 +637,13 @@ class SolicitudeController extends BaseController
         $lastday = date('t-m-Y', strtotime($m));
         $firstday = date('01-m-Y', strtotime($m));
 
-        if (Auth::user()->type == 'S') {
-            $reps = Auth::user()->Sup->Reps;
+        $user = Auth::user();
+        if ($user->type == 'S') {
+            $reps = $user->Sup->Reps;
             $users_ids = [];
             foreach ($reps as $rm)
                 $users_ids[] = $rm->iduser;
+            $users_ids[] = $user->id;
             if ($start != null && $end != null) {
                 if ($estado != 0) {
                     $solicituds = Solicitude::whereIn('iduser', $users_ids)
@@ -589,15 +676,34 @@ class SolicitudeController extends BaseController
         }
     }
 
+    public function cancelSolicitudeSup()
+    {
+
+        $inputs = Input::all();
+        $id = $inputs['idsolicitude'];
+        $solicitude = Solicitude::where('idsolicitud', $id);
+        $solicitude->estado = CANCELADO;
+        $data = $this->objectToArray($solicitude);
+        $solicitude->update($data);
+
+        return $this->listSolicitude(PENDIENTE);
+
+    }
+
+
     /** --------------------------------------------- Gerente de  Producto ----------------------------------------------- */
 
     public function show_gerprod()
     {
-
+        $state = Session::get('state');
         $states = State::orderBy('idestado', 'ASC')->get();
-        return View::make('Dmkt.GerProd.show_gerprod')->with('states', $states);
-    }
+        $data = [
 
+            'states' => $states,
+            'state' => $state
+        ];
+        return View::make('Dmkt.GerProd.show_gerprod',$data);
+    }
 
     public function listSolicitudeGerProd($id)
     {
@@ -656,6 +762,7 @@ class SolicitudeController extends BaseController
         ];
         return View::make('Dmkt.GerProd.view_solicitude_gerprod', $data);
     }
+
     public function acceptedSolicitudeGerProd()
     {
 
@@ -684,6 +791,7 @@ class SolicitudeController extends BaseController
         return Redirect::to('show_gerprod');
 
     }
+
     public function searchSolicitudsGerProd()
     {
 
@@ -696,6 +804,7 @@ class SolicitudeController extends BaseController
         $lastday = date('t-m-Y', strtotime($m));
         $firstday = date('01-m-Y', strtotime($m));
         $user = Auth::user();
+
         if ($user->type == 'P') {
 
             if ($start != null && $end != null) {
@@ -714,21 +823,38 @@ class SolicitudeController extends BaseController
 
             } else {
                 if ($estado != 0) {
-                    $solicituds = Solicitude::whereIn('iduser', $users_ids)
+                    $solicituds = Solicitude::where('idaproved', $user->id)
                         ->where('estado', $estado)
                         ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
                         ->get();
                 } else {
-                    $solicituds = Solicitude::whereIn('iduser', $users_ids)
+                    $solicituds = Solicitude::where('idaproved', $user->id)
                         ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
                         ->get();
                 }
             }
 
-            $view = View::make('Dmkt.Sup.view_solicituds_sup')->with('solicituds', $solicituds);
+            $view = View::make('Dmkt.GerProd.view_solicituds_gerprod')->with('solicituds', $solicituds);
             return $view;
         }
     }
+
+    public function denySolicitudeGerProd()
+    {
+
+        $inputs = Input::all();
+        $id = $inputs['idsolicitude'];
+        $solicitude = Solicitude::where('idsolicitud', $id);
+        $solicitude->idsolicitud = (int)$id;
+        $solicitude->idaproved = Auth::user()->id;
+        $solicitude->observacion = $inputs['observacion'];
+        $solicitude->estado = RECHAZADO;
+        $data = $this->objectToArray($solicitude);
+        $solicitude->update($data);
+        return Redirect::to('show_gerprod')->with('state',RECHAZADO);
+
+    }
+
 
     /** ---------------------------------------------  Gerente Comercial  -------------------------------------------------*/
 

@@ -11,15 +11,13 @@
 |
 */
 
-App::before(function($request)
-{
-	//
+App::before(function ($request) {
+    //
 });
 
 
-App::after(function($request, $response)
-{
-	//
+App::after(function ($request, $response) {
+    //
 });
 
 /*
@@ -34,72 +32,59 @@ App::after(function($request, $response)
 */
 
 
-Route::filter('auth', function()
-{
-	if (Auth::guest())
-	{
-		if (Request::ajax())
-		{
-			return Response::make('Unauthorized', 401);
-		}
-		else
-		{
-			return Redirect::guest('login');
-		}
-	}
+Route::filter('auth', function () {
+    if (Auth::guest()) {
+        if (Request::ajax()) {
+            return Response::make('Unauthorized', 401);
+        } else {
+            return Redirect::guest('login');
+        }
+    }
 });
 
-Route::filter('rm', function()
-{
-    if (Auth::check())
-    {
-        if(Auth::user()->type != 'R' && Auth::user()->type=='S')
-        return Redirect::to('show_sup');
-        if(Auth::user()->type != 'R' && Auth::user()->type=='P')
+Route::filter('rm', function () {
+
+    if (Auth::check()) {
+        if (Auth::user()->type != 'R' && Auth::user()->type == 'S')
+            return Redirect::to('show_sup');
+        if (Auth::user()->type != 'R' && Auth::user()->type == 'P')
             return Redirect::to('show_gerprod');
 
-    }else{
+    } else {
 
         return Redirect::to('login');
     }
 });
 
-Route::filter('sup', function()
-{
-    if (Auth::check())
-    {
-        if(Auth::user()->type != 'S' && Auth::user()->type == 'R')
+Route::filter('sup', function () {
+    if (Auth::check()) {
+        if (Auth::user()->type != 'S' && Auth::user()->type == 'R')
             return Redirect::to('show_rm');
-        if(Auth::user()->type != 'S' && Auth::user()->type == 'P')
+        if (Auth::user()->type != 'S' && Auth::user()->type == 'P')
             return Redirect::to('show_gerprod');
 
-    }else{
+    } else {
 
         return Redirect::to('login');
     }
 });
 
-Route::filter('gerprod', function()
-{
-    if (Auth::check())
-    {
-        if(Auth::user()->type != 'P' && Auth::user()->type == 'R')
+Route::filter('gerprod', function () {
+    if (Auth::check()) {
+        if (Auth::user()->type != 'P' && Auth::user()->type == 'R')
             return Redirect::to('show_rm');
-        if(Auth::user()->type != 'P' && Auth::user()->type == 'S')
+        if (Auth::user()->type != 'P' && Auth::user()->type == 'S')
             return Redirect::to('show_sup');
 
-    }else{
+    } else {
 
         return Redirect::to('login');
     }
 });
 
 
-
-
-Route::filter('auth.basic', function()
-{
-	return Auth::basic();
+Route::filter('auth.basic', function () {
+    return Auth::basic();
 });
 
 /*
@@ -113,9 +98,8 @@ Route::filter('auth.basic', function()
 |
 */
 
-Route::filter('guest', function()
-{
-	if (Auth::check()) return Redirect::to('/');
+Route::filter('guest', function () {
+    if (Auth::check()) return Redirect::to('/');
 });
 
 /*
@@ -129,10 +113,8 @@ Route::filter('guest', function()
 |
 */
 
-Route::filter('csrf', function()
-{
-	if (Session::token() != Input::get('_token'))
-	{
-		throw new Illuminate\Session\TokenMismatchException;
-	}
+Route::filter('csrf', function () {
+    if (Session::token() != Input::get('_token')) {
+        throw new Illuminate\Session\TokenMismatchException;
+    }
 });
