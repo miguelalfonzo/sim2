@@ -144,8 +144,8 @@
             <p class="firma">FIRMA DEL EMPLEADO</p>
             <p class="firma">V°B° SUPERVISOR</p>
             <p class="firma">V°B° GERENTE COMERCIAL</p>
-            <div>DNI:&nbsp;<span class="dni">44815627</span></div>
-            <div>NOMBRE:&nbsp;<span class="dni">Lucy Alfaro Benavides</span></div>
+            <div>DNI:&nbsp;<span class="dni">{{$solicitude->user->username}}</span></div>
+            <div>NOMBRE:&nbsp;<span class="dni">{{$solicitude->user->email}}</span></div>
         </footer>
     </div>
 </body>
