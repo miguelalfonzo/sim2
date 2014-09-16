@@ -2,7 +2,7 @@
 
 namespace Expense;
 
-use \BaseController;x
+use \BaseController;
 use \View;
 use \Dmkt\Activity;
 use \Dmkt\Solicitude;
@@ -230,7 +230,7 @@ class ExpenseController extends BaseController{
 		}
 		$data = [
 			'solicitude' => $solicitude,
-			'expense' => $expense
+			'expense'    => $expense
 		];
 		return View::make('Expense.view',$data);
 	}
@@ -251,17 +251,19 @@ class ExpenseController extends BaseController{
 		}
 		$data = [
 			'solicitude' => $solicitude,
-			'date' => $this->getDay(),
-			'name' => $name_aproved,
-			'charge' => $charge,
-			'expense' => $expense
+			'date'       => $this->getDay(),
+			'name'       => $name_aproved,
+			'charge'     => $charge,
+			'expense'    => $expense
 		];
 		$html = View::make('Expense.report',$data);
 		return PDF::load($html, 'A4', 'landscape')->show();
 	}
 
 	public function test(){
- 		$html = View::make('Expense.report');
-		return PDF::load($html, 'A4', 'landscape')->show();
+ 		// 	$html = View::make('Expense.report');
+		// return PDF::load($html, 'A4', 'landscape')->show();
+		$states = State::orderBy('idestado', 'ASC')->get();
+		echo json_encode($states);
 	}
 }

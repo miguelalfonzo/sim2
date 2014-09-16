@@ -9,7 +9,7 @@
 			set_time_limit(60);
 			// $rucConsultado='10461782863';
 			// $rucConsultado= '20160641810';
-			$rucConsultado= '20556820628';
+			$rucConsultado= '20514606774';
 			$url = 'http://www.sunat.gob.pe/w/wapS01Alias?ruc='.$rucConsultado;
 			$proxy = 'proxy.bagoperu.com.pe:3128';
 			$proxyauth = 'outinf01:uy349asx';
@@ -59,18 +59,18 @@
 				preg_match("(<br/>(.*))", $salida[1][$i++], $tipo);
 				$tipo = trim($tipo[1]);
 				
-				print_r('Datos RUC');
-				var_dump('RUC: '.$ruc);
-				var_dump('Razon Social: '.$razonSocial);
-				var_dump('Ruc anterior: '.$rucAntiguo);
-				var_dump('Estado: '.$estado);
-				var_dump('Observacion: '.$exc);
-				var_dump('Nombre Comercial: '.$nomComercial);
-				var_dump('Direccion: '.$direccion);
-				var_dump('Situacion: '.$situacion);
-				var_dump('Telefonos: '.$telefonos);
-				var_dump('Dependencia: '.$dependencia);
-				var_dump('Tipo: '.$tipo);
+				var_dump("Datos RUC<br>");
+				var_dump('RUC: '.$ruc."<br>");
+				var_dump('Razon Social: '.$razonSocial."<br>");
+				var_dump('Ruc anterior: '.$rucAntiguo."<br>");
+				var_dump('Estado: '.$estado."<br>");
+				var_dump('Observacion: '.$exc."<br>");
+				var_dump('Nombre Comercial: '.$nomComercial."<br>");
+				var_dump('Direccion: '.$direccion."<br>");
+				var_dump('Situacion: '.$situacion."<br>");
+				var_dump('Telefonos: '.$telefonos."<br>");
+				var_dump('Dependencia: '.$dependencia."<br>");
+				var_dump('Tipo: '.$tipo."<br>");
 			}
 		?>
 	</body>
