@@ -60,7 +60,27 @@
                 <!-- Table -->
 
             </div>
+            <a id="show_leyenda" style="margin-left: 15px" href="#">Ver leyenda</a>
+            <a id="hide_leyenda" style="margin-left: 15px;display: none" href="#" >Ocultar leyenda</a>
         </div>
     </div>
+</div>
+<div class="container" id="leyenda" style="display: none">
+    <table style=  "border-collapse: separate;border-spacing: 5px" >
+        <tbody>
+        @foreach($states as $state)
+
+        <tr>
+            <td>
+                <div class="" style='background-color: {{$state->color}} ; border-radius: 5px; text-align: center ;width: 120px'><span style="color: #ffffff">{{$state->nombre}}</span></div>
+            </td>
+            <td>
+                <span style="text-indent:50px;">{{$state->descripcion}}</span>
+            </td>
+
+        </tr>
+        @endforeach
+        </tbody>
+    </table>
 </div>
 @stop

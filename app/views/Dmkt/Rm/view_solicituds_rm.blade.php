@@ -35,7 +35,7 @@
                 <a target="_blank" href="{{URL::to('a'.'/'.$solicitude->token)}}"><span class="glyphicon glyphicon-print"></span></a>
                 <a  href="{{URL::to('ver-gasto'.'/'.$solicitude->token)}}"><span class="glyphicon glyphicon-usd"></span></a>
                 @endif
-                @if($solicitude->estado == PENDIENTE)
+                @if($solicitude->estado == PENDIENTE && $solicitude->derive == 0)
                 <a href="{{URL::to('editar-solicitud').'/'.$solicitude->token}}"><span class="glyphicon glyphicon-pencil"></span></a>
                 <a href="#" class="cancel-solicitude" data-idsolicitude = "{{$solicitude->idsolicitud}}"><span class="glyphicon glyphicon-remove"></span></a>
                 @endif

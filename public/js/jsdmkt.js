@@ -21,6 +21,19 @@ function newSolicitude() {
         clients = data;
     });
 
+    // leyenda
+
+    $('#show_leyenda').on('click',function(){
+        $('#leyenda').show();
+        $(this).hide();
+        $('#hide_leyenda').show()
+    });
+
+    $('#hide_leyenda').on('click',function(){
+        $('#leyenda').hide();
+        $(this).hide();
+        $('#show_leyenda').show();
+    })
     //add a family
     $("#btn-add-family").on('click', function () {
 

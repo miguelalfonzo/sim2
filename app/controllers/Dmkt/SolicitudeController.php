@@ -56,9 +56,11 @@ class SolicitudeController extends BaseController
     public function test()
 
     {
-        $user = Auth::user();
-        $var = $user->GerProd->solicituds;
-        echo json_encode($var);
+        $result = Solicitude::where(function ($query) {
+            $query->where('monto',400)
+                ->orWhere('estado', 2);
+        })->where('tipo_moneda',1)->get();
+        echo json_encode($result);
 
         /*
         $today = getdate();
@@ -154,7 +156,8 @@ class SolicitudeController extends BaseController
         list($d, $m, $y) = explode('/', $date);
         $d = mktime(11, 14, 54, $m, $d, $y);
         $date = date("Y/m/d", $d);
-        $solicitude->idsolicitud = $solicitude->searchId() + 1;
+        $aux_idsol = $solicitude->searchId() + 1;
+        $solicitude->idsolicitud = $aux_idsol;
         $solicitude->descripcion = $inputs['description'];
         $solicitude->titulo = $inputs['titulo'];
         $solicitude->monto = $inputs['monto'];
@@ -204,8 +207,24 @@ class SolicitudeController extends BaseController
             $typeUser = Auth::user()->type;
             if ($typeUser == 'R')
                 return 'R';
-            if ($typeUser == 'S')
+            if ($typeUser == 'S'){
+
+
+                //Solicitude::where('idsolicitud', $aux_idsol)->update(array('derived'=>1));
+                //$solicitude = Solicitude::where('ids', $token)->firstOrFail();
+
+                $sol = Solicitude::find($aux_idsol);
+                foreach ($sol->families as $v) {
+                    $solGer = new SolicitudeGer;
+                    $solGer->idsolicitud_gerente = $solGer->searchId() + 1;
+                    $solGer->idsolicitud = $aux_idsol;
+                    $solGer->idgerprod = $v->marca->manager->id;
+                    $solGer->save();
+                }
+
                 return 'S';
+            }
+
 
         }
 
@@ -257,7 +276,7 @@ class SolicitudeController extends BaseController
     public function editSolicitude($token)
     {
 
-        $families = Marca::all();
+        $families = Marca::orderBy('descripcion','Asc')->get();
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $id = $solicitude->idsolicitud;
         $clients = DB::table('DMKT_RG_SOLICITUD_CLIENTES')->where('idsolicitud', $id)->lists('idcliente');
@@ -797,7 +816,7 @@ class SolicitudeController extends BaseController
             $i++;
         }
         //echo json_encode($families);die;
-        return Redirect::to('show_gerprod');
+        return Redirect::to('show_gerprod')->with('state',ACEPTADO);
 
     }
 
