@@ -16,7 +16,9 @@
         <td style="text-align: center">{{$solicitude->typemoney->simbolo.$solicitude->monto}}
         </td>
         <td style="text-align: center">
-            <span class="label" style='background-color: {{$solicitude->state->color}}'>{{$solicitude->state->nombre}}</span>
+            <span class="label element" data-toggle="tooltip" data-placement="left" title="{{$solicitude->state->descripcion}}" style='background-color: {{$solicitude->state->color}}'>
+            {{$solicitude->state->nombre}}
+            </span>
            @if($solicitude->state->idestado == PENDIENTE && $solicitude->derived == 1)
             <span class="label" style='background-color: {{$solicitude->state->color}}'>D</span>
            @endif
@@ -37,3 +39,6 @@
     </tbody>
 
 </table>
+<script>
+    $('.element').tooltip()
+</script>

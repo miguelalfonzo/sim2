@@ -72,12 +72,16 @@
             <!-- Table -->
 
         </div>
+
+        <a id="show_leyenda" style="margin-left: 15px" href="#">Ver leyenda</a>
+        <a id="hide_leyenda" style="margin-left: 15px;display: none" href="#" >Ocultar leyenda</a>
     </div>
+
 </div>
 </div>
 
-<div class="container">
-<table style=  "border-collapse: separate;border-spacing: 5px">
+<div class="container" id="leyenda" style="display: none">
+<table style=  "border-collapse: separate;border-spacing: 5px" >
     <tbody>
     @foreach($states as $state)
 
