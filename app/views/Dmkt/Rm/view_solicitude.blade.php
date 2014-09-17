@@ -12,7 +12,7 @@
         <div class="panel-heading"><h3 class="panel-title">Solicitud</h3> <small style="float: right; margin-top: -10px"><strong>Usuario : {{Auth::user()->Rm->nombres}}</strong></small></div>
         <div class="panel-body">
 
-
+            <!--    Type Solicitude  -->
             <div class="form-group col-sm-6 col-md-4 col-lg-4">
 
                 <label class="col-sm-8 col-md-8 col-lg-4 control-label" for="textinput">Tipo Solicitud</label>
@@ -25,6 +25,7 @@
                 </div>
             </div>
 
+            <!--    Name Solicitude  -->
             <div class="form-group col-sm-6 col-md-4 col-lg-4">
 
                 <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Nombre Solicitud</label>
@@ -36,18 +37,21 @@
 
                 </div>
             </div>
-
+            <!--  Amount Solicitude -->
             <div class="form-group col-sm-6 col-md-4 col-lg-4">
                 <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Monto Solicitado</label>
 
                 <div class="col-sm-12 col-md-12 col-lg-12">
+                    <div class="input-group">
+                    <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
                     <input id="textinput" name="textinput" type="text" placeholder="" value="{{$solicitude->monto}}"
                            readonly
                            class="form-control input-md">
-
+                    </div>
                 </div>
             </div>
 
+           <!--  Amount Factura -->
            @if(isset($solicitude->monto_factura))
             <div class="form-group col-sm-6 col-md-4 col-lg-4">
                 <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Monto Factura</label>
@@ -59,7 +63,9 @@
 
                 </div>
             </div>
-            @endif
+           @endif
+
+            <!-- Date Delivery -->
             <div class="form-group col-sm-6 col-md-4 col-lg-4">
                 <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Fecha de Entrega</label>
 
@@ -74,6 +80,8 @@
 
                 </div>
             </div>
+
+            <!-- Fondo -->
             <div class="form-group col-sm-6 col-md-4 col-lg-4">
                 <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="selectbasic">Fondo</label>
 
@@ -85,6 +93,8 @@
 
                 </div>
             </div>
+
+            <!-- Date Created -->
             <div class="form-group col-sm-6 col-md-4 col-lg-4">
                 <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="selectbasic">Fecha de Creacion</label>
 
@@ -98,9 +108,24 @@
                 </div>
             </div>
 
+            <!-- Observation-->
+            <div class="form-group col-sm-6 col-md-4 col-lg-4">
+                <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="selectbasic">Observacion</label>
+
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                    @if($solicitude->estado == PENDIENTE)
+                    <textarea id="textinput" name="observacion" placeholder=""
+                              class="form-control"></textarea>
+                    @else
+                    <textarea id="textinput" name="observacion" placeholder=""
+                              class="form-control" disabled>{{$solicitude->observacion}}</textarea>
+                    @endif
+                </div>
+
+            </div>
 
 
-            @if(isset($solicitude) && $solicitude->idtiposolicitud == 2)
+            @if(isset($solicitude) && $solicitude->idtiposolicitud == ACEPTADO)
             <div class="form-group col-sm-6 col-md-4 col-lg-4">
                 <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="selectbasic">&nbsp;</label>
                 <div class="col-sm-12 col-md-12 col-lg-12">
@@ -108,7 +133,6 @@
                         Ver Comprobante
                     </button>
                 </div>
-
             </div>
             <div class="modal fade" id="myFac" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
@@ -122,7 +146,6 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
-
                         </div>
                     </div>
                 </div>
@@ -134,10 +157,12 @@
                     <div class="lightbox-caption"><p>Your caption here</p></div>
                 </div>
             </div>
-
             @endif
+
+
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding: 0">
-            <div class="form-group col-sm-12 col-md-6 col-lg-6">
+                <!-- Products -->
+                <div class="form-group col-sm-12 col-md-6 col-lg-6">
 
                 <div style="padding-left: 15px">
                     <div class="panel panel-default">
@@ -172,6 +197,8 @@
                     </div>
                 </div>
             </div>
+
+                <!-- Clients -->
             <div class="form-group col-sm-12 col-md-6 col-lg-6">
 
                 <div style="padding:0 15px" >
@@ -189,7 +216,6 @@
                                     <input id="textinput" name="textinput" type="text" placeholder=""
                                            value="{{$client->client->clnombre}}" readonly
                                            class="form-control input-md ">
-
                                 </div>
                             </div>
                             @endforeach
@@ -198,6 +224,8 @@
                 </div>
             </div>
             </div>
+
+            <!-- Description Solicitude -->
             <div class="col-sm-12 col-md-12 col-lg-12" style="margin-top: 10px">
                 <div class="form-group col-sm-12 col-md-12 col-lg-12">
                     <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textarea">Descripcion de la
