@@ -40,8 +40,8 @@ $(function(){
     var razon;
     var razon_hide;
     var razon_edit;
-    var number_proof_one;
-    var number_proof_two;
+    var number_prefix;
+    var number_serie;
     var voucher_number;
     var date;
     var desc_expense;
@@ -75,8 +75,8 @@ $(function(){
     //Restrictions on data entry forms
         //only numbers integers
         $("#ruc").numeric({negative:false,decimal:false});
-        $("#number-proof-one").numeric({negative:false,decimal:false});
-        $("#number-proof-two").numeric({negative:false,decimal:false});
+        $("#number-prefix").numeric({negative:false,decimal:false});
+        $("#number-serie").numeric({negative:false,decimal:false});
         //only numbers floats
         $("#imp-ser").numeric({negative:false});
         $(".total-item input").numeric({negative:false});
@@ -104,7 +104,6 @@ $(function(){
         $(".date").on("change",function(){
             $(this).datepicker('hide');
         });
-
         //Cancel the view button to register expense
         $("#cancel-expense").on("click",function(e){
             e.preventDefault();
@@ -161,7 +160,6 @@ $(function(){
             tot_expense    = parseFloat($(this).parent().parent().find('.total_expense').html());
             ruc            = $(this).parent().parent().find('.ruc').html();
             voucher_number = $(this).parent().parent().find('.voucher_number').html();
-
             bootbox.confirm("¿Esta seguro que desea eliminar el gasto?", function(result) {
                 if(result)
                 {
@@ -217,14 +215,13 @@ $(function(){
                     responseUI('Editar Gasto','green');
                     $("html, body").animate({scrollTop:200},'500','swing');
                     data_response = JSON.parse(JSON.stringify(response));
-                    $("#proof-type").val(data_response.expense.tipo_comprobante);
+                    $("#proof-type").val(data_response.expense.idcomprobante).attr("disabled",true);
                     $("#ruc").val(data_response.expense.ruc).attr("disabled",true);
                     $("#ruc-hide").val(data_response.expense.ruc);
                     $("#razon").text(data_response.expense.razon).css("color","#5c5c5c");
                     $("#razon").attr("data-edit",1);
-                    var arr = data_response.expense.num_comprobante.split('-');
-                    $("#number-proof-one").val(arr[0]).attr("disabled",true);
-                    $("#number-proof-two").val(arr[1]).attr("disabled",true);
+                    $("#number-prefix").val(data_response.expense.num_prefijo).attr("disabled",true);
+                    $("#number-serie").val(data_response.expense.num_serie).attr("disabled",true);
                     date = data_response.date.split('-');
                     date = date[2].substring(0,2)+'/'+date[1]+'/'+date[0];
                     $("#date").val(date);
@@ -239,7 +236,7 @@ $(function(){
                         $(".total-item input").numeric({negative:false});
                         $(".quantity input").numeric({negative:false});
                     });
-                    if(data_response.expense.tipo_comprobante == '2')
+                    if(data_response.expense.idcomprobante == '2')
                     {
                         $(".tot-document").show();
                         $("#sub-tot").val(data_response.expense.sub_tot);
@@ -284,9 +281,8 @@ $(function(){
             razon            = $("#razon").text();
             razon_hide       = $("#razon").val();
             razon_edit       = $("#razon").attr("data-edit");
-            number_proof_one = $("#number-proof-one").val();
-            number_proof_two = $("#number-proof-two").val();
-            voucher_number   = number_proof_one+'-'+number_proof_two;
+            number_prefix    = $("#number-prefix").val();
+            number_serie     = $("#number-serie").val();
             date             = $("#date").val();
             desc_expense     = $("#desc-expense").val();
             var balance      = parseFloat($("#balance").val());
@@ -316,16 +312,16 @@ $(function(){
                 $("#razon").removeClass("error-incomplete");
                 error = 1;
             }
-            if(!number_proof_one)
+            if(!number_prefix)
             {
-                $("#number-proof-one").attr("placeholder","Nro. Comprobante vacío");
-                $("#number-proof-one").addClass("error-incomplete");
+                $("#number-prefix").attr("placeholder","Nro. Prejifo vacío");
+                $("#number-prefix").addClass("error-incomplete");
                 error = 1;
             }
-            if(!number_proof_two)
+            if(!number_serie)
             {
-                $("#number-proof-two").attr("placeholder","Nro. Comprobante vacío");
-                $("#number-proof-two").addClass("error-incomplete");
+                $("#number-serie").attr("placeholder","Nro. Serie vacío");
+                $("#number-serie").addClass("error-incomplete");
                 error = 1;
             }
             if(!date)
@@ -336,7 +332,7 @@ $(function(){
             }
             if(!desc_expense)
             {
-                $("#desc-expense").attr("placeholder","No se ha ingresado el RUC.");
+                $("#desc-expense").attr("placeholder","No se ha ingresado la Descripción.");
                 $("#desc-expense").addClass("error-incomplete");
                 error = 1;
             }
@@ -357,7 +353,8 @@ $(function(){
                 data.proof_type     = proof_type;
                 data.ruc            = ruc;
                 data.razon          = razon;
-                data.voucher_number = voucher_number;
+                data.number_prefix  = number_prefix;
+                data.number_serie   = number_serie;
                 data.date_movement  = date;
                 data.desc_expense   = desc_expense;
 
@@ -367,11 +364,11 @@ $(function(){
                 total_item = $(".total-item input");
                 var data_quantity    = validateEmpty(quantity);
                 var data_total_item  = validateEmpty(total_item);
-                var arr_type_expense = [];
+                // var arr_type_expense = [];
                 var arr_description = [];
-                $.each($(".type-expense"),function(index){
-                    arr_type_expense[index] = $(this).val();
-                });
+                // $.each($(".type-expense"),function(index){
+                //     arr_type_expense[index] = $(this).val();
+                // });
                 $.each($(".description input"),function(index){
                     if($(this).val().length>0)
                     {
@@ -388,7 +385,7 @@ $(function(){
                 (data_quantity.length>0) ? data.quantity = data_quantity : error_json = 1;
                 data.description = arr_description;
                 (data_total_item.length>0) ? data.total_item = data_total_item : error_json = 1;
-                data.type_expense = arr_type_expense;
+                // data.type_expense = arr_type_expense;
                 //Validando el Objeto JSON
                 if(error_json === 0)
                 {
@@ -484,7 +481,7 @@ $(function(){
                                         {
                                             $.ajax({
                                                 type: 'post',
-                                                url: 'update-expense',
+                                                url: server+'update-expense',
                                                 data: {
                                                     data: JSON.stringify(data)
                                                 },
@@ -589,7 +586,7 @@ $(function(){
                 var l = Ladda.create(document.getElementById('razon'));
                 $.ajax({
                     type: 'post',
-                    url: 'consultarRuc',
+                    url: server+'consultarRuc',
                     data: {
                         ruc: ruc
                     },
@@ -684,14 +681,14 @@ $(function(){
         //Delete data
         function deleteExpense()
         {
-            $("#proof-type").val("1");
+            $("#proof-type").val("1").attr("disabled",false);
             $("#ruc").val('').attr('disabled',false);
             $("#ruc-hide").val('');
             $("#razon").html('');
             $("#razon").val(0);
             $("#razon").attr("data-edit",0);
-            $("#number-proof-one").val('').attr('disabled',false);
-            $("#number-proof-two").val('').attr('disabled',false);
+            $("#number-prefix").val('').attr('disabled',false);
+            $("#number-serie").val('').attr('disabled',false);
             $("#sub-tot").val(0);
             $("#imp-ser").val(0);
             $("#igv").val(0);
@@ -710,6 +707,7 @@ $(function(){
             var tot_expense = parseFloat($("#total-expense").val());
             var imp_serv = parseFloat($("#imp-ser").val());
             if(!$.isNumeric(imp_serv)) imp_serv = 0;
+            if(!$.isNumeric(tot_expense)) tot_expense = 0;
             if(btn_save === "Registrar")
             {
                 balance = deposit - tot_expenses - tot_expense;
@@ -729,7 +727,7 @@ $(function(){
             {
                 $("#balance").removeClass('error-incomplete');
                 $(".message-expense").hide().css("color","black");
-                $("#balance").css("color","black");
+                $("#balance").css("color","#555");
             }
         }
         //Calculate the IGV
@@ -742,10 +740,10 @@ $(function(){
             var igv = 0;
             var total_expense = 0;
             $.each(total_item,function(){
-                if($(this).val())
-                    total_expense += parseFloat($(this).val());
-                else
+                if(!$.isNumeric($(this).val()))
                     total_expense += 0;
+                else
+                    total_expense += parseFloat($(this).val());
             });
             if(total_expense>0)
             {

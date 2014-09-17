@@ -17,7 +17,7 @@ class Expense extends Eloquent {
 	}
 
 	public function idProofType(){
-		return $this->hasOne('Expense\ProofType','idcomprobante','tipo_comprobante');
+		return $this->hasOne('Expense\ProofType','idcomprobante','idcomprobante');
 	}
 
     public function items(){
@@ -31,6 +31,15 @@ class Expense extends Eloquent {
         }else{
             return $lastId->idgasto;
         }
+	}
+
+	public function lastIdIgv(){
+		$lastIdIgv = Expense::orderBy('idigv','desc')->first();
+		if($lastIdIgv == null){
+            return 0;
+        }else{
+            return $lastIdIgv->idigv;
+        }	
 	}
 
 }

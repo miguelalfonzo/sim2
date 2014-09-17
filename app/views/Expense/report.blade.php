@@ -44,7 +44,7 @@
                                 
                                 <td>{{date('d/m/Y',strtotime($value->fecha_movimiento))}}</td>
                                 <td>{{mb_convert_case($value->idProofType->descripcion,MB_CASE_TITLE,'UTF-8')}}</td>
-                                <td>{{$value->num_comprobante}}</td>
+                                <td>{{$value->num_prefijo.'-'.$value->num_serie}}</td>
                                 <td>{{mb_convert_case($value->descripcion,MB_CASE_TITLE,'UTF-8')}}</td>
                                 <td>
                                     <?php $string = ""; ?>

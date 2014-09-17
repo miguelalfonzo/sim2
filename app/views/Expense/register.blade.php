@@ -29,7 +29,7 @@
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Autorizado por</label>
-						<input type="text" class="form-control" value="Lucy Alfaro" disabled>
+						<input type="text" class="form-control" value="{{$name_aproved}}" disabled>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
@@ -80,9 +80,9 @@
 					<div class="form-expense">
 						<label class="inline-block">Número de Comprobante</label>
 						<div class="input-group">
-							<input id="number-proof-one" type="text" class="form-control">
+							<input id="number-prefix" type="text" class="form-control">
 							<div class="input-group-addon">-</div>
-					      	<input id="number-proof-two" class="form-control" type="text">
+					      	<input id="number-serie" class="form-control" type="text">
 						</div>
 					</div>
 				</div>
@@ -116,7 +116,7 @@
 										<tr>
 											<th class="w-quantity">Cantidad</th>
 											<th class="w-desc-item">Descripción</th>
-											<th class="w-type-expense">Tipo de Gasto</th>
+											<!-- <th class="w-type-expense">Tipo de Gasto</th> -->
 											<th class="w-total-item">Valor de Venta</th>
 											<th>Eliminar</th>
 										</tr>
@@ -125,13 +125,13 @@
 										<tr>
 											<th class="quantity"><input type="text" class="form-control" maxlength="4"></th>
 											<th class="description"><input type="text" class="form-control"></th>
-											<th>
+											<!-- <th>
 												<select class="form-control type-expense">
 													@foreach($typeExpense as $val)
 														<option value="{{$val->idtipogasto}}">{{mb_convert_case($val->descripcion,MB_CASE_TITLE, 'UTF-8')}}</option>
 													@endforeach
 												</select>
-											</th>
+											</th> -->
 											<th class="total-item">
 												<div class="input-group">
 											    	<div class="input-group-addon">{{$solicitude->typemoney->simbolo}}</div>
@@ -221,7 +221,7 @@
 												<th class="proof-type">{{mb_convert_case($val->idProofType->descripcion,MB_CASE_TITLE,'UTF-8')}}</th>
 												<th class="ruc">{{$val->ruc}}</th>
 												<th class="razon">{{$val->razon}}</th>
-												<th class="voucher_number">{{$val->num_comprobante}}</th>
+												<th class="voucher_number">{{$val->num_prefijo.'-'.$val->num_serie}}</th>
 												<th class="date_movement">{{date('d/m/Y',strtotime($val->fecha_movimiento))}}</th>
 												<th class="total"><span class="type_moeny">{{$solicitude->typemoney->simbolo}}&nbsp;<span class="total_expense">{{$val->monto}}</span></th>
 												<th><a class="edit-expense" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
