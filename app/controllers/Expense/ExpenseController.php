@@ -203,6 +203,7 @@ class ExpenseController extends BaseController{
 	        $d = mktime(11, 14, 54, $m, $d, $y);
 	        $date = date("Y/m/d", $d);
 	        $expenseEdit->fecha_movimiento = $date;
+	        $expenseEdit->descripcion = $expenseJson->desc_expense;
 	        $data = $this->objectToArray($expenseEdit);
 	        //Detail Expense
 			$quantity = $expenseJson->quantity;

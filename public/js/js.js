@@ -175,6 +175,8 @@ $(function(){
                         $("#balance").val(balance);
                         $("#save-expense").html("Registrar");
                         $(".detail-expense").show();
+                        $(".search-ruc").show();
+                        $("#ruc-hide").siblings().parent().addClass('input-group');
                     });
                 }
             });
@@ -282,7 +284,8 @@ $(function(){
             razon_hide       = $("#razon").val();
             razon_edit       = $("#razon").attr("data-edit");
             number_prefix    = $("#number-prefix").val();
-            number_serie     = $("#number-serie").val();
+            number_serie     = parseInt($("#number-serie").val(),10);
+            voucher_number   = number_prefix+"-"+number_serie;
             date             = $("#date").val();
             desc_expense     = $("#desc-expense").val();
             var balance      = parseFloat($("#balance").val());
