@@ -82,6 +82,20 @@ Route::filter('gerprod', function () {
     }
 });
 
+Route::filter('cont', function () {
+    if (Auth::check()) {
+        if (Auth::user()->type != 'C' && Auth::user()->type == 'R')
+            return Redirect::to('show_rm');
+        if (Auth::user()->type != 'C' && Auth::user()->type == 'S')
+            return Redirect::to('show_sup');
+        if (Auth::user()->type != 'C' && Auth::user()->type == 'P')
+            return Redirect::to('show_gerprod');
+    } else {
+
+        return Redirect::to('login');
+    }
+});
+
 
 Route::filter('auth.basic', function () {
     return Auth::basic();

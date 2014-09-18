@@ -101,6 +101,13 @@ Route::get('aprobar-solicitud/{token}', 'Dmkt\SolicitudeController@approvedSolic
 Route::post('buscar-solicitudes-gercom','Dmkt\SolicitudeController@searchSolicitudsGerCom');
 // ======================================================================
 
+Route::group(array('before' => 'cont'), function() {
+    Route::get('show_cont', 'Dmkt\SolicitudeController@show_cont');
+    Route::get('ver-solicitud-cont/{id}', 'Dmkt\SolicitudeController@viewSolicitudeCont');
+    Route::get('listar-solicitudes-cont/{id}', 'Dmkt\SolicitudeController@listSolicitudeCont');
+});
+
+
 App::error(function (ModelNotFoundException $e) {
     return View::make('notfound');
  });

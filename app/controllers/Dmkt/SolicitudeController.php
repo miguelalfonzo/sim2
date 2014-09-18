@@ -987,4 +987,36 @@ class SolicitudeController extends BaseController
             return $view;
 
     }
+
+    public function show_cont()
+    {
+        $state = Session::get('state');
+        $states = State::orderBy('idestado', 'ASC')->get();
+        $data = [
+            'states' => $states,
+            'state' => $state
+        ];
+        return View::make('Dmkt.Cont.show_cont',$data);
+    }
+
+    public function listSolicitudeCont($id)
+    {
+        if ($id == 0) {
+            $solicituds = Solicitude::all();
+        } else {
+            $solicituds = Solicitude::where('estado', '=', $id)->get();
+        }
+
+        $view = View::make('Dmkt.Cont.view_solicituds_cont')->with('solicituds', $solicituds);
+        return $view;
+    }
+
+    public function viewSolicitudeCont($id)
+    {
+        $solicitude = Solicitude::where('token', $token)->firstOrFail();
+        echo json_encode($solicitude);die;
+        return View::make('Dmkt.Cont.view_solicitude_cont')->with('solicitude', $solicitude);
+    }
+
+
 }
