@@ -9,7 +9,13 @@
 <div class="content">
 
     <div class="panel panel-default">
-        <div class="panel-heading"><h3 class="panel-title">Solicitud</h3> <small style="float: right; margin-top: -10px"><strong>Usuario : {{Auth::user()->Rm->nombres}}</strong></small></div>
+        <div class="panel-heading"><h3 class="panel-title">Solicitud</h3>
+            @if($solicitude->blocked == 1)
+
+            <h4 class="" style="color: darkred">LA SOLICITUD ESTA SIENDO EVALUADA</h4>
+
+            @endif
+            <small style="float: right; margin-top: -10px"><strong>Usuario : {{Auth::user()->Rm->nombres}}</strong></small></div>
         <div class="panel-body">
 
             <!--    Type Solicitude  -->
@@ -121,7 +127,6 @@
                               class="form-control" disabled>{{$solicitude->observacion}}</textarea>
                     @endif
                 </div>
-
             </div>
 
 

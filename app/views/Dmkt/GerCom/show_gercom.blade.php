@@ -4,7 +4,7 @@
     <div class="col-md-12" style="">
         <!-- Default panel contents -->
         <div class="panel panel-default">
-            <div class="panel-heading"><h3 class="panel-title">Solicitudes Gerente Comercial</h3><small style="float: right; margin-top: -10px"><strong>Usuario : {{Auth::user()->Gerprod->descripcion}}</strong></small></div>
+            <div class="panel-heading"><h3 class="panel-title">Solicitudes Gerente Comercial</h3><small style="float: right; margin-top: -10px"><strong>Usuario : Gerente Comercial</strong></small></div>
 
             <div class="panel-body table-solicituds-gercom">
                 <div class="col-md-12" style="padding: 0">
@@ -14,7 +14,7 @@
                                 <select id="select_state_solicitude_gercom" name="idstate"
                                         class="form-control select_state_solicitude_gercom">
                                     @foreach($states as $state)
-                                    @if($state->idestado == 4 || $state->idestado == 8)
+                                    @if($state->idestado == ACEPTADO || $state->idestado == DEPOSITADO)
                                     <option value="{{$state->idestado}}">{{$state->nombre}}</option>
                                     @endif
                                     @endforeach
@@ -49,7 +49,7 @@
                         <div class="form-group col-sm-1 col-md-2">
 
                             <div class="" style="padding: 0">
-                                <a id="search_solicitude_sup" class="btn btn-sm btn-primary ladda-button"
+                                <a id="search_solicitude_gercom" class="btn btn-sm btn-primary ladda-button"
                                    data-style="expand-right" data-size="l"><i class="glyphicon glyphicon-search"></i></a>
                             </div>
 

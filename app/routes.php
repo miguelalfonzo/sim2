@@ -65,6 +65,7 @@ Route::group(array('before' => 'sup'), function () {
     Route::post('buscar-solicitudes-sup', 'Dmkt\SolicitudeController@searchSolicitudsSup');
     Route::get('derivar-solicitud/{token}', 'Dmkt\SolicitudeController@derivedSolicitude');
     Route::post('cancelar-solicitud-sup', 'Dmkt\SolicitudeController@cancelSolicitudeSup');
+    Route::get('desbloquear-solicitud-sup/{token}', 'Dmkt\SolicitudeController@disBlockSolicitudeSup');
 });
 
 /*------------------ Test --------------**/
@@ -85,7 +86,7 @@ Route::group(array('before' => 'gerprod'), function () {
     Route::post('aceptar-solicitud-gerprod', 'Dmkt\SolicitudeController@acceptedSolicitudeGerProd');
     Route::post('rechazar-solicitud-gerprod', 'Dmkt\SolicitudeController@denySolicitudeGerProd');
     Route::post('buscar-solicitudes-gerprod', 'Dmkt\SolicitudeController@searchSolicitudsGerProd');
-    Route::get('cancelar-solicitud-gerprod/{token}','Dmkt\SolicitudeController@cancelSolicitudeGerProd');
+    Route::get('cancelar-solicitud-gerprod/{token}','Dmkt\SolicitudeController@disBlockSolicitudeGerProd');
 
 });
 /**
@@ -97,6 +98,7 @@ Route::get('show_gercom', 'Dmkt\SolicitudeController@show_gercom');
 Route::get('listar-solicitudes-gercom/{id}', 'Dmkt\SolicitudeController@listSolicitudeGerCom');
 Route::get('ver-solicitud-gercom/{id}', 'Dmkt\SolicitudeController@viewSolicitudeGerCom');
 Route::get('aprobar-solicitud/{token}', 'Dmkt\SolicitudeController@approvedSolicitude');
+Route::post('buscar-solicitudes-gercom','Dmkt\SolicitudeController@searchSolicitudsGerCom');
 // ======================================================================
 
 App::error(function (ModelNotFoundException $e) {

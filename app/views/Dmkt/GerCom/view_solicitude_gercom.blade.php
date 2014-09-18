@@ -204,7 +204,7 @@
 
                 <div class="col-sm-12 col-md-12" style="text-align: center">
 
-                    @if($solicitude->estado == 8)
+                    @if($solicitude->estado == ACEPTADO)
                     <a href="{{URL::to('aprobar-solicitud'.'/'.$solicitude->token)}}" id="" name="button1id"
                        class="btn btn-primary">Aprobar
                     </a>

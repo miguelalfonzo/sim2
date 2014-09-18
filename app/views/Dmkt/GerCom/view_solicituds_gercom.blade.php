@@ -1,10 +1,11 @@
 <table class="table table-striped table-bordered dataTable" id="table_solicitude_gercom" style="width: 100%">
     <thead>
     <tr>
-        <th>Solicitude</th>
-        <th>Presupuesto</th>
+        <th>Solicitud</th>
+        <th>Monto Solicitado</th>
         <th>Estado</th>
-        <th>Observaciones</th>
+        <th>Fecha</th>
+        <th>Tipo de Solicitud</th>
         <th>Edicion</th>
     </tr>
     </thead>
@@ -12,13 +13,14 @@
     @foreach($solicituds as $solicitude)
     <tr>
         <td>{{$solicitude->titulo}}</td>
-        <td>{{$solicitude->typemoney->simbolo.$solicitude->monto}}
+        <td style="text-align: center">{{$solicitude->typemoney->simbolo.$solicitude->monto}}
         </td>
-        <td>
+        <td style="text-align: center">
             <span class="label" style='background-color: {{$solicitude->state->color}}'>{{$solicitude->state->nombre}}</span>
 
         </td>
-        <td>{{$solicitude->observacion}}</td>
+        <td style="text-align: center">{{ date_format(date_create($solicitude->created_at), 'd/m/Y' )}}</td>
+        <td style="text-align: center">{{$solicitude->typesolicitude->nombre}}</td>
         <td><div style="text-align: center">
 
                 <a href="{{URL::to('ver-solicitud-gercom').'/'.$solicitude->token}}"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span></a>

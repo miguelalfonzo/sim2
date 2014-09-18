@@ -56,12 +56,19 @@ class SolicitudeController extends BaseController
     public function test()
 
     {
-        $result = Solicitude::where(function ($query) {
+        /*$result = Solicitude::where(function ($query) {
             $query->where('monto',400)
                 ->orWhere('estado', 2);
         })->where('tipo_moneda',1)->get();
         echo json_encode($result);
-
+*/
+        $user = new User();
+        $user->id = 16;
+        $user->email = 'gercom@bago.com';
+        $user->username = 'gerente comercial';
+        $user->password = Hash::make('admin');
+        $user->type = 'G';
+        $user->save();
         /*
         $today = getdate();
         $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
@@ -461,7 +468,9 @@ class SolicitudeController extends BaseController
 
     public function viewSolicitudeSup($token)
     {
+        Solicitude::where('token', $token)->update(array('blocked'=>1));
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
+
         $managers = Manager::all();
         $data = [
 
@@ -473,8 +482,6 @@ class SolicitudeController extends BaseController
 
     public function registerSolicitudeGerProd()
     {
-
-
         $inputs = Input::all();
         $image = Input::file('file');
         $solicitude = new Solicitude;
@@ -486,8 +493,6 @@ class SolicitudeController extends BaseController
             Image::make($image->getRealPath())->resize(800, 600)->save($path);
             $solicitude->image = $filename;
         }
-
-
         $date = $inputs['delivery_date'];
         list($d, $m, $y) = explode('/', $date);
         $d = mktime(11, 14, 54, $m, $d, $y);
@@ -704,8 +709,15 @@ class SolicitudeController extends BaseController
         $solicitude->estado = CANCELADO;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
-
         return $this->listSolicitude(PENDIENTE);
+
+    }
+    public function disBlockSolicitudeSup($token){
+
+        $solicitude = Solicitude::where('token', $token)->firstOrFail();
+        Solicitude::where('idsolicitud',$solicitude->idsolicitud) // desbloqueamos la solicitud para que el rm lo pueda editar
+            ->update(array('blocked'=> 0));
+        return Redirect::to('show_sup');
 
     }
 
@@ -782,7 +794,7 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.GerProd.view_solicitude_gerprod', $data);
     }
 
-    public function cancelSolicitudeGerProd($token){
+    public function disBlockSolicitudeGerProd($token){
 
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         SolicitudeGer::where('idsolicitud',$solicitude->idsolicitud) // desblockeamos la solicitud para que el otro gerente no lo pueda editar
@@ -902,7 +914,7 @@ class SolicitudeController extends BaseController
     public function listSolicitudeGerCom($id)
     {
 
-        if (Auth::user()->type == 'P') {
+
             if ($id == 0) {
                 $solicituds = Solicitude::all();
             } else {
@@ -911,7 +923,7 @@ class SolicitudeController extends BaseController
 
             $view = View::make('Dmkt.GerCom.view_solicituds_gercom')->with('solicituds', $solicituds);
             return $view;
-        }
+
     }
 
     public function viewSolicitudeGerCom($token)
@@ -932,4 +944,47 @@ class SolicitudeController extends BaseController
         return Redirect::to('show_gercom');
     }
 
+    public function searchSolicitudsGerCom()
+    {
+
+        $inputs = Input::all();
+        $estado = $inputs['idstate'];
+        $start = $inputs['date_start'];
+        $end = $inputs['date_end'];
+        $today = getdate();
+        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
+        $lastday = date('t-m-Y', strtotime($m));
+        $firstday = date('01-m-Y', strtotime($m));
+        $user = Auth::user();
+
+
+            if ($start != null && $end != null) {
+                if ($estado != 0) {
+                    $solicituds = Solicitude::where('estado',$estado)
+                        ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                        ->get();
+
+                } else {
+                    $solicituds = Solicitude::where('estado', $estado)
+                        ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                        ->get();
+                }
+
+
+            } else {
+                if ($estado != 0) {
+                    $solicituds = Solicitude::where('estado', $estado)
+                        ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                        ->get();
+                } else {
+                    $solicituds = Solicitude::where('estado', $estado)
+                        ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                        ->get();
+                }
+            }
+
+            $view = View::make('Dmkt.GerCom.view_solicituds_gercom')->with('solicituds', $solicituds);
+            return $view;
+
+    }
 }

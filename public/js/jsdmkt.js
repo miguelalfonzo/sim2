@@ -16,6 +16,19 @@ function newSolicitude() {
     var idamount = $('#idamount');
     var clients = [];
 
+    var TODOS = 0;
+    var PENDIENTE =1 ;
+    var ACEPTADO = 2;
+    var APROBADO = 3;
+    var DEPOSITADO = 4;
+    var REGISTRADO = 5;
+    var ENTREGADO = 6;
+    var GENERADO = 7;
+    var CANCELADO =  8;
+    var RECHAZADO = 9;
+    var BLOQUEADO = 10;
+
+
     // get clients
     $.getJSON(server + "getclients", function (data) {
         clients = data;
@@ -857,7 +870,7 @@ function newSolicitude() {
     /** --------------------------------- GERENTE COMERCIAL -------------------------------------- **/
 
     $.ajax({
-        url: server + 'listar-solicitudes-gercom/' + 8,
+        url: server + 'listar-solicitudes-gercom/' + ACEPTADO,
         type: 'GET',
         dataType: 'html'
 
@@ -880,35 +893,7 @@ function newSolicitude() {
         );
     });
 
-    $('.select_state_solicitude_gercom').on('change', function () {
-        var idstate = $(this).val();
-        $('#table_solicitude_gercom_wrapper').remove();
-        setTimeout(function () {
 
-            $.ajax({
-                url: server + 'listar-solicitudes-gercom/' + idstate,
-                type: 'GET',
-                dataType: 'html'
-
-            }).done(function (data) {
-                $('.table-solicituds-gercom').append(data);
-                $('#table_solicitude_gercom').dataTable({
-                        "order": [
-                            [ 3, "desc" ]
-                        ],
-                        "bLengthChange": false,
-                        'iDisplayLength': 7,
-                        "oLanguage": {
-                            "sSearch": "Buscar: ",
-                            "sZeroRecords": "No hay solicitudes",
-                            "sInfoEmpty": "No hay solicitudes",
-                            "sInfo": 'Mostrando _END_ de _TOTAL_'
-                        }
-                    }
-                );
-            });
-        }, 200)
-    })
 
 
     /* preview image */
@@ -916,6 +901,66 @@ function newSolicitude() {
 
         addImage(e);
     });
+
+    var search_solicitude_gercom = $('#search_solicitude_gercom');
+    search_solicitude_gercom.on('click', function () {
+        var date_start = $('#date_start');
+        var date_end = $('#date_end');
+        var validate = 0;
+        if (!date_start.val() && date_end.val()) {
+            validate = 1;
+            date_start.parent().addClass('has-error');
+            date_start.attr('placeholder', 'Ingrese Fecha');
+            date_start.addClass('input-placeholder-error');
+
+        }
+        if (!date_end.val() && date_start.val()) {
+            validate = 1;
+            date_end.parent().addClass('has-error');
+            date_end.attr('placeholder', 'Ingrese Fecha');
+            date_end.addClass('input-placeholder-error');
+        }
+        if (validate == 0) {
+
+            date_start.parent().removeClass('has-error');
+            date_start.attr('placeholder', '');
+            date_end.parent().removeClass('has-error');
+            date_end.attr('placeholder', '');
+
+            var l = Ladda.create(this);
+            var idstate = $('#select_state_solicitude_gercom').val();
+            l.start();
+            var jqxhr = $.post(server + "buscar-solicitudes-gercom",
+                { idstate: idstate, date_start: date_start.val(), date_end: date_end.val() })
+                .done(function (data) {
+                    console.log(data);
+                    $('#table_solicitude_gercom_wrapper').remove();
+                    $('.table-solicituds-gercom').append(data);
+                    $('#table_solicitude_gercom').dataTable({
+                            "order": [
+                                [ 3, "desc" ]
+                            ],
+                            "bLengthChange": false,
+                            'iDisplayLength': 7,
+                            "oLanguage": {
+                                "sSearch": "Buscar: ",
+                                "sZeroRecords": "No hay solicitudes",
+                                "sInfoEmpty": "No hay solicitudes",
+                                "sInfo": 'Mostrando _END_ de _TOTAL_'
+                            }
+                        }
+                    );
+
+                    l.stop();
+                })
+                .fail(function () {
+                    alert("error");
+                })
+
+        }
+    });
+
+    /** ----------------------------------------------------------------------------------------------- **/
 
     function addImage(e) {
         var file = e.target.files[0],
