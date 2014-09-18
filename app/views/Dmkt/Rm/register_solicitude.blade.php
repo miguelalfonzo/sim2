@@ -7,9 +7,7 @@
 <div class="panel-heading">
     <h3 class="panel-title">Nueva Solicitud</h3>
     @if(isset($solicitude) && $solicitude->blocked == 1)
-
     <h4 class="" style="color: darkred">LA SOLICITUD ESTA SIENDO EVALUADA</h4>
-
     @endif
 
     <small style="float: right; margin-top: -10px"><strong>Usuario : @if(Auth::user()->type == 'R') {{Auth::user()->rm->nombres}}@else {{Auth::user()->Sup->nombres}} @endif</strong></small>
@@ -293,7 +291,13 @@
 
 
     <div class="col-sm-12 col-md-12" style="text-align: center">
-        @if($solicitude->blocked == 0)
+        @if(isset($solicitude) && $solicitude->blocked == 0)
+        <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">{{isset($solicitude) ?
+            'Actualizar' : 'Crear'}}
+
+        </button>
+        <a id="button2id" href="{{URL::to('show_rm')}}" name="button2id" class="btn btn-primary">Cancelar</a>
+        @else
         <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">{{isset($solicitude) ?
             'Actualizar' : 'Crear'}}
 

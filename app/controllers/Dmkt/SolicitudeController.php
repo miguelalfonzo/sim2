@@ -63,11 +63,11 @@ class SolicitudeController extends BaseController
         echo json_encode($result);
 */
         $user = new User();
-        $user->id = 16;
-        $user->email = 'gercom@bago.com';
-        $user->username = 'gerente comercial';
+        $user->id = 17;
+        $user->email = 'contador@bago.com';
+        $user->username = 'contador';
         $user->password = Hash::make('admin');
-        $user->type = 'G';
+        $user->type = 'C';
         $user->save();
         /*
         $today = getdate();
