@@ -49,6 +49,9 @@ Route::filter('rm', function () {
             return Redirect::to('show_sup');
         if (Auth::user()->type != 'R' && Auth::user()->type == 'P')
             return Redirect::to('show_gerprod');
+        if (Auth::user()->type != 'R' && Auth::user()->type == 'C')
+            return Redirect::to('show_cont');
+
 
     } else {
 
@@ -62,6 +65,8 @@ Route::filter('sup', function () {
             return Redirect::to('show_rm');
         if (Auth::user()->type != 'S' && Auth::user()->type == 'P')
             return Redirect::to('show_gerprod');
+        if (Auth::user()->type != 'S' && Auth::user()->type == 'C')
+            return Redirect::to('show_cont');
 
     } else {
 
@@ -75,7 +80,8 @@ Route::filter('gerprod', function () {
             return Redirect::to('show_rm');
         if (Auth::user()->type != 'P' && Auth::user()->type == 'S')
             return Redirect::to('show_sup');
-
+        if (Auth::user()->type != 'P' && Auth::user()->type == 'C')
+            return Redirect::to('show_cont');
     } else {
 
         return Redirect::to('login');
@@ -84,11 +90,11 @@ Route::filter('gerprod', function () {
 
 Route::filter('cont', function () {
     if (Auth::check()) {
-        if (Auth::user()->type != 'C' && Auth::user()->type == 'R' && Auth::user()->type != 'P')
+        if (Auth::user()->type != 'C' && Auth::user()->type == 'R')
             return Redirect::to('show_rm');
-        if (Auth::user()->type != 'C' && Auth::user()->type == 'S')
+        if (Auth::user()->type != 'C' && Auth::user()->type == 'S' )
             return Redirect::to('show_sup');
-        if (Auth::user()->type != 'C' && Auth::user()->type == 'P')
+        if (Auth::user()->type != 'C' && Auth::user()->type == 'P' )
             return Redirect::to('show_gerprod');
     } else {
 

@@ -382,6 +382,36 @@ function newSolicitude() {
         e.preventDefault();
     }));
 
+
+    function listSolicitude(typeUser , state){
+
+        $.ajax({
+            url: server + 'listar-solicitudes-'+typeUser +'/' + state,
+            type: 'GET',
+            dataType: 'html'
+
+
+        }).done(function (data) {
+            $('.table-solicituds-'+typeUser).append(data);
+            $('#table_solicitude_'+typeUser).dataTable({
+                    "order": [
+                        [ 3, "desc" ]
+                    ],
+                    "bLengthChange": false,
+                    'iDisplayLength': 7,
+                    "oLanguage": {
+                        "sSearch": "Buscar: ",
+                        "sZeroRecords": "No hay solicitudes",
+                        "sInfoEmpty": "No hay solicitudes",
+                        "sInfo": 'Mostrando _END_ de _TOTAL_'
+                    }
+                }
+            );
+        });
+
+    }
+
+
     /* List solicitude pending */
     $.ajax({
         url: server + 'listar-solicitudes/' + 1,
@@ -501,31 +531,8 @@ function newSolicitude() {
     /** SUPERVISOR */
 
     /* list solicitude pending or depending of type state */
-    $.ajax({
-        url: server + 'listar-solicitudes-sup/' + $('#state_view').val(),
-        type: 'GET',
-        dataType: 'html'
+    listSolicitude('sup', $('#state_view').val());
 
-
-    }).done(function (data) {
-        $('.table-solicituds-sup').append(data);
-        $('#table_solicitude_sup').dataTable({
-                "order": [
-                    [ 3, "desc" ]
-                ],
-
-                "bLengthChange": false,
-                'iDisplayLength': 7,
-                "oLanguage": {
-                    "sSearch": "Buscar: ",
-                    "sZeroRecords": "No hay solicitudes",
-                    "sInfoEmpty": "No hay solicitudes",
-                    "sInfo": 'Mostrando _END_ de _TOTAL_'
-                }
-            }
-        );
-
-    });
 
     var amount_families = $('.amount_families');
     amount_families.numeric({negative: false});
@@ -736,30 +743,7 @@ function newSolicitude() {
 
     /** --------------------------------- GERENTE PRODUCTO -------------------------------------- **/
 
-    $.ajax({
-        url: server + 'listar-solicitudes-gerprod/' +  $('#state_view').val(),
-        type: 'GET',
-        dataType: 'html'
-
-
-    }).done(function (data) {
-        $('.table-solicituds-gerprod').append(data);
-        $('#table_solicitude_gerprod').dataTable({
-                "order": [
-                    [ 3, "desc" ]
-                ],
-
-                "bLengthChange": false,
-                'iDisplayLength': 7,
-                "oLanguage": {
-                    "sSearch": "Buscar: ",
-                    "sZeroRecords": "No hay solicitudes",
-                    "sInfoEmpty": "No hay solicitudes",
-                    "sInfo": 'Mostrando _END_ de _TOTAL_'
-                }
-            }
-        );
-    });
+    listSolicitude('gerprod',$('#state_view').val())
 
     /* solicitude accepted */
     var form_acepted_solicitude = $('#form_make_activity');
@@ -867,9 +851,12 @@ function newSolicitude() {
 
         }
     });
+
+
     /** --------------------------------- GERENTE COMERCIAL -------------------------------------- **/
 
-    $.ajax({
+    listSolicitude('gercom',ACEPTADO);
+    /*$.ajax({
         url: server + 'listar-solicitudes-gercom/' + ACEPTADO,
         type: 'GET',
         dataType: 'html'
@@ -892,7 +879,7 @@ function newSolicitude() {
             }
         );
     });
-
+  */
 
 
 
