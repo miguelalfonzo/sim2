@@ -1011,10 +1011,9 @@ class SolicitudeController extends BaseController
         return $view;
     }
 
-    public function viewSolicitudeCont($id)
+    public function viewSolicitudeCont($token)
     {
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
-        echo json_encode($solicitude);die;
         return View::make('Dmkt.Cont.view_solicitude_cont')->with('solicitude', $solicitude);
     }
 

@@ -23,6 +23,7 @@
                 <strong><p style="display:inline">Ciudad:</strong>&nbsp;Lima</p>
                 <strong><p style="display:inline">Cargo:</strong>&nbsp;{{mb_convert_case($charge,MB_CASE_TITLE,'UTF-8')}}</p>
                 <strong><p style="display:inline">N° de Depósito:</strong>&nbsp;101</p>
+                <strong><p style="display:inline">Fecha de Depósito:</strong>&nbsp;{{$date['toDay']}}</p>
             </section>
             <section style="margin-top:2em;">
                 <table class="table">
