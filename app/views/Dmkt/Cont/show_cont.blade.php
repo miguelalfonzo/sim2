@@ -14,7 +14,7 @@
 	                                <select id="select_state_solicitude_cont" name="idstate"
 	                                        class="form-control select_state_solicitude_cont">
 	                                    @foreach($states as $state)
-		                                    @if($state->idestado == APROBADO)
+		                                    @if($state->idestado == APROBADO || $state->idestado == DEPOSITADO || $state->idestado == REGISTRADO || $state->idestado == GENERADO )
 		                                    	<option value="{{$state->idestado}}">{{$state->nombre}}</option>
 		                                    @endif
 	                                    @endforeach

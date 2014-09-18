@@ -25,7 +25,7 @@
         <td>
             <div class="div-icons-solicituds">
                 <a href="{{URL::to('ver-solicitud').'/'.$solicitude->token}}"><span class="glyphicon glyphicon-eye-open"></span></a>
-                @if($solicitude->estado == DEPOSITADO)
+                @if($solicitude->estado == DEPOSITADO && $solicitude->asiento == 1)
                 <a id="token-a" href="#"><span class="glyphicon glyphicon-usd"></span></a>
                 <form id="form-token" action="{{URL::to('registrar-gasto')}}" method="POST">
                     <input type="hidden" name="token" value="{{$solicitude->token}}">

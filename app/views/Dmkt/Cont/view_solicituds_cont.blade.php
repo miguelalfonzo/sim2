@@ -1,4 +1,4 @@
-<table class="table table-striped table-bordered dataTable" id="table_solicitude_gercom" style="width: 100%">
+<table class="table table-striped table-bordered dataTable" id="table_solicitude_cont" style="width: 100%">
     <thead>
     <tr>
         <th>Solicitud</th>
@@ -24,8 +24,8 @@
         <td style="text-align: center">{{$solicitude->typesolicitude->nombre}}</td>
         <td>
             <div class="div-icons-solicituds">
-                <a href="{{URL::to('ver-solicitud').'/'.$solicitude->token}}"><span class="glyphicon glyphicon-eye-open"></span></a>
-                @if($solicitude->estado == APROBADO)
+                <a href="{{URL::to('ver-solicitud-cont').'/'.$solicitude->token}}"><span class="glyphicon glyphicon-eye-open"></span></a>
+                @if($solicitude->estado == DEPOSITADO)
                     <a id="token-a" href="#"><span class="glyphicon glyphicon-book"></span></a>
                     <form id="form-token" action="{{URL::to('generar-asiento')}}" method="POST">
                         <input type="hidden" name="token" value="{{$solicitude->token}}">

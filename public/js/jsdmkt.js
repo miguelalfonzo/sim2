@@ -987,6 +987,7 @@ function newSolicitude() {
         );
     });
 
+
     var search_solicitude_cont = $('#search_solicitude_cont');
     search_solicitude_cont.on('click', function () {
         var date_start = $('#date_start');

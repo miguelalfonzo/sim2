@@ -84,7 +84,7 @@ Route::filter('gerprod', function () {
 
 Route::filter('cont', function () {
     if (Auth::check()) {
-        if (Auth::user()->type != 'C' && Auth::user()->type == 'R')
+        if (Auth::user()->type != 'C' && Auth::user()->type == 'R' && Auth::user()->type != 'P')
             return Redirect::to('show_rm');
         if (Auth::user()->type != 'C' && Auth::user()->type == 'S')
             return Redirect::to('show_sup');

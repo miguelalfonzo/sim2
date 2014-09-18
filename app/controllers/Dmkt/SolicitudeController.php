@@ -988,6 +988,9 @@ class SolicitudeController extends BaseController
 
     }
 
+    /** ---------------------------------------------  Contabilidad -------------------------------------------------*/
+
+
     public function show_cont()
     {
         $state = Session::get('state');
@@ -1011,9 +1014,52 @@ class SolicitudeController extends BaseController
         return $view;
     }
 
+    public function searchSolicitudeCont(){
+
+        $inputs = Input::all();
+        $estado = $inputs['idstate'];
+        $start = $inputs['date_start'];
+        $end = $inputs['date_end'];
+        $today = getdate();
+        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
+        $lastday = date('t-m-Y', strtotime($m));
+        $firstday = date('01-m-Y', strtotime($m));
+        $user = Auth::user();
+
+
+        if ($start != null && $end != null) {
+            if ($estado != 0) {
+                $solicituds = Solicitude::where('estado',$estado)
+                    ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                    ->get();
+
+            } else {
+                $solicituds = Solicitude::where('estado', $estado)
+                    ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                    ->get();
+            }
+
+
+        } else {
+            if ($estado != 0) {
+                $solicituds = Solicitude::where('estado', $estado)
+                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                    ->get();
+            } else {
+                $solicituds = Solicitude::where('estado', $estado)
+                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                    ->get();
+            }
+        }
+
+        $view = View::make('Dmkt.Cont.view_solicituds_cont')->with('solicituds', $solicituds);
+        return $view;
+
+    }
     public function viewSolicitudeCont($token)
     {
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
+
         return View::make('Dmkt.Cont.view_solicitude_cont')->with('solicitude', $solicitude);
     }
 
