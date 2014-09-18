@@ -99,14 +99,19 @@ Route::get('listar-solicitudes-gercom/{id}', 'Dmkt\SolicitudeController@listSoli
 Route::get('ver-solicitud-gercom/{id}', 'Dmkt\SolicitudeController@viewSolicitudeGerCom');
 Route::get('aprobar-solicitud/{token}', 'Dmkt\SolicitudeController@approvedSolicitude');
 Route::post('buscar-solicitudes-gercom','Dmkt\SolicitudeController@searchSolicitudsGerCom');
-// ======================================================================
 
-Route::group(array('before' => 'cont'), function() {
-    Route::get('show_cont', 'Dmkt\SolicitudeController@show_cont');
-    Route::get('ver-solicitud-cont/{id}', 'Dmkt\SolicitudeController@viewSolicitudeCont');
-    Route::get('listar-solicitudes-cont/{id}', 'Dmkt\SolicitudeController@listSolicitudeCont');
-});
 
+/**
+|-------------------------------------------------------------------------------------------- |
+                                   | Contabilidad |
+|-------------------------------------------------------------------------------------------- |
+ */
+
+
+Route::get('show_cont', 'Dmkt\SolicitudeController@show_cont');
+Route::get('ver-solicitud-cont/{id}', 'Dmkt\SolicitudeController@viewSolicitudeCont');
+Route::get('listar-solicitudes-cont/{id}', 'Dmkt\SolicitudeController@listSolicitudeCont');
+Route::post('buscar-solicitudes-cont','Dmkt\SolicitudeController@searchSolicitudeCont');
 
 App::error(function (ModelNotFoundException $e) {
     return View::make('notfound');

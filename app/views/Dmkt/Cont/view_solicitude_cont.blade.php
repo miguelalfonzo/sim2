@@ -9,10 +9,6 @@
     </div>
     <div class="panel-body">
         <form id="form_make_activity" class="" method="post" action="">
-            <label class="col-sm-8 col-md-8 control-label" for="textinput">ID Solicitud</label>
-            <input id="textinput" name="idsolicitude" type="text" placeholder=""
-                   value="{{$solicitude->idsolicitud}}">
-
             <div class="form-group col-sm-6 col-md-4">
 
                 <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo Solicitud</label>
@@ -204,16 +200,8 @@
             <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
 
                 <div class="col-sm-12 col-md-12" style="text-align: center">
-                   
-                    @if($solicitude->estado == ACEPTADO)
-                    <a href="{{URL::to('aprobar-solicitud'.'/'.$solicitude->token)}}" id="" name="button1id"
-                       class="btn btn-primary">Aprobar
-                    </a>
 
-                    <a id="deny_solicitude" name="button1id" class="btn btn-primary deny_solicitude">Rechazar
-                    </a>
-                    @endif
-                    <a id="button2id" href="{{URL::to('show_sup')}}" name="button2id"
+                    <a id="button2id" href="{{URL::to('show_cont')}}" name="button2id"
                        class="btn btn-primary">Cancelar</a>
 
                 </div>
