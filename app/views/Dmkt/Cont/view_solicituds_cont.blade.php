@@ -27,7 +27,7 @@
                 <a href="{{URL::to('ver-solicitud-cont').'/'.$solicitude->token}}"><span class="glyphicon glyphicon-eye-open"></span></a>
                 @if($solicitude->estado == DEPOSITADO)
                     <a id="token-a" href="#"><span class="glyphicon glyphicon-book"></span></a>
-                    <form id="form-token" action="{{URL::to('generar-asiento')}}" method="POST">
+                    <form id="form-token" action="{{URL::to('generar-asiento-solicitud')}}" method="POST">
                         <input type="hidden" name="token" value="{{$solicitude->token}}">
                     </form>
                 @endif
