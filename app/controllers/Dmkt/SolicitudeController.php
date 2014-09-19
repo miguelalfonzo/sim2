@@ -1066,7 +1066,6 @@ class SolicitudeController extends BaseController
     public function generateSeatSolicitud()
     {
         $token = Input::get('token');
-        $
         return View::make('Dmkt.Cont.register_seat');
     }
 
