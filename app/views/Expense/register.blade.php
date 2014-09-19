@@ -238,7 +238,7 @@
 			</section>
 			<section class="row reg-expense align-center" style="margin-top:2em">
 				<div class="col-xs-12 col-sm-12 col-md-12">
-					<a href="{{URL::to('end-expense').'/'.$solicitude->token}}" id="finish-expense" class="btn btn-success" style="margin:-2em 2em .5em 0">Terminar</a>
+					<a href="#" id="finish-expense" class="btn btn-success" style="margin:-2em 2em .5em 0">Terminar</a>
 					<a href="#" id="cancel-expense" class="btn btn-danger" style="margin:-2em 2em .5em 0">Cancelar</a>
 				</div>
 			</section>

@@ -109,6 +109,11 @@ $(function(){
             e.preventDefault();
             window.location.href = server+"show_rm";
         });
+        //Cancel the view button to generate seat solicitude
+        $("#cancel-seat-cont").on("click",function(e){
+            e.preventDefault();
+            window.location.href = server+"show_cont";
+        });
         //Record end Solicitude
         $("#finish-expense").on("click",function(e){
             e.preventDefault();
@@ -127,6 +132,23 @@ $(function(){
             {
                 bootbox.alert("No puede finalizar el registro de este gasto, aún tiene saldo pendiente por registrar.");
             }
+        });
+        //Generate Seat Solicitude
+        $("#seat-solicitude").on("click",function(e){
+            e.preventDefault();
+            var idsolicitude = $("#idsolicitud").val();
+            bootbox.confirm("¿Esta seguro que desea Generar el Asiento ontable>?", function(result) {
+                if(result)
+                {
+                   window.location.href = server+'generate-seat-solicitude/'+idsolicitude;
+                }
+            });
+        });
+        //Enable deposit
+        $("#enable-deposit").on("click",function(e){
+            e.preventDefault();
+            var idsolicitude = $("#token");
+            
         });
         //IGV, Imp. Service show if you check Factura
         $("#proof-type").on("change",function(){
