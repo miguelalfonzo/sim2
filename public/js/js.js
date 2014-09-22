@@ -82,6 +82,9 @@ $(function(){
         $(".total-item input").numeric({negative:false});
         $(".quantity input").numeric({negative:false});
         $("#igv").numeric({negative:false});
+        $("#ret1").numeric({negative:false});
+        $("#ret2").numeric({negative:false});
+        $("#ret3").numeric({negative:false});
     //Events: Datepicker, Buttons, Keyup.
         //Calcule the IGV and Balance once typed the total amount per item
         $(document).on("keyup",".total-item input",function(){
@@ -151,8 +154,14 @@ $(function(){
             bootbox.confirm("¿Esta seguro que desea habilitar el depósito?", function(result) {
                 if(result)
                 {
-                    console.log(token);
-                    window.location.href = server+'enable-deposit/'+token;
+                    if(validateRet() === true)
+                    {
+                        $("#form_enable_deposit").submit();
+                    }
+                    else
+                    {
+                        console.log("false");
+                    }
                 }
             });
         });
@@ -678,6 +687,9 @@ $(function(){
             $(this).removeClass("error-incomplete").attr("placeholder",'');
             $(".message-expense").hide();
         });
+        $(".ret").on("click",function(){
+            $(".ret").removeClass("error-incomplete");
+        });
         //Calculating sum of rows
         function calculateTot(rows,clas){
             var sum = 0;
@@ -850,6 +862,36 @@ $(function(){
             if(error === 0)
             {
                 return data;
+            }
+        }
+
+        //Validation inputs retention for discount background
+        function validateRet()
+        {
+            var arrayRet = [];
+            for(var i=0; i<=2; i++)
+            {
+                if(parseFloat($("#ret"+i).val()) === 0)
+                {
+                    $("#ret"+i).addClass('error-incomplete');
+                    $("#ret"+i).val('');
+                    $("#ret"+i).attr('placeholder','Número mayor a 0.');
+                    return false;
+                }
+                if(parseFloat($("#ret"+i).val()))
+                    arrayRet[i] = parseFloat($("#ret"+i).val());
+            }
+            if(arrayRet.length > 1)
+            {
+                for(var i=0; i<arrayRet.length; i++)
+                {
+                    $("#ret"+i).addClass('error-incomplete');
+                }
+                return false;
+            }
+            else
+            {
+                return true;
             }
         }
 });
