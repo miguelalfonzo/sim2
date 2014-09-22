@@ -37,7 +37,7 @@
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo Solicitud</label>
 
     <div class="col-sm-12 col-md-12">
-        <select id="" name="type_solicitude" class="form-control selecttypesolicitude">
+        <select id="" name="type_solicitude" class="form-control selecttypesolicitude" >
             @foreach($typesolicituds as $type)
             @if(isset($solicitude) && $solicitude->idtiposolicitud == $type->idtiposolicitud)
             <option selected value="{{$type->idtiposolicitud}}">{{$type->nombre}}</option>
@@ -73,7 +73,7 @@
 
     <div class="col-sm-12 col-md-12">
         <input id="ruc" name="ruc" type="text" placeholder=""
-               value="{{isset($solicitude->numpago) ? $solicitude->numpago : null }}"
+               value="{{isset($solicitude->numruc) ? $solicitude->numruc : null }}"
                class="form-control input-md" maxlength="11">
 
     </div>
@@ -83,7 +83,7 @@
 
     <div class="col-sm-12 col-md-12">
         <input id="number_account" name="number_account" type="text" placeholder=""
-               value="{{isset($solicitude->numpago) ? $solicitude->numpago : null }}"
+               value="{{isset($solicitude->numcuenta) ? $solicitude->numcuenta : null }}"
                class="form-control input-md">
 
     </div>
@@ -145,7 +145,6 @@
 
 <div class="form-group col-sm-6 col-md-4">
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Fecha de Entrega</label>
-
     <div class="col-sm-12 col-md-12">
 
         <div class="input-group date">
@@ -332,19 +331,21 @@
 
     <div class="col-sm-12 col-md-12" style="text-align: center">
         @if(isset($solicitude))
-        @if($solicitude->blocked == 0)
-        <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">{{isset($solicitude) ?
-            'Actualizar' : 'Crear'}}
-        </button>
-        @else
-        <a id="button2id" href="{{URL::to('show_rm')}}" name="button2id" class="btn btn-primary">Cancelar</a>
-        @endif
+
+            @if($solicitude->blocked == 0)
+            <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">{{isset($solicitude) ?
+                'Actualizar' : 'Crear'}}
+            </button>
+            <a id="button2id" href="{{URL::to('show_rm')}}" name="button2id" class="btn btn-primary">Cancelar</a>
+            @else
+            <a id="button2id" href="{{URL::to('show_rm')}}" name="button2id" class="btn btn-primary">Cancelar</a>
+            @endif
 
         @else
-        <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">{{isset($solicitude) ?
-            'Actualizar' : 'Crear'}}
-        </button>
-        <a id="button2id" href="{{URL::to('show_rm')}}" name="button2id" class="btn btn-primary">Cancelar</a>
+            <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">{{isset($solicitude) ?
+                'Actualizar' : 'Crear'}}
+            </button>
+            <a id="button2id" href="{{URL::to('show_rm')}}" name="button2id" class="btn btn-primary">Cancelar</a>
         @endif
     </div>
 </div>

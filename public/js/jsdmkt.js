@@ -116,6 +116,8 @@ function newSolicitude() {
     //select type payment
     solicitude_number_account.hide();
     solicitude_ruc.hide();
+    if(select_type_payment.val()==2)  solicitude_ruc.show();
+    if(select_type_payment.val()==3)  solicitude_number_account.show();
     select_type_payment.on('change', function(){
         if($(this).val() == 1){
             solicitude_ruc.hide();

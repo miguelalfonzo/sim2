@@ -31,14 +31,20 @@
 
 <!--    Type Payment -->
 
-<div class="form-group col-sm-6 col-md-4">
+<div class="form-group col-sm-6 col-md-4" >
 
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo de Pago</label>
 
     <div class="col-sm-12 col-md-12">
-        <input id="textinput" name="textinput" type="text" placeholder=""
-               value="{{$solicitude->typePayment->nombre}}" readonly
-               class="form-control input-md">
+        <select id="" name="type_payment" class="form-control selectTypePayment" disabled>
+            @foreach($typePayments as $type)
+            @if(isset($solicitude) && $solicitude->idtipopago == $type->idtipopago)
+            <option selected value="{{$type->idtipopago}}">{{$type->nombre}}</option>
+            @else
+            <option value="{{$type->idtipopago}}">{{$type->nombre}}</option>
+            @endif
+            @endforeach
+        </select>
 
     </div>
 </div>
