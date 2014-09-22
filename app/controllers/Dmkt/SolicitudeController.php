@@ -1079,4 +1079,10 @@ class SolicitudeController extends BaseController
         return Redirect::to('show_cont');
     }
 
+    public function enableDeposit($token)
+    {
+        $solicitude = Solicitude::where('token',$token)->firstOrFail();
+        return Redirect::to('show_cont');
+    }
+
 }

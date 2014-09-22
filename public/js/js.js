@@ -147,8 +147,14 @@ $(function(){
         //Enable deposit
         $("#enable-deposit").on("click",function(e){
             e.preventDefault();
-            var idsolicitude = $("#token");
-            
+            var token = $("#token").val();
+            bootbox.confirm("¿Esta seguro que desea habilitar el depósito?", function(result) {
+                if(result)
+                {
+                    console.log(token);
+                    window.location.href = server+'enable-deposit/'+token;
+                }
+            });
         });
         //IGV, Imp. Service show if you check Factura
         $("#proof-type").on("change",function(){

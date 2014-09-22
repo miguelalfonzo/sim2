@@ -11,6 +11,7 @@
                         <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo Solicitud</label>
                         <div class="col-sm-12 col-md-12">
                             <input id="textinput" name="textinput" type="text" value="{{$solicitude->typesolicitude->nombre}}" class="form-control input-md" readonly>
+                            <input type="hidden" id="token" value="{{$solicitude->token}}">
                         </div>
                     </div>
                     <div class="form-group col-sm-6 col-md-4">
@@ -136,7 +137,7 @@
                         <div class="col-sm-12 col-md-12">
                             <div class="input-group">
                                 <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                                <input type="text" class="form-control input-md">
+                                <input id="ret1" type="text" class="form-control input-md">
                             </div>
                         </div>
                     </div>
@@ -145,7 +146,7 @@
                         <div class="col-sm-12 col-md-12">
                             <div class="input-group">
                                 <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                                <input type="text" class="form-control input-md">
+                                <input id="ret2" type="text" class="form-control input-md">
                             </div>
                         </div>
                     </div>
@@ -154,10 +155,10 @@
                         <div class="col-sm-12 col-md-12">
                             <div class="input-group">
                                 <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                                <input type="text" class="form-control input-md">
+                                <input id="ret3" type="text" class="form-control input-md">
                             </div>
                         </div>
-                    </div>  
+                    </div>
                     <!-- Button (Double) -->
                     <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
                         <div class="col-sm-12 col-md-12" style="text-align: center">
