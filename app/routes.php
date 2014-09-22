@@ -114,7 +114,7 @@ Route::get('listar-solicitudes-cont/{id}', 'Dmkt\SolicitudeController@listSolici
 Route::post('buscar-solicitudes-cont','Dmkt\SolicitudeController@searchSolicitudeCont');
 Route::post('generar-asiento-solicitud','Dmkt\SolicitudeController@viewSeatSolicitude');
 Route::get('generate-seat-solicitude/{id}','Dmkt\SolicitudeController@generateSeatSolicitude');
-Route::get('enable-deposit/{token}','Dmkt\SolicitudeController@enableDeposit');
+Route::post('enable-deposit','Dmkt\SolicitudeController@enableDeposit');
 
 });
 App::error(function (ModelNotFoundException $e) {
