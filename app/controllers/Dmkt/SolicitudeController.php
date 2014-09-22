@@ -178,11 +178,11 @@ class SolicitudeController extends BaseController
         $solicitude->idsubtipoactividad = $inputs['sub_type_activity'];
         $solicitude->tipo_moneda = $inputs['money'];
         if($inputs['type_payment']== 2){
-            $solicitude->numpago = $inputs['ruc'];
+            $solicitude->numruc = $inputs['ruc'];
         }else if( $inputs['type_payment'] == 3){
-            $solicitude->numpago = $inputs['number_account'];
+            $solicitude->numcuenta = $inputs['number_account'];
         }
-
+        $solicitude->idtipopago = $inputs['type_payment'];
         if ($solicitude->save()) {
             $data = array(
 
@@ -301,7 +301,7 @@ class SolicitudeController extends BaseController
         $families2 = Marca::whereIn('id', $families2)->get(array('id', 'descripcion'));
 
         $typesolicituds = TypeSolicitude::all();
-
+        $typePayments = TypePayment::all();
         $subtypeactivities = SubTypeActivity::all();
 
         $data = [
@@ -311,7 +311,8 @@ class SolicitudeController extends BaseController
             'families' => $families,
             'families2' => $families2,
             'typesolicituds' => $typesolicituds,
-            'subtypeactivities' => $subtypeactivities
+            'subtypeactivities' => $subtypeactivities,
+            'typePayments' => $typePayments
         ];
         //echo json_encode($data);
 
@@ -351,6 +352,19 @@ class SolicitudeController extends BaseController
         $solicitude->monto_factura = $inputs['amount_fac'];
         $solicitude->idsubtipoactividad = $inputs['sub_type_activity'];
         $solicitude->tipo_moneda = $inputs['money'];
+        $typePayment = $inputs['type_payment'];
+        if($typePayment == 1){
+            $solicitude->numruc = null;
+            $solicitude->numcuenta = null;
+        }else if($typePayment == 2){
+            $solicitude->numruc = $inputs['ruc'];
+            $solicitude->numcuenta = null;
+        }else if($typePayment == 3){
+            $solicitude->numcuenta = $inputs['number_account'];
+            $solicitude->numruc = null;
+        }
+        $solicitude->idtipopago = $inputs['type_payment'];
+
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
 
