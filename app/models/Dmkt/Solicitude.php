@@ -20,16 +20,16 @@ class Solicitude extends Eloquent{
     function searchId(){
 
         $lastId = Solicitude::orderBy('idsolicitud', 'DESC')->first();
-         if($lastId == null){
-             return 0;
-         }else{
-             return $lastId->idsolicitud;
-         }
+        if($lastId == null){
+            return 0;
+        }else{
+            return $lastId->idsolicitud;
+        }
 
     }
     function subtype(){
 
-       return  $this->hasOne('Common\SubTypeActivity','idsubtipoactividad','idsubtipoactividad');
+        return  $this->hasOne('Common\SubTypeActivity','idsubtipoactividad','idsubtipoactividad');
     }
 
     function state(){
@@ -60,4 +60,8 @@ class Solicitude extends Eloquent{
         return $this->belongsTo('User','iduser');
     }
 
+    function typePayment(){
+        return $this->hasOne('Common\TypePayment','idtipopago','idtipopago');
+
+    }
 }

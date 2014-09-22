@@ -50,6 +50,44 @@
     </div>
 </div>
 
+<div class="form-group col-sm-6 col-md-4">
+
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo de Pago</label>
+
+    <div class="col-sm-12 col-md-12">
+        <select id="" name="type_payment" class="form-control selectTypePayment">
+            @foreach($typePayments as $type)
+            @if(isset($solicitude) && $solicitude->idtipopago == $type->idtipopago)
+            <option selected value="{{$type->idtipopago}}">{{$type->nombre}}</option>
+            @else
+            <option value="{{$type->idtipopago}}">{{$type->nombre}}</option>
+            @endif
+            @endforeach
+        </select>
+
+    </div>
+</div>
+
+<div class="form-group col-sm-6 col-md-4" id="div_ruc">
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Ruc</label>
+
+    <div class="col-sm-12 col-md-12">
+        <input id="ruc" name="ruc" type="text" placeholder=""
+               value="{{isset($solicitude->numpago) ? $solicitude->numpago : null }}"
+               class="form-control input-md" maxlength="11">
+
+    </div>
+</div>
+<div class="form-group col-sm-6 col-md-4" id="div_number_account">
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Nº de Cuenta</label>
+
+    <div class="col-sm-12 col-md-12">
+        <input id="number_account" name="number_account" type="text" placeholder=""
+               value="{{isset($solicitude->numpago) ? $solicitude->numpago : null }}"
+               class="form-control input-md">
+
+    </div>
+</div>
 
 <div class="form-group col-sm-6 col-md-4">
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto Solicitado</label>
@@ -122,111 +160,113 @@
 @if(!isset($solicitude))
 <div class="solicitude_factura form-group col-sm-6 col-md-8">
 
-        <label class="col-sm-8 col-md-8 control-label" for="textinput">Factura <small>(solo imagenes)</small></label>
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Factura <small>(solo imagenes)</small></label>
 
-        <div class="col-sm-12 col-md-6" style="padding-right: 30px">
+    <div class="col-sm-12 col-md-6" style="padding-right: 30px">
 
-                <div class="input-group">
+        <div class="input-group">
                     <span class="input-group-btn">
                          <span class="btn btn-primary btn-file">
                              <i class="glyphicon glyphicon-folder-open"></i> <input type="file" multiple="" name="file">
                          </span>
                     </span>
-                        <input type="text" id="input-file-factura"  class="form-control" readonly="">
-                </div>
+            <input type="text" id="input-file-factura"  class="form-control" readonly="">
+        </div>
 
-         </div>
+    </div>
 </div>
 @endif
-<div class="form-group col-sm-6 col-md-4 ">
-    <label class="col-sm-8 col-md-8 control-label" for="textinput">Cliente</label>
 
-    <ul id="listclient" class="col-sm-12 col-md-12">
+<div class="form-group col-sm-12 col-md-12" style="padding: 0">
+    <div class="form-group col-sm-6 col-md-4 ">
+        <label class="col-sm-8 col-md-8 control-label" for="textinput">Cliente</label>
 
-        @if(isset($clients))
-        @foreach($clients as $client)
-        <li>
-            <div style="position: relative" class="">
-                <input id="project1" name="clients[]" type="text" placeholder="" style="margin-bottom: 10px"
-                       class="form-control input-md project input-client"
-                       value="{{isset($client->clnombre) ? $client->clcodigo.' - '.$client->clnombre : null }}">
+        <ul id="listclient" class="col-sm-12 col-md-12">
 
-                <button type='button' class='btn-delete-client' style="z-index: 2"><span
-                        class='glyphicon glyphicon-remove'></span></button>
-            </div>
-        </li>
-        @endforeach
-        @else
-        <li>
-            <div style="position: relative" class="">
-                <input id="idclient1" name="clients[]" type="text" placeholder="" style="margin-bottom: 10px"
-                       class="form-control input-md input-client"
-                       value="{{isset($client->clnombre) ? $client->clcodigo.' - '.$client->clnombre : null }}">
+            @if(isset($clients))
+            @foreach($clients as $client)
+            <li>
+                <div style="position: relative" class="">
+                    <input id="project1" name="clients[]" type="text" placeholder="" style="margin-bottom: 10px"
+                           class="form-control input-md project input-client"
+                           value="{{isset($client->clnombre) ? $client->clcodigo.' - '.$client->clnombre : null }}">
 
-                <button type='button' class='btn-delete-client' style="display: none; z-index: 2"><span
-                        class='glyphicon glyphicon-remove'></span></button>
-            </div>
-        </li>
+                    <button type='button' class='btn-delete-client' style="z-index: 2"><span
+                            class='glyphicon glyphicon-remove'></span></button>
+                </div>
+            </li>
+            @endforeach
+            @else
+            <li>
+                <div style="position: relative" class="">
+                    <input id="idclient1" name="clients[]" type="text" placeholder="" style="margin-bottom: 10px"
+                           class="form-control input-md input-client"
+                           value="{{isset($client->clnombre) ? $client->clcodigo.' - '.$client->clnombre : null }}">
 
-        @endif
-    </ul>
+                    <button type='button' class='btn-delete-client' style="display: none; z-index: 2"><span
+                            class='glyphicon glyphicon-remove'></span></button>
+                </div>
+            </li>
+
+            @endif
+        </ul>
     <span class="
     col-sm-10 col-md-10 clients_repeat" style=""></span>
-    <button type="button" class="btn btn-default" id="btn-add-client">Agregar Otro Cliente</button>
+        <button type="button" class="btn btn-default" id="btn-add-client">Agregar Otro Cliente</button>
 
+    </div>
+    <div class="form-group col-sm-6 col-md-4">
+        <label class="col-sm-8 col-md-8 control-label" for="selectfamily">Familia</label>
+
+
+        <ul id="listfamily" class="col-sm-10 col-md-10" style="">
+
+            @if(isset($families2))
+            @foreach($families2 as $family2)
+            <li>
+                <div class="" style="position: relative">
+
+                    <select id="selectfamily" name="families[]" class="form-control selectfamily"
+                            style="margin-bottom:10px ">
+                        @foreach($families as $family)
+                        @if($family->id == $family2->id)
+                        <option value="{{$family->id}}" selected>{{$family->descripcion}}</option>
+                        @else
+                        <option value="{{$family->id}}">{{$family->descripcion}}</option>
+                        @endif
+                        @endforeach
+                    </select>
+                    <button type='button' class='btn-delete-family' style=""><span
+                            class='glyphicon glyphicon-remove'></span></button>
+                </div>
+
+            </li>
+            @endforeach
+            @else
+            <li>
+                <div class="" style="position: relative">
+
+                    <select id="selectfamily" name="families[]" class="form-control selectfamily"
+                            style="margin-bottom:10px ">
+                        @foreach($families as $family)
+                        <option value="{{$family->id}}">{{$family->descripcion}}</option>
+                        @endforeach
+                    </select>
+                    <button type='button' class='btn-delete-family' style="display: none"><span
+                            class='glyphicon glyphicon-remove'></span></button>
+                </div>
+
+            </li>
+            @endif
+
+
+        </ul>
+
+        <button type="button" class="btn btn-default" id="btn-add-family">Agregar Otra Familia</button>
+
+
+    </div>
 </div>
-<div class="form-group col-sm-6 col-md-4">
-    <label class="col-sm-8 col-md-8 control-label" for="selectfamily">Familia</label>
-
-
-    <ul id="listfamily" class="col-sm-10 col-md-10" style="">
-
-        @if(isset($families2))
-        @foreach($families2 as $family2)
-        <li>
-            <div class="" style="position: relative">
-
-                <select id="selectfamily" name="families[]" class="form-control selectfamily"
-                        style="margin-bottom:10px ">
-                    @foreach($families as $family)
-                    @if($family->id == $family2->id)
-                    <option value="{{$family->id}}" selected>{{$family->descripcion}}</option>
-                    @else
-                    <option value="{{$family->id}}">{{$family->descripcion}}</option>
-                    @endif
-                    @endforeach
-                </select>
-                <button type='button' class='btn-delete-family' style=""><span
-                        class='glyphicon glyphicon-remove'></span></button>
-            </div>
-
-        </li>
-        @endforeach
-        @else
-        <li>
-            <div class="" style="position: relative">
-
-                <select id="selectfamily" name="families[]" class="form-control selectfamily"
-                        style="margin-bottom:10px ">
-                    @foreach($families as $family)
-                    <option value="{{$family->id}}">{{$family->descripcion}}</option>
-                    @endforeach
-                </select>
-                <button type='button' class='btn-delete-family' style="display: none"><span
-                        class='glyphicon glyphicon-remove'></span></button>
-            </div>
-
-        </li>
-        @endif
-
-
-    </ul>
-
-    <button type="button" class="btn btn-default" id="btn-add-family">Agregar Otra Familia</button>
-
-
-</div>
-
 @if(isset($solicitude) && $solicitude->idtiposolicitud == 2)
 
 <div class="form-group col-sm-6 col-md-4">
@@ -291,21 +331,21 @@
 
 
     <div class="col-sm-12 col-md-12" style="text-align: center">
-        @if(isset($solicitude) && $solicitude->blocked == 0)
+        @if(isset($solicitude))
+        @if($solicitude->blocked == 0)
         <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">{{isset($solicitude) ?
             'Actualizar' : 'Crear'}}
-
         </button>
-        <a id="button2id" href="{{URL::to('show_rm')}}" name="button2id" class="btn btn-primary">Cancelar</a>
         @else
-        <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">{{isset($solicitude) ?
-            'Actualizar' : 'Crear'}}
-
-        </button>
         <a id="button2id" href="{{URL::to('show_rm')}}" name="button2id" class="btn btn-primary">Cancelar</a>
         @endif
 
-
+        @else
+        <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">{{isset($solicitude) ?
+            'Actualizar' : 'Crear'}}
+        </button>
+        <a id="button2id" href="{{URL::to('show_rm')}}" name="button2id" class="btn btn-primary">Cancelar</a>
+        @endif
     </div>
 </div>
 

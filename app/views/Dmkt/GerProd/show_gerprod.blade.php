@@ -12,7 +12,7 @@
                         <input type="hidden" id="state_view" value="{{isset($state) ? $state : PENDIENTE}}">
                         <div class="form-group col-sm-3 col-md-2" style="padding: 0">
                             <div class="">
-                                <select id="select_state_solicitude_gerprod" name="idstate"
+                                <select id="idState" name="idstate"
                                         class="form-control selectestatesolicitude">
                                     @foreach($states as $state)
                                     <option value="{{$state->idestado}}">{{$state->nombre}}</option>

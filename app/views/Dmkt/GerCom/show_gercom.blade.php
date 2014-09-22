@@ -11,7 +11,7 @@
                     <form method="post" action="" class="">
                         <div class="form-group col-sm-3 col-md-2" style="padding: 0">
                             <div class="">
-                                <select id="select_state_solicitude_gercom" name="idstate"
+                                <select id="idState" name="idState"
                                         class="form-control select_state_solicitude_gercom">
                                     @foreach($states as $state)
                                     @if($state->idestado == ACEPTADO || $state->idestado == DEPOSITADO)
@@ -50,7 +50,7 @@
 
                             <div class="" style="padding: 0">
                                 <a id="search_solicitude_gercom" class="btn btn-sm btn-primary ladda-button"
-                                   data-style="expand-right" data-size="l"><i class="glyphicon glyphicon-search"></i></a>
+                                   data-style="zoom-in" data-size="l"><i class="glyphicon glyphicon-search"></i></a>
                             </div>
 
                         </div>

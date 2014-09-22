@@ -29,6 +29,23 @@
     <a id="logout" href="{{URL::to('logout')}}" title="Cerrar sesión" alt="Cerrar sesión">
         <bdi>Cerrar sesión</bdi>
         <img src="{{URL::to('/')}}/img/user.png"></a>
+
+    @if(Auth::user()->type == 'R')
+    <input id="typeUser" type="hidden" value="R">
+    @endif
+    @if(Auth::user()->type == 'S')
+    <input id="typeUser" type="hidden" value="S">
+    @endif
+    @if(Auth::user()->type == 'G')
+    <input id="typeUser" type="hidden" value="G">
+    @endif
+    @if(Auth::user()->type == 'C')
+    <input id="typeUser" type="hidden" value="C">
+    @endif
+    @if(Auth::user()->type == 'P')
+    <input id="typeUser" type="hidden" value="P">
+    @endif
+
 </header>
 <section>
     @yield('content')

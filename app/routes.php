@@ -74,9 +74,9 @@ Route::get('prueba', 'Dmkt\SolicitudeController@test');
 
 /**
 |-------------------------------------------------------------------------------------------- |
-	                            | Gerente de Producto |
+| Gerente de Producto |
 |-------------------------------------------------------------------------------------------- |
-*/
+ */
 Route::group(array('before' => 'gerprod'), function () {
 
     Route::get('show_gerprod', 'Dmkt\SolicitudeController@show_gerprod');
@@ -91,9 +91,9 @@ Route::group(array('before' => 'gerprod'), function () {
 });
 /**
 |-------------------------------------------------------------------------------------------- |
-	                            | Gerente Comercial |
+| Gerente Comercial |
 |-------------------------------------------------------------------------------------------- |
-*/
+ */
 Route::get('show_gercom', 'Dmkt\SolicitudeController@show_gercom');
 Route::get('listar-solicitudes-gercom/{id}', 'Dmkt\SolicitudeController@listSolicitudeGerCom');
 Route::get('ver-solicitud-gercom/{id}', 'Dmkt\SolicitudeController@viewSolicitudeGerCom');
@@ -103,7 +103,7 @@ Route::post('buscar-solicitudes-gercom','Dmkt\SolicitudeController@searchSolicit
 
 /**
 |-------------------------------------------------------------------------------------------- |
-                                   | Contabilidad |
+| Contabilidad |
 |-------------------------------------------------------------------------------------------- |
  */
 
@@ -112,13 +112,11 @@ Route::get('show_cont', 'Dmkt\SolicitudeController@show_cont');
 Route::get('ver-solicitud-cont/{id}', 'Dmkt\SolicitudeController@viewSolicitudeCont');
 Route::get('listar-solicitudes-cont/{id}', 'Dmkt\SolicitudeController@listSolicitudeCont');
 Route::post('buscar-solicitudes-cont','Dmkt\SolicitudeController@searchSolicitudeCont');
-Route::post('generar-asiento-solicitud','Dmkt\SolicitudeController@viewSeatSolicitud');
-Route::get('generate-seat-solicitude/{id}','Dmkt\SolicitudeController@generateSeatSolicitud');
-Route::get('enable-deposit/{token}','Dmkt\SolicitudeController@enableDeposit');
+Route::post('generar-asiento-solicitud','Dmkt\SolicitudeController@generateSeatSolicitud');
 
 App::error(function (ModelNotFoundException $e) {
     return View::make('notfound');
- });
+});
 
 
 /**   Gastos */

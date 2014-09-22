@@ -1,4 +1,4 @@
-<table class="table table-striped table-bordered dataTable" id="table_solicitude" style="width: 100%">
+<table class="table table-striped table-bordered dataTable" id="table_solicitude_rm" style="width: 100%">
     <thead>
     <tr>
         <th>Solicitud</th>
@@ -24,7 +24,7 @@
         <td style="text-align: center">{{$solicitude->typesolicitude->nombre}}</td>
         <td>
             <div class="div-icons-solicituds">
-                <a href="{{URL::to('ver-solicitud').'/'.$solicitude->token}}"><span class="glyphicon glyphicon-eye-open"></span></a>
+                <a href="{{URL::to('ver-solicitud-rm').'/'.$solicitude->token}}"><span class="glyphicon glyphicon-eye-open"></span></a>
                 @if($solicitude->estado == DEPOSITADO && $solicitude->asiento == 1)
                 <a id="token-a" href="#"><span class="glyphicon glyphicon-usd"></span></a>
                 <form id="form-token" action="{{URL::to('registrar-gasto')}}" method="POST">
