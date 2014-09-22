@@ -137,7 +137,7 @@ $(function(){
         $("#seat-solicitude").on("click",function(e){
             e.preventDefault();
             var idsolicitude = $("#idsolicitud").val();
-            bootbox.confirm("¿Esta seguro que desea Generar el Asiento ontable>?", function(result) {
+            bootbox.confirm("¿Esta seguro que desea Generar el Asiento Contable?", function(result) {
                 if(result)
                 {
                    window.location.href = server+'generate-seat-solicitude/'+idsolicitude;

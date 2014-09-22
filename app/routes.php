@@ -112,7 +112,7 @@ Route::get('show_cont', 'Dmkt\SolicitudeController@show_cont');
 Route::get('ver-solicitud-cont/{id}', 'Dmkt\SolicitudeController@viewSolicitudeCont');
 Route::get('listar-solicitudes-cont/{id}', 'Dmkt\SolicitudeController@listSolicitudeCont');
 Route::post('buscar-solicitudes-cont','Dmkt\SolicitudeController@searchSolicitudeCont');
-Route::post('generar-asiento-solicitud','Dmkt\SolicitudeController@viewSeatSolicitud');
+Route::post('generar-asiento-solicitud','Dmkt\SolicitudeController@viewSeatSolicitude');
 Route::get('generate-seat-solicitude/{id}','Dmkt\SolicitudeController@generateSeatSolicitude');
 Route::get('enable-deposit/{token}','Dmkt\SolicitudeController@enableDeposit');
 

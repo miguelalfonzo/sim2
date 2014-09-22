@@ -1000,7 +1000,7 @@ class SolicitudeController extends BaseController
     /** ---------------------------------------------  Contabilidad -------------------------------------------------*/
 
 
-    public function show_cont()
+     public function show_cont()
     {
         $state = Session::get('state');
         $states = State::orderBy('idestado', 'ASC')->get();
@@ -1072,7 +1072,7 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.Cont.view_solicitude_cont')->with('solicitude', $solicitude);
     }
 
-    public function viewSeatSolicitud()
+    public function viewSeatSolicitude()
     {
         $token = Input::get('token');
         $solicitude = Solicitude::where('token',$token)->firstOrFail();
@@ -1082,10 +1082,17 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.Cont.register_seat',$data);
     }
 
-    public function generateSeatSolicitud($id)
+    public function generateSeatSolicitude($id)
     {
         $solicitude = Solicitude::find($id);
         return Redirect::to('show_cont');
     }
+
+    public function enableDeposit($token)
+    {
+        $solicitude = Solicitude::where('token',$token)->firstOrFail();
+        return Redirect::to('show_cont');
+    }
+
 
 }
