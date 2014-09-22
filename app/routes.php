@@ -34,10 +34,10 @@ Route::group(array('before' => 'rm'), function () {
 
 
     Route::get('show_rm', 'Dmkt\SolicitudeController@show_rm');
-    Route::get('nueva-solicitud', 'Dmkt\SolicitudeController@newSolicitude');
-    Route::get('ver-solicitud/{token}', 'Dmkt\SolicitudeController@viewSolicitude');
+    Route::get('nueva-solicitud-rm', 'Dmkt\SolicitudeController@newSolicitude');
+    Route::get('ver-solicitud-rm/{token}', 'Dmkt\SolicitudeController@viewSolicitude');
     Route::post('cancelar-solicitud-rm', 'Dmkt\SolicitudeController@cancelSolicitude');
-    Route::get('listar-solicitudes/{id}', 'Dmkt\SolicitudeController@listSolicitude');
+    Route::get('listar-solicitudes-rm/{id}', 'Dmkt\SolicitudeController@listSolicitude');
     Route::get('getsubtypeactivities/{id}', 'Dmkt\SolicitudeController@subtypeactivity');
     Route::post('buscar-solicitudes', 'Dmkt\SolicitudeController@searchSolicituds');
 
@@ -107,13 +107,16 @@ Route::post('buscar-solicitudes-gercom','Dmkt\SolicitudeController@searchSolicit
 |-------------------------------------------------------------------------------------------- |
  */
 
-
+Route::group(array('before' => 'cont'), function () {
 Route::get('show_cont', 'Dmkt\SolicitudeController@show_cont');
 Route::get('ver-solicitud-cont/{id}', 'Dmkt\SolicitudeController@viewSolicitudeCont');
 Route::get('listar-solicitudes-cont/{id}', 'Dmkt\SolicitudeController@listSolicitudeCont');
 Route::post('buscar-solicitudes-cont','Dmkt\SolicitudeController@searchSolicitudeCont');
-Route::post('generar-asiento-solicitud','Dmkt\SolicitudeController@generateSeatSolicitud');
+Route::post('generar-asiento-solicitud','Dmkt\SolicitudeController@viewSeatSolicitud');
+Route::get('generate-seat-solicitude/{id}','Dmkt\SolicitudeController@generateSeatSolicitude');
+Route::get('enable-deposit/{token}','Dmkt\SolicitudeController@enableDeposit');
 
+});
 App::error(function (ModelNotFoundException $e) {
     return View::make('notfound');
 });
