@@ -156,7 +156,7 @@
 
     </div>
 </div>
-@if(!isset($solicitude))
+
 <div class="solicitude_factura form-group col-sm-6 col-md-8">
 
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Factura <small>(solo imagenes)</small></label>
@@ -174,7 +174,7 @@
 
     </div>
 </div>
-@endif
+
 
 <div class="form-group col-sm-12 col-md-12" style="padding: 0">
     <div class="form-group col-sm-6 col-md-4 ">

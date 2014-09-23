@@ -352,6 +352,15 @@ class SolicitudeController extends BaseController
         $solicitude->monto_factura = $inputs['amount_fac'];
         $solicitude->idsubtipoactividad = $inputs['sub_type_activity'];
         $solicitude->tipo_moneda = $inputs['money'];
+        $typeSolicitude = $inputs['type_solicitude'];
+        if($sol->idtiposolicitud == 2 && ($typeSolicitude == 1 || $typeSolicitude == 3)){
+            $path = public_path('img/reembolso/' . $sol->image);
+            @unlink($path);
+            $solicitude->monto_factura = null;
+        }
+
+        $solicitude->idtiposolicitud = $typeSolicitude;
+
         $typePayment = $inputs['type_payment'];
         if($typePayment == 1){
             $solicitude->numruc = null;

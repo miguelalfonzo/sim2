@@ -41,8 +41,6 @@ Route::group(array('before' => 'rm'), function () {
     Route::get('getsubtypeactivities/{id}', 'Dmkt\SolicitudeController@subtypeactivity');
     Route::post('buscar-solicitudes-rm', 'Dmkt\SolicitudeController@searchSolicituds');
 
-
-
 });
 Route::group(array('before' => 'auth') ,function(){
 
