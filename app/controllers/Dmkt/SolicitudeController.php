@@ -1119,10 +1119,29 @@ class SolicitudeController extends BaseController
     public function enableDeposit()
     {
         $inputs = Input::all();
-        echo json_encode($inputs);die;
-        // $solicitude = Solicitude::where('token',$token)->firstOrFail();
-        // return Redirect::to('show_cont');
+        $ret    = array();
+        for($i=0; $i<=2; $i++)
+        {
+            if($inputs["ret$i"])
+            {
+                $ret[$i] = $inputs["ret$i"];
+            }
+        }
+        if(count($ret)>1){
+            echo "<script>alert('error');</script>";
+            die;
+        }
+        if(count($ret) == 0)
+        {
+            $ret[0] = null;
+        }
+        $id = $inputs['idsolicitud'];
+        $solicitude = Solicitude::where('idsolicitud',$id);
+        $solicitude->retencion = $ret[0];
+        $solicitude->asiento = 1;
+        $data = $this->objectToArray($solicitude);
+        $solicitude->update($data);
+        
+        return Redirect::to('show_cont');
     }
-
-
 }

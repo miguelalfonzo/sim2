@@ -115,10 +115,14 @@ Route::get('generate-seat-solicitude/{id}','Dmkt\SolicitudeController@generateSe
 Route::post('enable-deposit','Dmkt\SolicitudeController@enableDeposit');
 
 });
-App::error(function (ModelNotFoundException $e) {
-    return View::make('notfound');
-});
+// App::error(function (ModelNotFoundException $e) {
+//     return View::make('notfound');
+// });
 
+App::missing(function($exception)
+{
+    return Redirect::to('show_rm');
+});
 
 /**   Gastos */
 
