@@ -82,9 +82,9 @@ $(function(){
         $(".total-item input").numeric({negative:false});
         $(".quantity input").numeric({negative:false});
         $("#igv").numeric({negative:false});
+        $("#ret0").numeric({negative:false});
         $("#ret1").numeric({negative:false});
         $("#ret2").numeric({negative:false});
-        $("#ret3").numeric({negative:false});
     //Events: Datepicker, Buttons, Keyup.
         //Calcule the IGV and Balance once typed the total amount per item
         $(document).on("keyup",".total-item input",function(){
@@ -869,23 +869,35 @@ $(function(){
         function validateRet()
         {
             var arrayRet = [];
+            var j        = 0;
             for(var i=0; i<=2; i++)
             {
-                if(parseFloat($("#ret"+i).val()) === 0)
+                if($.isNumeric($("#ret"+i).val()))
                 {
-                    $("#ret"+i).addClass('error-incomplete');
-                    $("#ret"+i).val('');
-                    $("#ret"+i).attr('placeholder','Número mayor a 0.');
-                    return false;
+                    if(parseFloat($("#ret"+i).val()) === 0)
+                    {
+                        $("#ret"+i).addClass('error-incomplete');
+                        $("#ret"+i).val('');
+                        $("#ret"+i).attr('placeholder','Número mayor a 0.');
+                        return false;
+                    }
+                    else
+                    {
+                        arrayRet[j] = [i,parseFloat($("#ret"+i).val())];
+                        j++;
+                    }
                 }
-                if(parseFloat($("#ret"+i).val()))
-                    arrayRet[i] = parseFloat($("#ret"+i).val());
             }
             if(arrayRet.length > 1)
             {
                 for(var i=0; i<arrayRet.length; i++)
                 {
-                    $("#ret"+i).addClass('error-incomplete');
+                    $.each(arrayRet[i],function(index,value){
+                        if(index === 0)
+                        {
+                            $("#ret"+value).addClass('error-incomplete');
+                        }
+                    });
                 }
                 return false;
             }
