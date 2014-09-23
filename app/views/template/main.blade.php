@@ -45,6 +45,9 @@
     @if(Auth::user()->type == 'P')
     <input id="typeUser" type="hidden" value="P">
     @endif
+    @if(Auth::user()->type == 'T')
+    <input id="typeUser" type="hidden" value="T">
+    @endif
 
 </header>
 <section>

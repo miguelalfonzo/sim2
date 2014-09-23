@@ -409,7 +409,6 @@ function newSolicitude() {
 
     //Function list Solicitude
     function listSolicitude(typeUser , state){
-
         $.ajax({
             url: server + 'listar-solicitudes-'+typeUser +'/' + state,
             type: 'GET',
@@ -782,6 +781,16 @@ function newSolicitude() {
     var search_solicitude_cont = $('#search_solicitude_cont');
     search_solicitude_cont.on('click', function () {
         searchSolicitudeToDate('cont',this)
+    });
+
+    /** --------------------------------------------- TESORERIA ------------------------------------------------- **/
+
+    if(userType === 'T')
+        listSolicitude('tes',APROBADO);
+
+    var search_solicitude_cont = $('#search_solicitude_tes');
+    search_solicitude_cont.on('click', function () {
+        searchSolicitudeToDate('tes',this)
     });
 
 

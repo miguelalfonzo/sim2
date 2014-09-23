@@ -66,6 +66,9 @@ class LoginController extends BaseController{
                 if($typeUser == 'C'){
                     return Redirect::to('show_cont');
                 }
+                if($typeUser == 'T'){
+                    return Redirect::to('show_tes');
+                }
 
 
             } else {

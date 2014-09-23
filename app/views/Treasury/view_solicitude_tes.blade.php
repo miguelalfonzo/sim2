@@ -3,10 +3,10 @@
     <div class="content">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">Ver Solicitud Contabilidad</h3>
+                <h3 class="panel-title">Ver Solicitud Tesorería</h3>
             </div>
             <div class="panel-body">
-                <form id="form_enable_deposit" class="" method="post" action="{{URL::to('enable-deposit')}}">
+                <form id="form_deposit" class="" method="post" action="">
                     <div class="form-group col-sm-6 col-md-4">
                         <label class="col-sm-8 col-md-8 control-label" for="textinput">Código de Solicitud</label>
                         <div class="col-sm-12 col-md-12">
@@ -131,39 +131,11 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Cálculos Contabilidad -->
-                    <div class="form-group col-sm-6 col-md-4">
-                        <label class="col-sm-8 col-md-8 control-label" for="textinput">Retención 6%</label>
-                        <div class="col-sm-12 col-md-12">
-                            <div class="input-group">
-                                <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                                <input id="ret0" name="ret0" type="text" class="form-control input-md ret">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group col-sm-6 col-md-4">
-                        <label class="col-sm-8 col-md-8 control-label" for="textinput">Detracción 0%</label>
-                        <div class="col-sm-12 col-md-12">
-                            <div class="input-group">
-                                <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                                <input id="ret1" name="ret1" type="text" class="form-control input-md ret">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group col-sm-6 col-md-4">
-                        <label class="col-sm-8 col-md-8 control-label" for="textinput">Retención 10%</label>
-                        <div class="col-sm-12 col-md-12">
-                            <div class="input-group">
-                                <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                                <input id="ret2" name="ret2" type="text" class="form-control input-md ret">
-                            </div>
-                        </div>
-                    </div>
                     <!-- Button (Double) -->
                     <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
                         <div class="col-sm-12 col-md-12" style="text-align: center">
-                            <a id="enable-deposit" href="#" class="btn btn-success" style="margin-right: 1em;">Habilitar Depósito</a>
-                            <a id="button2id" href="{{URL::to('show_cont')}}" name="button2id" class="btn btn-primary">Cancelar</a>
+                            <a id="register-deposit" href="{{URL::to('depositar')}}/{{$solicitude->token}}" class="btn btn-success" style="margin-right: 1em;">Registrar Depósito</a>
+                            <a id="button2id" href="{{URL::to('show_tes')}}" name="button2id" class="btn btn-primary">Cancelar</a>
                         </div>
                     </div>
                 </form>

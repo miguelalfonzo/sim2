@@ -63,11 +63,11 @@ class SolicitudeController extends BaseController
         echo json_encode($result);
 */
         $user = new User();
-        $user->id = 17;
-        $user->email = 'contador@bago.com';
-        $user->username = 'contador';
+        $user->id = 18;
+        $user->email = 'tesoreria@bago.com';
+        $user->username = 'tesoreria';
         $user->password = Hash::make('admin');
-        $user->type = 'C';
+        $user->type = 'T';
         $user->save();
         /*
         $today = getdate();
@@ -1028,7 +1028,7 @@ class SolicitudeController extends BaseController
     /** ---------------------------------------------  Contabilidad -------------------------------------------------*/
 
 
-     public function show_cont()
+    public function show_cont()
     {
         $state = Session::get('state');
         $states = State::orderBy('idestado', 'ASC')->get();
@@ -1046,7 +1046,7 @@ class SolicitudeController extends BaseController
         } else {
             $solicituds = Solicitude::where('estado', '=', $id)->get();
         }
-
+        
         $view = View::make('Dmkt.Cont.view_solicituds_cont')->with('solicituds', $solicituds);
         return $view;
     }
