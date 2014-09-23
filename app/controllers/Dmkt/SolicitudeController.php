@@ -473,7 +473,7 @@ class SolicitudeController extends BaseController
         return $view;
     }
 
-    /** -----------------------------------------------  Supervisor -------------------------------------------------------*/
+    /** -----------------------------------------------  Supervisor  -------------------------------------------------------- */
 
     public function show_sup()
     {
@@ -491,14 +491,18 @@ class SolicitudeController extends BaseController
 
     public function viewSolicitudeSup($token)
     {
-        Solicitude::where('token', $token)->update(array('blocked'=>1));
-        $solicitude = Solicitude::where('token', $token)->firstOrFail();
+        $sol = Solicitude :: where('token', $token)->firstOrFail();
 
+        if($sol->user->type == 'R')
+        Solicitude::where('token', $token)->update(array('blocked'=>1));
+
+        $solicitude = Solicitude::where('token', $token)->firstOrFail();
+        $typePayments = TypePayment::all();
         $managers = Manager::all();
         $data = [
-
             'solicitude' => $solicitude,
-            'managers' => $managers
+            'managers' => $managers,
+            'typePayments' => $typePayments
         ];
         return View::make('Dmkt.Sup.view_solicitude_sup', $data);
     }
@@ -808,10 +812,11 @@ class SolicitudeController extends BaseController
             $block = true;
         }
 
-
+        $typePayments = TypePayment::all();
         $data = [
             'solicitude' => $solicitude,
-            'block' => $block
+            'block' => $block,
+            'typePayments' => $typePayments
 
         ];
         return View::make('Dmkt.GerProd.view_solicitude_gerprod', $data);

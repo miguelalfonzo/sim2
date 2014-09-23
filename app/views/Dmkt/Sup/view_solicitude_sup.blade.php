@@ -36,6 +36,48 @@
     </div>
 </div>
 
+<!-- Type Payment -->
+<div class="form-group col-sm-6 col-md-4" >
+
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo de Pago</label>
+
+    <div class="col-sm-12 col-md-12">
+        <select id="" name="type_payment" class="form-control selectTypePayment" disabled>
+            @foreach($typePayments as $type)
+            @if(isset($solicitude) && $solicitude->idtipopago == $type->idtipopago)
+            <option selected value="{{$type->idtipopago}}">{{$type->nombre}}</option>
+            @else
+            <option value="{{$type->idtipopago}}">{{$type->nombre}}</option>
+            @endif
+            @endforeach
+        </select>
+
+    </div>
+</div>
+<!-- Ruc -->
+<div class="form-group col-sm-6 col-md-4" id="div_ruc">
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Ruc</label>
+
+    <div class="col-sm-12 col-md-12">
+        <input id="ruc" name="ruc" type="text" placeholder=""
+               value="{{isset($solicitude->numruc) ? $solicitude->numruc : null }}"
+               class="form-control input-md" maxlength="11" readonly>
+
+    </div>
+</div>
+<!-- Account Number -->
+<div class="form-group col-sm-6 col-md-4" id="div_number_account">
+
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Nº de Cuenta</label>
+    <div class="col-sm-12 col-md-12">
+        <input id="number_account" name="number_account" type="text" placeholder=""
+               value="{{isset($solicitude->numcuenta) ? $solicitude->numcuenta : null }}"
+               class="form-control input-md" readonly>
+
+    </div>
+</div>
+
+
 <div class="form-group col-sm-6 col-md-4 col-lg-4">
     <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Monto Solicitado</label>
 

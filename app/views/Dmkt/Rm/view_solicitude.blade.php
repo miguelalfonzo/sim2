@@ -48,6 +48,30 @@
 
     </div>
 </div>
+<!-- Ruc -->
+<div class="form-group col-sm-6 col-md-4" id="div_ruc">
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Ruc</label>
+
+    <div class="col-sm-12 col-md-12">
+        <input id="ruc" name="ruc" type="text" placeholder=""
+               value="{{isset($solicitude->numruc) ? $solicitude->numruc : null }}"
+               class="form-control input-md" maxlength="11" readonly>
+
+    </div>
+</div>
+<!-- Account Number -->
+<div class="form-group col-sm-6 col-md-4" id="div_number_account">
+
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Nº de Cuenta</label>
+    <div class="col-sm-12 col-md-12">
+        <input id="number_account" name="number_account" type="text" placeholder=""
+               value="{{isset($solicitude->numcuenta) ? $solicitude->numcuenta : null }}"
+               class="form-control input-md" readonly>
+
+    </div>
+</div>
+
+
 <!--    Name Solicitude  -->
 <div class="form-group col-sm-6 col-md-4 col-lg-4">
 

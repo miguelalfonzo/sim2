@@ -39,7 +39,7 @@ Route::group(array('before' => 'rm'), function () {
     Route::post('cancelar-solicitud-rm', 'Dmkt\SolicitudeController@cancelSolicitude');
     Route::get('listar-solicitudes-rm/{id}', 'Dmkt\SolicitudeController@listSolicitude');
     Route::get('getsubtypeactivities/{id}', 'Dmkt\SolicitudeController@subtypeactivity');
-    Route::post('buscar-solicitudes', 'Dmkt\SolicitudeController@searchSolicituds');
+    Route::post('buscar-solicitudes-rm', 'Dmkt\SolicitudeController@searchSolicituds');
 
 
 

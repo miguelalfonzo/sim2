@@ -14,7 +14,7 @@
                                 <select id="idState" name="idState"
                                         class="form-control select_state_solicitude_gercom">
                                     @foreach($states as $state)
-                                    @if($state->idestado == ACEPTADO || $state->idestado == DEPOSITADO)
+                                    @if($state->idestado == ACEPTADO || $state->idestado == DEPOSITADO || $state->idestado == APROBADO)
                                     <option value="{{$state->idestado}}">{{$state->nombre}}</option>
                                     @endif
                                     @endforeach
