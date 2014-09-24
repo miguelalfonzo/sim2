@@ -135,7 +135,7 @@ Route::get('show_tes','Deposit\DepositController@show_tes');
 Route::get('listar-solicitudes-tes/{id}', 'Deposit\DepositController@listSolicitudeTes');
 Route::get('ver-solicitud-tes/{id}', 'Deposit\DepositController@viewSolicitudeTes');
 Route::post('buscar-solicitudes-tes', 'Deposit\DepositController@searchSolicitudeTes');
-Route::get('depositar/{id}', 'Deposit\DepositController@depositSolicitudeTes');
+Route::post('depositar', 'Deposit\DepositController@depositSolicitudeTes');
 
 /* ================================================================================= */
 

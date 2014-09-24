@@ -77,6 +77,7 @@ $(function(){
         $("#ruc").numeric({negative:false,decimal:false});
         $("#number-prefix").numeric({negative:false,decimal:false});
         $("#number-serie").numeric({negative:false,decimal:false});
+        $("#op-number").numeric({negative:false,decimal:false});
         //only numbers floats
         $("#imp-ser").numeric({negative:false});
         $(".total-item input").numeric({negative:false});
@@ -164,6 +165,29 @@ $(function(){
                     }
                 }
             });
+        });
+        //Register Deposit
+        $("#register-deposit").on("click",function(e){
+            e.preventDefault();
+            var token      = $("#token").val();
+            var op_number  = $("#op-number").val();
+            data.op_number = op_number;
+            data.token     = token;
+            if(!op_number)
+            {
+                $("#message-op-number").text("Ingrese el número de Operación");
+            }
+            else
+            {
+                console.log(JSON.stringify(data));
+                $.post(server+"depositar", {data: JSON.stringify(data)})
+                .done(function (data){
+                    window.location.href = server+'show_tes';
+                });
+            }
+        });
+        $("#op-number").on("focus",function(){
+            $("#message-op-number").text('');
         });
         //IGV, Imp. Service show if you check Factura
         $("#proof-type").on("change",function(){

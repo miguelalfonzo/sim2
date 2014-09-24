@@ -284,9 +284,9 @@ class ExpenseController extends BaseController{
 	public function test(){
  		// 	$html = View::make('Expense.report');
 		// return PDF::load($html, 'A4', 'landscape')->show();
-		$solicituds = Solicitude::where('estado', '=', APROBADO)->where('asiento','=',1)->get();
-		echo json_encode($solicituds);die;
-		$states = State::orderBy('idestado', 'ASC')->get();
-		echo json_encode($states);
+		// $solicituds = Solicitude::where('estado', '=', APROBADO)->where('asiento','=',1)->get();
+		// echo json_encode($solicituds);die;
+			$states = State::orderBy('idestado', 'ASC')->get();
+			echo json_encode($states);
 	}
 }

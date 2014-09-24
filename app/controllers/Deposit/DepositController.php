@@ -88,11 +88,12 @@ class DepositController extends BaseController{
         return $view;
     }
 
-    public function depositSolicitudeTes($token)
+    public function depositSolicitudeTes()
     {
-        $solicitude = Solicitude::where('token',$token)->firstOrFail();
+        $deposit     = Input::get('data');
+        $depositJSON = json_decode($deposit);
+        $solicitude  = Solicitude::where('token',$depositJSON->token)->firstOrFail();
         return Redirect::to('show_tes');
     }
-
 
 }
