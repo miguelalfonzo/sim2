@@ -597,6 +597,7 @@ class SolicitudeController extends BaseController
         $solicitude->idsolicitud = (int)$id;
         $solicitude->observacion = $inputs['observacion'];
         $solicitude->estado = RECHAZADO;
+        $solicitude->blocked = 0;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
         return Redirect::to('show_sup')->with('state',RECHAZADO);
@@ -607,13 +608,13 @@ class SolicitudeController extends BaseController
     {
 
         $inputs = Input::all();
-        $amount_assigned = $inputs['amount_assigned'];
         $idSol = $inputs['idsolicitude'];
         $solicitude = Solicitude::where('idsolicitud', $idSol);
         $solicitude->estado = ACEPTADO;
         $solicitude->idaproved = Auth::user()->id;
         $solicitude->monto = $inputs['monto'];
         $solicitude->observacion = $inputs['observacion'];
+        $solicitude->blocked = 0;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
 
@@ -851,6 +852,7 @@ class SolicitudeController extends BaseController
         $solicitude->idaproved = Auth::user()->id;
         $solicitude->monto = $inputs['monto'];
         $solicitude->observacion = $inputs['observacion'];
+        $solicitude->blocked = 0;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
 
@@ -931,6 +933,7 @@ class SolicitudeController extends BaseController
         $solicitude->idsolicitud = (int)$id;
         $solicitude->idaproved = Auth::user()->id;
         $solicitude->observacion = $inputs['observacion'];
+        $solicitude->blocked = 0;
         $solicitude->estado = RECHAZADO;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
@@ -967,7 +970,12 @@ class SolicitudeController extends BaseController
     {
 
 
-        $solicitude = Solicitude::where('token', $token)->firstOrFail();
+        $solicitude = Solicitude::where('token', $token)->first();
+        $sol = Solicitude::where($solicitude->idsolicitud);
+        $sol->blocked = 1;
+        $data = $this->objectToArray($sol);
+        $sol->update($data);
+
         return View::make('Dmkt.GerCom.view_solicitude_gercom')->with('solicitude', $solicitude);
     }
 
@@ -976,9 +984,26 @@ class SolicitudeController extends BaseController
 
         $solicitude = Solicitude::where('token', $token);
         $solicitude->estado = APROBADO;
+        $solicitude->blocked = 0;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
         return Redirect::to('show_gercom');
+    }
+    public function denySolicitudeGerCom()
+    {
+
+        $inputs = Input::all();
+        $id = $inputs['idsolicitude'];
+        $solicitude = Solicitude::where('idsolicitud', $id);
+        $solicitude->idsolicitud = (int)$id;
+        $solicitude->idaproved = Auth::user()->id;
+        $solicitude->observacion = $inputs['observacion'];
+        $solicitude->estado = RECHAZADO;
+        $solicitude->blocked = 0;
+        $data = $this->objectToArray($solicitude);
+        $solicitude->update($data);
+        return Redirect::to('show_gercom')->with('state',RECHAZADO);
+
     }
 
     public function searchSolicitudsGerCom()

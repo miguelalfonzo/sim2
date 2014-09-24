@@ -773,6 +773,17 @@ function newSolicitude() {
         searchSolicitudeToDate('gercom',this)
     });
 
+    $('#deny_solicitude_gercom').on('click', function (e) {
+
+        bootbox.confirm("¿Esta seguro que desea rechazar esta solicitud?", function (result) {
+            if (result) {
+                var url = server + 'rechazar-solicitud-gercom';
+                form_acepted_solicitude.attr('action', url);
+                form_acepted_solicitude.submit();
+            }
+        });
+
+    });
     /** --------------------------------------------- CONTABILIDAD ------------------------------------------------- **/
 
     if(userType === 'C')

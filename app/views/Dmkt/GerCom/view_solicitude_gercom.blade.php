@@ -209,7 +209,7 @@
                        class="btn btn-primary">Aprobar
                     </a>
 
-                    <a id="deny_solicitude" name="button1id" class="btn btn-primary deny_solicitude">Rechazar
+                    <a id="deny_solicitude_gercom" name="button1id" class="btn btn-primary deny_solicitude">Rechazar
                     </a>
                     @endif
                     <a id="button2id" href="{{URL::to('show_sup')}}" name="button2id"
