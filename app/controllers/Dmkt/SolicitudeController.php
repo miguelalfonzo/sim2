@@ -810,10 +810,10 @@ class SolicitudeController extends BaseController
 
         $block = false;
         $userid = Auth::user()->gerprod->id;
-
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
 
-        $solicitudeBlocked  = SolicitudeGer::where('idsolicitud',$solicitude->idsolicitud)->where ('idgerprod',$userid)->firstOrFail();//vemos si la solicitud esta blokeada
+        $solicitudeBlocked  = SolicitudeGer::where('idsolicitud',$solicitude->idsolicitud)->where('idgerprod',$userid)->firstOrFail();//vemos si la solicitud esta blokeada
+        //echo json_encode($solicitudeBlocked);die;
         if($solicitudeBlocked->blocked == 0){
             SolicitudeGer::where('idsolicitud',$solicitude->idsolicitud) // blockeamos la solicitud para que el otro gerente no lo pueda editar
                 ->where('idgerprod','<>',$userid)
@@ -971,7 +971,7 @@ class SolicitudeController extends BaseController
 
 
         $solicitude = Solicitude::where('token', $token)->first();
-        $sol = Solicitude::where($solicitude->idsolicitud);
+        $sol = Solicitude::where('token', $token);
         $sol->blocked = 1;
         $data = $this->objectToArray($sol);
         $sol->update($data);
