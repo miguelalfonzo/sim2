@@ -24,11 +24,31 @@
         <td>
             <div class="div-icons-solicituds">
                 <a href="{{URL::to('ver-solicitud-tes').'/'.$solicitude->token}}"><span class="glyphicon glyphicon-eye-open"></span></a>
-                <a href="{{URL::to('depositar').'/'.$solicitude->token}}"><span class="glyphicon glyphicon-usd"></span></a>
+                <a href="#" data-toggle="modal" data-target="#myModal"><span class="glyphicon glyphicon-usd"></span></a>
+                <input type="hidden" id="token-hidden">
+                <!-- Modal -->
+                <div class="modal fade" id="myModal" data-token="{{$solicitude->token}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                <h4 class="modal-title" id="myModalLabel">Registro del Depósito</h4>
+                            </div>
+                            <div class="modal-body">
+                                <label for="op-number">Número de Operación, Transacción, Cheque:</label>
+                                <input id="op-number" type="text" class="form-control">
+                                <p id="message-op-number" style="margin-top:1em;color:#a94442;"></p>
+                            </div>
+                            <div class="modal-footer">
+                                <a href="#" id="register-deposit" href="#" class="btn btn-success" style="margin-right: 1em;">Confirmar Operación</a>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </td>
     </tr>
     @endforeach
     </tbody>
-
 </table>

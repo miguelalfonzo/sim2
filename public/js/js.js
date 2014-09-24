@@ -77,7 +77,9 @@ $(function(){
         $("#ruc").numeric({negative:false,decimal:false});
         $("#number-prefix").numeric({negative:false,decimal:false});
         $("#number-serie").numeric({negative:false,decimal:false});
-        $("#op-number").numeric({negative:false,decimal:false});
+        $(document).on("keypress","#op-number",function(){
+            $(this).numeric({negative:false,decimal:false});
+        });
         //only numbers floats
         $("#imp-ser").numeric({negative:false});
         $(".total-item input").numeric({negative:false});
@@ -166,10 +168,20 @@ $(function(){
                 }
             });
         });
+        //Modal
+        $(document).on('show.bs.modal', '#myModal', function (e) {
+            console.log($(this));
+        });
+
         //Register Deposit
-        $("#register-deposit").on("click",function(e){
+        $(document).on("click","#register-deposit",function(e){
             e.preventDefault();
-            var token      = $("#token").val();
+            $("#op_number").val('');
+            $("#message-op-number").text('');
+            if($(this).data('token'))
+            {
+                token = $(this).data('token');
+            }
             var op_number  = $("#op-number").val();
             data.op_number = op_number;
             data.token     = token;
@@ -182,11 +194,19 @@ $(function(){
                 console.log(JSON.stringify(data));
                 $.post(server+"depositar", {data: JSON.stringify(data)})
                 .done(function (data){
-                    window.location.href = server+'show_tes';
+                    if(data === 1)
+                    {
+                        window.location.href = server+'show_tes';
+                    }
+                    else
+                    {
+                        $("#message-op-number").text("No se ha podido registrar el depósito.");
+                    }
                 });
             }
         });
-        $("#op-number").on("focus",function(){
+        //Empty message in modal register deposit
+        $(document).on("focus","#op-number",function(){
             $("#message-op-number").text('');
         });
         //IGV, Imp. Service show if you check Factura
