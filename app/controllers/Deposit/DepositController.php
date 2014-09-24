@@ -12,8 +12,19 @@ use \Common\Deposit;
 use \Dmkt\Solicitude;
 use \Input;
 use \Redirect;
+use \DB;
+use \Exception;
 
 class DepositController extends BaseController{
+
+    private function objectToArray($object)
+    {
+        $array = array();
+        foreach ($object as $member => $data) {
+            $array[$member] = $data;
+        }
+        return $array;
+    }
 
 	public function show_tes()
 	{
@@ -92,8 +103,27 @@ class DepositController extends BaseController{
     {
         $deposit     = Input::get('data');
         $depositJSON = json_decode($deposit);
-        $solicitude  = Solicitude::where('token',$depositJSON->token)->firstOrFail();
-        return Redirect::to('show_tes');
-    }
 
+        try {
+            DB::transaction (function() use ($depositJSON) {
+                $solicitude = Solicitude::where('token',$depositJSON->token)->firstOrFail();
+                $deposit    = new Deposit;
+                $deposit->iddeposito        = $deposit->lastId()+1;
+                $deposit->total             = $solicitude->monto;
+                $deposit->num_transferencia = $depositJSON->op_number;
+                $deposit->idsolicitud       = $solicitude->idsolicitud;
+                
+                if($deposit->save())
+                {
+                    $solicitude         = Solicitude::where('token',$depositJSON->token);
+                    $solicitude->estado = DEPOSITADO;
+                    $data               = $this->objectToArray($solicitude);
+                    $solicitude->update($data);
+                }
+            });
+            return 1;
+        } catch (Exception $e) {
+            return 0;
+        }
+    }
 }
