@@ -4,7 +4,7 @@
     <div class="col-md-12" style="">
         <!-- Default panel contents -->
         <div class="panel panel-default">
-            <div class="panel-heading"><h3 class="panel-title">Solicitudes Aprobada</h3><small style="float: right; margin-top: -10px"><strong>Usuario : Contabilidad</strong></small></div>
+            <div class="panel-heading"><h3 class="panel-title">Solicitudes Aprobada</h3><strong class="user">Usuario : {{Auth::user()->username}}</strong></small></div>
 
             <div class="panel-body table-solicituds-cont">
                 <div class="col-md-12" style="padding: 0">

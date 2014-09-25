@@ -3,7 +3,7 @@
     <div class="content">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">Ver Solicitud Tesorería</h3>
+                <h3 class="panel-title">Ver Solicitud Tesorería</h3><strong class="user">Usuario : {{Auth::user()->username}}</strong>
             </div>
             <div class="panel-body">
                 <div class="form-group col-sm-6 col-md-4">
@@ -133,7 +133,9 @@
                 <!-- Button (Double) -->
                 <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
                     <div class="col-sm-12 col-md-12" style="text-align: center">
-                        <button class="btn btn-success" data-toggle="modal" data-target="#myModal">Registrar Depósito</button>
+                        @if($solicitude->estado == 3)
+                            <button class="btn btn-success" data-toggle="modal" data-target="#myModal">Registrar Depósito</button>
+                        @endif
                         <a id="button2id" href="{{URL::to('show_tes')}}" name="button2id" class="btn btn-primary">Cancelar</a>
                     </div>
                 </div>

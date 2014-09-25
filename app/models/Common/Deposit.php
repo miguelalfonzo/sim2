@@ -21,7 +21,7 @@ class Deposit extends Eloquent{
 		if($lastId == null){
             return 0;
         }else{
-            return $lastId->idgasto;
+            return $lastId->iddeposito;
         }
 	}
 }

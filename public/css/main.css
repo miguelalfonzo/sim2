@@ -107,6 +107,13 @@ table thead th, table th
 	margin: 0 auto;
 }
 
+.user
+{
+	float: right;
+	margin-top: -1.25em;
+	font-size: .85em;
+}
+
 .message-expense
 {
 	font-size: 1em;
