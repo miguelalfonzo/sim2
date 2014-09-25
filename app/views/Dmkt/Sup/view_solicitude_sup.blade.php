@@ -5,7 +5,11 @@
 
 <div class="panel panel-default">
 <div class="panel-heading">
-    <h3 class="panel-title">Ver Solicitud Supervisor</h3> <small style="float: right; margin-top: -10px"><strong>Usuario : {{Auth::user()->Sup->nombres}}</strong></small>
+    <h3 class="panel-title">Ver Solicitud Supervisor</h3>
+    @if($solicitude->blocked == 1 && $solicitude->user->type === 'S')
+    <h4 class="" style="color: darkred">LA SOLICITUD ESTA SIENDO EVALUADA</h4>
+    @endif
+    <small style="float: right; margin-top: -10px"><strong>Usuario : {{Auth::user()->Sup->nombres}}</strong></small>
 </div>
 <div class="panel-body">
 <form id="form_make_activity" class="" method="post" action="">

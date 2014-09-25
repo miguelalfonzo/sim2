@@ -157,11 +157,11 @@
     </div>
 </div>
 
-<div class="solicitude_factura form-group col-sm-6 col-md-8">
+<div class="solicitude_factura form-group col-sm-6 col-md-4">
 
-    <label class="col-sm-8 col-md-8 control-label" for="textinput">Factura <small>(solo imagenes)</small></label>
+    <label class="col-sm-12 col-md-12 control-label" for="textinput">Factura <small>(solo imagenes)</small></label>
 
-    <div class="col-sm-12 col-md-6" style="padding-right: 30px">
+    <div class="col-sm-12 col-md-12" style="">
 
         <div class="input-group">
                     <span class="input-group-btn">

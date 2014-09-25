@@ -784,6 +784,23 @@ function newSolicitude() {
         });
 
     });
+
+    var approved_solicitude = $('.approved_solicitude');
+    approved_solicitude.on('click',function(e){
+        e.preventDefault();
+        var aux = $(this);
+        bootbox.confirm("¿Esta seguro que desea aprobar esta solicitud?", function (result) {
+
+            if (result) {
+                $.post(server + 'aprobar-solicitud', {token: aux.attr('data-token')})
+                    .done(function (data) {
+
+                            window.location.href = server + 'show_gercom'
+
+                    })
+            }
+        });
+    });
     /** --------------------------------------------- CONTABILIDAD ------------------------------------------------- **/
 
     if(userType === 'C')

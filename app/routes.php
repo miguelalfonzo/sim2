@@ -97,7 +97,7 @@ Route::group(array('before' => 'gercom'), function () {
     Route::get('show_gercom', 'Dmkt\SolicitudeController@show_gercom');
     Route::get('listar-solicitudes-gercom/{id}', 'Dmkt\SolicitudeController@listSolicitudeGerCom');
     Route::get('ver-solicitud-gercom/{id}', 'Dmkt\SolicitudeController@viewSolicitudeGerCom');
-    Route::get('aprobar-solicitud/{token}', 'Dmkt\SolicitudeController@approvedSolicitude');
+    Route::post('aprobar-solicitud', 'Dmkt\SolicitudeController@approvedSolicitude');
     Route::post('buscar-solicitudes-gercom','Dmkt\SolicitudeController@searchSolicitudsGerCom');
     Route::post('rechazar-solicitud-gercom', 'Dmkt\SolicitudeController@denySolicitudeGerCom');
 

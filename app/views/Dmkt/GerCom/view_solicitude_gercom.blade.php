@@ -40,21 +40,14 @@
                 <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto Solicitado</label>
 
                 <div class="col-sm-12 col-md-12">
-                    @if($solicitude->estado == 2)
-                    <div class="input-group">
-                        <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                        <input id="idamount" name="monto" type="text" placeholder="" value="{{$solicitude->monto}}"
-                               class="form-control input-md">
-                    </div>
 
-                    @else
                     <div class="input-group">
                         <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
                         <input id="idamount" name="monto" type="text" placeholder="" value="{{$solicitude->monto}}"
                                class="form-control input-md" readonly>
                     </div>
 
-                    @endif
+
 
                 </div>
             </div>
@@ -205,8 +198,8 @@
                 <div class="col-sm-12 col-md-12" style="text-align: center">
 
                     @if($solicitude->estado == ACEPTADO)
-                    <a href="{{URL::to('aprobar-solicitud'.'/'.$solicitude->token)}}" id="" name="button1id"
-                       class="btn btn-primary">Aprobar
+                    <a href="" id="" name="button1id" data-token ="{{$solicitude->token}}"
+                       class="btn btn-primary approved_solicitude">Aprobar
                     </a>
 
                     <a id="deny_solicitude_gercom" name="button1id" class="btn btn-primary deny_solicitude">Rechazar

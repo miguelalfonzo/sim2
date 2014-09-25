@@ -811,6 +811,7 @@ class SolicitudeController extends BaseController
         $block = false;
         $userid = Auth::user()->gerprod->id;
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
+        Solicitude::where('token', $token)->update(array('blocked'=> 1));
 
         $solicitudeBlocked  = SolicitudeGer::where('idsolicitud',$solicitude->idsolicitud)->where('idgerprod',$userid)->firstOrFail();//vemos si la solicitud esta blokeada
         //echo json_encode($solicitudeBlocked);die;
@@ -979,15 +980,16 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.GerCom.view_solicitude_gercom')->with('solicitude', $solicitude);
     }
 
-    public function approvedSolicitude($token)
+    public function approvedSolicitude()
     {
 
+        $token = Input::get('token');
         $solicitude = Solicitude::where('token', $token);
         $solicitude->estado = APROBADO;
         $solicitude->blocked = 0;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
-        return Redirect::to('show_gercom');
+        return 'approved';
     }
     public function denySolicitudeGerCom()
     {
