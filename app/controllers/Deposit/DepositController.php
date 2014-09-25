@@ -103,27 +103,36 @@ class DepositController extends BaseController{
     {
         $deposit     = Input::get('data');
         $depositJSON = json_decode($deposit);
-
+        
         try {
             DB::transaction (function() use ($depositJSON) {
                 $solicitude = Solicitude::where('token',$depositJSON->token)->firstOrFail();
-                $deposit    = new Deposit;
-                $deposit->iddeposito        = $deposit->lastId()+1;
-                $deposit->total             = $solicitude->monto;
-                $deposit->num_transferencia = $depositJSON->op_number;
-                $deposit->idsolicitud       = $solicitude->idsolicitud;
-                
-                if($deposit->save())
+                $row_deposit = Deposit::where('idsolicitud',$solicitude->idsolicitud)->get();
+                if(count($row_deposit)>0)
                 {
-                    $solicitude         = Solicitude::where('token',$depositJSON->token);
-                    $solicitude->estado = DEPOSITADO;
-                    $data               = $this->objectToArray($solicitude);
-                    $solicitude->update($data);
+                    return 0;
+                }
+                else
+                {
+                    $newDeposit = new Deposit;
+                    $newDeposit->iddeposito        = $newDeposit->lastId()+1;
+                    $newDeposit->total             = $solicitude->monto;
+                    $newDeposit->num_transferencia = $depositJSON->op_number;
+                    $newDeposit->idsolicitud       = $solicitude->idsolicitud;  
+                    
+                    if($newDeposit->save())
+                    {
+                        $solicitudeUpd         = Solicitude::where('token',$depositJSON->token);
+                        $solicitudeUpd->estado = DEPOSITADO;
+                        $data                  = $this->objectToArray($solicitudeUpd);
+                        $solicitudeUpd->update($data);
+                    }  
                 }
             });
             return 1;
         } catch (Exception $e) {
             return 0;
         }
+
     }
 }

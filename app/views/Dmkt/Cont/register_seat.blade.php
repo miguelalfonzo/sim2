@@ -3,7 +3,7 @@
 	<div class="content">
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<h3 class="panel-title"><strong>Generar Asiento de Solicitud</strong></h3>
+				<h3 class="panel-title"><strong>Generar Asiento de Solicitud</strong></h3><strong class="user">Usuario : {{Auth::user()->username}}</strong>
 			</div>
 			<div class="panel-body">
 				<section class="row reg-expense" style="margin:0">

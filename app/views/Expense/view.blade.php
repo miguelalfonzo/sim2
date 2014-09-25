@@ -3,7 +3,7 @@
 	<div class="content">
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			<h3 class="panel-title"><strong>Gasto Registrado</strong></h3>
+			<h3 class="panel-title"><strong>Gasto Registrado</strong><strong class="user" style="margin-top:0">Usuario : {{Auth::user()->username}}</strong></h3>
 		</div>
 		<div class="panel-body">
 			<section class="row reg-expense" style="margin:0">

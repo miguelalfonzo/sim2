@@ -77,9 +77,7 @@ $(function(){
         $("#ruc").numeric({negative:false,decimal:false});
         $("#number-prefix").numeric({negative:false,decimal:false});
         $("#number-serie").numeric({negative:false,decimal:false});
-        $(document).on("keypress","#op-number",function(){
-            $(this).numeric({negative:false,decimal:false});
-        });
+        $("#op-number").numeric({negative:false,decimal:false});
         //only numbers floats
         $("#imp-ser").numeric({negative:false});
         $(".total-item input").numeric({negative:false});
@@ -123,7 +121,6 @@ $(function(){
         //Record end Solicitude
         $("#finish-expense").on("click",function(e){
             e.preventDefault();
-            var token = $("#token").val();
             var balance = parseFloat($("#balance").val());
             if(balance === 0)
             {
@@ -136,7 +133,7 @@ $(function(){
             }
             else
             {
-                bootbox.alert("No puede finalizar el registro de este gasto, aún tiene saldo pendiente por registrar.");
+                bootbox.alert("No puede finalizar el registro del gasto, aún tiene saldo pendiente por registrar.");
             }
         });
         //Generate Seat Solicitude
@@ -153,7 +150,6 @@ $(function(){
         //Enable deposit
         $("#enable-deposit").on("click",function(e){
             e.preventDefault();
-            var token = $("#token").val();
             bootbox.confirm("¿Esta seguro que desea habilitar el depósito?", function(result) {
                 if(result)
                 {
@@ -168,20 +164,11 @@ $(function(){
                 }
             });
         });
-        //Modal
-        $(document).on('show.bs.modal', '#myModal', function (e) {
-            console.log($(this));
-        });
-
         //Register Deposit
-        $(document).on("click","#register-deposit",function(e){
+        $("#register-deposit").on("click",function(e){
             e.preventDefault();
             $("#op_number").val('');
             $("#message-op-number").text('');
-            if($(this).data('token'))
-            {
-                token = $(this).data('token');
-            }
             var op_number  = $("#op-number").val();
             data.op_number = op_number;
             data.token     = token;
@@ -191,10 +178,9 @@ $(function(){
             }
             else
             {
-                console.log(JSON.stringify(data));
                 $.post(server+"depositar", {data: JSON.stringify(data)})
                 .done(function (data){
-                    if(data === 1)
+                    if(parseInt(data,10) === 1)
                     {
                         window.location.href = server+'show_tes';
                     }
