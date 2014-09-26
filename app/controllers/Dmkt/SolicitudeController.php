@@ -444,7 +444,7 @@ class SolicitudeController extends BaseController
         $firstday = date('01-m-Y', strtotime($m));
         $idUser = Auth::user()->id;
         if ($start != null && $end != null) {
-            if ($estado != 0) {
+            if ($estado != 10) {
 
                 $solicituds = Solicitude::select('*')
                     ->where('estado', $estado)
@@ -461,7 +461,7 @@ class SolicitudeController extends BaseController
             }
 
         } else {
-            if ($estado != 0) {
+            if ($estado != 10) {
 
                 $solicituds = Solicitude::select('*')
                     ->where('estado', $estado)
@@ -666,7 +666,7 @@ class SolicitudeController extends BaseController
             foreach ($reps as $rm)
                 $users_ids[] = $rm->iduser;
             $users_ids[] = Auth::user()->id;
-            if ($id == 0) {
+            if ($id == 10) {
 
                 $solicituds = Solicitude::whereIn('iduser', $users_ids)
                     ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
@@ -706,7 +706,7 @@ class SolicitudeController extends BaseController
                 $users_ids[] = $rm->iduser;
             $users_ids[] = $user->id;
             if ($start != null && $end != null) {
-                if ($estado != 0) {
+                if ($estado != 10) {
                     $solicituds = Solicitude::whereIn('iduser', $users_ids)
                         ->where('estado', $estado)
                         ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
@@ -720,7 +720,7 @@ class SolicitudeController extends BaseController
 
 
             } else {
-                if ($estado != 0) {
+                if ($estado != 10) {
                     $solicituds = Solicitude::whereIn('iduser', $users_ids)
                         ->where('estado', $estado)
                         ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
@@ -894,7 +894,7 @@ class SolicitudeController extends BaseController
             }
 
             if ($start != null && $end != null) {
-                if ($estado != 0) {
+                if ($estado != 10) {
                     $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
                         ->where('estado',$estado)
                         ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
@@ -908,7 +908,7 @@ class SolicitudeController extends BaseController
 
 
             } else {
-                if ($estado != 0) {
+                if ($estado != 10) {
                     $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
                         ->where('estado', $estado)
                         ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
@@ -1023,12 +1023,20 @@ class SolicitudeController extends BaseController
 
 
         if ($start != null && $end != null) {
-            if ($estado != 0) {
-                $solicituds = Solicitude::where('estado',$estado)
-                    ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
-                    ->get();
+            if ($estado != 10) {
+                if($estado == RECHAZADO){
+                    $solicituds = Solicitude::where('estado',$estado)->where('idaproved',16)
+                        ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                        ->get();
+                }else{
+                    $solicituds = Solicitude::where('estado',$estado)
+                        ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                        ->get();
+                }
+
 
             } else {
+
                 $solicituds = Solicitude::where('estado', $estado)
                     ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
                     ->get();
@@ -1036,10 +1044,17 @@ class SolicitudeController extends BaseController
 
 
         } else {
-            if ($estado != 0) {
-                $solicituds = Solicitude::where('estado', $estado)
-                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                    ->get();
+            if ($estado != 10) {
+                if($estado == RECHAZADO){
+                    $solicituds = Solicitude::where('estado', $estado)->where('idaproved',16) // id gerente comercial
+                        ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                        ->get();
+                }else{
+                    $solicituds = Solicitude::where('estado', $estado)
+                        ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                        ->get();
+                }
+
             } else {
                 $solicituds = Solicitude::where('estado', $estado)
                     ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
@@ -1092,7 +1107,7 @@ class SolicitudeController extends BaseController
 
 
         if ($start != null && $end != null) {
-            if ($estado != 0) {
+            if ($estado != 10) {
                 $solicituds = Solicitude::where('estado',$estado)
                     ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
                     ->get();
@@ -1105,7 +1120,7 @@ class SolicitudeController extends BaseController
 
 
         } else {
-            if ($estado != 0) {
+            if ($estado != 10) {
                 $solicituds = Solicitude::where('estado', $estado)
                     ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
                     ->get();
