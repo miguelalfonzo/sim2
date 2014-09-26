@@ -118,15 +118,22 @@
 </div>
 @endif
 
-<div class="form-group col-sm-6 col-md-4 col-lg-4">
-    <label class="col-sm-8 col-md-8 control-label" for="selectbasic">Fondo</label>
+<div class="form-group col-sm-6 col-md-4">
 
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Fondo</label>
 
-    <div class="col-sm-12 col-md-12 col-lg-12">
-        <input id="textinput" name="textinput" type="text" placeholder=""
-               value="{{$solicitude->subtype->nombre}}" readonly
-               class="form-control input-md">
-
+    <div class="col-sm-12 col-md-12">
+        <select id="sub_type_activity" name="sub_type_activity" class="form-control">
+            @foreach($subtypeactivities as $sub)
+                @if(isset($solicitude->idsubtipoactividad) && $sub->idsubtipoactividad == $solicitude->subtype->idsubtipoactividad)
+                    <option selected value="{{$sub->idsubtipoactividad}}">{{$sub->nombre}}</option>
+                @else
+                    @if($sub->idsubtipoactividad == 1)
+                    <option value="{{$sub->idsubtipoactividad}}">{{$sub->nombre}}</option>
+                    @endif
+                @endif
+            @endforeach
+        </select>
     </div>
 </div>
 <div class="form-group col-sm-6 col-md-4 col-lg-4">

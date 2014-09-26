@@ -700,7 +700,7 @@ function newSolicitude() {
     /** ---------------------------------------------- GERENTE PRODUCTO -------------------------------------------- **/
 
     if(userType === 'P')
-        listSolicitude('gerprod',$('#state_view').val())
+        listSolicitude('gerprod',$('#state_view').val());
 
     /* solicitude accepted */
     var form_acepted_solicitude = $('#form_make_activity');

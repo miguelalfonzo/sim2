@@ -125,6 +125,7 @@
     </div>
 </div>
 
+@if(Auth::user()->type === 'S')
 <div class="form-group col-sm-6 col-md-4">
 
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Fondo</label>
@@ -132,16 +133,18 @@
     <div class="col-sm-12 col-md-12">
         <select id="sub_type_activity" name="sub_type_activity" class="form-control">
             @foreach($subtypeactivities as $sub)
-            @if(isset($solicitude) && $sub->idsubtipoactividad == $solicitude->subtype->idsubtipoactividad)
-            <option selected value="{{$sub->idsubtipoactividad}}">{{$sub->nombre}}</option>
-            @else
-            <option value="{{$sub->idsubtipoactividad}}">{{$sub->nombre}}</option>
-            @endif
+                @if(isset($solicitude) && $sub->idsubtipoactividad == $solicitude->subtype->idsubtipoactividad)
+                    <option selected value="{{$sub->idsubtipoactividad}}">{{$sub->nombre}}</option>
+                @else
+                    @if($sub->idsubtipoactividad == 1)
+                    <option value="{{$sub->idsubtipoactividad}}">{{$sub->nombre}}</option>
+                    @endif
+                @endif
             @endforeach
         </select>
-
     </div>
 </div>
+@endif
 
 <div class="form-group col-sm-6 col-md-4">
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Fecha de Entrega</label>

@@ -175,7 +175,11 @@ class SolicitudeController extends BaseController
         $solicitude->fecha_entrega = $date;
         $solicitude->idtiposolicitud = $inputs['type_solicitude'];
         $solicitude->token = sha1(md5(uniqid($solicitude->idsolicitud, true)));
-        $solicitude->idsubtipoactividad = $inputs['sub_type_activity'];
+
+        if(isset($inputs['sub_type_activity'])){
+            $solicitude->idsubtipoactividad = $inputs['sub_type_activity'];
+        }
+
         $solicitude->tipo_moneda = $inputs['money'];
         if($inputs['type_payment']== 2){
             $solicitude->numruc = $inputs['ruc'];
@@ -508,10 +512,12 @@ class SolicitudeController extends BaseController
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $typePayments = TypePayment::all();
         $managers = Manager::all();
+        $subTypeActivities = SubTypeActivity::all();
         $data = [
             'solicitude' => $solicitude,
             'managers' => $managers,
-            'typePayments' => $typePayments
+            'typePayments' => $typePayments,
+            'subtypeactivities' => $subTypeActivities
         ];
         return View::make('Dmkt.Sup.view_solicitude_sup', $data);
     }
@@ -613,6 +619,7 @@ class SolicitudeController extends BaseController
         $solicitude->estado = ACEPTADO;
         $solicitude->idaproved = Auth::user()->id;
         $solicitude->monto = $inputs['monto'];
+        $solicitude->idsubtipoactividad = $inputs['sub_type_activity'];
         $solicitude->observacion = $inputs['observacion'];
         $solicitude->blocked = 0;
         $data = $this->objectToArray($solicitude);
@@ -822,12 +829,13 @@ class SolicitudeController extends BaseController
         }else{
             $block = true;
         }
-
+        $subTypeActivities = SubTypeActivity::all();
         $typePayments = TypePayment::all();
         $data = [
             'solicitude' => $solicitude,
             'block' => $block,
-            'typePayments' => $typePayments
+            'typePayments' => $typePayments,
+            'subtypeactivities' => $subTypeActivities
 
         ];
         return View::make('Dmkt.GerProd.view_solicitude_gerprod', $data);
@@ -846,13 +854,13 @@ class SolicitudeController extends BaseController
     {
 
         $inputs = Input::all();
-        $amount_assigned = $inputs['amount_assigned'];
         $idSol = $inputs['idsolicitude'];
         $solicitude = Solicitude::where('idsolicitud', $idSol);
         $solicitude->estado = ACEPTADO;
         $solicitude->idaproved = Auth::user()->id;
         $solicitude->monto = $inputs['monto'];
         $solicitude->observacion = $inputs['observacion'];
+        $solicitude->idsubtipoactividad = $inputs['sub_type_activity'];
         $solicitude->blocked = 0;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
