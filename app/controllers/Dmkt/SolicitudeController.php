@@ -1129,7 +1129,7 @@ class SolicitudeController extends BaseController
 
     public function viewSeatSolicitude()
     {
-        $token = Input::get('token');
+        $token      = Input::get('token');
         $solicitude = Solicitude::where('token',$token)->firstOrFail();
         $data = [
             'solicitude' => $solicitude
@@ -1139,7 +1139,10 @@ class SolicitudeController extends BaseController
 
     public function generateSeatSolicitude($id)
     {
-        $solicitude = Solicitude::find($id);
+        $solicitude = Solicitude::where('idsolicitud',$id);
+        $solicitude->asiento = 2;
+        $data = $this->objectToArray($solicitude);
+        $solicitude->update($data);
         return Redirect::to('show_cont');
     }
 
