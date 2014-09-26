@@ -17,12 +17,12 @@
                 <strong><p style="display:inline">Autorizado por:</strong>&nbsp;{{mb_convert_case($name,MB_CASE_TITLE,'UTF-8')}}</p>
                 <strong><p style="display:inline">Fondo:</strong>&nbsp;{{mb_convert_case($solicitude->subtype->nombre,MB_CASE_TITLE,'UTF-8')}}</p>
                 <strong><p style="display:inline">Código Comercial:</strong>&nbsp;{{$solicitude->idsolicitud}}</p>
+                <strong><p style="display:inline">N° de Depósito:</strong>&nbsp;101</p>
             </section>
             <section style="text-align:center;margin-top:2em;">
                 <strong><p style="display:inline">Colaborador Bagó:</strong>&nbsp;{{mb_convert_case($name,MB_CASE_TITLE,'UTF-8')}}</p>
                 <strong><p style="display:inline">Ciudad:</strong>&nbsp;Lima</p>
                 <strong><p style="display:inline">Cargo:</strong>&nbsp;{{mb_convert_case($charge,MB_CASE_TITLE,'UTF-8')}}</p>
-                <strong><p style="display:inline">N° de Depósito:</strong>&nbsp;101</p>
                 <strong><p style="display:inline">Fecha de Depósito:</strong>&nbsp;{{$date['toDay']}}</p>
             </section>
             <section style="margin-top:2em;">
