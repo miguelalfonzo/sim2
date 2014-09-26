@@ -24,12 +24,12 @@
         <td style="text-align: center">{{$solicitude->typesolicitude->nombre}}</td>
         <td>
             <div class="div-icons-solicituds">
-                <a class="" href="{{URL::to('ver-solicitud-rm').'/'.$solicitude->token}}"><span class="glyphicon glyphicon-eye-open"></span></a>
-                @if($solicitude->estado == DEPOSITADO && $solicitude->asiento == 1)
-                    <a id="token-a" href="#"><span class="glyphicon glyphicon-usd"></span></a>
-                    <form id="form-token" action="{{URL::to('registrar-gasto')}}" method="POST">
-                        <input type="hidden" name="token" value="{{$solicitude->token}}">
-                    </form>
+                <a href="{{URL::to('ver-solicitud-rm').'/'.$solicitude->token}}"><span class="glyphicon glyphicon-eye-open"></span></a>
+                @if($solicitude->estado == DEPOSITADO && $solicitude->asiento == 2)
+                <a id="token-a" href="#"><span class="glyphicon glyphicon-usd"></span></a>
+                <form id="form-token" action="{{URL::to('registrar-gasto')}}" method="POST">
+                    <input type="hidden" name="token" value="{{<1solicit></1solicit>ude->token}}">
+                </form>
                 @endif
                 @if($solicitude->estado == REGISTRADO)
                     <a target="_blank" href="{{URL::to('a'.'/'.$solicitude->token)}}"><span class="glyphicon glyphicon-print"></span></a>
