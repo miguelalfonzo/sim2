@@ -28,7 +28,7 @@
                 @if($solicitude->estado == DEPOSITADO && $solicitude->asiento == 2)
                 <a id="token-a" href="#"><span class="glyphicon glyphicon-usd"></span></a>
                 <form id="form-token" action="{{URL::to('registrar-gasto')}}" method="POST">
-                    <input type="hidden" name="token" value="{{<1solicit></1solicit>ude->token}}">
+                    <input type="hidden" name="token" value="{{solicitude->token}}">
                 </form>
                 @endif
                 @if($solicitude->estado == REGISTRADO)
