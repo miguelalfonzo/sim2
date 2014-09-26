@@ -32,12 +32,16 @@
                 </form>
                 @endif
                 @if($solicitude->estado == REGISTRADO)
-                <a target="_blank" href="{{URL::to('a'.'/'.$solicitude->token)}}"><span class="glyphicon glyphicon-print"></span></a>
-                <a  href="{{URL::to('ver-gasto'.'/'.$solicitude->token)}}"><span class="glyphicon glyphicon-usd"></span></a>
+                    <a target="_blank" href="{{URL::to('a'.'/'.$solicitude->token)}}"><span class="glyphicon glyphicon-print"></span></a>
+                    <a  href="{{URL::to('ver-gasto'.'/'.$solicitude->token)}}"><span class="glyphicon glyphicon-usd"></span></a>
                 @endif
                 @if($solicitude->estado == PENDIENTE && $solicitude->derive == 0)
-                <a href="{{URL::to('editar-solicitud').'/'.$solicitude->token}}"><span class="glyphicon glyphicon-pencil"></span></a>
-                <a href="#" class="cancel-solicitude" data-idsolicitude = "{{$solicitude->idsolicitud}}"><span class="glyphicon glyphicon-remove"></span></a>
+                    <a href="{{URL::to('editar-solicitud').'/'.$solicitude->token}}"><span class="glyphicon glyphicon-pencil"></span></a>
+                   @if($solicitude->blocked == 1)
+                    <a href="#"  class="cancel-solicitude active-link" data-idsolicitude = "{{$solicitude->idsolicitud}}"><span class="glyphicon glyphicon-remove"></span></a>
+                   @else
+                    <a href="#" class="cancel-solicitude" data-idsolicitude = "{{$solicitude->idsolicitud}}"><span class="glyphicon glyphicon-remove"></span></a>
+                   @endif
                 @endif
 
             </div>
