@@ -44,7 +44,7 @@
                     <div class="input-group">
                         <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
                         <input id="idamount" name="monto" type="text" placeholder="" value="{{$solicitude->monto}}"
-                               class="form-control input-md" readonly>
+                               class="form-control input-md" >
                     </div>
 
 
@@ -75,7 +75,7 @@
                                 <div class="col-sm-4 col-md-4" style="padding: 0">
                                     <div class="input-group">
                                         <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                                        <input id="" readonly name="amount_assigned[]" type="text" class="form-control input-md amount_families" value="{{isset($family->monto_asignado)? $family->monto_asignado : round($solicitude->monto/count($solicitude->families),2)}}">
+                                        <input id="amount_assigned"  name="amount_assigned[]" type="text" class="form-control input-md amount_families" value="{{isset($family->monto_asignado)? $family->monto_asignado : round($solicitude->monto/count($solicitude->families),2)}}">
                                     </div>
                                 </div>
 

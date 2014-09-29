@@ -130,7 +130,12 @@
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Fondo</label>
 
     <div class="col-sm-12 col-md-12">
-        <select id="sub_type_activity" name="sub_type_activity" class="form-control">
+        @if($solicitude->estado == ACEPTADO)
+            <select id="sub_type_activity" name="sub_type_activity" class="form-control" disabled>
+        @else
+            <select id="sub_type_activity" name="sub_type_activity" class="form-control" >
+        @endif
+
             @foreach($subtypeactivities as $sub)
                 @if(isset($solicitude->idsubtipoactividad) && $sub->idsubtipoactividad == $solicitude->subtype->idsubtipoactividad)
                     <option selected value="{{$sub->idsubtipoactividad}}">{{$sub->nombre}}</option>

@@ -792,7 +792,7 @@ function newSolicitude() {
         bootbox.confirm("¿Esta seguro que desea aprobar esta solicitud?", function (result) {
 
             if (result) {
-                $.post(server + 'aprobar-solicitud', {token: aux.attr('data-token')})
+                $.post(server + 'aprobar-solicitud', {token: aux.attr('data-token') , monto : idamount.val() , amount_assigned : $('#amount_assigned').val()})
                     .done(function (data) {
 
                             window.location.href = server + 'show_gercom'

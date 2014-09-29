@@ -128,7 +128,7 @@ class SolicitudeController extends BaseController
     public function newSolicitude()
     {
 
-        $families = Marca::orderBy('descripcion','Asc')->get();
+        $families = Marca::orderBy('descripcion', 'Asc')->get();
         $typePayments = TypePayment::all();
         $subtypeactivities = SubTypeActivity::all();
         $typesolicituds = TypeSolicitude::all();
@@ -136,7 +136,7 @@ class SolicitudeController extends BaseController
             'families' => $families,
             'subtypeactivities' => $subtypeactivities,
             'typesolicituds' => $typesolicituds,
-            'typePayments' =>$typePayments
+            'typePayments' => $typePayments
         ];
 
         return View::make('Dmkt.Rm.register_solicitude', $data);
@@ -150,6 +150,7 @@ class SolicitudeController extends BaseController
         $inputs = Input::all();
         $image = Input::file('file');
         $solicitude = new Solicitude;
+        $typeUser = Auth::user()->type;
         if (isset($image)) {
 
             $filename = uniqid() . '.' . $image->getClientOriginalExtension();
@@ -169,24 +170,31 @@ class SolicitudeController extends BaseController
         $solicitude->descripcion = $inputs['description'];
         $solicitude->titulo = $inputs['titulo'];
         $solicitude->monto = $inputs['monto'];
-        $solicitude->estado = PENDIENTE;
+
         $solicitude->iduser = Auth::user()->id;
         $solicitude->monto_factura = $inputs['amount_fac'];
         $solicitude->fecha_entrega = $date;
         $solicitude->idtiposolicitud = $inputs['type_solicitude'];
         $solicitude->token = sha1(md5(uniqid($solicitude->idsolicitud, true)));
 
-        if(isset($inputs['sub_type_activity'])){
+        if (isset($inputs['sub_type_activity'])) {
             $solicitude->idsubtipoactividad = $inputs['sub_type_activity'];
         }
 
         $solicitude->tipo_moneda = $inputs['money'];
-        if($inputs['type_payment']== 2){
+        if ($inputs['type_payment'] == 2) {
             $solicitude->numruc = $inputs['ruc'];
-        }else if( $inputs['type_payment'] == 3){
+        } else if ($inputs['type_payment'] == 3) {
             $solicitude->numcuenta = $inputs['number_account'];
         }
         $solicitude->idtipopago = $inputs['type_payment'];
+
+        if ($typeUser == 'R')
+            $solicitude->estado = PENDIENTE;
+
+        if ($typeUser == 'S')
+            $solicitude->estado = ACEPTADO;
+
         if ($solicitude->save()) {
             $data = array(
 
@@ -222,29 +230,10 @@ class SolicitudeController extends BaseController
                 $solicitude_families->idfamilia = $family;
                 $solicitude_families->save();
             }
-            $typeUser = Auth::user()->type;
-            if ($typeUser == 'R')
-                return 'R';
-            if ($typeUser == 'S'){
-
-
-                //Solicitude::where('idsolicitud', $aux_idsol)->update(array('derived'=>1));
-                //$solicitude = Solicitude::where('ids', $token)->firstOrFail();
-
-                $sol = Solicitude::find($aux_idsol);
-                foreach ($sol->families as $v) {
-                    $solGer = new SolicitudeGer;
-                    $solGer->idsolicitud_gerente = $solGer->searchId() + 1;
-                    $solGer->idsolicitud = $aux_idsol;
-                    $solGer->idgerprod = $v->marca->manager->id;
-                    $solGer->save();
-                }
-
-                return 'S';
-            }
-
+            return $typeUser;
 
         }
+
 
     }
 
@@ -296,7 +285,7 @@ class SolicitudeController extends BaseController
     public function editSolicitude($token)
     {
 
-        $families = Marca::orderBy('descripcion','Asc')->get();
+        $families = Marca::orderBy('descripcion', 'Asc')->get();
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $id = $solicitude->idsolicitud;
         $clients = DB::table('DMKT_RG_SOLICITUD_CLIENTES')->where('idsolicitud', $id)->lists('idcliente');
@@ -357,7 +346,7 @@ class SolicitudeController extends BaseController
         $solicitude->idsubtipoactividad = $inputs['sub_type_activity'];
         $solicitude->tipo_moneda = $inputs['money'];
         $typeSolicitude = $inputs['type_solicitude'];
-        if($sol->idtiposolicitud == 2 && ($typeSolicitude == 1 || $typeSolicitude == 3)){
+        if ($sol->idtiposolicitud == 2 && ($typeSolicitude == 1 || $typeSolicitude == 3)) {
             $path = public_path('img/reembolso/' . $sol->image);
             @unlink($path);
             $solicitude->monto_factura = null;
@@ -366,13 +355,13 @@ class SolicitudeController extends BaseController
         $solicitude->idtiposolicitud = $typeSolicitude;
 
         $typePayment = $inputs['type_payment'];
-        if($typePayment == 1){
+        if ($typePayment == 1) {
             $solicitude->numruc = null;
             $solicitude->numcuenta = null;
-        }else if($typePayment == 2){
+        } else if ($typePayment == 2) {
             $solicitude->numruc = $inputs['ruc'];
             $solicitude->numcuenta = null;
-        }else if($typePayment == 3){
+        } else if ($typePayment == 3) {
             $solicitude->numcuenta = $inputs['number_account'];
             $solicitude->numruc = null;
         }
@@ -506,8 +495,8 @@ class SolicitudeController extends BaseController
     {
         $sol = Solicitude :: where('token', $token)->firstOrFail();
 
-        if($sol->user->type == 'R')
-        Solicitude::where('token', $token)->update(array('blocked'=>1));
+        if ($sol->user->type == 'R')
+            Solicitude::where('token', $token)->update(array('blocked' => 1));
 
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $typePayments = TypePayment::all();
@@ -606,7 +595,7 @@ class SolicitudeController extends BaseController
         $solicitude->blocked = 0;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
-        return Redirect::to('show_sup')->with('state',RECHAZADO);
+        return Redirect::to('show_sup')->with('state', RECHAZADO);
 
     }
 
@@ -637,14 +626,14 @@ class SolicitudeController extends BaseController
         }
         //echo json_encode($families);die;
 
-        return Redirect::to('show_sup')->with('state',ACEPTADO);
+        return Redirect::to('show_sup')->with('state', ACEPTADO);
 
     }
 
     public function derivedSolicitude($token)
     {
 
-        Solicitude::where('token', $token)->update(array('derived'=>1));
+        Solicitude::where('token', $token)->update(array('derived' => 1));
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
 
         $id = $solicitude->idsolicitud;
@@ -756,11 +745,13 @@ class SolicitudeController extends BaseController
         return $this->listSolicitude(PENDIENTE);
 
     }
-    public function disBlockSolicitudeSup($token){
+
+    public function disBlockSolicitudeSup($token)
+    {
 
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
-        Solicitude::where('idsolicitud',$solicitude->idsolicitud) // desbloqueamos la solicitud para que el rm lo pueda editar
-            ->update(array('blocked'=> 0));
+        Solicitude::where('idsolicitud', $solicitude->idsolicitud) // desbloqueamos la solicitud para que el rm lo pueda editar
+            ->update(array('blocked' => 0));
         return Redirect::to('show_sup');
 
     }
@@ -777,7 +768,7 @@ class SolicitudeController extends BaseController
             'states' => $states,
             'state' => $state
         ];
-        return View::make('Dmkt.GerProd.show_gerprod',$data);
+        return View::make('Dmkt.GerProd.show_gerprod', $data);
     }
 
     public function listSolicitudeGerProd($id)
@@ -788,10 +779,10 @@ class SolicitudeController extends BaseController
         $lastday = date('t-m-Y', strtotime($m));
         $firstday = date('01-m-Y', strtotime($m));
         $user = Auth::user();
-        if($user->type == 'P'){
-            $solicitud_ids=[];
+        if ($user->type == 'P') {
+            $solicitud_ids = [];
             $solicituds = $user->GerProd->solicituds;
-            foreach($solicituds as $sol){
+            foreach ($solicituds as $sol) {
                 $solicitud_ids[] = $sol->idsolicitud;
             }
 
@@ -818,15 +809,15 @@ class SolicitudeController extends BaseController
         $block = false;
         $userid = Auth::user()->gerprod->id;
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
-        Solicitude::where('token', $token)->update(array('blocked'=> 1));
+        Solicitude::where('token', $token)->update(array('blocked' => 1));
 
-        $solicitudeBlocked  = SolicitudeGer::where('idsolicitud',$solicitude->idsolicitud)->where('idgerprod',$userid)->firstOrFail();//vemos si la solicitud esta blokeada
+        $solicitudeBlocked = SolicitudeGer::where('idsolicitud', $solicitude->idsolicitud)->where('idgerprod', $userid)->firstOrFail(); //vemos si la solicitud esta blokeada
         //echo json_encode($solicitudeBlocked);die;
-        if($solicitudeBlocked->blocked == 0){
-            SolicitudeGer::where('idsolicitud',$solicitude->idsolicitud) // blockeamos la solicitud para que el otro gerente no lo pueda editar
-                ->where('idgerprod','<>',$userid)
-                ->update(array('blocked'=> 1));
-        }else{
+        if ($solicitudeBlocked->blocked == 0) {
+            SolicitudeGer::where('idsolicitud', $solicitude->idsolicitud) // blockeamos la solicitud para que el otro gerente no lo pueda editar
+                ->where('idgerprod', '<>', $userid)
+                ->update(array('blocked' => 1));
+        } else {
             $block = true;
         }
         $subTypeActivities = SubTypeActivity::all();
@@ -841,11 +832,12 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.GerProd.view_solicitude_gerprod', $data);
     }
 
-    public function disBlockSolicitudeGerProd($token){
+    public function disBlockSolicitudeGerProd($token)
+    {
 
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
-        SolicitudeGer::where('idsolicitud',$solicitude->idsolicitud) // desblockeamos la solicitud para que el otro gerente no lo pueda editar
-            ->update(array('blocked'=> 0));
+        SolicitudeGer::where('idsolicitud', $solicitude->idsolicitud) // desblockeamos la solicitud para que el otro gerente no lo pueda editar
+            ->update(array('blocked' => 0));
         return Redirect::to('show_gerprod');
 
     }
@@ -876,7 +868,7 @@ class SolicitudeController extends BaseController
             $i++;
         }
         //echo json_encode($families);die;
-        return Redirect::to('show_gerprod')->with('state',ACEPTADO);
+        return Redirect::to('show_gerprod')->with('state', ACEPTADO);
 
     }
 
@@ -895,16 +887,16 @@ class SolicitudeController extends BaseController
 
         if ($user->type == 'P') {
 
-            $solicitud_ids=[];
+            $solicitud_ids = [];
             $solicituds = $user->GerProd->solicituds;
-            foreach($solicituds as $sol){
+            foreach ($solicituds as $sol) {
                 $solicitud_ids[] = $sol->idsolicitud;
             }
 
             if ($start != null && $end != null) {
                 if ($estado != 10) {
                     $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
-                        ->where('estado',$estado)
+                        ->where('estado', $estado)
                         ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
                         ->get();
 
@@ -946,7 +938,7 @@ class SolicitudeController extends BaseController
         $solicitude->estado = RECHAZADO;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
-        return Redirect::to('show_gerprod')->with('state',RECHAZADO);
+        return Redirect::to('show_gerprod')->with('state', RECHAZADO);
 
     }
 
@@ -991,14 +983,31 @@ class SolicitudeController extends BaseController
     public function approvedSolicitude()
     {
 
-        $token = Input::get('token');
+        $inputs = Input::all();
+        $token = $inputs['token'];
+        $sol = Solicitude::where('token', $token)->first();
+        $idSol = $sol->idsolicitud;
         $solicitude = Solicitude::where('token', $token);
         $solicitude->estado = APROBADO;
         $solicitude->blocked = 0;
+        $solicitude->monto = $inputs['monto'];
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
+        SolicitudeFamily::where('idsolicitud', $idSol)->delete();
+        $amount_assigned = $inputs['amount_assigned'];
+        $families = SolicitudeFamily::where('idsolicitud', $idSol)->get();
+        $i = 0;
+        foreach ($families as $fam) {
+            $family = SolicitudeFamily::where('idsolicitud_familia', $fam->idsolicitud_familia);
+            $family->monto_asignado = $amount_assigned[$i];
+            $data = $this->objectToArray($family);
+            $family->update($data);
+            $i++;
+        }
+
         return 'approved';
     }
+
     public function denySolicitudeGerCom()
     {
 
@@ -1012,7 +1021,7 @@ class SolicitudeController extends BaseController
         $solicitude->blocked = 0;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
-        return Redirect::to('show_gercom')->with('state',RECHAZADO);
+        return Redirect::to('show_gercom')->with('state', RECHAZADO);
 
     }
 
@@ -1032,12 +1041,12 @@ class SolicitudeController extends BaseController
 
         if ($start != null && $end != null) {
             if ($estado != 10) {
-                if($estado == RECHAZADO){
-                    $solicituds = Solicitude::where('estado',$estado)->where('idaproved',16)
+                if ($estado == RECHAZADO) {
+                    $solicituds = Solicitude::where('estado', $estado)->where('idaproved', 16)
                         ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
                         ->get();
-                }else{
-                    $solicituds = Solicitude::where('estado',$estado)
+                } else {
+                    $solicituds = Solicitude::where('estado', $estado)
                         ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
                         ->get();
                 }
@@ -1053,11 +1062,11 @@ class SolicitudeController extends BaseController
 
         } else {
             if ($estado != 10) {
-                if($estado == RECHAZADO){
-                    $solicituds = Solicitude::where('estado', $estado)->where('idaproved',16) // id gerente comercial
+                if ($estado == RECHAZADO) {
+                    $solicituds = Solicitude::where('estado', $estado)->where('idaproved', 16) // id gerente comercial
                         ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
                         ->get();
-                }else{
+                } else {
                     $solicituds = Solicitude::where('estado', $estado)
                         ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
                         ->get();
@@ -1086,7 +1095,7 @@ class SolicitudeController extends BaseController
             'states' => $states,
             'state' => $state
         ];
-        return View::make('Dmkt.Cont.show_cont',$data);
+        return View::make('Dmkt.Cont.show_cont', $data);
     }
 
     public function listSolicitudeCont($id)
@@ -1096,12 +1105,13 @@ class SolicitudeController extends BaseController
         } else {
             $solicituds = Solicitude::where('estado', '=', $id)->get();
         }
-        
+
         $view = View::make('Dmkt.Cont.view_solicituds_cont')->with('solicituds', $solicituds);
         return $view;
     }
 
-    public function searchSolicitudeCont(){
+    public function searchSolicitudeCont()
+    {
 
         $inputs = Input::all();
         $estado = $inputs['idstate'];
@@ -1116,7 +1126,7 @@ class SolicitudeController extends BaseController
 
         if ($start != null && $end != null) {
             if ($estado != 10) {
-                $solicituds = Solicitude::where('estado',$estado)
+                $solicituds = Solicitude::where('estado', $estado)
                     ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
                     ->get();
 
@@ -1143,6 +1153,7 @@ class SolicitudeController extends BaseController
         return $view;
 
     }
+
     public function viewSolicitudeCont($token)
     {
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
@@ -1152,17 +1163,17 @@ class SolicitudeController extends BaseController
 
     public function viewSeatSolicitude()
     {
-        $token      = Input::get('token');
-        $solicitude = Solicitude::where('token',$token)->firstOrFail();
+        $token = Input::get('token');
+        $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $data = [
             'solicitude' => $solicitude
         ];
-        return View::make('Dmkt.Cont.register_seat',$data);
+        return View::make('Dmkt.Cont.register_seat', $data);
     }
 
     public function generateSeatSolicitude($id)
     {
-        $solicitude = Solicitude::where('idsolicitud',$id);
+        $solicitude = Solicitude::where('idsolicitud', $id);
         $solicitude->asiento = 2;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
@@ -1172,29 +1183,26 @@ class SolicitudeController extends BaseController
     public function enableDeposit()
     {
         $inputs = Input::all();
-        $ret    = array();
-        for($i=0; $i<=2; $i++)
-        {
-            if($inputs["ret$i"])
-            {
+        $ret = array();
+        for ($i = 0; $i <= 2; $i++) {
+            if ($inputs["ret$i"]) {
                 $ret[$i] = $inputs["ret$i"];
             }
         }
-        if(count($ret)>1){
+        if (count($ret) > 1) {
             echo "<script>alert('error');</script>";
             die;
         }
-        if(count($ret) == 0)
-        {
+        if (count($ret) == 0) {
             $ret[0] = null;
         }
         $id = $inputs['idsolicitud'];
-        $solicitude = Solicitude::where('idsolicitud',$id);
+        $solicitude = Solicitude::where('idsolicitud', $id);
         $solicitude->retencion = $ret[0];
         $solicitude->asiento = 1;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
-        
+
         return Redirect::to('show_cont');
     }
 }
