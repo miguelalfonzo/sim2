@@ -128,18 +128,18 @@
     </div>
 </div>
 
-<!-- Fondo -->
+<!-- Fondo
 <div class="form-group col-sm-6 col-md-4 col-lg-4">
     <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="selectbasic">Fondo</label>
 
 
     <div class="col-sm-12 col-md-12 col-lg-12">
         <input id="textinput" name="textinput" type="text" placeholder=""
-               value="{{$solicitude->subtype->nombre}}" readonly
+               value="" readonly
                class="form-control input-md">
 
     </div>
-</div>
+</div> -->
 
 <!-- Date Created -->
 <div class="form-group col-sm-6 col-md-4 col-lg-4">
@@ -161,7 +161,7 @@
 
     <div class="col-sm-12 col-md-12 col-lg-12">
         @if($solicitude->estado == PENDIENTE)
-        <textarea id="textinput" name="observacion" placeholder=""
+        <textarea id="textinput" name="observacion" placeholder="" disabled
                   class="form-control"></textarea>
         @else
         <textarea id="textinput" name="observacion" placeholder=""
