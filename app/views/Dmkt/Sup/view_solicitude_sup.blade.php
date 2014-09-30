@@ -322,19 +322,18 @@
 
     <div class="col-sm-12 col-md-12 col-lg-12" style="text-align: center">
         @if($solicitude->estado == PENDIENTE && $solicitude->derived == 0 && $solicitude->user->type == 'R')
-        <a href="{{URL::to('aceptar_solicitud')}}" id="test" name="button1id"
-           class="btn btn-primary accepted_solicitude_sup">Aceptar
-        </a>
-        <a class="btn btn-primary" data-toggle="modal" data-target="#myModal">
-            Derivar
-        </a>
-        <a id="deny_solicitude" name="button1id" class="btn btn-primary deny_solicitude">Rechazar
-        </a>
+            <a href="{{URL::to('aceptar_solicitud')}}" id="test" name="button1id"
+               class="btn btn-primary accepted_solicitude_sup">Aceptar
+            </a>
+            <a class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+                Derivar
+            </a>
+            <a id="deny_solicitude" name="button1id" class="btn btn-primary deny_solicitude">Rechazar
+            </a>
 
-        <a id="button2id" href="{{URL::to('desbloquear-solicitud-sup').'/'.$solicitude->token}}" name="button2id" class="btn btn-primary">Cancelar</a>
-
+            <a id="button2id" href="{{URL::to('desbloquear-solicitud-sup').'/'.$solicitude->token}}" name="button2id" class="btn btn-primary">Cancelar</a>
         @else
-            @if($solicitude->derived == 0)
+            @if($solicitude->derived == 0 && $solicitude->estado != ACEPTADO)
                 <a href="{{URL::to('aceptar_solicitud')}}" id="test" name="button1id"
                    class="btn btn-primary accepted_solicitude_sup">Aceptar
                 </a>

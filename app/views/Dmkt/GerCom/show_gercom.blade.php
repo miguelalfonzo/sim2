@@ -12,8 +12,7 @@
                         <input type="hidden" id="state_view" value="{{isset($state) ? $state : ACEPTADO}}">
                         <div class="form-group col-sm-3 col-md-2" style="padding: 0">
                             <div class="">
-                                <select id="idState" name="idState"
-                                        class="form-control select_state_solicitude_gercom">
+                                <select id="idState" name="idState" class="form-control select_state_solicitude_gercom">
 
                                     @foreach($states as $state1)
                                         @if($state1->idestado == ACEPTADO || $state1->idestado == RECHAZADO || $state1->idestado == APROBADO)
