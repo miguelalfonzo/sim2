@@ -241,7 +241,7 @@ class SolicitudeController extends BaseController
 
     }
 
-    public function listSolicitude($id)
+    public function listSolicitude($state)
     {
 
         $today = getdate();
@@ -250,9 +250,7 @@ class SolicitudeController extends BaseController
         $firstday = date('01-m-Y', strtotime($m));
 
         if (Auth::user()->type == 'R') {
-
-
-            if ($id == 0) {
+            if ($state== 0) {
 
                 $solicituds = Solicitude::where('iduser', Auth::user()->Rm->iduser)
                     ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
@@ -260,7 +258,7 @@ class SolicitudeController extends BaseController
 
             } else {
                 $solicituds = Solicitude::where('iduser', Auth::user()->Rm->iduser)
-                    ->where('estado', $id)
+                    ->where('estado', $state)
                     ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
                     ->get();
 

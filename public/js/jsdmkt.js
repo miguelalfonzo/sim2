@@ -19,6 +19,8 @@ function newSolicitude() {
     var number_account = $('#number_account');
     var idamount = $('#idamount');
     var clients = [];
+    var input_file_factura = $('#input-file-factura');
+    var validate = 0; // si cambia  a 1 hay errores
 
     var userType = $('#typeUser').val();
     var TODOS = 0;
@@ -225,6 +227,9 @@ function newSolicitude() {
     amountfac.on('focus', function () {
         $(this).parent().removeClass('has-error')
     });
+    amount_fac.on('focus', function () {
+        $(this).parent().removeClass('has-error')
+    });
     selectfamily.on('click', function () {
         $(this).css('border-color', 'none')
     });
@@ -234,6 +239,9 @@ function newSolicitude() {
     data_end.on('focus', function () {
         $(this).parent().removeClass('has-error');
     });
+    input_file_factura.on('focus', function () {
+        $(this).parent().removeClass('has-error');
+    });
     /* End Removing Errors */
 
 
@@ -241,7 +249,7 @@ function newSolicitude() {
 
     $('.register_solicitude').on('click', (function (e) {
         var aux = 0;
-        var validate = 0; // si cambia  a 1 hay errores
+
         var obj = [];
         var clients_input = [];
         var families_input = [];
@@ -274,11 +282,19 @@ function newSolicitude() {
             input_client.addClass('input-placeholder-error');
             console.log(validate = 1);
         }
-        if (!amountfac.val()) {
-            amountfac.parent().addClass('has-error');
-            amountfac.attr('placeholder', 'Ingrese Cliente');
-            amountfac.addClass('input-placeholder-error');
-            // validate =1;
+        if(select_type_solicitude.val() == 2){
+            if (!amount_fac.val()) {
+                amount_fac.parent().addClass('has-error');
+                amount_fac.attr('placeholder', 'Ingrese Monto de la Factura');
+                amount_fac.addClass('input-placeholder-error');
+                console.log(validate = 1);
+            }
+            if(!input_file_factura.val()){
+                input_file_factura.parent().addClass('has-error');
+                input_file_factura.attr('placeholder', 'Ingrese Imagen');
+                input_file_factura.addClass('input-placeholder-error');
+                console.log(validate = 1);
+            }
         }
 
         setTimeout(function () {
@@ -510,9 +526,9 @@ function newSolicitude() {
                     .done(function (data) {
                         console.log(data);
 
-                        $('#table_solicitude_wrapper').remove();
-                        $('.table-solicituds').append(data);
-                        $('#table_solicitude').dataTable({
+                        $('#table_solicitude_wrapper_rm').remove();
+                        $('.table-solicituds-rm').append(data);
+                        $('#table_solicitude_rm').dataTable({
                                 "order": [
                                     [ 3, "desc" ]
                                 ],
@@ -678,7 +694,7 @@ function newSolicitude() {
 
     $('.btn-file :file').on('fileselect', function (event, numFiles, label) {
 
-        $('#input-file-factura').val(label);
+        input_file_factura.val(label);
     });
 
     $(document).on('change', '.btn-file :file', function (e) {
@@ -763,7 +779,7 @@ function newSolicitude() {
         listSolicitude('gercom',$('#state_view').val());
 
     /* preview image */
-    $('#input-file-factura').change(function (e) {
+    input_file_factura.change(function (e) {
 
         addImage(e);
     });

@@ -250,22 +250,25 @@
                                class="form-control input-md">
 
                     </div>
+
+                    @if($solicitude->idaproved == null || $solicitude->idaproved == Auth::user()->id)
                     <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" style="padding: 0">
                         <div class="input-group">
                             <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
                             @if($solicitude->estado == PENDIENTE)
 
-                            <input id="" name="amount_assigned[]" type="text"
-                                   class="form-control input-md amount_families"
-                                   value="{{isset($family->monto_asignado)? $family->monto_asignado : round($solicitude->monto/count($solicitude->families),2)}}">
+                                <input id="" name="amount_assigned[]" type="text"
+                                       class="form-control input-md amount_families"
+                                       value="{{isset($family->monto_asignado)? $family->monto_asignado : round($solicitude->monto/count($solicitude->families),2)}}">
                             @else
-                            <input disabled id="" name="amount_assigned[]" type="text"
-                                   class="form-control input-md amount_families"
-                                   value="{{isset($family->monto_asignado)? $family->monto_asignado : round($solicitude->monto/count($solicitude->families),2)}}">
+                                <input disabled id="" name="amount_assigned[]" type="text"
+                                       class="form-control input-md amount_families"
+                                       value="{{isset($family->monto_asignado)? $family->monto_asignado : round($solicitude->monto/count($solicitude->families),2)}}">
 
                             @endif
                         </div>
                     </div>
+                    @endif
 
                 </div>
                 <?php $t = $t + round($solicitude->monto / count($solicitude->families), 2) ?>
@@ -333,6 +336,7 @@
 
             <a id="button2id" href="{{URL::to('desbloquear-solicitud-sup').'/'.$solicitude->token}}" name="button2id" class="btn btn-primary">Cancelar</a>
         @else
+
             @if($solicitude->derived == 0 && $solicitude->estado != ACEPTADO)
                 <a href="{{URL::to('aceptar_solicitud')}}" id="test" name="button1id"
                    class="btn btn-primary accepted_solicitude_sup">Aceptar

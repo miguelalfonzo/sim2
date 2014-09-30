@@ -162,7 +162,7 @@
 
     </div>
 </div>
-
+@if(!isset($solicitude))
 <div class="solicitude_factura form-group col-sm-6 col-md-4">
 
     <label class="col-sm-12 col-md-12 control-label" for="textinput">Factura <small>(solo imagenes)</small></label>
@@ -175,12 +175,12 @@
                              <i class="glyphicon glyphicon-folder-open"></i> <input type="file" multiple="" name="file">
                          </span>
                     </span>
-            <input type="text" id="input-file-factura"  class="form-control" readonly="">
+            <input type="text" id="input-file-factura"  class="form-control" readonly="" required="">
         </div>
 
     </div>
 </div>
-
+@endif
 
 <div class="form-group col-sm-12 col-md-12" style="padding: 0">
     <div class="form-group col-sm-6 col-md-4 ">
