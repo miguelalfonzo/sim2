@@ -14,8 +14,12 @@
                             <div class="">
                                 <select id="idState" name="idstate"
                                         class="form-control selectestatesolicitude">
-                                    @foreach($states as $state)
-                                    <option value="{{$state->idestado}}">{{$state->nombre}}</option>
+                                    @foreach($states as $state1)
+                                    @if($state1->idestado == $state)
+                                    <option  selected value="{{$state1->idestado}}">{{$state1->nombre}}</option>
+                                    @else
+                                    <option value="{{$state1->idestado}}">{{$state1->nombre}}</option>
+                                    @endif
                                     @endforeach
                                 </select>
                             </div>

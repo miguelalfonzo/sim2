@@ -334,8 +334,13 @@
         <a id="button2id" href="{{URL::to('desbloquear-solicitud-sup').'/'.$solicitude->token}}" name="button2id" class="btn btn-primary">Cancelar</a>
 
         @else
-        <a id="button2id" href="{{URL::to('show_sup')}}" name="button2id"
-           class="btn btn-primary">Cancelar</a>
+            @if($solicitude->derived == 0)
+                <a href="{{URL::to('aceptar_solicitud')}}" id="test" name="button1id"
+                   class="btn btn-primary accepted_solicitude_sup">Aceptar
+                </a>
+            @endif
+                <a id="button2id" href="{{URL::to('show_sup')}}" name="button2id"
+                   class="btn btn-primary">Cancelar</a>
         @endif
     </div>
 </div>

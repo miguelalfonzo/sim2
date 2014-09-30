@@ -760,7 +760,7 @@ function newSolicitude() {
     /** -------------------------------------------- GERENTE COMERCIAL --------------------------------------------- **/
 
     if(userType === 'G')
-        listSolicitude('gercom',ACEPTADO);
+        listSolicitude('gercom',$('#state_view').val());
 
     /* preview image */
     $('#input-file-factura').change(function (e) {
@@ -791,14 +791,18 @@ function newSolicitude() {
         var aux = $(this);
         bootbox.confirm("¿Esta seguro que desea aprobar esta solicitud?", function (result) {
 
+
             if (result) {
-                $.post(server + 'aprobar-solicitud', {token: aux.attr('data-token') , monto : idamount.val() , amount_assigned : $('#amount_assigned').val()})
-                    .done(function (data) {
+                var message = 'Validando Solicitud..';
+                loadingUI(message);
+                setTimeout(function () {
 
-                            window.location.href = server + 'show_gercom'
+                    form_acepted_solicitude.attr('action', server + 'aprobar-solicitud');
+                    form_acepted_solicitude.submit();
+                }, 1200);
 
-                    })
             }
+
         });
     });
     /** --------------------------------------------- CONTABILIDAD ------------------------------------------------- **/

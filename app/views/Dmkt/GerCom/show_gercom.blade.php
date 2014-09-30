@@ -9,14 +9,20 @@
             <div class="panel-body table-solicituds-gercom">
                 <div class="col-md-12" style="padding: 0">
                     <form method="post" action="" class="">
+                        <input type="hidden" id="state_view" value="{{isset($state) ? $state : ACEPTADO}}">
                         <div class="form-group col-sm-3 col-md-2" style="padding: 0">
                             <div class="">
                                 <select id="idState" name="idState"
                                         class="form-control select_state_solicitude_gercom">
-                                    @foreach($states as $state)
-                                    @if($state->idestado == ACEPTADO || $state->idestado == RECHAZADO || $state->idestado == APROBADO)
-                                    <option value="{{$state->idestado}}">{{$state->nombre}}</option>
-                                    @endif
+
+                                    @foreach($states as $state1)
+                                        @if($state1->idestado == ACEPTADO || $state1->idestado == RECHAZADO || $state1->idestado == APROBADO)
+                                            @if($state1->idestado == $state)
+                                                <option  selected value="{{$state1->idestado}}">{{$state1->nombre}}</option>
+                                            @else
+                                                <option value="{{$state1->idestado}}">{{$state1->nombre}}</option>
+                                            @endif
+                                        @endif
                                     @endforeach
                                 </select>
                             </div>

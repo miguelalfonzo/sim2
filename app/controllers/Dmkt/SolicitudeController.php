@@ -175,9 +175,11 @@ class SolicitudeController extends BaseController
         $solicitude->monto_factura = $inputs['amount_fac'];
         $solicitude->fecha_entrega = $date;
         $solicitude->idtiposolicitud = $inputs['type_solicitude'];
-        $solicitude->token = sha1(md5(uniqid($solicitude->idsolicitud, true)));
+        $token = sha1(md5(uniqid($solicitude->idsolicitud, true)));
+        $solicitude->token =  $token;
 
         if (isset($inputs['sub_type_activity'])) {
+            $activity = $inputs['sub_type_activity'];
             $solicitude->idsubtipoactividad = $inputs['sub_type_activity'];
         }
 
@@ -188,12 +190,8 @@ class SolicitudeController extends BaseController
             $solicitude->numcuenta = $inputs['number_account'];
         }
         $solicitude->idtipopago = $inputs['type_payment'];
+        $solicitude->estado = PENDIENTE;
 
-        if ($typeUser == 'R')
-            $solicitude->estado = PENDIENTE;
-
-        if ($typeUser == 'S')
-            $solicitude->estado = ACEPTADO;
 
         if ($solicitude->save()) {
             $data = array(
@@ -230,9 +228,15 @@ class SolicitudeController extends BaseController
                 $solicitude_families->idfamilia = $family;
                 $solicitude_families->save();
             }
+
+            if(isset($activity) && $activity== 31 ) // si es de tipo actividad "otros" lo deriva a los gerentes
+            $this->derivedSolicitude($token,1);
+
             return $typeUser;
 
         }
+
+
 
 
     }
@@ -343,7 +347,7 @@ class SolicitudeController extends BaseController
         $solicitude->estado = PENDIENTE;
         $solicitude->fecha_entrega = $date;
         $solicitude->monto_factura = $inputs['amount_fac'];
-        $solicitude->idsubtipoactividad = $inputs['sub_type_activity'];
+
         $solicitude->tipo_moneda = $inputs['money'];
         $typeSolicitude = $inputs['type_solicitude'];
         if ($sol->idtiposolicitud == 2 && ($typeSolicitude == 1 || $typeSolicitude == 3)) {
@@ -367,11 +371,23 @@ class SolicitudeController extends BaseController
         }
         $solicitude->idtipopago = $inputs['type_payment'];
 
+        if(isset($inputs['sub_type_activity'])){
+            $activity =$inputs['sub_type_activity'];
+            $solicitude->idsubtipoactividad = $activity;
+        }
+
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
 
         SolicitudeClient::where('idsolicitud', '=', $id)->delete();
         SolicitudeFamily::where('idsolicitud', '=', $id)->delete();
+
+       /* if($activity == 1){
+
+        }
+        else if($activity == 31){
+
+        }*/
 
         $clients = $inputs['clients'];
         //var_dump($clients);die;
@@ -630,10 +646,10 @@ class SolicitudeController extends BaseController
 
     }
 
-    public function derivedSolicitude($token)
+    public function derivedSolicitude($token,$derive=0)
     {
 
-        Solicitude::where('token', $token)->update(array('derived' => 1));
+        Solicitude::where('token', $token)->update(array('derived' => 1 ,'idsubtipoactividad' => 31));
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
 
         $id = $solicitude->idsolicitud;
@@ -645,7 +661,8 @@ class SolicitudeController extends BaseController
             $solGer->idgerprod = $v->marca->manager->id;
             $solGer->save();
         }
-        return Redirect::to('show_sup');
+
+         if($derive == 0)return Redirect::to('show_sup');
     }
 
     public function listSolicitudeSup($id)
@@ -947,9 +964,13 @@ class SolicitudeController extends BaseController
 
     public function show_gercom()
     {
-
+        $state = Session::get('state');
         $states = State::orderBy('idestado', 'ASC')->get();
-        return View::make('Dmkt.GerCom.show_gercom')->with('states', $states);
+        $data = [
+          'state' => $state,
+          'states' => $states  
+        ];
+        return View::make('Dmkt.GerCom.show_gercom', $data);
     }
 
     public function listSolicitudeGerCom($id)
@@ -993,7 +1014,7 @@ class SolicitudeController extends BaseController
         $solicitude->monto = $inputs['monto'];
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
-        SolicitudeFamily::where('idsolicitud', $idSol)->delete();
+        //SolicitudeFamily::where('idsolicitud', $idSol)->delete();
         $amount_assigned = $inputs['amount_assigned'];
         $families = SolicitudeFamily::where('idsolicitud', $idSol)->get();
         $i = 0;
@@ -1005,7 +1026,7 @@ class SolicitudeController extends BaseController
             $i++;
         }
 
-        return 'approved';
+        return Redirect::to('show_gercom')->with('state',APROBADO);
     }
 
     public function denySolicitudeGerCom()

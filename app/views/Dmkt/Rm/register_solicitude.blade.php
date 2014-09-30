@@ -57,11 +57,11 @@
     <div class="col-sm-12 col-md-12">
         <select id="" name="type_payment" class="form-control selectTypePayment">
             @foreach($typePayments as $type)
-            @if(isset($solicitude) && $solicitude->idtipopago == $type->idtipopago)
-            <option selected value="{{$type->idtipopago}}">{{$type->nombre}}</option>
-            @else
-            <option value="{{$type->idtipopago}}">{{$type->nombre}}</option>
-            @endif
+                @if(isset($solicitude) && $solicitude->idtipopago == $type->idtipopago)
+                    <option selected value="{{$type->idtipopago}}">{{$type->nombre}}</option>
+                @else
+                    <option value="{{$type->idtipopago}}">{{$type->nombre}}</option>
+                @endif
             @endforeach
         </select>
 
@@ -131,14 +131,17 @@
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Fondo</label>
 
     <div class="col-sm-12 col-md-12">
-        <select id="sub_type_activity" name="sub_type_activity" class="form-control">
+
+            <select id="sub_type_activity" name="sub_type_activity" class="form-control" disabled>
+
             @foreach($subtypeactivities as $sub)
                 @if(isset($solicitude) && $sub->idsubtipoactividad == $solicitude->subtype->idsubtipoactividad)
                     <option selected value="{{$sub->idsubtipoactividad}}">{{$sub->nombre}}</option>
                 @else
-                    @if($sub->idsubtipoactividad == 1)
+                    @if($sub->idsubtipoactividad == 1 || $sub->idsubtipoactividad == 31) <!-- AREK Y OTROS -->
                     <option value="{{$sub->idsubtipoactividad}}">{{$sub->nombre}}</option>
                     @endif
+
                 @endif
             @endforeach
         </select>

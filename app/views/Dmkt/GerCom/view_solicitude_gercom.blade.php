@@ -9,6 +9,8 @@
     </div>
     <div class="panel-body">
         <form id="form_make_activity" class="" method="post" action="">
+        <input type="hidden" value="{{$solicitude->token}}" name="token">
+
             <input id="textinput" name="idsolicitude" type="hidden" placeholder=""
                    value="{{$solicitude->idsolicitud}}">
 
@@ -198,7 +200,7 @@
                 <div class="col-sm-12 col-md-12" style="text-align: center">
 
                     @if($solicitude->estado == ACEPTADO)
-                    <a href="" id="" name="button1id" data-token ="{{$solicitude->token}}"
+                    <a id="" name="button1id" data-token ="{{$solicitude->token}}"
                        class="btn btn-primary approved_solicitude">Aprobar
                     </a>
 
