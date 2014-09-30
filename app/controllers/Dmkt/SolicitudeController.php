@@ -1205,21 +1205,32 @@ class SolicitudeController extends BaseController
     {
         $inputs = Input::all();
         $ret = array();
-        for ($i = 0; $i <= 2; $i++) {
-            if ($inputs["ret$i"]) {
+        for ($i = 0; $i <= 2; $i++) 
+        {
+            if ($inputs["ret$i"]) 
+            {
                 $ret[$i] = $inputs["ret$i"];
             }
         }
-        if (count($ret) > 1) {
+        if (count($ret) == 0) 
+        {
+            $val_ret = null;
+        }
+        else if (count($ret) == 1) 
+        {
+            foreach ($ret as $value) 
+            {
+                $val_ret = $value;
+            }    
+        }
+        else
+        {
             echo "<script>alert('error');</script>";
             die;
         }
-        if (count($ret) == 0) {
-            $ret[0] = null;
-        }
         $id = $inputs['idsolicitud'];
         $solicitude = Solicitude::where('idsolicitud', $id);
-        $solicitude->retencion = $ret[0];
+        $solicitude->retencion = $val_ret;
         $solicitude->asiento = 1;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
