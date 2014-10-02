@@ -13,7 +13,7 @@
     <tbody>
     @foreach($solicituds as $solicitude)
     <tr>
-        <td style="text-align: center">{{$solcitude->idsolicitud}}</td>
+        <td style="text-align: center">{{$solicitude->idsolicitud}}</td>
         <td>{{$solicitude->titulo}}</td>
         <td style="text-align: center">
             {{$solicitude->typemoney->simbolo.$solicitude->monto }}
