@@ -2,7 +2,7 @@
 @section('content')
 
 <div class="content">
-
+<input type="hidden" id="state_view" value="{{isset($state) ? $state : PENDIENTE}}">
 <div class="panel panel-default">
 <div class="panel-heading">
     <h3 class="panel-title">Nueva Solicitud</h3>
@@ -132,10 +132,10 @@
 
     <div class="col-sm-12 col-md-12">
 
-            <select id="sub_type_activity" name="sub_type_activity" class="form-control" disabled>
+            <select id="sub_type_activity" name="sub_type_activity" class="form-control">
 
             @foreach($subtypeactivities as $sub)
-                @if(isset($solicitude) && $sub->idsubtipoactividad == $solicitude->subtype->idsubtipoactividad)
+                @if(isset($solicitude->idsubtipoactividad) && $sub->idsubtipoactividad == $solicitude->subtype->idsubtipoactividad)
                     <option selected value="{{$sub->idsubtipoactividad}}">{{$sub->nombre}}</option>
                 @else
                     @if($sub->idsubtipoactividad == 1 || $sub->idsubtipoactividad == 31) <!-- AREK Y OTROS -->
@@ -144,7 +144,7 @@
 
                 @endif
             @endforeach
-        </select>
+            </select>
     </div>
 </div>
 @endif

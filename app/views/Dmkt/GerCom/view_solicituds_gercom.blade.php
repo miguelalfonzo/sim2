@@ -1,6 +1,7 @@
 <table class="table table-striped table-bordered dataTable" id="table_solicitude_gercom" style="width: 100%">
     <thead>
     <tr>
+        <th>#</th>
         <th>Solicitud</th>
         <th>Monto Solicitado</th>
         <th>Estado</th>
@@ -12,6 +13,7 @@
     <tbody>
     @foreach($solicituds as $solicitude)
     <tr>
+        <td style="text-align: center">{{$solicitude->idsolicitud}}</td>
         <td>{{$solicitude->titulo}}</td>
         <td style="text-align: center">{{$solicitude->typemoney->simbolo.$solicitude->monto}}
         </td>
