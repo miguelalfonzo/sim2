@@ -526,7 +526,7 @@ function newSolicitude() {
                     .done(function (data) {
                         console.log(data);
 
-                        $('#table_solicitude_wrapper_rm').remove();
+                        $('#table_solicitude_rm_wrapper').remove();
                         $('.table-solicituds-rm').append(data);
                         $('#table_solicitude_rm').dataTable({
                                 "order": [
