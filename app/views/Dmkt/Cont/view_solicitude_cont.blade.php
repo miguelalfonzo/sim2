@@ -131,7 +131,7 @@
                             </div>
                         </div>
                     </div>
-                    @if($solicitude->asiento != 1)
+                    @if($solicitude->asiento != 1 && $solicitude->estado == APROBADO)
                         <!-- Cálculos Contabilidad -->
                         <div class="form-group col-sm-6 col-md-4">
                             <label class="col-sm-8 col-md-8 control-label" for="textinput">Retención 6%</label>
@@ -164,7 +164,7 @@
                     <!-- Button (Double) -->
                     <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
                         <div class="col-sm-12 col-md-12" style="text-align: center">
-                            @if($solicitude->asiento != 1)
+                            @if($solicitude->asiento != 1 && $solicitude->estado == APROBADO)
                                 <a id="enable-deposit" href="#" class="btn btn-success" style="margin-right: 1em;">Habilitar Depósito</a>
                             @endif
                             <a id="button2id" href="{{URL::to('show_cont')}}" name="button2id" class="btn btn-primary">Cancelar</a>

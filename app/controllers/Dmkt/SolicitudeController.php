@@ -1199,6 +1199,15 @@ class SolicitudeController extends BaseController
         return Redirect::to('show_cont');
     }
 
+    public function generateSeatExpense($id)
+    {
+        $solicitude = Solicitude::where('idsolicitud', $id);
+        $solicitude->estado = 7;
+        $data = $this->objectToArray($solicitude);
+        $solicitude->update($data);
+        return Redirect::to('show_cont');
+    }
+
     public function enableDeposit()
     {
         $inputs = Input::all();

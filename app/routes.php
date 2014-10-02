@@ -117,6 +117,7 @@ Route::post('buscar-solicitudes-cont','Dmkt\SolicitudeController@searchSolicitud
 Route::post('generar-asiento-solicitud','Dmkt\SolicitudeController@viewSeatSolicitude');
 Route::get('generate-seat-solicitude/{id}','Dmkt\SolicitudeController@generateSeatSolicitude');
 Route::post('enable-deposit','Dmkt\SolicitudeController@enableDeposit');
+Route::get('generar-asiento-expense/{token}','Dmk\SolicitudeController@generateSeatExpense');
 
 });
 // App::error(function (ModelNotFoundException $e) {
