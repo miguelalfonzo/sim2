@@ -302,8 +302,8 @@
                     <div class="col-sm-12 col-md-10">
 
                         <div class="input-group">
-
-                            <input type="file" id="input-file-factura" name="file" class="form-control" readonly="">
+                            <input id="isSetImage"type="hidden" value="{{$solicitude->image}}"><!-- para validar si es que hay una imagen cuando se va a editar -->
+                            <input type="file" id="input-file-factura" name="file" class="form-control"  >
                         </div>
 
                     </div>

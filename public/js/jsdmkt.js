@@ -21,6 +21,7 @@ function newSolicitude() {
     var clients = [];
     var input_file_factura = $('#input-file-factura');
     var validate = 0; // si cambia  a 1 hay errores
+    var isSetImage = $('#isSetImage');
 
     var userType = $('#typeUser').val();
     var TODOS = 0;
@@ -249,7 +250,7 @@ function newSolicitude() {
 
     $('.register_solicitude').on('click', (function (e) {
         var aux = 0;
-
+        validate = 0;
         var obj = [];
         var clients_input = [];
         var families_input = [];
@@ -289,7 +290,7 @@ function newSolicitude() {
                 amount_fac.addClass('input-placeholder-error');
                 console.log(validate = 1);
             }
-            if(!input_file_factura.val()){
+            if(!input_file_factura.val() && isSetImage.val()==null){
                 input_file_factura.parent().addClass('has-error');
                 input_file_factura.attr('placeholder', 'Ingrese Imagen');
                 input_file_factura.addClass('input-placeholder-error');
@@ -779,10 +780,7 @@ function newSolicitude() {
         listSolicitude('gercom',$('#state_view').val());
 
     /* preview image */
-    input_file_factura.change(function (e) {
 
-        addImage(e);
-    });
 
     var search_solicitude_gercom = $('#search_solicitude_gercom');
     search_solicitude_gercom.on('click', function () {
@@ -842,9 +840,64 @@ function newSolicitude() {
     });
 
 
+    /** --------------------------------------------- ADMIN ------------------------------------------------- **/
+
+    $('#register_user').on('click',function(e){
+        e.preventDefault();
+        var form = $('#form-register-user');
+
+        var message = 'Registrando Usuario';
+        var message2 = 'Usuario Registrado';
+
+        $.ajax({
+            url: server + 'register-user',
+            type: 'POST',
+            data: form.serialize(),
+
+            beforeSend: function () {
+                loadingUI(message);
+            }
+
+        }).done(function (data) {
+           // $.unblockUI();
+
+            if (data == 'SI') {
+                responseUI(message2, 'green');
+                setTimeout(
+                    function () {
+                        window.location.href = server + 'register'
+                    }
+                    , 200);
+            }
+        }).fail(function (e) {
+            $.unblockUI();
+            alert('error');
+        })
+
+    });
+    $('#table-users').dataTable({
+            "order": [
+                [ 0, "desc" ]
+            ],
+            "bLengthChange": false,
+            'iDisplayLength': 7,
+            "oLanguage": {
+                "sSearch": "Buscar: ",
+                "sZeroRecords": "No hay solicitudes",
+                "sInfoEmpty": "No hay solicitudes",
+                "sInfo": 'Mostrando _END_ de _TOTAL_'
+            }
+        }
+    );
+
+
 
     /** ------------------------------------------------------------------------------------------------------------ **/
 
+    input_file_factura.change(function (e) {
+
+        addImage(e);
+    });
     function addImage(e) {
         var file = e.target.files[0],
             imageType = /image.*/;
@@ -865,4 +918,22 @@ function newSolicitude() {
     }
 
     /* end preview image */
+
+    /* Menu */
+    var navItems = $('.admin-menu li > a');
+    var navListItems = $('.admin-menu li');
+    var allWells = $('.admin-content');
+    var allWellsExceptFirst = $('.admin-content:not(:first)');
+
+    allWellsExceptFirst.hide();
+    navItems.click(function(e)
+    {
+        e.preventDefault();
+        navListItems.removeClass('active');
+        $(this).closest('li').addClass('active');
+
+        allWells.hide();
+        var target = $(this).attr('data-target-id');
+        $('#' + target).show();
+    });
 }

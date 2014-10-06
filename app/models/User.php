@@ -23,7 +23,20 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	 */
 	protected $hidden = array('password', 'remember_token');
 
+    function searchId(){
 
+        $lastId = User::orderBy('id', 'DESC')->first();
+        if($lastId == null){
+            return 0;
+        }else{
+            return $lastId->id;
+        }
+
+    }
+    function person(){
+        return $this->hasOne('Common\Person','iduser','id');
+
+    }
     public function Rm(){
 
         return $this->hasOne('Dmkt\Rm','iduser','id');
@@ -39,5 +52,10 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 
     public function GerProd(){
         return $this->hasOne('Dmkt\Manager','iduser','id');
+    }
+
+    public function type(){
+
+        return $this->hasOne('Common\TypeUser','codigo','type');
     }
 }

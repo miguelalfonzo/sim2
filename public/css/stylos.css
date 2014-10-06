@@ -140,5 +140,7 @@ selectproduct{
     pointer-events: none; /* evita que el enlace nos envíe a donde apunta.*/
 }
 
+@import url(http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css);
+.fa-fw {width: 2em;}
 
 /** Gastos  */

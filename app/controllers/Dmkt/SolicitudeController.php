@@ -56,19 +56,16 @@ class SolicitudeController extends BaseController
     public function test()
 
     {
+
         /*$result = Solicitude::where(function ($query) {
             $query->where('monto',400)
                 ->orWhere('estado', 2);
         })->where('tipo_moneda',1)->get();
         echo json_encode($result);
 */
-        $user = new User();
-        $user->id = 18;
-        $user->email = 'tesoreria@bago.com';
-        $user->username = 'tesoreria';
-        $user->password = Hash::make('admin');
-        $user->type = 'T';
-        $user->save();
+        $user = User::find(1);
+        echo json_encode($user->rm->nombres);
+
         /*
         $today = getdate();
         $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];

@@ -11,6 +11,10 @@
 |
 */
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+/** Admin */
+
+Route::get('register','Admin\AdminController@register');
+Route::post('register-user','Admin\AdminController@form_register');
 
 /** Login */
 // route to show the login form
