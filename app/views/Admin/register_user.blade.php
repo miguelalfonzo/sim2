@@ -26,39 +26,41 @@
                                 <div class="form-group">
                                     <label class="col-md-4 control-label" for="textinput">Nombres</label>
 
-                                    <div class="col-md-4">
+                                    <div id="first_name" class="col-md-4">
                                         <input id="textinput" name="first_name" type="text" placeholder=""
                                                class="form-control input-md">
-                                        <span class="help-block"></span>
+                                        <span class="help-block error-incomplete"></span>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-md-4 control-label" for="textinput">Apellidos</label>
+                                    <label  class="col-md-4 control-label" for="textinput">Apellidos</label>
 
-                                    <div class="col-md-4">
+                                    <div id="last_name" class="col-md-4">
                                         <input id="textinput" name="last_name" type="text" placeholder=""
                                                class="form-control input-md">
-                                        <span class="help-block"></span>
+                                        <span class="help-block error-incomplete"></span>
                                     </div>
                                 </div>
 
                                 <div class="form-group">
                                     <label class="col-md-4 control-label" for="textinput">Usuario</label>
 
-                                    <div class="col-md-4">
-                                        <input id="textinput" name="username" type="text" placeholder=""
+                                    <div id="username" class="col-md-4" style="position: relative">
+                                        <input id="" name="username" type="text" placeholder=""
                                                class="form-control input-md">
-                                        <span class="help-block"></span>
+                                        <span class="help-block error-incomplete"></span>
+                                        <span style="position: absolute; top:0.5em; right: 2em; display: none"><img src="{{URL::to('img/ajax-loader2.gif')}}"></span>
+                                        <span style="position: absolute; top:0.7em; right: 2em; display: none; color: forestgreen" class="glyphicon glyphicon-ok" ></span>
                                     </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="col-md-4 control-label" for="textinput">Email</label>
+                                    <label  class="col-md-4 control-label" for="textinput">Email</label>
 
-                                    <div class="col-md-4">
+                                    <div id="email" class="col-md-4">
                                         <input id="textinput" name="email" type="text" placeholder=""
                                                class="form-control input-md">
-                                        <span class="help-block"></span>
+                                        <span class="help-block error-incomplete"></span>
                                     </div>
                                 </div>
 
@@ -66,10 +68,10 @@
                                 <div class="form-group">
                                     <label class="col-md-4 control-label" for="passwordinput">Password</label>
 
-                                    <div class="col-md-4">
-                                        <input id="passwordinput" name="password" type="password" placeholder=""
+                                    <div id="password"  class="col-md-4">
+                                        <input name="password" type="password" placeholder=""
                                                class="form-control input-md">
-                                        <span class="help-block"></span>
+                                        <span class="help-block error-incomplete"></span>
                                     </div>
                                 </div>
 
@@ -123,10 +125,10 @@
                                 </td>
                                 @if($user->type == 'R')
                                 <td style="text-align: center">{{$user->rm->nombres}}</td>
-                                <td style="text-align: center"></td>
+                                <td style="text-align: center">{{$user->rm->apellidos}}</td>
                                 @elseif($user->type == 'S')
                                 <td style="text-align: center">{{$user->Sup->nombres}}</td>
-                                <td style="text-align: center"></td>
+                                <td style="text-align: center">{{$user->Sup->apellidos}}</td>
                                 @elseif($user->type == 'P')
                                 <td style="text-align: center">{{$user->gerprod->descripcion}}</td>
                                 <td style="text-align: center"></td>
@@ -135,7 +137,13 @@
                                 <td style="text-align: center">{{$user->person->apellidos}}</td>
                                 @endif
 
-                                <td style="text-align: center"></td>
+                                <td>
+                                    <div class="div-icons-solicituds">
+                                    <a href=""><span class="glyphicon glyphicon-eye-open"></span></a>
+                                    <a href=""><span class="glyphicon glyphicon-pencil"></span></a>
+                                    <a href=""><span class="glyphicon glyphicon-remove"></span></a>
+                                    </div>
+                                </td>
 
                             </tr>
                             @endforeach

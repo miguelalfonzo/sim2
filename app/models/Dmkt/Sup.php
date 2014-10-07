@@ -13,6 +13,18 @@ class Sup extends Eloquent{
     protected $table = 'DMKT_RG_SUPERVISOR';
     protected $primaryKey = 'IDSUP';
 
+
+    function searchId(){
+
+        $lastId = Sup::orderBy('idsup', 'DESC')->first();
+        if($lastId == null){
+            return 0;
+        }else{
+            return $lastId->idsup;
+        }
+
+    }
+
     public function Reps(){
 
         return $this->hasMany('Dmkt\Rm','idsup','idsup');

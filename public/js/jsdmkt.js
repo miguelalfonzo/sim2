@@ -842,12 +842,36 @@ function newSolicitude() {
 
     /** --------------------------------------------- ADMIN ------------------------------------------------- **/
 
+    $('#username input').focusout(function(){
+
+        if($(this).val()){
+        $('#username span:eq(2)').hide();
+        $('#username span:eq(0)').hide();
+        $.ajax({
+            url:server + 'search-user/'+ $(this).val(),
+            type:'GET',
+            beforeSend : function(){
+                $('#username span:eq(1)').show();
+            }
+        }).done(function(data){
+            $('#username span:eq(1)').hide();
+            if(data === 'SI'){
+                $('#username span:eq(0)').show();
+                $('#username span:eq(0)').text('Usuario ya registrado');
+            }else{
+                $('#username span:eq(2)').show();
+
+            }
+        })
+        }
+    });
     $('#register_user').on('click',function(e){
         e.preventDefault();
         var form = $('#form-register-user');
 
         var message = 'Registrando Usuario';
         var message2 = 'Usuario Registrado';
+        var message3 = 'Verifique sus campos';
 
         $.ajax({
             url: server + 'register-user',
@@ -868,6 +892,21 @@ function newSolicitude() {
                         window.location.href = server + 'register'
                     }
                     , 200);
+            }else{
+                responseUI(message3, 'red');
+                if(typeof data.username != 'undefined')
+                $('#username span:first').text(data.username[0]);
+                if(typeof data.last_name != 'undefined')
+                $('#last_name span:first').text(data.last_name[0]);
+                if(typeof data.first_name != 'undefined')
+                $('#first_name span:first').text(data.first_name[0]);
+                if(typeof data.email != 'undefined')
+                $('#email span:first').text(data.email[0]);
+                if(typeof data.password != 'undefined')
+                $('#password span:first').text(data.password[0]);
+
+
+
             }
         }).fail(function (e) {
             $.unblockUI();

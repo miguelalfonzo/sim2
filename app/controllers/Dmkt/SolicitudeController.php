@@ -63,8 +63,8 @@ class SolicitudeController extends BaseController
         })->where('tipo_moneda',1)->get();
         echo json_encode($result);
 */
-        $user = User::find(1);
-        echo json_encode($user->rm->nombres);
+        $user = User::find(3);
+        echo json_encode($user->rm);
 
         /*
         $today = getdate();
