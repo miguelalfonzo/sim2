@@ -22,6 +22,7 @@ function newSolicitude() {
     var input_file_factura = $('#input-file-factura');
     var validate = 0; // si cambia  a 1 hay errores
     var isSetImage = $('#isSetImage');
+    var amount_error_families = $('#amount_error_families');
 
     var userType = $('#typeUser').val();
     var TODOS = 0;
@@ -480,6 +481,7 @@ function newSolicitude() {
             l.start();
             var jqxhr = $.post(server + "buscar-solicitudes-"+typeUser, { idstate: $('#idState').val(), date_start: $('#date_start').val(), date_end: $('#date_end').val() })
                 .done(function (data) {
+                    console.log(data);
                     $('#table_solicitude_'+typeUser+'_wrapper').remove();
                     $('.table-solicituds-'+typeUser).append(data);
                     $('#table_solicitude_'+typeUser).dataTable({
@@ -586,7 +588,7 @@ function newSolicitude() {
 
     });
 
-    var amount_error_families = $('#amount_error_families');
+
     amount_families.on('focus', function () {
         amount_error_families.text('');
     });
@@ -800,9 +802,20 @@ function newSolicitude() {
     });
 
     var approved_solicitude = $('.approved_solicitude');
+
+
     approved_solicitude.on('click',function(e){
         e.preventDefault();
         var aux = $(this);
+        var total = 0;
+
+        //almacenamos el monto total por cada familia
+        amount_families.each(function (index, value) {
+
+            total += parseFloat($(this).val());
+        });
+
+        if (idamount.val() == Math.round(total)) {
         bootbox.confirm("¿Esta seguro que desea aprobar esta solicitud?", function (result) {
 
 
@@ -818,6 +831,13 @@ function newSolicitude() {
             }
 
         });
+        }else if (idamount.val() < Math.round(total)) {
+            amount_error_families.text('El monto distribuido supera el monto total').css('color', 'red');
+
+        } else {
+            amount_error_families.text('El monto distribuido es menor al monto total').css('color', 'red');
+
+        }
     });
     /** --------------------------------------------- CONTABILIDAD ------------------------------------------------- **/
 
@@ -842,6 +862,12 @@ function newSolicitude() {
 
     /** --------------------------------------------- ADMIN ------------------------------------------------- **/
 
+    //quita los errores
+    $('#form-register-user input').on('focus',function(){
+        var span = $(this).parent().find('.error-incomplete').text('');
+        console.log(span);
+    });
+
     $('#username input').focusout(function(){
 
         if($(this).val()){
@@ -865,10 +891,10 @@ function newSolicitude() {
         })
         }
     });
+
     $('#register_user').on('click',function(e){
         e.preventDefault();
         var form = $('#form-register-user');
-
         var message = 'Registrando Usuario';
         var message2 = 'Usuario Registrado';
         var message3 = 'Verifique sus campos';

@@ -798,16 +798,17 @@ class SolicitudeController extends BaseController
                 $solicitud_ids[] = $sol->idsolicitud;
             }
 
-
-            if ($id == 0) {
-                $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
-                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                    ->get();
-            } else {
-                $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
-                    ->where('estado', $id)
-                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                    ->get();
+            if(count($solicitud_ids)){ // si no hay solicitudes
+                if ($id == 0) {
+                    $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
+                        ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                        ->get();
+                } else {
+                    $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
+                        ->where('estado', $id)
+                        ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                        ->get();
+                }
             }
 
             $view = View::make('Dmkt.GerProd.view_solicituds_gerprod')->with('solicituds', $solicituds);

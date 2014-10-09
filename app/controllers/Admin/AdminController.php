@@ -41,6 +41,24 @@ class AdminController extends BaseController
 
     }
 
+    public function edit($id){
+
+        $users = User::all();
+        $user = User::find($id);
+        $typeUser = TypeUser::all();
+        $data = [
+            'user' => $user,
+            'types' => $typeUser,
+            'users' => $users
+        ];
+        return View::make('Admin.register_user',$data);
+
+    }
+
+    public function form_edit(){
+
+
+    }
     public function form_register(){
 
         $inputs = Input::all();

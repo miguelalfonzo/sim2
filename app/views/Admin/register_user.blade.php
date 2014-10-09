@@ -27,8 +27,25 @@
                                     <label class="col-md-4 control-label" for="textinput">Nombres</label>
 
                                     <div id="first_name" class="col-md-4">
+                                        @if(isset($user))
+                                            @if($user->type == 'R')
+                                            <input id="textinput" name="first_name" type="text" placeholder=""
+                                                   class="form-control input-md" value="{{$user->rm->nombres}}">
+                                            @elseif($user->type == 'S')
+                                            <input id="textinput" name="first_name" type="text" placeholder=""
+                                                   class="form-control input-md" value="{{$user->sup->nombres}}">
+
+                                            @elseif($user->type == 'P')
+                                            <input id="textinput" name="first_name" type="text" placeholder=""
+                                                   class="form-control input-md" value="{{$user->gerprod->descripcion}}">
+                                            @else
+                                            <input id="textinput" name="first_name" type="text" placeholder=""
+                                                   class="form-control input-md" value="$user->person->nombres">
+                                            @endif
+                                        @else
                                         <input id="textinput" name="first_name" type="text" placeholder=""
                                                class="form-control input-md">
+                                        @endif
                                         <span class="help-block error-incomplete"></span>
                                     </div>
                                 </div>
@@ -139,8 +156,8 @@
 
                                 <td>
                                     <div class="div-icons-solicituds">
-                                    <a href=""><span class="glyphicon glyphicon-eye-open"></span></a>
-                                    <a href=""><span class="glyphicon glyphicon-pencil"></span></a>
+
+                                    <a href="{{URL::to('editar').'/'.$user->id}}"><span class="glyphicon glyphicon-pencil"></span></a>
                                     <a href=""><span class="glyphicon glyphicon-remove"></span></a>
                                     </div>
                                 </td>
