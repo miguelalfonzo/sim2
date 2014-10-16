@@ -11,9 +11,8 @@
 
                     <div class="col-md-2">
                         <ul class="nav nav-pills nav-stacked admin-menu">
-                            <li class="active"><a href="#" data-target-id="home"><i class="fa fa-home fa-fw"></i>Registrar</a></li>
+                            <li class="active"><a href="{{isset($user) ? 'register' : '#'}}" data-target-id="home"><i class="fa fa-home fa-fw"></i>Registrar</a></li>
                             <li><a href="" data-target-id="widgets"><i class="fa fa-list-alt fa-fw"></i>Listar</a></li>
-                            <li><a href="" data-target-id="pages"><i class="fa fa-file-o fa-fw"></i>Pages</a></li>
 
                         </ul>
                     </div>
@@ -22,7 +21,7 @@
                             <fieldset>
 
                                 <!-- Form Name -->
-
+                                <input id="idUser" name="iduser" value="{{ isset($user) ? $user->id : null }}" type="hidden">
                                 <div class="form-group">
                                     <label class="col-md-4 control-label" for="textinput">Nombres</label>
 
@@ -40,7 +39,7 @@
                                                    class="form-control input-md" value="{{$user->gerprod->descripcion}}">
                                             @else
                                             <input id="textinput" name="first_name" type="text" placeholder=""
-                                                   class="form-control input-md" value="$user->person->nombres">
+                                                   class="form-control input-md" value="{{$user->person->nombres}}">
                                             @endif
                                         @else
                                         <input id="textinput" name="first_name" type="text" placeholder=""
@@ -51,10 +50,27 @@
                                 </div>
                                 <div class="form-group">
                                     <label  class="col-md-4 control-label" for="textinput">Apellidos</label>
-
                                     <div id="last_name" class="col-md-4">
+                                        @if(isset($user))
+                                            @if($user->type == 'R')
+                                            <input id="textinput" name="last_name" type="text" placeholder=""
+                                                   class="form-control input-md" value="{{$user->rm->apellidos}}">
+                                            @elseif($user->type == 'S')
+                                            <input id="textinput" name="last_name" type="text" placeholder=""
+                                                   class="form-control input-md" value="{{$user->sup->apellidos}}">
+
+                                            @elseif($user->type == 'P')
+                                            <input id="textinput" name="last_name" type="text" placeholder=""
+                                                   class="form-control input-md" value="{{$user->gerprod->descripcion}}">
+                                            @else
+                                            <input id="textinput" name="last_name" type="text" placeholder=""
+                                                   class="form-control input-md" value="{{$user->person->apellidos}}">
+                                            @endif
+                                        @else
+
                                         <input id="textinput" name="last_name" type="text" placeholder=""
                                                class="form-control input-md">
+                                        @endif
                                         <span class="help-block error-incomplete"></span>
                                     </div>
                                 </div>
@@ -63,8 +79,13 @@
                                     <label class="col-md-4 control-label" for="textinput">Usuario</label>
 
                                     <div id="username" class="col-md-4" style="position: relative">
+                                        @if(isset($user))
+                                        <input id="user-no" name="username" type="text" placeholder=""
+                                               class="form-control input-md" readonly value="{{isset($user) ? $user->username : ''}}">
+                                        @else
                                         <input id="" name="username" type="text" placeholder=""
-                                               class="form-control input-md">
+                                               class="form-control input-md" value="">
+                                        @endif
                                         <span class="help-block error-incomplete"></span>
                                         <span style="position: absolute; top:0.5em; right: 2em; display: none"><img src="{{URL::to('img/ajax-loader2.gif')}}"></span>
                                         <span style="position: absolute; top:0.7em; right: 2em; display: none; color: forestgreen" class="glyphicon glyphicon-ok" ></span>
@@ -76,7 +97,7 @@
 
                                     <div id="email" class="col-md-4">
                                         <input id="textinput" name="email" type="text" placeholder=""
-                                               class="form-control input-md">
+                                               class="form-control input-md" value="{{isset($user) ? $user->email : ''}}">
                                         <span class="help-block error-incomplete"></span>
                                     </div>
                                 </div>
@@ -99,7 +120,11 @@
                                     <div class="col-md-4">
                                         <select id="selectbasic" name="type" class="form-control">
                                             @foreach($types as $type)
-                                            <option value="{{$type->codigo}}">{{$type->descripcion}}</option>
+                                                @if(isset($user) && $user->type == $type->codigo)
+                                                    <option selected value="{{$type->codigo}}">{{$type->descripcion}}</option>
+                                                @else
+                                                    <option value="{{$type->codigo}}">{{$type->descripcion}}</option>
+                                                @endif
                                             @endforeach
                                         </select>
                                     </div>
@@ -110,7 +135,7 @@
                                     <label class="col-md-4 control-label" for="singlebutton"></label>
 
                                     <div class="col-md-4">
-                                        <a id="register_user" name="singlebutton" class="btn btn-primary">Registrar</a>
+                                        <a id="register_user" name="singlebutton" class="btn btn-primary">{{isset($user)? 'Guardar' : 'Registrar' }}</a>
                                     </div>
                                 </div>
 
@@ -127,6 +152,7 @@
                                 <th>Tipo</th>
                                 <th>Nombres</th>
                                 <th>Apellidos</th>
+                                <th>Activado</th>
                                 <th>Edicion</th>
                             </tr>
                             </thead>
@@ -153,12 +179,13 @@
                                 <td style="text-align: center">{{$user->person->nombres}}</td>
                                 <td style="text-align: center">{{$user->person->apellidos}}</td>
                                 @endif
-
+                                <td>@if($user->active == 1)SI @else NO @endif</td>
                                 <td>
                                     <div class="div-icons-solicituds">
 
                                     <a href="{{URL::to('editar').'/'.$user->id}}"><span class="glyphicon glyphicon-pencil"></span></a>
-                                    <a href=""><span class="glyphicon glyphicon-remove"></span></a>
+                                        <a id="" href="" class="active-user" data-iduser = '{{$user->id}}'><span class="glyphicon glyphicon-ok" style="color: forestgreen"></span></a>
+                                        <a id="" href="" class="look-user" data-iduser = '{{$user->id}}' ><span class="glyphicon glyphicon-remove" style="color: darkred"></span></a>
                                     </div>
                                 </td>
 

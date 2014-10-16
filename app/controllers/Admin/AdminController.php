@@ -29,6 +29,15 @@ use \Session;
 class AdminController extends BaseController
 {
 
+    function objectToArray($object)
+    {
+        $array = array();
+        foreach ($object as $member => $data) {
+            $array[$member] = $data;
+        }
+        return $array;
+    }
+
     public function register(){
 
         $users = User::all();
@@ -52,14 +61,84 @@ class AdminController extends BaseController
             'users' => $users
         ];
         return View::make('Admin.register_user',$data);
-
     }
 
-    public function form_edit(){
+    public function formEditUser(){
+        $inputs = Input::all();
 
+        $rules = array(
+            'username'         => 'required',
+            'first_name'             => 'required',
+            'last_name'             => 'required', // just a normal required validation
+            'email'            => 'required|email', 	// required and must be unique in the ducks table
+
+        );
+
+
+        $validator = Validator::make(Input::all(), $rules);
+        if ($validator->fails()) {
+
+            // get the error messages from the validator
+            $messages = $validator->messages();
+
+            // redirect our user back to the form with the errors from the validator
+            return $messages;
+        }else{
+
+            $iduser = $inputs['iduser'];
+
+            $user = User::where('id',$iduser);
+
+            $user->username = $inputs['username'];
+            $user->email = $inputs['email'];
+            if(isset($inputs['password']))
+            $user->password = Hash::make($inputs['password']);
+            $typeUser = $inputs['type'];
+            $user->type = $inputs['type'];
+            $data = $this->objectToArray($user);
+            $user->update($data);
+            if($typeUser == 'R'){
+                $idRm = $user->rm->idrm;
+                $rm = Rm::where('idrm',$idRm);
+                $rm->nombres = $inputs['first_name'];
+                $rm->apellidos = $inputs['last_name'];
+                $rm->iduser = $iduser;
+                $data = $this->objectToArray($rm);
+                $rm->update($data);
+            }else if($typeUser == 'S'){
+                $idSup = $user->sup->idsup;
+                $sup = Sup::where('idsup',$idSup);
+                $sup ->idsup = $sup->searchId() + 1;
+                $sup ->nombres = $inputs['first_name'];
+                $sup ->apellidos = $inputs['last_name'];
+                $sup ->iduser = $iduser;
+                $data = $this->objectToArray($sup);
+                $sup ->update($data);
+            }else if($typeUser == 'P'){
+                $idGerProd = $user->gerprod->id;
+                $ger = Manager::where('id',$idGerProd);
+                $ger->descripcion = $inputs['first_name'].' '.$inputs['last_name'];
+                $ger->iduser = $iduser;
+                $data = $this->objectToArray($ger);
+                $ger->update($data);
+
+            }else
+            {
+                $idPerson = $user->first()->person->idpersona;
+                $person = Person::where('idpersona',$idPerson);
+                $person->nombres = $inputs['first_name'];
+                $person->apellidos = $inputs['last_name'];
+                $person->iduser = $iduser;
+                $data = $this->objectToArray($person);
+                $person->update($data);
+
+            }
+
+            return  'SI';
+        }
 
     }
-    public function form_register(){
+    public function formRegister(){
 
         $inputs = Input::all();
 
@@ -132,6 +211,22 @@ class AdminController extends BaseController
 
     }
 
+    public function activeUser(){
+        $iduser = Input::get('iduser');
+        //$user = User::where('id',$iduser)->update(array('active'=>1));
+        $user = User::find($iduser);
+        $user->active = 1;
+        $user->save();
+        return 'ok';
+    }
 
+    public function lookUser(){
+        $iduser = Input::get('iduser');
+        //$user = User::where('id',$iduser)->update(array('active'=>1));
+        $user = User::find($iduser);
+        $user->active = 0;
+        $user->save();
+        return 'ok';
+    }
 
 }

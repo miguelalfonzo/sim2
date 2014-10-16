@@ -15,8 +15,12 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 /** Admin */
 
 Route::get('register', 'Admin\AdminController@register');
-Route::post('register-user', 'Admin\AdminController@form_register');
+Route::post('register-user', 'Admin\AdminController@formRegister');
 Route::get('editar/{id}','Admin\AdminController@edit');
+Route::post('edit-user','Admin\AdminController@formEditUser');
+Route::post('active-user','Admin\AdminController@activeUser');
+Route::post('look-user','Admin\AdminController@lookUser');
+
 Route::get('search-user/{username}', function ($username) {
 
     $user = User::where('username', $username)->count();

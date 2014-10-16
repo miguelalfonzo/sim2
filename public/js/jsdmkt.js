@@ -870,7 +870,7 @@ function newSolicitude() {
 
     $('#username input').focusout(function(){
 
-        if($(this).val()){
+        if($(this).val() && $(this).attr('id') != 'user-no'){
         $('#username span:eq(2)').hide();
         $('#username span:eq(0)').hide();
         $.ajax({
@@ -898,27 +898,50 @@ function newSolicitude() {
         var message = 'Registrando Usuario';
         var message2 = 'Usuario Registrado';
         var message3 = 'Verifique sus campos';
+        var message4 = 'Editando...';
+        var message5 = 'Datos Actualizados';
 
+        var url;
+        var idUser = $('#idUser').val();
+        console.log(idUser);
+        if( idUser != null){
+            url = 'edit-user';
+            console.log(url);
+        }else{
+            url = 'register-user';
+            console.log(url);
+        }
         $.ajax({
-            url: server + 'register-user',
+            url: server + url,
             type: 'POST',
             data: form.serialize(),
 
             beforeSend: function () {
-                loadingUI(message);
+                if(idUser != null){
+                    loadingUI(message4);
+                }else{
+                    loadingUI(message);
+                }
+
             }
 
         }).done(function (data) {
            // $.unblockUI();
 
             if (data == 'SI') {
-                responseUI(message2, 'green');
+                if(idUser != null){
+                    responseUI(message5, 'green');
+                }else{
+                    responseUI(message2, 'green');
+                }
+
                 setTimeout(
                     function () {
                         window.location.href = server + 'register'
                     }
                     , 200);
             }else{
+                console.log(data);
                 responseUI(message3, 'red');
                 if(typeof data.username != 'undefined')
                 $('#username span:first').text(data.username[0]);
@@ -930,8 +953,6 @@ function newSolicitude() {
                 $('#email span:first').text(data.email[0]);
                 if(typeof data.password != 'undefined')
                 $('#password span:first').text(data.password[0]);
-
-
 
             }
         }).fail(function (e) {
@@ -948,13 +969,40 @@ function newSolicitude() {
             'iDisplayLength': 7,
             "oLanguage": {
                 "sSearch": "Buscar: ",
-                "sZeroRecords": "No hay solicitudes",
-                "sInfoEmpty": "No hay solicitudes",
+                "sZeroRecords": "No hay usuarios",
+
                 "sInfo": 'Mostrando _END_ de _TOTAL_'
             }
         }
     );
 
+    $('.active-user').on('click',function(e){
+        e.preventDefault();
+        var _iduser = $(this).data('iduser');
+        bootbox.confirm("¿Esta seguro que desea activar este usuario?", function (result) {
+
+            if(result){
+                $.post(server + 'active-user',{ 'iduser' : _iduser } ,function(data){
+                    alert('usuario activado');
+                    window.location.href = server + 'register';
+                })
+            }
+        })
+    });
+
+    $('.look-user').on('click',function(e){
+        e.preventDefault();
+        var _iduser = $(this).data('iduser');
+        bootbox.confirm("¿Esta seguro que desea activar este usuario?", function (result) {
+
+            if(result){
+                $.post(server + 'look-user',{ 'iduser' : _iduser } ,function(data){
+                    alert('usuario desactivado');
+                    window.location.href = server + 'register';
+                })
+            }
+        })
+    });
 
 
     /** ------------------------------------------------------------------------------------------------------------ **/
