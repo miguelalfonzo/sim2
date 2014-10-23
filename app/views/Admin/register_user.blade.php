@@ -17,11 +17,20 @@
                         </ul>
                     </div>
                     <div class="col-md-10  admin-content" id="home">
-                        <form class="form-horizontal" id="form-register-user" method="post">
+
+
+                           <?php $errors = Session::get('errors');?>
+
+
+
+                        @if(isset($user))
+                        {{ Form::open(array('url'=>'edit-user','class'=>'form-horizontal registerUser')) }}
+                        @else
+                        {{ Form::open(array('url'=>'register-user', 'class'=>'form-horizontal registerUser')) }}
+                        @endif
+
                             <fieldset>
 
-                                <!-- Form Name -->
-                                <input id="idUser" name="iduser" value="{{ isset($user) ? $user->id : null }}" type="hidden">
                                 <div class="form-group">
                                     <label class="col-md-4 control-label" for="textinput">Nombres</label>
 
@@ -86,7 +95,7 @@
                                         <input id="" name="username" type="text" placeholder=""
                                                class="form-control input-md" value="">
                                         @endif
-                                        <span class="help-block error-incomplete"></span>
+                                        <span class="help-block error-incomplete">@if($errors){{$errors->first('username')}}@endif</span>
                                         <span style="position: absolute; top:0.5em; right: 2em; display: none"><img src="{{URL::to('img/ajax-loader2.gif')}}"></span>
                                         <span style="position: absolute; top:0.7em; right: 2em; display: none; color: forestgreen" class="glyphicon glyphicon-ok" ></span>
                                     </div>
@@ -98,7 +107,7 @@
                                     <div id="email" class="col-md-4">
                                         <input id="textinput" name="email" type="text" placeholder=""
                                                class="form-control input-md" value="{{isset($user) ? $user->email : ''}}">
-                                        <span class="help-block error-incomplete"></span>
+                                        <span class="help-block error-incomplete">@if($errors){{$errors->first('email')}}@endif</span>
                                     </div>
                                 </div>
 
@@ -129,7 +138,19 @@
                                         </select>
                                     </div>
                                 </div>
+                                @if(Session::has('message'))
+                                <div class="form-group" id="success-user">
+                                    <label class="col-md-4 control-label" for="singlebutton"></label>
+                                    <div class="col-md-4">
 
+                                        <span style="color: green">{{Session::get('message')}}</span>
+                                        <script>
+                                            $('#success-user').fadeOut(10000);
+                                        </script>
+
+                                    </div>
+                                </div>
+                                @endif
                                 <!-- Button -->
                                 <div class="form-group">
                                     <label class="col-md-4 control-label" for="singlebutton"></label>
@@ -140,7 +161,7 @@
                                 </div>
 
                             </fieldset>
-                        </form>
+                        {{ Form::close() }}
                     </div>
                     <div class="col-md-10  admin-content" id="widgets">
                         <table class="table table-striped table-bordered dataTable" id="table-users" style="width: 100%">
@@ -175,6 +196,9 @@
                                 @elseif($user->type == 'P')
                                 <td style="text-align: center">{{$user->gerprod->descripcion}}</td>
                                 <td style="text-align: center"></td>
+                                @elseif($user->type == 'A')
+                                <td style="text-align: center">admin</td>
+                                <td style="text-align: center">admin</td>
                                 @else
                                 <td style="text-align: center">{{$user->person->nombres}}</td>
                                 <td style="text-align: center">{{$user->person->apellidos}}</td>

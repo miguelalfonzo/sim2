@@ -72,6 +72,9 @@ class LoginController extends BaseController{
                 if($typeUser == 'G'){
                     return Redirect::to('show_gercom');
                 }
+                if($typeUser == 'A'){
+                    return Redirect::to('register');
+                }
 
             } else {
 

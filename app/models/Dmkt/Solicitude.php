@@ -29,7 +29,7 @@ class Solicitude extends Eloquent{
     }
     function subtype(){
 
-        return  $this->hasOne('Common\SubTypeActivity','idsubtipoactividad','idsubtipoactividad');
+        return  $this->hasOne('Common\Fondo','idfondo','idfondo');
     }
 
     function state(){

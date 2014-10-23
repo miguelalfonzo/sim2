@@ -29,7 +29,7 @@ return array(
     'ClassPreloader\\Parser\\FileVisitor' => $vendorDir . '/classpreloader/classpreloader/src/ClassPreloader/Parser/FileVisitor.php',
     'ClassPreloader\\Parser\\NodeTraverser' => $vendorDir . '/classpreloader/classpreloader/src/ClassPreloader/Parser/NodeTraverser.php',
     'Common\\State' => $baseDir . '/app/models/Common/State.php',
-    'Common\\SubTypeActivity' => $baseDir . '/app/models/Common/SubTypeActivity.php',
+    'Common\\Fondo' => $baseDir . '/app/models/Common/Fondo.php',
     'Common\\TypeActivity' => $baseDir . '/app/models/Common/TypeActivity.php',
     'Common\\TypeMoney' => $baseDir . '/app/models/Common/TypeMoney.php',
     'Crypt_AES' => $vendorDir . '/phpseclib/phpseclib/phpseclib/Crypt/AES.php',

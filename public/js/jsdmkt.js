@@ -901,16 +901,10 @@ function newSolicitude() {
         var message4 = 'Editando...';
         var message5 = 'Datos Actualizados';
 
-        var url;
-        var idUser = $('#idUser').val();
-        console.log(idUser);
-        if( idUser != null){
-            url = 'edit-user';
-            console.log(url);
-        }else{
-            url = 'register-user';
-            console.log(url);
-        }
+        $('.registerUser').submit();
+      /*
+
+
         $.ajax({
             url: server + url,
             type: 'POST',
@@ -958,7 +952,7 @@ function newSolicitude() {
         }).fail(function (e) {
             $.unblockUI();
             alert('error');
-        })
+        })*/
 
     });
     $('#table-users').dataTable({

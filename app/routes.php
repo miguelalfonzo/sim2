@@ -13,13 +13,14 @@
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /** Admin */
-
-Route::get('register', 'Admin\AdminController@register');
-Route::post('register-user', 'Admin\AdminController@formRegister');
-Route::get('editar/{id}','Admin\AdminController@edit');
-Route::post('edit-user','Admin\AdminController@formEditUser');
-Route::post('active-user','Admin\AdminController@activeUser');
-Route::post('look-user','Admin\AdminController@lookUser');
+Route::group(array('before' => 'admin'), function () {
+    Route::get('register', 'Admin\AdminController@register');
+    Route::post('register-user', 'Admin\AdminController@formRegister');
+    Route::get('editar/{id}', 'Admin\AdminController@edit');
+    Route::post('edit-user', 'Admin\AdminController@formEditUser');
+    Route::post('active-user', 'Admin\AdminController@activeUser');
+    Route::post('look-user', 'Admin\AdminController@lookUser');
+});
 
 Route::get('search-user/{username}', function ($username) {
 
@@ -28,7 +29,7 @@ Route::get('search-user/{username}', function ($username) {
     if ($user) {
         return 'SI';
 
-    }else{
+    } else {
         return 'NO';
     }
 });
@@ -59,7 +60,7 @@ Route::group(array('before' => 'rm'), function () {
     Route::get('ver-solicitud-rm/{token}', 'Dmkt\SolicitudeController@viewSolicitude');
     Route::post('cancelar-solicitud-rm', 'Dmkt\SolicitudeController@cancelSolicitude');
     Route::get('listar-solicitudes-rm/{id}', 'Dmkt\SolicitudeController@listSolicitude');
-    Route::get('getsubtypeactivities/{id}', 'Dmkt\SolicitudeController@subtypeactivity');
+    Route::get('getfondos/{id}', 'Dmkt\SolicitudeController@Fondo');
     Route::post('buscar-solicitudes-rm', 'Dmkt\SolicitudeController@searchSolicituds');
 
 });

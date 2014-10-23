@@ -159,7 +159,7 @@ class AdminController extends BaseController
             $messages = $validator->messages();
 
             // redirect our user back to the form with the errors from the validator
-            return $messages;
+            return Redirect::to('register')->with('errors', $messages);
         }else{
 
             $user = new User();
@@ -204,7 +204,7 @@ class AdminController extends BaseController
 
             }
 
-            return  'SI';
+            return Redirect::to('register')->with('message','Registro de Usuario Satisfactorio');
         }
 
 

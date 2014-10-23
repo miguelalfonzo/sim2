@@ -48,7 +48,7 @@
 </div>
 
 <!-- Type Payment -->
-<div class="form-group col-sm-6 col-md-4" >
+<div class="form-group col-sm-6 col-md-4">
 
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo de Pago</label>
 
@@ -80,6 +80,7 @@
 <div class="form-group col-sm-6 col-md-4" id="div_number_account">
 
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Nº de Cuenta</label>
+
     <div class="col-sm-12 col-md-12">
         <input id="number_account" name="number_account" type="text" placeholder=""
                value="{{isset($solicitude->numcuenta) ? $solicitude->numcuenta : null }}"
@@ -131,14 +132,28 @@
 
     <div class="col-sm-12 col-md-12">
 
+        @if(isset($solicitude))
+        <select id="sub_type_activity" name="sub_type_activity" class="form-control">
+            @foreach($fondos as $sub)
+                @if($sub->idfondo != 31 && $sub->idfondo !=1)
+                    @if($sub->idfondo == $solicitude->idfondo)
+                    <option selected value="{{$sub->idfondo}}">{{$sub->nombre}} -> {{$sub->saldo}}</option>
+                    @else
+                    <option value="{{$sub->idfondo}}">{{$sub->nombre}} -> {{$sub->saldo}}</option>
+                    @endif
+                @endif
+            @endforeach
+        </select>
+        @else
+        <select id="sub_type_activity" name="sub_type_activity" class="form-control">
+            @foreach($fondos as $sub)
+            @if($sub->idfondo != 31 && $sub->idfondo !=1)
+            <option value="{{$sub->idfondo}}">{{$sub->nombre}} -> {{$sub->saldo}}</option>
+            @endif
+            @endforeach
+        </select>
+        @endif
 
-            <select id="sub_type_activity" name="sub_type_activity" class="form-control" >
-                @foreach($subtypeactivities as $sub)
-                     @if($sub->idsubtipoactividad != 31 && $sub->idsubtipoactividad !=1)
-                     <option value="{{$sub->idsubtipoactividad}}">{{$sub->nombre}}</option>
-                     @endif
-                @endforeach
-            </select>
     </div>
 </div>
 

@@ -17,6 +17,6 @@ class TypeActivity extends Eloquent{
 
     public function subtype(){
 
-        return $this->hasMany('\Common\SubTypeActivity','idtipoactividad','idtipoactividad');
+        return $this->hasMany('\Common\Fondo','idtipoactividad','idtipoactividad');
     }
 }

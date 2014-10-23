@@ -42,9 +42,27 @@ Route::filter('auth', function () {
     }
 });
 
+Route::filter('admin',function(){
+
+    if(Auth::check()){
+        if (Auth::user()->type != 'A' && Auth::user()->type == 'S')
+            return Redirect::to('show_sup');
+        if (Auth::user()->type != 'A' && Auth::user()->type == 'P')
+            return Redirect::to('show_gerprod');
+        if (Auth::user()->type != 'A' && Auth::user()->type == 'C')
+            return Redirect::to('show_cont');
+        if (Auth::user()->type != 'A' && Auth::user()->type == 'G')
+            return Redirect::to('show_gercom');
+        if (Auth::user()->type != 'A' && Auth::user()->type == 'T')
+            return Redirect::to('show_test');
+    }
+});
+
 Route::filter('rm', function () {
 
     if (Auth::check()) {
+        if (Auth::user()->type != 'S' && Auth::user()->type == 'R')
+            return Redirect::to('show_rm');
         if (Auth::user()->type != 'R' && Auth::user()->type == 'S')
             return Redirect::to('show_sup');
         if (Auth::user()->type != 'R' && Auth::user()->type == 'P')
@@ -55,7 +73,8 @@ Route::filter('rm', function () {
             return Redirect::to('show_gercom');
         if (Auth::user()->type != 'R' && Auth::user()->type == 'T')
             return Redirect::to('show_test');
-
+        if (Auth::user()->type != 'R' && Auth::user()->type == 'A')
+            return Redirect::to('register');
     } else {
 
         return Redirect::to('login');
@@ -74,6 +93,8 @@ Route::filter('sup', function () {
             return Redirect::to('show_tes');
         if (Auth::user()->type != 'S' && Auth::user()->type == 'G')
             return Redirect::to('show_gercom');
+        if (Auth::user()->type != 'R' && Auth::user()->type == 'A')
+            return Redirect::to('register');
 
     } else {
 
@@ -93,6 +114,8 @@ Route::filter('gerprod', function () {
             return Redirect::to('show_tes');
         if (Auth::user()->type != 'P' && Auth::user()->type == 'G')
             return Redirect::to('show_gercom');
+        if (Auth::user()->type != 'R' && Auth::user()->type == 'A')
+            return Redirect::to('register');
     } else {
 
         return Redirect::to('login');
@@ -111,6 +134,8 @@ Route::filter('cont', function () {
             return Redirect::to('show_gercom');
         if (Auth::user()->type != 'C' && Auth::user()->type == 'T' )
             return Redirect::to('show_tes');
+        if (Auth::user()->type != 'R' && Auth::user()->type == 'A')
+            return Redirect::to('register');
     } else {
 
         return Redirect::to('login');
@@ -129,6 +154,8 @@ Route::filter('gercom', function () {
             return Redirect::to('show_tes');
         if (Auth::user()->type != 'G' && Auth::user()->type == 'C' )
             return Redirect::to('show_cont');
+        if (Auth::user()->type != 'R' && Auth::user()->type == 'A')
+            return Redirect::to('register');
     } else {
 
         return Redirect::to('login');

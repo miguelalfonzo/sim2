@@ -134,12 +134,12 @@
 
             <select id="sub_type_activity" name="sub_type_activity" class="form-control">
 
-            @foreach($subtypeactivities as $sub)
-                @if(isset($solicitude->idsubtipoactividad) && $sub->idsubtipoactividad == $solicitude->subtype->idsubtipoactividad)
-                    <option selected value="{{$sub->idsubtipoactividad}}">{{$sub->nombre}}</option>
+            @foreach($fondos as $sub)
+                @if(isset($solicitude->idfondo) && $sub->idfondo == $solicitude->subtype->idfondo)
+                    <option selected value="{{$sub->idfondo}}">{{$sub->nombre}}</option>
                 @else
-                    @if($sub->idsubtipoactividad == 1 || $sub->idsubtipoactividad == 31) <!-- AREK Y OTROS -->
-                    <option value="{{$sub->idsubtipoactividad}}">{{$sub->nombre}}</option>
+                    @if($sub->idfondo == 1 || $sub->idfondo == 31) <!-- AREK Y OTROS -->
+                    <option value="{{$sub->idfondo}}">{{$sub->nombre}}</option>
                     @endif
 
                 @endif
