@@ -898,9 +898,9 @@ class SolicitudeController extends BaseController
             $solicitud_ids = [];
             $solicituds = $user->GerProd->solicituds;
             foreach ($solicituds as $sol) {
-                $solicitud_ids[] = $sol->idsolicitud;
+                $solicitud_ids[] = $sol->idsolicitud; // jalo los ids de las solicitudes pertenecientes al gerente de producto
             }
-
+            $solicitud_ids[] = 0; // el cero va para que tenga al menos con que comparar, para que no salga error.
             if ($start != null && $end != null) {
                 if ($estado != 10) {
                     $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)

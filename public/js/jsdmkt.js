@@ -479,7 +479,7 @@ function newSolicitude() {
             date_end.attr('placeholder', '');
             var l = Ladda.create(search);
             l.start();
-            var jqxhr = $.post(server + "buscar-solicitudes-"+typeUser, { idstate: $('#idState').val(), date_start: $('#date_start').val(), date_end: $('#date_end').val() })
+            var jqxhr = $.post(server + "buscar-solicitudes-"+typeUser, { idstate: $('#idState').val(), date_start: $('#date_start').val(), date_end: $('#date_end').val() ,_token : document.getElementsByName('_token')[0].value })
                 .done(function (data) {
                     console.log(data);
                     $('#table_solicitude_'+typeUser+'_wrapper').remove();

@@ -26,7 +26,7 @@ class LoginController extends BaseController{
     {
         // validate the info, create rules for the inputs
         $rules = array(
-            'email'    => 'required|email', // make sure the email is an actual email
+            'username'    => 'required', // make sure the email is an actual email
             'password' => 'required|min:3' // password can only be alphanumeric and has to be greater than 3 characters
         );
 
@@ -43,16 +43,13 @@ class LoginController extends BaseController{
 
             // create our user data for the authentication
             $userdata = array(
-                'email' 	=> Input::get('email'),
+                'username' 	=> Input::get('username'),
                 'password' 	=> Input::get('password')
             );
 
-            // attempt to do the login
-           // var_dump($userdata);
-            //var_dump(Auth::attempt($userdata));die;
             if (Auth::attempt($userdata)) {
                 $user = User::where('email',Input::get('email'))->first();
-                Auth::login($user);
+                //Auth::login($user);
                 $typeUser = Auth::user()->type;
                 if($typeUser == 'R'){
                     return Redirect::to('show_rm');

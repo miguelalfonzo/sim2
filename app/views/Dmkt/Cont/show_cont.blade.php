@@ -9,6 +9,7 @@
             <div class="panel-body table-solicituds-cont">
                 <div class="col-md-12" style="padding: 0">
                     <form method="post" action="" class="">
+                        {{Form::token()}}
                         <div class="form-group col-sm-3 col-md-2" style="padding: 0">
                             <div class="">
                                 <select id="idState" name="idstate"

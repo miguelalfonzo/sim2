@@ -9,6 +9,7 @@
             <div class="panel-body table-solicituds-sup">
                 <div class="col-md-12" style="padding: 0">
                     <form method="post" action="" class="">
+                        {{Form::token()}}
                         <input type="hidden" id="state_view" value="{{isset($state) ? $state : PENDIENTE}}">
                         <div class="form-group col-sm-3 col-md-2" style="padding: 0">
                             <div class="">

@@ -17,14 +17,11 @@
                         </ul>
                     </div>
                     <div class="col-md-10  admin-content" id="home">
-
-
                            <?php $errors = Session::get('errors');?>
-
-
 
                         @if(isset($user))
                         {{ Form::open(array('url'=>'edit-user','class'=>'form-horizontal registerUser')) }}
+                        <input type="hidden" name="iduser" value="{{$user->id}}">
                         @else
                         {{ Form::open(array('url'=>'register-user', 'class'=>'form-horizontal registerUser')) }}
                         @endif
@@ -155,9 +152,14 @@
                                 <div class="form-group">
                                     <label class="col-md-4 control-label" for="singlebutton"></label>
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-1">
                                         <a id="register_user" name="singlebutton" class="btn btn-primary">{{isset($user)? 'Guardar' : 'Registrar' }}</a>
                                     </div>
+                                    @if(isset($user))
+                                    <div class="col-md-1">
+                                        <a href="{{URL::to('register')}}" id="register_user" name="singlebutton" class="btn btn-primary">Cancelar</a>
+                                    </div>
+                                    @endif
                                 </div>
 
                             </fieldset>

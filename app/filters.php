@@ -12,7 +12,12 @@
 */
 
 App::before(function ($request) {
-    //
+    /*
+    if ((time() - Illuminate\Session\Store::activity()) > (Config::get('session.lifetime') * 60)) {
+        return Redirect::to('recharge');
+    }*/
+
+
 });
 
 
@@ -42,9 +47,12 @@ Route::filter('auth', function () {
     }
 });
 
-Route::filter('admin',function(){
+Route::filter('admin', function () {
 
-    if(Auth::check()){
+    if (Auth::check()) {
+
+        if (Auth::user()->type != 'S' && Auth::user()->type == 'R')
+            return Redirect::to('show_rm');
         if (Auth::user()->type != 'A' && Auth::user()->type == 'S')
             return Redirect::to('show_sup');
         if (Auth::user()->type != 'A' && Auth::user()->type == 'P')
@@ -55,14 +63,16 @@ Route::filter('admin',function(){
             return Redirect::to('show_gercom');
         if (Auth::user()->type != 'A' && Auth::user()->type == 'T')
             return Redirect::to('show_test');
+
+    } else {
+        return Redirect::to('login');
     }
 });
 
 Route::filter('rm', function () {
 
     if (Auth::check()) {
-        if (Auth::user()->type != 'S' && Auth::user()->type == 'R')
-            return Redirect::to('show_rm');
+
         if (Auth::user()->type != 'R' && Auth::user()->type == 'S')
             return Redirect::to('show_sup');
         if (Auth::user()->type != 'R' && Auth::user()->type == 'P')
@@ -126,13 +136,13 @@ Route::filter('cont', function () {
     if (Auth::check()) {
         if (Auth::user()->type != 'C' && Auth::user()->type == 'R')
             return Redirect::to('show_rm');
-        if (Auth::user()->type != 'C' && Auth::user()->type == 'S' )
+        if (Auth::user()->type != 'C' && Auth::user()->type == 'S')
             return Redirect::to('show_sup');
-        if (Auth::user()->type != 'C' && Auth::user()->type == 'P' )
+        if (Auth::user()->type != 'C' && Auth::user()->type == 'P')
             return Redirect::to('show_gerprod');
-        if (Auth::user()->type != 'C' && Auth::user()->type == 'G' )
+        if (Auth::user()->type != 'C' && Auth::user()->type == 'G')
             return Redirect::to('show_gercom');
-        if (Auth::user()->type != 'C' && Auth::user()->type == 'T' )
+        if (Auth::user()->type != 'C' && Auth::user()->type == 'T')
             return Redirect::to('show_tes');
         if (Auth::user()->type != 'R' && Auth::user()->type == 'A')
             return Redirect::to('register');
@@ -146,13 +156,13 @@ Route::filter('gercom', function () {
     if (Auth::check()) {
         if (Auth::user()->type != 'G' && Auth::user()->type == 'R')
             return Redirect::to('show_rm');
-        if (Auth::user()->type != 'G' && Auth::user()->type == 'S' )
+        if (Auth::user()->type != 'G' && Auth::user()->type == 'S')
             return Redirect::to('show_sup');
-        if (Auth::user()->type != 'G' && Auth::user()->type == 'P' )
+        if (Auth::user()->type != 'G' && Auth::user()->type == 'P')
             return Redirect::to('show_gerprod');
-        if (Auth::user()->type != 'G' && Auth::user()->type == 'T' )
+        if (Auth::user()->type != 'G' && Auth::user()->type == 'T')
             return Redirect::to('show_tes');
-        if (Auth::user()->type != 'G' && Auth::user()->type == 'C' )
+        if (Auth::user()->type != 'G' && Auth::user()->type == 'C')
             return Redirect::to('show_cont');
         if (Auth::user()->type != 'R' && Auth::user()->type == 'A')
             return Redirect::to('register');

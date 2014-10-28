@@ -35,14 +35,11 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
     }
     function person(){
         return $this->hasOne('Common\Person','iduser','id');
-
     }
     public function Rm(){
-
         return $this->hasOne('Dmkt\Rm','iduser','id');
     }
     public function Sup(){
-
         return $this->hasOne('Dmkt\Sup','iduser','id');
     }
 
@@ -55,7 +52,6 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
     }
 
     public function type(){
-
         return $this->hasOne('Common\TypeUser','codigo','type');
     }
 }

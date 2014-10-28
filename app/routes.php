@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /** Admin */
 Route::group(array('before' => 'admin'), function () {
+
+
     Route::get('register', 'Admin\AdminController@register');
     Route::post('register-user', 'Admin\AdminController@formRegister');
     Route::get('editar/{id}', 'Admin\AdminController@edit');
@@ -46,7 +48,9 @@ Route::get('logout', array('uses' => 'Dmkt\LoginController@doLogout'));
 Route::get('/', function () {
     return View::make('hello');
 });
-
+Route::get('recharge', function(){
+    return View::make('recharge');
+});
 Route::get('getclients', 'Dmkt\SolicitudeController@getClients');
 
 /** Auth */

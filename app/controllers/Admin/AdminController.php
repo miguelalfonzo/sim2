@@ -87,7 +87,7 @@ class AdminController extends BaseController
 
             $iduser = $inputs['iduser'];
 
-            $user = User::where('id',$iduser);
+            $user = User::where('id',$iduser)->first();
 
             $user->username = $inputs['username'];
             $user->email = $inputs['email'];
@@ -95,8 +95,9 @@ class AdminController extends BaseController
             $user->password = Hash::make($inputs['password']);
             $typeUser = $inputs['type'];
             $user->type = $inputs['type'];
-            $data = $this->objectToArray($user);
-            $user->update($data);
+            //$data = $this->objectToArray($user);
+            //$user->update($data);
+            $user->save();
             if($typeUser == 'R'){
                 $idRm = $user->rm->idrm;
                 $rm = Rm::where('idrm',$idRm);
@@ -106,15 +107,17 @@ class AdminController extends BaseController
                 $data = $this->objectToArray($rm);
                 $rm->update($data);
             }else if($typeUser == 'S'){
+
                 $idSup = $user->sup->idsup;
                 $sup = Sup::where('idsup',$idSup);
-                $sup ->idsup = $sup->searchId() + 1;
                 $sup ->nombres = $inputs['first_name'];
                 $sup ->apellidos = $inputs['last_name'];
                 $sup ->iduser = $iduser;
                 $data = $this->objectToArray($sup);
                 $sup ->update($data);
+
             }else if($typeUser == 'P'){
+
                 $idGerProd = $user->gerprod->id;
                 $ger = Manager::where('id',$idGerProd);
                 $ger->descripcion = $inputs['first_name'].' '.$inputs['last_name'];
@@ -134,14 +137,13 @@ class AdminController extends BaseController
 
             }
 
-            return  'SI';
+            return Redirect::to('register')->with('message','Actualizacion de Usuario Satisfactorio');
         }
 
     }
     public function formRegister(){
 
         $inputs = Input::all();
-
         $rules = array(
             'username'         => 'required|unique:users',
             'first_name'             => 'required',
@@ -150,7 +152,7 @@ class AdminController extends BaseController
             'password'         => 'required',
 
         );
-
+        //dd($inputs);
 
         $validator = Validator::make(Input::all(), $rules);
         if ($validator->fails()) {

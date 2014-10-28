@@ -31,12 +31,14 @@
                     <a id="token-a" href="#"><span class="glyphicon glyphicon-book"></span></a>
                     <form id="form-token" action="{{URL::to('generar-asiento-solicitud')}}" method="POST">
                         <input type="hidden" name="token" value="{{$solicitude->token}}">
+                        {{Form::token()}}
                     </form>
                 @endif
                 @if($solicitude->estado == REGISTRADO)
                     <a id="token-a" href="#"><span class="glyphicon glyphicon-book"></span></a>
                     <form id="form-token" action="{{URL::to('generar-asiento-expense')}}" method="POST">
                         <input type="hidden" name="token" value="{{$solicitude->token}}">
+                        {{Form::token()}}
                     </form>
                 @endif
             </div>

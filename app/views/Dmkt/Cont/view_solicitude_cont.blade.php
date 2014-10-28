@@ -7,6 +7,8 @@
             </div>
             <div class="panel-body">
                 <form id="form_enable_deposit" class="" method="post" action="{{URL::to('enable-deposit')}}">
+
+                    {{Form::token()}}
                     <div class="form-group col-sm-6 col-md-4">
                         <label class="col-sm-8 col-md-8 control-label" for="textinput">Código de Solicitud</label>
                         <div class="col-sm-12 col-md-12">

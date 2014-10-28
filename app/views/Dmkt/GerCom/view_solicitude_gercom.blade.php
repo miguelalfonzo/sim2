@@ -9,6 +9,7 @@
     </div>
     <div class="panel-body">
         <form id="form_make_activity" class="" method="post" action="">
+        {{Form::token()}}
         <input type="hidden" value="{{$solicitude->token}}" name="token">
 
             <input id="textinput" name="idsolicitude" type="hidden" placeholder=""
