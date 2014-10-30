@@ -20,10 +20,10 @@
                            <?php $errors = Session::get('errors');?>
 
                         @if(isset($user))
-                        {{ Form::open(array('url'=>'edit-user','class'=>'form-horizontal registerUser')) }}
+                        {{ Form::open(['url'=>'edit-user','class'=>'form-horizontal registerUser']) }}
                         <input type="hidden" name="iduser" value="{{$user->id}}">
                         @else
-                        {{ Form::open(array('url'=>'register-user', 'class'=>'form-horizontal registerUser')) }}
+                        {{ Form::open(['url'=>'register-user', 'class'=>'form-horizontal registerUser']) }}
                         @endif
 
                             <fieldset>
@@ -210,8 +210,9 @@
                                     <div class="div-icons-solicituds">
 
                                     <a href="{{URL::to('editar').'/'.$user->id}}"><span class="glyphicon glyphicon-pencil"></span></a>
-                                        <a id="" href="" class="active-user" data-iduser = '{{$user->id}}'><span class="glyphicon glyphicon-ok" style="color: forestgreen"></span></a>
-                                        <a id="" href="" class="look-user" data-iduser = '{{$user->id}}' ><span class="glyphicon glyphicon-remove" style="color: darkred"></span></a>
+
+                                        <a id="" href="" class="active-user" data-iduser = '{{$user->id}}' data-token='{{ csrf_token()}}' ><span class="glyphicon glyphicon-ok" style="color: forestgreen"></span></a>
+                                        <a id="" href="" class="look-user" data-iduser = '{{$user->id}}' data-token= '{{ csrf_token()}}'><span class="glyphicon glyphicon-remove" style="color: darkred"></span></a>
                                     </div>
                                 </td>
 
@@ -221,12 +222,7 @@
 
                         </table>
                     </div>
-                    <div class="col-md-10 well admin-content" id="pages">
-                        Pages
-                    </div>
-
-
-            </div>
+       </div>
 
         </div>
     </div>

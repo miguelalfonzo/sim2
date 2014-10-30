@@ -47,10 +47,11 @@ class LoginController extends BaseController{
                 'password' 	=> Input::get('password')
             );
 
-            if (Auth::attempt($userdata)) {
+            if (Auth::attempt($userdata) && Auth::user()->active == 1 ) {
                 $user = User::where('email',Input::get('email'))->first();
                 //Auth::login($user);
                 $typeUser = Auth::user()->type;
+
                 if($typeUser == 'R'){
                     return Redirect::to('show_rm');
                 }

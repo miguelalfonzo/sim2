@@ -24,6 +24,7 @@ function newSolicitude() {
     var isSetImage = $('#isSetImage');
     var amount_error_families = $('#amount_error_families');
 
+
     var userType = $('#typeUser').val();
     var TODOS = 0;
     var PENDIENTE =1 ;
@@ -892,67 +893,62 @@ function newSolicitude() {
         }
     });
 
+    $('#first_name input').on('focus',function(){
+        $('#first_name span').text('');
+    });
+    $('#last_name input').on('focus',function(){
+        $('#last_name span').text('');
+    });
+    $('#username input').on('focus', function(){
+        $('#username span').text('');
+    });
+    $('#email input').on('focus', function(){
+        $('#email span').text('');
+    });
+    $('#password input').on('focus',function(){
+        $('#password span').text('');
+    });
+
     $('#register_user').on('click',function(e){
         e.preventDefault();
-        var form = $('#form-register-user');
-        var message = 'Registrando Usuario';
-        var message2 = 'Usuario Registrado';
-        var message3 = 'Verifique sus campos';
-        var message4 = 'Editando...';
-        var message5 = 'Datos Actualizados';
+        var regex_email = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        console.log(regex_email.test($('#email input').val()));
 
-        $('.registerUser').submit();
-      /*
+        if(!$('#first_name input').val()){
+            $('#first_name span').text('Campo Obligatorio');
+           validate = 1;
+           console.log(validate);
+       }
+        if(!$('#last_name input').val()){
+            $('#last_name span').text('Campo Obligatorio');
+            validate = 1;
+            console.log(validate);
+        }
+        if(!$('#username input').val()){
+            $('#username span').text('Campo Obligatorio');
+            validate = 1;
+            console.log(validate);
+        }
+        if(!$('#email input').val()){
+            $('#email span').text('Campo Obligatorio');
 
+            validate = 1;
+            console.log(validate);
+        }else if(!regex_email.test($('#email input').val())){;
+            $('#email span').text('Email Invalido');
+        }
+        if(!$('#password input').val()){
+            $('#password span').text('Campo Obligatorio');
+            validate = 1;
+            console.log(validate);
+        }
 
-        $.ajax({
-            url: server + url,
-            type: 'POST',
-            data: form.serialize(),
+        if(validate = 0){
+            $('.registerUser').submit();
+        }else{
+            console.log('error');
+        }
 
-            beforeSend: function () {
-                if(idUser != null){
-                    loadingUI(message4);
-                }else{
-                    loadingUI(message);
-                }
-
-            }
-
-        }).done(function (data) {
-           // $.unblockUI();
-
-            if (data == 'SI') {
-                if(idUser != null){
-                    responseUI(message5, 'green');
-                }else{
-                    responseUI(message2, 'green');
-                }
-
-                setTimeout(
-                    function () {
-                        window.location.href = server + 'register'
-                    }
-                    , 200);
-            }else{
-                console.log(data);
-                responseUI(message3, 'red');
-                if(typeof data.username != 'undefined')
-                $('#username span:first').text(data.username[0]);
-                if(typeof data.last_name != 'undefined')
-                $('#last_name span:first').text(data.last_name[0]);
-                if(typeof data.first_name != 'undefined')
-                $('#first_name span:first').text(data.first_name[0]);
-                if(typeof data.email != 'undefined')
-                $('#email span:first').text(data.email[0]);
-                if(typeof data.password != 'undefined')
-                $('#password span:first').text(data.password[0]);
-
-            }
-        }).fail(function (e) {
-            $.unblockUI();
-            alert('error');
-        })*/
 
     });
     $('#table-users').dataTable({
@@ -973,10 +969,11 @@ function newSolicitude() {
     $('.active-user').on('click',function(e){
         e.preventDefault();
         var _iduser = $(this).data('iduser');
+        var _token = $(this).data('token');
         bootbox.confirm("¿Esta seguro que desea activar este usuario?", function (result) {
 
             if(result){
-                $.post(server + 'active-user',{ 'iduser' : _iduser } ,function(data){
+                $.post(server + 'active-user',{ 'iduser' : _iduser , '_token' :_token } ,function(data){
                     alert('usuario activado');
                     window.location.href = server + 'register';
                 })
@@ -987,10 +984,13 @@ function newSolicitude() {
     $('.look-user').on('click',function(e){
         e.preventDefault();
         var _iduser = $(this).data('iduser');
-        bootbox.confirm("¿Esta seguro que desea activar este usuario?", function (result) {
+        var _token  = $(this).data('token');
+        console.log(_token);
+
+        bootbox.confirm("¿Esta seguro que desea desactivar este usuario?", function (result) {
 
             if(result){
-                $.post(server + 'look-user',{ 'iduser' : _iduser } ,function(data){
+                $.post(server + 'look-user',{ 'iduser' : _iduser , '_token' : _token} ,function(data){
                     alert('usuario desactivado');
                     window.location.href = server + 'register';
                 })

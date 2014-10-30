@@ -13,9 +13,9 @@ use Dmkt\Rm;
 use Dmkt\Sup;
 use Dmkt\Manager;
 
+use Symfony\Component\Console\Input\Input;
 use \View;
 use \DB;
-use \Input;
 use \Redirect;
 use \Auth;
 use \Validator;
@@ -219,6 +219,7 @@ class AdminController extends BaseController
         $user = User::find($iduser);
         $user->active = 1;
         $user->save();
+
         return 'ok';
     }
 

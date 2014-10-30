@@ -12,11 +12,6 @@
 */
 
 App::before(function ($request) {
-    /*
-    if ((time() - Illuminate\Session\Store::activity()) > (Config::get('session.lifetime') * 60)) {
-        return Redirect::to('recharge');
-    }*/
-
 
 });
 
@@ -51,6 +46,7 @@ Route::filter('admin', function () {
 
     if (Auth::check()) {
 
+
         if (Auth::user()->type != 'S' && Auth::user()->type == 'R')
             return Redirect::to('show_rm');
         if (Auth::user()->type != 'A' && Auth::user()->type == 'S')
@@ -73,18 +69,19 @@ Route::filter('rm', function () {
 
     if (Auth::check()) {
 
-        if (Auth::user()->type != 'R' && Auth::user()->type == 'S')
-            return Redirect::to('show_sup');
-        if (Auth::user()->type != 'R' && Auth::user()->type == 'P')
-            return Redirect::to('show_gerprod');
-        if (Auth::user()->type != 'R' && Auth::user()->type == 'C')
-            return Redirect::to('show_cont');
-        if (Auth::user()->type != 'R' && Auth::user()->type == 'G')
-            return Redirect::to('show_gercom');
-        if (Auth::user()->type != 'R' && Auth::user()->type == 'T')
-            return Redirect::to('show_test');
-        if (Auth::user()->type != 'R' && Auth::user()->type == 'A')
-            return Redirect::to('register');
+            if (Auth::user()->type != 'R' && Auth::user()->type == 'S')
+                return Redirect::to('show_sup');
+            if (Auth::user()->type != 'R' && Auth::user()->type == 'P')
+                return Redirect::to('show_gerprod');
+            if (Auth::user()->type != 'R' && Auth::user()->type == 'C')
+                return Redirect::to('show_cont');
+            if (Auth::user()->type != 'R' && Auth::user()->type == 'G')
+                return Redirect::to('show_gercom');
+            if (Auth::user()->type != 'R' && Auth::user()->type == 'T')
+                return Redirect::to('show_test');
+            if (Auth::user()->type != 'R' && Auth::user()->type == 'A')
+                return Redirect::to('register');
+
     } else {
 
         return Redirect::to('login');
