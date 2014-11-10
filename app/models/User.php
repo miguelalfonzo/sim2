@@ -54,4 +54,9 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
     public function type(){
         return $this->hasOne('Common\TypeUser','codigo','type');
     }
+
+    public function apps(){
+        return $this->hasMany('Common\UserApp' ,'iduser','id');
+    }
+
 }

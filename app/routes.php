@@ -10,7 +10,7 @@
 | and give it the Closure to execute when that URI is requested.
 |
 */
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+
 
 /** Admin */
 Route::group(array('before' => 'admin'), function () {

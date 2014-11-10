@@ -29,7 +29,14 @@ use \Illuminate\Database\Query\Builder;
 
 class SolicitudeController extends BaseController
 {
+    public function __construct()
+    {
+        parent::__construct();
 
+        $this->beforeFilter('active-user');
+
+
+    }
 
     function objectToArray($object)
     {
@@ -205,7 +212,6 @@ class SolicitudeController extends BaseController
             foreach ($clients as $client) {
                 $cod = explode(' ', $client);
                 $solicitude_clients = new SolicitudeClient;
-
                 $solicitude_clients->idsolicitud_clientes = $solicitude_clients->searchId() + 1;
                 $solicitude_clients->idsolicitud = $solicitude->searchId();
                 $solicitude_clients->idcliente = $cod[0];

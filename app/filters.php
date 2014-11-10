@@ -173,6 +173,11 @@ Route::filter('auth.basic', function () {
     return Auth::basic();
 });
 
+Route::filter('active-user',function(){
+    if(Auth::user()->active == 0) {
+        return Redirect::to('login');
+    }
+});
 /*
 |--------------------------------------------------------------------------
 | Guest Filter

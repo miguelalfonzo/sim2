@@ -21,7 +21,7 @@
 
                         @if(isset($user))
                         {{ Form::open(['url'=>'edit-user','class'=>'form-horizontal registerUser']) }}
-                        <input type="hidden" name="iduser" value="{{$user->id}}">
+                        <input id="iduser" type="hidden" name="iduser" value="{{$user->id}}" >
                         @else
                         {{ Form::open(['url'=>'register-user', 'class'=>'form-horizontal registerUser']) }}
                         @endif
@@ -107,9 +107,18 @@
                                         <span class="help-block error-incomplete">@if($errors){{$errors->first('email')}}@endif</span>
                                     </div>
                                 </div>
+                                <div class="form-group" id="div-change-password">
+                                  <label class="col-md-4 control-label" for="checkboxes">Cambiar contraseña</label>
+                                  <div class="col-md-4">
+                                    <label class="checkbox-inline" for="checkboxes-0">
+                                      <input id="change-password" type="checkbox" name="checkboxes" id="checkboxes-0" value="1">
+                                      Si
+                                    </label>
 
+                                  </div>
+                                </div>
                                 <!-- Password input-->
-                                <div class="form-group">
+                                <div class="form-group" id="div-password">
                                     <label class="col-md-4 control-label" for="passwordinput">Password</label>
 
                                     <div id="password"  class="col-md-4">

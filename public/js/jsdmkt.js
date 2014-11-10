@@ -526,7 +526,7 @@ function newSolicitude() {
         bootbox.confirm("¿Esta seguro que desea cancelar esta solicitud?", function (result) {
             if (result) {
 
-                $.post(server + 'cancelar-solicitud-rm', {idsolicitude: $(aux).attr('data-idsolicitude')})
+                $.post(server + 'cancelar-solicitud-rm', {idsolicitude: $(aux).attr('data-idsolicitude') ,_token :$(aux).attr('data-token')})
                     .done(function (data) {
                         console.log(data);
 
@@ -937,7 +937,7 @@ function newSolicitude() {
         }else if(!regex_email.test($('#email input').val())){;
             $('#email span').text('Email Invalido');
         }
-        if(!$('#password input').val()){
+        if(!$('#password input').val() && $('#iduser').val()){
             $('#password span').text('Campo Obligatorio');
             validate = 1;
             console.log(validate);
@@ -986,7 +986,6 @@ function newSolicitude() {
         var _iduser = $(this).data('iduser');
         var _token  = $(this).data('token');
         console.log(_token);
-
         bootbox.confirm("¿Esta seguro que desea desactivar este usuario?", function (result) {
 
             if(result){
@@ -998,6 +997,19 @@ function newSolicitude() {
         })
     });
 
+   $('#div-change-password').hide();
+    if($('#iduser').val()){
+        $('#div-change-password').show();
+        $('#div-password').hide();
+        $('#change-password').on('change',function(){
+            if($(this).prop('checked')){
+                $('#div-password').show();
+            }else{
+                $('#div-password').hide();
+            }
+        });
+
+    }
 
     /** ------------------------------------------------------------------------------------------------------------ **/
 

@@ -48,31 +48,41 @@ class LoginController extends BaseController{
             );
 
             if (Auth::attempt($userdata) && Auth::user()->active == 1 ) {
-                $user = User::where('email',Input::get('email'))->first();
-                //Auth::login($user);
-                $typeUser = Auth::user()->type;
+                $apps =  Auth::user()->apps;
+                $aplication = false;
+                foreach($apps as  $app){
+                    if($app->idapp == 2) // 2 : Aplicacion descargo de marketing
+                        $aplication = true;
+                }
+                if($aplication){
+                    $typeUser = Auth::user()->type;
 
-                if($typeUser == 'R'){
-                    return Redirect::to('show_rm');
+                    if($typeUser == 'R'){
+                        return Redirect::to('show_rm');
+                    }
+                    if($typeUser == 'S'){
+                        return Redirect::to('show_sup');
+                    }
+                    if($typeUser == 'P'){
+                        return Redirect::to('show_gerprod');
+                    }
+                    if($typeUser == 'C'){
+                        return Redirect::to('show_cont');
+                    }
+                    if($typeUser == 'T'){
+                        return Redirect::to('show_tes');
+                    }
+                    if($typeUser == 'G'){
+                        return Redirect::to('show_gercom');
+                    }
+                    if($typeUser == 'A'){
+                        return Redirect::to('register');
+                    }
+                }else{
+
+                    return Redirect::to('login'); // no tiene permiso para esta aplicacion
                 }
-                if($typeUser == 'S'){
-                    return Redirect::to('show_sup');
-                }
-                if($typeUser == 'P'){
-                    return Redirect::to('show_gerprod');
-                }
-                if($typeUser == 'C'){
-                    return Redirect::to('show_cont');
-                }
-                if($typeUser == 'T'){
-                    return Redirect::to('show_tes');
-                }
-                if($typeUser == 'G'){
-                    return Redirect::to('show_gercom');
-                }
-                if($typeUser == 'A'){
-                    return Redirect::to('register');
-                }
+
 
             } else {
 
