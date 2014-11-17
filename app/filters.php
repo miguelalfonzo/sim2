@@ -149,6 +149,26 @@ Route::filter('cont', function () {
     }
 });
 
+Route::filter('tes', function () {
+    if (Auth::check()) {
+        if (Auth::user()->type != 'T' && Auth::user()->type == 'R')
+            return Redirect::to('show_rm');
+        if (Auth::user()->type != 'T' && Auth::user()->type == 'S')
+            return Redirect::to('show_sup');
+        if (Auth::user()->type != 'T' && Auth::user()->type == 'P')
+            return Redirect::to('show_gerprod');
+        if (Auth::user()->type != 'T' && Auth::user()->type == 'G')
+            return Redirect::to('show_gercom');
+        if (Auth::user()->type != 'T' && Auth::user()->type == 'C')
+            return Redirect::to('show_cont');
+        if (Auth::user()->type != 'R' && Auth::user()->type == 'A')
+            return Redirect::to('register');
+    } else {
+
+        return Redirect::to('login');
+    }
+});
+
 Route::filter('gercom', function () {
     if (Auth::check()) {
         if (Auth::user()->type != 'G' && Auth::user()->type == 'R')
