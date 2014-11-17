@@ -393,7 +393,7 @@ function newSolicitude() {
             console.log(validate);
 
             if (validate == 0) {
-
+                console.log('entro');
                 var form = $('#form-register-solicitude');
                 var formData = new FormData(form[0]);
                 var rute = form.attr('action');
