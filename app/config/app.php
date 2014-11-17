@@ -124,7 +124,8 @@ return array(
 		'Illuminate\Workbench\WorkbenchServiceProvider',
 		'yajra\Oci8\Oci8ServiceProvider',
         'Intervention\Image\ImageServiceProvider',
-        'Thujohn\Pdf\PdfServiceProvider'
+        'Thujohn\Pdf\PdfServiceProvider',
+        'Maatwebsite\Excel\ExcelServiceProvider',
 	),
 
 	/*
@@ -192,7 +193,8 @@ return array(
 		'Validator'         => 'Illuminate\Support\Facades\Validator',
 		'View'              => 'Illuminate\Support\Facades\View',
         'Image' => 'Intervention\Image\Facades\Image',
-        'PDF' => 'Thujohn\Pdf\PdfFacade'
+        'PDF' => 'Thujohn\Pdf\PdfFacade',
+        'Excel' => 'Maatwebsite\Excel\Facades\Excel',
 	),
 
 );

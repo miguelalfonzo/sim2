@@ -134,23 +134,32 @@
     <div class="col-sm-12 col-md-12">
 
         @if(isset($solicitude))
-        <select id="sub_type_activity" name="sub_type_activity" class="form-control">
-            @foreach($fondos as $sub)
-                @if($sub->idfondo != 31 && $sub->idfondo !=1)
-                    @if($sub->idfondo == $solicitude->idfondo)
-                    <option selected value="{{$sub->idfondo}}">{{$sub->nombre}} -> {{$sub->saldo}}</option>
-                    @else
-                    <option value="{{$sub->idfondo}}">{{$sub->nombre}} -> {{$sub->saldo}}</option>
-                    @endif
-                @endif
-            @endforeach
-        </select>
+
+            @if($solicitude->estado != PENDIENTE)
+
+                    <input id="textinput" name="amount_fac" type="text" placeholder=""
+                           value="{{$solicitude->fondo->nombre}}" readonly
+                           class="form-control input-md">
+            @else
+              <select id="sub_type_activity" name="sub_type_activity" class="form-control">
+                        @foreach($fondos as $sub)
+                            @if($sub->idfondo != 31 && $sub->idfondo !=1)
+                                @if($sub->idfondo == $solicitude->idfondo)
+                                <option selected value="{{$sub->idfondo}}">{{$sub->nombre}} -> {{$sub->saldo}}</option>
+                                @else
+                                <option value="{{$sub->idfondo}}">{{$sub->nombre}} -> {{$sub->saldo}}</option>
+                                @endif
+                            @endif
+                        @endforeach
+                    </select>
+            @endif
+
         @else
         <select id="sub_type_activity" name="sub_type_activity" class="form-control">
             @foreach($fondos as $sub)
-            @if($sub->idfondo != 31 && $sub->idfondo !=1)
-            <option value="{{$sub->idfondo}}">{{$sub->nombre}} -> {{$sub->saldo}}</option>
-            @endif
+                @if($sub->idfondo != 31 && $sub->idfondo !=1)
+                    <option value="{{$sub->idfondo}}">{{$sub->nombre}} -> {{$sub->saldo}}</option>
+                @endif
             @endforeach
         </select>
         @endif

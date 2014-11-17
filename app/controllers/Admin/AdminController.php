@@ -86,9 +86,7 @@ class AdminController extends BaseController
         }else{
 
             $iduser = $inputs['iduser'];
-
             $user = User::where('id',$iduser)->first();
-
             $user->username = $inputs['username'];
             $user->email = $inputs['email'];
             if(isset($inputs['password']))
@@ -141,6 +139,7 @@ class AdminController extends BaseController
         }
 
     }
+
     public function formRegister(){
 
         $inputs = Input::all();

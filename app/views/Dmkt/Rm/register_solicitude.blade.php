@@ -194,7 +194,7 @@
             <li>
                 <div style="position: relative" class="">
                     <input id="project1" name="clients[]" type="text" placeholder="" style="margin-bottom: 10px"
-                           class="form-control input-md project input-client"
+                           class="form-control input-md project input-client" data-valor="{{$client->clcodigo}}"
                            value="{{isset($client->clnombre) ? $client->clcodigo.' - '.$client->clnombre : null }}">
 
                     <button type='button' class='btn-delete-client' style="z-index: 2"><span
@@ -206,7 +206,7 @@
             <li>
                 <div style="position: relative" class="">
                     <input id="idclient1" name="clients[]" type="text" placeholder="" style="margin-bottom: 10px"
-                           class="form-control input-md input-client"
+                           class="form-control input-md input-client" data-valor=""
                            value="{{isset($client->clnombre) ? $client->clcodigo.' - '.$client->clnombre : null }}">
 
                     <button type='button' class='btn-delete-client' style="display: none; z-index: 2"><span
@@ -267,7 +267,7 @@
 
 
         </ul>
-
+<span class="col-sm-10 col-md-10 families_repeat" style="margin-bottom: 10px ; margin-top: -10px"></span>
         <button type="button" class="btn btn-default" id="btn-add-family">Agregar Otra Familia</button>
 
 

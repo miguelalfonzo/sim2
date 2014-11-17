@@ -92,7 +92,7 @@ return array(
 			'password' => 'outdvp',
 			'charset' => 'utf8',
 			'prefix' => '',
-            'schema' => 'public'
+            //'schema' => 'public'
 		),
 		/*
 		'oracle_ms' => array(

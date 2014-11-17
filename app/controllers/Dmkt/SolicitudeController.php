@@ -13,7 +13,6 @@ use \Common\State;
 use \Common\Fondo;
 use \Common\TypePayment;
 use \BaseController;
-use Symfony\Component\Finder\Comparator\DateComparator;
 use \View;
 use \DB;
 use \Input;
@@ -25,6 +24,9 @@ use \Hash;
 use \User;
 use \Auth;
 use \Session;
+use \Validator;
+use \Excel;
+use \Response;
 use \Illuminate\Database\Query\Builder;
 
 class SolicitudeController extends BaseController
@@ -63,49 +65,20 @@ class SolicitudeController extends BaseController
     public function test()
 
     {
+        Excel::load('test.xlsx', function($reader) {
 
-        /*$result = Solicitude::where(function ($query) {
-            $query->where('monto',400)
-                ->orWhere('estado', 2);
-        })->where('tipo_moneda',1)->get();
-        echo json_encode($result);
-*/
-        //$var = Solicitude::with(array('TypeMoney','TypeSolicitude'))->get()->toJson();
-        //echo $var;
-        Demo::display();
-        /*
-        $today = getdate();
-        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
-        $lastday = date('t-m-Y', strtotime($m));
-        $firstday = date('01-m-Y', strtotime($m));
+            $results = $reader->get();
 
-        if (Auth::user()->type == 'R') {
+            // ->all() is a wrapper for ->get() and will work the same
+            $results = $reader->all();
+            echo $results;
 
-            $solicituds = Solicitude::where('iduser', Auth::user()->Rm->iduser)->get();
-            echo json_encode($solicituds);
-        } else {
-            $sup = Sup::find(Auth::user()->Sup->idsup);
-            $reps = Auth::user()->Sup->Reps;
-            $users_ids = [];
-            foreach ($reps as $rm)
-                $users_ids[] = $rm->iduser;
-            //echo json_encode($users_ids);die;
+        });
 
-            $solicituds = Solicitude::whereIn('iduser', $users_ids)
-                ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                ->get();
-            foreach($solicituds as $sol){
-                echo json_encode($sol->user->type);
-            }
-            //echo json_encode($solicituds);
 
-        }*/
 
-        /*
-        $solicitude = Solicitude::find(9);
+       // Demo::display();
 
-        foreach($solicitude->families as $v)
-            echo json_encode($v->marca->manager->id);*/
 
     }
 
@@ -121,7 +94,8 @@ class SolicitudeController extends BaseController
     {
 
         $clients = Client::take(1030)->get(array('clcodigo', 'clnombre'));
-        return json_encode($clients);
+        return Response::json($clients);
+        //return json_encode($clients);
     }
 
     public function newSolicitude()
@@ -148,93 +122,110 @@ class SolicitudeController extends BaseController
 
         $inputs = Input::all();
         $image = Input::file('file');
-        $solicitude = new Solicitude;
-        $typeUser = Auth::user()->type;
-        if (isset($image)) {
 
-            $filename = uniqid() . '.' . $image->getClientOriginalExtension();
-            //$filename = $image->getClientOriginalName();
-            $path = public_path('img/reembolso/' . $filename);
-            Image::make($image->getRealPath())->resize(800, 600)->save($path);
-            $solicitude->image = $filename;
-        }
+        $rules = array(
+            'titulo'         => 'required|alpha_num',
+            'description'             => 'alpha_num',
+            'monto'             => 'required|numeric',
 
+        );
+        $validator = Validator::make(Input::all(), $rules);
+        if ($validator->fails()) {
 
-        $date = $inputs['delivery_date'];
-        list($d, $m, $y) = explode('/', $date);
-        $d = mktime(11, 14, 54, $m, $d, $y);
-        $date = date("Y/m/d", $d);
-        $aux_idsol = $solicitude->searchId() + 1;
-        $solicitude->idsolicitud = $aux_idsol;
-        $solicitude->descripcion = $inputs['description'];
-        $solicitude->titulo = $inputs['titulo'];
-        $solicitude->monto = $inputs['monto'];
+            // get the error messages from the validator
+            $messages = $validator->messages();
 
-        $solicitude->iduser = Auth::user()->id;
-        $solicitude->monto_factura = $inputs['amount_fac'];
-        $solicitude->fecha_entrega = $date;
-        $solicitude->idtiposolicitud = $inputs['type_solicitude'];
-        $token = sha1(md5(uniqid($solicitude->idsolicitud, true)));
-        $solicitude->token =  $token;
+            // redirect our user back to the form with the errors from the validator
+            //return Redirect::to('show_rm')->with('errors', $messages);
+            return $messages;
+        }else{
 
-        if (isset($inputs['sub_type_activity'])) {
-            $fondo = $inputs['sub_type_activity'];
-            $solicitude->idfondo = $inputs['sub_type_activity'];
-        }
+            $solicitude = new Solicitude;
+            $typeUser = Auth::user()->type;
+            if (isset($image)) {
 
-        $solicitude->tipo_moneda = $inputs['money'];
-        if ($inputs['type_payment'] == 2) {
-            $solicitude->numruc = $inputs['ruc'];
-        } else if ($inputs['type_payment'] == 3) {
-            $solicitude->numcuenta = $inputs['number_account'];
-        }
-        $solicitude->idtipopago = $inputs['type_payment'];
-        $solicitude->estado = PENDIENTE;
-
-
-        if ($solicitude->save()) {
-            $data = array(
-
-                'name' => $inputs['titulo'],
-                'description' => $inputs['description'],
-                'monto' => $inputs['monto'],
-                'money' => $inputs['money']
-
-            );
-
-            /*
-            Mail::send('emails.template', $data, function ($message) {
-                $message->to('cesarhm1687@gmail.com');
-                $message->subject('Nueva Solicitud');
-
-            });*/
-            $clients = $inputs['clients'];
-            foreach ($clients as $client) {
-                $cod = explode(' ', $client);
-                $solicitude_clients = new SolicitudeClient;
-                $solicitude_clients->idsolicitud_clientes = $solicitude_clients->searchId() + 1;
-                $solicitude_clients->idsolicitud = $solicitude->searchId();
-                $solicitude_clients->idcliente = $cod[0];
-                $solicitude_clients->save();
-            }
-            $families = $inputs['families'];
-            foreach ($families as $family) {
-
-                $solicitude_families = new SolicitudeFamily;
-                $solicitude_families->idsolicitud_familia = $solicitude_families->searchId() + 1;
-                $solicitude_families->idsolicitud = $solicitude->searchId();
-                $solicitude_families->idfamilia = $family;
-                $solicitude_families->save();
+                $filename = uniqid() . '.' . $image->getClientOriginalExtension();
+                //$filename = $image->getClientOriginalName();
+                $path = public_path('img/reembolso/' . $filename);
+                Image::make($image->getRealPath())->resize(800, 600)->save($path);
+                $solicitude->image = $filename;
             }
 
-            if(isset($fondo) && $fondo == 31 ) // si es de tipo actividad "otros" lo deriva a los gerentes
-            $this->derivedSolicitude($token,1);
 
-            return $typeUser;
+            $date = $inputs['delivery_date'];
+            list($d, $m, $y) = explode('/', $date);
+            $d = mktime(11, 14, 54, $m, $d, $y);
+            $date = date("Y/m/d", $d);
+            $aux_idsol = $solicitude->searchId() + 1;
+            $solicitude->idsolicitud = $aux_idsol;
+            $solicitude->descripcion = $inputs['description'];
+            $solicitude->titulo = $inputs['titulo'];
+            $solicitude->monto = $inputs['monto'];
 
+            $solicitude->iduser = Auth::user()->id;
+            $solicitude->monto_factura = $inputs['amount_fac'];
+            $solicitude->fecha_entrega = $date;
+            $solicitude->idtiposolicitud = $inputs['type_solicitude'];
+            $token = sha1(md5(uniqid($solicitude->idsolicitud, true)));
+            $solicitude->token =  $token;
+
+            if (isset($inputs['sub_type_activity'])) {
+                $fondo = $inputs['sub_type_activity'];
+                $solicitude->idfondo = $inputs['sub_type_activity'];
+            }
+
+            $solicitude->tipo_moneda = $inputs['money'];
+            if ($inputs['type_payment'] == 2) {
+                $solicitude->numruc = $inputs['ruc'];
+            } else if ($inputs['type_payment'] == 3) {
+                $solicitude->numcuenta = $inputs['number_account'];
+            }
+            $solicitude->idtipopago = $inputs['type_payment'];
+            $solicitude->estado = PENDIENTE;
+
+
+            if ($solicitude->save()) {
+                $data = array(
+
+                    'name' => $inputs['titulo'],
+                    'description' => $inputs['description'],
+                    'monto' => $inputs['monto'],
+                    'money' => $inputs['money']
+
+                );
+
+                /*
+                Mail::send('emails.template', $data, function ($message) {
+                    $message->to('cesarhm1687@gmail.com');
+                    $message->subject('Nueva Solicitud');
+
+                });*/
+                $clients = $inputs['clients'];
+                foreach ($clients as $client) {
+                    $cod = explode(' ', $client);
+                    $solicitude_clients = new SolicitudeClient;
+                    $solicitude_clients->idsolicitud_clientes = $solicitude_clients->searchId() + 1;
+                    $solicitude_clients->idsolicitud = $solicitude->searchId();
+                    $solicitude_clients->idcliente = $cod[0];
+                    $solicitude_clients->save();
+                }
+                $families = $inputs['families'];
+                foreach ($families as $family) {
+
+                    $solicitude_families = new SolicitudeFamily;
+                    $solicitude_families->idsolicitud_familia = $solicitude_families->searchId() + 1;
+                    $solicitude_families->idsolicitud = $solicitude->searchId();
+                    $solicitude_families->idfamilia = $family;
+                    $solicitude_families->save();
+                }
+
+                if(isset($fondo) && $fondo == 31 ) // si es de tipo actividad "otros" lo deriva a los gerentes
+                    $this->derivedSolicitude($token,1);
+
+                return $typeUser;
+
+            }
         }
-
-
 
 
     }
@@ -507,7 +498,7 @@ class SolicitudeController extends BaseController
     {
         $sol = Solicitude :: where('token', $token)->firstOrFail();
 
-        if ($sol->user->type == 'R')
+        if ($sol->user->type == 'R' && $sol->estado == PENDIENTE)
             Solicitude::where('token', $token)->update(array('blocked' => 1));
 
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
@@ -823,6 +814,7 @@ class SolicitudeController extends BaseController
         $block = false;
         $userid = Auth::user()->gerprod->id;
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
+        if($solicitude->estado == PENDIENTE)
         Solicitude::where('token', $token)->update(array('blocked' => 1));
 
         $solicitudeBlocked = SolicitudeGer::where('idsolicitud', $solicitude->idsolicitud)->where('idgerprod', $userid)->firstOrFail(); //vemos si la solicitud esta blokeada

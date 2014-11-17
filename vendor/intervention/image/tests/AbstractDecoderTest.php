@@ -89,6 +89,19 @@ class AbstractDecoderTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($source->isInterventionImage());
     }
 
+    public function testIsSplFileInfo()
+    {
+        $source = $this->getTestDecoder(1);
+        $this->assertFalse($source->isSplFileInfo());
+
+        $img = Mockery::mock('SplFileInfo');
+        $source = $this->getTestDecoder($img);
+        $this->assertTrue($source->isSplFileInfo());
+
+        $img = Mockery::mock('Symfony\Component\HttpFoundation\File\UploadedFile', 'SplFileInfo');
+        $this->assertTrue($source->isSplFileInfo());
+    }
+
     public function testIsSymfonyUpload()
     {
         $source = $this->getTestDecoder(1);
@@ -106,6 +119,19 @@ class AbstractDecoderTest extends PHPUnit_Framework_TestCase
 
         $source = $this->getTestDecoder(null);
         $this->assertFalse($source->isDataUrl());
+    }
+
+    public function testIsBase64()
+    {
+        $decoder = $this->getTestDecoder(null);
+        $this->assertFalse($decoder->isBase64());
+
+        $decoder = $this->getTestDecoder('random');
+        $this->assertFalse($decoder->isBase64());
+
+        $base64 = "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGElEQVQYlWM8c+bMfwYiABMxikYVUk8hAHWzA3cRvs4UAAAAAElFTkSuQmCC";
+        $decoder = $this->getTestDecoder($base64);
+        $this->assertTrue($decoder->isBase64());
     }
 
     public function getTestDecoder($data)

@@ -64,4 +64,8 @@ class Solicitude extends Eloquent{
         return $this->hasOne('Common\TypePayment','idtipopago','idtipopago');
 
     }
+    function fondo(){
+        return $this->hasOne('Common\Fondo','idfondo','idfondo');
+
+    }
 }

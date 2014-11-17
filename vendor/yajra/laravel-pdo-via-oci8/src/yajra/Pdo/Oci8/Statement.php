@@ -8,6 +8,7 @@
  * @copyright Copyright (c) 2013 Mathieu Dumoulin (http://crazycoders.net/)
  * @license MIT
  */
+
 namespace yajra\Pdo\Oci8;
 
 use yajra\Pdo\Oci8;
@@ -53,11 +54,11 @@ class Statement
     protected $_key;
 
     /**
-     * flag to convert BLOB to string or not
+     * flag to convert LOB to string or not
      *
      * @var boolean
      */
-    protected $returnLobs = true;
+    protected $_returnLobs = true;
 
     /**
      * Statement options
@@ -65,6 +66,41 @@ class Statement
      * @var array
      */
     protected $_options = array();
+
+    /**
+     * Fetch mode selected via setFetchMode()
+     *
+     * @var int
+     */
+    protected $_fetchMode = \PDO::ATTR_DEFAULT_FETCH_MODE;
+
+    /**
+     * Column number for PDO::FETCH_COLUMN fetch mode
+     *
+     * @var int
+     */
+    protected $_fetchColno = 0;
+
+    /**
+     * Class name for PDO::FETCH_CLASS fetch mode
+     *
+     * @var string
+     */
+    protected $_fetchClassName = '\stdClass';
+
+    /**
+     * Constructor arguments for PDO::FETCH_CLASS
+     *
+     * @var array
+     */
+    protected $_fetchCtorargs = array();
+
+    /**
+     * Object reference for PDO::FETCH_INTO fetch mode
+     *
+     * @var object
+     */
+    protected $_fetchIntoObject = null;
 
     /**
      * Constructor
@@ -116,13 +152,13 @@ class Statement
         if($result != true)
         {
             $e = oci_error($this->_sth);
-            
+
             $message = '';
             $message = $message . 'Error Code    : ' . $e['code'] . PHP_EOL;
             $message = $message . 'Error Message : ' . $e['message'] . PHP_EOL;
             $message = $message . 'Position      : ' . $e['offset'] . PHP_EOL;
             $message = $message . 'Statement     : ' . $e['sqltext'];
-            
+
             throw new SqlException($message, $e['code']);
         }
         return $result;
@@ -131,7 +167,7 @@ class Statement
     /**
      * Fetches the next row from a result set
      *
-     * @param int|null $fetchStyle Controls how the next row will be returned to
+     * @param int|null $fetchMode Controls how the next row will be returned to
      *   the caller. This value must be one of the PDO::FETCH_* constants,
      *   defaulting to value of PDO::ATTR_DEFAULT_FETCH_MODE (which defaults to
      *   PDO::FETCH_BOTH).
@@ -143,27 +179,37 @@ class Statement
      *   to PDO::CURSOR_SCROLL when you prepare the SQL statement with
      *   PDO::prepare.
      * @param int $cursorOffset [optional]
-     * @return mixed
+     * @return mixed The return value of this function on success depends on the
+     *   fetch type. In all cases, FALSE is returned on failure.
      * @todo Implement cursorOrientation and cursorOffset
-     * @todo Fix PDO::FETCH_CLASS with specified class name and constructor
-     *       arguments
-     * @todo Implement PDO::FETCH_OBJECT
      */
-    public function fetch($fetchStyle = \PDO::FETCH_BOTH,
+    public function fetch($fetchMode = null,
                           $cursorOrientation = \PDO::FETCH_ORI_NEXT,
                           $cursorOffset = 0)
     {
+        // If not fetchMode was specified, used the default value of or the mode
+        // set by the last call to setFetchMode()
+        if ($fetchMode === null) {
+            $fetchMode = $this->_fetchMode;
+        }
+
         // Convert array keys (or object properties) to lowercase
         $toLowercase = ($this->getAttribute(\PDO::ATTR_CASE) == \PDO::CASE_LOWER);
-        switch($fetchStyle)
+        // Convert null value to empty string
+        $nullToString = ($this->getAttribute(\PDO::ATTR_ORACLE_NULLS) == \PDO::NULL_TO_STRING);
+        // Convert empty string to null
+        $nullEmptyString = ($this->getAttribute(\PDO::ATTR_ORACLE_NULLS) == \PDO::NULL_EMPTY_STRING);
+
+        // Determine the fetch mode
+        switch($fetchMode)
         {
             case \PDO::FETCH_BOTH:
-                $rs = oci_fetch_array($this->_sth); // add OCI_BOTH?
+                $rs = oci_fetch_array($this->_sth); // Fetches both; nice!
                 if($rs === false) {
                     return false;
                 }
                 if($toLowercase) $rs = array_change_key_case($rs);
-                if ($this->returnLobs && is_array($rs)) {
+                if ($this->_returnLobs && is_array($rs)) {
                     foreach ($rs as $field => $value) {
                         if (is_object($value) ) {
                             $rs[$field] = $value->load();
@@ -179,7 +225,7 @@ class Statement
                     return false;
                 }
                 if($toLowercase) $rs = array_change_key_case($rs);
-                if ($this->returnLobs && is_array($rs)) {
+                if ($this->_returnLobs && is_array($rs)) {
                     foreach ($rs as $field => $value) {
                         if (is_object($value) ) {
                             $rs[$field] = $value->load();
@@ -190,16 +236,11 @@ class Statement
                 return $rs;
 
             case \PDO::FETCH_NUM:
-                return oci_fetch_row($this->_sth);
-
-            case \PDO::FETCH_CLASS:
-                $rs = oci_fetch_assoc($this->_sth);
+                $rs = oci_fetch_row($this->_sth);
                 if($rs === false) {
                     return false;
                 }
-                if($toLowercase) $rs = array_change_key_case($rs);
-
-                if ($this->returnLobs && is_array($rs)) {
+                if ($this->_returnLobs && is_array($rs)) {
                     foreach ($rs as $field => $value) {
                         if (is_object($value) ) {
                             $rs[$field] = $value->load();
@@ -207,8 +248,82 @@ class Statement
                     }
                 }
 
-                return (object) $rs;
+                return $rs;
+
+            case \PDO::FETCH_COLUMN:
+                $rs = oci_fetch_row($this->_sth);
+                $colno = (int) $this->_fetchColno;
+                if (is_array($rs) && array_key_exists($colno, $rs)) {
+                    $value = $rs[$colno];
+                    if (is_object($value)) {
+                        return $value->load();
+                    } else {
+                        return $value;
+                    }
+                } else {
+                    return false;
+                }
+                break;
+
+            case \PDO::FETCH_OBJ:
+            case \PDO::FETCH_INTO:
+            case \PDO::FETCH_CLASS:
+            case \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE:
+                $rs = oci_fetch_assoc($this->_sth);
+                if($rs === false) {
+                    return false;
+                }
+                if($toLowercase) $rs = array_change_key_case($rs);
+
+                if ($fetchMode === \PDO::FETCH_INTO) {
+                    if (is_object($this->_fetchIntoObject)) {
+                        $object = $this->_fetchIntoObject;
+                    } else {
+                        // Object to set into has not been set
+                        return false;
+                    }
+                } else {
+                    if ($fetchMode === \PDO::FETCH_OBJ) {
+                        $className = '\stdClass';
+                        $ctorargs = array();
+                    } else {
+                        $className = $this->_fetchClassName;
+                        $ctorargs = $this->_fetchCtorargs;
+                    }
+
+                    if ($ctorargs) {
+                        $reflectionClass = new \ReflectionClass($className);
+                        $object = $reflectionClass->newInstanceArgs($ctorargs);
+                    } else {
+                        $object = new $className();
+                    }
+                }
+
+                // Format recordsets values depending on options
+                foreach($rs as $field => $value)
+                {
+                    // convert null to empty string
+                    if (is_null($value) && $nullToString) {
+                        $rs[$field] = '';
+                    }
+
+                    // convert empty string to null
+                    if (empty($rs[$field]) && $nullEmptyString) {
+                        $rs[$field] = null;
+                    }
+
+                    // convert LOB to string
+                    if ($this->_returnLobs && is_object($value)) {
+                        $object->$field = $value->load();
+                    } else {
+                        $object->$field = $value;
+                    }
+                }
+
+                return $object;
         }
+
+        return false;
     }
 
     /**
@@ -349,32 +464,34 @@ class Statement
      * @param int $colNumber 0-indexed number of the column you wish to retrieve
      *   from the row. If no value is supplied, it fetches the first column.
      * @return string Returns a single column in the next row of a result set.
-     * @todo Implement colNumber
      */
-    public function fetchColumn($colNumber = 0)
+    public function fetchColumn($colNumber = null)
     {
-        return reset($this->fetch());
+        $this->setFetchMode(\PDO::FETCH_COLUMN, $colNumber);
+        return $this->fetch();
     }
 
     /**
      * Returns an array containing all of the result set rows
      *
-     * @param int $fetchStyle Controls the contents of the returned array as
+     * @param int $fetchMode Controls the contents of the returned array as
      *   documented in PDOStatement::fetch.
      * @param mixed $fetchArgument This argument has a different meaning
-     *   depending on the value of the fetchStyle parameter.
+     *   depending on the value of the fetchMode parameter.
      * @param array $ctorArgs [optional] Arguments of custom class constructor
      *   when the fetch_style parameter is PDO::FETCH_CLASS.
      * @return array Array containing all of the remaining rows in the result
      *   set. The array represents each row as either an array of column values
      *   or an object with properties corresponding to each column name.
      */
-    public function fetchAll($fetchStyle = \PDO::FETCH_BOTH,
+    public function fetchAll($fetchMode = \PDO::FETCH_BOTH,
                              $fetchArgument = null,
-                             $ctorArgs = null)
+                             $ctorArgs = array())
     {
+        $this->setFetchMode($fetchMode, $fetchArgument, $ctorArgs);
+
         $results = array();
-        while($row = $this->fetch($fetchStyle, $fetchArgument, $ctorArgs))
+        while($row = $this->fetch())
         {
             $results[] = $row;
         }
@@ -387,12 +504,11 @@ class Statement
      * @param string $className
      * @param array $ctorArgs
      * @return mixed
-     * @todo Implement className and ctorArgs; easiest implementation will be
-     *       by implementing in fetch() and calling it with proper parameters
      */
-    public function fetchObject($className = null, $ctorArgs = null)
+    public function fetchObject($className = null, $ctorArgs = array())
     {
-        return (object)$this->fetch();
+        $this->setFetchMode(\PDO::FETCH_CLASS, $className, $ctorArgs);
+        return $this->fetch();
     }
 
     /**
@@ -508,6 +624,7 @@ class Statement
         $meta['len'] = oci_field_size($this->_sth, $column);
         $meta['precision'] = oci_field_precision($this->_sth, $column);
         $meta['pdo_type'] = null;
+        $meta['is_null'] = oci_field_is_null($this->_sth, $column);
 
         return $meta;
     }
@@ -521,13 +638,60 @@ class Statement
      * @param array|null $ctorArgs Constructor arguments.
      * @throws \Exception
      * @return bool TRUE on success or FALSE on failure.
-     * @todo Implement method
      */
     public function setFetchMode($fetchMode,
                                  $modeArg = null,
                                  array $ctorArgs = array())
     {
-        throw new \Exception("seteFetchMode has not been implemented");
+        // See which fetch mode we have
+        switch($fetchMode)
+        {
+            case \PDO::FETCH_ASSOC:
+            case \PDO::FETCH_NUM:
+            case \PDO::FETCH_BOTH:
+            case \PDO::FETCH_OBJ:
+                $this->_fetchMode = $fetchMode;
+                $this->_fetchColno = 0;
+                $this->_fetchClassName = '\stdClass';
+                $this->_fetchCtorargs = array();
+                $this->_fetchIntoObject = null;
+                break;
+            case \PDO::FETCH_CLASS:
+            case \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE:
+                $this->_fetchMode = $fetchMode;
+                $this->_fetchColno = 0;
+                $this->_fetchClassName = '\stdClass';
+                if ($modeArg) {
+                    $this->_fetchClassName = $modeArg;
+                }
+                $this->_fetchCtorargs = $ctorArgs;
+                $this->_fetchIntoObject = null;
+                break;
+            case \PDO::FETCH_INTO:
+                if (! is_object($modeArg)) {
+                    throw new \Exception(
+                        '$modeArg must be instance of an object');
+                }
+                $this->_fetchMode = $fetchMode;
+                $this->_fetchColno = 0;
+                $this->_fetchClassName = '\stdClass';
+                $this->_fetchCtorargs = array();
+                $this->_fetchIntoObject = $modeArg;
+                break;
+            case \PDO::FETCH_COLUMN:
+                $this->_fetchMode = $fetchMode;
+                $this->_fetchColno = (int) $modeArg;
+                $this->_fetchClassName = '\stdClass';
+                $this->_fetchCtorargs = array();
+                $this->_fetchIntoObject = null;
+                break;
+            default:
+                throw new \Exception("Requested fetch mode is not supported " .
+                    "by this implementation");
+                break;
+        }
+
+        return true;
     }
 
     /**
@@ -539,7 +703,7 @@ class Statement
      */
     public function nextRowset()
     {
-        throw new \Exception("seteFetchMode has not been implemented");
+        throw new \Exception("setFetchMode has not been implemented");
     }
 
     /**
@@ -551,7 +715,7 @@ class Statement
      */
     public function closeCursor()
     {
-        throw new \Exception("seteFetchMode has not been implemented");
+        throw new \Exception("setFetchMode has not been implemented");
     }
 
     /**
@@ -563,7 +727,7 @@ class Statement
      */
     public function debugDumpParams()
     {
-        throw new \Exception("seteFetchMode has not been implemented");
+        throw new \Exception("setFetchMode has not been implemented");
     }
 
 }

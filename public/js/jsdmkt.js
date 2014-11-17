@@ -72,6 +72,7 @@ function newSolicitude() {
 
         $('#listfamily>li .porcentaje_error').css({"border": "0"});
         $(".option-des-1").removeClass('error');
+        $('.families_repeat').text('');
         var k = $("#listfamily li").size();
         if (k > 1) {
             var other = $(".btn-delete-family").index(this);
@@ -175,6 +176,7 @@ function newSolicitude() {
                     $(this).parent().addClass('has-success has-feedback');
                     $(this).parent().children('.span-alert').addClass('glyphicon glyphicon-ok form-control-feedback');
                     $(this).attr('readonly', 'readonly');
+                    $(this).attr('data-valor','all');
                     return false;
                 }
             })
@@ -201,6 +203,7 @@ function newSolicitude() {
     $(document).on("click", ".btn-delete-client", function () {
         $('#listclient>li .porcentaje_error').css({"border": "0"});
         $('.clients_repeat').text('');
+
         $(".option-des-1").removeClass('error');
         var k = $("#listclient li").size();
         if (k > 1) {
@@ -325,6 +328,27 @@ function newSolicitude() {
         }, 100);
 
         setTimeout(function () {
+
+            //validate fields not select
+            $('.input-client').each(function (index) {
+                var input = $(this).val();
+
+                if (!$(this).attr('data-valor')) {
+
+                    aux = 1;
+                    console.log(validate = 1);
+                    $(this).parent().addClass('has-error has-feedback');
+                    $(this).parent().children('.span-alert').addClass('span-alert glyphicon glyphicon-remove form-control-feedback');
+                    $(this).val('');
+                    $(this).attr('placeholder','Seleccione cliente');
+                    $(this).addClass('input-placeholder-error');
+                }
+
+            });
+
+
+        }, 100);
+        setTimeout(function () {
             //Validate of fields duplicate in clients
             for (var i = 0; i < clients_input.length; i++) {
                 $('.input-client').each(function (index) {
@@ -362,6 +386,7 @@ function newSolicitude() {
                         families_input[index] = '';
 
                         $(this).css('border-color', 'red');
+                        $(".families_repeat").text('Datos Repetidos').css('color', 'red');
                     }
                 });
             }
@@ -373,10 +398,10 @@ function newSolicitude() {
                 var formData = new FormData(form[0]);
                 var rute = form.attr('action');
                 var message1 = 'Registrando';
-                var message2 = 'Registro Completado';
+                var message2 = '<strong style="color: green">Solicitud Registrada</strong>';
                 if (rute == 'editar-solicitud') {
                     message1 = 'Actualizando';
-                    message2 = 'Registro Actualizado'
+                    message2 = '<strong style="color: green">Solicitud Actualizada</strong>'
                 }
 
                 $.ajax({
@@ -393,16 +418,13 @@ function newSolicitude() {
 
                 }).done(function (data) {
 
-                    // $.unblockUI();
+                     $.unblockUI();
 
                     if (data == 'R') {
 
-                        responseUI(message2, 'green');
-                        setTimeout(
-                            function () {
-                                window.location.href = server + 'show_rm'
-                            }
-                            , 200);
+                        bootbox.alert(message2, function() {
+                            window.location.href = server + 'show_rm'
+                        });
 
                     }
                     if(data == 'S'){
@@ -523,34 +545,39 @@ function newSolicitude() {
     $(document).on('click', cancel_solicitude, function (e) {
         e.preventDefault();
         var aux = $(this);
-        bootbox.confirm("¿Esta seguro que desea cancelar esta solicitud?", function (result) {
-            if (result) {
+        bootbox.confirm({
+            message : '¿Esta seguro que desea cancelar esta solicitud?',
+            buttons: {
+                'cancel' :{ label :'Cancelar' ,className: 'btn-primary'},
+                'confirm' :{ label :'Aceptar' ,className: 'btn-default'}
+            },
+            callback : function (result) {
+                if (result) {
 
-                $.post(server + 'cancelar-solicitud-rm', {idsolicitude: $(aux).attr('data-idsolicitude') ,_token :$(aux).attr('data-token')})
-                    .done(function (data) {
-                        console.log(data);
-
-                        $('#table_solicitude_rm_wrapper').remove();
-                        $('.table-solicituds-rm').append(data);
-                        $('#table_solicitude_rm').dataTable({
-                                "order": [
-                                    [ 3, "desc" ]
-                                ],
-                                "bLengthChange": false,
-                                'iDisplayLength': 7,
-                                "oLanguage": {
-                                    "sSearch": "Buscar: ",
-                                    "sZeroRecords": "No hay solicitudes",
-                                    "sInfoEmpty": "No hay solicitudes",
-                                    "sInfo": 'Mostrando _END_ de _TOTAL_'
-                                }
-                            }
-                        );
-
-                    })
+                    $.post(server + 'cancelar-solicitud-rm', {idsolicitude: $(aux).attr('data-idsolicitude') ,_token :$(aux).attr('data-token')})
+                        .done(function (data) {
+                            bootbox.alert('Solicitud Cancelada' , function(){
+                                $('#table_solicitude_rm_wrapper').remove();
+                                $('.table-solicituds-rm').append(data);
+                                $('#table_solicitude_rm').dataTable({
+                                        "order": [
+                                            [ 3, "desc" ]
+                                        ],
+                                        "bLengthChange": false,
+                                        'iDisplayLength': 7,
+                                        "oLanguage": {
+                                            "sSearch": "Buscar: ",
+                                            "sZeroRecords": "No hay solicitudes",
+                                            "sInfoEmpty": "No hay solicitudes",
+                                            "sInfo": 'Mostrando _END_ de _TOTAL_'
+                                        }
+                                    }
+                                );
+                            });
+                        })
+                }
             }
-        });
-
+        })
 
     });
 
@@ -632,12 +659,20 @@ function newSolicitude() {
 
     $('#deny_solicitude').on('click', function (e) {
 
-        bootbox.confirm("¿Esta seguro que desea rechazar esta solicitud?", function (result) {
-            if (result) {
-                var url = server + 'rechazar-solicitud';
-                form_acepted_solicitude.attr('action', url);
-                form_acepted_solicitude.submit();
-            }
+        bootbox.confirm({
+            message : '¿Esta seguro que desea cancelar esta solicitud?',
+            buttons: {
+                'cancel' :{ label :'cancel' ,className: 'btn-primary'},
+                'confirm' :{ label :'aceptar' ,className: 'btn-default'}
+            },
+            callback : function (result) {
+                if (result) {
+                    var url = server + 'rechazar-solicitud';
+                    form_acepted_solicitude.attr('action', url);
+                    form_acepted_solicitude.submit();
+                }
+              }
+
         });
 
     });
@@ -646,35 +681,40 @@ function newSolicitude() {
     $(document).on('click', cancel_solicitude_sup, function (e) {
         e.preventDefault();
         var aux = $(this);
-        bootbox.confirm("¿Esta seguro que desea cancelar esta solicitud?", function (result) {
-            if (result) {
+        bootbox.confirm({
+            message: '¿Esta seguro que desea cancelar esta solicitud?',
+            buttons: {
+                'cancel': {label: 'cancelar', className: 'btn-primary'},
+                'confirm': {label: 'aceptar', className: 'btn-default'}
+            },
+            callback: function (result) {
+                if (result) {
 
-                $.post(server + 'cancelar-solicitud-sup', {idsolicitude: aux.attr('data-idsolicitude')})
-                    .done(function (data) {
-                        console.log(data);
+                    $.post(server + 'cancelar-solicitud-sup', {idsolicitude: aux.attr('data-idsolicitude')})
+                        .done(function (data) {
+                            console.log(data);
 
-                        $('#table_solicitude_sup_wrapper').remove();
-                        $('.table-solicituds-sup').append(data);
-                        $('#table_solicitude_sup').dataTable({
-                                "order": [
-                                    [ 3, "desc" ]
-                                ],
-                                "bLengthChange": false,
-                                'iDisplayLength': 7,
-                                "oLanguage": {
-                                    "sSearch": "Buscar: ",
-                                    "sZeroRecords": "No hay solicitudes",
-                                    "sInfoEmpty": "No hay solicitudes",
-                                    "sInfo": 'Mostrando _END_ de _TOTAL_'
+                            $('#table_solicitude_sup_wrapper').remove();
+                            $('.table-solicituds-sup').append(data);
+                            $('#table_solicitude_sup').dataTable({
+                                    "order": [
+                                        [3, "desc"]
+                                    ],
+                                    "bLengthChange": false,
+                                    'iDisplayLength': 7,
+                                    "oLanguage": {
+                                        "sSearch": "Buscar: ",
+                                        "sZeroRecords": "No hay solicitudes",
+                                        "sInfoEmpty": "No hay solicitudes",
+                                        "sInfo": 'Mostrando _END_ de _TOTAL_'
+                                    }
                                 }
-                            }
-                        );
+                            );
 
-                    })
+                        })
+                }
             }
-        });
-
-
+        })
     });
 
 
@@ -741,7 +781,6 @@ function newSolicitude() {
                     var message = 'Validando Solicitud..';
                     loadingUI(message);
                     setTimeout(function () {
-
                         form_acepted_solicitude.attr('action', server + 'aceptar-solicitud-gerprod');
                         form_acepted_solicitude.submit();
                     }, 1200);
@@ -761,12 +800,19 @@ function newSolicitude() {
 
     $('#deny_solicitude_gerprod').on('click', function (e) {
 
-        bootbox.confirm("¿Esta seguro que desea rechazar esta solicitud?", function (result) {
-            if (result) {
-                var url = server + 'rechazar-solicitud-gerprod';
-                form_acepted_solicitude.attr('action', url);
-                form_acepted_solicitude.submit();
-            }
+        bootbox.confirm({
+            message : '¿Esta seguro que desea rechazar esta solicitud?',
+            buttons: {
+            'cancel': {label: 'cancelar', className: 'btn-primary'},
+            'confirm': {label: 'aceptar', className: 'btn-default'}
+            },
+            callback : function (result) {
+                if (result) {
+                    var url = server + 'rechazar-solicitud-gerprod';
+                    form_acepted_solicitude.attr('action', url);
+                    form_acepted_solicitude.submit();
+                }
+        }
         });
 
     });
@@ -860,6 +906,42 @@ function newSolicitude() {
         searchSolicitudeToDate('tes',this)
     });
 
+    /** --------------------------------------------- FONDOS ------------------------------------------------- **/
+
+    $('.register_fondo').on('click',function(){
+
+        var dato = {
+            'institucion' : $('#fondo_institucion').val(),
+            'repmed' : $('#fondo_repmed').val(),
+            'supervisor' : $('#fondo_supervisor').val(),
+            'total' : $('#fondo_total').val(),
+            'cuenta': $('#fondo_cuenta').val(),
+            '_token' : $('#_token').val()
+        };
+        $.post(server + 'registrar-fondo',dato).done(function(data)
+            {
+                console.log(data);
+                $('#table_solicitude_fondos_wrapper').remove();
+                $('.table-solicituds-fondos').append(data);
+                $('#table_solicitude_fondos').dataTable({
+                        "order": [
+                            [ 3, "desc" ]
+                        ],
+                        "bLengthChange": false,
+                        'iDisplayLength': 7,
+                        "oLanguage": {
+                            "sSearch": "Buscar: ",
+                            "sZeroRecords": "No hay solicitudes",
+                            "sInfoEmpty": "No hay solicitudes",
+                            "sInfo": 'Mostrando _END_ de _TOTAL_'
+                        }
+                    }
+                );
+            }
+        )
+
+
+    });
 
     /** --------------------------------------------- ADMIN ------------------------------------------------- **/
 
@@ -1055,4 +1137,6 @@ function newSolicitude() {
         var target = $(this).attr('data-target-id');
         $('#' + target).show();
     });
+
+
 }

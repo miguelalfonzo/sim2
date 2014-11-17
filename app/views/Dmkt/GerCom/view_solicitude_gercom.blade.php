@@ -167,7 +167,7 @@
 
                 <div class="col-sm-12 col-md-12 col-lg-12">
                     <div class="input-group">
-                        @if($solicitude->user->type == 'R')
+                        @if($solicitude->user->typed == 'R')
                         <span class="input-group-addon">R</span>
                         <input id="textinput" name="titulo" type="text" placeholder=""
                                value="{{$solicitude->user->rm->nombres}}" readonly
@@ -179,7 +179,6 @@
                                class="form-control input-md">
                         @endif
                     </div>
-
                 </div>
             </div>
 
