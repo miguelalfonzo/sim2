@@ -467,7 +467,11 @@ function newSolicitude() {
                         "sSearch": "Buscar: ",
                         "sZeroRecords": "No hay solicitudes",
                         "sInfoEmpty": "No hay solicitudes",
-                        "sInfo": 'Mostrando _END_ de _TOTAL_'
+                        "sInfo": 'Mostrando _END_ de _TOTAL_',
+                        "oPaginate": {
+                            "sPrevious": "Anterior",
+                            "sNext" : "Siguiente"
+                        }
                     }
                 }
             );
@@ -517,7 +521,11 @@ function newSolicitude() {
                                 "sSearch": "Buscar: ",
                                 "sZeroRecords": "No hay solicitudes",
                                 "sInfoEmpty": "No hay solicitudes",
-                                "sInfo": 'Mostrando _END_ de _TOTAL_'
+                                "sInfo": 'Mostrando _END_ de _TOTAL_',
+                                "oPaginate": {
+                                    "sPrevious": "Anterior",
+                                    "sNext" : "Siguiente"
+                                }
                             }
                         }
                     );
@@ -569,7 +577,11 @@ function newSolicitude() {
                                             "sSearch": "Buscar: ",
                                             "sZeroRecords": "No hay solicitudes",
                                             "sInfoEmpty": "No hay solicitudes",
-                                            "sInfo": 'Mostrando _END_ de _TOTAL_'
+                                            "sInfo": 'Mostrando _END_ de _TOTAL_',
+                                            "oPaginate": {
+                                                "sPrevious": "Anterior",
+                                                "sNext" : "Siguiente"
+                                            }
                                         }
                                     }
                                 );
@@ -706,7 +718,11 @@ function newSolicitude() {
                                         "sSearch": "Buscar: ",
                                         "sZeroRecords": "No hay solicitudes",
                                         "sInfoEmpty": "No hay solicitudes",
-                                        "sInfo": 'Mostrando _END_ de _TOTAL_'
+                                        "sInfo": 'Mostrando _END_ de _TOTAL_',
+                                        "oPaginate": {
+                                            "sPrevious": "Anterior",
+                                            "sNext" : "Siguiente"
+                                        }
                                     }
                                 }
                             );
@@ -910,7 +926,7 @@ function newSolicitude() {
 
     $.get(server + 'list-fondos').done(function(data)
         {
-            console.log(data);
+
             //$('#table_solicitude_fondos_wrapper').remove();
             $('.table-solicituds-fondos').append(data);
             $('#table_solicitude_fondos').dataTable({
@@ -945,6 +961,7 @@ function newSolicitude() {
             'cuenta': $('#fondo_cuenta').val(),
             '_token' : $('#_token').val()
         };
+
         var l = Ladda.create(aux);
         l.start();
         $.post(server + 'registrar-fondo',dato).done(function(data)
@@ -956,7 +973,7 @@ function newSolicitude() {
                  $('#fondo_cuenta').val('');
                 // $('#_token').val('');
                 l.stop();
-                console.log(data);
+
                 $('#table_solicitude_fondos_wrapper').remove();
                 $('.table-solicituds-fondos').append(data);
                 $('#table_solicitude_fondos').dataTable({
@@ -967,17 +984,126 @@ function newSolicitude() {
                         'iDisplayLength': 7,
                         "oLanguage": {
                             "sSearch": "Buscar: ",
-                            "sZeroRecords": "No hay solicitudes",
-                            "sInfoEmpty": "No hay solicitudes",
-                            "sInfo": 'Mostrando _END_ de _TOTAL_'
+                            "sZeroRecords": "No hay fondos",
+                            "sInfoEmpty": " ",
+                            "sInfo": 'Mostrando _END_ de _TOTAL_',
+                            "oPaginate": {
+                                "sPrevious": "Anterior",
+                                "sNext" : "Siguiente"
+                            }
                         }
                     }
                 );
             }
         )
 
+    });
+
+    $(document).on('click' , '.delete-fondo' , function(e){
+        e.preventDefault();
+
+        $.get(server + 'delete-fondo/' + $(this).attr('data-idfondo')).done(function(data){
+            $('#table_solicitude_fondos_wrapper').remove();
+            $('.table-solicituds-fondos').append(data);
+            $('#table_solicitude_fondos').dataTable({
+                    "order": [
+                        [ 3, "desc" ]
+                    ],
+                    "bLengthChange": false,
+                    'iDisplayLength': 7,
+                    "oLanguage": {
+                        "sSearch": "Buscar: ",
+                        "sZeroRecords": "No hay fondos",
+                        "sInfoEmpty": " ",
+                        "sInfo": 'Mostrando _END_ de _TOTAL_',
+                        "oPaginate": {
+                            "sPrevious": "Anterior",
+                            "sNext" : "Siguiente"
+                        }
+                    }
+                }
+            );
+        })
+    });
+    $('.btn_cancel_fondo').hide();
+    $('.btn_edit_fondo').hide();
+    $(document).on('click','.edit-fondo',function(e){
+        $('.register_fondo').hide();
+        e.preventDefault();
+        $.get(server + 'get-fondo/' + $(this).attr('data-idfondo')).done(function(data){
+            $('.btn_cancel_fondo').show();
+            $('.btn_edit_fondo').show();
+            console.log(data);
+            $('#fondo_institucion').val(data.institucion);
+            $('#fondo_repmed').val(data.repmed);
+            $('#fondo_supervisor').val(data.supervisor);
+            $('#fondo_total').val(data.total);
+            $('#fondo_cuenta').val(data.cuenta);
+            $('#idfondo').val(data.idfondo)
+        });
 
     });
+    $(document).on('click','.btn_cancel_fondo',function(e){
+        $('.register_fondo').show();
+        $('.btn_edit_fondo').hide();
+        $(this).hide();
+        $('#fondo_institucion').val('');
+        $('#fondo_repmed').val('');
+        $('#fondo_supervisor').val('');
+        $('#fondo_total').val('');
+        $('#fondo_cuenta').val('');
+
+    });
+    $(document).on('click','.btn_edit_fondo',function(e){
+        e.preventDefault();
+        var aux = this;
+        var dato = {
+            'institucion' : $('#fondo_institucion').val(),
+            'repmed' : $('#fondo_repmed').val(),
+            'supervisor' : $('#fondo_supervisor').val(),
+            'total' : $('#fondo_total').val(),
+            'cuenta': $('#fondo_cuenta').val(),
+            '_token' : $('#_token').val(),
+            'idfondo' : $('#idfondo').val()
+        };
+        var l = Ladda.create(aux);
+        l.start();
+        $.post(server + 'update-fondo',dato).done(function(data)
+            {
+
+                $('#fondo_institucion').val('');
+                $('#fondo_repmed').val('');
+                $('#fondo_supervisor').val('');
+                $('#fondo_total').val('');
+                $('#fondo_cuenta').val('');
+                // $('#_token').val('');
+                l.stop();
+
+                $('#table_solicitude_fondos_wrapper').remove();
+                $('.table-solicituds-fondos').append(data);
+                $('#table_solicitude_fondos').dataTable({
+                        "order": [
+                            [ 3, "desc" ]
+                        ],
+                        "bLengthChange": false,
+                        'iDisplayLength': 7,
+                        "oLanguage": {
+                            "sSearch": "Buscar: ",
+                            "sZeroRecords": "No hay fondos",
+                            "sInfoEmpty": " ",
+                            "sInfo": 'Mostrando _END_ de _TOTAL_',
+                            "oPaginate": {
+                                "sPrevious": "Anterior",
+                                "sNext" : "Siguiente"
+                            }
+                        }
+                    }
+                );
+            }
+        )
+
+    });
+
 
     /** --------------------------------------------- ADMIN ------------------------------------------------- **/
 
@@ -1078,8 +1204,11 @@ function newSolicitude() {
             "oLanguage": {
                 "sSearch": "Buscar: ",
                 "sZeroRecords": "No hay usuarios",
-
-                "sInfo": 'Mostrando _END_ de _TOTAL_'
+                "sInfo": 'Mostrando _END_ de _TOTAL_',
+                "oPaginate": {
+                    "sPrevious": "Anterior",
+                    "sNext" : "Siguiente"
+                }
             }
         }
     );

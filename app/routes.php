@@ -115,6 +115,9 @@ Route::get('prueba', 'Dmkt\SolicitudeController@test');
 Route::get('registrar-fondo','Dmkt\FondoController@getRegister');
 Route::post('registrar-fondo','Dmkt\FondoController@postRegister');
 Route::get('list-fondos','Dmkt\FondoController@getFondos');
+Route::get('get-fondo/{id}','Dmkt\FondoController@getFondo');
+Route::get('delete-fondo/{id}','Dmkt\FondoController@delFondo');
+Route::post('update-fondo','Dmkt\FondoController@updateFondo');
 
 /**
  * |-------------------------------------------------------------------------------------------- |

@@ -12,7 +12,7 @@ class FondoInstitucional extends Eloquent{
 
 
     protected $table = 'FONDOINSTITUCIONAL';
-    protected $primaryKey = 'IDFONDO';
+    protected $primaryKey = 'idfondo';
 
     function searchId(){
 

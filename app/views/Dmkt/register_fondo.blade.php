@@ -9,11 +9,12 @@
 </div>
 <div class="panel-body">
 <div>
-{{Form::token()}}
-@if(isset($fondo))
-<input value="{{$fondo->idfondo}}" name="idfondo" type="hidden">
-@endif
+
+
+<input value="" id="idfondo" name="idfondo" type="hidden">
+
 <input value="{{csrf_token()}}" name="_token" id="_token" type="hidden">
+
 <div class="form-group col-sm-6 col-md-4">
 
     <label class="col-sm-8 col-md-8 control-label" for="textinput">SiSol - Hospital</label>
@@ -83,11 +84,12 @@
 
     <div class="col-sm-12 col-md-12" style="text-align: center">
 
-            <button id="" name="button1id" class="btn btn-primary register_fondo ladda-button" data-style="zoom-in" data-size="l">{{isset($fondo) ?
-                'Actualizar' : 'Registrar'}}
+            <button id="" name="button1id" class="btn btn-primary register_fondo ladda-button" data-style="zoom-in" data-size="l">Registrar
             </button>
-
-
+            <button id="" name="button1id" class="btn btn-primary btn_edit_fondo ladda-button" data-style="zoom-in" data-size="l">Actualizar
+            </button>
+            <button id="" name="button1id" class="btn btn-primary btn_cancel_fondo ladda-button" data-style="zoom-in" data-size="l">Cancelar
+            </button>
     </div>
 </div>
 

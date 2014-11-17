@@ -25,10 +25,8 @@
         <td style="text-align: center">{{$fondo->supervisor}}</td>
         <td>
             <div class="div-icons-solicituds">
-                <a href=""><span class="glyphicon glyphicon-pencil"></span></a>
-                <a href=""><span class="glyphicon glyphicon-remove"></span></a>
-
-
+                <a href="#" class="edit-fondo" data-idfondo="{{$fondo->idfondo}}"><span class="glyphicon glyphicon-pencil"></span></a>
+                <a  href="#" class ="delete-fondo" data-idfondo="{{$fondo->idfondo}}"><span class="glyphicon glyphicon-remove"></span></a>
             </div>
         </td>
     </tr>

@@ -46,4 +46,27 @@ class FondoController extends BaseController{
         return View::make('Dmkt.list_fondos')->with('fondos',$fondos);
     }
 
+    function getFondo($id){
+        $fondo = FondoInstitucional::find($id);
+        return $fondo;
+    }
+    function delFondo($id){
+        $fondo = FondoInstitucional::find($id);
+        $fondo->delete();
+        $fondos = FondoInstitucional::all();
+        return View::make('Dmkt.list_fondos')->with('fondos',$fondos);
+    }
+    function updateFondo(){
+        $inputs = Input::all();
+        $fondo = FondoInstitucional::find($inputs['idfondo']);
+        $fondo->institucion = $inputs['institucion'];
+        $fondo->repmed = $inputs['repmed'];
+        $fondo->supervisor = $inputs['supervisor'];
+        $fondo->total = $inputs['total'];
+        $fondo->cuenta = $inputs['cuenta'];
+        $fondo->save();
+        $fondos = FondoInstitucional::all();
+        return View::make('Dmkt.list_fondos')->with('fondos',$fondos);
+
+    }
 }
