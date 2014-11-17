@@ -61,9 +61,15 @@ $(function(){
     var data          = {};
     var data_response = {};
     //Submit Events
-    $(document).on("click","#token-a",function(e){
+    $(document).on("click","#token-solicitude",function(e){
         e.preventDefault();
-        $(this).parent().parent().find('#form-token').submit();
+        var token = $(this).attr('data-url');
+        window.location.href = server+'generar-asiento-gasto/'+token;
+    });
+    $(document).on("click","#token-expense",function(e){
+        e.preventDefault();
+        var token = $(this).attr('data-url');
+        window.location.href = server+'generar-asiento-gasto/'+token;
     });
     //Default events
         //Calculate the IGV loading
@@ -147,6 +153,17 @@ $(function(){
                 }
             });
         });
+        //Generate Seat Expense
+        $("#seat-expense").on("click",function(e){
+            e.preventDefault();
+            var idsolicitude = $("#idsolicitud").val();
+            bootbox.confirm("¿Esta seguro que desea Generar el Asiento Contable?", function(result) {
+                if(result)
+                {
+                   // window.location.href = server+'generate-seat-solicitude/'+idsolicitude;
+                }
+            });
+        });
         //Enable deposit
         $("#enable-deposit").on("click",function(e){
             e.preventDefault();
@@ -155,7 +172,24 @@ $(function(){
                 {
                     if(validateRet() === true)
                     {
-                        $("#form_enable_deposit").submit();
+                        data._token       = $("input[name=_token]").val();
+                        data.idsolicitude = $("input[name=idsolicitud]").val();
+                        data.ret0         = $("#ret0").val();
+                        data.ret1         = $("#ret1").val();
+                        data.ret2         = $("#ret2").val();
+                        $.post(server+'enable-deposit', data)
+                        .done(function (data){
+                            if(data == 1)
+                            {
+                                bootbox.alert("<p class='green'>Se habilito el depósito correctamente.</p>", function(){
+                                    window.location.href = server+'show_cont';
+                                });
+                            }
+                            else
+                            {
+                                bootbox.alert("<p class='red'>Error, no se puede habilitar el depósito.</p>");
+                            }
+                        });
                     }
                     else
                     {
@@ -717,9 +751,6 @@ $(function(){
             $(this).removeClass("error-incomplete").attr("placeholder",'');
             $(".message-expense").hide();
         });
-        $(".ret").on("click",function(){
-            $(".ret").removeClass("error-incomplete");
-        });
         //Calculating sum of rows
         function calculateTot(rows,clas){
             var sum = 0;
@@ -925,7 +956,7 @@ $(function(){
                     $.each(arrayRet[i],function(index,value){
                         if(index === 0)
                         {
-                            $("#ret"+value).addClass('error-incomplete');
+                            $("#ret"+value).addClass('error-incomplete').attr('placeholder','Escoger solo una retención.').val('');
                         }
                     });
                 }
@@ -933,6 +964,14 @@ $(function(){
             }
             else
             {
+                if(arrayRet.length == 1)
+                {
+                    if(parseInt($("#idamount").val(),10) < parseInt(arrayRet[0][1],10))
+                    {
+                        $("#ret"+arrayRet[0][0]).addClass('error-incomplete').attr('placeholder','Retención menor al monto depositado.').val('');
+                        return false;
+                    }    
+                }
                 return true;
             }
         }

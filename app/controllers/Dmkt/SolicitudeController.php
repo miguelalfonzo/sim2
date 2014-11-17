@@ -28,6 +28,7 @@ use \Validator;
 use \Excel;
 use \Response;
 use \Illuminate\Database\Query\Builder;
+use \Expense\Expense;
 
 class SolicitudeController extends BaseController
 {
@@ -1180,6 +1181,17 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.Cont.register_seat', $data);
     }
 
+    public function viewSeatExpenseSolicitude($token)
+    {
+        $solicitude = Solicitude::where('token', $token)->firstOrFail();
+        $expense = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
+        $data = [
+            'solicitude' => $solicitude,
+            'expense' => $expense
+        ];
+        return View::make('Dmkt.Cont.register_seat_expense', $data);
+    }
+
     public function generateSeatSolicitude($id)
     {
         $solicitude = Solicitude::where('idsolicitud', $id);
@@ -1189,9 +1201,9 @@ class SolicitudeController extends BaseController
         return Redirect::to('show_cont');
     }
 
-    public function generateSeatExpense($id)
+    public function generateSeatExpense($token)
     {
-        $solicitude = Solicitude::where('idsolicitud', $id);
+        $solicitude = Solicitude::where('token', $token)->get();
         $solicitude->estado = 7;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
@@ -1201,37 +1213,34 @@ class SolicitudeController extends BaseController
     public function enableDeposit()
     {
         $inputs = Input::all();
-        $ret = array();
-        for ($i = 0; $i <= 2; $i++) 
+
+        $val_ret = null;
+        if($inputs['ret0'])
         {
-            if ($inputs["ret$i"]) 
-            {
-                $ret[$i] = $inputs["ret$i"];
-            }
+            $val_ret = intval($inputs['ret0']);
         }
-        if (count($ret) == 0) 
+        if($inputs['ret1'])
         {
-            $val_ret = null;
+            $val_ret = intval($inputs['ret1']);
         }
-        else if (count($ret) == 1) 
+        if($inputs['ret2'])
         {
-            foreach ($ret as $value) 
-            {
-                $val_ret = $value;
-            }    
+            $val_ret = intval($inputs['ret2']);
         }
-        else
-        {
-            echo "<script>alert('error');</script>";
-            die;
-        }
-        $id = $inputs['idsolicitud'];
+        
+        $id = $inputs['idsolicitude'];
         $solicitude = Solicitude::where('idsolicitud', $id);
         $solicitude->retencion = $val_ret;
         $solicitude->asiento = 1;
         $data = $this->objectToArray($solicitude);
-        $solicitude->update($data);
 
-        return Redirect::to('show_cont');
+        if($solicitude->update($data))
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
     }
 }

@@ -101,6 +101,11 @@ table thead th, table th
 	margin-bottom: 1em;
 }
 
+.green
+{
+	color: green;
+}
+
 .inline
 {
 	display: inline;
@@ -126,6 +131,11 @@ table thead th, table th
 .quantity input
 {
 	text-align: center;
+}
+
+.red
+{
+	color: red;
 }
 
 .reg-expense
