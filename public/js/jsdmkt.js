@@ -908,8 +908,35 @@ function newSolicitude() {
 
     /** --------------------------------------------- FONDOS ------------------------------------------------- **/
 
+    $.get(server + 'list-fondos').done(function(data)
+        {
+            console.log(data);
+            //$('#table_solicitude_fondos_wrapper').remove();
+            $('.table-solicituds-fondos').append(data);
+            $('#table_solicitude_fondos').dataTable({
+                    "order": [
+                        [ 0, "desc" ]
+                    ],
+                    "bLengthChange": false,
+                    'iDisplayLength': 7,
+                    "oLanguage": {
+                        "sSearch": "Buscar: ",
+                        "sZeroRecords": "No hay fondos",
+                        "sInfoEmpty": " ",
+                        "sInfo": 'Mostrando _END_ de _TOTAL_',
+                        "oPaginate": {
+                            "sPrevious": "Anterior",
+                            "sNext" : "Siguiente"
+                        }
+                    }
+                }
+            );
+        }
+    );
+
     $('.register_fondo').on('click',function(){
 
+        var aux = this;
         var dato = {
             'institucion' : $('#fondo_institucion').val(),
             'repmed' : $('#fondo_repmed').val(),
@@ -918,8 +945,17 @@ function newSolicitude() {
             'cuenta': $('#fondo_cuenta').val(),
             '_token' : $('#_token').val()
         };
+        var l = Ladda.create(aux);
+        l.start();
         $.post(server + 'registrar-fondo',dato).done(function(data)
             {
+                 $('#fondo_institucion').val('');
+                 $('#fondo_repmed').val('');
+                 $('#fondo_supervisor').val('');
+                 $('#fondo_total').val('');
+                 $('#fondo_cuenta').val('');
+                // $('#_token').val('');
+                l.stop();
                 console.log(data);
                 $('#table_solicitude_fondos_wrapper').remove();
                 $('.table-solicituds-fondos').append(data);

@@ -45,7 +45,7 @@
     <div class="col-sm-12 col-md-12">
         <input id="fondo_cuenta" name="cuenta" type="text" placeholder=""
                value="{{isset($fondo->cuenta) ? $fondo->cuenta : null }}"
-               class="form-control input-md" maxlength="11">
+               class="form-control input-md" maxlength="25">
 
     </div>
 </div>
@@ -83,10 +83,10 @@
 
     <div class="col-sm-12 col-md-12" style="text-align: center">
 
-            <button id="" name="button1id" class="btn btn-primary register_fondo">{{isset($fondo) ?
+            <button id="" name="button1id" class="btn btn-primary register_fondo ladda-button" data-style="zoom-in" data-size="l">{{isset($fondo) ?
                 'Actualizar' : 'Registrar'}}
             </button>
-            <a id="button2id" href="{{URL::to('show_rm')}}" name="button2id" class="btn btn-primary">Cancelar</a>
+
 
     </div>
 </div>
@@ -105,45 +105,7 @@
 </div>
 <div class="panel-body table-solicituds-fondos">
 
- <table class="table table-striped table-bordered dataTable" id="table_solicitude_fondos" style="width: 100%">
-    <thead>
-    <tr>
-        <th>#</th>
-        <th>SiSol - Hospital</th>
-        <th>Depositar a</th>
-        <th>N° Cuenta Bagó. Bco Credito</th>
-        <th>Total a depositar</th>
-        <th>Supervisor</th>
-        <th>Edicion</th>
-    </tr>
-    </thead>
-    <tbody>
-    <?php $i=1?>
-    @foreach($fondos as  $fondo)
-    <tr>
-        <td>{{$i}}</td>
-        <td style="text-align: center">{{$fondo->institucion}}</td>
-        <td>{{$fondo->repmed}}</td>
-        <td style="text-align: center">
-            {{$fondo->cuenta }}
-        </td>
 
-        <td style="text-align: center">{{$fondo->total}}</td>
-        <td style="text-align: center">{{$fondo->supervisor}}</td>
-        <td>
-            <div class="div-icons-solicituds">
-                <a href=""><span class="glyphicon glyphicon-eye-open"></span></a>
-                <a href=""><span class="glyphicon glyphicon-edit"></span></a>
-
-
-            </div>
-        </td>
-    </tr>
-    <?php $i++?>
-    @endforeach
-    </tbody>
-
-</table>
 </div>
 </div>
 </div>

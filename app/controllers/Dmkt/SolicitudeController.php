@@ -119,7 +119,6 @@ class SolicitudeController extends BaseController
     public function registerSolicitude()
     {
 
-
         $inputs = Input::all();
         $image = Input::file('file');
 

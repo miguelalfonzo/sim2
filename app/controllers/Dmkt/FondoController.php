@@ -14,7 +14,7 @@ use \Input;
 use \Redirect;
 use \Auth;
 use \Validator;
-use User;
+
 
 class FondoController extends BaseController{
 
@@ -40,4 +40,10 @@ class FondoController extends BaseController{
         return View::make('Dmkt.list_fondos')->with('fondos',$fondos);
 
     }
+    function getFondos(){
+
+        $fondos = FondoInstitucional::all();
+        return View::make('Dmkt.list_fondos')->with('fondos',$fondos);
+    }
+
 }
