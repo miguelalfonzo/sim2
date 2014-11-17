@@ -11,11 +11,8 @@
 |
 */
 
-
 /** Admin */
 Route::group(array('before' => 'admin'), function () {
-
-
     Route::get('register', 'Admin\AdminController@register');
     Route::post('register-user', 'Admin\AdminController@formRegister');
     Route::get('editar/{id}', 'Admin\AdminController@edit');
@@ -57,8 +54,6 @@ Route::get('getclients', 'Dmkt\SolicitudeController@getClients');
 
 Route::group(array('before' => 'rm'), function () {
     /** Rep. Medico */
-
-
     Route::get('show_rm', 'Dmkt\SolicitudeController@show_rm');
     Route::get('nueva-solicitud-rm', 'Dmkt\SolicitudeController@newSolicitude');
     Route::get('ver-solicitud-rm/{token}', 'Dmkt\SolicitudeController@viewSolicitude');
@@ -66,6 +61,21 @@ Route::group(array('before' => 'rm'), function () {
     Route::get('listar-solicitudes-rm/{id}', 'Dmkt\SolicitudeController@listSolicitude');
     Route::get('getfondos/{id}', 'Dmkt\SolicitudeController@Fondo');
     Route::post('buscar-solicitudes-rm', 'Dmkt\SolicitudeController@searchSolicituds');
+
+    // Expense
+    Route::post('registrar-gasto', 'Expense\ExpenseController@show');
+    Route::post('register-expense', 'Expense\ExpenseController@registerExpense');
+    Route::post('delete-expense', 'Expense\ExpenseController@deleteExpense');
+    Route::post('update-expense', 'Expense\ExpenseController@updateExpense');
+    Route::get('edit-expense', 'Expense\ExpenseController@editExpense');
+    Route::get('end-expense/{token}', 'Expense\ExpenseController@finishExpense');
+    Route::get('ver-gasto/{token}', 'Expense\ExpenseController@viewExpense');
+
+    // Ruc
+    Route::post('consultarRuc', 'Expense\RucController@show');
+    Route::get('ruc', function () {
+        return View::make('Expense\ruc');
+    });
 
 });
 Route::group(array('before' => 'auth'), function () {
@@ -145,6 +155,7 @@ Route::group(array('before' => 'gercom'), function () {
  */
 
 Route::group(array('before' => 'cont'), function () {
+
     Route::get('show_cont', 'Dmkt\SolicitudeController@show_cont');
     Route::get('ver-solicitud-cont/{id}', 'Dmkt\SolicitudeController@viewSolicitudeCont');
     Route::get('listar-solicitudes-cont/{id}', 'Dmkt\SolicitudeController@listSolicitudeCont');
@@ -170,28 +181,19 @@ App::missing(function ($exception) {
  * | Tesorería |
  * |-------------------------------------------------------------------------------------------- |
  */
-Route::get('show_tes', 'Deposit\DepositController@show_tes');
-Route::get('listar-solicitudes-tes/{id}', 'Deposit\DepositController@listSolicitudeTes');
-Route::get('ver-solicitud-tes/{id}', 'Deposit\DepositController@viewSolicitudeTes');
-Route::post('buscar-solicitudes-tes', 'Deposit\DepositController@searchSolicitudeTes');
-Route::post('depositar', 'Deposit\DepositController@depositSolicitudeTes');
+
+Route::group(array('before' => 'tes'), function(){
+
+    Route::get('show_tes', 'Deposit\DepositController@show_tes');
+    Route::get('listar-solicitudes-tes/{id}', 'Deposit\DepositController@listSolicitudeTes');
+    Route::get('ver-solicitud-tes/{id}', 'Deposit\DepositController@viewSolicitudeTes');
+    Route::post('buscar-solicitudes-tes', 'Deposit\DepositController@searchSolicitudeTes');
+    Route::post('depositar', 'Deposit\DepositController@depositSolicitudeTes');
+    
+});
 
 /* ================================================================================= */
 
-// Expense
-Route::post('registrar-gasto', 'Expense\ExpenseController@show');
-Route::post('register-expense', 'Expense\ExpenseController@registerExpense');
-Route::post('delete-expense', 'Expense\ExpenseController@deleteExpense');
-Route::post('update-expense', 'Expense\ExpenseController@updateExpense');
-Route::get('edit-expense', 'Expense\ExpenseController@editExpense');
-Route::get('end-expense/{token}', 'Expense\ExpenseController@finishExpense');
-Route::get('ver-gasto/{token}', 'Expense\ExpenseController@viewExpense');
-
-// Ruc
-Route::post('consultarRuc', 'Expense\RucController@show');
-Route::get('ruc', function () {
-    return View::make('Expense\ruc');
-});
 
 //test
 Route::get('hola', 'Expense\ExpenseController@test');

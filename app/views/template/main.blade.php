@@ -25,7 +25,7 @@
 </head>
 <body>
 <header>
-    {{ HTML::link('/', '', array('id' => 'logo', 'title' => 'Bagó Perú', 'alt' => 'Bagó Perú')) }}
+    {{ HTML::link('/show_rm', '', array('id' => 'logo', 'title' => 'Bagó Perú', 'alt' => 'Bagó Perú')) }}
     <a id="logout" href="{{URL::to('logout')}}" title="Cerrar sesión" alt="Cerrar sesión">
         <bdi>Cerrar sesión</bdi>
         <img src="{{URL::to('/')}}/img/user.png"></a>
