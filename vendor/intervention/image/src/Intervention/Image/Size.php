@@ -168,7 +168,7 @@ class Size
     /**
      * Scale size according to given constraints
      *
-     * @param  integer $height
+     * @param  integer $width
      * @param  Closure $callback
      * @return Size
      */
@@ -222,7 +222,7 @@ class Size
      * @param  Size   $size
      * @return \Intervention\Image\Size
      */
-    public function fit(Size $size, $position = 'center')
+    public function fit(Size $size)
     {
         // create size with auto height
         $auto_height = clone $size;
@@ -248,8 +248,8 @@ class Size
             $size = $auto_width;
         }
 
-        $this->align($position);
-        $size->align($position);
+        $this->align('center');
+        $size->align('center');
         $size->setPivot($this->relativePosition($size));
 
         return $size;

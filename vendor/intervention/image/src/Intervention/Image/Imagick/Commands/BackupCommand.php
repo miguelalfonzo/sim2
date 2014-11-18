@@ -12,10 +12,8 @@ class BackupCommand extends \Intervention\Image\Commands\AbstractCommand
      */
     public function execute($image)
     {
-        $backupName = $this->argument(0)->value();
-
         // clone current image resource
-        $image->setBackup(clone $image->getCore(), $backupName);
+        $image->setBackup(clone $image->getCore());
 
         return true;
     }

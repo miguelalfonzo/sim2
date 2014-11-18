@@ -58,7 +58,7 @@ Route::filter('admin', function () {
         if (Auth::user()->type != 'A' && Auth::user()->type == 'G')
             return Redirect::to('show_gercom');
         if (Auth::user()->type != 'A' && Auth::user()->type == 'T')
-            return Redirect::to('show_test');
+            return Redirect::to('show_tes');
 
     } else {
         return Redirect::to('login');
@@ -78,7 +78,7 @@ Route::filter('rm', function () {
             if (Auth::user()->type != 'R' && Auth::user()->type == 'G')
                 return Redirect::to('show_gercom');
             if (Auth::user()->type != 'R' && Auth::user()->type == 'T')
-                return Redirect::to('show_test');
+                return Redirect::to('show_tes');
             if (Auth::user()->type != 'R' && Auth::user()->type == 'A')
                 return Redirect::to('register');
 

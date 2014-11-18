@@ -56,17 +56,6 @@ class GdSystemTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(10, $img->getHeight());
     }
 
-    public function testMakeFromBase64()
-    {
-        $img = $this->manager()->make('iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGElEQVQYlWM8c+bMfwYiABMxikYVUk8hAHWzA3cRvs4UAAAAAElFTkSuQmCC');
-        $this->assertInstanceOf('Intervention\Image\Image', $img);
-        $this->assertInternalType('resource', $img->getCore());
-        $this->assertInternalType('int', $img->getWidth());
-        $this->assertInternalType('int', $img->getHeight());
-        $this->assertEquals(10, $img->getWidth());
-        $this->assertEquals(10, $img->getHeight());
-    }
-
     public function testCanvas()
     {
         $img = $this->manager()->canvas(30, 20);
@@ -206,19 +195,6 @@ class GdSystemTest extends PHPUnit_Framework_TestCase
         $this->assertTransparentPosition($img, 60, 0);
     }
 
-    public function testWidenImageWithConstraint()
-    {
-        $img = $this->manager()->make('tests/images/tile.png');
-        $img->widen(100, function ($constraint) {$constraint->upsize();});
-        $this->assertInstanceOf('Intervention\Image\Image', $img);
-        $this->assertInternalType('resource', $img->getCore());
-        $this->assertInternalType('int', $img->getWidth());
-        $this->assertInternalType('int', $img->getHeight());
-        $this->assertEquals(16, $img->getWidth());
-        $this->assertEquals(16, $img->getHeight());
-        $this->assertTransparentPosition($img, 8, 0);
-    }
-
     public function testHeightenImage()
     {
         $img = $this->manager()->make('tests/images/tile.png');
@@ -230,19 +206,6 @@ class GdSystemTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(100, $img->getWidth());
         $this->assertEquals(100, $img->getHeight());
         $this->assertTransparentPosition($img, 60, 0);
-    }
-
-    public function testHeightenImageWithConstraint()
-    {
-        $img = $this->manager()->make('tests/images/tile.png');
-        $img->heighten(100, function ($constraint) {$constraint->upsize();});
-        $this->assertInstanceOf('Intervention\Image\Image', $img);
-        $this->assertInternalType('resource', $img->getCore());
-        $this->assertInternalType('int', $img->getWidth());
-        $this->assertInternalType('int', $img->getHeight());
-        $this->assertEquals(16, $img->getWidth());
-        $this->assertEquals(16, $img->getHeight());
-        $this->assertTransparentPosition($img, 8, 0);
     }
 
     public function testResizeCanvasCenter()
@@ -1115,29 +1078,6 @@ class GdSystemTest extends PHPUnit_Framework_TestCase
         $img->backup();
         $img->reset();
         $this->assertTransparentPosition($img, 0, 0);
-    }
-
-    public function testResetToNamed()
-    {
-        $img = $this->manager()->make('tests/images/tile.png');
-        $img->backup('original');
-        $img->resize(30, 20);
-        $img->backup('30x20');
-
-        // reset to original
-        $img->reset('original');
-        $this->assertEquals(16, $img->getWidth());
-        $this->assertEquals(16, $img->getHeight());
-
-        // reset to 30x20
-        // $img->reset('30x20');
-        // $this->assertEquals(30, $img->getWidth());
-        // $this->assertEquals(20, $img->getHeight());
-
-        // reset to original again
-        $img->reset('original');
-        $this->assertEquals(16, $img->getWidth());
-        $this->assertEquals(16, $img->getHeight());
     }
 
     public function testLimitColors()

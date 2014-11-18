@@ -18,10 +18,9 @@ class FitCommand extends ResizeCommand
         $width = $this->argument(0)->type('digit')->required()->value();
         $height = $this->argument(1)->type('digit')->value($width);
         $constraints = $this->argument(2)->type('closure')->value();
-        $position = $this->argument(3)->type('string')->value('center');
 
         // calculate size
-        $cropped = $image->getSize()->fit(new Size($width, $height), $position);
+        $cropped = $image->getSize()->fit(new Size($width, $height));
         $resized = clone $cropped;
         $resized = $resized->resize($width, $height, $constraints);
 

@@ -215,12 +215,15 @@ class Color extends AbstractColor
      */
     private function alpha2gd($input)
     {
-        $oldMin = 0;
-        $oldMax = 1;
+        $range_input = range(1, 0, 1/127);
+        $range_output = range(0, 127);
 
-        $newMin = 127;
-        $newMax = 0;
+        foreach ($range_input as $key => $value) {
+            if ($value <= $input) {
+                return $range_output[$key];
+            }
+        }
 
-        return ceil(((($input- $oldMin) * ($newMax - $newMin)) / ($oldMax - $oldMin)) + $newMin);
+        return 127;
     }
 }

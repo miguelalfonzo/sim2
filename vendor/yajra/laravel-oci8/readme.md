@@ -2,12 +2,7 @@
 
 ###Laravel-OCI8
 
-[![Build Status](https://travis-ci.org/yajra/laravel-oci8.png?branch=master)](https://travis-ci.org/yajra/laravel-oci8)
-[![Total Downloads](https://poser.pugx.org/yajra/laravel-oci8/downloads.png)](https://packagist.org/packages/yajra/laravel-oci8)
-[![Latest Stable Version](https://poser.pugx.org/yajra/laravel-oci8/v/stable.png)](https://packagist.org/packages/yajra/laravel-oci8)
-[![Latest Unstable Version](https://poser.pugx.org/yajra/laravel-oci8/v/unstable.svg)](https://packagist.org/packages/yajra/laravel-oci8)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/yajra/laravel-oci8/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/yajra/laravel-oci8/?branch=master)
-[![License](https://poser.pugx.org/yajra/laravel-oci8/license.svg)](https://packagist.org/packages/yajra/laravel-oci8)
+[![Latest Stable Version](https://poser.pugx.org/yajra/laravel-oci8/v/stable.png)](https://packagist.org/packages/yajra/laravel-oci8) [![Total Downloads](https://poser.pugx.org/yajra/laravel-oci8/downloads.png)](https://packagist.org/packages/yajra/laravel-oci8) [![Build Status](https://travis-ci.org/yajra/laravel-oci8.png?branch=master)](https://travis-ci.org/yajra/laravel-oci8)
 
 Laravel-OCI8 is an Oracle Database Driver package for [Laravel 4](http://laravel.com/). Laravel-OCI8 is an extension of [Illuminate/Database](https://github.com/illuminate/database) that uses [OCI8](http://php.net/oci8) extension to communicate with Oracle. Thanks to @taylorotwell.
 
@@ -23,7 +18,6 @@ tested [OCI8](http://php.net/oci8) functions instead of using the still experime
 - [Auto-Increment Support](#auto-increment-support)
 - [Examples](#examples)
 - [Support](#support)
-- [Using the package outside of Laravel](#using-the-package-outside-of-laravel)
 - [Credits](#credits)
 
 ###Requirements
@@ -103,7 +97,7 @@ To support auto-increment in Laravel-OCI8, you must meet the following requireme
 ```php
 Schema::create('posts', function($table)
 {
-    $table->increments('id');
+    $table->increments('id')->unsigned();
     $table->integer('user_id')->unsigned();
     $table->string('title');
     $table->string('slug');
@@ -121,16 +115,6 @@ This script will trigger Laravel-OCI8 to create the following DB objects
 - posts_id_trg (trigger)
 
 > Check the starter kit provided to see how it works.
-
-###Auto-Increment Start With Option
-- You can now set the auto-increment starting value by setting the `start` attribute.
-```php
-Schema::create('posts', function($table)
-{
-    $table->increments('id')->start(10000);
-    $table->string('title');
-}
-```
 
 ####Inserting Records Into A Table With An Auto-Incrementing ID
 
@@ -297,60 +281,6 @@ DB::setDateFormat('MM/DD/YYYY');
 Just like the built-in database drivers, you can use the connection method to access the oracle database(s) you setup in the database config file.
 
 See [Laravel 4 Database Basic Docs](http://laravel.com/docs/database) for more information.
-
-
-###Using the package outside of Laravel
-
-- add `"yajra/laravel-oci8": "1.*"` on your composer then run `composer install`
-- create `database.php` and add the code below
-```php
-require 'vendor/autoload.php';
-
-use Illuminate\Database\Capsule\Manager as Capsule;
-use yajra\Oci8\Connectors\OracleConnector;
-use yajra\Oci8\Oci8Connection;
-
-$capsule = new Capsule;
-
-$manager = $capsule->getDatabaseManager();
-$manager->extend('oracle', function($config)
-{
-    $connector = new OracleConnector();
-    $connection = $connector->connect($config);
-    $db = new Oci8Connection($connection, $config["database"], $config["prefix"]);
-    // set oracle date format to match PHP's date
-    $db->setDateFormat('YYYY-MM-DD HH24:MI:SS');
-    return $db;
-});
-
-$capsule->addConnection(array(
-    'driver'   => 'oracle',
-    'host'     => 'oracle.host',
-    'database' => 'xe',
-    'username' => 'user',
-    'password' => 'password',
-    'prefix'   => '',
-    'port'  => 1521
-));
-
-$capsule->bootEloquent();
-```
-
-- Now we can start working with database tables just like we would if we were using Laravel!
-```php
-include 'database.php';
-
-// Create the User model
-class User extends Illuminate\Database\Eloquent\Model {
-    public $timestamps = false;
-}
-
-// Grab a user with an id of 1
-$user = User::find(1);
-
-echo $user->toJson(); die();
-```
-
 
 ###License
 

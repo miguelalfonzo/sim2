@@ -68,13 +68,6 @@ abstract class AbstractEncoder
     abstract protected function processBmp();
 
     /**
-     * Processes and returns encoded image as ICO string
-     *
-     * @return string
-     */
-    abstract protected function processIco();
-
-    /**
      * Process a given image
      *
      * @param  Image   $image
@@ -132,17 +125,6 @@ abstract class AbstractEncoder
             case 'image/x-windows-bmp':
             case 'image/x-xbitmap':
                 $this->result = $this->processBmp();
-                break;
-
-            case 'ico':
-            case 'image/x-icon':
-            case 'image/vnd.microsoft.icon':
-                $this->result = $this->processIco();
-                break;
-
-            case 'psd':
-            case 'image/vnd.adobe.photoshop':
-                $this->result = $this->processPsd();
                 break;
                 
             default:

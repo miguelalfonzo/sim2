@@ -15,7 +15,7 @@ class Solicitude extends Eloquent{
 
 
     protected $table = 'DMKT_RG_SOLICITUD';
-    protected $primaryKey = 'IDSOLICITUD';
+    protected $primaryKey = 'idsolicitud';
 
     function searchId(){
 

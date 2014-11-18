@@ -63,15 +63,12 @@ class Oci8
      */
     public function __construct($dsn, $username, $password, array $options = array())
     {
-        // Set default charset to AL32UTF8
-        $charset = 'AL32UTF8';
         // Get the character set
+        $charset = null;
         if (array_key_exists("charset", $options))
         {
             $charset = $options["charset"];
         }
-        // Convert UTF8 charset to AL32UTF8
-        $charset = strtolower($charset)=='utf8' ? 'AL32UTF8' : $charset;
 
         //Attempt a connection
         if (isset($options[\PDO::ATTR_PERSISTENT]) && $options[\PDO::ATTR_PERSISTENT]) {
@@ -103,26 +100,22 @@ class Oci8
      */
     public function prepare($statement, $options = null)
     {
+
         // Get instance options
         if($options == null) $options = $this->_options;
-
-        // Skip replacing ? with a pseudo named parameter on alter/create table command
-        if (!preg_match('/^alter+ +table/', strtolower(trim($statement)))
-            and !preg_match('/^create+ +table/', strtolower(trim($statement)))){
-            // Replace ? with a pseudo named parameter
-            $newStatement = null;
-            $parameter = 0;
-            while($newStatement !== $statement)
+        //Replace ? with a pseudo named parameter
+        $newStatement = null;
+        $parameter = 0;
+        while($newStatement !== $statement)
+        {
+            if($newStatement !== null)
             {
-                if($newStatement !== null)
-                {
-                    $statement = $newStatement;
-                }
-                $newStatement = preg_replace('/\?/', ':autoparam'.$parameter, $statement, 1);
-                $parameter++;
+                $statement = $newStatement;
             }
-            $statement = $newStatement;
+            $newStatement = preg_replace('/\?/', ':autoparam'.$parameter, $statement, 1);
+            $parameter++;
         }
+        $statement = $newStatement;
 
         // check if statement is insert function
         if (strpos(strtolower($statement), 'insert into')!==false) {
@@ -131,7 +124,7 @@ class Oci8
             $this->_table = $matches[1];
         }
 
-        // Prepare the statement
+        //Prepare the statement
         $sth = @oci_parse($this->_dbh, $statement);
 
         if (!$sth) {

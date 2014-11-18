@@ -13,14 +13,11 @@ class HeightenCommand extends ResizeCommand
     public function execute($image)
     {
         $height = $this->argument(0)->type('digit')->required()->value();
-        $additionalConstraints = $this->argument(1)->type('closure')->value();
 
         $this->arguments[0] = null;
         $this->arguments[1] = $height;
-        $this->arguments[2] = function ($constraint) use ($additionalConstraints) {
+        $this->arguments[2] = function ($constraint) {
             $constraint->aspectRatio();
-            if(is_callable($additionalConstraints)) 
-                $additionalConstraints($constraint);
         };
 
         return parent::execute($image);

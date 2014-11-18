@@ -32,7 +32,6 @@ class Decoder extends \Intervention\Image\AbstractDecoder
 
             case IMAGETYPE_JPEG:
                 $core = imagecreatefromjpeg($path);
-                $this->gdResourceToTruecolor($core);
                 break;
 
             case IMAGETYPE_GIF:

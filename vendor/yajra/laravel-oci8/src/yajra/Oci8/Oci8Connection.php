@@ -1,13 +1,6 @@
 <?php namespace yajra\Oci8;
 
 use Illuminate\Database\Connection;
-use Doctrine\DBAL\Connection as DoctrineConnection;
-use Doctrine\DBAL\Driver\OCI8\Driver as DoctrineDriver;
-use yajra\Oci8\Query\Grammars\OracleGrammar as QueryGrammar;
-use yajra\Oci8\Schema\Grammars\OracleGrammar as SchemaGrammar;
-use yajra\Oci8\Query\Processors\OracleProcessor as Processor;
-use yajra\Oci8\Schema\OracleBuilder as SchemaBuilder;
-use yajra\Oci8\Query\OracleBuilder as QueryBuilder;
 
 class Oci8Connection extends Connection {
 
@@ -18,7 +11,7 @@ class Oci8Connection extends Connection {
 	 */
 	protected function getDefaultQueryGrammar()
 	{
-		return $this->withTablePrefix(new QueryGrammar);
+		return $this->withTablePrefix(new Query\Grammars\OracleGrammar);
 	}
 
 	/**
@@ -28,7 +21,7 @@ class Oci8Connection extends Connection {
 	 */
 	protected function getDefaultSchemaGrammar()
 	{
-		return $this->withTablePrefix(new SchemaGrammar);
+		return $this->withTablePrefix(new Schema\Grammars\OracleGrammar);
 	}
 
 	/**
@@ -48,7 +41,7 @@ class Oci8Connection extends Connection {
  	 */
  	protected function getDefaultPostProcessor()
  	{
- 		return new Processor;
+ 		return new Query\Processors\OracleProcessor;
  	}
 
 	/**
@@ -58,9 +51,7 @@ class Oci8Connection extends Connection {
 	 */
 	public function getSchemaBuilder()
 	{
-		if (is_null($this->schemaGrammar)) { $this->useDefaultSchemaGrammar(); }
-
-		return new SchemaBuilder($this);
+		return new Schema\OracleBuilder($this);
 	}
 
 	/**
@@ -73,14 +64,13 @@ class Oci8Connection extends Connection {
 	{
 		$processor = $this->getPostProcessor();
 
-		$query = new QueryBuilder($this, $this->getQueryGrammar(), $processor);
+		$query = new Query\OracleBuilder($this, $this->getQueryGrammar(), $processor);
 
 		return $query->from($table);
 	}
 
 	/**
 	 * function to set oracle's current session date format
-	 *
 	 * @param string $format
 	 */
 	public function setDateFormat($format = 'YYYY-MM-DD HH24:MI:SS')
@@ -91,28 +81,27 @@ class Oci8Connection extends Connection {
 
 	/**
 	 * function to create oracle sequence
-	 *
-	 * @param  string  $name
-	 * @param  integer $start
+	 * @param  strine $name
 	 * @return boolean
 	 */
-	public function createSequence($name, $start = 1)
+	public function createSequence($name)
 	{
-		if (!$name) return false;
+		if (!$name)
+			return false;
 
-		return self::statement("create sequence {$name} start with {$start}");
+		return self::statement('create sequence '. $name);
 	}
 
 	/**
 	 * function to safely drop sequence db object
-	 *
 	 * @param  string $name
 	 * @return boolean
 	 */
 	public function dropSequence($name)
 	{
 		// check if a valid name and sequence exists
-		if (!$name or !self::checkSequence($name)) return 0;
+		if (!$name or !self::checkSequence($name))
+			return 0;
 
 		return self::statement("
 			declare
@@ -126,6 +115,7 @@ class Oci8Connection extends Connection {
 			end;");
 	}
 
+
 	/**
 	 * function to get oracle sequence last inserted id
 	 * @param  string $name
@@ -134,7 +124,8 @@ class Oci8Connection extends Connection {
 	public function lastInsertId($name)
 	{
 		// check if a valid name and sequence exists
-		if (!$name or !self::checkSequence($name)) return 0;
+		if (!$name or !self::checkSequence($name))
+			return 0;
 
 		$data = self::select("select {$name}.currval as id from dual");
 		return $data[0]->id;
@@ -142,13 +133,12 @@ class Oci8Connection extends Connection {
 
 	/**
 	 * get sequence next value
-	 *
 	 * @param  string $name
 	 * @return integer
 	 */
-	public function nextSequenceValue($name)
-	{
-		if (!$name) return 0;
+	public function nextSequenceValue($name) {
+		if (!$name)
+			return 0;
 
 		$data = self::select("SELECT $name.NEXTVAL as id FROM DUAL");
 		return $data[0]->id;
@@ -156,7 +146,6 @@ class Oci8Connection extends Connection {
 
 	/**
 	 * same function as lastInsertId. added for clarity with oracle sql statement.
-	 *
 	 * @param  string $name
 	 * @return integer
 	 */
@@ -167,7 +156,6 @@ class Oci8Connection extends Connection {
 
 	/**
 	 * function to create auto increment trigger for a table
-	 *
 	 * @param  string $table
 	 * @param  string $column
 	 * @param  string $triggerName
@@ -192,7 +180,6 @@ class Oci8Connection extends Connection {
 
 	/**
 	 * function to safely drop trigger db object
-	 *
 	 * @param  string $name
 	 * @return boolean
 	 */
@@ -215,13 +202,13 @@ class Oci8Connection extends Connection {
 
 	/**
 	 * get table's primary key
-	 *
 	 * @param  string $table
 	 * @return string
 	 */
 	public function getPrimaryKey($table)
 	{
-		if (!$table) return '';
+		if (!$table)
+			return '';
 
 		$data = self::select("
 			SELECT cols.column_name
@@ -235,20 +222,21 @@ class Oci8Connection extends Connection {
 			ORDER BY cols.table_name, cols.position
 			");
 
-		if (count($data)) return $data[0]->column_name;
+		if (count($data))
+			return $data[0]->column_name;
 
 		return '';
 	}
 
 	/**
 	 * function to check if sequence exists
-	 *
 	 * @param  string $name
 	 * @return boolean
 	 */
 	public function checkSequence($name)
 	{
-		if (!$name) return false;
+		if (!$name)
+			return false;
 
 		return self::select("select *
 			from all_sequences
@@ -256,30 +244,6 @@ class Oci8Connection extends Connection {
 				sequence_name=upper('{$name}')
 				and sequence_owner=upper(user)
 			");
-	}
-
-	/**
-	 * Get the Doctrine DBAL database connection instance.
-	 *
-	 * @return \Doctrine\DBAL\Connection
-	 */
-	public function getDoctrineConnection()
-	{
-		$driver = $this->getDoctrineDriver();
-
-		$data = array('pdo' => $this->pdo, 'user' => $this->getConfig('database'));
-
-		return new DoctrineConnection($data, $driver);
-	}
-
-	/**
-	 * Get the Doctrine DBAL driver.
-	 *
-	 * @return \Doctrine\DBAL\Driver\OCI8\Driver
-	 */
-	protected function getDoctrineDriver()
-	{
-		return new DoctrineDriver;
 	}
 
 }

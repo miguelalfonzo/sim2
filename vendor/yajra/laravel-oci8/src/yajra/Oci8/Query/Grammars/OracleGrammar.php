@@ -100,12 +100,9 @@ class OracleGrammar extends Grammar {
  	 */
 	protected function compileTableExpression($sql, $constraint, $query)
 	{
-		if ($query->limit > 0)
-		{
+		if ($query->limit > 0) {
 			return "select t2.* from ( select rownum AS \"rn\", t1.* from ({$sql}) t1 ) t2 where t2.\"rn\" {$constraint}";
-		}
-		else
-		{
+		} else {
 			return "select * from ({$sql}) where rownum {$constraint}";
 		}
 	}
@@ -173,11 +170,9 @@ class OracleGrammar extends Grammar {
 
 		$value = array_fill(0, count($values), "($parameters)");
 
-		if (count($value) > 1)
-		{
+		if (count($value) > 1) {
 			$insertQueries = array();
-			foreach ($value as $parameter)
-			{
+			foreach ($value as $parameter) {
 				$parameter = (str_replace(array('(',')'), '', $parameter));
 				$insertQueries[] = "select ". $parameter . " from dual ";
 			}
@@ -282,8 +277,7 @@ class OracleGrammar extends Grammar {
 
 		// create EMPTY_BLOB sql for each binary
 		$binarySql = array();
-		foreach ( (array) $binaryColumns as $binary)
-		{
+		foreach ( (array) $binaryColumns as $binary) {
 			$binarySql[] = "$binary = EMPTY_BLOB()";
 		}
 

@@ -1181,7 +1181,7 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.Cont.register_seat', $data);
     }
 
-    public function viewSeatExpenseSolicitude($token)
+    public function viewSeatExpense($token)
     {
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $expense = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
@@ -1201,13 +1201,16 @@ class SolicitudeController extends BaseController
         return Redirect::to('show_cont');
     }
 
-    public function generateSeatExpense($token)
+    public function generateSeatExpense()
     {
-        $solicitude = Solicitude::where('token', $token)->get();
+        $inputs = Input::all();
+        $solicitude = Solicitude::find($inputs['idsolicitude']);
         $solicitude->estado = 7;
-        $data = $this->objectToArray($solicitude);
-        $solicitude->update($data);
-        return Redirect::to('show_cont');
+        if($solicitude->update())
+        {
+            return 1;
+        }
+        return 0;
     }
 
     public function enableDeposit()

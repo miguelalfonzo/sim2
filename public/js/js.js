@@ -160,7 +160,22 @@ $(function(){
             bootbox.confirm("¿Esta seguro que desea Generar el Asiento Contable?", function(result) {
                 if(result)
                 {
-                   // window.location.href = server+'generate-seat-solicitude/'+idsolicitude;
+                    console.log(idsolicitude);
+                    data.idsolicitude = idsolicitude;
+                    data._token       = $("input[name=_token]").val();
+                    $.post(server+'generate-seat-solicitude', data)
+                    .done( function (data){
+                        if(data == 1)
+                        {
+                            bootbox.alert("<p class='green'>Se generó el asiento contable correctamente.</p>", function(){
+                                window.location.href = server+'show_cont';
+                            });
+                        }
+                        else
+                        {
+                            bootbox.alert("<p class='red'>Error, no se puede generar el asiento contable.</p>");
+                        }
+                    });
                 }
             });
         });

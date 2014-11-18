@@ -1,6 +1,6 @@
 # Intervention Image
 
-Intervention Image is a **PHP image handling and manipulation** library providing an easier and expressive way to create, edit, and compose images. The package includes ServiceProviders and Facades for easy **Laravel** integration.
+Intervention Image is a **PHP image handling and manipulation** library providing an easier and expressive way to create, edit, and compose images. The package includes ServiceProviders and Facades for easy **Laravel 4** integration.
 
 [![Build Status](https://travis-ci.org/Intervention/image.png?branch=master)](https://travis-ci.org/Intervention/image)
 
@@ -42,7 +42,7 @@ Refer to the [documentation](http://image.intervention.io/) to learn more about 
 
 Contributions to the Intervention Image library are welcome. Please note the following guidelines before submiting your pull request.
 
-- Follow [PSR-2](http://www.php-fig.org/psr/psr-2/) coding standards.
+- Follow [PSR-0](http://www.php-fig.org/psr/psr-0/), [PSR-1](http://www.php-fig.org/psr/psr-1/) and [PSR-2](http://www.php-fig.org/psr/psr-2/) coding standards.
 - Write tests for new functions and added features
 - API calls should work consistently with both GD and Imagick drivers
 

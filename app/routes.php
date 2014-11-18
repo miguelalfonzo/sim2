@@ -167,8 +167,8 @@ Route::group(array('before' => 'cont'), function () {
     Route::post('enable-deposit', 'Dmkt\SolicitudeController@enableDeposit');
     Route::get('generar-asiento-solicitud/{token}', 'Dmkt\SolicitudeController@viewSeatSolicitude');
     Route::post('generate-seat-solicitude', 'Dmkt\SolicitudeController@generateSeatSolicitude');
-    Route::get('generar-asiento-gasto/{token}', 'Dmkt\SolicitudeController@viewSeatExpenseSolicitude');
-    Route::post('generate-seat-solicitude', 'Dmkt\SolicitudeController@generateSeatExpenseSolicitude');
+    Route::get('generar-asiento-gasto/{token}', 'Dmkt\SolicitudeController@viewSeatExpense');
+    Route::post('generate-seat-solicitude', 'Dmkt\SolicitudeController@generateSeatExpense');
 });
 // App::error(function (ModelNotFoundException $e) {
 //     return View::make('notfound');

@@ -12,17 +12,12 @@ class ResetCommand extends \Intervention\Image\Commands\AbstractCommand
      */
     public function execute($image)
     {
-        $backupName = $this->argument(0)->value();
-
-        $backup = $image->getBackup($backupName);
+        $backup = $image->getBackup();
 
         if ($backup instanceof \Imagick) {
 
-            // destroy current core
+            // destroy old core
             $image->getCore()->clear();
-
-            // clone backup
-            $backup = clone $backup;
 
             // reset to new resource
             $image->setCore($backup);
@@ -31,7 +26,7 @@ class ResetCommand extends \Intervention\Image\Commands\AbstractCommand
         }
 
         throw new \Intervention\Image\Exception\RuntimeException(
-            "Backup not available. Call backup({$backupName}) before reset()."
+            "Backup not available. Call backup() before reset()."
         );
     }
 }
