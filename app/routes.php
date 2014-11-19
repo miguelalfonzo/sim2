@@ -13,12 +13,14 @@
 
 /** Admin */
 Route::group(array('before' => 'admin'), function () {
+
     Route::get('register', 'Admin\AdminController@register');
     Route::post('register-user', 'Admin\AdminController@formRegister');
     Route::get('editar/{id}', 'Admin\AdminController@edit');
     Route::post('edit-user', 'Admin\AdminController@formEditUser');
     Route::post('active-user', 'Admin\AdminController@activeUser');
     Route::post('look-user', 'Admin\AdminController@lookUser');
+
 });
 
 Route::get('search-user/{username}', function ($username) {
@@ -63,7 +65,7 @@ Route::group(array('before' => 'rm'), function () {
     Route::post('buscar-solicitudes-rm', 'Dmkt\SolicitudeController@searchSolicituds');
 
     // Expense
-    Route::get('registrar-gasto/{token}', 'Expense\ExpenseController@show');
+    Route::post('registrar-gasto', 'Expense\ExpenseController@show');
     Route::post('register-expense', 'Expense\ExpenseController@registerExpense');
     Route::post('delete-expense', 'Expense\ExpenseController@deleteExpense');
     Route::post('update-expense', 'Expense\ExpenseController@updateExpense');
@@ -103,7 +105,7 @@ Route::group(array('before' => 'sup'), function () {
 });
 
 /*------------------ Test --------------**/
-Route::get('prueba', 'Dmkt\SolicitudeController@test');
+Route::get('prueba', 'Dmkt\FondoController@test');
 
 
 /**
@@ -118,6 +120,8 @@ Route::get('list-fondos','Dmkt\FondoController@getFondos');
 Route::get('get-fondo/{id}','Dmkt\FondoController@getFondo');
 Route::get('delete-fondo/{id}','Dmkt\FondoController@delFondo');
 Route::post('update-fondo','Dmkt\FondoController@updateFondo');
+Route::get('representatives','Dmkt\FondoController@getRepresentatives');
+Route::get('getctabanc/{dni}','Dmkt\FondoController@getCtaBanc');
 
 /**
  * |-------------------------------------------------------------------------------------------- |
@@ -168,7 +172,7 @@ Route::group(array('before' => 'cont'), function () {
     Route::get('generar-asiento-solicitud/{token}', 'Dmkt\SolicitudeController@viewSeatSolicitude');
     Route::post('generate-seat-solicitude', 'Dmkt\SolicitudeController@generateSeatSolicitude');
     Route::get('generar-asiento-gasto/{token}', 'Dmkt\SolicitudeController@viewSeatExpense');
-    Route::post('generate-seat-expense', 'Dmkt\SolicitudeController@generateSeatExpense');
+    Route::post('generate-seat-solicitude', 'Dmkt\SolicitudeController@generateSeatExpense');
 });
 // App::error(function (ModelNotFoundException $e) {
 //     return View::make('notfound');
@@ -193,7 +197,7 @@ Route::group(array('before' => 'tes'), function(){
     Route::get('ver-solicitud-tes/{id}', 'Deposit\DepositController@viewSolicitudeTes');
     Route::post('buscar-solicitudes-tes', 'Deposit\DepositController@searchSolicitudeTes');
     Route::post('depositar', 'Deposit\DepositController@depositSolicitudeTes');
-    
+
 });
 
 /* ================================================================================= */

@@ -143,4 +143,9 @@ selectproduct{
 @import url(http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css);
 .fa-fw {width: 2em;}
 
-/** Gastos  */
+.edit-repr {
+    color: green;
+    position: absolute;
+    right: 1.75em;
+    top: 0.6em;
+}
