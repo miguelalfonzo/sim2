@@ -24,6 +24,7 @@
 	                        <div class="form-group col-sm-4 col-md-3">
 	                            <div class="" style="padding: 0">
 	                                <div class="input-group ">
+	                                	{{Form::token()}}
 	                                    <span class="input-group-addon">Desde</span>
 	                                    <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
 

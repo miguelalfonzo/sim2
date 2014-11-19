@@ -11,6 +11,7 @@
                     <div class="col-sm-12 col-md-12">
                         <input id="textinput" name="idsolicitud" type="text" value="{{$solicitude->idsolicitud}}" class="form-control input-md" readonly>
                         <input type="hidden" id="token" value="{{$solicitude->token}}">
+                        {{Form::token()}}
                     </div>
                 </div>
                 <div class="form-group col-sm-6 col-md-4">

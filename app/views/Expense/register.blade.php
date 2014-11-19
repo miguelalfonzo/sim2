@@ -12,6 +12,7 @@
 						<label>Solicitud</label>
 						<input type="text" class="form-control" value="{{mb_convert_case($solicitude->titulo, MB_CASE_TITLE, 'UTF-8')}}" disabled>
 						<input type="hidden" id="token" value="{{$solicitude->token}}">
+						{{Form::token()}}
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
@@ -157,7 +158,7 @@
 						<label>Sub Total</label>
 						<div class="input-group">
 					    	<div class="input-group-addon">{{$solicitude->typemoney->simbolo}}</div>
-					      	<input id="sub-tot" class="form-control" type="text" value=0 disabled>
+					      	<input id="sub-tot" class="form-control" type="text" value=0>
 					    </div>
 					</div>
 				</div>

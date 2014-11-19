@@ -37,11 +37,10 @@ class ExpenseController extends BaseController{
         return $array;
     }
 
-	public function show(){
+	public function show($token){
 		$date         = $this->getDay();
 		$typeProof    = ProofType::all();
 		$typeExpense  = ExpenseType::orderBy('idtipogasto','asc')->get();
-		$token        = Input::get('token');
 		$solicitude   = Solicitude::where('token',$token)->firstOrFail();
 		$expense      = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
 		$aproved_user = User::where('id',$solicitude->idaproved)->firstOrFail();
@@ -75,11 +74,10 @@ class ExpenseController extends BaseController{
 	}
 
 	public function registerExpense(){
-		$expense        = Input::get('data');
-		$expenseJson    = json_decode($expense);
-		$row_solicitude = Solicitude::where('token',$expenseJson->token)->firstOrFail();
-		$row_expense    = Expense::where('ruc',$expenseJson->ruc)->where('num_prefijo',$expenseJson->number_prefix)
-						  ->where('num_serie',$expenseJson->number_serie)->get();
+		$inputs         = Input::all();
+		$row_solicitude = Solicitude::where('token',$inputs['token'])->firstOrFail();
+		$row_expense    = Expense::where('ruc',$inputs['ruc'])->where('num_prefijo',$inputs['number_prefix'])
+						  ->where('num_serie',$inputs['number_serie'])->get();
 
 		if(count($row_expense)>0)
 		{
@@ -89,16 +87,16 @@ class ExpenseController extends BaseController{
 		{
 			$expense = new Expense;
 			//Header Expense
-			$expense->num_prefijo = $expenseJson->number_prefix;
-			$expense->num_serie = $expenseJson->number_serie;
-			$expense->ruc = $expenseJson->ruc;
-			$expense->razon = $expenseJson->razon;
-			$expense->monto = $expenseJson->total_expense;
-			if($expenseJson->proof_type == '2')
+			$expense->num_prefijo = $inputs['number_prefix'];
+			$expense->num_serie = $inputs['number_serie'];
+			$expense->ruc = $inputs['ruc'];
+			$expense->razon = $inputs['razon'];
+			$expense->monto = $inputs['total_expense'];
+			if($inputs['proof_type'] == '2')
 			{
-				$expense->igv = $expenseJson->igv;
-				$expense->imp_serv = $expenseJson->imp_service;
-				$expense->sub_tot = $expenseJson->sub_total_expense;
+				$expense->igv = $inputs['igv'];
+				$expense->imp_serv = $inputs['imp_service'];
+				$expense->sub_tot = $inputs['sub_total_expense'];
 				$expense->idigv = $expense->lastIdIgv()+1;
 			}
 			else
@@ -108,21 +106,21 @@ class ExpenseController extends BaseController{
 				$expense->sub_tot = null;	
 				$expense->idigv = null;
 			}
-			$date = $expenseJson->date_movement;
+			$date = $inputs['date_movement'];
 	        list($d, $m, $y) = explode('/', $date);
 	        $d = mktime(11, 14, 54, $m, $d, $y);
 	        $date = date("Y/m/d", $d);
-	        $expense->descripcion = $expenseJson->desc_expense;
+	        $expense->descripcion = $inputs['desc_expense'];
 	        $expense->fecha_movimiento = $date;
-	        $expense->idcomprobante = $expenseJson->proof_type;
+	        $expense->idcomprobante = $inputs['proof_type'];
 			$idgasto = $expense->lastId()+1;
 			$expense->idgasto = $idgasto;
 			$expense->idsolicitud = $row_solicitude->idsolicitud;
 			//Detail Expense
-			$quantity = $expenseJson->quantity;
-			$description = $expenseJson->description;
+			$quantity = $inputs['quantity'];
+			$description = $inputs['description'];
 			// $type_expense = $expenseJson->type_expense;
-			$total_item = $expenseJson->total_item;
+			$total_item = $inputs['total_item'];
 
 			if($expense->save())
 			{
@@ -148,10 +146,9 @@ class ExpenseController extends BaseController{
 	}
 
 	public function deleteExpense(){
-		$expense        = Input::get('data');
-		$expenseJson    = json_decode($expense);
-		$voucher_number = explode("-",$expenseJson->voucher_number);
-		$expense_row 	= Expense::where('ruc',$expenseJson->ruc)->where('num_prefijo',$voucher_number[0])
+		$inputs = Input::all();
+		$voucher_number = explode("-",$inputs['voucher_number']);
+		$expense_row 	= Expense::where('ruc',$inputs['ruc'])->where('num_prefijo',$voucher_number[0])
 						  ->where('num_serie',$voucher_number[1])->firstOrFail();
 		$delete_row     = Expense::where('idgasto',$expense_row->idgasto)->delete();
 		return "OK";
@@ -169,10 +166,9 @@ class ExpenseController extends BaseController{
 	}
 
 	public function updateExpense(){
-		$expense        = Input::get('data');
-		$expenseJson    = json_decode($expense);
-		$voucher_number = explode("-",$expenseJson->voucher_number);
-		$expenseUpdate  = Expense::where('ruc',$expenseJson->ruc)->where('num_prefijo',$voucher_number[0])
+		$inputs = Input::all();
+		$voucher_number = explode("-",$inputs['voucher_number']);
+		$expenseUpdate  = Expense::where('ruc',$inputs['ruc'])->where('num_prefijo',$voucher_number[0])
 						  ->where('num_serie',$voucher_number[1])->get();
 		if(count($expenseUpdate)>0)
 		{
@@ -180,36 +176,36 @@ class ExpenseController extends BaseController{
 				$idgasto = $value->idgasto;
 			}
 			$expenseEdit = Expense::where('idgasto',$idgasto);
-			$expenseEdit->num_prefijo = $expenseJson->number_prefix;
-			$expenseEdit->num_serie = $expenseJson->number_serie;
-			$expenseEdit->ruc = $expenseJson->ruc;
-			$expenseEdit->razon = $expenseJson->razon;
-			$expenseEdit->monto = $expenseJson->total_expense;
-			if($expenseJson->proof_type == '2')
+			$expenseEdit->num_prefijo = $inputs['number_prefix'];
+			$expenseEdit->num_serie = $inputs['number_serie'];
+			$expenseEdit->ruc = $inputs['ruc'];
+			$expenseEdit->razon = $inputs['razon'];
+			$expenseEdit->monto = $inputs['total_expense'];
+			if($inputs['proof_type'] == '2')
 			{
-				$expenseEdit->igv      = $expenseJson->igv;
-				$expenseEdit->imp_serv = $expenseJson->imp_service;
-				$expenseEdit->sub_tot  = $expenseJson->sub_total_expense;
+				$expenseEdit->igv      = $inputs['igv'];
+				$expenseEdit->imp_serv = $inputs['imp_service'];
+				$expenseEdit->sub_tot  = $inputs['sub_total_expense'];
 			}
 			else
 			{
 				$expenseEdit->igv      = null;
 				$expenseEdit->imp_serv = null;
-				$expenseEdit->sub_tot  = null;	
+				$expenseEdit->sub_tot  = null;
 			}
-			$expenseEdit->idcomprobante = $expenseJson->proof_type;
-			$date = $expenseJson->date_movement;
+			$expenseEdit->idcomprobante = $inputs['proof_type'];
+			$date = $inputs['date_movement'];
 	        list($d, $m, $y) = explode('/', $date);
 	        $d = mktime(11, 14, 54, $m, $d, $y);
 	        $date = date("Y/m/d", $d);
 	        $expenseEdit->fecha_movimiento = $date;
-	        $expenseEdit->descripcion = $expenseJson->desc_expense;
+	        $expenseEdit->descripcion = $inputs['desc_expense'];
 	        $data = $this->objectToArray($expenseEdit);
 	        //Detail Expense
-			$quantity = $expenseJson->quantity;
-			$description = $expenseJson->description;
+			$quantity = $inputs['quantity'];
+			$description = $inputs['description'];
 			// $type_expense = $expenseJson->type_expense;
-			$total_item = $expenseJson->total_item;
+			$total_item = $inputs['total_item'];
 			if($expenseEdit->update($data))
 			{
 				$expense_detail_edit = ExpenseItem::where('idgasto',$idgasto)->delete();

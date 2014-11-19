@@ -1171,9 +1171,8 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.Cont.view_solicitude_cont')->with('solicitude', $solicitude);
     }
 
-    public function viewSeatSolicitude()
+    public function viewSeatSolicitude($token)
     {
-        $token = Input::get('token');
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $data = [
             'solicitude' => $solicitude
@@ -1192,13 +1191,17 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.Cont.register_seat_expense', $data);
     }
 
-    public function generateSeatSolicitude($id)
+    public function generateSeatSolicitude()
     {
-        $solicitude = Solicitude::where('idsolicitud', $id);
+        $inputs     = Input::all();
+        $solicitude = Solicitude::where('idsolicitud', $inputs['idsolicitude']);
         $solicitude->asiento = 2;
         $data = $this->objectToArray($solicitude);
-        $solicitude->update($data);
-        return Redirect::to('show_cont');
+        if($solicitude->update($data))
+        {
+            return 1;
+        }
+        return 0;
     }
 
     public function generateSeatExpense()

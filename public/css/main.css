@@ -84,6 +84,11 @@ table thead th, table th
 	line-height: 2.5em;
 }
 
+.div-icons-solicituds a
+{
+	cursor: pointer;
+}
+
 .error-incomplete
 {
 	color: #a94442;

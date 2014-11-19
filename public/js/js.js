@@ -61,10 +61,15 @@ $(function(){
     var data          = {};
     var data_response = {};
     //Submit Events
+    $(document).on("click","#token-reg-expense",function(e){
+        e.preventDefault();
+        var token = $(this).attr('data-url');
+        window.location.href = server+'registrar-gasto/'+token;
+    });
     $(document).on("click","#token-solicitude",function(e){
         e.preventDefault();
         var token = $(this).attr('data-url');
-        window.location.href = server+'generar-asiento-gasto/'+token;
+        window.location.href = server+'generar-asiento-solicitud/'+token;
     });
     $(document).on("click","#token-expense",function(e){
         e.preventDefault();
@@ -149,7 +154,22 @@ $(function(){
             bootbox.confirm("¿Esta seguro que desea Generar el Asiento Contable?", function(result) {
                 if(result)
                 {
-                   window.location.href = server+'generate-seat-solicitude/'+idsolicitude;
+                    data.idsolicitude = idsolicitude;
+                    data._token       = $("input[name=_token]").val();
+                    console.log(data);
+                    $.post(server+'generate-seat-solicitude', data)
+                    .done( function (data){
+                        if(data == 1)
+                        {
+                            bootbox.alert("<p class='green'>Se generó el asiento contable correctamente.</p>", function(){
+                                window.location.href = server+'show_cont';
+                            });
+                        }
+                        else
+                        {
+                            bootbox.alert("<p class='red'>Error, no se puede generar el asiento contable.</p>");
+                        }
+                    });
                 }
             });
         });
@@ -160,10 +180,9 @@ $(function(){
             bootbox.confirm("¿Esta seguro que desea Generar el Asiento Contable?", function(result) {
                 if(result)
                 {
-                    console.log(idsolicitude);
                     data.idsolicitude = idsolicitude;
                     data._token       = $("input[name=_token]").val();
-                    $.post(server+'generate-seat-solicitude', data)
+                    $.post(server+'generate-seat-expense', data)
                     .done( function (data){
                         if(data == 1)
                         {
@@ -220,18 +239,22 @@ $(function(){
             $("#message-op-number").text('');
             var op_number  = $("#op-number").val();
             data.op_number = op_number;
-            data.token     = token;
+            data.token     = $("#token").val();
+            data._token    = $("input[name=_token]").val();
             if(!op_number)
             {
                 $("#message-op-number").text("Ingrese el número de Operación");
             }
             else
             {
-                $.post(server+"depositar", {data: JSON.stringify(data)})
+                $.post(server+"depositar", data)
                 .done(function (data){
                     if(parseInt(data,10) === 1)
                     {
-                        window.location.href = server+'show_tes';
+                        $('#myModal').modal('hide');
+                        bootbox.alert("<p class='green'>Se registro el asiento contable correctamente.</p>", function(){
+                            window.location.href = server+'show_tes';
+                        });
                     }
                     else
                     {
@@ -279,8 +302,9 @@ $(function(){
             bootbox.confirm("¿Esta seguro que desea eliminar el gasto?", function(result) {
                 if(result)
                 {
-                    data = {"ruc":ruc,"voucher_number":voucher_number};
-                    $.post(server + 'delete-expense', {data: JSON.stringify(data)})
+                    //aquí
+                    data = {"ruc":ruc,"voucher_number":voucher_number, "_token":$("input[name=_token]").val()};
+                    $.post(server + 'delete-expense', data)
                     .done(function (data) {
                         row_expense.remove();
                         tot_expenses = calculateTot($(".total").parent(),'.total_expense');
@@ -468,14 +492,15 @@ $(function(){
             }
             else
             {
-                data.token          = token;
-                data.proof_type     = proof_type;
-                data.ruc            = ruc;
-                data.razon          = razon;
-                data.number_prefix  = number_prefix;
-                data.number_serie   = number_serie;
-                data.date_movement  = date;
-                data.desc_expense   = desc_expense;
+                data._token        = $("input[name=_token]").val();
+                data.token         = $("#token").val();
+                data.proof_type    = proof_type;
+                data.ruc           = ruc;
+                data.razon         = razon;
+                data.number_prefix = number_prefix;
+                data.number_serie  = number_serie;
+                data.date_movement = date;
+                data.desc_expense  = desc_expense;
 
                 var error_json = 0;
                 //Datos del detalle gastos por items
@@ -527,7 +552,7 @@ $(function(){
                     {
                         if(validateRuc(ruc) === true)
                         {
-                            ajaxExpense(JSON.stringify(data))
+                            ajaxExpense(data)
                             .done(function(result){
                                 if(result == -1)
                                 {
@@ -558,7 +583,7 @@ $(function(){
                         {
                             if(validateVoucher(ruc,voucher_number) === true)
                             {
-                                ajaxExpense(JSON.stringify(data))
+                                ajaxExpense(data)
                                 .done(function(result){
                                     if(result == -1)
                                     {
@@ -601,9 +626,7 @@ $(function(){
                                             $.ajax({
                                                 type: 'post',
                                                 url: server+'update-expense',
-                                                data: {
-                                                    data: JSON.stringify(data)
-                                                },
+                                                data: data,
                                                 beforeSend: function(){
                                                     loadingUI('Actualizando ...');
                                                 },
@@ -640,7 +663,7 @@ $(function(){
                     }
                     else
                     {
-                        ajaxExpense(JSON.stringify(data))
+                        ajaxExpense(data)
                         .done(function(result){
                             if(result == -1)
                             {
@@ -680,7 +703,7 @@ $(function(){
             $(".search-ruc").show();
             $("#ruc-hide").siblings().parent().addClass('input-group');
         });
-    //Ajax
+    
         //Search Social Reason in SUNAT once introduced the RUC
         $(".search-ruc").on("click",function(){
             $(".message-expense").text("");
@@ -703,12 +726,12 @@ $(function(){
             else
             {
                 var l = Ladda.create(document.getElementById('razon'));
+                data.ruc    = ruc;
+                data._token = $("input[name=_token]").val();
                 $.ajax({
                     type: 'post',
                     url: server+'consultarRuc',
-                    data: {
-                        ruc: ruc
-                    },
+                    data: data,
                     beforeSend:function(){
                         l.start();
                         $("#razon").css("color","#5c5c5c");
@@ -742,21 +765,19 @@ $(function(){
             }
         });
         //Save data to the controller Expense
-        function ajaxExpense(jsonExpense)
+        function ajaxExpense(data)
         {
             return $.ajax({
                 type: 'post',
                 url: server+'register-expense',
                 datatype: 'json',
                 asynch: false,
-                data: {
-                    data : jsonExpense
-                },
+                data: data,
                 beforeSend: function(){
                     loadingUI('Registrando');
                 },
                 error:function(){
-                    alert("No se pueden grabar los datos.");
+                    bootbox.alert("No se pueden grabar los datos.");
                 }
             });
         }

@@ -101,12 +101,11 @@ class DepositController extends BaseController{
 
     public function depositSolicitudeTes()
     {
-        $deposit     = Input::get('data');
-        $depositJSON = json_decode($deposit);
-        
+        $deposit = Input::all();
+
         try {
-            DB::transaction (function() use ($depositJSON) {
-                $solicitude = Solicitude::where('token',$depositJSON->token)->firstOrFail();
+            DB::transaction (function() use ($deposit) {
+                $solicitude = Solicitude::where('token',$deposit['token'])->firstOrFail();
                 $row_deposit = Deposit::where('idsolicitud',$solicitude->idsolicitud)->get();
                 if(count($row_deposit)>0)
                 {
@@ -117,22 +116,21 @@ class DepositController extends BaseController{
                     $newDeposit = new Deposit;
                     $newDeposit->iddeposito        = $newDeposit->lastId()+1;
                     $newDeposit->total             = $solicitude->monto;
-                    $newDeposit->num_transferencia = $depositJSON->op_number;
+                    $newDeposit->num_transferencia = $deposit['op_number'];
                     $newDeposit->idsolicitud       = $solicitude->idsolicitud;  
                     
                     if($newDeposit->save())
                     {
-                        $solicitudeUpd         = Solicitude::where('token',$depositJSON->token);
+                        $solicitudeUpd         = Solicitude::where('token',$deposit['token']);
                         $solicitudeUpd->estado = DEPOSITADO;
                         $data                  = $this->objectToArray($solicitudeUpd);
                         $solicitudeUpd->update($data);
-                    }  
+                    }
                 }
             });
             return 1;
         } catch (Exception $e) {
             return 0;
         }
-
     }
 }

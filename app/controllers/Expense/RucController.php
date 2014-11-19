@@ -7,8 +7,9 @@ use \Input;
 
 class RucController extends BaseController{
     public function show(){
-    	$rucConsult = Input::get('ruc');
-        // if(strlen($ruc)<11) 
+        $inputs = Input::all();
+    	$rucConsult = $inputs['ruc'];
+        
         if(strlen($rucConsult)<11)
     	{
     		return 0;
