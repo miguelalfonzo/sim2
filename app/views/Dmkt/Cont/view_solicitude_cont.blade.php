@@ -133,35 +133,21 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Cálculos Retención Contabilidad -->
                     @if($solicitude->asiento != 1 && $solicitude->estado == APROBADO)
-                        <!-- Cálculos Contabilidad -->
-                        <div class="form-group col-sm-6 col-md-4">
-                            <label class="col-sm-8 col-md-8 control-label" for="textinput">Retención 6%</label>
-                            <div class="col-sm-12 col-md-12">
-                                <div class="input-group">
-                                    <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                                    <input id="ret0" name="ret0" type="text" class="form-control input-md ret">
+                        <?php $i=0;?>
+                        @foreach($typeRetention as $retention)
+                            <div class="form-group col-sm-6 col-md-4">
+                                <label class="col-sm-8 col-md-8 control-label" for="textinput">{{mb_convert_case($retention->descripcion." ".$retention->porcentaje, MB_CASE_TITLE, 'UTF-8')}}</label>
+                                <div class="col-sm-12 col-md-12">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
+                                        <input id="ret{{$i}}" name="ret{{$i}}" type="text" class="form-control input-md ret">
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="form-group col-sm-6 col-md-4">
-                            <label class="col-sm-8 col-md-8 control-label" for="textinput">Detracción 0%</label>
-                            <div class="col-sm-12 col-md-12">
-                                <div class="input-group">
-                                    <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                                    <input id="ret1" name="ret1" type="text" class="form-control input-md ret">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group col-sm-6 col-md-4">
-                            <label class="col-sm-8 col-md-8 control-label" for="textinput">Retención 10%</label>
-                            <div class="col-sm-12 col-md-12">
-                                <div class="input-group">
-                                    <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                                    <input id="ret2" name="ret2" type="text" class="form-control input-md ret">
-                                </div>
-                            </div>
-                        </div>
+                            </div> 
+                            <?php $i++;?>
+                        @endforeach
                     @endif
                     <!-- Button (Double) -->
                     <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">

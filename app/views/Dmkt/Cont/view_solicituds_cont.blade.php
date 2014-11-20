@@ -31,6 +31,7 @@
                     <a id="token-solicitude" data-url="{{$solicitude->token}}" href="#"><span class="glyphicon glyphicon-book"></span></a>
                 @endif
                 @if($solicitude->estado == REGISTRADO)
+                    <a id="token-reg-expense" data-url="{{$solicitude->token}}"><span class="glyphicon glyphicon-usd"></span></a>
                     <a id="token-expense" data-url="{{$solicitude->token}}" href="#"><span class="glyphicon glyphicon-book"></span></a>
                 @endif
             </div>

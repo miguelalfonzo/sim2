@@ -114,16 +114,18 @@ class DepositController extends BaseController{
                 else
                 {
                     $newDeposit = new Deposit;
-                    $newDeposit->iddeposito        = $newDeposit->lastId()+1;
+                    $id = $newDeposit->lastId()+1;
+                    $newDeposit->iddeposito        = $id;
                     $newDeposit->total             = $solicitude->monto;
                     $newDeposit->num_transferencia = $deposit['op_number'];
                     $newDeposit->idsolicitud       = $solicitude->idsolicitud;  
                     
                     if($newDeposit->save())
                     {
-                        $solicitudeUpd         = Solicitude::where('token',$deposit['token']);
-                        $solicitudeUpd->estado = DEPOSITADO;
-                        $data                  = $this->objectToArray($solicitudeUpd);
+                        $solicitudeUpd             = Solicitude::where('token',$deposit['token']);
+                        $solicitudeUpd->estado     = DEPOSITADO;
+                        $solicitudeUpd->iddeposito = $id;
+                        $data                      = $this->objectToArray($solicitudeUpd);
                         $solicitudeUpd->update($data);
                     }
                 }
