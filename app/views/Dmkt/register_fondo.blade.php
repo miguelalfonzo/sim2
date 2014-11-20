@@ -47,7 +47,7 @@
                 <div class="col-sm-12 col-md-12">
                     <input id="fondo_cuenta" name="cuenta" type="text" placeholder=""
                            value="{{isset($fondo->cuenta) ? $fondo->cuenta : null }}"
-                           class="form-control input-md" maxlength="25" readonly>
+                           class="form-control input-md" maxlength="25">
 
                 </div>
             </div>
@@ -110,17 +110,16 @@
 
 </div>
 <div class="panel-body table-solicituds-fondos" style="position: relative">
-<div class="form-group">
-  <label class="col-md-1 control-label" for="selectbasic">Mes</label>
-  <div class="col-md-3">
-    <select id="selectbasic" name="selectbasic" class="form-control">
-      <option value="1">Option one</option>
-      <option value="2">Option two</option>
-    </select>
+<div class="form-group col-md-12">
+  <div id="txtDate" class="form-group col-md-4">
+  					<div class="input-group date">
+  						<input type="text" id="date-fondo" readonly class="form-control"><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+  					</div>
   </div>
-   <div class="col-md-1" >
-        <a id="search-solicitude" class="btn btn-sm btn-primary ladda-button"
-                                     data-style="zoom-in" data-size="l"><i class="glyphicon glyphicon-search"></i></a>
+
+    <div class="col-sm-offset-11 col-md-offset-11" >
+            <a id="export-fondo" class="btn btn-sm btn-primary ladda-button" href=""
+                                         data-style="zoom-in" data-size="l"><i class="glyphicon glyphicon-print"></i> Exportar</a>
     </div>
 </div>
 

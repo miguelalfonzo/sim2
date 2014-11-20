@@ -939,9 +939,12 @@ function newSolicitude() {
             },
             select: function( event, ui ) {
 
-                $('#fondo_cuenta').val('191-18771078-0-83');
+                //me trae la cuenta del rep medico
+                $.get(server + 'getctabanc/' + ui.item.vislegajo).done(function(data){
+                    $('#fondo_cuenta').val(data);
+                });
                 $(this).attr('data-cod',ui.item.visvisitador);
-                $(this).val( ui.item.visvisitador + ' - ' + ui.item.visnombre + ' ' + ui.item.vispaterno + ' '+ui.item.vismaterno );
+                $(this).val(ui.item.visnombre + ' ' + ui.item.vispaterno + ' '+ui.item.vismaterno );
                 $("#id_change_before_rep").val( ui.item.visvisitador );
                 $(this).attr('disabled',true).addClass('success');
                 $(this).parent().find('.edit-repr').fadeIn();
@@ -958,12 +961,17 @@ function newSolicitude() {
     });
 
     $('#edit-rep').hide();
-    $(document).on("click","#edit-rep",function(e){
-        e.preventDefault();
-        $(this).parent().find('input:text').removeClass('success').attr('disabled', false).val('').focus();
+    function removeinput(data){
+
+        data.parent().find('input:text').removeClass('success').attr('disabled', false).val('').focus();
         $('#fondo_cuenta').val('');
-        $(this).parent().find('input:hidden').val('');
-        $(this).fadeOut();
+        data.parent().find('input:hidden').val('');
+        data.fadeOut();
+    }
+    $(document).on("click","#edit-rep", function(e){
+        e.preventDefault();
+        removeinput($(this))
+
     });
 
     function findRepresentatives(request, response) {
@@ -986,10 +994,13 @@ function newSolicitude() {
         response(matches);
     }
 
-    $.get(server + 'list-fondos').done(function(data)
+    var dateactual = new Date();
+    $.get(server + 'list-fondos/'+(dateactual.getMonth()+1)+'-'+dateactual.getFullYear()).done(function(data)
         {
 
+            console.log(data);
             //$('#table_solicitude_fondos_wrapper').remove();
+
             $('.table-solicituds-fondos').append(data);
             $('#table_solicitude_fondos').dataTable({
                     "order": [
@@ -1036,6 +1047,7 @@ function newSolicitude() {
                 $('#fondo_cuenta').val('');
                 // $('#_token').val('');
                 l.stop();
+                removeinput($('#edit-rep'));
                 $('#total-fondo').remove();
                 $('#table_solicitude_fondos_wrapper').remove();
                 $('.table-solicituds-fondos').append(data);
@@ -1128,6 +1140,7 @@ function newSolicitude() {
         var dato = {
             'institucion' : $('#fondo_institucion').val(),
             'repmed' : $('#fondo_repmed').val(),
+            'codrepmed' : $('#fondo_repmed').attr('data-cod'),
             'supervisor' : $('#fondo_supervisor').val(),
             'total' : $('#fondo_total').val(),
             'cuenta': $('#fondo_cuenta').val(),
@@ -1148,7 +1161,7 @@ function newSolicitude() {
                 $('#fondo_total').val('');
                 $('#fondo_cuenta').val('');
 
-                // $('#_token').val('');
+                removeinput($('#edit-rep'));
                 l.stop();
                 $('#total-fondo').remove();
                 $('#table_solicitude_fondos_wrapper').remove();
@@ -1175,8 +1188,70 @@ function newSolicitude() {
         )
 
     });
+    var date_options = {
+        format: "mm-yyyy",
+        startDate: $('#startDate').val(),
+        endDate: $('#endDate').val(),
+        minViewMode: 1,
+        language: "es",
+        autoclose: true
+    };
+    $('#export-fondo').hide();
+    $(".date").datepicker(date_options).on('changeDate', function (e) {
 
+        $(this).tooltip('hide');
+        //$('#date-fondo').val(e.format('mm'));
+        var datefondo = $('#date-fondo').val();
+        if(datefondo!='') {
+            $('#export-fondo').show();
+            $('#export-fondo').attr('href', server + 'exportfondos/' + datefondo);
+        }
+        else{
+            $('#export-fondo').hide()
+        }
+        $(".date").removeClass('has-error');
+        searchFondos();
+        if (isNaN(e.date)) {
+            console.log('1')
+            $("#year").val('');
+            $("#month").val('');
+        } else {
+            console.log('2')
+            $("#year").val(e.format('yyyy'));
+            $("#month").val(parseInt(e.format('mm')));
+        }
+        //evento obligatorio para configuración
+        $("#month").change();
 
+    });
+    function searchFondos() {
+
+        var date = $('#date-fondo').val();
+        $.get(server + 'list-fondos/' + date).done(function (data) {
+            console.log(data);
+            $('#total-fondo').remove();
+            $('#table_solicitude_fondos_wrapper').remove();
+            $('.table-solicituds-fondos').append(data);
+            $('#table_solicitude_fondos').dataTable({
+                    "order": [
+                        [3, "desc"]
+                    ],
+                    "bLengthChange": false,
+                    'iDisplayLength': 7,
+                    "oLanguage": {
+                        "sSearch": "Buscar: ",
+                        "sZeroRecords": "No hay fondos",
+                        "sInfoEmpty": " ",
+                        "sInfo": 'Mostrando _END_ de _TOTAL_',
+                        "oPaginate": {
+                            "sPrevious": "Anterior",
+                            "sNext": "Siguiente"
+                        }
+                    }
+                }
+            );
+        })
+    }
     /** --------------------------------------------- ADMIN ------------------------------------------------- **/
 
         //quita los errores

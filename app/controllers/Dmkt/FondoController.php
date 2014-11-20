@@ -59,6 +59,15 @@ class FondoController extends BaseController
 
     }
 
+    function objectToArray($object)
+    {
+        $array = array();
+        foreach ($object as $member => $data) {
+            $array[$member] = $data;
+        }
+        return $array;
+    }
+
     function getRegister()
     {
 
@@ -84,11 +93,37 @@ class FondoController extends BaseController
 
     }
 
-    function getFondos()
+    function getFondos($start,$export=0)
     {
 
-        $fondos = FondoInstitucional::all();
-        return View::make('Dmkt.list_fondos')->with('fondos', $fondos);
+        $st = $start;
+        $start = '01-'.$st ;
+        $end = $st[0].$st[1] ;
+        $mes = [
+
+            '01'=>31,
+            '02'=>28,
+            '03'=>31,
+            '04'=>30,
+            '05'=>31,
+            '06'=>30,
+            '07'=>31,
+            '08'=>31,
+            '09'=>30,
+            '10'=>31,
+            '11'=>30,
+            '12'=>31
+        ];
+
+        $end = $mes[$end].'-'.$st;
+
+         if($export){
+             return FondoInstitucional::whereRaw("created_at between to_date('$start' ,'DD-MM-YYYY') and to_date('$end' ,'DD-MM-YYYY')+1")->get(array('repmed','institucion','cuenta','supervisor','total'));
+         }else{
+             $fondos = FondoInstitucional::whereRaw("created_at between to_date('$start' ,'DD-MM-YYYY') and to_date('$end' ,'DD-MM-YYYY')+1")->get();
+             return View::make('Dmkt.list_fondos')->with('fondos', $fondos);
+         }
+
     }
 
     function getFondo($id)
@@ -130,7 +165,61 @@ class FondoController extends BaseController
     }
 
     function getCtaBanc($dni){
-        $cta = CtaRm::where('codbeneficiario',$dni)->where('tipo','H')->first()->codbeneficiario;
+        $cta = CtaRm::where('codbeneficiario',$dni)->where('tipo','H')->first()->cuenta;
         return $cta;
+    }
+    function exportExcelFondos($start){
+
+        $data = $this->getFondos($start,1);
+        $dato = $data->toArray();
+        $sum = $data->sum('total');
+        Excel::create('Filename4', function($excel) use($dato ,$sum) {
+
+            $excel->sheet('Sheetname', function($sheet) use($dato , $sum) {
+                $sheet->mergeCells('A1:E1');
+                $sheet->row(1,array('FONDO INSTITUCIONAL 2014'));
+                $sheet->row(1,function($row){
+                    $row->setAlignment('center');
+                    $row->setFont(array(
+                        'family'     => 'Calibri',
+                        'size'       => '20',
+                        'bold'       =>  true
+                    ));
+                    $row->setBackground('#339246');
+
+                });
+                $sheet->setHeight(1, 30);
+                $count = count($dato)+2;
+                $sheet->setBorder('A1:E'.$count, 'thin');
+                $sheet->setHeight(2, 20);
+                $sheet->row(2,  array('SISOL  - Hospital','Depositar a:','Nº Cuenta Bagó Bco. Crédito',' SUPERVISOR','Monto Real'));
+                $sheet->row(2, function($row){
+                    $row->setFont(array(
+                        'family'     => 'Calibri',
+                        'size'       => '15',
+                        'bold'       =>  true
+                    ));
+
+                    $row->setBackground('#D2E718');
+                    $row->setAlignment('center');
+                });
+
+
+                $sheet->fromArray($dato,null, 'A3', false, false);
+                $sheet->row($count+1 , array('','','','Total:',$sum));
+                $sheet->row($count+1 , function($row){
+                    $row->setAlignment('center');
+                    $row->setFont(array(
+                        'family'     => 'Calibri',
+                        'size'       => '16',
+                        'bold'       =>  true
+                    ));
+
+                });
+
+            });
+
+        })->download('xls');
+
     }
 }
