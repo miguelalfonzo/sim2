@@ -16,7 +16,8 @@ use \Input;
 use \DB;
 use \Redirect;
 use \PDF;
-use \Dmkt\Client;
+use \Client;
+use \Dmkt\TypeRetention;
 
 class ExpenseController extends BaseController{
 
@@ -71,6 +72,43 @@ class ExpenseController extends BaseController{
 			'name_aproved' => $name_aproved
 		];
  		return View::make('Expense.register',$data);
+	}
+
+	public function showCont($token)
+	{
+		$date         = $this->getDay();
+		$typeProof    = ProofType::all();
+		$typeExpense  = ExpenseType::orderBy('idtipogasto','asc')->get();
+		$solicitude   = Solicitude::where('token',$token)->firstOrFail();
+		$expense      = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
+		$aproved_user = User::where('id',$solicitude->idaproved)->firstOrFail();
+		if($aproved_user->type === 'S')
+		{
+			$name_aproved = $aproved_user->sup->nombres;
+		}
+		if($aproved_user->type === 'P')
+		{
+			$name_aproved = $aproved_user->gerprod->descripcion;
+		}
+		$balance     = $solicitude->monto;
+		if(count($expense)>0)
+		{
+			$balance         = 0;
+			foreach ($expense as $key => $value) {
+				$balance += $value->monto;
+			}
+			$balance= $solicitude->monto - $balance;
+ 		}
+ 		$data = [
+			'solicitude'   => $solicitude,
+			'typeProof'    => $typeProof,
+			'typeExpense'  => $typeExpense,
+			'date'         => $date,
+			'balance'      => $balance,
+			'expense'      => $expense,
+			'name_aproved' => $name_aproved
+		];
+ 		return View::make('Expense.register_cont',$data);
 	}
 
 	public function registerExpense(){
@@ -282,7 +320,8 @@ class ExpenseController extends BaseController{
 		// return PDF::load($html, 'A4', 'landscape')->show();
 		// $solicituds = Solicitude::where('estado', '=', APROBADO)->where('asiento','=',1)->get();
 		// echo json_encode($solicituds);die;
-			$states = State::orderBy('idestado', 'ASC')->get();
-			echo json_encode($states);
+			$data = TypeRetention::all();
+			$data = "↵												LUCY ALFARO asdasdadasdad											";
+			echo trim($data,"↵");
 	}
 }

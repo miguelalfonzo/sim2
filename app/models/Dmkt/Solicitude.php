@@ -68,4 +68,15 @@ class Solicitude extends Eloquent{
         return $this->hasOne('Common\Fondo','idfondo','idfondo');
 
     }
+    function typeRetention(){
+        return $this->hasOne('Dmkt\TypeRetention','idtiporetencion','idtiporetencion');
+    }
+
+    function aproved(){
+        return $this->hasOne('User','id', 'idaproved');
+    }
+
+    function deposit(){
+        return $this->hasOne('Common\Deposit','iddeposito', 'iddeposito');
+    }
 }

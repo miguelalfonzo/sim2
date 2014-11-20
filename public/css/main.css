@@ -12,6 +12,11 @@ body > header{
 	background: #a51984;
 }
 
+hr
+{
+	border-top: 2px solid #D8D6D6  !important;
+}
+
 table thead th, table th
 {
 	text-align: center;
@@ -53,12 +58,12 @@ table thead th, table th
 	text-align: left;
 }
 
-#table-expense
+#table-expense, #table-seat-solicitude
 {
 	font-size: .9em;
 }	
 
-#table-expense thead
+#table-expense thead, #table-seat-solicitude thead
 {
 	background: #073F70;
 	color: white;
@@ -171,7 +176,7 @@ table thead th, table th
 
 .tot-document
 {
-	display: none;
+	display: block;
 }
 
 .total-item input
@@ -195,7 +200,7 @@ table thead th, table th
 }
 
 @media screen and (max-width:920px){
-	#table-expense
+	#table-expense, #table-seat-solicitude
 	{
 		font-size: .85em;
 	}

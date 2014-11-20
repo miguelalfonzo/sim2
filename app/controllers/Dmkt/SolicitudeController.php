@@ -41,6 +41,14 @@ class SolicitudeController extends BaseController
 
     }
 
+    private function getDay(){
+        $currentDate = getdate();
+        $toDay = $currentDate['mday']."/".str_pad($currentDate['mon'],2,'0',STR_PAD_LEFT)."/".$currentDate['year'];
+        $lastDay = '06/'.str_pad(($currentDate['mon']+1),2,'0',STR_PAD_LEFT).'/'.$currentDate['year'];
+        $date = ['toDay'=>$toDay,'lastDay'=> $lastDay];
+        return $date;
+    }
+
     function objectToArray($object)
     {
         $array = array();
@@ -1149,8 +1157,13 @@ class SolicitudeController extends BaseController
     public function viewSolicitudeCont($token)
     {
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
+        $typeRetention = TypeRetention::all();
+        $data = [
+            'solicitude' => $solicitude,
+            'typeRetention' => $typeRetention
+        ];
 
-        return View::make('Dmkt.Cont.view_solicitude_cont')->with('solicitude', $solicitude);
+        return View::make('Dmkt.Cont.view_solicitude_cont', $data);
     }
 
     public function viewSeatSolicitude()
@@ -1160,7 +1173,20 @@ class SolicitudeController extends BaseController
         $data = [
             'solicitude' => $solicitude
         ];
-        return View::make('Dmkt.Cont.register_seat', $data);
+        return View::make('Dmkt.Cont.view_seat_solicitude', $data);
+    }
+
+    public function viewGenerateSeatSolicitude($token)
+    {
+        $solicitude = Solicitude::where('token', $token)->firstOrFail();
+        $expense = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
+        $date = $this->getDay();
+        $data = [ 
+            'solicitude' => $solicitude,
+            'expense' => $expense,
+            'date' => $date
+        ];
+        return View::make('Dmkt.Cont.register_seat_solicitude', $data);
     }
 
     public function viewSeatExpense($token)
@@ -1174,9 +1200,15 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.Cont.register_seat_expense', $data);
     }
 
-    public function generateSeatSolicitude($id)
+    public function generateSeatSolicitude()
     {
-        $solicitude = Solicitude::where('idsolicitud', $id);
+
+        $inputs  = Input::all();
+        $leyenda = trim($inputs['leyenda']);
+
+        //FALTA
+        return 0;
+        $solicitude = Solicitude::where('idsolicitud', $inputs['idsolicitude']);
         $solicitude->asiento = 2;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
@@ -1203,19 +1235,26 @@ class SolicitudeController extends BaseController
         if($inputs['ret0'])
         {
             $val_ret = intval($inputs['ret0']);
+            $idtyperetention = 1;
         }
         if($inputs['ret1'])
         {
             $val_ret = intval($inputs['ret1']);
+            $idtyperetention = 2;
         }
         if($inputs['ret2'])
         {
             $val_ret = intval($inputs['ret2']);
+            $idtyperetention = 3;
         }
 
         $id = $inputs['idsolicitude'];
         $solicitude = Solicitude::where('idsolicitud', $id);
         $solicitude->retencion = $val_ret;
+        if($val_ret != null)
+        {
+            $solicitude->idtiporetencion = $idtyperetention;    
+        }
         $solicitude->asiento = 1;
         $data = $this->objectToArray($solicitude);
 

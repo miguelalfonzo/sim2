@@ -69,7 +69,7 @@ $(function(){
     $(document).on("click","#token-solicitude",function(e){
         e.preventDefault();
         var token = $(this).attr('data-url');
-        window.location.href = server+'generar-asiento-solicitud/'+token;
+        window.location.href = server+'revisar-asiento-solicitud/'+token;
     });
     $(document).on("click","#token-expense",function(e){
         e.preventDefault();
@@ -89,6 +89,7 @@ $(function(){
         $("#number-prefix").numeric({negative:false,decimal:false});
         $("#number-serie").numeric({negative:false,decimal:false});
         $("#op-number").numeric({negative:false,decimal:false});
+        $("#number_account").numeric({negative:false,decimal:false});
         //only numbers floats
         $("#imp-ser").numeric({negative:false});
         $(".total-item input").numeric({negative:false});
@@ -97,6 +98,7 @@ $(function(){
         $("#ret0").numeric({negative:false});
         $("#ret1").numeric({negative:false});
         $("#ret2").numeric({negative:false});
+        $("#total").numeric({negative:false});        
     //Events: Datepicker, Buttons, Keyup.
         //Calcule the IGV and Balance once typed the total amount per item
         $(document).on("keyup",".total-item input",function(){
@@ -129,6 +131,39 @@ $(function(){
             e.preventDefault();
             window.location.href = server+"show_cont";
         });
+        //Add row seat solicitude
+        $("#add-seat-solicitude").on("click", function(e){
+            e.preventDefault();
+            var error = 0;
+            if(!$("#name_account").val())
+            {
+                $("#name_account").attr("placeholder","No ha ingresado la cuenta.").addClass("error-incomplete");
+                error = 1;
+            }
+            if(!$("#number_account").val())
+            {
+                $("#number_account").attr("placeholder","No ha ingresado el Número de la cuenta.").addClass("error-incomplete");
+                error = 1;
+            }
+            if(!$("#total").val())
+            {
+                $("#total").attr("placeholder","No ha ingresado el Importe.").addClass("error-incomplete");
+                error = 1;
+            }
+            if(error == 1)
+            {
+                return;
+            }
+            var row_seat = $("#table-seat-solicitude tbody tr:first").clone(true,true);
+            row_seat.find('.name_account').text($("#name_account").val());
+            row_seat.find('.number_account').text($("#number_account").val());
+            row_seat.find('.dc').text($("#dc").val());
+            row_seat.find('.importe').text($("#importe").val());
+            $("#table-seat-solicitude tbody").append(row_seat);
+            $("#name_account").val('');
+            $("#number_account").val('');
+            $("#total").val('');
+        });
         //Record end Solicitude
         $("#finish-expense").on("click",function(e){
             e.preventDefault();
@@ -150,13 +185,33 @@ $(function(){
         //Generate Seat Solicitude
         $("#seat-solicitude").on("click",function(e){
             e.preventDefault();
-            var idsolicitude = $("#idsolicitud").val();
+            data._token = $("input[name=_token]").val();
+            var name_account = [];
+            var number_account = [];
+            var dc = [];
+            var total = [];
+            var leyenda = [];
+            $("#table-seat-solicitude tbody .name_account").each(function(index){
+                name_account[index] = $(this).text();
+            });
+            $("#table-seat-solicitude tbody .number_account").each(function(index){
+                number_account[index] = $(this).text();
+            });
+            $("#table-seat-solicitude tbody .dc").each(function(index){
+                dc[index] = $(this).text();
+            });
+            $("#table-seat-solicitude tbody .total").each(function(index){
+                total[index] = parseFloat($(this).text());
+            });
+            data.name_account = name_account;
+            data.number_account = number_account;
+            data.dc = dc;
+            data.total = total;
+            data.leyenda = $("#table-seat-solicitude tbody .leyenda:eq(0)").text();
+            data.idsolicitude = parseInt($("#idsolicitud").val(),10);
             bootbox.confirm("¿Esta seguro que desea Generar el Asiento Contable?", function(result) {
                 if(result)
                 {
-                    data.idsolicitude = idsolicitude;
-                    data._token       = $("input[name=_token]").val();
-                    console.log(data);
                     $.post(server+'generate-seat-solicitude', data)
                     .done( function (data){
                         if(data == 1)
@@ -170,6 +225,23 @@ $(function(){
                             bootbox.alert("<p class='red'>Error, no se puede generar el asiento contable.</p>");
                         }
                     });
+                }
+            });
+        });
+        //Delete row seat solicitude
+        $(document).on("click","#table-seat-solicitude .delete-seat-solicitude",function(e){
+            e.preventDefault();
+            var element = $(this);
+            bootbox.confirm({
+                message: '¿Esta seguro que desea Eliminar el registro?',
+                buttons: {
+                    'cancel': { label: 'Cancelar', className: 'btn-primary' },
+                    'confirm': { label: 'Eliminar', className: 'btn-default' }
+                },
+                callback: function(result) {
+                    if (result) {
+                        element.parent().parent().remove();
+                    }
                 }
             });
         });
@@ -270,7 +342,15 @@ $(function(){
         //IGV, Imp. Service show if you check Factura
         $("#proof-type").on("change",function(){
             calcularIGV();
-            ($(this).val()==='2') ? $(".tot-document").show() : $(".tot-document").hide();
+            var proof_type_sel = $(this).val();
+            if(proof_type_sel === '1' || proof_type_sel === '4' || proof_type_sel === '6')
+            {
+                $(".tot-document").show();
+            }
+            else
+            {
+                $(".tot-document").hide();
+            }
         });
         //Add an element of expense detail
         $("#add-item").on("click",function(e){

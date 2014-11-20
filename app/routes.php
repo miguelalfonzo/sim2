@@ -160,7 +160,7 @@ Route::group(array('before' => 'gercom'), function () {
 /**
  * |-------------------------------------------------------------------------------------------- |
  * | Contabilidad |
- * |-------------------------------------------------------------------------------------------- |
+ * |-------------------------------------------------------  ------------------------------------- |
  */
 
 Route::group(array('before' => 'cont'), function () {
@@ -170,10 +170,22 @@ Route::group(array('before' => 'cont'), function () {
     Route::get('listar-solicitudes-cont/{id}', 'Dmkt\SolicitudeController@listSolicitudeCont');
     Route::post('buscar-solicitudes-cont', 'Dmkt\SolicitudeController@searchSolicitudeCont');
     Route::post('enable-deposit', 'Dmkt\SolicitudeController@enableDeposit');
-    Route::get('generar-asiento-solicitud/{token}', 'Dmkt\SolicitudeController@viewSeatSolicitude');
+    Route::get('revisar-asiento-solicitud/{token}', 'Dmkt\SolicitudeController@viewSeatSolicitude');
+    Route::get('generar-asiento-solicitud/{token}', 'Dmkt\SolicitudeController@viewGenerateSeatSolicitude');
     Route::post('generate-seat-solicitude', 'Dmkt\SolicitudeController@generateSeatSolicitude');
-    Route::get('generar-asiento-gasto/{token}', 'Dmkt\SolicitudeController@viewSeatExpense');
-    Route::post('generate-seat-solicitude', 'Dmkt\SolicitudeController@generateSeatExpense');
+
+    
+    Route::get('revisar-asiento-gasto/{token}', 'Dmkt\SolicitudeController@viewSeatExpense');
+    Route::get('generar-asiento-gasto/{token}', 'Dmkt\SolicitudeController@viewGenerateSeatExpense');
+    Route::post('generate-seat-expense', 'Dmkt\SolicitudeController@generateSeatExpense');
+
+    //RM
+    Route::get('registrar-gasto/{token}', 'Expense\ExpenseController@showCont');
+    Route::post('consultarRuc', 'Expense\RucController@show');
+    Route::get('edit-expense', 'Expense\ExpenseController@editExpense');
+    Route::post('update-expense', 'Expense\ExpenseController@updateExpense');
+    Route::post('register-expense', 'Expense\ExpenseController@registerExpense');
+
 });
 // App::error(function (ModelNotFoundException $e) {
 //     return View::make('notfound');
