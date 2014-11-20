@@ -65,7 +65,7 @@ function newSolicitude() {
         $('#listfamily>li:first-child').clone(true, true).appendTo('#listfamily');
     });
 
-   // $('.selectestatesolicitude option[value=1]').attr('selected','selected');
+    // $('.selectestatesolicitude option[value=1]').attr('selected','selected');
 
     //delete a family
     $(document).on("click", ".btn-delete-family", function () {
@@ -183,8 +183,8 @@ function newSolicitude() {
                 .data("ui-autocomplete")._renderItem = function (ul, item) {
                 return $("<li>")
                     .append("<a>" +
-                        "<br><span style='font-size: 80%;'>Codigo: " + item.clcodigo + "</span>" +
-                        "<br><span style='font-size: 60%;'>Cliente: " + item.clnombre + "</span></a>")
+                    "<br><span style='font-size: 80%;'>Codigo: " + item.clcodigo + "</span>" +
+                    "<br><span style='font-size: 60%;'>Cliente: " + item.clnombre + "</span></a>")
                     .appendTo(ul);
             };
         }
@@ -418,7 +418,7 @@ function newSolicitude() {
 
                 }).done(function (data) {
 
-                     $.unblockUI();
+                    $.unblockUI();
 
                     if (data == 'R') {
 
@@ -683,7 +683,7 @@ function newSolicitude() {
                     form_acepted_solicitude.attr('action', url);
                     form_acepted_solicitude.submit();
                 }
-              }
+            }
 
         });
 
@@ -819,8 +819,8 @@ function newSolicitude() {
         bootbox.confirm({
             message : '¿Esta seguro que desea rechazar esta solicitud?',
             buttons: {
-            'cancel': {label: 'cancelar', className: 'btn-primary'},
-            'confirm': {label: 'aceptar', className: 'btn-default'}
+                'cancel': {label: 'cancelar', className: 'btn-primary'},
+                'confirm': {label: 'aceptar', className: 'btn-default'}
             },
             callback : function (result) {
                 if (result) {
@@ -828,7 +828,7 @@ function newSolicitude() {
                     form_acepted_solicitude.attr('action', url);
                     form_acepted_solicitude.submit();
                 }
-        }
+            }
         });
 
     });
@@ -879,21 +879,21 @@ function newSolicitude() {
         });
 
         if (idamount.val() == Math.round(total)) {
-        bootbox.confirm("¿Esta seguro que desea aprobar esta solicitud?", function (result) {
+            bootbox.confirm("¿Esta seguro que desea aprobar esta solicitud?", function (result) {
 
 
-            if (result) {
-                var message = 'Validando Solicitud..';
-                loadingUI(message);
-                setTimeout(function () {
+                if (result) {
+                    var message = 'Validando Solicitud..';
+                    loadingUI(message);
+                    setTimeout(function () {
 
-                    form_acepted_solicitude.attr('action', server + 'aprobar-solicitud');
-                    form_acepted_solicitude.submit();
-                }, 1200);
+                        form_acepted_solicitude.attr('action', server + 'aprobar-solicitud');
+                        form_acepted_solicitude.submit();
+                    }, 1200);
 
-            }
+                }
 
-        });
+            });
         }else if (idamount.val() < Math.round(total)) {
             amount_error_families.text('El monto distribuido supera el monto total').css('color', 'red');
 
@@ -924,6 +924,68 @@ function newSolicitude() {
 
     /** --------------------------------------------- FONDOS ------------------------------------------------- **/
 
+
+    $.getJSON(server+'representatives', function (data) {
+        representatives = data;
+    });
+
+    $(".change_before_rep").on("keyup",function(){
+        $(this).autocomplete({
+            minLength: 3,
+            source: findRepresentatives,
+            focus: function( event, ui ) {
+                $(this).val( ui.item.visvisitador + ' - ' + ui.item.visnombre + ' ' +ui.item.vispaterno + ' '+ui.item.vismaterno );
+                return false;
+            },
+            select: function( event, ui ) {
+
+                $('#fondo_cuenta').val('191-18771078-0-83');
+                $(this).attr('data-cod',ui.item.visvisitador);
+                $(this).val( ui.item.visvisitador + ' - ' + ui.item.visnombre + ' ' + ui.item.vispaterno + ' '+ui.item.vismaterno );
+                $("#id_change_before_rep").val( ui.item.visvisitador );
+                $(this).attr('disabled',true).addClass('success');
+                $(this).parent().find('.edit-repr').fadeIn();
+
+                return false;
+            }
+        })
+            .data("ui-autocomplete")._renderItem = function (ul, item) {
+            return $("<li>")
+                .append("<a>" +
+                "<span style='font-size: 70%;'>"+ item.visvisitador + ' - ' +item.visnombre+' '+item.vispaterno + ' '+ item.vismaterno+ "</span></a>")
+                .appendTo(ul);
+        };
+    });
+
+    $('#edit-rep').hide();
+    $(document).on("click","#edit-rep",function(e){
+        e.preventDefault();
+        $(this).parent().find('input:text').removeClass('success').attr('disabled', false).val('').focus();
+        $('#fondo_cuenta').val('');
+        $(this).parent().find('input:hidden').val('');
+        $(this).fadeOut();
+    });
+
+    function findRepresentatives(request, response) {
+        function hasMatch(s) {
+            return s.toLowerCase().indexOf(request.term.toLowerCase()) !== -1;
+        }
+
+        var i, l, obj, matches = [];
+
+        if (request.term === "") {
+            response([]);
+            return;
+        }
+        for (i = 0, l = representatives.length; i < l; i++) {
+            obj = representatives[i];
+            if (hasMatch(obj.vispaterno)) {
+                matches.push(obj);
+            }
+        }
+        response(matches);
+    }
+
     $.get(server + 'list-fondos').done(function(data)
         {
 
@@ -950,13 +1012,14 @@ function newSolicitude() {
         }
     );
 
-    $('.register_fondo').on('click',function(){
+    $(document).on('click','.register_fondo',function(){
 
         var aux = this;
         var dato = {
             'institucion' : $('#fondo_institucion').val(),
             'repmed' : $('#fondo_repmed').val(),
             'supervisor' : $('#fondo_supervisor').val(),
+            'codrepmed' : $('#fondo_repmed').attr('data-cod'),
             'total' : $('#fondo_total').val(),
             'cuenta': $('#fondo_cuenta').val(),
             '_token' : $('#_token').val()
@@ -966,14 +1029,14 @@ function newSolicitude() {
         l.start();
         $.post(server + 'registrar-fondo',dato).done(function(data)
             {
-                 $('#fondo_institucion').val('');
-                 $('#fondo_repmed').val('');
-                 $('#fondo_supervisor').val('');
-                 $('#fondo_total').val('');
-                 $('#fondo_cuenta').val('');
+                $('#fondo_institucion').val('');
+                $('#fondo_repmed').val('');
+                $('#fondo_supervisor').val('');
+                $('#fondo_total').val('');
+                $('#fondo_cuenta').val('');
                 // $('#_token').val('');
                 l.stop();
-
+                $('#total-fondo').remove();
                 $('#table_solicitude_fondos_wrapper').remove();
                 $('.table-solicituds-fondos').append(data);
                 $('#table_solicitude_fondos').dataTable({
@@ -1003,6 +1066,7 @@ function newSolicitude() {
         e.preventDefault();
 
         $.get(server + 'delete-fondo/' + $(this).attr('data-idfondo')).done(function(data){
+            $('#total-fondo').remove();
             $('#table_solicitude_fondos_wrapper').remove();
             $('.table-solicituds-fondos').append(data);
             $('#table_solicitude_fondos').dataTable({
@@ -1027,8 +1091,11 @@ function newSolicitude() {
     });
     $('.btn_cancel_fondo').hide();
     $('.btn_edit_fondo').hide();
+
     $(document).on('click','.edit-fondo',function(e){
+        $("#fondo_repmed").attr('disabled',true).addClass('success');
         $('.register_fondo').hide();
+        $('#edit-rep').show();
         e.preventDefault();
         $.get(server + 'get-fondo/' + $(this).attr('data-idfondo')).done(function(data){
             $('.btn_cancel_fondo').show();
@@ -1056,6 +1123,7 @@ function newSolicitude() {
     });
     $(document).on('click','.btn_edit_fondo',function(e){
         e.preventDefault();
+        $('#edit-rep').hide();
         var aux = this;
         var dato = {
             'institucion' : $('#fondo_institucion').val(),
@@ -1068,17 +1136,21 @@ function newSolicitude() {
         };
         var l = Ladda.create(aux);
         l.start();
+
         $.post(server + 'update-fondo',dato).done(function(data)
             {
-
+                $('.btn_cancel_fondo').hide();
+                $('.btn_edit_fondo').hide();
+                $('.register_fondo').show();
                 $('#fondo_institucion').val('');
                 $('#fondo_repmed').val('');
                 $('#fondo_supervisor').val('');
                 $('#fondo_total').val('');
                 $('#fondo_cuenta').val('');
+
                 // $('#_token').val('');
                 l.stop();
-
+                $('#total-fondo').remove();
                 $('#table_solicitude_fondos_wrapper').remove();
                 $('.table-solicituds-fondos').append(data);
                 $('#table_solicitude_fondos').dataTable({
@@ -1107,7 +1179,7 @@ function newSolicitude() {
 
     /** --------------------------------------------- ADMIN ------------------------------------------------- **/
 
-    //quita los errores
+        //quita los errores
     $('#form-register-user input').on('focus',function(){
         var span = $(this).parent().find('.error-incomplete').text('');
         console.log(span);
@@ -1116,24 +1188,24 @@ function newSolicitude() {
     $('#username input').focusout(function(){
 
         if($(this).val() && $(this).attr('id') != 'user-no'){
-        $('#username span:eq(2)').hide();
-        $('#username span:eq(0)').hide();
-        $.ajax({
-            url:server + 'search-user/'+ $(this).val(),
-            type:'GET',
-            beforeSend : function(){
-                $('#username span:eq(1)').show();
-            }
-        }).done(function(data){
-            $('#username span:eq(1)').hide();
-            if(data === 'SI'){
-                $('#username span:eq(0)').show();
-                $('#username span:eq(0)').text('Usuario ya registrado');
-            }else{
-                $('#username span:eq(2)').show();
+            $('#username span:eq(2)').hide();
+            $('#username span:eq(0)').hide();
+            $.ajax({
+                url:server + 'search-user/'+ $(this).val(),
+                type:'GET',
+                beforeSend : function(){
+                    $('#username span:eq(1)').show();
+                }
+            }).done(function(data){
+                $('#username span:eq(1)').hide();
+                if(data === 'SI'){
+                    $('#username span:eq(0)').show();
+                    $('#username span:eq(0)').text('Usuario ya registrado');
+                }else{
+                    $('#username span:eq(2)').show();
 
-            }
-        })
+                }
+            })
         }
     });
 
@@ -1160,9 +1232,9 @@ function newSolicitude() {
 
         if(!$('#first_name input').val()){
             $('#first_name span').text('Campo Obligatorio');
-           validate = 1;
-           console.log(validate);
-       }
+            validate = 1;
+            console.log(validate);
+        }
         if(!$('#last_name input').val()){
             $('#last_name span').text('Campo Obligatorio');
             validate = 1;
@@ -1244,7 +1316,7 @@ function newSolicitude() {
         })
     });
 
-   $('#div-change-password').hide();
+    $('#div-change-password').hide();
     if($('#iduser').val()){
         $('#div-change-password').show();
         $('#div-password').hide();

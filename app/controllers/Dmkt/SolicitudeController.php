@@ -71,25 +71,7 @@ class SolicitudeController extends BaseController
         return $result;
     }
 
-    public function test()
 
-    {
-        Excel::load('test.xlsx', function($reader) {
-
-            $results = $reader->get();
-
-            // ->all() is a wrapper for ->get() and will work the same
-            $results = $reader->all();
-            echo $results;
-
-        });
-
-
-
-       // Demo::display();
-
-
-    }
 
     /** ----------------------------------  Representante Medico ---------------------------------- */
 
@@ -377,12 +359,12 @@ class SolicitudeController extends BaseController
         SolicitudeClient::where('idsolicitud', '=', $id)->delete();
         SolicitudeFamily::where('idsolicitud', '=', $id)->delete();
 
-       /* if($activity == 1){
+        /* if($activity == 1){
 
-        }
-        else if($activity == 31){
+         }
+         else if($activity == 31){
 
-        }*/
+         }*/
 
         $clients = $inputs['clients'];
         //var_dump($clients);die;
@@ -657,7 +639,7 @@ class SolicitudeController extends BaseController
             $solGer->save();
         }
 
-         if($derive == 0)return Redirect::to('show_sup');
+        if($derive == 0)return Redirect::to('show_sup');
     }
 
     public function listSolicitudeSup($id)
@@ -763,7 +745,7 @@ class SolicitudeController extends BaseController
 
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         Solicitude::where('idsolicitud', $solicitude->idsolicitud) // desbloqueamos la solicitud para que el rm lo pueda editar
-            ->update(array('blocked' => 0));
+        ->update(array('blocked' => 0));
         return Redirect::to('show_sup');
 
     }
@@ -823,13 +805,13 @@ class SolicitudeController extends BaseController
         $userid = Auth::user()->gerprod->id;
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         if($solicitude->estado == PENDIENTE)
-        Solicitude::where('token', $token)->update(array('blocked' => 1));
+            Solicitude::where('token', $token)->update(array('blocked' => 1));
 
         $solicitudeBlocked = SolicitudeGer::where('idsolicitud', $solicitude->idsolicitud)->where('idgerprod', $userid)->firstOrFail(); //vemos si la solicitud esta blokeada
         //echo json_encode($solicitudeBlocked);die;
         if ($solicitudeBlocked->blocked == 0) {
             SolicitudeGer::where('idsolicitud', $solicitude->idsolicitud) // blockeamos la solicitud para que el otro gerente no lo pueda editar
-                ->where('idgerprod', '<>', $userid)
+            ->where('idgerprod', '<>', $userid)
                 ->update(array('blocked' => 1));
         } else {
             $block = true;
@@ -851,7 +833,7 @@ class SolicitudeController extends BaseController
 
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         SolicitudeGer::where('idsolicitud', $solicitude->idsolicitud) // desblockeamos la solicitud para que el otro gerente no lo pueda editar
-            ->update(array('blocked' => 0));
+        ->update(array('blocked' => 0));
         return Redirect::to('show_gerprod');
 
     }
@@ -964,8 +946,8 @@ class SolicitudeController extends BaseController
         $state = Session::get('state');
         $states = State::orderBy('idestado', 'ASC')->get();
         $data = [
-          'state' => $state,
-          'states' => $states  
+            'state' => $state,
+            'states' => $states
         ];
         return View::make('Dmkt.GerCom.show_gercom', $data);
     }
@@ -1082,7 +1064,7 @@ class SolicitudeController extends BaseController
             if ($estado != 10) {
                 if ($estado == RECHAZADO) {
                     $solicituds = Solicitude::where('estado', $estado)->where('idaproved', 16) // id gerente comercial
-                        ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
                         ->get();
                 } else {
                     $solicituds = Solicitude::where('estado', $estado)
@@ -1184,8 +1166,9 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.Cont.view_solicitude_cont', $data);
     }
 
-    public function viewSeatSolicitude($token)
+    public function viewSeatSolicitude()
     {
+        $token = Input::get('token');
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $data = [
             'solicitude' => $solicitude
@@ -1219,6 +1202,7 @@ class SolicitudeController extends BaseController
 
     public function generateSeatSolicitude()
     {
+
         $inputs  = Input::all();
         $leyenda = trim($inputs['leyenda']);
 
@@ -1227,11 +1211,8 @@ class SolicitudeController extends BaseController
         $solicitude = Solicitude::where('idsolicitud', $inputs['idsolicitude']);
         $solicitude->asiento = 2;
         $data = $this->objectToArray($solicitude);
-        if($solicitude->update($data))
-        {
-            return 1;
-        }
-        return 0;
+        $solicitude->update($data);
+        return Redirect::to('show_cont');
     }
 
     public function generateSeatExpense()
@@ -1266,7 +1247,7 @@ class SolicitudeController extends BaseController
             $val_ret = intval($inputs['ret2']);
             $idtyperetention = 3;
         }
-        
+
         $id = $inputs['idsolicitude'];
         $solicitude = Solicitude::where('idsolicitud', $id);
         $solicitude->retencion = $val_ret;

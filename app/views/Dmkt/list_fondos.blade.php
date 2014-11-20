@@ -1,3 +1,5 @@
+
+
  <table class="table table-striped table-bordered dataTable" id="table_solicitude_fondos" style="width: 100%">
     <thead>
     <tr>
@@ -11,7 +13,7 @@
     </tr>
     </thead>
     <tbody>
-    <?php $i=1?>
+    <?php $i=1 ; $total = 0?>
     @foreach($fondos as  $fondo)
     <tr>
         <td>{{$i}}</td>
@@ -30,8 +32,9 @@
             </div>
         </td>
     </tr>
-    <?php $i++?>
+    <?php $total += $fondo->total ; $i++?>
     @endforeach
     </tbody>
 
 </table>
+<span  id="total-fondo" style="position: absolute ; top: 5% ; left:42%">Total {{$total}}</span>
