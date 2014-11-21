@@ -1166,9 +1166,8 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.Cont.view_solicitude_cont', $data);
     }
 
-    public function viewSeatSolicitude()
+    public function viewSeatSolicitude($token)
     {
-        $token = Input::get('token');
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $data = [
             'solicitude' => $solicitude

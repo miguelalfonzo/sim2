@@ -66,7 +66,7 @@
 						<label>RUC</label>
 						<div class="input-group">
 							<input id="ruc" type="text" class="form-control" maxlength="11">
-							<div class="input-group-addon search-ruc"><span class="glyphicon glyphicon-search"></span></div>
+							<div class="input-group-addon search-ruc" data-sol="1"><span class="glyphicon glyphicon-search"></span></div>
 							<input id="ruc-hide" type="hidden">
 						</div>
 					</div>
@@ -193,7 +193,7 @@
 			<section class="row reg-expense detail-expense" style="margin:0">
 				<div class="col-xs-12 col-sm-12 col-md-12">
 					<div class="form-expense">
-						<button id="save-expense" type="button" class="btn btn-primary">Registrar</button>
+						<button id="save-expense" data-sol="1" type="button" class="btn btn-primary">Registrar</button>
 						<div class="inline"><p class="inline message-expense"></p></div>
 					</div>
 				</div>
@@ -225,7 +225,7 @@
 												<th class="voucher_number">{{$val->num_prefijo.'-'.$val->num_serie}}</th>
 												<th class="date_movement">{{date('d/m/Y',strtotime($val->fecha_movimiento))}}</th>
 												<th class="total"><span class="type_moeny">{{$solicitude->typemoney->simbolo}}&nbsp;<span class="total_expense">{{$val->monto}}</span></th>
-												<th><a class="edit-expense" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
+												<th><a class="edit-expense" data-sol="1" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
 												<th><a class="delete-expense" href="#"><span class="glyphicon glyphicon-remove"></span></a></a></th>
 											</tr>	
 										@endforeach

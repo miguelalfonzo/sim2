@@ -24,15 +24,11 @@
 							<label>Nombre del Solicitante</label>
 							<div class="input-group">
 		                        @if($solicitude->user->type == 'R')
-		                        <span class="input-group-addon">R</span>
-		                        <input id="textinput" name="titulo" type="text" placeholder=""
-		                               value="{{mb_convert_case($solicitude->user->rm->nombres.' '.$solicitude->user->rm->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled
-		                               class="form-control">
+			                        <span class="input-group-addon">R</span>
+			                        <input id="textinput" name="titulo" type="text" placeholder="" value="{{mb_convert_case($solicitude->user->rm->nombres.' '.$solicitude->user->rm->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled class="form-control">
 		                        @else
-		                        <span class="input-group-addon">S</span>
-		                        <input id="textinput" name="titulo" type="text" placeholder=""
-		                               value="{{mb_convert_case($solicitude->user->sup->nombres.' '.$solicitude->user->sup->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled
-		                               class="form-control">
+			                        <span class="input-group-addon">S</span>
+			                        <input id="textinput" name="titulo" type="text" placeholder="" value="{{mb_convert_case($solicitude->user->sup->nombres.' '.$solicitude->user->sup->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled class="form-control">
 		                        @endif
 		                    </div>							
 						</div>
@@ -56,18 +52,17 @@
 						<div class="form-expense">
 							<label>Autorizado por</label>
 							<div class="input-group">
-		                        @if($solicitude->user->type == 'S')
+		                        @if($solicitude->aproved->type == 'S')
 		                        <span class="input-group-addon">S</span>
 		                        <input id="textinput" name="titulo" type="text" placeholder=""
-		                               value="{{mb_convert_case($solicitude->user->rm->nombres.' '.$solicitude->user->rm->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled
+		                               value="{{mb_convert_case($solicitude->aproved->sup->nombres.' '.$solicitude->aproved->sup->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled
 		                               class="form-control">
 		                        @else
 		                        <span class="input-group-addon">G</span>
 		                        <input id="textinput" name="titulo" type="text" placeholder=""
-		                               value="{{mb_convert_case($solicitude->aproved->gerprod->descripcion,MB_CASE_TITLE,'UTF-8')}}" disabled
-		                               class="form-control">
+		                               value="{{mb_convert_case($solicitude->aproved->gerprod->descripcion,MB_CASE_TITLE,'UTF-8')}}" disabled class="form-control">
 		                        @endif
-		                    </div>							
+		                    </div>
 						</div>
 					</div>
 					<div class="col-xs-12 col-sm-6 col-md-4">
@@ -75,7 +70,7 @@
 							<label>Número de Depósito</label>
 							<input type="text" class="form-control" value="{{$solicitude->iddeposito}}" disabled>
 						</div>
-					</div>
+					</div>	
 					<div class="col-xs-12 col-sm-6 col-md-4">
 						<div class="form-expense">
 							<label>Fecha de Depósito</label>

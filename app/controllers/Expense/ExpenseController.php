@@ -242,13 +242,18 @@ class ExpenseController extends BaseController{
 	        //Detail Expense
 			$quantity = $inputs['quantity'];
 			$description = $inputs['description'];
+			$reparo = array();
+			if(isset($inputs['rep']))
+			{
+				$reparo = $inputs['rep'];
+			}
 			// $type_expense = $expenseJson->type_expense;
 			$total_item = $inputs['total_item'];
 			if($expenseEdit->update($data))
 			{
 				$expense_detail_edit = ExpenseItem::where('idgasto',$idgasto)->delete();
 				try {
-					DB::transaction (function() use ($idgasto,$quantity,$description,$total_item){
+					DB::transaction (function() use ($idgasto,$quantity,$description,$total_item, $reparo){
 						for($i=0;$i<count($quantity);$i++)
 						{
 							$expense_detail = new ExpenseItem;
@@ -256,6 +261,10 @@ class ExpenseController extends BaseController{
 							$expense_detail->cantidad = $quantity[$i];
 							$expense_detail->descripcion = $description[$i];
 							// $expense_detail->tipo_gasto = $type_expense[$i];
+							if(isset($reparo[$i]))
+							{
+								$expense_detail->reparo = $reparo[$i];
+							}
 							$expense_detail->importe = $total_item[$i];
 							$expense_detail->save();	
 						}
