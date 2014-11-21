@@ -65,7 +65,7 @@ Route::group(array('before' => 'rm'), function () {
     Route::post('buscar-solicitudes-rm', 'Dmkt\SolicitudeController@searchSolicituds');
 
     // Expense
-    Route::post('registrar-gasto', 'Expense\ExpenseController@show');
+    Route::get('registrar-gasto/{token}', 'Expense\ExpenseController@show');
     Route::post('register-expense', 'Expense\ExpenseController@registerExpense');
     Route::post('delete-expense', 'Expense\ExpenseController@deleteExpense');
     Route::post('update-expense', 'Expense\ExpenseController@updateExpense');
@@ -180,12 +180,10 @@ Route::group(array('before' => 'cont'), function () {
     Route::post('generate-seat-expense', 'Dmkt\SolicitudeController@generateSeatExpense');
 
     //RM
-    Route::get('registrar-gasto/{token}', 'Expense\ExpenseController@showCont');
-    Route::post('consultarRuc', 'Expense\RucController@show');
-    Route::get('edit-expense', 'Expense\ExpenseController@editExpense');
-    Route::post('update-expense', 'Expense\ExpenseController@updateExpense');
-    Route::post('register-expense', 'Expense\ExpenseController@registerExpense');
-
+    Route::get('ver-gasto/{token}', 'Expense\ExpenseController@showCont');
+    Route::post('consultarRucCont', 'Expense\RucController@show');
+    Route::get('edit-expense-cont', 'Expense\ExpenseController@editExpense');
+    Route::post('update-expense-cont', 'Expense\ExpenseController@updateExpense');
 });
 // App::error(function (ModelNotFoundException $e) {
 //     return View::make('notfound');

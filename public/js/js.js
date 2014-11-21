@@ -64,7 +64,14 @@ $(function(){
     $(document).on("click","#token-reg-expense",function(e){
         e.preventDefault();
         var token = $(this).attr('data-url');
-        window.location.href = server+'registrar-gasto/'+token;
+        if($(this).attr('data-cont'))
+        {
+            window.location.href = server+'ver-gasto/'+token;
+        }
+        else
+        {
+            window.location.href = server+'registrar-gasto/'+token;
+        }
     });
     $(document).on("click","#token-solicitude",function(e){
         e.preventDefault();
@@ -159,6 +166,10 @@ $(function(){
             row_seat.find('.number_account').text($("#number_account").val());
             row_seat.find('.dc').text($("#dc").val());
             row_seat.find('.importe').text($("#importe").val());
+            if($("#add-seat-solicitude").text() === 'Actualizar Detalle')
+            {
+                
+            }
             $("#table-seat-solicitude tbody").append(row_seat);
             $("#name_account").val('');
             $("#number_account").val('');
@@ -382,7 +393,6 @@ $(function(){
             bootbox.confirm("¿Esta seguro que desea eliminar el gasto?", function(result) {
                 if(result)
                 {
-                    //aquí
                     data = {"ruc":ruc,"voucher_number":voucher_number, "_token":$("input[name=_token]").val()};
                     $.post(server + 'delete-expense', data)
                     .done(function (data) {
@@ -400,6 +410,17 @@ $(function(){
                     });
                 }
             });
+        });
+        $(document).on("click","#table-seat-solicitude .edit-seat-solicitude",function(e){
+            e.preventDefault();
+            $("#table-seat-solicitude tbody tr").removeClass("select-row");
+            $("#add-seat-solicitude").html('Actualizar Detalle');
+            var row_edit = $(this).parent().parent();
+            $("#name_account").val(row_edit.find('.name_account').text());
+            $("#number_account").val(row_edit.find('.number_account').text());
+            $("#total").val(row_edit.find('.total').text());
+            $("#dc").val(row_edit.find('.dc').text());
+            row_edit.addClass('select-row');
         });
         //Edit a document already registered
         $(document).on("click","#table-expense .edit-expense",function(e){
@@ -419,9 +440,17 @@ $(function(){
             $("#table-items tbody tr").remove();
             $("#save-expense ").html("Actualizar");
             data = {"ruc":ruc,"voucher_number":voucher_number};
+            if($(this).attr('data-sol'))
+            {
+                var ruta = 'edit-expense';
+            }
+            else
+            {
+                var ruta = 'edit-expense-cont';
+            }
             $.ajax({
                 type: 'get',
-                url: server+'edit-expense',
+                url: server+ruta,
                 dataType: 'json',
                 data: {
                     data : JSON.stringify(data)
@@ -454,6 +483,13 @@ $(function(){
                         row_add.find('.description input').val(value.descripcion);
                         row_add.find('.type-expense').val(value.tipo_gasto);
                         row_add.find('.total-item input').val(value.importe);
+                        if($(".reparo"))
+                        {
+                            if(value.reparo == 1)
+                            {
+                                row_add.find('.reparo').attr('checked', true);
+                            }
+                        }
                         $("#table-items tbody").append(row_add);
                         $(".total-item input").numeric({negative:false});
                         $(".quantity input").numeric({negative:false});
@@ -483,6 +519,14 @@ $(function(){
         //Validation spending record button
         $("#save-expense").on("click",function(e){
             e.preventDefault();
+            if($(this).attr('data-sol'))
+            {
+                route_update = 'update-expense';
+            }
+            else
+            {
+                route_update = 'update-expense-cont';
+            }
             $(".message-expense").text('').hide();
             var btn_save = $(this).html();
             var row = "<tr>";
@@ -605,10 +649,25 @@ $(function(){
                         error_json = 1;
                     }
                 });
+                var rep = [];
+                if($(".reparo"))
+                {
+                    $(".reparo").each(function(index){
+                        if($(this).is(":checked"))
+                        {
+                            rep[index] = 1;
+                        }
+                        else
+                        {
+                            rep[index] = 0;
+                        }
+                    });
+                }
 
                 (data_quantity.length>0) ? data.quantity = data_quantity : error_json = 1;
                 data.description = arr_description;
                 (data_total_item.length>0) ? data.total_item = data_total_item : error_json = 1;
+                data.rep = rep;
                 // data.type_expense = arr_type_expense;
                 //Validando el Objeto JSON
                 if(error_json === 0)
@@ -700,12 +759,13 @@ $(function(){
                                 else
                                 {
                                     var rows = $(".total").parent();
+
                                     $.each(rows,function(index){
                                         if($(this).find(".voucher_number").html()===voucher_number && $(this).find(".ruc").html()===ruc)
                                         {
                                             $.ajax({
                                                 type: 'post',
-                                                url: server+'update-expense',
+                                                url: server+route_update,
                                                 data: data,
                                                 beforeSend: function(){
                                                     loadingUI('Actualizando ...');
@@ -786,6 +846,14 @@ $(function(){
     
         //Search Social Reason in SUNAT once introduced the RUC
         $(".search-ruc").on("click",function(){
+            if($(this).attr('data-sol'))
+            {
+                rout_ruc = 'consultarRuc';
+            }
+            else
+            {
+                rout_ruc = 'consultarRucCont';
+            }
             $(".message-expense").text("");
             $("#razon").removeClass('error-incomplete');
             var ruc = $("#ruc").val();
@@ -810,7 +878,7 @@ $(function(){
                 data._token = $("input[name=_token]").val();
                 $.ajax({
                     type: 'post',
-                    url: server+'consultarRuc',
+                    url: server+rout_ruc,
                     data: data,
                     beforeSend:function(){
                         l.start();

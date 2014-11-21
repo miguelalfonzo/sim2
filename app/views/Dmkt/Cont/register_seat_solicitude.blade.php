@@ -56,16 +56,15 @@
 						<div class="form-expense">
 							<label>Autorizado por</label>
 							<div class="input-group">
-		                        @if($solicitude->user->type == 'S')
+		                        @if($solicitude->aproved->type == 'S')
 		                        <span class="input-group-addon">S</span>
 		                        <input id="textinput" name="titulo" type="text" placeholder=""
-		                               value="{{mb_convert_case($solicitude->user->sup->nombres.' '.$solicitude->user->sup->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled
+		                               value="{{mb_convert_case($solicitude->aproved->sup->nombres.' '.$solicitude->aproved->sup->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled
 		                               class="form-control">
 		                        @else
 		                        <span class="input-group-addon">G</span>
 		                        <input id="textinput" name="titulo" type="text" placeholder=""
-		                               value="{{mb_convert_case($solicitude->aproved->gerprod->descripcion,MB_CASE_TITLE,'UTF-8')}}" disabled
-		                               class="form-control">
+		                               value="{{mb_convert_case($solicitude->aproved->gerprod->descripcion,MB_CASE_TITLE,'UTF-8')}}" disabled class="form-control">
 		                        @endif
 		                    </div>							
 						</div>
@@ -144,8 +143,8 @@
 											<th class="dc">D</th>
 											<th class="total">{{$solicitude->monto}}</th>
 											<th class="leyenda">
-												@if($solicitude->user->type == 'S')
-													{{$solicitude->user->sup->nombres.' '.$solicitude->user->sup->apellidos.' '.$solicitude->titulo}}
+												@if($solicitude->aproved->type == 'S')
+													{{$solicitude->aproved->sup->nombres.' '.$solicitude->aproved->sup->apellidos.' '.$solicitude->titulo}}
 												@else
 													{{$solicitude->aproved->gerprod->descripcion.' '.$solicitude->titulo}}
 												@endif
@@ -160,8 +159,8 @@
 											<th class="dc">C</th>
 											<th class="total">{{$solicitude->monto}}</th>
 											<th class="leyenda">
-												@if($solicitude->user->type == 'S')
-													{{$solicitude->user->sup->nombres.' '.$solicitude->user->sup->apellidos.' '.$solicitude->titulo}}
+												@if($solicitude->aproved->type == 'S')
+													{{$solicitude->aproved->sup->nombres.' '.$solicitude->aproved->sup->apellidos.' '.$solicitude->titulo}}
 												@else
 													{{$solicitude->aproved->gerprod->descripcion.' '.$solicitude->titulo}}
 												@endif
@@ -177,8 +176,8 @@
 												<th class="dc">C</th>
 												<th class="total">{{$solicitude->retencion}}</th>
 												<th class="leyenda">
-													@if($solicitude->user->type == 'S')
-														{{$solicitude->user->sup->nombres.' '.$solicitude->user->sup->apellidos.' '.$solicitude->titulo}}
+													@if($solicitude->aproved->type == 'S')
+														{{$solicitude->aproved->sup->nombres.' '.$solicitude->aproved->sup->apellidos.' '.$solicitude->titulo}}
 													@else
 														{{$solicitude->aproved->gerprod->descripcion.' '.$solicitude->titulo}}
 													@endif
