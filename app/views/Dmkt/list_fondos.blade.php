@@ -37,4 +37,4 @@
     </tbody>
 
 </table>
-<span  id="total-fondo" style="position: absolute ; top: 5% ; left:42%">Total {{$total}}</span>
+<input id="total-fondo-hiden" type="hidden" value="{{$total}}">

@@ -111,13 +111,20 @@
 </div>
 <div class="panel-body table-solicituds-fondos" style="position: relative">
 <div class="form-group col-md-12">
-  <div id="txtDate" class="form-group col-md-4">
-  					<div class="input-group date">
-  						<input type="text" id="date-fondo" readonly class="form-control"><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+  <div id="" class="form-group col-xs-6 col-sm-6 col-md-4">
+  					<div class="input-group">
+  						<input type="text" id="datefondo" readonly class="form-control"><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
   					</div>
   </div>
+  <div class="col-xs-3 col-sm-3 col-md-3" >
+      <div class="col-sm-12 col-md-12">
+                          <input id="total-fondo" name="total" type="text" placeholder=""
+                                 value=""
+                                 class="form-control input-md" readonly>
 
-    <div class="col-sm-offset-11 col-md-offset-11" >
+                      </div>
+    </div>
+    <div class="col-xs-3 col-sm-3 col-md-1 pull-right" >
             <a id="export-fondo" class="btn btn-sm btn-primary ladda-button" href=""
                                          data-style="zoom-in" data-size="l"><i class="glyphicon glyphicon-print"></i> Exportar</a>
     </div>

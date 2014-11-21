@@ -1000,7 +1000,6 @@ function newSolicitude() {
 
 
             //$('#table_solicitude_fondos_wrapper').remove();
-
             $('.table-solicituds-fondos').append(data);
             $('#table_solicitude_fondos').dataTable({
                     "order": [
@@ -1020,6 +1019,8 @@ function newSolicitude() {
                     }
                 }
             );
+
+            $('#total-fondo').val($('#total-fondo-hiden').val());
         }
     );
 
@@ -1045,6 +1046,8 @@ function newSolicitude() {
                 $('#fondo_supervisor').val('');
                 $('#fondo_total').val('');
                 $('#fondo_cuenta').val('');
+                $('#total-fondo').val('');
+                $('#date-fondo').val((dateactual.getMonth()+1)+'-'+dateactual.getFullYear());
                 // $('#_token').val('');
                 l.stop();
                 removeinput($('#edit-rep'));
@@ -1188,20 +1191,18 @@ function newSolicitude() {
         )
 
     });
-    var date_options = {
+    var date_options2 = {
         format: "mm-yyyy",
-        startDate: $('#startDate').val(),
-        endDate: $('#endDate').val(),
         minViewMode: 1,
         language: "es",
         autoclose: true
     };
     $('#export-fondo').hide();
-    $(".date").datepicker(date_options).on('changeDate', function (e) {
+    $("#datefondo").datepicker(date_options2).on('changeDate', function (e) {
 
         $(this).tooltip('hide');
-        //$('#date-fondo').val(e.format('mm'));
-        var datefondo = $('#date-fondo').val();
+
+        var datefondo = $(this).val();
         if(datefondo!='') {
             $('#export-fondo').show();
             $('#export-fondo').attr('href', server + 'exportfondos/' + datefondo);
@@ -1209,8 +1210,8 @@ function newSolicitude() {
         else{
             $('#export-fondo').hide()
         }
-        $(".date").removeClass('has-error');
-        searchFondos();
+        $(".date-fondo").removeClass('has-error');
+        searchFondos(datefondo);
         if (isNaN(e.date)) {
 
             $("#year").val('');
@@ -1224,12 +1225,11 @@ function newSolicitude() {
         $("#month").change();
 
     });
-    function searchFondos() {
+    function searchFondos(datefondo) {
 
-        var date = $('#date-fondo').val();
-        $.get(server + 'list-fondos/' + date).done(function (data) {
 
-            $('#total-fondo').remove();
+        $.get(server + 'list-fondos/' + datefondo).done(function (data) {
+            $('#total-fondo-hiden').remove();
             $('#table_solicitude_fondos_wrapper').remove();
             $('.table-solicituds-fondos').append(data);
             $('#table_solicitude_fondos').dataTable({
@@ -1250,6 +1250,9 @@ function newSolicitude() {
                     }
                 }
             );
+
+
+            $('#total-fondo').val($('#total-fondo-hiden').val());
         })
     }
     /** --------------------------------------------- ADMIN ------------------------------------------------- **/

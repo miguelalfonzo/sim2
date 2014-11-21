@@ -118,10 +118,16 @@ class FondoController extends BaseController
         $end = $mes[$end].'-'.$st;
 
          if($export){
-             return FondoInstitucional::whereRaw("created_at between to_date('$start' ,'DD-MM-YYYY') and to_date('$end' ,'DD-MM-YYYY')+1")->get(array('repmed','institucion','cuenta','supervisor','total'));
+             $fondos = FondoInstitucional::whereRaw("created_at between to_date('$start' ,'DD-MM-YYYY') and to_date('$end' ,'DD-MM-YYYY')+1")->get(array('repmed','institucion','cuenta','supervisor','total'));
+             return $fondos;
          }else{
              $fondos = FondoInstitucional::whereRaw("created_at between to_date('$start' ,'DD-MM-YYYY') and to_date('$end' ,'DD-MM-YYYY')+1")->get();
-             return View::make('Dmkt.list_fondos')->with('fondos', $fondos);
+             $view = View::make('Dmkt.list_fondos')->with('fondos', $fondos);
+             $data =[
+                 'view' =>$view,
+                 'total' => $fondos->sum('total')
+             ];
+             return $view;
          }
 
     }
