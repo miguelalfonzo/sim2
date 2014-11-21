@@ -157,9 +157,10 @@ class FondoController extends BaseController
         $fondo->cuenta = $inputs['cuenta'];
         $fondo->codrepmed = $inputs['codrepmed'];
         $fondo->save();
-        $fondos = FondoInstitucional::all();
-        return View::make('Dmkt.list_fondos')->with('fondos', $fondos);
+        $start = $inputs['start'];
 
+        $fondos = $this->getFondos($start);
+        return $fondos;
     }
 
     function getRepresentatives()

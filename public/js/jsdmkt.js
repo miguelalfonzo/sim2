@@ -994,8 +994,9 @@ function newSolicitude() {
         response(matches);
     }
 
-    var dateactual = new Date();
-    $.get(server + 'list-fondos/'+(dateactual.getMonth()+1)+'-'+dateactual.getFullYear()).done(function(data)
+    var datef = new Date();
+    var dateactual = (datef.getMonth()+1)+'-'+datef.getFullYear();
+    $.get(server + 'list-fondos/'+ dateactual).done(function(data)
         {
 
 
@@ -1051,7 +1052,7 @@ function newSolicitude() {
                 // $('#_token').val('');
                 l.stop();
                 removeinput($('#edit-rep'));
-                $('#total-fondo').remove();
+               // $('#total-fondo').remove();
                 $('#table_solicitude_fondos_wrapper').remove();
                 $('.table-solicituds-fondos').append(data);
                 $('#table_solicitude_fondos').dataTable({
@@ -1079,9 +1080,13 @@ function newSolicitude() {
 
     $(document).on('click' , '.delete-fondo' , function(e){
         e.preventDefault();
+        var data = {
+            idfondo: $(this).attr('data-idfondo'),
+            start: dateactual
 
-        $.get(server + 'delete-fondo/' + $(this).attr('data-idfondo')).done(function(data){
-            $('#total-fondo').remove();
+        };
+        $.post(server + 'delete-fondo' + data ).done(function(data){
+            //$('#total-fondo').remove();
             $('#table_solicitude_fondos_wrapper').remove();
             $('.table-solicituds-fondos').append(data);
             $('#table_solicitude_fondos').dataTable({
@@ -1148,7 +1153,8 @@ function newSolicitude() {
             'total' : $('#fondo_total').val(),
             'cuenta': $('#fondo_cuenta').val(),
             '_token' : $('#_token').val(),
-            'idfondo' : $('#idfondo').val()
+            'idfondo' : $('#idfondo').val(),
+            'start' : dateactual
         };
         var l = Ladda.create(aux);
         l.start();
@@ -1166,7 +1172,8 @@ function newSolicitude() {
 
                 removeinput($('#edit-rep'));
                 l.stop();
-                $('#total-fondo').remove();
+                $('#total-fondo').val('');
+                $('#total-fondo').val($('#total-fondo-hiden').val());
                 $('#table_solicitude_fondos_wrapper').remove();
                 $('.table-solicituds-fondos').append(data);
                 $('#table_solicitude_fondos').dataTable({
