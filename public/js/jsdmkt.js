@@ -508,7 +508,7 @@ function newSolicitude() {
             l.start();
             var jqxhr = $.post(server + "buscar-solicitudes-"+typeUser, { idstate: $('#idState').val(), date_start: $('#date_start').val(), date_end: $('#date_end').val() ,_token : document.getElementsByName('_token')[0].value })
                 .done(function (data) {
-                    console.log(data);
+
                     $('#table_solicitude_'+typeUser+'_wrapper').remove();
                     $('.table-solicituds-'+typeUser).append(data);
                     $('#table_solicitude_'+typeUser).dataTable({
@@ -611,7 +611,7 @@ function newSolicitude() {
         var sum_total =0;
         amount_families.each(function(i,v){
             sum_total += parseFloat($(this).val());
-            console.log(Math.round(sum_total));
+
         });
 
         if(sum_total > parseInt(idamount.val())){
@@ -704,7 +704,7 @@ function newSolicitude() {
 
                     $.post(server + 'cancelar-solicitud-sup', {idsolicitude: aux.attr('data-idsolicitude')})
                         .done(function (data) {
-                            console.log(data);
+
 
                             $('#table_solicitude_sup_wrapper').remove();
                             $('.table-solicituds-sup').append(data);
@@ -998,7 +998,7 @@ function newSolicitude() {
     $.get(server + 'list-fondos/'+(dateactual.getMonth()+1)+'-'+dateactual.getFullYear()).done(function(data)
         {
 
-            console.log(data);
+
             //$('#table_solicitude_fondos_wrapper').remove();
 
             $('.table-solicituds-fondos').append(data);
@@ -1112,7 +1112,7 @@ function newSolicitude() {
         $.get(server + 'get-fondo/' + $(this).attr('data-idfondo')).done(function(data){
             $('.btn_cancel_fondo').show();
             $('.btn_edit_fondo').show();
-            console.log(data);
+
             $('#fondo_institucion').val(data.institucion);
             $('#fondo_repmed').val(data.repmed);
             $('#fondo_supervisor').val(data.supervisor);
@@ -1212,11 +1212,11 @@ function newSolicitude() {
         $(".date").removeClass('has-error');
         searchFondos();
         if (isNaN(e.date)) {
-            console.log('1')
+
             $("#year").val('');
             $("#month").val('');
         } else {
-            console.log('2')
+
             $("#year").val(e.format('yyyy'));
             $("#month").val(parseInt(e.format('mm')));
         }
@@ -1228,7 +1228,7 @@ function newSolicitude() {
 
         var date = $('#date-fondo').val();
         $.get(server + 'list-fondos/' + date).done(function (data) {
-            console.log(data);
+
             $('#total-fondo').remove();
             $('#table_solicitude_fondos_wrapper').remove();
             $('.table-solicituds-fondos').append(data);
@@ -1257,7 +1257,7 @@ function newSolicitude() {
         //quita los errores
     $('#form-register-user input').on('focus',function(){
         var span = $(this).parent().find('.error-incomplete').text('');
-        console.log(span);
+
     });
 
     $('#username input').focusout(function(){
@@ -1303,7 +1303,7 @@ function newSolicitude() {
     $('#register_user').on('click',function(e){
         e.preventDefault();
         var regex_email = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        console.log(regex_email.test($('#email input').val()));
+
 
         if(!$('#first_name input').val()){
             $('#first_name span').text('Campo Obligatorio');
@@ -1379,7 +1379,7 @@ function newSolicitude() {
         e.preventDefault();
         var _iduser = $(this).data('iduser');
         var _token  = $(this).data('token');
-        console.log(_token);
+
         bootbox.confirm("¿Esta seguro que desea desactivar este usuario?", function (result) {
 
             if(result){
