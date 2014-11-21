@@ -130,7 +130,7 @@ class ExpenseController extends BaseController{
 			$expense->ruc = $inputs['ruc'];
 			$expense->razon = $inputs['razon'];
 			$expense->monto = $inputs['total_expense'];
-			if($inputs['proof_type'] == '2')
+			if($inputs['proof_type'] == '1' || $inputs['proof_type'] == '4' || $inputs['proof_type'] == '6')
 			{
 				$expense->igv = $inputs['igv'];
 				$expense->imp_serv = $inputs['imp_service'];

@@ -180,7 +180,7 @@ Route::group(array('before' => 'cont'), function () {
     Route::post('generate-seat-expense', 'Dmkt\SolicitudeController@generateSeatExpense');
 
     //RM
-    Route::get('ver-gasto/{token}', 'Expense\ExpenseController@showCont');
+    Route::get('revisar-gasto/{token}', 'Expense\ExpenseController@showCont');
     Route::post('consultarRucCont', 'Expense\RucController@show');
     Route::get('edit-expense-cont', 'Expense\ExpenseController@editExpense');
     Route::post('update-expense-cont', 'Expense\ExpenseController@updateExpense');
