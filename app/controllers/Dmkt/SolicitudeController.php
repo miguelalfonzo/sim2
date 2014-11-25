@@ -1204,14 +1204,13 @@ class SolicitudeController extends BaseController
 
         $inputs  = Input::all();
         $leyenda = trim($inputs['leyenda']);
-
         //FALTA
-        return 0;
+        // return 0;
         $solicitude = Solicitude::where('idsolicitud', $inputs['idsolicitude']);
         $solicitude->asiento = 2;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
-        return Redirect::to('show_cont');
+        return 1;
     }
 
     public function generateSeatExpense()

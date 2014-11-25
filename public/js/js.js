@@ -66,7 +66,7 @@ $(function(){
         var token = $(this).attr('data-url');
         if($(this).attr('data-cont'))
         {
-            window.location.href = server+'ver-gasto/'+token;
+            window.location.href = server+'revisar-gasto/'+token;
         }
         else
         {
@@ -105,7 +105,7 @@ $(function(){
         $("#ret0").numeric({negative:false});
         $("#ret1").numeric({negative:false});
         $("#ret2").numeric({negative:false});
-        $("#total").numeric({negative:false});        
+        $("#total").numeric({negative:false});
     //Events: Datepicker, Buttons, Keyup.
         //Calcule the IGV and Balance once typed the total amount per item
         $(document).on("keyup",".total-item input",function(){
@@ -161,19 +161,32 @@ $(function(){
             {
                 return;
             }
-            var row_seat = $("#table-seat-solicitude tbody tr:first").clone(true,true);
-            row_seat.find('.name_account').text($("#name_account").val());
-            row_seat.find('.number_account').text($("#number_account").val());
-            row_seat.find('.dc').text($("#dc").val());
-            row_seat.find('.importe').text($("#importe").val());
             if($("#add-seat-solicitude").text() === 'Actualizar Detalle')
             {
-                
+                $("#table-seat-solicitude tbody tr").each(function(index){
+                    if($(this).hasClass('select-row'))
+                    {
+                        $('.name_account:eq('+index+')').text($("#name_account").val());
+                        $('.number_account:eq('+index+')').text($("#number_account").val());
+                        $('.dc:eq('+index+')').text($("#dc").val());
+                        $('.total:eq('+index+')').text($("#total").val());
+                    }
+                });
             }
-            $("#table-seat-solicitude tbody").append(row_seat);
+            else
+            {
+                var row_seat = $("#table-seat-solicitude tbody tr:first").clone(true,true);
+                row_seat.find('.name_account').text($("#name_account").val());
+                row_seat.find('.number_account').text($("#number_account").val());
+                row_seat.find('.dc').text($("#dc").val());
+                row_seat.find('.total').text($("#total").val());
+                $("#table-seat-solicitude tbody").append(row_seat);
+            }
             $("#name_account").val('');
             $("#number_account").val('');
             $("#total").val('');
+            $("#table-seat-solicitude tbody tr").removeClass('select-row');
+            $(this).html('Agregar Detalle');
         });
         //Record end Solicitude
         $("#finish-expense").on("click",function(e){
@@ -459,6 +472,7 @@ $(function(){
                     loadingUI('Cargando Datos');
                 },
                 error:function(){
+                    $.blockUI();
                     $(".message-expense").text('No se pueden recuperar los datos del servidor.').show();
                 }
             }).done(function (response){
@@ -494,7 +508,7 @@ $(function(){
                         $(".total-item input").numeric({negative:false});
                         $(".quantity input").numeric({negative:false});
                     });
-                    if(data_response.expense.idcomprobante == '2')
+                    if(data_response.expense.idcomprobante == 1 || data_response.expense.idcomprobante == 4 || data_response.expense.idcomprobante == 6)
                     {
                         $(".tot-document").show();
                         $("#sub-tot").val(data_response.expense.sub_tot);
@@ -715,7 +729,7 @@ $(function(){
                             })
                             .fail(function(){
                                 responseUI("Error del servidor","red");
-                                $(".message-expense").text("Ocurrió un error al momento de registrar los gastos");
+                                $(".message-expense").text("Error al momento de registrar los gastos");
                             });
                         }
                         else
@@ -964,11 +978,12 @@ $(function(){
             row_item_first.find('.quantity input').val('');
             row_item_first.find('.description input').val('');
             row_item_first.find('.total-item input').val('');
-             $("#table-items tbody").append(row_item_first);
+            $("#table-items tbody").append(row_item_first);
         }
         //Delete data
         function deleteExpense()
         {
+            $(".tot-document").show();
             $("#proof-type").val("1").attr("disabled",false);
             $("#ruc").val('').attr('disabled',false);
             $("#ruc-hide").val('');
@@ -980,7 +995,6 @@ $(function(){
             $("#sub-tot").val(0);
             $("#imp-ser").val(0);
             $("#igv").val(0);
-            $(".tot-document").hide();
             $("#total-expense").val('');
             $("#tot-edit-hidden").val('');
             $("#desc-expense").val('');
@@ -1035,7 +1049,7 @@ $(function(){
             });
             if(total_expense>0)
             {
-                if($("#proof-type").val()==='2')
+                if($("#proof-type").val()==='1' || $("#proof-type").val()==='4' || $("#proof-type").val()==='6')
                 {
                     sub_total_expense = total_expense/1.18;
                     igv = sub_total_expense*0.18;
