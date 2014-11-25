@@ -149,3 +149,9 @@ selectproduct{
     right: 1.75em;
     top: 0.6em;
 }
+#table_solicitude_fondos_wrapper{
+    margin-top: 50px;
+}
+.table-hover > tbody > tr:hover > td, .table-hover > tbody > tr:hover > th {
+    background-color: #E2E2E2;
+}

@@ -88,8 +88,9 @@ class FondoController extends BaseController
         $fondo->cuenta = $inputs['cuenta'];
         $fondo->codrepmed = $inputs['codrepmed'];
         $fondo->save();
-        $fondos = FondoInstitucional::all();
-        return View::make('Dmkt.list_fondos')->with('fondos', $fondos);
+        $start = $inputs['start'];
+        $fondos = $this->getFondos($start);
+        return  $fondos;
 
     }
 
@@ -118,11 +119,11 @@ class FondoController extends BaseController
         $end = $mes[$end].'-'.$st;
 
          if($export){
-             $fondos = FondoInstitucional::whereRaw("created_at between to_date('$start' ,'DD-MM-YYYY') and to_date('$end' ,'DD-MM-YYYY')+1")->get(array('repmed','institucion','cuenta','supervisor','total'));
+             $fondos = FondoInstitucional::whereRaw("created_at between to_date('$start' ,'DD-MM-YYYY') and to_date('$end' ,'DD-MM-YYYY')+1")->get(array('institucion','repmed','cuenta','supervisor','total'));
              return $fondos;
          }else{
              $fondos = FondoInstitucional::whereRaw("created_at between to_date('$start' ,'DD-MM-YYYY') and to_date('$end' ,'DD-MM-YYYY')+1")->get();
-             $view = View::make('Dmkt.list_fondos')->with('fondos', $fondos);
+             $view = View::make('Dmkt.list_fondos')->with('fondos', $fondos)->with('sum',$fondos->sum('total'));
              $data =[
                  'view' =>$view,
                  'total' => $fondos->sum('total')
@@ -132,18 +133,44 @@ class FondoController extends BaseController
 
     }
 
+    function endFondos($start){
+        $st = $start;
+        $start = '01-'.$st ;
+        $end = $st[0].$st[1] ;
+        $mes = [
+
+            '01'=>31,
+            '02'=>28,
+            '03'=>31,
+            '04'=>30,
+            '05'=>31,
+            '06'=>30,
+            '07'=>31,
+            '08'=>31,
+            '09'=>30,
+            '10'=>31,
+            '11'=>30,
+            '12'=>31
+        ];
+
+        $end = $mes[$end].'-'.$st;
+        FondoInstitucional::whereRaw("created_at between to_date('$start' ,'DD-MM-YYYY') and to_date('$end' ,'DD-MM-YYYY')+1")->update(array('terminado'=>1));
+        return 'Fondos Terminados';
+    }
     function getFondo($id)
     {
         $fondo = FondoInstitucional::find($id);
         return $fondo;
     }
 
-    function delFondo($id)
+    function delFondo()
     {
+        $id = Input::get('idfondo');
+        $start = Input::get('start');
         $fondo = FondoInstitucional::find($id);
         $fondo->delete();
-        $fondos = FondoInstitucional::all();
-        return View::make('Dmkt.list_fondos')->with('fondos', $fondos);
+        $fondos = $this->getFondos($start);
+        return  $fondos;
     }
 
     function updateFondo()
@@ -180,11 +207,30 @@ class FondoController extends BaseController
         $data = $this->getFondos($start,1);
         $dato = $data->toArray();
         $sum = $data->sum('total');
-        Excel::create('Filename4', function($excel) use($dato ,$sum) {
+        $mes = [
 
-            $excel->sheet('Sheetname', function($sheet) use($dato , $sum) {
+            '01'=>'enero',
+            '02'=>'febrero',
+            '03'=>'marzo',
+            '04'=>'abril',
+            '05'=>'mayo',
+            '06'=>'junio',
+            '07'=>'julio',
+            '08'=>'agosto',
+            '09'=>'setiembre',
+            '10'=>'octubre',
+            '11'=>'noviembre',
+            '12'=>'diciembre'
+        ];
+        $st = $start;
+        $end = $st[0].$st[1] ;
+        $mes = $mes[$end];
+        $anio = $start;
+        Excel::create('Filename4', function($excel) use($dato ,$sum, $mes , $anio) {
+
+            $excel->sheet($mes, function($sheet) use($dato , $sum , $mes , $anio) {
                 $sheet->mergeCells('A1:E1');
-                $sheet->row(1,array('FONDO INSTITUCIONAL 2014'));
+                $sheet->row(1,array('FONDO INSTITUCIONAL '. strtoupper($mes).' - '. substr($anio,3)));
                 $sheet->row(1,function($row){
                     $row->setAlignment('center');
                     $row->setFont(array(

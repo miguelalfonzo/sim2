@@ -1,5 +1,8 @@
 @extends('template.main')
 @section('content')
+<div id="loading-fondo" class="hide" style="z-index: 9999 ; position: absolute; top:45% ; left: 45%">
+<img src="{{URL::to('img/loading.gif')}}">
+</div>
 <div class="content">
 
 <div class="panel panel-default ">
@@ -11,6 +14,7 @@
 
 <div id="collapseOne" class="panel-collapse collapse in">
 			<div class="panel-body">
+			
             <div>
 
 
@@ -110,25 +114,22 @@
 
 </div>
 <div class="panel-body table-solicituds-fondos" style="position: relative">
-<div class="form-group col-md-12">
-  <div id="" class="form-group col-xs-6 col-sm-6 col-md-4">
+
+
+    <div id="" class="form-group col-xs-3 col-sm-3 col-md-3">
   					<div class="input-group">
   						<input type="text" id="datefondo" readonly class="form-control"><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
   					</div>
-  </div>
-  <div class="col-xs-3 col-sm-3 col-md-3" >
-      <div class="col-sm-12 col-md-12">
-                          <input id="total-fondo" name="total" type="text" placeholder=""
-                                 value=""
-                                 class="form-control input-md" readonly>
+     </div>
 
-                      </div>
-    </div>
-    <div class="col-xs-3 col-sm-3 col-md-1 pull-right" >
+    <div class="col-xs-2 col-sm-2 col-md-1 pull-right" >
             <a id="export-fondo" class="btn btn-sm btn-primary ladda-button" href=""
                                          data-style="zoom-in" data-size="l"><i class="glyphicon glyphicon-print"></i> Exportar</a>
     </div>
-</div>
+    <div class="col-xs-2 col-sm-2 col-md-1 pull-right" >
+            <a id="terminate-fondo" class="btn btn-sm btn-danger" href=""
+                                         data-style="zoom-in" data-size="l"><i class="glyphicon glyphicon-download"></i> Terminar</a>
+    </div>
 
 </div>
 </div>

@@ -1,6 +1,13 @@
+<div class="col-xs-3 col-sm-3 col-md-3 total-fondo" style="">
+
+                          <input id="" name="total" type="text" placeholder=""
+                                 value="Total : {{$sum}}"
+                                 class="form-control input-md" readonly>
 
 
- <table class="table table-striped table-bordered dataTable" id="table_solicitude_fondos" style="width: 100%">
+</div>
+<div class="table-responsive">
+ <table class="table table-hover table-bordered table-condensed dataTable" id="table_solicitude_fondos" style="width: 100%">
     <thead>
     <tr>
         <th>#</th>
@@ -28,7 +35,7 @@
         <td>
             <div class="div-icons-solicituds">
                 <a href="#" class="edit-fondo" data-idfondo="{{$fondo->idfondo}}"><span class="glyphicon glyphicon-pencil"></span></a>
-                <a  href="#" class ="delete-fondo" data-idfondo="{{$fondo->idfondo}}"><span class="glyphicon glyphicon-remove"></span></a>
+                <a  href="#" class ="delete-fondo" data-idfondo="{{$fondo->idfondo}}" data-token="{{csrf_token()}}"><span class="glyphicon glyphicon-remove"></span></a>
             </div>
         </td>
     </tr>
@@ -37,4 +44,4 @@
     </tbody>
 
 </table>
-<input id="total-fondo-hiden" type="hidden" value="{{$total}}">
+</div>
