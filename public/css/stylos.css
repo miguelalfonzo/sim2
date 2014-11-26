@@ -155,3 +155,15 @@ selectproduct{
 .table-hover > tbody > tr:hover > td, .table-hover > tbody > tr:hover > th {
     background-color: #E2E2E2;
 }
+@media screen and (max-width: 480px){
+    .closed-session
+    {
+        display: none;
+    }
+    .off::after
+     {
+         content: "Off";
+     }
+
+}
+

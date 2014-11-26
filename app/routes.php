@@ -11,29 +11,6 @@
 |
 */
 
-/** Admin */
-Route::group(array('before' => 'admin'), function () {
-
-    Route::get('register', 'Admin\AdminController@register');
-    Route::post('register-user', 'Admin\AdminController@formRegister');
-    Route::get('editar/{id}', 'Admin\AdminController@edit');
-    Route::post('edit-user', 'Admin\AdminController@formEditUser');
-    Route::post('active-user', 'Admin\AdminController@activeUser');
-    Route::post('look-user', 'Admin\AdminController@lookUser');
-
-});
-
-Route::get('search-user/{username}', function ($username) {
-
-    $user = User::where('username', $username)->count();
-
-    if ($user) {
-        return 'SI';
-
-    } else {
-        return 'NO';
-    }
-});
 
 /** Login */
 // route to show the login form
@@ -114,16 +91,21 @@ Route::get('prueba', 'Dmkt\FondoController@test');
  * |-------------------------------------------------------------------------------------------- |
  */
 
-Route::get('registrar-fondo','Dmkt\FondoController@getRegister');
-Route::post('registrar-fondo','Dmkt\FondoController@postRegister');
-Route::get('list-fondos/{date}','Dmkt\FondoController@getFondos');
-Route::get('get-fondo/{id}','Dmkt\FondoController@getFondo');
-Route::post('delete-fondo','Dmkt\FondoController@delFondo');
-Route::post('update-fondo','Dmkt\FondoController@updateFondo');
-Route::get('representatives','Dmkt\FondoController@getRepresentatives');
-Route::get('getctabanc/{dni}','Dmkt\FondoController@getCtaBanc');
-Route::get('exportfondos/{date}','Dmkt\FondoController@exportExcelFondos');
-Route::get('endfondos/{date}','Dmkt\FondoController@endfondos');
+Route::group(array ('before' => 'ager') ,function(){
+
+    Route::get('registrar-fondo','Dmkt\FondoController@getRegister');
+    Route::post('registrar-fondo','Dmkt\FondoController@postRegister');
+    Route::get('list-fondos/{date}','Dmkt\FondoController@getFondos');
+    Route::get('get-fondo/{id}','Dmkt\FondoController@getFondo');
+    Route::post('delete-fondo','Dmkt\FondoController@delFondo');
+    Route::post('update-fondo','Dmkt\FondoController@updateFondo');
+    Route::get('representatives','Dmkt\FondoController@getRepresentatives');
+    Route::get('getctabanc/{dni}','Dmkt\FondoController@getCtaBanc');
+    Route::get('exportfondos/{date}','Dmkt\FondoController@exportExcelFondos');
+    Route::get('endfondos/{date}','Dmkt\FondoController@endfondos');
+
+});
+
 
 /**
  * |-------------------------------------------------------------------------------------------- |

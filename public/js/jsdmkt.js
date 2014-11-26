@@ -1081,6 +1081,7 @@ function newSolicitude() {
             l.start();
             $.post(server + 'registrar-fondo',dato).done(function(data)
                 {
+                    $('html, body').animate({scrollTop: $('.table-solicituds-fondos').offset().top -10 }, 'slow');
                     fondo_institucion.val('');
                     fondo_repmed.val('');
                     fondo_supervisor.val('');
@@ -1299,8 +1300,9 @@ function newSolicitude() {
     });
     function searchFondos(datefondo) {
 
-
+        $('#loading-fondo').attr('class','show');
         $.get(server + 'list-fondos/' + datefondo).done(function (data) {
+            $('#loading-fondo').attr('class','hide');
             $('#total-fondo-hiden').remove();
             $('.total-fondo').remove();
             $('#table_solicitude_fondos_wrapper').remove();

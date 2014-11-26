@@ -1,4 +1,4 @@
-<div class="col-xs-3 col-sm-3 col-md-3 total-fondo" style="">
+<div class="form-group col-xs-12 col-sm-3 col-md-3 total-fondo" style="">
 
                           <input id="" name="total" type="text" placeholder=""
                                  value="Total : {{$sum}}"

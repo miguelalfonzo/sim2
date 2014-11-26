@@ -8,7 +8,7 @@
 <div class="panel panel-default ">
 <div class="panel-heading">
     <h3 class="panel-title">Registrar Fondo</h3>
-    <small style="float: right; margin-top: -10px"><strong>Usuario : NN</strong> <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" class="icon-collapse"><span class="glyphicon glyphicon-chevron-down"></span></a></small>
+    <small style="float: right; margin-top: -10px"><a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" class="icon-collapse"><span class="glyphicon glyphicon-chevron-down"></span></a></small>
 
 </div>
 
@@ -116,17 +116,17 @@
 <div class="panel-body table-solicituds-fondos" style="position: relative">
 
 
-    <div id="" class="form-group col-xs-3 col-sm-3 col-md-3">
+    <div id="" class="form-group col-xs-6 col-sm-3 col-md-3">
   					<div class="input-group">
   						<input type="text" id="datefondo" readonly class="form-control"><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
   					</div>
      </div>
 
-    <div class="col-xs-2 col-sm-2 col-md-1 pull-right" >
+    <div class="form-group col-xs-3 col-sm-2 col-md-1 pull-right" >
             <a id="export-fondo" class="btn btn-sm btn-primary ladda-button" href=""
                                          data-style="zoom-in" data-size="l"><i class="glyphicon glyphicon-print"></i> Exportar</a>
     </div>
-    <div class="col-xs-2 col-sm-2 col-md-1 pull-right" >
+    <div class="form-group col-xs-3 col-sm-2 col-md-1 pull-right" >
             <a id="terminate-fondo" class="btn btn-sm btn-danger" href=""
                                          data-style="zoom-in" data-size="l"><i class="glyphicon glyphicon-download"></i> Terminar</a>
     </div>

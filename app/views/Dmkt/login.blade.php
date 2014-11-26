@@ -28,14 +28,14 @@
                             <label for="inputEmail3" class="col-sm-3 control-label">
                                 Usuario</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" name="username" id="inputEmail3" placeholder="Usuario" required>
+                                <input type="text" class="form-control" name="username" id="inputEmail3"  required>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="inputPassword3" class="col-sm-3 control-label">
                                 Clave</label>
                             <div class="col-sm-9">
-                                <input type="password" class="form-control" name="password" id="inputPassword3" placeholder="Clave" required>
+                                <input type="password" class="form-control" name="password" id="inputPassword3"  required>
                             </div>
                         </div>
                         <!-- <div class="form-group">
@@ -52,6 +52,7 @@
                             <div class="col-sm-offset-3 col-sm-9">
                                 <button type="submit" class="btn btn-success btn-sm">Ingresar</button>
                                 <button type="reset" class="btn btn-default btn-sm">Limpiar</button>
+                                <a href="http://intra.bagoperu.com.pe/produccion/intranet.php" class="btn btn-danger btn-sm">Regresar</a>
                             </div>
                         </div>
                    {{ Form::close() }}
