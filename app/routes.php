@@ -55,7 +55,8 @@ Route::group(array('before' => 'rm'), function () {
     Route::get('ruc', function () {
         return View::make('Expense\ruc');
     });
-
+    // Fondo
+    Route::get('list-fondos-rm','Dmkt\FondoController@listFondosRep');
 });
 Route::group(array('before' => 'auth'), function () {
 
@@ -80,6 +81,7 @@ Route::group(array('before' => 'sup'), function () {
     Route::post('cancelar-solicitud-sup', 'Dmkt\SolicitudeController@cancelSolicitudeSup');
     Route::get('desbloquear-solicitud-sup/{token}', 'Dmkt\SolicitudeController@disBlockSolicitudeSup');
 });
+
 
 /*------------------ Test --------------**/
 Route::get('prueba', 'Dmkt\FondoController@test');

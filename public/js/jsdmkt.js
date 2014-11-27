@@ -417,7 +417,7 @@ function newSolicitude() {
                     }
 
                 }).done(function (data) {
-
+                    console.log(data);
                     $.unblockUI();
 
                     if (data == 'R') {
@@ -477,6 +477,36 @@ function newSolicitude() {
             );
         });
 
+    }
+
+    function lisFondos(){
+
+        $.ajax({
+            url: server + 'list-fondos-rm',
+            type: 'GET',
+            dataType: 'html'
+
+        }).done(function (data) {
+            $('.table_fondos_rm').append(data);
+            $('#table_fondos_rm').dataTable({
+                    "order": [
+                        [ 3, "desc" ] //order date
+                    ],
+                    "bLengthChange": false,
+                    'iDisplayLength': 7,
+                    "oLanguage": {
+                        "sSearch": "Buscar: ",
+                        "sZeroRecords": "No hay fondos",
+                        "sInfoEmpty": "No hay fondos",
+                        "sInfo": 'Mostrando _END_ de _TOTAL_',
+                        "oPaginate": {
+                            "sPrevious": "Anterior",
+                            "sNext" : "Siguiente"
+                        }
+                    }
+                }
+            );
+        });
     }
 
     //Function search solicitude x date
@@ -539,8 +569,11 @@ function newSolicitude() {
 
     /* List solicitude pending */
 
-    if(userType === 'R')
+    if(userType === 'R'){
         listSolicitude('rm',PENDIENTE);
+
+    }
+    lisFondos();
 
 
     /* Filter all solicitude by date */

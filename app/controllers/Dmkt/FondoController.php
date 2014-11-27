@@ -82,11 +82,11 @@ class FondoController extends BaseController
         $fondo = new FondoInstitucional;
         $fondo->idfondo = $fondo->searchId() + 1;
         $fondo->institucion = $inputs['institucion'];
-        $fondo->repmed = $inputs['repmed'];
+        $fondo->repmed= $inputs['repmed'];
         $fondo->supervisor = $inputs['supervisor'];
         $fondo->total = $inputs['total'];
         $fondo->cuenta = $inputs['cuenta'];
-        $fondo->codrepmed = $inputs['codrepmed'];
+        $fondo->idrm = $inputs['codrepmed'];
         $fondo->save();
         $start = $inputs['start'];
         $fondos = $this->getFondos($start);
@@ -182,7 +182,7 @@ class FondoController extends BaseController
         $fondo->supervisor = $inputs['supervisor'];
         $fondo->total = $inputs['total'];
         $fondo->cuenta = $inputs['cuenta'];
-        $fondo->codrepmed = $inputs['codrepmed'];
+        $fondo->idrm = $inputs['codrepmed'];
         $fondo->save();
         $start = $inputs['start'];
 
@@ -199,8 +199,18 @@ class FondoController extends BaseController
     }
 
     function getCtaBanc($dni){
-        $cta = CtaRm::where('codbeneficiario',$dni)->where('tipo','H')->first()->cuenta;
-        return $cta;
+        $cta = CtaRm::where('codbeneficiario',$dni)->where('tipo','H')->first();
+        if($cta){
+            return $cta->cuenta;
+        }
+        else{
+            $cta = CtaRm::where('codbeneficiario',$dni)->where('tipo','B')->first();
+            if($cta)
+                return $cta->cuenta;
+            else
+            return '---';
+        }
+
     }
     function exportExcelFondos($start){
 
@@ -273,6 +283,12 @@ class FondoController extends BaseController
             });
 
         })->download('xls');
+
+    }
+    function listFondosRep(){
+
+        $fondos = FondoInstitucional::where('idrm',Auth::user()->rm->idrm)->get();
+        return View::make('Dmkt.list_fondos_rm')->with('fondos',$fondos);
 
     }
 }

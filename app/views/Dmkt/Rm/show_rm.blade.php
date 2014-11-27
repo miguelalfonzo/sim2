@@ -87,8 +87,8 @@
                               </div>
                   </div>
                   <div class="tab-pane fade" id="fondos">
-
-                  </div>
+                    <div class="panel-body table_fondos_rm"></div>
+                </div>
 
             </div>
 
