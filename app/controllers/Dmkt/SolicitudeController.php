@@ -114,8 +114,7 @@ class SolicitudeController extends BaseController
         $image = Input::file('file');
 
         $rules = array(
-            'titulo'         => 'required|alpha_num',
-            'description'             => 'alpha_num',
+            'titulo'         => 'required',
             'monto'             => 'required|numeric',
 
         );
