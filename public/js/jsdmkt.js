@@ -211,7 +211,11 @@ function newSolicitude() {
             $("#listclient li").eq(other).remove();
             var p = $("#listclient li").size();
             if (p == 1) {
-                $(".btn-delete-client").hide();
+                $(".btn-delete-client").on('click',function(){
+                   $('#idclient1').parent().removeClass('has-success has-feedback');
+                    $('#idclient1').attr('readonly',false);
+                    $('#idclient1').val('');
+                });
             }
         }
     });

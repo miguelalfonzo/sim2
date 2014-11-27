@@ -287,7 +287,7 @@ class FondoController extends BaseController
     }
     function listFondosRep(){
 
-        $fondos = FondoInstitucional::where('idrm',Auth::user()->rm->idrm)->get();
+        $fondos = FondoInstitucional::where('idrm',Auth::user()->rm->idrm)->where('depositado',1)->get();
         return View::make('Dmkt.list_fondos_rm')->with('fondos',$fondos);
 
     }
