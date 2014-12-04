@@ -19,13 +19,9 @@ use \Excel;
 
 class FondoController extends BaseController
 {
-
-
     public function test()
 
     {
-
-
         //$data = DB::table('FONDOINSTITUCIONAL')->select('repmed','institucion','cuenta','supervisor','total')->toJson();
         /*$dato = FondoInstitucional::all();
 
@@ -72,7 +68,7 @@ class FondoController extends BaseController
     {
 
         $fondos = FondoInstitucional::all();
-        return View::make('Dmkt.register_fondo')->with('fondos', $fondos);
+        return View::make('Dmkt.AsisGer.register_fondo')->with('fondos', $fondos);
     }
 
     function postRegister()
@@ -123,7 +119,7 @@ class FondoController extends BaseController
              return $fondos;
          }else{
              $fondos = FondoInstitucional::whereRaw("created_at between to_date('$start' ,'DD-MM-YYYY') and to_date('$end' ,'DD-MM-YYYY')+1")->get();
-             $view = View::make('Dmkt.list_fondos')->with('fondos', $fondos)->with('sum',$fondos->sum('total'));
+             $view = View::make('Dmkt.AsisGer.list_fondos')->with('fondos', $fondos)->with('sum',$fondos->sum('total'));
              $data =[
                  'view' =>$view,
                  'total' => $fondos->sum('total')
@@ -325,7 +321,7 @@ class FondoController extends BaseController
     function listFondosRep(){
 
         $fondos = FondoInstitucional::where('idrm',Auth::user()->rm->idrm)->where('depositado',1)->get();
-        return View::make('Dmkt.list_fondos_rm')->with('fondos',$fondos);
+        return View::make('Dmkt.AsisGer.list_fondos_rm')->with('fondos',$fondos);
 
     }
 }

@@ -135,6 +135,9 @@ selectproduct{
     opacity: 0.5;
 
 }
+#table_solicitude_ager_wrapper{
+    margin-top: 15px;
+}
 .active-link {
     cursor: default !important; /* mantiene la flecha, sin que aparezca la manito. */
     pointer-events: none; /* evita que el enlace nos envíe a donde apunta.*/

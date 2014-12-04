@@ -1272,4 +1272,11 @@ class SolicitudeController extends BaseController
             return 0;
         }
     }
+
+    /** ---------------------------  Asistente de  Gerencia  ---------------------------- **/
+    public function listSolicitudeAGer(){
+
+        $solicituds = Solicitude::where('estado',DEPOSITADO)->where('idtipopago',2)->where('asiento',2)->get();
+        return View::make('Dmkt.AsisGer.list_solicitudes')->with('solicituds',$solicituds);
+    }
 }

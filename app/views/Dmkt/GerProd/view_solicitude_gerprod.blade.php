@@ -216,6 +216,26 @@
 
     </div>
 </div>
+<!--
+<div class="form-group col-sm-6 col-md-4 col-lg-4">
+
+    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Responsable</label>
+
+    <div class="col-sm-12 col-md-12 col-lg-12">
+        <div class="input-group">
+            <select  class="form-control">
+             @if($solicitude->user->type == 'R')
+                <option value="{{$solicitude->user->id}}">{{$solicitude->user->rm->nombres}}</option>
+             @else
+                <option value="{{$solicitude->user->id}}">{{$solicitude->user->sup->nombres}}</option>
+             @endif
+            <option value="25">Asistente de Gerencia</option>
+            </select>
+
+        </div>
+
+    </div>
+</div>-->
 <div class="form-group col-sm-6 col-md-4 col-lg-4">
 
     <label class="col-sm-8 col-md-8 ol-lg-8 control-label" for="textinput">Observacion</label>

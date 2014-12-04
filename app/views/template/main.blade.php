@@ -50,6 +50,9 @@
         @if(Auth::user()->type == 'T')
         <input id="typeUser" type="hidden" value="T">
         @endif
+        @if(Auth::user()->type == 'AG')
+                <input id="typeUser" type="hidden" value="AG">
+        @endif
     @endif
 
 </header>

@@ -994,7 +994,7 @@ function newSolicitude() {
         searchSolicitudeToDate('tes',this)
     });
 
-    /** --------------------------------------------- FONDOS ------------------------------------------------- **/
+    /** --------------------------------------------- ASISTENCIA DE GERENCIA ------------------------------------------------- **/
 
     var fondo_repmed = $('#fondo_repmed');
     var fondo_total = $('#fondo_total');
@@ -1411,6 +1411,38 @@ function newSolicitude() {
             $('#total-fondo').val($('#total-fondo-hiden').val());
         })
     }
+
+    if(userType === 'AG'){
+        console.log('ager');
+        $.ajax({
+            url: server + 'listar-solicitudes-ager',
+            type: 'GET',
+            dataType: 'html'
+
+        }).done(function (data) {
+            $('.table-solicituds-ager').append(data);
+            $('#table_solicitude_ager').dataTable({
+                    "order": [
+                        [ 3, "desc" ] //order date
+                    ],
+                    "bLengthChange": false,
+                    'iDisplayLength': 7,
+                    "oLanguage": {
+                        "sSearch": "Buscar: ",
+                        "sZeroRecords": "No hay solicitudes",
+                        "sInfoEmpty": "No hay solicitudes",
+                        "sInfo": 'Mostrando _END_ de _TOTAL_',
+                        "oPaginate": {
+                            "sPrevious": "Anterior",
+                            "sNext" : "Siguiente"
+                        }
+                    }
+                }
+            );
+        });
+    }
+
+
     /** --------------------------------------------- ADMIN ------------------------------------------------- **/
 
         //quita los errores

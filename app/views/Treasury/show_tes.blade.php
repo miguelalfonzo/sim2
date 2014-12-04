@@ -18,7 +18,7 @@
             <div class="tab-content">
             <!-- Solicitudes -->
                   <div class="tab-pane fade active in" id="solicitudes">
-                       <div class="panel panel-default">
+                       <div class="panel panel-default" style="margin-top: 10px">
 
                      	            <div class="panel-body table-solicituds-tes">
                      	                <div class="col-md-12" style="padding: 0">

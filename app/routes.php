@@ -106,7 +106,7 @@ Route::group(array ('before' => 'ager') ,function(){
     Route::get('getctabanc/{dni}','Dmkt\FondoController@getCtaBanc');
     Route::get('exportfondos/{date}','Dmkt\FondoController@exportExcelFondos');
     Route::get('endfondos/{date}','Dmkt\FondoController@endfondos');
-
+    Route::get('listar-solicitudes-ager','Dmkt\SolicitudeController@listSolicitudeAGer');
 });
 
 
