@@ -1,5 +1,7 @@
 var server = "http://localhost/BitBucket/bago_dmkt_rg/public/";
 //Funciones Globales
+var datef = new Date();
+var dateactual = (datef.getMonth()+1)+'-'+datef.getFullYear();
 function loadingUI(message){
     $.blockUI({ css: {
         border: 'none',
@@ -328,28 +330,79 @@ $(function(){
                 }
             });
         });
+        //Deposit Fondo
+        $(document).on('click','.deposit-fondo',function(){
+
+            var idfondo = $(this).attr('data-idfondo');
+            $('#idfondo').val(idfondo);
+
+        });
         //Register Deposit
-        $("#register-deposit").on("click",function(e){
+        $(document).on("click",".register-deposit", function(e){
+            console.log('deposit')
             e.preventDefault();
+            var url;
+            var op_number  = $("#op-number").val();
+            var type_deposit = $(this).attr('data-deposit');
+            if(type_deposit ==='fondo'){
+                url = 'deposit-fondo'
+                data.idfondo = $('#idfondo').val();
+                data.op_number = op_number;
+                data._token = $("input[name=_token]").val();
+            }else if(type_deposit === 'solicitude'){
+                url = 'deposit-solicitude';
+                data.op_number = op_number;
+                data.token     = $("#token").val();
+                data._token    = $("input[name=_token]").val();
+            }
             $("#op_number").val('');
             $("#message-op-number").text('');
-            var op_number  = $("#op-number").val();
-            data.op_number = op_number;
-            data.token     = $("#token").val();
-            data._token    = $("input[name=_token]").val();
+
+
             if(!op_number)
             {
                 $("#message-op-number").text("Ingrese el número de Operación");
             }
             else
             {
-                $.post(server+"depositar", data)
+                $.post(server + url, data)
                 .done(function (data){
                     if(parseInt(data,10) === 1)
                     {
                         $('#myModal').modal('hide');
                         bootbox.alert("<p class='green'>Se registro el asiento contable correctamente.</p>", function(){
-                            window.location.href = server+'show_tes';
+                            if(type_deposit === 'fondo'){
+                                $.ajax({
+                                    url: server + 'list-fondos-tesoreria/'+ dateactual,
+                                    type: 'GET',
+                                    dataType: 'html'
+
+                                }).done(function (data) {
+                                    $('#table_solicitude_fondos-tesoreria_wrapper').remove();
+                                    $('.table_solicitude_fondos-tesoreria').append(data);
+                                    $('#table_solicitude_fondos-tesoreria').dataTable({
+                                            "order": [
+                                                [ 3, "desc" ] //order date
+                                            ],
+                                            "bLengthChange": false,
+                                            'iDisplayLength': 7,
+                                            "oLanguage": {
+                                                "sSearch": "Buscar: ",
+                                                "sZeroRecords": "No hay fondos",
+                                                "sInfoEmpty": "No hay fondos",
+                                                "sInfo": 'Mostrando _END_ de _TOTAL_',
+                                                "oPaginate": {
+                                                    "sPrevious": "Anterior",
+                                                    "sNext" : "Siguiente"
+                                                }
+                                            }
+                                        }
+                                    );
+                                });
+                            }else{
+                                window.location.href = server+'show_tes';
+                            }
+
                         });
                     }
                     else

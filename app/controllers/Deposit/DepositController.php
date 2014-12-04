@@ -3,6 +3,7 @@
 namespace Deposit;
 
 use \BaseController;
+use \Dmkt\FondoInstitucional;
 use \View;
 use \Session;
 use \Auth;
@@ -134,5 +135,43 @@ class DepositController extends BaseController{
         } catch (Exception $e) {
             return 0;
         }
+    }
+
+    public function depositFondoTes(){
+        $deposit = Input::all();
+        try {
+            DB::transaction (function() use ($deposit) {
+                $idfondo = $deposit['idfondo'];
+                $row_deposit = Deposit::where('idfondo',$idfondo)->get();
+                if(count($row_deposit)>0)
+                {
+                    return 0;
+                }
+                else
+                {
+                    $fondo = FondoInstitucional::find($idfondo);
+                    $fondo->depositado = 1;
+                    $newDeposit = new Deposit;
+                    $id = $newDeposit->lastId()+1;
+                    $newDeposit->iddeposito        = $id;
+                    $newDeposit->total             = $fondo->total;
+                    $newDeposit->num_transferencia = $deposit['op_number'];
+                    $newDeposit->idfondo       = $idfondo;
+                    $newDeposit->save();
+                    $fondo->save();
+                    return $this->getFondos();
+                }
+            });
+            return 1;
+        } catch (Exception $e) {
+            return $e;
+        }
+    }
+    public function getFondos(){
+
+        $fondos = FondoInstitucional::where('terminado',1)->get();
+        $view = View::make('Treasury.list_fondos')->with('fondos',$fondos);
+        return $view;
+
     }
 }

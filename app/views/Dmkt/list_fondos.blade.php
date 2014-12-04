@@ -27,7 +27,7 @@
         <td style="text-align: center">{{$fondo->institucion}}</td>
         <td>{{$fondo->repmed}}</td>
         <td style="text-align: center">
-            {{$fondo->cuenta }}
+            {{$fondo->cuenta}}
         </td>
 
         <td style="text-align: center">{{$fondo->total}}</td>

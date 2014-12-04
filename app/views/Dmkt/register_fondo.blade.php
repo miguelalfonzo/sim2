@@ -39,7 +39,7 @@
 
                 <div class="col-sm-12 col-md-12">
                     <input id="fondo_repmed"  name="repmed" type="text" placeholder="" style="position: relative"
-                           value="{{isset($fondo->repmed)? $fondo->repmed : null }}"
+                           value="{{isset($fondo->repmed)? $fondo->repmed : null }}" data-select="false"
                            class="form-control input-md change_before_rep" data-cod="">
                      <a id="edit-rep" class="edit-repr" href="#" style="display: inline;"><span class="glyphicon glyphicon-pencil"></span></a>
                 </div>
@@ -118,7 +118,7 @@
 
     <div id="" class="form-group col-xs-6 col-sm-3 col-md-3">
   					<div class="input-group">
-  						<input type="text" id="datefondo" readonly class="form-control"><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+  						<input type="text" id="datefondo" readonly class="form-control" data-type="fondos"><span class="input-group-addon" ><i class="glyphicon glyphicon-calendar"></i></span>
   					</div>
      </div>
 

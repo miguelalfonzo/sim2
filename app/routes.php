@@ -76,6 +76,7 @@ Route::group(array('before' => 'sup'), function () {
     Route::post('rechazar-solicitud', 'Dmkt\SolicitudeController@denySolicitude');
     Route::post('registrar-solicitud-gerprod', 'Dmkt\SolicitudeController@registerSolicitude');
     Route::post('aceptar-solicitud', 'Dmkt\SolicitudeController@acceptedSolicitude');
+    Route::get('aceptar-solicitud', 'Dmkt\SolicitudeController@redirectAcceptedSolicitude');
     Route::post('buscar-solicitudes-sup', 'Dmkt\SolicitudeController@searchSolicitudsSup');
     Route::get('derivar-solicitud/{token}', 'Dmkt\SolicitudeController@derivedSolicitude');
     Route::post('cancelar-solicitud-sup', 'Dmkt\SolicitudeController@cancelSolicitudeSup');
@@ -121,6 +122,7 @@ Route::group(array('before' => 'gerprod'), function () {
     Route::get('ver-solicitud-gerprod/{id}', 'Dmkt\SolicitudeController@viewSolicitudeGerProd');
     Route::get('aprobar-solicitud/{token}', 'Dmkt\SolicitudeController@approvedSolicitude');
     Route::post('aceptar-solicitud-gerprod', 'Dmkt\SolicitudeController@acceptedSolicitudeGerProd');
+    Route::get('aceptar-solicitud-gerprod', 'Dmkt\SolicitudeController@redirectAcceptedSolicitudeGerProd');
     Route::post('rechazar-solicitud-gerprod', 'Dmkt\SolicitudeController@denySolicitudeGerProd');
     Route::post('buscar-solicitudes-gerprod', 'Dmkt\SolicitudeController@searchSolicitudsGerProd');
     Route::get('cancelar-solicitud-gerprod/{token}', 'Dmkt\SolicitudeController@disBlockSolicitudeGerProd');
@@ -137,6 +139,7 @@ Route::group(array('before' => 'gercom'), function () {
     Route::get('listar-solicitudes-gercom/{id}', 'Dmkt\SolicitudeController@listSolicitudeGerCom');
     Route::get('ver-solicitud-gercom/{id}', 'Dmkt\SolicitudeController@viewSolicitudeGerCom');
     Route::post('aprobar-solicitud', 'Dmkt\SolicitudeController@approvedSolicitude');
+    Route::get('aprobar-solicitud', 'Dmkt\SolicitudeController@redirectApprovedSolicitude');
     Route::post('buscar-solicitudes-gercom', 'Dmkt\SolicitudeController@searchSolicitudsGerCom');
     Route::post('rechazar-solicitud-gercom', 'Dmkt\SolicitudeController@denySolicitudeGerCom');
 
@@ -175,7 +178,7 @@ Route::group(array('before' => 'cont'), function () {
 // });
 
 App::missing(function ($exception) {
-    return Redirect::to('show_rm');
+   // return Redirect::to('show_rm');
 });
 
 /**   Gastos */
@@ -192,11 +195,13 @@ Route::group(array('before' => 'tes'), function(){
     Route::get('listar-solicitudes-tes/{id}', 'Deposit\DepositController@listSolicitudeTes');
     Route::get('ver-solicitud-tes/{id}', 'Deposit\DepositController@viewSolicitudeTes');
     Route::post('buscar-solicitudes-tes', 'Deposit\DepositController@searchSolicitudeTes');
-    Route::post('depositar', 'Deposit\DepositController@depositSolicitudeTes');
+    Route::post('deposit-solicitude', 'Deposit\DepositController@depositSolicitudeTes');
+    //Route::get('list-fondos-tesoreria','Deposit\DepositController@getFondos');
+    Route::post('deposit-fondo','Deposit\DepositController@depositFondoTes');
 
 });
-
-/* ================================================================================= */
+Route::get('list-fondos-tesoreria/{date}','Dmkt\FondoController@getFondosTesoreria');
+/* =============================================================================================== */
 
 
 //test

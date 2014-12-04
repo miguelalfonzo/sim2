@@ -595,32 +595,35 @@ class SolicitudeController extends BaseController
     {
 
         $inputs = Input::all();
-        $idSol = $inputs['idsolicitude'];
-        $solicitude = Solicitude::where('idsolicitud', $idSol);
-        $solicitude->estado = ACEPTADO;
-        $solicitude->idaproved = Auth::user()->id;
-        $solicitude->monto = $inputs['monto'];
-        $solicitude->idfondo = $inputs['sub_type_activity'];
-        $solicitude->observacion = $inputs['observacion'];
-        $solicitude->blocked = 0;
-        $data = $this->objectToArray($solicitude);
-        $solicitude->update($data);
 
-        $amount_assigned = $inputs['amount_assigned'];
-        $families = SolicitudeFamily::where('idsolicitud', $idSol)->get();
-        $i = 0;
-        foreach ($families as $fam) {
-            $family = SolicitudeFamily::where('idsolicitud_familia', $fam->idsolicitud_familia);
-            $family->monto_asignado = $amount_assigned[$i];
-            $data = $this->objectToArray($family);
-            $family->update($data);
-            $i++;
-        }
-        //echo json_encode($families);die;
+            $idSol = $inputs['idsolicitude'];
+            $solicitude = Solicitude::where('idsolicitud', $idSol);
+            $solicitude->estado = ACEPTADO;
+            $solicitude->idaproved = Auth::user()->id;
+            $solicitude->monto = $inputs['monto'];
+            $solicitude->idfondo = $inputs['sub_type_activity'];
+            $solicitude->observacion = $inputs['observacion'];
+            $solicitude->blocked = 0;
+            $data = $this->objectToArray($solicitude);
+            $solicitude->update($data);
 
-        return Redirect::to('show_sup')->with('state', ACEPTADO);
+            $amount_assigned = $inputs['amount_assigned'];
+            $families = SolicitudeFamily::where('idsolicitud', $idSol)->get();
+            $i = 0;
+            foreach ($families as $fam) {
+                $family = SolicitudeFamily::where('idsolicitud_familia', $fam->idsolicitud_familia);
+                $family->monto_asignado = $amount_assigned[$i];
+                $data = $this->objectToArray($family);
+                $family->update($data);
+                $i++;
+            }
+            return 'ok';
+
 
     }
+   public function redirectAcceptedSolicitude(){
+       return Redirect::to('show_sup')->with('state', ACEPTADO);
+   }
 
     public function derivedSolicitude($token,$derive=0)
     {
@@ -863,8 +866,11 @@ class SolicitudeController extends BaseController
             $i++;
         }
         //echo json_encode($families);die;
-        return Redirect::to('show_gerprod')->with('state', ACEPTADO);
+        return 'ok';
 
+    }
+    public function redirectAcceptedSolicitudeGerProd(){
+        return Redirect::to('show_gerprod')->with('state', ACEPTADO);
     }
 
     public function searchSolicitudsGerProd()
@@ -1004,9 +1010,11 @@ class SolicitudeController extends BaseController
             $i++;
         }
 
+       return 'ok';
+    }
+    public function redirectApprovedSolicitude(){
         return Redirect::to('show_gercom')->with('state',APROBADO);
     }
-
     public function denySolicitudeGerCom()
     {
 

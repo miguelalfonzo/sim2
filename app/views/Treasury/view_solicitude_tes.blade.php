@@ -135,7 +135,7 @@
                 <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
                     <div class="col-sm-12 col-md-12" style="text-align: center">
                         @if($solicitude->estado == 3)
-                            <button class="btn btn-success" data-toggle="modal" data-target="#myModal">Registrar Depósito</button>
+                            <button class="btn btn-success" data-toggle="modal" data-target="#myModal" >Registrar Depósito</button>
                         @endif
                         <a id="button2id" href="{{URL::to('show_tes')}}" name="button2id" class="btn btn-primary">Cancelar</a>
                     </div>
@@ -155,7 +155,7 @@
                             </div>
                             <div class="modal-footer">
                                 <!-- <a id="register-deposit" href="{{URL::to('depositar')}}/{{$solicitude->token}}" class="btn btn-success" style="margin-right: 1em;">Confirmar Operación</a> -->
-                                <a id="register-deposit" href="#" class="btn btn-success" style="margin-right: 1em;">Confirmar Operación</a>
+                                <a id="" href="#" class="btn btn-success register-deposit" data-deposit = "solicitude" style="margin-right: 1em;">Confirmar Operación</a>
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
                             </div>
                         </div>

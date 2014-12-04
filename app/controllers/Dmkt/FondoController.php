@@ -132,7 +132,44 @@ class FondoController extends BaseController
          }
 
     }
+    function getFondosTesoreria($start,$export=0)
+    {
 
+        $st = $start;
+        $start = '01-'.$st ;
+        $end = $st[0].$st[1] ;
+        $mes = [
+
+            '01'=>31,
+            '02'=>28,
+            '03'=>31,
+            '04'=>30,
+            '05'=>31,
+            '06'=>30,
+            '07'=>31,
+            '08'=>31,
+            '09'=>30,
+            '10'=>31,
+            '11'=>30,
+            '12'=>31
+        ];
+
+        $end = $mes[$end].'-'.$st;
+
+        if($export){
+            $fondos = FondoInstitucional::whereRaw("created_at between to_date('$start' ,'DD-MM-YYYY') and to_date('$end' ,'DD-MM-YYYY')+1")->get(array('institucion','repmed','cuenta','supervisor','total'));
+            return $fondos;
+        }else{
+            $fondos = FondoInstitucional::whereRaw("created_at between to_date('$start' ,'DD-MM-YYYY') and to_date('$end' ,'DD-MM-YYYY')+1")->get();
+            $view = View::make('Treasury.list_fondos')->with('fondos', $fondos)->with('sum',$fondos->sum('total'));
+            $data =[
+                'view' =>$view,
+                'total' => $fondos->sum('total')
+            ];
+            return $view;
+        }
+
+    }
     function endFondos($start){
         $st = $start;
         $start = '01-'.$st ;

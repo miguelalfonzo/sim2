@@ -25,7 +25,8 @@ function newSolicitude() {
     var amount_error_families = $('#amount_error_families');
 
 
-    var userType = $('#typeUser').val();
+
+    var userType = $('#typeUser').val();//tipo de usuario se encuentra en main
     var TODOS = 0;
     var PENDIENTE =1 ;
     var ACEPTADO = 2;
@@ -483,16 +484,17 @@ function newSolicitude() {
 
     }
 
-    function lisFondos(){
+    function listFondos(user){
 
         $.ajax({
-            url: server + 'list-fondos-rm',
+            url: server + 'list-'+user +'/'+dateactual,
             type: 'GET',
             dataType: 'html'
 
         }).done(function (data) {
-            $('.table_fondos_rm').append(data);
-            $('#table_fondos_rm').dataTable({
+            console.log('.table_solicitude_' + user);
+            $('.table_solicitude_'+user).append(data);
+            $('#table_solicitude_'+user).dataTable({
                     "order": [
                         [ 3, "desc" ] //order date
                     ],
@@ -575,9 +577,9 @@ function newSolicitude() {
 
     if(userType === 'R'){
         listSolicitude('rm',PENDIENTE);
-
     }
-    lisFondos();
+    //lisFondos('rm');
+
 
 
     /* Filter all solicitude by date */
@@ -687,12 +689,20 @@ function newSolicitude() {
                 if (result) {
                     var message = 'Validando Solicitud..';
                     loadingUI(message);
-                    setTimeout(function () {
+                    $.post(server + 'aceptar-solicitud' , form_acepted_solicitude.serialize()).done(function(data){
+                        $.unblockUI();
+                        bootbox.alert('<h4 style="color: green">Solicitud Aceptada</h4>' , function(){
+                            window.location.href = server + 'aceptar-solicitud';
+                        });
+
+
+                    });
+                   /* setTimeout(function () {
 
                         form_acepted_solicitude.attr('action', server + 'aceptar-solicitud');
                         form_acepted_solicitude.submit();
                     }, 1200);
-
+                    */
                 }
             });
 
@@ -833,10 +843,20 @@ function newSolicitude() {
                 if (result) {
                     var message = 'Validando Solicitud..';
                     loadingUI(message);
-                    setTimeout(function () {
-                        form_acepted_solicitude.attr('action', server + 'aceptar-solicitud-gerprod');
-                        form_acepted_solicitude.submit();
-                    }, 1200);
+                    $.post(server + 'aceptar-solicitud-gerprod', form_acepted_solicitude.serialize()).done(function(data){
+                        $.unblockUI();
+                        if(data === 'ok'){
+                            bootbox.alert('<h4 style="color: green">Solicitud Aceptada</h4>' , function(){
+                                window.location.href = server + 'aceptar-solicitud-gerprod';
+                            });
+                        }else{
+                            bootbox.alert('<h4 style="color: red">La solicitud no se puedo guardar</h4>' , function(){
+                                //window.location.href = server + 'aceptar-solicitud-gerprod';
+                            });
+                        }
+
+                    });
+
 
                 }
             });
@@ -922,11 +942,22 @@ function newSolicitude() {
                 if (result) {
                     var message = 'Validando Solicitud..';
                     loadingUI(message);
-                    setTimeout(function () {
 
-                        form_acepted_solicitude.attr('action', server + 'aprobar-solicitud');
-                        form_acepted_solicitude.submit();
-                    }, 1200);
+                    $.post(server + 'aprobar-solicitud', form_acepted_solicitude.serialize()).done(function(data){
+                        $.unblockUI();
+                        if(data === 'ok'){
+                            bootbox.alert('<h4 style="color: green">Solicitud Aprobada</h4>' , function(){
+                                window.location.href = server + 'aprobar-solicitud';
+                            });
+                        }else{
+                            bootbox.alert('<h4 style="color: red">La solicitud no se puedo aprobar</h4>' , function(){
+                                //window.location.href = server + 'aceptar-solicitud-gerprod';
+                            });
+                        }
+
+                    });
+
+
 
                 }
 
@@ -951,8 +982,12 @@ function newSolicitude() {
 
     /** --------------------------------------------- TESORERIA ------------------------------------------------- **/
 
-    if(userType === 'T')
+    if(userType === 'T'){
+        console.log('tesooo');
         listSolicitude('tes',APROBADO);
+        listFondos('fondos-tesoreria');
+    }
+
 
     var search_solicitude_cont = $('#search_solicitude_tes');
     search_solicitude_cont.on('click', function () {
@@ -995,6 +1030,7 @@ function newSolicitude() {
                 $.get(server + 'getctabanc/' + ui.item.vislegajo).done(function(data){
                     $('#fondo_cuenta').val(data);
                 });
+                $(this).attr('data-select','true');
                 $(this).attr('data-cod',ui.item.visvisitador);
                 $(this).val(ui.item.visnombre + ' ' + ui.item.vispaterno + ' '+ui.item.vismaterno );
                 $("#id_change_before_rep").val( ui.item.visvisitador );
@@ -1046,8 +1082,7 @@ function newSolicitude() {
         response(matches);
     }
 
-    var datef = new Date();
-    var dateactual = (datef.getMonth()+1)+'-'+datef.getFullYear();
+
     $.get(server + 'list-fondos/'+ dateactual).done(function(data)
         {
 
@@ -1080,6 +1115,7 @@ function newSolicitude() {
     fondo_total.numeric();
 
     $(document).on('click','.register_fondo',function(){
+        console.log(fondo_repmed.attr('disabled'));
         validate = 0;
         var aux = this;
         if(!fondo_repmed.val()){
@@ -1098,6 +1134,13 @@ function newSolicitude() {
             fondo_cuenta.parent().addClass('has-error');
             fondo_cuenta.attr('placeholder', 'Ingrese Cuenta');
             fondo_cuenta.addClass('input-placeholder-error');
+            console.log(validate = 1);
+        }
+        if(fondo_repmed.attr('data-select') == 'false'){
+            fondo_repmed.val('');
+            fondo_repmed.parent().addClass('has-error');
+            fondo_repmed.attr('placeholder', 'Ingrese Representante');
+            fondo_repmed.addClass('input-placeholder-error');
             console.log(validate = 1);
         }
         if(validate == 0){
@@ -1310,9 +1353,9 @@ function newSolicitude() {
 
     $("#datefondo").datepicker(date_options2).on('changeDate', function (e) {
 
-        $(this).tooltip('hide');
 
         var datefondo = $(this).val();
+        var type = $(this).attr('data-type');
         if(datefondo!='') {
             $('#export-fondo').show();
             $('#export-fondo').attr('href', server + 'exportfondos/' + datefondo);
@@ -1321,7 +1364,8 @@ function newSolicitude() {
             $('#export-fondo').hide()
         }
         $(".date-fondo").removeClass('has-error');
-        searchFondos(datefondo);
+
+        searchFondos(datefondo,type);
         if (isNaN(e.date)) {
 
             $("#year").val('');
@@ -1335,16 +1379,16 @@ function newSolicitude() {
         $("#month").change();
 
     });
-    function searchFondos(datefondo) {
+    function searchFondos(datefondo , aux) {
 
         $('#loading-fondo').attr('class','show');
-        $.get(server + 'list-fondos/' + datefondo).done(function (data) {
+        $.get(server + 'list-'+aux+'/' + datefondo).done(function (data) { console.log('table_solicitude_'+aux+'_wrapper');
             $('#loading-fondo').attr('class','hide');
             $('#total-fondo-hiden').remove();
             $('.total-fondo').remove();
-            $('#table_solicitude_fondos_wrapper').remove();
-            $('.table-solicituds-fondos').append(data);
-            $('#table_solicitude_fondos').dataTable({
+            $('#table_solicitude_'+aux+'_wrapper').remove();
+            $('.table_solicitude_'+aux).append(data);
+            $('#table_solicitude_'+aux).dataTable({
                     "order": [
                         [3, "desc"]
                     ],
