@@ -1279,4 +1279,9 @@ class SolicitudeController extends BaseController
         $solicituds = Solicitude::where('estado',DEPOSITADO)->where('idtipopago',2)->where('asiento',2)->get();
         return View::make('Dmkt.AsisGer.list_solicitudes')->with('solicituds',$solicituds);
     }
+    public function viewSolicitudeAGer($token){
+        $solicitude = Solicitude::where('token', $token)->firstOrFail();
+        return View::make('Treasury.view_solicitude_tes')->with('solicitude', $solicitude);
+
+    }
 }

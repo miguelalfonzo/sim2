@@ -26,7 +26,7 @@
         <td style="text-align: center">{{$solicitude->typesolicitude->nombre}}</td>
         <td>
             <div class="div-icons-solicituds">
-                <a href="{{URL::to('ver-solicitud-rm').'/'.$solicitude->token}}"><span class="glyphicon glyphicon-eye-open"></span></a>
+                <a href="{{URL::to('ver-solicitud-ager').'/'.$solicitude->token}}"><span class="glyphicon glyphicon-eye-open"></span></a>
                 @if($solicitude->estado == DEPOSITADO && $solicitude->asiento == 2)
                     <a id="token-reg-expense" data-url="{{$solicitude->token}}"><span class="glyphicon glyphicon-usd"></span></a>
                 @endif
