@@ -1,8 +1,8 @@
 <?php namespace Maatwebsite\Excel\Classes;
 
-use \Config;
-use \PHPExcel_Settings;
-use \PHPExcel_CachedObjectStorageFactory;
+use PHPExcel_Settings;
+use Illuminate\Support\Facades\Config;
+use PHPExcel_CachedObjectStorageFactory;
 
 class Cache {
 
@@ -17,17 +17,17 @@ class Cache {
      * @var array
      */
     protected $available = array(
-        'memory'        => 'cache_in_memory',
-        'gzip'          => 'cache_in_memory_gzip',
-        'serialized'    => 'cache_in_memory_serialized',
-        'igbinary'      => 'cache_igbinary',
-        'discISAM'      => 'cache_to_discISAM',
-        'apc'           => 'cache_to_apc',
-        'memcache'      => 'cache_to_memcache',
-        'temp'          => 'cache_to_phpTemp',
-        'wincache'      => 'cache_to_wincache',
-        'sqlite'        => 'cache_to_sqlite',
-        'sqlite3'       => 'cache_to_sqlite3'
+        'memory'     => 'cache_in_memory',
+        'gzip'       => 'cache_in_memory_gzip',
+        'serialized' => 'cache_in_memory_serialized',
+        'igbinary'   => 'cache_igbinary',
+        'discISAM'   => 'cache_to_discISAM',
+        'apc'        => 'cache_to_apc',
+        'memcache'   => 'cache_to_memcache',
+        'temp'       => 'cache_to_phpTemp',
+        'wincache'   => 'cache_to_wincache',
+        'sqlite'     => 'cache_to_sqlite',
+        'sqlite3'    => 'cache_to_sqlite3'
     );
 
     /**
@@ -42,17 +42,17 @@ class Cache {
     public function __construct()
     {
         // Get driver and settings from the config
-        $this->driver   = Config::get($this->configName . '.driver', 'memory');
+        $this->driver = Config::get($this->configName . '.driver', 'memory');
         $this->settings = Config::get($this->configName . '.settings', array());
 
         // Init if caching is enabled
-        if($this->isEnabled())
+        if ($this->isEnabled())
             $this->init();
     }
 
     /**
      * Init the cache
-     * @return [type] [description]
+     * @return void
      */
     public function init()
     {
@@ -65,16 +65,17 @@ class Cache {
 
     /**
      * Set the right driver
+     * @return void
      */
     public function findDriver()
     {
-        $property       = $this->detect();
-        $this->method   = constant($this->class.'::'.$property);
+        $property = $this->detect();
+        $this->method = constant($this->class . '::' . $property);
     }
 
     /**
      * Detect the caching driver
-     * @return [type] [description]
+     * @return string $driver
      */
     protected function detect()
     {
@@ -87,17 +88,18 @@ class Cache {
 
     /**
      * Add additional settings for the current driver
+     * @return  void
      */
     protected function addAdditionalSettings()
     {
-        switch($this->driver)
+        switch ($this->driver)
         {
             case 'memcache':
 
                 // Add extra memcache settings
                 $this->settings = array_merge($this->settings, array(
-                    'memcacheServer'    => Config::get($this->configName . '.memcache.host', 'localhost'),
-                    'memcachePort'      => Config::get($this->configName . '.memcache.port', 11211)
+                    'memcacheServer' => Config::get($this->configName . '.memcache.host', 'localhost'),
+                    'memcachePort'   => Config::get($this->configName . '.memcache.port', 11211)
                 ));
 
                 break;
@@ -106,7 +108,7 @@ class Cache {
 
                 // Add dir
                 $this->settings = array_merge($this->settings, array(
-                    'dir'    => Config::get($this->configName . '.dir', storage_path('cache')),
+                    'dir' => Config::get($this->configName . '.dir', storage_path('cache')),
                 ));
 
                 break;
@@ -115,11 +117,10 @@ class Cache {
 
     /**
      * Check if caching is enabled
-     * @return boolean [description]
+     * @return boolean
      */
     public function isEnabled()
     {
         return Config::get($this->configName . '.enable', true) ? true : false;
     }
-
 }

@@ -3,6 +3,7 @@
 namespace Expense;
 
 use \BaseController;
+use Dmkt\FondoInstitucional;
 use \View;
 use \Dmkt\Activity;
 use \Dmkt\Solicitude;
@@ -73,6 +74,35 @@ class ExpenseController extends BaseController{
 		];
  		return View::make('Expense.register',$data);
 	}
+    public function showRegisterFondo($token){
+
+        $date         = $this->getDay();
+        $typeProof    = ProofType::all();
+        $typeExpense  = ExpenseType::orderBy('idtipogasto','asc')->get();
+        $fondo = FondoInstitucional::where('token',$token)->firstOrFail();
+        $expense      = Expense::where('idfondo',$fondo->idfondo)->get();
+
+
+        $balance     = $fondo->total;
+        if(count($expense)>0)
+        {
+            $balance         = 0;
+            foreach ($expense as $key => $value) {
+                $balance += $value->monto;
+            }
+            $balance= $fondo->total - $balance;
+        }
+        $data = [
+            'fondo'   => $fondo,
+            'typeProof'    => $typeProof,
+            'typeExpense'  => $typeExpense,
+            'date'         => $date,
+            'balance' => $balance,
+            'expense' => $expense
+
+        ];
+        return View::make('Expense.register-fondo',$data);
+    }
 
 	public function showCont($token)
 	{
@@ -112,8 +142,12 @@ class ExpenseController extends BaseController{
 	}
 
 	public function registerExpense(){
+
 		$inputs         = Input::all();
+        if($inputs['type']=='S')
 		$row_solicitude = Solicitude::where('token',$inputs['token'])->firstOrFail();
+        if($inputs['type']=='F')
+        $row_fondo = $inputs['idfondo'];
 		$row_expense    = Expense::where('ruc',$inputs['ruc'])->where('num_prefijo',$inputs['number_prefix'])
 						  ->where('num_serie',$inputs['number_serie'])->get();
 
@@ -130,6 +164,11 @@ class ExpenseController extends BaseController{
 			$expense->ruc = $inputs['ruc'];
 			$expense->razon = $inputs['razon'];
 			$expense->monto = $inputs['total_expense'];
+            if($inputs['type']=='S')
+                $expense->tipo = 'S';
+            if($inputs['type']=='F')
+                $expense->tipo = 'F';
+
 			if($inputs['proof_type'] == '1' || $inputs['proof_type'] == '4' || $inputs['proof_type'] == '6')
 			{
 				$expense->igv = $inputs['igv'];
@@ -153,7 +192,10 @@ class ExpenseController extends BaseController{
 	        $expense->idcomprobante = $inputs['proof_type'];
 			$idgasto = $expense->lastId()+1;
 			$expense->idgasto = $idgasto;
+            if($inputs['type']=='S')
 			$expense->idsolicitud = $row_solicitude->idsolicitud;
+            if($inputs['type']=='F')
+            $expense->idfondo = $row_fondo;
 			//Detail Expense
 			$quantity = $inputs['quantity'];
 			$description = $inputs['description'];
@@ -219,18 +261,26 @@ class ExpenseController extends BaseController{
 			$expenseEdit->ruc = $inputs['ruc'];
 			$expenseEdit->razon = $inputs['razon'];
 			$expenseEdit->monto = $inputs['total_expense'];
-			if($inputs['proof_type'] == '2')
-			{
-				$expenseEdit->igv      = $inputs['igv'];
-				$expenseEdit->imp_serv = $inputs['imp_service'];
-				$expenseEdit->sub_tot  = $inputs['sub_total_expense'];
-			}
-			else
-			{
-				$expenseEdit->igv      = null;
-				$expenseEdit->imp_serv = null;
-				$expenseEdit->sub_tot  = null;
-			}
+            if($inputs['proof_type'] == '1' || $inputs['proof_type'] == '4' || $inputs['proof_type'] == '6')
+            {
+                if($inputs['igv'] || $inputs['imp_service'])
+                {
+                    $expenseEdit->igv = $inputs['igv'];
+                    $expenseEdit->imp_serv = $inputs['imp_service'];
+                    $expenseEdit->sub_tot = $inputs['sub_total_expense'];
+                }
+                else
+                {
+                    $expenseEdit->sub_tot = $inputs['total_expense'];
+                }
+            }
+            else
+            {
+                $expenseEdit->igv      = null;
+                $expenseEdit->imp_serv = null;
+                $expenseEdit->sub_tot  = null;
+            }
+
 			$expenseEdit->idcomprobante = $inputs['proof_type'];
 			$date = $inputs['date_movement'];
 	        list($d, $m, $y) = explode('/', $date);
@@ -286,6 +336,11 @@ class ExpenseController extends BaseController{
 		}
 	}
 
+    public function finishExpenseFondo($idfondo){
+        $fondo = FondoInstitucional::where('idfondo',$idfondo)->update(array('registrado'=>1));
+        $states = State::orderBy('idestado', 'ASC')->get();
+        return Redirect::to('show_rm')->with('states', $states);
+    }
 	public function viewExpense($token){
 		$solicitude = Solicitude::where('token',$token)->firstOrFail();
 		if(count($solicitude)>0)
@@ -298,6 +353,19 @@ class ExpenseController extends BaseController{
 		];
 		return View::make('Expense.view',$data);
 	}
+    public function viewExpenseFondo($token){
+
+        $fondo = FondoInstitucional::where('token',$token)->firstOrFail();
+        if(count($fondo)>0)
+        {
+            $expense = Expense::where('idfondo',$fondo->idfondo)->get();
+        }
+        $data = [
+            'fondo' => $fondo,
+            'expense'    => $expense
+        ];
+        return View::make('Expense.view-fondo',$data);
+    }
 
 	public function reportExpense($token){
 		$solicitude = Solicitude::where('token',$token)->firstOrFail();
@@ -323,6 +391,20 @@ class ExpenseController extends BaseController{
 		$html = View::make('Expense.report',$data);
 		return PDF::load($html, 'A4', 'landscape')->show();
 	}
+    public function reportExpenseFondo($token){
+
+        $fondo = FondoInstitucional::where('token',$token)->firstOrFail();
+        $expense = Expense::where('idfondo',$fondo->idfondo)->get();
+        $data = [
+            'fondo' => $fondo,
+            'date'       => $this->getDay(),
+            'expense'    => $expense
+        ];
+        $html = View::make('Expense.report-fondo',$data);
+        return PDF::load($html, 'A4', 'landscape')->show();
+
+
+    }
 
 	public function test(){
  		// 	$html = View::make('Expense.report');

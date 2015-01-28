@@ -1,8 +1,9 @@
 <?php namespace Maatwebsite\Excel\Readers;
 
-use \Config;
-use \Closure;
+use Closure;
+use PHPExcel;
 use Maatwebsite\Excel\Excel;
+use Illuminate\Support\Facades\Config;
 use Maatwebsite\Excel\Collections\SheetCollection;
 use Maatwebsite\Excel\Exceptions\LaravelExcelException;
 
@@ -21,33 +22,35 @@ class ConfigReader {
 
     /**
      * Excel object
-     * @var [type]
+     * @var PHPExcel
      */
     public $excel;
 
     /**
      * The sheet
-     * @var [type]
+     * @var LaravelExcelWorksheet
      */
     public $sheet;
 
     /**
      * The sheetname
-     * @var [type]
+     * @var string
      */
     public $sheetName;
 
     /**
      * Collection of sheets (through the config reader)
-     * @var [type]
+     * @var SheetCollection
      */
     public $sheetCollection;
 
     /**
      * Constructor
-     * @param [type] $files [description]
+     * @param PHPExcel $excel
+     * @param string   $config
+     * @param callback $callback
      */
-    public function __construct($excel, $config = 'excel::import', $callback = false)
+    public function __construct(PHPExcel $excel, $config = 'excel::import', $callback = null)
     {
         // Set excel object
         $this->excel = $excel;
@@ -61,8 +64,9 @@ class ConfigReader {
 
     /**
      * Start the import
-     * @param  boolean $callback [description]
-     * @return [type]            [description]
+     * @param bool|callable $callback $callback
+     * @throws \PHPExcel_Exception
+     * @return void
      */
     public function start($callback = false)
     {
@@ -70,10 +74,10 @@ class ConfigReader {
         $this->sheetCollection = new SheetCollection();
 
         // Get the sheet names
-        if($sheets = $this->excel->getSheetNames())
+        if ($sheets = $this->excel->getSheetNames())
         {
             // Loop through the sheets
-            foreach($sheets as $index => $name)
+            foreach ($sheets as $index => $name)
             {
                 // Set sheet name
                 $this->sheetName = $name;
@@ -82,7 +86,7 @@ class ConfigReader {
                 $this->sheet = $this->excel->setActiveSheetIndex($index);
 
                 // Do the callback
-                if($callback instanceof Closure)
+                if ($callback instanceof Closure)
                 {
                     call_user_func($callback, $this);
                 }
@@ -97,7 +101,7 @@ class ConfigReader {
 
     /**
      * Get the sheet collection
-     * @return [type] [description]
+     * @return SheetCollection
      */
     public function getSheetCollection()
     {
@@ -106,8 +110,8 @@ class ConfigReader {
 
     /**
      * Get value by index
-     * @param  [type] $field [description]
-     * @return [type]        [description]
+     * @param  string $field
+     * @return string|null
      */
     protected function valueByIndex($field)
     {
@@ -115,7 +119,7 @@ class ConfigReader {
         $field = snake_case($field);
 
         // Get coordinate
-        if($coordinate = $this->getCoordinateByKey($field))
+        if ($coordinate = $this->getCoordinateByKey($field))
         {
             // return cell value by coordinate
             return $this->getCellValueByCoordinate($coordinate);
@@ -126,17 +130,18 @@ class ConfigReader {
 
     /**
      * Return cell value
-     * @param  [type] $coordinate [description]
-     * @return [type]             [description]
+     * @param  string $coordinate
+     * @return string|null
      */
     protected function getCellValueByCoordinate($coordinate)
     {
-        if($this->sheet)
+        if ($this->sheet)
         {
-            if(str_contains($coordinate, ':'))
+            if (str_contains($coordinate, ':'))
             {
                 // We want to get a range of cells
                 $values = $this->sheet->rangeToArray($coordinate);
+
                 return $values;
             }
             else
@@ -151,8 +156,8 @@ class ConfigReader {
 
     /**
      * Get the coordinates from the config file
-     * @param  [type] $field [description]
-     * @return [type]        [description]
+     * @param  string $field
+     * @return string|boolean
      */
     protected function getCoordinateByKey($field)
     {
@@ -161,8 +166,8 @@ class ConfigReader {
 
     /**
      * Dynamically get a value by config
-     * @param  [type] $field [description]
-     * @return [type]        [description]
+     * @param  string $field
+     * @return string
      */
     public function __get($field)
     {

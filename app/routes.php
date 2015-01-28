@@ -57,6 +57,9 @@ Route::group(array('before' => 'rm'), function () {
     });
     // Fondo
     Route::get('list-fondos-rm','Dmkt\FondoController@listFondosRep');
+    Route::get('registrar-gasto-fondo/{token}', 'Expense\ExpenseController@showRegisterFondo');
+    Route::get('end-expense-fondo/{id}','Expense\ExpenseController@finishExpenseFondo');
+    Route::get('ver-gasto-fondo/{token}','Expense\ExpenseController@viewExpenseFondo');
 });
 Route::group(array('before' => 'auth'), function () {
 
@@ -98,7 +101,7 @@ Route::group(array ('before' => 'ager') ,function(){
 
     Route::get('registrar-fondo','Dmkt\FondoController@getRegister');
     Route::post('registrar-fondo','Dmkt\FondoController@postRegister');
-    Route::get('list-fondos/{date}','Dmkt\FondoController@getFondos');
+
     Route::get('get-fondo/{id}','Dmkt\FondoController@getFondo');
     Route::post('delete-fondo','Dmkt\FondoController@delFondo');
     Route::post('update-fondo','Dmkt\FondoController@updateFondo');
@@ -110,7 +113,7 @@ Route::group(array ('before' => 'ager') ,function(){
     Route::get('ver-solicitud-ager/{token}','Dmkt\SolicitudeController@viewSolicitudeAGer');
 });
 
-
+Route::get('list-fondos/{date}','Dmkt\FondoController@getFondos');
 /**
  * |-------------------------------------------------------------------------------------------- |
  * | Gerente de Producto |
@@ -173,6 +176,8 @@ Route::group(array('before' => 'cont'), function () {
     Route::post('consultarRucCont', 'Expense\RucController@show');
     Route::get('edit-expense-cont', 'Expense\ExpenseController@editExpense');
     Route::post('update-expense-cont', 'Expense\ExpenseController@updateExpense');
+    //Fondos
+    Route::get('list-fondos-contabilidad/{date}','Dmkt\FondoController@getFondosContabilidad');
 });
 // App::error(function (ModelNotFoundException $e) {
 //     return View::make('notfound');
@@ -199,14 +204,14 @@ Route::group(array('before' => 'tes'), function(){
     Route::post('deposit-solicitude', 'Deposit\DepositController@depositSolicitudeTes');
     //Route::get('list-fondos-tesoreria','Deposit\DepositController@getFondos');
     Route::post('deposit-fondo','Deposit\DepositController@depositFondoTes');
-
+    Route::get('list-fondos-tesoreria/{date}','Dmkt\FondoController@getFondosTesoreria');
 });
-Route::get('list-fondos-tesoreria/{date}','Dmkt\FondoController@getFondosTesoreria');
+
 /* =============================================================================================== */
 
 
 //test
 Route::get('hola', 'Expense\ExpenseController@test');
 Route::get('a/{token}', 'Expense\ExpenseController@reportExpense');
-
+Route::get('report-fondo/{token}','Expense\ExpenseController@reportExpenseFondo');
 Route::get('report', 'ExpenseController@reportExpense');

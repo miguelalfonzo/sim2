@@ -1,15 +1,18 @@
 <?php namespace Maatwebsite\Excel;
 
-use \Config;
-use \PHPExcel_Settings;
+use PHPExcel_Settings;
+use PHPExcel_Shared_Font;
+use Maatwebsite\Excel\Readers\Html;
 use Maatwebsite\Excel\Classes\Cache;
+use Illuminate\Support\Facades\Config;
 use Maatwebsite\Excel\Classes\PHPExcel;
 use Illuminate\Support\ServiceProvider;
-use Maatwebsite\Excel\Readers\Html;
+use Maatwebsite\Excel\Parsers\CssParser;
+use Maatwebsite\Excel\Parsers\ViewParser;
+use Maatwebsite\Excel\Classes\FormatIdentifier;
 use Maatwebsite\Excel\Readers\LaravelExcelReader;
 use Maatwebsite\Excel\Writers\LaravelExcelWriter;
-use Maatwebsite\Excel\Classes\LaravelExcelWorksheet;
-use Maatwebsite\Excel\Parsers\ViewParser;
+use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
 /**
  *
@@ -24,145 +27,203 @@ use Maatwebsite\Excel\Parsers\ViewParser;
  */
 class ExcelServiceProvider extends ServiceProvider {
 
-	/**
-	 * Indicates if loading of the provider is deferred.
-	 *
-	 * @var bool
-	 */
-	protected $defer = false;
+    /**
+     * Indicates if loading of the provider is deferred.
+     *
+     * @var bool
+     */
+    protected $defer = false;
 
-	/**
-	 * Bootstrap the application events.
-	 *
-	 * @return void
-	 */
+    /**
+     * Bootstrap the application events.
+     *
+     * @return void
+     */
 
-	public function boot()
-	{
-		$this->package('maatwebsite/excel');
-	}
+    public function boot()
+    {
+        // Boot the package
+        $this->package('maatwebsite/excel');
 
-	/**
-	 * Register the service provider.
-	 *
-	 * @return void
-	 */
-	public function register()
-	{
-		$this->bindReaders();
-		$this->bindParsers();
-		$this->bindPHPExcelClass();
-		$this->bindWriters();
-		$this->bindExcel();
-	}
+        // Set the autosizing settings
+        $this->setAutoSizingSettings();
 
-	/**
-	 * Bind PHPExcel classes
-	 * @return [type] [description]
-	 */
-	protected function bindPHPExcelClass()
-	{
+        // Register filters
+        $this->registerFilters();
+    }
 
-		// Set object
-		$me = $this;
+    /**
+     * Register the service provider.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        $this->bindClasses();
+        $this->bindCssParser();
+        $this->bindReaders();
+        $this->bindParsers();
+        $this->bindPHPExcelClass();
+        $this->bindWriters();
+        $this->bindExcel();
+    }
 
-		// Bind the PHPExcel class
-		$this->app['phpexcel'] = $this->app->share(function($app) use($me) {
+    /**
+     * Bind PHPExcel classes
+     * @return void
+     */
+    protected function bindPHPExcelClass()
+    {
+        // Set object
+        $me = $this;
 
-			// Set locale
-			$me->setLocale();
+        // Bind the PHPExcel class
+        $this->app['phpexcel'] = $this->app->share(function ($app) use ($me)
+        {
+            // Set locale
+            $me->setLocale();
 
-			// Set the caching settings
-			$me->setCacheSettings();
+            // Set the caching settings
+            $me->setCacheSettings();
 
-			// Init phpExcel
-			return new PHPExcel();
-		});
-	}
+            // Init phpExcel
+            return new PHPExcel();
+        });
+    }
 
-	/**
-	 * Bind writers
-	 * @return [type] [description]
-	 */
-	protected function bindReaders()
-	{
-		// Bind the laravel excel reader
-		$this->app['excel.reader'] = $this->app->share(function($app)
-		{
-			return new LaravelExcelReader($app['files']);
-		});
+    /**
+     * Bind the css parser
+     */
+    protected function bindCssParser()
+    {
+        // Bind css parser
+        $this->app->bindShared('excel.parsers.css', function ($app)
+        {
+            return new CssParser(new CssToInlineStyles());
+        });
+    }
 
-		// Bind the html reader class
-		$this->app['excel.readers.html'] = $this->app->share(function($app)
-		{
-			return new Html();
-		});
-	}
+    /**
+     * Bind writers
+     * @return void
+     */
+    protected function bindReaders()
+    {
+        // Bind the laravel excel reader
+        $this->app['excel.reader'] = $this->app->share(function ($app)
+        {
+            return new LaravelExcelReader($app['files'], $app['excel.identifier']);
+        });
 
-	/**
-	 * Bind writers
-	 * @return [type] [description]
-	 */
-	protected function bindParsers()
-	{
-		// Bind the view parser
-		$this->app['excel.parsers.view'] = $this->app->share(function($app)
-		{
-			return new ViewParser($app['excel.readers.html']);
-		});
-	}
+        // Bind the html reader class
+        $this->app['excel.readers.html'] = $this->app->share(function ($app)
+        {
+            return new Html($app['excel.parsers.css']);
+        });
+    }
 
-	/**
-	 * Bind writers
-	 * @return [type] [description]
-	 */
-	protected function bindWriters()
-	{
-		// Bind the excel writer
-		$this->app['excel.writer'] = $this->app->share(function($app)
-		{
-			return new LaravelExcelWriter($app->make('Response'), $app['files']);
-		});
-	}
+    /**
+     * Bind writers
+     * @return void
+     */
+    protected function bindParsers()
+    {
+        // Bind the view parser
+        $this->app['excel.parsers.view'] = $this->app->share(function ($app)
+        {
+            return new ViewParser($app['excel.readers.html']);
+        });
+    }
 
-	/**
-	 * Bind Excel class
-	 * @return [type] [description]
-	 */
-	protected function bindExcel()
-	{
-		// Bind the Excel class and inject its dependencies
-		$this->app['excel'] = $this->app->share(function($app)
+    /**
+     * Bind writers
+     * @return void
+     */
+    protected function bindWriters()
+    {
+        // Bind the excel writer
+        $this->app['excel.writer'] = $this->app->share(function ($app)
+        {
+            return new LaravelExcelWriter($app->make('Response'), $app['files'], $app['excel.identifier']);
+        });
+    }
+
+    /**
+     * Bind Excel class
+     * @return void
+     */
+    protected function bindExcel()
+    {
+        // Bind the Excel class and inject its dependencies
+        $this->app['excel'] = $this->app->share(function ($app)
         {
             return new Excel($app['phpexcel'], $app['excel.reader'], $app['excel.writer'], $app['excel.parsers.view']);
         });
-	}
+    }
 
-	/**
-	 * Set the cache settings
-	 */
-	public function setCacheSettings()
-	{
-		return new Cache();
-	}
+    /**
+     * Bind other classes
+     * @return void
+     */
+    protected function bindClasses()
+    {
+        // Bind the format identifier
+        $this->app['excel.identifier'] = $this->app->share(function ($app)
+        {
+            return new FormatIdentifier($app['files']);
+        });
+    }
 
-	/**
-	 * Set locale
-	 */
-	public function setLocale()
-	{
-		$locale = Config::get('app.locale', 'en_us');
-		PHPExcel_Settings::setLocale($locale);
-	}
+    /**
+     * Set cache settings
+     * @return Maatwebsite\Excel\Classes\Cache
+     */
+    public function setCacheSettings()
+    {
+        return new Cache();
+    }
 
-	/**
-	 * Get the services provided by the provider.
-	 *
-	 * @return array
-	 */
-	public function provides()
-	{
-		return array('excel');
-	}
+    /**
+     * Set locale
+     */
+    public function setLocale()
+    {
+        $locale = Config::get('app.locale', 'en_us');
+        PHPExcel_Settings::setLocale($locale);
+    }
 
+    /**
+     * Set the autosizing settings
+     */
+    public function setAutoSizingSettings()
+    {
+        $method = Config::get('excel::export.autosize-method', PHPExcel_Shared_Font::AUTOSIZE_METHOD_APPROX);
+        PHPExcel_Shared_Font::setAutoSizeMethod($method);
+    }
+
+    /**
+     * Register filters
+     * @return void
+     */
+    public function registerFilters()
+    {
+        app('excel')->registerFilters(Config::get('excel::filters', array() ));
+    }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides()
+    {
+        return array(
+            'excel',
+            'phpexcel',
+            'excel.reader',
+            'excel.readers.html',
+            'excel.parsers.view',
+            'excel.writer'
+        );
+    }
 }

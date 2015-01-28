@@ -81,6 +81,7 @@
                      	            </div>
                      	        </div>
                   </div>
+            <!-- Fondos -->
                   <div class="tab-pane fade" id="fondos">
                   <div class="panel-body table_solicitude_fondos-tesoreria">
                    <div id="" class="form-group col-xs-6 col-sm-3 col-md-3">

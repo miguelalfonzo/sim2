@@ -35,13 +35,13 @@ class ExcelTester extends ExcelTestCase {
     }
 
     /**
-     * Test a batch
+     * Test select sheets
      * @return [type] [description]
      */
-    public function testBatch()
+    public function testSelectSheetsByIndex()
     {
-        $loaded = $this->excel->batch(array('file'), function() {});
-        $this->assertInstanceOf('Maatwebsite\Excel\Readers\Batch', $loaded);
+        $selected = $this->excel->selectSheetsByIndex(array('0'));
+        $this->assertEquals($this->excel, $selected);
     }
 
     /**

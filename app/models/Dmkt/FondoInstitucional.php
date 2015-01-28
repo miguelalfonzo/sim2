@@ -8,6 +8,7 @@
 
 namespace Dmkt;
 use \Eloquent;
+
 class FondoInstitucional extends Eloquent{
 
 
@@ -23,5 +24,10 @@ class FondoInstitucional extends Eloquent{
             return $lastId->idfondo;
         }
 
+    }
+
+    public function deposit(){
+
+        return $this->hasOne('Common\Deposit','idfondo','idfondo');
     }
 }

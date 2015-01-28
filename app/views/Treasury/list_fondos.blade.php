@@ -39,6 +39,85 @@
     </tbody>
 
 </table>
+<script>
+var data          = {};
+$('#register-deposit-fondo').on('click' ,function(e){
+            e.preventDefault();
+            console.log('register');
+
+            $("#op_number").val('');
+            $("#message-op-number").text('');
+            var op_number  = $("#op-number").val();
+            var type_deposit = $(this).attr('data-deposit');
+            if(type_deposit ==='fondo'){
+                url = 'deposit-fondo'
+                data.idfondo = $('#idfondo').val();
+                data.op_number = op_number;
+                data._token = $("input[name=_token]").val();
+            }else if(type_deposit === 'solicitude'){
+                url = 'deposit-solicitude';
+                data.op_number = op_number;
+                data.token     = $("#token").val();
+                data._token    = $("input[name=_token]").val();
+            }
+            $("#op_number").val('');
+            $("#message-op-number").text('');
+
+
+            if(!op_number)
+            {
+                $("#message-op-number").text("Ingrese el número de Operación");
+            }
+            else
+            {
+                $.post(server + url, data)
+                .done(function (data){
+                    if(parseInt(data,10) === 1)
+                    {
+                        $('#myModal').modal('hide');
+                        bootbox.alert("<p class='green'>Se registro el asiento contable correctamente.</p>", function(){
+                            if(type_deposit === 'fondo'){
+                                $.ajax({
+                                    url: server + 'list-fondos-tesoreria/'+ dateactual,
+                                    type: 'GET',
+                                    dataType: 'html'
+
+                                }).done(function (data) {
+                                    $('#table_solicitude_fondos-tesoreria_wrapper').remove();
+                                    $('.table_solicitude_fondos-tesoreria').append(data);
+                                    $('#table_solicitude_fondos-tesoreria').dataTable({
+                                            "order": [
+                                                [ 3, "desc" ] //order date
+                                            ],
+                                            "bLengthChange": false,
+                                            'iDisplayLength': 7,
+                                            "oLanguage": {
+                                                "sSearch": "Buscar: ",
+                                                "sZeroRecords": "No hay fondos",
+                                                "sInfoEmpty": "No hay fondos",
+                                                "sInfo": 'Mostrando _END_ de _TOTAL_',
+                                                "oPaginate": {
+                                                    "sPrevious": "Anterior",
+                                                    "sNext" : "Siguiente"
+                                                }
+                                            }
+                                        }
+                                    );
+                                });
+                            }else{
+                                window.location.href = server+'show_tes';
+                            }
+
+                        });
+                    }
+                    else
+                    {
+                        $("#message-op-number").text("No se ha podido registrar el depósito.");
+                    }
+                });
+            }
+})
+</script>
   <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -54,7 +133,7 @@
                             </div>
                             <div class="modal-footer">
 
-                                <a id="" href="" class="btn btn-success register-deposit" data-deposit="fondo" style="margin-right: 1em;">Confirmar Operación</a>
+                                <a id="register-deposit-fondo" href="#" class="btn btn-success " data-deposit="fondo" style="margin-right: 1em;">Confirmar Operación</a>
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
                             </div>
                         </div>

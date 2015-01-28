@@ -1,14 +1,14 @@
-<div class="table-responsive">
+<div class="table-responsive" style="margin-top: 50px">
  <table class="table table-hover table-bordered table-condensed dataTable" id="table_fondos_rm" style="width: 100%">
     <thead>
     <tr>
         <th>#</th>
-        <th>SiSol - Hospitall</th>
+        <th>SiSol - Hospital</th>
         <th>Depositar a</th>
         <th>N° Cuenta Bagó. Bco Credito</th>
         <th>Total a depositar</th>
         <th>Supervisor</th>
-        <th>Reg. Gasto</th>
+        <th>Reg. Depósito</th>
     </tr>
     </thead>
     <tbody>
@@ -26,8 +26,11 @@
         <td style="text-align: center">{{$fondo->supervisor}}</td>
         <td>
             <div class="div-icons-solicituds">
-                <a href="#" class="edit-fondo" data-idfondo="{{$fondo->idfondo}}"><span class="glyphicon glyphicon-usd"></span></a>
-
+                @if($fondo->depositado == 0)
+                <a href="#" class="deposit-fondo" data-idfondo="{{$fondo->idfondo}}" data-toggle="modal" data-target="#myModal" ><span class="glyphicon glyphicon-usd"></span></a>
+                @else
+                <span><strong>Depositado</strong></span>
+                @endif
             </div>
         </td>
     </tr>
@@ -35,5 +38,4 @@
     @endforeach
     </tbody>
 
-</table>
-</div>
+</table></div>

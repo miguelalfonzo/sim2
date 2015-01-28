@@ -83,6 +83,8 @@ class FondoController extends BaseController
         $fondo->total = $inputs['total'];
         $fondo->cuenta = $inputs['cuenta'];
         $fondo->idrm = $inputs['codrepmed'];
+        $token = sha1(md5(uniqid($fondo->idfondo, true)));
+        $fondo->token = $token;
         $fondo->save();
         $start = $inputs['start'];
         $fondos = $this->getFondos($start);
@@ -158,6 +160,44 @@ class FondoController extends BaseController
         }else{
             $fondos = FondoInstitucional::whereRaw("created_at between to_date('$start' ,'DD-MM-YYYY') and to_date('$end' ,'DD-MM-YYYY')+1")->get();
             $view = View::make('Treasury.list_fondos')->with('fondos', $fondos)->with('sum',$fondos->sum('total'));
+            $data =[
+                'view' =>$view,
+                'total' => $fondos->sum('total')
+            ];
+            return $view;
+        }
+
+    }
+    function getFondosContabilidad($start,$export=0)
+    {
+
+        $st = $start;
+        $start = '01-'.$st ;
+        $end = $st[0].$st[1] ;
+        $mes = [
+
+            '01'=>31,
+            '02'=>28,
+            '03'=>31,
+            '04'=>30,
+            '05'=>31,
+            '06'=>30,
+            '07'=>31,
+            '08'=>31,
+            '09'=>30,
+            '10'=>31,
+            '11'=>30,
+            '12'=>31
+        ];
+
+        $end = $mes[$end].'-'.$st;
+
+        if($export){
+            $fondos = FondoInstitucional::whereRaw("created_at between to_date('$start' ,'DD-MM-YYYY') and to_date('$end' ,'DD-MM-YYYY')+1")->get(array('institucion','repmed','cuenta','supervisor','total'));
+            return $fondos;
+        }else{
+            $fondos = FondoInstitucional::whereRaw("created_at between to_date('$start' ,'DD-MM-YYYY') and to_date('$end' ,'DD-MM-YYYY')+1")->where('depositado',1)->get();
+            $view = View::make('Dmkt.Cont.list_fondos')->with('fondos', $fondos)->with('sum',$fondos->sum('total'));
             $data =[
                 'view' =>$view,
                 'total' => $fondos->sum('total')
@@ -321,7 +361,19 @@ class FondoController extends BaseController
     function listFondosRep(){
 
         $fondos = FondoInstitucional::where('idrm',Auth::user()->rm->idrm)->where('depositado',1)->get();
-        return View::make('Dmkt.AsisGer.list_fondos_rm')->with('fondos',$fondos);
+        return View::make('Dmkt.Rm.list_fondos_rm')->with('fondos',$fondos);
 
+    }
+    public function viewGenerateFondo($token)
+    {
+        $fondo = FondoInstitucional::where('token', $token)->firstOrFail();
+        $expense = Expense::where('idfondo',$fondo->idfondo)->get();
+        $date = $this->getDay();
+        $data = [
+            'fondo' => $fondo,
+            'expense' => $expense,
+            'date' => $date
+        ];
+        return View::make('Dmkt.Cont.register_seat_fondo', $data);
     }
 }

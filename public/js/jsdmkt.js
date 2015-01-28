@@ -577,9 +577,35 @@ function newSolicitude() {
 
     if(userType === 'R'){
         listSolicitude('rm',PENDIENTE);
+        listFondosRm()
     }
-    //lisFondos('rm');
+    //
 
+    function listFondosRm(){
+        $.get(server + 'list-fondos-rm').done(function(data){
+
+            $('.table_fondos_rm').append(data);
+            $('#table_fondos_rm').dataTable({
+                    "order": [
+                        [ 3, "desc" ]
+                    ],
+                    "bLengthChange": false,
+                    'iDisplayLength': 7,
+                    "oLanguage": {
+                        "sSearch": "Buscar: ",
+                        "sZeroRecords": "No hay Fondos",
+                        "sInfoEmpty": "",
+                        "sInfo": 'Mostrando _END_ de _TOTAL_',
+                        "oPaginate": {
+                            "sPrevious": "Anterior",
+                            "sNext" : "Siguiente"
+                        }
+                    }
+                }
+            );
+
+        });
+    }
 
 
     /* Filter all solicitude by date */
@@ -631,6 +657,7 @@ function newSolicitude() {
         })
 
     });
+
 
 
     /**------------------------------------------------ SUPERVISOR ---------------------------------------------------*/
@@ -972,8 +999,11 @@ function newSolicitude() {
     });
     /** --------------------------------------------- CONTABILIDAD ------------------------------------------------- **/
 
-    if(userType === 'C')
+    if(userType === 'C'){
         listSolicitude('cont',APROBADO);
+        listFondos('fondos-contabilidad');
+    }
+
 
     var search_solicitude_cont = $('#search_solicitude_cont');
     search_solicitude_cont.on('click', function () {

@@ -1,7 +1,7 @@
 {
     "name": "yajra/laravel-oci8",
-    "description": "Oracle DB driver for Laravel 4 via OCI8",
-    "keywords" : ["laravel4","laravel","oracle","oci8","pdo_oci"],
+    "description": "Oracle DB driver for Laravel 4|5 via OCI8",
+    "keywords" : ["laravel4","laravel5","laravel","oracle","oci8","pdo_oci"],
     "license": "MIT",
     "authors": [
         {
@@ -10,10 +10,10 @@
         }
     ],
     "require": {
-        "php": ">=5.3.0",
-        "illuminate/support": "4.*",
-        "illuminate/database": "4.*",
-        "yajra/laravel-pdo-via-oci8": "*"
+        "php": ">=5.4",
+        "illuminate/support": "~4.2|~5.0",
+        "illuminate/database": "~4.2|~5.0",
+        "yajra/laravel-pdo-via-oci8": "~0.7"
     },
     "require-dev": {
         "mockery/mockery": "0.9.*",

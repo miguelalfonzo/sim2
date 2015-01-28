@@ -193,7 +193,7 @@
 			<section class="row reg-expense detail-expense" style="margin:0">
 				<div class="col-xs-12 col-sm-12 col-md-12">
 					<div class="form-expense">
-						<button id="save-expense" data-sol="1" type="button" class="btn btn-primary">Registrar</button>
+						<button id="save-expense" data-sol="1" data-type="S" type="button" class="btn btn-primary">Registrar</button>
 						<div class="inline"><p class="inline message-expense"></p></div>
 					</div>
 				</div>

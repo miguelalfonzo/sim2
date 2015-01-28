@@ -5,7 +5,6 @@
  * LaravelExcel CellCollection
  *
  * @category   Laravel Excel
- * @version    1.0.0
  * @package    maatwebsite/excel
  * @copyright  Copyright (c) 2013 - 2014 Maatwebsite (http://www.maatwebsite.nl)
  * @author     Maatwebsite <info@maatwebsite.nl>
@@ -15,9 +14,8 @@ class CellCollection extends ExcelCollection {
 
     /**
      * Create a new collection.
-     *
-     * @param  array  $items
-     * @return void
+     * @param  array $items
+     * @return \Maatwebsite\Excel\Collections\CellCollection
      */
     public function __construct(array $items = array())
     {
@@ -25,39 +23,38 @@ class CellCollection extends ExcelCollection {
     }
 
     /**
-     * Create a new collection instance if the value isn't one already.
-     *
-     * @param  mixed  $items
-     * @return \Illuminate\Support\Collection
-     */
-    public static function make($items)
-    {
-        if (is_null($items)) return new static;
-        return new static(is_array($items) ? $items : array($items));
-    }
-
-    /**
      * Set the items
-     * @param [type] $items [description]
+     * @param array $items
+     * @return void
      */
     public function setItems($items)
     {
-        foreach($items as $name => $value)
+        foreach ($items as $name => $value)
         {
-            if($name)
-                $this->put($name, $value ? $value : null);
+            if ($name)
+                $this->put($name, $value || is_numeric($value) ? $value : null);
         }
     }
 
     /**
      * Dynamically get values
-     * @param  [type] $key [description]
-     * @return [type]      [description]
+     * @param  string $key
+     * @return string
      */
     public function __get($key)
     {
-        if($this->has($key))
+        if ($this->has($key))
             return $this->get($key);
     }
 
+    /**
+     * Determine if an attribute exists on the model.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function __isset($key)
+    {
+        return $this->has($key);
+    }
 }

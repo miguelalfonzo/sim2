@@ -193,19 +193,26 @@ $(function(){
         //Record end Solicitude
         $("#finish-expense").on("click",function(e){
             e.preventDefault();
+            var type = $(this).attr('data-type');
+            var idfondo = $(this).attr('data-idfondo');
             var balance = parseFloat($("#balance").val());
             if(balance === 0)
             {
                 bootbox.confirm("¿Esta seguro que desea Finalizar el registro del gasto?", function(result) {
                     if(result)
                     {
-                        window.location.href = server+'end-expense/'+token;
+                        if(type === 'F'){
+                           window.location.href = server + 'end-expense-fondo/' + idfondo;
+                        }else{
+                            window.location.href = server+'end-expense/'+token;
+                        }
+
                     }
                 });
             }
             else
             {
-                bootbox.alert("No puede finalizar el registro del gasto, aún tiene saldo pendiente por registrar.");
+                bootbox.alert("<p style='color: red'>No puede finalizar el registro del gasto, aún tiene saldo pendiente por registrar.</p>");
             }
         });
         //Generate Seat Solicitude
@@ -337,11 +344,14 @@ $(function(){
             $('#idfondo').val(idfondo);
 
         });
+
         //Register Deposit
-        $(document).on("click",".register-deposit", function(e){
-            console.log('deposit')
+        $(".register-deposit").on("click",function(e){
             e.preventDefault();
-            var url;
+            console.log('register');
+
+            $("#op_number").val('');
+            $("#message-op-number").text('');
             var op_number  = $("#op-number").val();
             var type_deposit = $(this).attr('data-deposit');
             if(type_deposit ==='fondo'){
@@ -370,7 +380,7 @@ $(function(){
                     if(parseInt(data,10) === 1)
                     {
                         $('#myModal').modal('hide');
-                        bootbox.alert("<p class='green'>Se registro el asiento contable correctamente.</p>", function(){
+                        bootbox.alert("<p class='green'>Se registro el codigo de deposito correctamente.</p>", function(){
                             if(type_deposit === 'fondo'){
                                 $.ajax({
                                     url: server + 'list-fondos-tesoreria/'+ dateactual,
@@ -692,6 +702,9 @@ $(function(){
                 data.number_serie  = number_serie;
                 data.date_movement = date;
                 data.desc_expense  = desc_expense;
+                data.type = $(this).attr('data-type');
+                if(data.type == 'F') // si es que el registro viene de un fondo
+                    data.idfondo = $('#idfondo').val();
 
                 var error_json = 0;
                 //Datos del detalle gastos por items
@@ -739,7 +752,7 @@ $(function(){
                 //Validando el Objeto JSON
                 if(error_json === 0)
                 {
-                    if(proof_type == '2')
+                    if(proof_type == '1' || proof_type == '4' || proof_type == '6')
                     {
                         var sub_total_expense = parseFloat($("#sub-tot").val());
                         var imp_service       = parseFloat($("#imp-ser").val());

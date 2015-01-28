@@ -7,22 +7,37 @@ return array(
     | Has heading
     |--------------------------------------------------------------------------
     |
-    | The sheet has a heading row which we can use as attribute names
+    | The sheet has a heading (first) row which we can use as attribute names
+    |
+    | Options: true|false|slugged|ascii|numeric|hashed|trans|original
     |
     */
 
-    'heading'   => true,
+    'heading'                 => 'slugged',
 
     /*
     |--------------------------------------------------------------------------
-    | Cell name word seperator
+    | Cell name word separator
     |--------------------------------------------------------------------------
     |
-    | The default seperator which is used for the cell names
+    | The default separator which is used for the cell names
+    | Note: only applies to 'heading' settings 'true' && 'slugged'
     |
     */
 
-    'seperator' => '_',
+    'separator'               => '_',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Sheet heading conversion
+    |--------------------------------------------------------------------------
+    |
+    | Convert headings to ASCII
+    | Note: only applies to 'heading' settings 'true' && 'slugged'
+    |
+    */
+
+    'to_ascii'                => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -30,10 +45,10 @@ return array(
     |--------------------------------------------------------------------------
     */
 
-    'encoding'  => array(
+    'encoding'                => array(
 
-        'input'     =>  'UTF-8',
-        'output'    =>  'UTF-8'
+        'input'  => 'UTF-8',
+        'output' => 'UTF-8'
 
     ),
 
@@ -46,7 +61,7 @@ return array(
     |
     */
 
-    'calculate' => true,
+    'calculate'               => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -57,7 +72,7 @@ return array(
     |
     */
 
-    'ignoreEmpty' => false,
+    'ignoreEmpty'             => false,
 
     /*
     |--------------------------------------------------------------------------
@@ -81,14 +96,14 @@ return array(
     |
     */
 
-    'dates' => array(
+    'dates'                   => array(
 
         /*
         |--------------------------------------------------------------------------
         | Enable/disable date formatting
         |--------------------------------------------------------------------------
         */
-        'enabled'   => true,
+        'enabled' => true,
 
         /*
         |--------------------------------------------------------------------------
@@ -98,14 +113,14 @@ return array(
         | If set to false, a carbon object will return
         |
         */
-        'format'    => false,
+        'format'  => false,
 
         /*
         |--------------------------------------------------------------------------
         | Date columns
         |--------------------------------------------------------------------------
         */
-        'columns'   => array()
+        'columns' => array()
     ),
 
     /*
@@ -113,7 +128,7 @@ return array(
     | Import sheets by config
     |--------------------------------------------------------------------------
     */
-    'sheets'    => array(
+    'sheets'                  => array(
 
         /*
         |--------------------------------------------------------------------------
@@ -124,7 +139,7 @@ return array(
         |
         */
 
-        'test'       =>  array(
+        'test' => array(
 
             'firstname' => 'A2'
 

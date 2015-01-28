@@ -1,7 +1,7 @@
 <?php namespace Maatwebsite\Excel\Parsers;
 
-use \View;
 use Maatwebsite\Excel\Readers\Html;
+use Illuminate\Support\Facades\View;
 
 /**
  *
@@ -18,7 +18,7 @@ class ViewParser {
 
     /**
      * View file
-     * @var [type]
+     * @var string
      */
     public $view;
 
@@ -36,7 +36,8 @@ class ViewParser {
 
     /**
      * Construct the view parser
-     * @param HTML_Reader $reader [description]
+     * @param Html $reader
+     * @return \Maatwebsite\Excel\Parsers\ViewParser
      */
     public function __construct(Html $reader)
     {
@@ -45,20 +46,21 @@ class ViewParser {
 
     /**
      * Parse the view
-     * @param  [type] $sheet [description]
-     * @return [type]        [description]
+     * @param  \Maatwebsite\Excel\Classes\LaravelExcelWorksheet $sheet
+     * @return \Maatwebsite\Excel\Classes\LaravelExcelWorksheet
      */
     public function parse($sheet)
     {
-        $html = View::make($this->view, $this->data, $this->mergeData)->render();
+        $html = View::make($this->getView(), $this->getData(), $this->getMergeData())->render();
+
         return $this->_loadHTML($sheet, $html);
     }
 
     /**
      * Load the HTML
-     * @param  [type] $sheet [description]
-     * @param  [type] $html  [description]
-     * @return [type]        [description]
+     * @param  \Maatwebsite\Excel\Classes\LaravelExcelWorksheet $sheet
+     * @param  string                                           $html
+     * @return \Maatwebsite\Excel\Classes\LaravelExcelWorksheet
      */
     protected function _loadHTML($sheet, $html)
     {
@@ -66,33 +68,59 @@ class ViewParser {
     }
 
     /**
+     * Get the view
+     * @return string
+     */
+    public function getView()
+    {
+        return $this->view;
+    }
+
+    /**
+     * Get data
+     * @return array
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * Get merge data
+     * @return array
+     */
+    public function getMergeData()
+    {
+        return $this->mergeData;
+    }
+
+    /**
      * Set the view
-     * @param [type] $view [description]
+     * @param bool|string $view
      */
     public function setView($view = false)
     {
-        if($view)
+        if ($view)
             $this->view = $view;
     }
 
     /**
      * Set the data
-     * @param array $data [description]
+     * @param array $data
      */
     public function setData($data = array())
     {
-        if(!empty($data))
+        if (!empty($data))
             $this->data = array_merge($this->data, $data);
     }
 
     /**
      * Set the merge data
-     * @param array $mergeData [description]
+     * @param array $mergeData
      */
     public function setMergeData($mergeData = array())
     {
-        if(!empty($mergeData))
+        if (!empty($mergeData))
             $this->mergeData = array_merge($this->mergeData, $mergeData);
     }
-
 }

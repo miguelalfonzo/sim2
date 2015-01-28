@@ -1,0 +1,1179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="237e2198-5fbe-4b42-a135-3df5cf06d65b" name="Default" comment="fix add clients in view solicitude">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/Dmkt/Cont/list_fondos.blade.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/Dmkt/Rm/list_fondos_rm.blade.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/Expense/register-fondo.blade.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/Dmkt/Cont/register_seat_fondo.blade.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/Expense/report-fondo.blade.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/Expense/view-fondo.blade.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/.gitignore" afterPath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/.gitignore" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/.travis.yml" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/.travis.yml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/.travis.yml" afterPath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/.travis.yml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/finder/Symfony/Component/Finder/Adapter/AbstractAdapter.php" afterPath="$PROJECT_DIR$/vendor/symfony/finder/Symfony/Component/Finder/Adapter/AbstractAdapter.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/AbstractDecoder.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/AbstractDecoder.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/tests/AbstractDecoderTest.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/tests/AbstractDecoderTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/AbstractEncoder.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/AbstractEncoder.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/process/Symfony/Component/Process/Tests/AbstractProcessTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/process/Symfony/Component/Process/Tests/AbstractProcessTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Tests/Profiler/AbstractProfilerStorageTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Tests/Profiler/AbstractProfilerStorageTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Session/Storage/Proxy/AbstractProxy.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Session/Storage/Proxy/AbstractProxy.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Tests/Session/Storage/Proxy/AbstractProxyTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Tests/Session/Storage/Proxy/AbstractProxyTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Tests/ApacheRequestTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Tests/ApacheRequestTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Application.php" afterPath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Application.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/css-selector/Symfony/Component/CssSelector/XPath/Extension/AttributeMatchingExtension.php" afterPath="$PROJECT_DIR$/vendor/symfony/css-selector/Symfony/Component/CssSelector/XPath/Extension/AttributeMatchingExtension.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Gd/Commands/BackupCommand.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Gd/Commands/BackupCommand.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Imagick/Commands/BackupCommand.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Imagick/Commands/BackupCommand.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/tests/BackupCommandTest.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/tests/BackupCommandTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Profiler/BaseMemcacheProfilerStorage.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Profiler/BaseMemcacheProfilerStorage.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Readers/Batch.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Readers/Batch.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Classes/Cache.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Classes/Cache.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Collections/CellCollection.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Collections/CellCollection.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/browser-kit/Symfony/Component/BrowserKit/Client.php" afterPath="$PROJECT_DIR$/vendor/symfony/browser-kit/Symfony/Component/BrowserKit/Client.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/browser-kit/Symfony/Component/BrowserKit/Tests/ClientTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/browser-kit/Symfony/Component/BrowserKit/Tests/ClientTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Gd/Color.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Gd/Color.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/DataCollector/ConfigDataCollector.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/DataCollector/ConfigDataCollector.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Readers/ConfigReader.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Readers/ConfigReader.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/ConsoleEvents.php" afterPath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/ConsoleEvents.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Tests/Controller/ControllerResolverTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Tests/Controller/ControllerResolverTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/browser-kit/Symfony/Component/BrowserKit/Cookie.php" afterPath="$PROJECT_DIR$/vendor/symfony/browser-kit/Symfony/Component/BrowserKit/Cookie.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/dom-crawler/Symfony/Component/DomCrawler/Crawler.php" afterPath="$PROJECT_DIR$/vendor/symfony/dom-crawler/Symfony/Component/DomCrawler/Crawler.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Parsers/CssParser.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Parsers/CssParser.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/translation/Symfony/Component/Translation/Loader/CsvFileLoader.php" afterPath="$PROJECT_DIR$/vendor/symfony/translation/Symfony/Component/Translation/Loader/CsvFileLoader.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Gd/Decoder.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Gd/Decoder.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Helper/DescriptorHelper.php" afterPath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Helper/DescriptorHelper.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/translation/Symfony/Component/Translation/Catalogue/DiffOperation.php" afterPath="$PROJECT_DIR$/vendor/symfony/translation/Symfony/Component/Translation/Catalogue/DiffOperation.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Gd/Encoder.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Gd/Encoder.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Imagick/Encoder.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Imagick/Encoder.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/tests/EncoderTest.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/tests/EncoderTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/debug/Symfony/Component/Debug/ErrorHandler.php" afterPath="$PROJECT_DIR$/vendor/symfony/debug/Symfony/Component/Debug/ErrorHandler.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/DataCollector/EventDataCollector.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/DataCollector/EventDataCollector.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/event-dispatcher/Symfony/Component/EventDispatcher/Tests/EventDispatcherTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/event-dispatcher/Symfony/Component/EventDispatcher/Tests/EventDispatcherTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Excel.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Excel.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Facades/Excel.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Facades/Excel.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Collections/ExcelCollection.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Collections/ExcelCollection.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Parsers/ExcelParser.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Parsers/ExcelParser.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/ExcelServiceProvider.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/ExcelServiceProvider.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/tests/Excel/ExcelTestCase.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/tests/Excel/ExcelTestCase.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/tests/Excel/ExcelTester.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/tests/Excel/ExcelTester.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/debug/Symfony/Component/Debug/ExceptionHandler.php" afterPath="$PROJECT_DIR$/vendor/symfony/debug/Symfony/Component/Debug/ExceptionHandler.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Commands/ExifCommand.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Commands/ExifCommand.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/Expense/ExpenseController.php" afterPath="$PROJECT_DIR$/app/controllers/Expense/ExpenseController.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/finder/Symfony/Component/Finder/Expression/Expression.php" afterPath="$PROJECT_DIR$/vendor/symfony/finder/Symfony/Component/Finder/Expression/Expression.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/File.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/File.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/FileBag.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/FileBag.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Config/FileLocator.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Config/FileLocator.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/finder/Symfony/Component/Finder/Iterator/FilePathsIterator.php" afterPath="$PROJECT_DIR$/vendor/symfony/finder/Symfony/Component/Finder/Iterator/FilePathsIterator.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Profiler/FileProfilerStorage.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Profiler/FileProfilerStorage.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/finder/Symfony/Component/Finder/Iterator/FileTypeFilterIterator.php" afterPath="$PROJECT_DIR$/vendor/symfony/finder/Symfony/Component/Finder/Iterator/FileTypeFilterIterator.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/finder/Symfony/Component/Finder/Tests/Iterator/FilecontentFilterIteratorTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/finder/Symfony/Component/Finder/Tests/Iterator/FilecontentFilterIteratorTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/filesystem/Symfony/Component/Filesystem/Filesystem.php" afterPath="$PROJECT_DIR$/vendor/symfony/filesystem/Symfony/Component/Filesystem/Filesystem.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/filesystem/Symfony/Component/Filesystem/Tests/FilesystemTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/filesystem/Symfony/Component/Filesystem/Tests/FilesystemTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/finder/Symfony/Component/Finder/Finder.php" afterPath="$PROJECT_DIR$/vendor/symfony/finder/Symfony/Component/Finder/Finder.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/finder/Symfony/Component/Finder/Tests/FinderTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/finder/Symfony/Component/Finder/Tests/FinderTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Gd/Commands/FitCommand.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Gd/Commands/FitCommand.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Imagick/Commands/FitCommand.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Imagick/Commands/FitCommand.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/tests/FitCommandTest.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/tests/FitCommandTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/debug/Symfony/Component/Debug/Exception/FlattenException.php" afterPath="$PROJECT_DIR$/vendor/symfony/debug/Symfony/Component/Debug/Exception/FlattenException.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/debug/Symfony/Component/Debug/Tests/Exception/FlattenExceptionTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/debug/Symfony/Component/Debug/Tests/Exception/FlattenExceptionTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/Dmkt/FondoController.php" afterPath="$PROJECT_DIR$/app/controllers/Dmkt/FondoController.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/Dmkt/FondoInstitucional.php" afterPath="$PROJECT_DIR$/app/models/Dmkt/FondoInstitucional.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/dom-crawler/Symfony/Component/DomCrawler/Tests/FormTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/dom-crawler/Symfony/Component/DomCrawler/Tests/FormTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/css-selector/Symfony/Component/CssSelector/XPath/Extension/FunctionExtension.php" afterPath="$PROJECT_DIR$/vendor/symfony/css-selector/Symfony/Component/CssSelector/XPath/Extension/FunctionExtension.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/tests/GdSystemTest.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/tests/GdSystemTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Fragment/HIncludeFragmentRenderer.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Fragment/HIncludeFragmentRenderer.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Tests/HeaderBagTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Tests/HeaderBagTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Gd/Commands/HeightenCommand.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Gd/Commands/HeightenCommand.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Imagick/Commands/HeightenCommand.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Imagick/Commands/HeightenCommand.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Command/HelpCommand.php" afterPath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Command/HelpCommand.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/css-selector/Symfony/Component/CssSelector/XPath/Extension/HtmlExtension.php" afterPath="$PROJECT_DIR$/vendor/symfony/css-selector/Symfony/Component/CssSelector/XPath/Extension/HtmlExtension.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Readers/HtmlReader.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Readers/HtmlReader.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/HttpCache/HttpCache.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/HttpCache/HttpCache.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Tests/HttpCache/HttpCacheTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Tests/HttpCache/HttpCacheTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Image.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Image.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/tests/ImagickSystemTest.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/tests/ImagickSystemTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Input/InputArgument.php" afterPath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Input/InputArgument.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Input/InputDefinition.php" afterPath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Input/InputDefinition.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Input/InputOption.php" afterPath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Input/InputOption.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Descriptor/JsonDescriptor.php" afterPath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Descriptor/JsonDescriptor.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Kernel.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Kernel.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/KernelEvents.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/KernelEvents.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Exceptions/LaravelExcelException.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Exceptions/LaravelExcelException.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Readers/LaravelExcelReader.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Readers/LaravelExcelReader.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Classes/LaravelExcelWorksheet.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Classes/LaravelExcelWorksheet.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Writers/LaravelExcelWriter.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Writers/LaravelExcelWriter.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Command/ListCommand.php" afterPath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Command/ListCommand.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/DataCollector/MemoryDataCollector.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/DataCollector/MemoryDataCollector.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/translation/Symfony/Component/Translation/Catalogue/MergeOperation.php" afterPath="$PROJECT_DIR$/vendor/symfony/translation/Symfony/Component/Translation/Catalogue/MergeOperation.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/translation/Symfony/Component/Translation/Dumper/MoFileDumper.php" afterPath="$PROJECT_DIR$/vendor/symfony/translation/Symfony/Component/Translation/Dumper/MoFileDumper.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/finder/Symfony/Component/Finder/Tests/Iterator/MockSplFileInfo.php" afterPath="$PROJECT_DIR$/vendor/symfony/finder/Symfony/Component/Finder/Tests/Iterator/MockSplFileInfo.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Session/Storage/Handler/MongoDbSessionHandler.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Session/Storage/Handler/MongoDbSessionHandler.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Tests/Session/Storage/Handler/MongoDbSessionHandlerTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Tests/Session/Storage/Handler/MongoDbSessionHandlerTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Tests/Session/Storage/Handler/NativeFileSessionHandlerTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Tests/Session/Storage/Handler/NativeFileSessionHandlerTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Session/Storage/Handler/NativeSessionHandler.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Session/Storage/Handler/NativeSessionHandler.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Tests/Session/Storage/Handler/NativeSessionHandlerTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Tests/Session/Storage/Handler/NativeSessionHandlerTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Session/Storage/NativeSessionStorage.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Session/Storage/NativeSessionStorage.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Tests/Session/Storage/NativeSessionStorageTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Tests/Session/Storage/NativeSessionStorageTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/css-selector/Symfony/Component/CssSelector/XPath/Extension/NodeExtension.php" afterPath="$PROJECT_DIR$/vendor/symfony/css-selector/Symfony/Component/CssSelector/XPath/Extension/NodeExtension.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/yajra/laravel-pdo-via-oci8/src/yajra/Pdo/Oci8.php" afterPath="$PROJECT_DIR$/vendor/yajra/laravel-pdo-via-oci8/src/yajra/Pdo/Oci8.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/src/yajra/Oci8/Oci8Connection.php" afterPath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/src/yajra/Oci8/Oci8Connection.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/tests/Oci8ConnectorTest.php" afterPath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/tests/Oci8ConnectorTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/tests/Oci8SchemaGrammarTest.php" afterPath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/tests/Oci8SchemaGrammarTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/src/yajra/Oci8/Oci8ServiceProvider.php" afterPath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/src/yajra/Oci8/Oci8ServiceProvider.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/src/yajra/Oci8/Schema/OracleBlueprint.php" afterPath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/src/yajra/Oci8/Schema/OracleBlueprint.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/src/yajra/Oci8/Query/OracleBuilder.php" afterPath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/src/yajra/Oci8/Query/OracleBuilder.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/src/yajra/Oci8/Schema/OracleBuilder.php" afterPath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/src/yajra/Oci8/Schema/OracleBuilder.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/src/yajra/Oci8/Connectors/OracleConnector.php" afterPath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/src/yajra/Oci8/Connectors/OracleConnector.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/src/yajra/Oci8/Query/Grammars/OracleGrammar.php" afterPath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/src/yajra/Oci8/Query/Grammars/OracleGrammar.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/src/yajra/Oci8/Schema/Grammars/OracleGrammar.php" afterPath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/src/yajra/Oci8/Schema/Grammars/OracleGrammar.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/src/yajra/Oci8/Query/Processors/OracleProcessor.php" afterPath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/src/yajra/Oci8/Query/Processors/OracleProcessor.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Formatter/OutputFormatterStyle.php" afterPath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Formatter/OutputFormatterStyle.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Output/OutputInterface.php" afterPath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Output/OutputInterface.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Classes/PHPExcel.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Classes/PHPExcel.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Tests/ParameterBagTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Tests/ParameterBagTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/finder/Symfony/Component/Finder/Iterator/PathFilterIterator.php" afterPath="$PROJECT_DIR$/vendor/symfony/finder/Symfony/Component/Finder/Iterator/PathFilterIterator.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/finder/Symfony/Component/Finder/Tests/Iterator/PathFilterIteratorTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/finder/Symfony/Component/Finder/Tests/Iterator/PathFilterIteratorTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/thujohn/pdf/src/Thujohn/Pdf/Pdf.php" afterPath="$PROJECT_DIR$/vendor/thujohn/pdf/src/Thujohn/Pdf/Pdf.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Profiler/PdoProfilerStorage.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Profiler/PdoProfilerStorage.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Session/Storage/Handler/PdoSessionHandler.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Session/Storage/Handler/PdoSessionHandler.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Tests/Session/Storage/PhpBridgeSessionStorageTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Tests/Session/Storage/PhpBridgeSessionStorageTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Tests/EventListener/ProfilerListenerTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Tests/EventListener/ProfilerListenerTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Helper/ProgressBar.php" afterPath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Helper/ProgressBar.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Helper/ProgressHelper.php" afterPath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Helper/ProgressHelper.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/css-selector/Symfony/Component/CssSelector/XPath/Extension/PseudoClassExtension.php" afterPath="$PROJECT_DIR$/vendor/symfony/css-selector/Symfony/Component/CssSelector/XPath/Extension/PseudoClassExtension.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/README.md" afterPath="$PROJECT_DIR$/vendor/intervention/image/README.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/README.md" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/README.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/filesystem/Symfony/Component/Filesystem/README.md" afterPath="$PROJECT_DIR$/vendor/symfony/filesystem/Symfony/Component/Filesystem/README.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Profiler/RedisProfilerStorage.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Profiler/RedisProfilerStorage.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/finder/Symfony/Component/Finder/Expression/Regex.php" afterPath="$PROJECT_DIR$/vendor/symfony/finder/Symfony/Component/Finder/Expression/Regex.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Request.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Request.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/DataCollector/RequestDataCollector.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/DataCollector/RequestDataCollector.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Tests/DataCollector/RequestDataCollectorTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Tests/DataCollector/RequestDataCollectorTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Tests/RequestTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Tests/RequestTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Gd/Commands/ResetCommand.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Gd/Commands/ResetCommand.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Imagick/Commands/ResetCommand.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Imagick/Commands/ResetCommand.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/tests/ResetCommandTest.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/tests/ResetCommandTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Response.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Response.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/browser-kit/Symfony/Component/BrowserKit/Response.php" afterPath="$PROJECT_DIR$/vendor/symfony/browser-kit/Symfony/Component/BrowserKit/Response.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Response.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Response.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/ResponseHeaderBag.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/ResponseHeaderBag.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/browser-kit/Symfony/Component/BrowserKit/Tests/ResponseTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/browser-kit/Symfony/Component/BrowserKit/Tests/ResponseTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Tests/ResponseTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Tests/ResponseTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/DataCollector/RouterDataCollector.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/DataCollector/RouterDataCollector.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Collections/RowCollection.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Collections/RowCollection.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Tests/Session/Storage/Proxy/SessionHandlerProxyTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Tests/Session/Storage/Proxy/SessionHandlerProxyTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Session/Storage/SessionStorageInterface.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Session/Storage/SessionStorageInterface.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Collections/SheetCollection.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Collections/SheetCollection.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/finder/Symfony/Component/Finder/Shell/Shell.php" afterPath="$PROJECT_DIR$/vendor/symfony/finder/Symfony/Component/Finder/Shell/Shell.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Size.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Size.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/tests/SizeTest.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/tests/SizeTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Tests/HttpCache/TestMultipleHttpKernel.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Tests/HttpCache/TestMultipleHttpKernel.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Tests/EventListener/TestSessionListenerTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/Tests/EventListener/TestSessionListenerTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Descriptor/TextDescriptor.php" afterPath="$PROJECT_DIR$/vendor/symfony/console/Symfony/Component/Console/Descriptor/TextDescriptor.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/DataCollector/TimeDataCollector.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-kernel/Symfony/Component/HttpKernel/DataCollector/TimeDataCollector.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/css-selector/Symfony/Component/CssSelector/Parser/Token.php" afterPath="$PROJECT_DIR$/vendor/symfony/css-selector/Symfony/Component/CssSelector/Parser/Token.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/event-dispatcher/Symfony/Component/EventDispatcher/Debug/TraceableEventDispatcher.php" afterPath="$PROJECT_DIR$/vendor/symfony/event-dispatcher/Symfony/Component/EventDispatcher/Debug/TraceableEventDispatcher.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/File/UploadedFile.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/File/UploadedFile.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Parsers/ViewParser.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/Maatwebsite/Excel/Parsers/ViewParser.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Gd/Commands/WidenCommand.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Gd/Commands/WidenCommand.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Imagick/Commands/WidenCommand.php" afterPath="$PROJECT_DIR$/vendor/intervention/image/src/Intervention/Image/Imagick/Commands/WidenCommand.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Session/Storage/Handler/WriteCheckSessionHandler.php" afterPath="$PROJECT_DIR$/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/Session/Storage/Handler/WriteCheckSessionHandler.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/translation/Symfony/Component/Translation/Tests/Dumper/XliffFileDumperTest.php" afterPath="$PROJECT_DIR$/vendor/symfony/translation/Symfony/Component/Translation/Tests/Dumper/XliffFileDumperTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/export/array.md" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/export/array.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/autoload.php" afterPath="$PROJECT_DIR$/vendor/autoload.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/composer/autoload_classmap.php" afterPath="$PROJECT_DIR$/vendor/composer/autoload_classmap.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/composer/autoload_files.php" afterPath="$PROJECT_DIR$/vendor/composer/autoload_files.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/composer/autoload_namespaces.php" afterPath="$PROJECT_DIR$/vendor/composer/autoload_namespaces.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/composer/autoload_psr4.php" afterPath="$PROJECT_DIR$/vendor/composer/autoload_psr4.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/composer/autoload_real.php" afterPath="$PROJECT_DIR$/vendor/composer/autoload_real.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/config/cache.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/config/cache.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/intervention/image/composer.json" afterPath="$PROJECT_DIR$/vendor/intervention/image/composer.json" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/composer.json" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/composer.json" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/thujohn/pdf/composer.json" afterPath="$PROJECT_DIR$/vendor/thujohn/pdf/composer.json" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/composer.json" afterPath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/composer.json" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/config/config.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/config/config.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/getting-started/contributing.md" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/getting-started/contributing.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/reference-guide/css-styles.md" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/reference-guide/css-styles.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/config/csv.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/config/csv.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/export.md" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/export.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/export/export.md" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/export/export.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/config/export.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/config/export.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/import/extra.md" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/import/extra.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/import.md" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/import.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/config/import.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/config/import.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/composer/installed.json" afterPath="$PROJECT_DIR$/vendor/composer/installed.json" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/js/js.js" afterPath="$PROJECT_DIR$/public/js/js.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/public/js/jsdmkt.js" afterPath="$PROJECT_DIR$/public/js/jsdmkt.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/Treasury/list_fondos.blade.php" afterPath="$PROJECT_DIR$/app/views/Treasury/list_fondos.blade.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/Dmkt/AsisGer/list_fondos_rm.blade.php" afterPath="$PROJECT_DIR$/app/views/Dmkt/AsisGer/list_fondos_rm.blade.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/thujohn/pdf/src/Thujohn/Pdf/dompdf/lib/fonts/log.htm" afterPath="$PROJECT_DIR$/vendor/thujohn/pdf/src/Thujohn/Pdf/dompdf/lib/fonts/log.htm" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/readme.md" afterPath="$PROJECT_DIR$/vendor/yajra/laravel-oci8/readme.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/reference-guide.md" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/reference-guide.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/Expense/register.blade.php" afterPath="$PROJECT_DIR$/app/views/Expense/register.blade.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/import/results.md" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/import/results.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/routes.php" afterPath="$PROJECT_DIR$/app/routes.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/import/select.md" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/import/select.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/export/sheet-styling.md" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/export/sheet-styling.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/export/sheets.md" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/export/sheets.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/Dmkt/Cont/show_cont.blade.php" afterPath="$PROJECT_DIR$/app/views/Dmkt/Cont/show_cont.blade.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/Treasury/show_tes.blade.php" afterPath="$PROJECT_DIR$/app/views/Treasury/show_tes.blade.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/blade/styling.md" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/blade/styling.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/changelog/version-1.md" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/docs/changelog/version-1.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/Dmkt/Rm/view_solicitude.blade.php" afterPath="$PROJECT_DIR$/app/views/Dmkt/Rm/view_solicitude.blade.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/Dmkt/Cont/view_solicitude_cont.blade.php" afterPath="$PROJECT_DIR$/app/views/Dmkt/Cont/view_solicitude_cont.blade.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/config/views.php" afterPath="$PROJECT_DIR$/vendor/maatwebsite/excel/src/config/views.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/symfony/translation/Symfony/Component/Translation/Loader/schema/dic/xliff-core/xml.xsd" afterPath="$PROJECT_DIR$/vendor/symfony/translation/Symfony/Component/Translation/Loader/schema/dic/xliff-core/xml.xsd" />
+    </list>
+    <ignored path="bago_dmkt_rg.iws" />
+    <ignored path=".idea/workspace.xml" />
+    <ignored path=".idea/dataSources.local.xml" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="DaemonCodeAnalyzer">
+    <disable_hints />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FavoritesManager">
+    <favorites_list name="bago_dmkt_rg" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="show_cont.blade.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/views/Dmkt/Cont/show_cont.blade.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="1428" max-vertical-offset="1802">
+              <caret line="84" column="39" selection-start-line="84" selection-start-column="39" selection-end-line="84" selection-end-column="39" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="jsdmkt.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/public/js/jsdmkt.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="16521" max-vertical-offset="28220">
+              <caret line="1003" column="39" selection-start-line="1003" selection-start-column="39" selection-end-line="1003" selection-end-column="39" />
+              <folding>
+                <element signature="e#15880#16017#0" expanded="false" />
+                <element signature="e#16156#16822#0" expanded="false" />
+                <marker date="1418165199130" expanded="false" signature="5923:5938" placeholder="..." />
+                <marker date="1418165199130" expanded="false" signature="6018:6033" placeholder="..." />
+                <marker date="1418165199130" expanded="false" signature="6274:6292" placeholder="..." />
+                <marker date="1418165199130" expanded="false" signature="6499:6509" placeholder="..." />
+                <marker date="1418165199130" expanded="false" signature="14257:14269" placeholder="..." />
+                <marker date="1418165199130" expanded="false" signature="14447:14459" placeholder="..." />
+                <marker date="1418165199130" expanded="false" signature="25644:25656" placeholder="..." />
+                <marker date="1418165199130" expanded="false" signature="31301:31313" placeholder="..." />
+                <marker date="1418165199130" expanded="false" signature="31564:31574" placeholder="..." />
+                <marker date="1418165199130" expanded="false" signature="34685:34697" placeholder="..." />
+                <marker date="1418165199130" expanded="false" signature="34940:34950" placeholder="..." />
+                <marker date="1418165199130" expanded="false" signature="38396:38411" placeholder="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ExpenseController.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/controllers/Expense/ExpenseController.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="3661" max-vertical-offset="6800">
+              <caret line="271" column="20" selection-start-line="271" selection-start-column="20" selection-end-line="271" selection-end-column="20" />
+              <folding>
+                <element signature="e#6781#7156#0#PHP" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="FondoController.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/controllers/Dmkt/FondoController.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="5768" max-vertical-offset="6324">
+              <caret line="371" column="17" selection-start-line="371" selection-start-column="17" selection-end-line="371" selection-end-column="17" />
+              <folding>
+                <marker date="1418169221257" expanded="true" signature="7555:7685" placeholder="select visvi..VISITADOR..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="list_fondos.blade.php" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/views/Dmkt/Cont/list_fondos.blade.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="238" max-vertical-offset="2516">
+              <caret line="14" column="29" selection-start-line="14" selection-start-column="29" selection-end-line="14" selection-end-column="29" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="register-fondo.blade.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/views/Expense/register-fondo.blade.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="153" max-vertical-offset="4318">
+              <caret line="9" column="16" selection-start-line="9" selection-start-column="16" selection-end-line="104" selection-end-column="22" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="show_tes.blade.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/views/Treasury/show_tes.blade.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="289" max-vertical-offset="1785">
+              <caret line="31" column="31" selection-start-line="31" selection-start-column="31" selection-end-line="31" selection-end-column="31" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="routes.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/routes.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="2487" max-vertical-offset="3638">
+              <caret line="165" column="105" selection-start-line="165" selection-start-column="79" selection-end-line="165" selection-end-column="105" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SolicitudeController.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/controllers/Dmkt/SolicitudeController.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="19661" max-vertical-offset="21556">
+              <caret line="1184" column="46" selection-start-line="1184" selection-start-column="20" selection-end-line="1184" selection-end-column="46" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="register_seat_fondo.blade.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/views/Dmkt/Cont/register_seat_fondo.blade.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="136" max-vertical-offset="3927">
+              <caret line="8" column="65" selection-start-line="8" selection-start-column="65" selection-end-line="8" selection-end-column="65" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindManager">
+    <FindUsagesManager>
+      <setting name="OPEN_NEW_TAB" value="true" />
+    </FindUsagesManager>
+  </component>
+  <component name="Git.Settings">
+    <option name="PUSH_AUTO_UPDATE" value="true" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="changedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/app/models/Dmkt/CtaRm.php" />
+        <option value="$PROJECT_DIR$/app/models/Dmkt/Solicitude.php" />
+        <option value="$PROJECT_DIR$/app/controllers/Dmkt/LoginController.php" />
+        <option value="$PROJECT_DIR$/app/filters.php" />
+        <option value="$PROJECT_DIR$/app/views/Dmkt/login.blade.php" />
+        <option value="$PROJECT_DIR$/app/views/Dmkt/list_fondos_rm.blade.php" />
+        <option value="$PROJECT_DIR$/app/views/Dmkt/Rm/register_solicitude.blade.php" />
+        <option value="$PROJECT_DIR$/app/views/Treasury/view_solicitude_tes.blade.php" />
+        <option value="$PROJECT_DIR$/app/controllers/Deposit/DepositController.php" />
+        <option value="$PROJECT_DIR$/app/views/Dmkt/register_fondo.blade.php" />
+        <option value="$PROJECT_DIR$/app/views/Dmkt/list_fondos.blade.php" />
+        <option value="$PROJECT_DIR$/app/views/Dmkt/Sup/view_solicitude_sup.blade.php" />
+        <option value="$PROJECT_DIR$/app/views/Dmkt/Cont/view_solicituds_cont.blade.php" />
+        <option value="$PROJECT_DIR$/app/views/Dmkt/Rm/show_rm.blade.php" />
+        <option value="$PROJECT_DIR$/app/views/Dmkt/GerProd/view_solicitude_gerprod.blade.php" />
+        <option value="$PROJECT_DIR$/app/views/template/main.blade.php" />
+        <option value="$PROJECT_DIR$/public/css/stylos.css" />
+        <option value="$PROJECT_DIR$/app/views/Dmkt/AsisGer/register_fondo.blade.php" />
+        <option value="$PROJECT_DIR$/app/controllers/Dmkt/SolicitudeController.php" />
+        <option value="$PROJECT_DIR$/app/views/Dmkt/AsisGer/list_solicitudes.blade.php" />
+        <option value="$PROJECT_DIR$/app/views/Dmkt/AsisGer/view_solicitude_ager.blade.php" />
+        <option value="$PROJECT_DIR$/app/views/Dmkt/Rm/view_solicitude.blade.php" />
+        <option value="$PROJECT_DIR$/app/views/Treasury/show_tes.blade.php" />
+        <option value="$PROJECT_DIR$/app/views/Treasury/list_fondos.blade.php" />
+        <option value="$PROJECT_DIR$/app/models/Dmkt/FondoInstitucional.php" />
+        <option value="$PROJECT_DIR$/app/views/Expense/register.blade.php" />
+        <option value="$PROJECT_DIR$/app/views/Expense/register-fondo.blade.php" />
+        <option value="$PROJECT_DIR$/app/views/Dmkt/AsisGer/list_fondos_rm.blade.php" />
+        <option value="$PROJECT_DIR$/app/views/Expense/report.blade.php" />
+        <option value="$PROJECT_DIR$/app/views/Expense/view-fondo.blade.php" />
+        <option value="$PROJECT_DIR$/app/views/Expense/report-fondo.blade.php" />
+        <option value="$PROJECT_DIR$/app/controllers/Expense/ExpenseController.php" />
+        <option value="$PROJECT_DIR$/app/views/Dmkt/Cont/view_solicitude_cont.blade.php" />
+        <option value="$PROJECT_DIR$/public/js/js.js" />
+        <option value="$PROJECT_DIR$/app/views/Dmkt/Cont/show_cont.blade.php" />
+        <option value="$PROJECT_DIR$/public/js/jsdmkt.js" />
+        <option value="$PROJECT_DIR$/app/routes.php" />
+        <option value="$PROJECT_DIR$/app/views/Dmkt/Rm/list_fondos_rm.blade.php" />
+        <option value="$PROJECT_DIR$/app/views/Dmkt/Cont/register_seat_fondo.blade.php" />
+        <option value="$PROJECT_DIR$/app/controllers/Dmkt/FondoController.php" />
+        <option value="$PROJECT_DIR$/app/views/Dmkt/Cont/list_fondos.blade.php" />
+      </list>
+    </option>
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="1382" />
+    <option name="height" value="744" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+          <State>
+            <id>PHP</id>
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>PhpCSValidationInspection</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
+    <OptionsSetting value="true" id="Add" />
+    <OptionsSetting value="true" id="Remove" />
+    <OptionsSetting value="true" id="Checkout" />
+    <OptionsSetting value="true" id="Update" />
+    <OptionsSetting value="true" id="Status" />
+    <OptionsSetting value="true" id="Edit" />
+    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="0" id="Remove" />
+  </component>
+  <component name="ProjectReloadState">
+    <option name="STATE" value="0" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bago_dmkt_rg" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bago_dmkt_rg" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bago_dmkt_rg" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bago_dmkt_rg" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bago_dmkt_rg" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="public" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bago_dmkt_rg" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bago_dmkt_rg" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="public" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="js" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bago_dmkt_rg" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bago_dmkt_rg" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bago_dmkt_rg" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bago_dmkt_rg" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="config" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../chequeras" />
+    <property name="FullScreen" value="false" />
+    <property name="options.lastSelected" value="com.intellij.profile.codeInspection.ui.ProjectInspectionToolsConfigurableProvider" />
+    <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\xampp\htdocs\BitBucket\bago_dmkt_rg\app\views\Dmkt\Cont" />
+      <recent name="C:\xampp\htdocs\BitBucket\bago_dmkt_rg\public\js" />
+      <recent name="C:\xampp\htdocs\BitBucket\bago_dmkt_rg\app\views\Dmkt\Rm" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\xampp\htdocs\BitBucket\bago_dmkt_rg\app\views\Dmkt\AsisGer" />
+      <recent name="C:\xampp\htdocs\BitBucket\bago_dmkt_rg\app\views\Dmkt\Rm" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
+      <TestRunner />
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpLocalRunConfigurationType" factoryName="PHP Console">
+      <method />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug">
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpBehatConfigurationType" factoryName="Behat">
+      <BehatRunner />
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpUnitRemoteRunConfigurationType" factoryName="PHPUnit on Server">
+      <method />
+    </configuration>
+    <configuration default="true" type="js.build_tools.gulp" factoryName="Gulp.js">
+      <node-options />
+      <gulpfile />
+      <tasks />
+      <pass-parent-env-vars>false</pass-parent-env-vars>
+      <envs />
+      <method />
+    </configuration>
+    <list size="0" />
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="237e2198-5fbe-4b42-a135-3df5cf06d65b" name="Default" comment="" />
+      <created>1416428187895</created>
+      <option name="number" value="Default" />
+      <updated>1416428187895</updated>
+    </task>
+    <task id="LOCAL-00001" summary="fondos">
+      <created>1416437959346</created>
+      <option name="number" value="00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1416437959357</updated>
+    </task>
+    <task id="LOCAL-00002" summary="create export excel fondos">
+      <created>1416526809046</created>
+      <option name="number" value="00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1416526809046</updated>
+    </task>
+    <task id="LOCAL-00003" summary="remove console logs">
+      <created>1416582401162</created>
+      <option name="number" value="00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1416582401162</updated>
+    </task>
+    <task id="LOCAL-00004" summary="search to month fondos">
+      <created>1416590136790</created>
+      <option name="number" value="00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1416590136790</updated>
+    </task>
+    <task id="LOCAL-00005" summary="search to month fondos">
+      <created>1416600609728</created>
+      <option name="number" value="00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1416600609728</updated>
+    </task>
+    <task id="LOCAL-00006" summary="implement function terminate fondos">
+      <created>1416950197566</created>
+      <option name="number" value="00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1416950197566</updated>
+    </task>
+    <task id="LOCAL-00007" summary="remove placeholder of login  and create login asistente de gerencia">
+      <created>1417045080989</created>
+      <option name="number" value="00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1417045080989</updated>
+    </task>
+    <task id="LOCAL-00008" summary="implement view list-fondos-rm">
+      <created>1417118406935</created>
+      <option name="number" value="00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1417118406935</updated>
+    </task>
+    <task id="LOCAL-00009" summary="remove rule solicitude">
+      <created>1417118762519</created>
+      <option name="number" value="00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1417118762519</updated>
+    </task>
+    <task id="LOCAL-00010" summary="fix add clients in view solicitude">
+      <created>1417123600285</created>
+      <option name="number" value="00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1417123600285</updated>
+    </task>
+    <task id="LOCAL-00011" summary="add view in tesoreria fondos">
+      <created>1417724676761</created>
+      <option name="number" value="00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1417724676761</updated>
+    </task>
+    <task id="LOCAL-00012" summary="create function designate responsible&#10;created view solicitude in view ager&#10;">
+      <created>1417735682726</created>
+      <option name="number" value="00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1417735682726</updated>
+    </task>
+    <task id="LOCAL-00013" summary="change francisco">
+      <created>1417796413011</created>
+      <option name="number" value="00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1417796413011</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
+    <servers />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
+    <editor active="false" />
+    <layout>
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32789558" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32843137" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2647504" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32843137" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32843137" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32843137" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+    </layout>
+    <layout-to-restore>
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32789558" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32843137" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32843137" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32843137" sideWeight="0.5" order="9" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32843137" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24583964" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+    </layout-to-restore>
+  </component>
+  <component name="Vcs.Log.UiProperties">
+    <option name="RECENTLY_FILTERED_USER_GROUPS">
+      <collection />
+    </option>
+    <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+      <collection />
+    </option>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="myTodoPanelSettings">
+      <TodoPanelSettings />
+    </option>
+    <MESSAGE value="fondos" />
+    <MESSAGE value="create export excel fondos" />
+    <MESSAGE value="remove console logs" />
+    <MESSAGE value="search to month fondos" />
+    <MESSAGE value="implement function terminate fondos" />
+    <MESSAGE value="remove placeholder of login  and create login asistente de gerencia" />
+    <MESSAGE value="implement view list-fondos-rm" />
+    <MESSAGE value="remove rule solicitude" />
+    <MESSAGE value="fix add clients in view solicitude" />
+    <MESSAGE value="add view in tesoreria fondos" />
+    <MESSAGE value="create function designate responsible&#10;created view solicitude in view ager&#10;" />
+    <MESSAGE value="change francisco" />
+    <option name="LAST_COMMIT_MESSAGE" value="change francisco" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <option name="time" value="2" />
+    </breakpoint-manager>
+    <watches-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/composer.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="782">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Dmkt/GerCom/view_solicitude_gercom.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.9118774" vertical-offset="2601" max-vertical-offset="3859">
+          <caret line="181" column="19" selection-start-line="181" selection-start-column="19" selection-end-line="181" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/User.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="510" max-vertical-offset="1105">
+          <caret line="41" column="24" selection-start-line="41" selection-start-column="20" selection-end-line="41" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/Dmkt/LoginController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="748" max-vertical-offset="1717">
+          <caret line="78" column="60" selection-start-line="78" selection-start-column="60" selection-end-line="78" selection-end-column="60" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Dmkt/login.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="306" max-vertical-offset="1275">
+          <caret line="52" column="58" selection-start-line="52" selection-start-column="58" selection-end-line="52" selection-end-column="58" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/filters.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-12.076923" vertical-offset="264" max-vertical-offset="4029">
+          <caret line="43" column="0" selection-start-line="43" selection-start-column="0" selection-end-line="43" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Dmkt/Rm/register_solicitude.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-75.88461" vertical-offset="1172" max-vertical-offset="4114">
+          <caret line="185" column="62" selection-start-line="185" selection-start-column="62" selection-end-line="185" selection-end-column="62" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Dmkt/Sup/view_solicitude_sup.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="5129" max-vertical-offset="6902">
+          <caret line="313" column="51" selection-start-line="313" selection-start-column="51" selection-end-line="313" selection-end-column="51" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Dmkt/Cont/view_solicituds_cont.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="1.1398468" vertical-offset="0" max-vertical-offset="918">
+          <caret line="35" column="44" selection-start-line="35" selection-start-column="44" selection-end-line="35" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Dmkt/GerProd/view_solicituds_gerprod.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="697">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Dmkt/GerProd/view_solicitude_gerprod.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="2.1724138" vertical-offset="2895" max-vertical-offset="7072">
+          <caret line="237" column="9" selection-start-line="237" selection-start-column="9" selection-end-line="237" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/template/main.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1003" max-vertical-offset="1513">
+          <caret line="59" column="21" selection-start-line="59" selection-start-column="21" selection-end-line="59" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Dmkt/GerProd/show_gerprod.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1649">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/public/css/stylos.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.42424244" vertical-offset="2023" max-vertical-offset="3026">
+          <caret line="133" column="0" selection-start-line="133" selection-start-column="0" selection-end-line="133" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Treasury/view_solicitude_tes.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-5.8846154" vertical-offset="0" max-vertical-offset="2924">
+          <caret line="9" column="12" selection-start-line="9" selection-start-column="12" selection-end-line="9" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Dmkt/AsisGer/register_fondo.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.65384614" vertical-offset="306" max-vertical-offset="2720">
+          <caret line="17" column="28" selection-start-line="17" selection-start-column="28" selection-end-line="17" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Dmkt/AsisGer/list_solicitudes.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-7.8461537" vertical-offset="272" max-vertical-offset="986">
+          <caret line="28" column="54" selection-start-line="28" selection-start-column="36" selection-end-line="28" selection-end-column="54" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Dmkt/AsisGer/view_solicitude_ager.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="493" max-vertical-offset="2924">
+          <caret line="29" column="20" selection-start-line="29" selection-start-column="20" selection-end-line="29" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Dmkt/AsisGer/list_fondos.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.27011493" vertical-offset="277" max-vertical-offset="901">
+          <caret line="8" column="29" selection-start-line="8" selection-start-column="29" selection-end-line="8" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Treasury/view_solicituds_tes.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.30268198" vertical-offset="158" max-vertical-offset="680">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Dmkt/Rm/show_rm.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-6.5384617" vertical-offset="221" max-vertical-offset="952">
+          <caret line="89" column="41" selection-start-line="89" selection-start-column="41" selection-end-line="89" selection-end-column="56" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/Deposit/DepositController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.41308412" vertical-offset="442" max-vertical-offset="2890">
+          <caret line="51" column="45" selection-start-line="51" selection-start-column="45" selection-end-line="51" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Treasury/list_fondos.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="1.8888888" vertical-offset="0" max-vertical-offset="2516">
+          <caret line="58" column="21" selection-start-line="58" selection-start-column="21" selection-end-line="58" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/Expense/Expense.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="799">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/Common/Deposit.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="561">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/Dmkt/CtaRm.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.2224299" vertical-offset="0" max-vertical-offset="535">
+          <caret line="12" column="41" selection-start-line="12" selection-start-column="41" selection-end-line="12" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/Dmkt/Marca.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="561">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/Dmkt/Solicitude.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="408" max-vertical-offset="1411">
+          <caret line="77" column="0" selection-start-line="77" selection-start-column="0" selection-end-line="77" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Expense/report.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.0" vertical-offset="0" max-vertical-offset="2686">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="152" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/Dmkt/FondoInstitucional.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-16.346153" vertical-offset="0" max-vertical-offset="561">
+          <caret line="30" column="50" selection-start-line="30" selection-start-column="50" selection-end-line="30" selection-end-column="50" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Dmkt/Rm/view_solicitude.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-13.076923" vertical-offset="1768" max-vertical-offset="5083">
+          <caret line="124" column="91" selection-start-line="124" selection-start-column="29" selection-end-line="124" selection-end-column="91" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Expense/register.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-15.038462" vertical-offset="2907" max-vertical-offset="4318">
+          <caret line="194" column="46" selection-start-line="194" selection-start-column="46" selection-end-line="194" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Expense/view-fondo.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.71647507" vertical-offset="459" max-vertical-offset="1241">
+          <caret line="79" column="108" selection-start-line="79" selection-start-column="108" selection-end-line="79" selection-end-column="108" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Expense/view.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.16283526" vertical-offset="1071" max-vertical-offset="1700">
+          <caret line="68" column="56" selection-start-line="68" selection-start-column="56" selection-end-line="68" selection-end-column="56" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Dmkt/Rm/view_solicituds_rm.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.49908257" vertical-offset="306" max-vertical-offset="986">
+          <caret line="34" column="137" selection-start-line="34" selection-start-column="17" selection-end-line="34" selection-end-column="137" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Dmkt/AsisGer/list_fondos_rm.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.90458715" vertical-offset="0" max-vertical-offset="782">
+          <caret line="29" column="167" selection-start-line="29" selection-start-column="167" selection-end-line="29" selection-end-column="167" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Expense/report-fondo.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-8.5" vertical-offset="153" max-vertical-offset="2550">
+          <caret line="22" column="98" selection-start-line="22" selection-start-column="98" selection-end-line="22" selection-end-column="98" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/public/js/js.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="21199">
+          <caret line="397" column="35" selection-start-line="397" selection-start-column="35" selection-end-line="397" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Dmkt/Cont/view_solicitude_cont.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-33.153847" vertical-offset="940" max-vertical-offset="2686">
+          <caret line="106" column="66" selection-start-line="106" selection-start-column="66" selection-end-line="106" selection-end-column="66" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Dmkt/Cont/show_cont.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1428" max-vertical-offset="1802">
+          <caret line="84" column="39" selection-start-line="84" selection-start-column="39" selection-end-line="84" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/public/js/jsdmkt.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="16521" max-vertical-offset="28220">
+          <caret line="1003" column="39" selection-start-line="1003" selection-start-column="39" selection-end-line="1003" selection-end-column="39" />
+          <folding>
+            <element signature="e#15880#16017#0" expanded="false" />
+            <element signature="e#16156#16822#0" expanded="false" />
+            <marker date="1418165199130" expanded="false" signature="5923:5938" placeholder="..." />
+            <marker date="1418165199130" expanded="false" signature="6018:6033" placeholder="..." />
+            <marker date="1418165199130" expanded="false" signature="6274:6292" placeholder="..." />
+            <marker date="1418165199130" expanded="false" signature="6499:6509" placeholder="..." />
+            <marker date="1418165199130" expanded="false" signature="14257:14269" placeholder="..." />
+            <marker date="1418165199130" expanded="false" signature="14447:14459" placeholder="..." />
+            <marker date="1418165199130" expanded="false" signature="25644:25656" placeholder="..." />
+            <marker date="1418165199130" expanded="false" signature="31301:31313" placeholder="..." />
+            <marker date="1418165199130" expanded="false" signature="31564:31574" placeholder="..." />
+            <marker date="1418165199130" expanded="false" signature="34685:34697" placeholder="..." />
+            <marker date="1418165199130" expanded="false" signature="34940:34950" placeholder="..." />
+            <marker date="1418165199130" expanded="false" signature="38396:38411" placeholder="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Dmkt/Rm/list_fondos_rm.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.5440613" vertical-offset="260" max-vertical-offset="884">
+          <caret line="32" column="21" selection-start-line="32" selection-start-column="21" selection-end-line="32" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Dmkt/Cont/register_seat_solicitude.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.39921722" vertical-offset="0" max-vertical-offset="3553">
+          <caret line="12" column="20" selection-start-line="0" selection-start-column="0" selection-end-line="203" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Treasury/show_tes.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="289" max-vertical-offset="1785">
+          <caret line="31" column="31" selection-start-line="31" selection-start-column="31" selection-end-line="31" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Expense/register-fondo.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="153" max-vertical-offset="4318">
+          <caret line="9" column="16" selection-start-line="9" selection-start-column="16" selection-end-line="104" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Dmkt/Cont/register_seat_fondo.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="136" max-vertical-offset="3927">
+          <caret line="8" column="65" selection-start-line="8" selection-start-column="65" selection-end-line="8" selection-end-column="65" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/Expense/ExpenseController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="3661" max-vertical-offset="6800">
+          <caret line="271" column="20" selection-start-line="271" selection-start-column="20" selection-end-line="271" selection-end-column="20" />
+          <folding>
+            <element signature="e#6781#7156#0#PHP" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/routes.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="2487" max-vertical-offset="3638">
+          <caret line="165" column="105" selection-start-line="165" selection-start-column="79" selection-end-line="165" selection-end-column="105" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/Dmkt/SolicitudeController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="19661" max-vertical-offset="21556">
+          <caret line="1184" column="46" selection-start-line="1184" selection-start-column="20" selection-end-line="1184" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/Dmkt/FondoController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="5768" max-vertical-offset="6324">
+          <caret line="371" column="17" selection-start-line="371" selection-start-column="17" selection-end-line="371" selection-end-column="17" />
+          <folding>
+            <marker date="1418169221257" expanded="true" signature="7555:7685" placeholder="select visvi..VISITADOR..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/Dmkt/Cont/list_fondos.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="238" max-vertical-offset="2516">
+          <caret line="14" column="29" selection-start-line="14" selection-start-column="29" selection-end-line="14" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>
+
