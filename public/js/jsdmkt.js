@@ -651,7 +651,7 @@ function newSolicitude() {
                                     }
                                 );
                             });
-                        })
+                        });
                 }
             }
         })
@@ -778,33 +778,34 @@ function newSolicitude() {
 
                     $.post(server + 'cancelar-solicitud-sup', {idsolicitude: aux.attr('data-idsolicitude'),_token :$(aux).attr('data-token')})
                         .done(function (data) {
-
-
-                            $('#table_solicitude_sup_wrapper').remove();
-                            $('.table-solicituds-sup').append(data);
-                            $('#table_solicitude_sup').dataTable({
-                                    "order": [
-                                        [3, "desc"]
-                                    ],
-                                    "bLengthChange": false,
-                                    'iDisplayLength': 7,
-                                    "oLanguage": {
-                                        "sSearch": "Buscar: ",
-                                        "sZeroRecords": "No hay solicitudes",
-                                        "sInfoEmpty": "No hay solicitudes",
-                                        "sInfo": 'Mostrando _END_ de _TOTAL_',
-                                        "oPaginate": {
-                                            "sPrevious": "Anterior",
-                                            "sNext" : "Siguiente"
+                            bootbox.alert('Solicitud Cancelada' , function(){
+                                $('#table_solicitude_rm_wrapper').remove();
+                                $('.table-solicituds-rm').append(data);
+                                $('#table_solicitude_rm').dataTable({
+                                        "order": [
+                                            [ 3, "desc" ]
+                                        ],
+                                        "bLengthChange": false,
+                                        'iDisplayLength': 7,
+                                        "oLanguage": {
+                                            "sSearch": "Buscar: ",
+                                            "sZeroRecords": "No hay solicitudes",
+                                            "sInfoEmpty": "No hay solicitudes",
+                                            "sInfo": 'Mostrando _END_ de _TOTAL_',
+                                            "oPaginate": {
+                                                "sPrevious": "Anterior",
+                                                "sNext" : "Siguiente"
+                                            }
                                         }
                                     }
-                                }
-                            );
-
-                        })
+                                );
+                            });
+                            // idkc: este cambio es temporal... 
+                            document.location.reload();
+                        });
                 }
             }
-        })
+        });
     });
 
 
