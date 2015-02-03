@@ -339,7 +339,7 @@
             <a id="button2id" href="{{URL::to('desbloquear-solicitud-sup').'/'.$solicitude->token}}" name="button2id" class="btn btn-primary">Cancelar</a>
         @else
 
-            @if($solicitude->derived == 0 && $solicitude->estado != ACEPTADO && $solicitude->estado != RECHAZADO)
+            @if($solicitude->derived == 0 && $solicitude->estado != ACEPTADO && $solicitude->estado != RECHAZADO && $solicitude->estado != CANCELADO)
                 <a href="{{URL::to('aceptar_solicitud')}}" id="test" name="button1id"
                    class="btn btn-primary accepted_solicitude_sup">Aceptar
                 </a>
