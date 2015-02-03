@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Developer
- * Date: 31/07/14
- * Time: 04:35 PM
- */
-
 
 namespace Dmkt;
 
@@ -738,7 +731,7 @@ class SolicitudeController extends BaseController
         $solicitude->estado = CANCELADO;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
-        return $this->listSolicitude(PENDIENTE);
+        return $this->listSolicitudeSup(PENDIENTE);
 
     }
 
