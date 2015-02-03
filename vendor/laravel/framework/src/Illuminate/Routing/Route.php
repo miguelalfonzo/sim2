@@ -557,13 +557,9 @@ class Route {
 	 */
 	protected function addFilters($type, $filters)
 	{
-		$filters = static::explodeFilters($filters);
-
 		if (isset($this->action[$type]))
 		{
-			$existing = static::explodeFilters($this->action[$type]);
-
-			$this->action[$type] = array_merge($existing, $filters);
+			$this->action[$type] .= '|'.$filters;
 		}
 		else
 		{

@@ -62,14 +62,17 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
     public function testUnsilencing()
     {
         ob_start();
-
-        $this->iniSet('log_errors', 0);
-        $this->iniSet('display_errors', 1);
+        $bak = array(
+            ini_set('log_errors', 0),
+            ini_set('display_errors', 1),
+        );
 
         // See below: this will fail with parse error
         // but this should not be @-silenced.
         @class_exists(__NAMESPACE__.'\TestingUnsilencing', true);
 
+        ini_set('log_errors', $bak[0]);
+        ini_set('display_errors', $bak[1]);
         $output = ob_get_clean();
 
         $this->assertStringMatchesFormat('%aParse error%a', $output);

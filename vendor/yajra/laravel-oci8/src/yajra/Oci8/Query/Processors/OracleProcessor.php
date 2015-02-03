@@ -2,153 +2,139 @@
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Processors\Processor;
-use PDO;
 use PDOStatement;
+use PDO;
 
 class OracleProcessor extends Processor {
 
-	/**
-	 * DB Statement
-	 *
-	 * @var PDOStatement
-	 */
-	protected $statement;
+    /**
+     * DB Statement
+     * @var PDOStatement
+     */
+    protected $statement;
 
-	/**
-	 * Process an "insert get ID" query.
-	 *
-	 * @param  Builder $query
-	 * @param  string $sql
-	 * @param  array $values
-	 * @param  string $sequence
-	 * @return int
-	 */
-	public function processInsertGetId(Builder $query, $sql, $values, $sequence = null)
-	{
-		$counter = 0;
-		$id = 0;
+    /**
+     * Process an "insert get ID" query.
+     *
+     * @param  Builder  $query
+     * @param  string  $sql
+     * @param  array   $values
+     * @param  string  $sequence
+     * @return int
+     */
+    public function processInsertGetId(Builder $query, $sql, $values, $sequence = null)
+    {
+        $counter = 0;
+        $id = 0;
 
-		// set PDO statement property
-		$this->prepareStatement($query, $sql);
-		$counter = $this->bindValuesAndReturnCounter($values, $counter);
+        // set PDO statement property
+        $this->prepareStatement($query, $sql);
+        $counter = $this->bindValuesAndReturnCounter($values, $counter);
 
-		// bind output param for the returning clause
-		$this->statement->bindParam($counter, $id, PDO::PARAM_INT);
+        // bind output param for the returning clause
+        $this->statement->bindParam($counter, $id, PDO::PARAM_INT);
 
-		// execute statement
-		$this->statement->execute();
+        // execute statement
+        $this->statement->execute();
 
-		return (int) $id;
-	}
+        return (int) $id;
+    }
 
-	/**
-	 * save Query with Blob returning primary key value
-	 *
-	 * @param  Builder $query
-	 * @param  string $sql
-	 * @param  array $values
-	 * @param  array $binaries
-	 * @return int
-	 */
-	public function saveLob(Builder $query, $sql, array $values, array $binaries)
-	{
-		$counter = 0;
-		$lob = [];
-		$id = 0;
+    /**
+     * save Query with Blob returning primary key value
+     *
+     * @param  Builder  $query
+     * @param  string  $sql
+     * @param  array   $values
+     * @param  array  $binaries
+     * @return int
+     */
+    public function saveLob(Builder $query, $sql, array $values, array $binaries)
+    {
+        $counter = 0;
+        $lob = array();
+        $id = 0;
 
-		// begin transaction
-		$query->getConnection()->getPdo()->beginTransaction();
+        // begin transaction
+        $query->getConnection()->getPdo()->beginTransaction();
 
-		// set PDO statement property
-		$this->prepareStatement($query, $sql);
-		$counter = $this->bindValuesAndReturnCounter($values, $counter);
+        // set PDO statement property
+        $this->prepareStatement($query, $sql);
+        $counter = $this->bindValuesAndReturnCounter($values, $counter);
 
-		for ($i = 0; $i < count($binaries); $i++)
-		{
-			// bind blob descriptor
-			$this->statement->bindParam($counter, $lob[$i], PDO::PARAM_LOB);
-			$counter++;
-		}
+        for ($i=0; $i < count($binaries); $i++)
+        {
+            // bind blob descriptor
+            $this->statement->bindParam($counter, $lob[$i], PDO::PARAM_LOB);
+            $counter++;
+        }
 
-		// bind output param for the returning clause
-		$this->statement->bindParam($counter, $id, PDO::PARAM_INT);
+        // bind output param for the returning clause
+        $this->statement->bindParam($counter, $id, PDO::PARAM_INT);
 
-		// execute statement
-		if ( ! $this->statement->execute())
-		{
-			$query->getConnection()->getPdo()->rollBack();
+        // execute statement
+        if ( ! $this->statement->execute())
+        {
+            $query->getConnection()->getPdo()->rollBack();
+            return false;
+        }
 
-			return false;
-		}
+        for ($i=0; $i < count($binaries); $i++)
+        {
+            // Discard the existing LOB contents
+            if (! $lob[$i]->truncate())
+            {
+                $query->getConnection()->getPdo()->rollBack();
+                return false;
+            }
+            // save blob content
+            if (! $lob[$i]->save($binaries[$i]))
+            {
+                $query->getConnection()->getPdo()->rollBack();
+                return false;
+            }
+        }
 
-		for ($i = 0; $i < count($binaries); $i++)
-		{
-			// Discard the existing LOB contents
-			if ( ! $lob[$i]->truncate())
-			{
-				$query->getConnection()->getPdo()->rollBack();
+        // commit statements
+        $query->getConnection()->getPdo()->commit();
 
-				return false;
-			}
-			// save blob content
-			if ( ! $lob[$i]->save($binaries[$i]))
-			{
-				$query->getConnection()->getPdo()->rollBack();
+        return (int) $id;
+    }
 
-				return false;
-			}
-		}
+    /**
+     * @param Builder $query
+     * @param string $sql
+     * @internal param $PDOStatement
+     */
+    protected function prepareStatement(Builder $query, $sql)
+    {
+        $this->statement = $query->getConnection()->getPdo()->prepare($sql);
+    }
 
-		// commit statements
-		$query->getConnection()->getPdo()->commit();
+    /**
+     * @param array $values
+     * @param integer $counter
+     * @return integer
+     */
+    protected function bindValuesAndReturnCounter(array $values, $counter)
+    {
+        // bind each parameter from the values array to their location
+        foreach ($values as $value) {
+            // try to determine type of result
+            if (is_int($value))
+                $param = PDO::PARAM_INT;
+            elseif (is_bool($value))
+                $param = PDO::PARAM_BOOL;
+            elseif (is_null($value))
+                $param = PDO::PARAM_NULL;
+            else
+                $param = PDO::PARAM_STR;
 
-		return (int) $id;
-	}
-
-	/**
-	 * @param Builder $query
-	 * @param string $sql
-	 * @internal param $PDOStatement
-	 */
-	protected function prepareStatement(Builder $query, $sql)
-	{
-		$this->statement = $query->getConnection()->getPdo()->prepare($sql);
-	}
-
-	/**
-	 * @param array $values
-	 * @param integer $counter
-	 * @return integer
-	 */
-	protected function bindValuesAndReturnCounter(array $values, $counter)
-	{
-		// bind each parameter from the values array to their location
-		foreach ($values as $value)
-		{
-			// try to determine type of result
-			if (is_int($value))
-			{
-				$param = PDO::PARAM_INT;
-			}
-			elseif (is_bool($value))
-			{
-				$param = PDO::PARAM_BOOL;
-			}
-			elseif (is_null($value))
-			{
-				$param = PDO::PARAM_NULL;
-			}
-			else
-			{
-				$param = PDO::PARAM_STR;
-			}
-
-			$this->statement->bindValue($counter, ($value), $param);
-			// increment counter
-			$counter++;
-		}
-
-		return $counter;
-	}
+            $this->statement->bindValue($counter, ($value), $param);
+            // increment counter
+            $counter++;
+        }
+        return $counter;
+    }
 
 }

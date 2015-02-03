@@ -18,6 +18,7 @@ use Monolog\Logger;
  */
 class LogEntriesHandler extends SocketHandler
 {
+
     /**
      * @var string
      */
@@ -52,4 +53,5 @@ class LogEntriesHandler extends SocketHandler
     {
         return $this->logToken . ' ' . $record['formatted'];
     }
+
 }

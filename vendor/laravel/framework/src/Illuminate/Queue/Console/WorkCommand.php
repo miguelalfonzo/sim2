@@ -23,9 +23,9 @@ class WorkCommand extends Command {
 	protected $description = 'Process the next job on a queue';
 
 	/**
-	 * The queue worker instance.
+	 * The queue listener instance.
 	 *
-	 * @var \Illuminate\Queue\Worker
+	 * @var \Illuminate\Queue\Listener
 	 */
 	protected $worker;
 

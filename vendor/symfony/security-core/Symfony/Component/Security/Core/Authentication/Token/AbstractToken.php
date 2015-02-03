@@ -85,7 +85,6 @@ abstract class AbstractToken implements TokenInterface
      * a __toString method or the username as a regular string.
      *
      * @param string|object $user The user
-     *
      * @throws \InvalidArgumentException
      */
     public function setUser($user)
@@ -189,7 +188,7 @@ abstract class AbstractToken implements TokenInterface
      *
      * @param string $name The attribute name
      *
-     * @return bool true if the attribute exists, false otherwise
+     * @return bool    true if the attribute exists, false otherwise
      */
     public function hasAttribute($name)
     {

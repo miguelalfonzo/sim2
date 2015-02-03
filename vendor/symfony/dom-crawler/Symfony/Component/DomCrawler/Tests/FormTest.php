@@ -63,8 +63,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * __construct() should throw \\LogicException if the form attribute is invalid.
-     *
+     * __construct() should throw \\LogicException if the form attribute is invalid
      * @expectedException \LogicException
      */
     public function testConstructorThrowsExceptionIfNoRelatedForm()

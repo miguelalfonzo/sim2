@@ -54,23 +54,6 @@ abstract class AbstractDecoder
     }
 
     /**
-     * Init from fiven URL
-     *
-     * @param  string $url
-     * @return \Intervention\Image\Image
-     */
-    public function initFromUrl($url)
-    {
-        if ($data = @file_get_contents($url)) {
-            return $this->initFromBinary($data);
-        }
-
-        throw new \Intervention\Image\Exception\NotReadableException(
-            "Unable to init from given url (".$url.")."
-        );
-    }
-
-    /**
      * Determines if current source data is GD resource
      *
      * @return boolean
@@ -204,7 +187,7 @@ abstract class AbstractDecoder
      */
     private function decodeDataUrl($data_url)
     {
-        $pattern = "/^data:(?:image\/[a-zA-Z\-\.]+)(?:charset=\".+\")?;base64,(?P<data>.+)$/";
+        $pattern = "/^data:(?:image\/.+)(?:charset=\".+\")?;base64,(?P<data>.+)$/";
         preg_match($pattern, $data_url, $matches);
 
         if (is_array($matches) && array_key_exists('data', $matches)) {
@@ -242,7 +225,7 @@ abstract class AbstractDecoder
                 return $this->initFromBinary($this->data);
 
             case $this->isUrl():
-                return $this->initFromUrl($this->data);
+                return $this->initFromBinary(file_get_contents($this->data));
 
             case $this->isFilePath():
                 return $this->initFromPath($this->data);

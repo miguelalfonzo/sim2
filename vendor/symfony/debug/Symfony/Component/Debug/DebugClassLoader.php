@@ -65,7 +65,11 @@ class DebugClassLoader
      */
     public function getClassLoader()
     {
-        return $this->wasFinder ? $this->classLoader[0] : $this->classLoader;
+        if ($this->wasFinder) {
+            return $this->classLoader[0];
+        } else {
+            return $this->classLoader;
+        }
     }
 
     /**
@@ -136,7 +140,7 @@ class DebugClassLoader
      *
      * @param string $class The name of the class
      *
-     * @return bool|null True, if loaded
+     * @return bool|null    True, if loaded
      *
      * @throws \RuntimeException
      */
@@ -209,7 +213,7 @@ class DebugClassLoader
                     chdir($cwd);
                 }
 
-                if (0 === substr_compare($real, $tail, -strlen($tail), strlen($tail), true)
+                if ( 0 === substr_compare($real, $tail, -strlen($tail), strlen($tail), true)
                   && 0 !== substr_compare($real, $tail, -strlen($tail), strlen($tail), false)
                 ) {
                     throw new \RuntimeException(sprintf('Case mismatch between class and source file names: %s vs %s', $class, $real));

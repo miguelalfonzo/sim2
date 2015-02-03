@@ -286,7 +286,7 @@ class LaravelExcelWorksheet extends PHPExcel_Worksheet {
 
         // Else if the 2nd param was set, we will use it as a cell value
         if ($callback)
-            $this->setCellValue($cell, $callback);
+            $this->sheet->setCellValue($cell, $callback);
 
         return $this;
     }
@@ -666,12 +666,10 @@ class LaravelExcelWorksheet extends PHPExcel_Worksheet {
         // If is a style
         elseif (in_array($key, $this->allowedStyles))
         {
-           return $this->setDefaultStyles($setter, $key, $params);
+            $this->setDefaultStyles($setter, $key, $params);
         }
-        else
-        {
-            throw new LaravelExcelException('[ERROR] Laravel Worksheet method [' . $setter . '] does not exist.');
-        }
+
+        throw new LaravelExcelException('[ERROR] Laravel Worksheet method [' . $setter . '] does not exist.');
     }
 
     /**
@@ -726,17 +724,24 @@ class LaravelExcelWorksheet extends PHPExcel_Worksheet {
      * @param array|string $params
      * @return  PHPExcel_Style
      */
-    protected function setFontStyle($caller, $setter, $key, $params)
+    protected function setFontStyle($caller, $key, $params)
     {
         // Set caller to font
         $caller = $caller->getFont();
         $params = is_array($params) ? $params : array($params);
 
         // Clean the setter name
-        $setter = lcfirst(str_replace('Font', '', $setter));
+        $key = lcfirst(str_replace('font', '', $key));
 
-        // Replace special cases
-        $setter = str_replace('Family', 'Name', $setter);
+        // Get setter method
+        list($setter, $key) = $this->_setSetter($key);
+
+        switch ($key)
+        {
+            case 'family':
+                $setter = 'setName';
+                break;
+        }
 
         return call_user_func_array(array($caller, $setter), $params);
     }
@@ -1208,7 +1213,7 @@ class LaravelExcelWorksheet extends PHPExcel_Worksheet {
      */
     public function setValueOfCell($cellValue, $currentColumn, $startRow)
     {
-        is_string($cellValue) && is_numeric($cellValue) && !is_integer($cellValue)
+        is_numeric($cellValue) && !is_integer($cellValue)
             ? $this->getCell($currentColumn . $startRow)->setValueExplicit($cellValue)
             : $this->getCell($currentColumn . $startRow)->setValue($cellValue);
     }

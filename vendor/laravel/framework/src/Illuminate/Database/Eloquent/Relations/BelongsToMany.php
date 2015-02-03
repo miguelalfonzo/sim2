@@ -44,13 +44,6 @@ class BelongsToMany extends Relation {
 	protected $pivotColumns = array();
 
 	/**
-	 * Any pivot table restrictions.
-	 *
-	 * @var array
-	 */
-	protected $pivotWheres = [];
-
-	/**
 	 * Create a new has many relationship instance.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -92,8 +85,6 @@ class BelongsToMany extends Relation {
 	 */
 	public function wherePivot($column, $operator = null, $value = null, $boolean = 'and')
 	{
-		$this->pivotWheres[] = func_get_args();
-
 		return $this->where($this->table.'.'.$column, $operator, $value, $boolean);
 	}
 
@@ -334,17 +325,6 @@ class BelongsToMany extends Relation {
 	}
 
 	/**
-	 * Determine whether the given column is defined as a pivot column.
-	 *
-	 * @param  string  $column
-	 * @return bool
-	 */
-	protected function hasPivotColumn($column)
-	{
-		return in_array($column, $this->pivotColumns);
-	}
-
-	/**
 	 * Set the join clause for the relation query.
 	 *
 	 * @param  \Illuminate\Database\Eloquent\Builder|null
@@ -579,7 +559,7 @@ class BelongsToMany extends Relation {
 	/**
 	 * Sync the intermediate tables with a list of IDs or collection of models.
 	 *
-	 * @param  array  $ids
+	 * @param  $ids
 	 * @param  bool   $detaching
 	 * @return array
 	 */
@@ -737,7 +717,7 @@ class BelongsToMany extends Relation {
 	{
 		$records = array();
 
-		$timed = ($this->hasPivotColumn($this->createdAt()) || $this->hasPivotColumn($this->updatedAt()));
+		$timed = in_array($this->createdAt(), $this->pivotColumns);
 
 		// To create the attachment records, we will simply spin through the IDs given
 		// and create a new record to insert for each ID. Each ID may actually be a
@@ -824,15 +804,9 @@ class BelongsToMany extends Relation {
 	{
 		$fresh = $this->parent->freshTimestamp();
 
-		if ( ! $exists && $this->hasPivotColumn($this->createdAt()))
-		{
-			$record[$this->createdAt()] = $fresh;
-		}
+		if ( ! $exists) $record[$this->createdAt()] = $fresh;
 
-		if ($this->hasPivotColumn($this->updatedAt()))
-		{
-			$record[$this->updatedAt()] = $fresh;
-		}
+		$record[$this->updatedAt()] = $fresh;
 
 		return $record;
 	}
@@ -911,11 +885,6 @@ class BelongsToMany extends Relation {
 	{
 		$query = $this->newPivotStatement();
 
-		foreach ($this->pivotWheres as $whereArgs)
-		{
-			call_user_func_array([$query, 'where'], $whereArgs);
-		}
-
 		return $query->where($this->foreignKey, $this->parent->getKey());
 	}
 
@@ -937,7 +906,11 @@ class BelongsToMany extends Relation {
 	 */
 	public function newPivotStatementForId($id)
 	{
-		return $this->newPivotQuery()->where($this->otherKey, $id);
+		$pivot = $this->newPivotStatement();
+
+		$key = $this->parent->getKey();
+
+		return $pivot->where($this->foreignKey, $key)->where($this->otherKey, $id);
 	}
 
 	/**
@@ -968,7 +941,7 @@ class BelongsToMany extends Relation {
 	/**
 	 * Set the columns on the pivot table to retrieve.
 	 *
-	 * @param  mixed  $columns
+	 * @param  array  $columns
 	 * @return $this
 	 */
 	public function withPivot($columns)

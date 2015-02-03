@@ -22,7 +22,6 @@ class ImageManager
      */
     public function __construct(array $config = array())
     {
-        $this->checkRequirements();
         $this->configure($config);
     }
 
@@ -88,7 +87,7 @@ class ImageManager
             return $imagecache->get($lifetime, $returnObj);
         }
 
-        throw new \Intervention\Image\Exception\MissingDependencyException(
+        throw new \Intervention\Image\Exception\NotSupportedException(
             "Please install package intervention/imagecache before running this function."
         );
     }
@@ -110,19 +109,5 @@ class ImageManager
         throw new \Intervention\Image\Exception\NotSupportedException(
             "Driver ({$drivername}) could not be instantiated."
         );
-    }
-
-    /**
-     * Check if all requirements are available
-     *
-     * @return void
-     */
-    private function checkRequirements()
-    {
-        if ( ! function_exists('finfo_buffer')) {
-            throw new \Intervention\Image\Exception\MissingDependencyException(
-                "PHP Fileinfo extension must be installed/enabled to use Intervention Image."
-            );
-        }
     }
 }

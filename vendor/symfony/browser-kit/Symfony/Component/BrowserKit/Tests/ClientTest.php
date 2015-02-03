@@ -14,6 +14,7 @@ namespace Symfony\Component\BrowserKit\Tests;
 use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\CookieJar;
+use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\BrowserKit\Response;
 
 class SpecialResponse extends Response

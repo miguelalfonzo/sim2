@@ -89,7 +89,7 @@ class MockArraySessionStorage implements SessionStorageInterface
      */
     public function start()
     {
-        if ($this->started) {
+        if ($this->started && !$this->closed) {
             return true;
         }
 

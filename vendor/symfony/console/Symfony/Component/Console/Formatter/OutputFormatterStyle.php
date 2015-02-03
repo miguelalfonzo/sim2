@@ -160,6 +160,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      * @param string $option The option name
      *
      * @throws \InvalidArgumentException When the option name isn't defined
+     *
      */
     public function unsetOption($option)
     {

@@ -97,10 +97,10 @@ class Excel {
      * @param  string        $file The file we want to load
      * @param  callback|null $callback
      * @param  string|null   $encoding
-     * @param bool           $noBasePath
      * @return LaravelExcelReader
+     *
      */
-    public function load($file, $callback = null, $encoding = null, $noBasePath = false)
+    public function load($file, $callback = null, $encoding = null)
     {
         // Reader instance
         $reader = clone $this->reader;
@@ -115,7 +115,7 @@ class Excel {
         $encoding = is_string($callback) ? $callback : $encoding;
 
         // Start loading
-        $reader->load($file, $encoding, $noBasePath);
+        $reader->load($file, $encoding);
 
         // Do the callback
         if ($callback instanceof Closure)

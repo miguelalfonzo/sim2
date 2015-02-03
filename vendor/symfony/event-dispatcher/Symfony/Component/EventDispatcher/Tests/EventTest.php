@@ -60,28 +60,24 @@ class EventTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->event->isPropagationStopped());
     }
 
-    public function testLegacySetDispatcher()
+    public function testSetDispatcher()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
         $this->event->setDispatcher($this->dispatcher);
         $this->assertSame($this->dispatcher, $this->event->getDispatcher());
     }
 
-    public function testLegacyGetDispatcher()
+    public function testGetDispatcher()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
         $this->assertNull($this->event->getDispatcher());
     }
 
-    public function testLegacyGetName()
+    public function testGetName()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
         $this->assertNull($this->event->getName());
     }
 
-    public function testLegacySetName()
+    public function testSetName()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
         $this->event->setName('foo');
         $this->assertEquals('foo', $this->event->getName());
     }

@@ -222,20 +222,21 @@ class Oci8SchemaGrammarTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('drop table users', $statements[0]);
 	}
 
-	public function testCompileTableExistsMethod()
+	public function testDropTableIfExists()
 	{
-		$grammar = $this->getGrammar();
-		$expected = 'select * from user_tables where upper(table_name) = upper(?)';
-		$sql = $grammar->compileTableExists();
-		$this->assertEquals($expected, $sql);
-	}
+		$blueprint = new Blueprint('users');
+		$blueprint->dropIfExists();
+		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-	public function testCompileColumnExistsMethod()
-	{
-		$grammar = $this->getGrammar();
-		$expected = 'select column_name from user_tab_columns where table_name = upper(?) and column_name = upper(?)';
-		$sql = $grammar->compileColumnExists();
-		$this->assertEquals($expected, $sql);
+		$this->assertEquals(1, count($statements));
+		$dropStatement = "declare c int;
+			begin
+			   select count(*) into c from user_tables where table_name = upper('users');
+			   if c = 1 then
+			      execute immediate 'drop table users';
+			   end if;
+			end;";
+		$this->assertEquals($dropStatement, $statements[0]);
 	}
 
 	public function testDropTableWithPrefix()
@@ -512,23 +513,6 @@ class Oci8SchemaGrammarTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(1, count($statements));
 		$this->assertEquals('alter table users add ( foo clob not null )', $statements[0]);
-	}
-
-	public function testAddingChar()
-	{
-		$blueprint = new Blueprint('users');
-		$blueprint->char('foo');
-		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
-		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table users add ( foo char(255) not null )', $statements[0]);
-
-		$blueprint = new Blueprint('users');
-		$blueprint->char('foo', 1);
-		$statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
-		$this->assertEquals(1, count($statements));
-		$this->assertEquals('alter table users add ( foo char(1) not null )', $statements[0]);
 	}
 
 	public function testAddingBigInteger()

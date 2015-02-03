@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Exception;
 
+use Symfony\Component\Debug\Exception\FlattenException as DebugFlattenException;
+
 /**
  * FlattenException wraps a PHP Exception to be able to serialize it.
  *
@@ -20,4 +22,6 @@ namespace Symfony\Component\HttpKernel\Exception;
  *
  * @deprecated Deprecated in 2.3, to be removed in 3.0. Use the same class from the Debug component instead.
  */
-class_exists('Symfony\Component\Debug\Exception\FlattenException');
+class FlattenException extends DebugFlattenException
+{
+}

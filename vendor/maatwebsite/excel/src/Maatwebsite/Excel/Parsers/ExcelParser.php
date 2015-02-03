@@ -94,8 +94,6 @@ class ExcelParser {
         $this->reader = $reader;
         $this->excel = $reader->excel;
 
-        $this->defaultStartRow = $this->currentRow = Config::get('excel::import.startRow', 1);
-
         // Reset
         $this->reset();
     }
@@ -114,7 +112,7 @@ class ExcelParser {
         $this->setSelectedColumns($columns);
 
         // If not parsed yet
-        if ( !$this->isParsed )
+        if (!$this->isParsed)
         {
             // Set worksheet count
             $this->w = 0;
@@ -126,13 +124,13 @@ class ExcelParser {
             foreach ($iterator as $this->worksheet)
             {
                 // Check if the sheet might have been selected by it's index
-                if ( $this->reader->isSelectedByIndex($iterator->key()) )
+                if ($this->reader->isSelectedByIndex($iterator->key()))
                 {
                     // Parse the worksheet
                     $worksheet = $this->parseWorksheet();
 
                     // If multiple sheets
-                    if ( $this->parseAsMultiple() )
+                    if ($this->parseAsMultiple())
                     {
                         // Push every sheet
                         $workbook->push($worksheet);
@@ -189,7 +187,7 @@ class ExcelParser {
     protected function getIndices()
     {
         // Fetch the first row
-        $this->row = $this->worksheet->getRowIterator($this->defaultStartRow)->current();
+        $this->row = $this->worksheet->getRowIterator(1)->current();
 
         // Set empty labels array
         $this->indices = array();
@@ -254,7 +252,7 @@ class ExcelParser {
         $separator = $this->reader->getSeparator();
 
         // Convert to ascii when needed
-        if ( $ascii )
+        if ($ascii)
             $value = $this->getAsciiIndex($value);
 
         // Convert all dashes/underscores into separator
@@ -322,14 +320,14 @@ class ExcelParser {
         // set sheet title
         $parsedRows->setTitle($this->excel->getActiveSheet()->getTitle());
 
-        // Get the start row
+        // Get the startrow
         $startRow = $this->getStartRow();
 
         // Loop through the rows inside the worksheet
         foreach ($this->worksheet->getRowIterator($startRow) as $this->row)
         {
             // Limit the results when needed
-            if ( $this->hasReachedLimit() )
+            if ($this->hasReachedLimit())
                 break;
 
             // Push the parsed cells inside the parsed rows
@@ -353,14 +351,14 @@ class ExcelParser {
         $startRow = $this->defaultStartRow;
 
         // If the reader has a heading, skip the first row
-        if ( $this->reader->hasHeading() )
+        if ($this->reader->hasHeading())
             $startRow++;
 
         // Get the amount of rows to skip
         $skip = $this->reader->getSkip();
 
         // If we want to skip rows, add the amount of rows
-        if ( $skip > 0 )
+        if ($skip > 0)
             $startRow = $startRow + $skip;
 
         // Return the startrow
@@ -398,11 +396,12 @@ class ExcelParser {
         // Foreach cells
         foreach ($cellIterator as $this->cell)
         {
+
             // Check how we need to save the parsed array
             $index = ($this->reader->hasHeading() && isset($this->indices[$i])) ? $this->indices[$i] : $this->getIndexFromColumn();
 
             // Check if we want to select this column
-            if ( $this->cellNeedsParsing($index) )
+            if ($this->cellNeedsParsing($index))
             {
                 // Set the value
                 $parsedCells[$index] = $this->parseCell($index);
@@ -423,14 +422,14 @@ class ExcelParser {
     protected function parseCell($index)
     {
         // If the cell is a date time
-        if ( $this->cellIsDate($index) )
+        if ($this->cellIsDate($index))
         {
             // Parse the date
             return $this->parseDate();
         }
 
         // Check if we want calculated values or not
-        elseif ( $this->reader->needsCalculation() )
+        elseif ($this->reader->needsCalculation())
         {
             // Get calculated value
             return $this->getCalculatedValue();
@@ -475,7 +474,7 @@ class ExcelParser {
         list($input, $output) = array_values(Config::get('excel::import.encoding', array('UTF-8', 'UTF-8')));
 
         // If they are the same, return the value
-        if ( $input == $output )
+        if ($input == $output)
             return $value;
 
         // Encode
@@ -489,7 +488,7 @@ class ExcelParser {
     protected function parseDate()
     {
         // If the date needs formatting
-        if ( $this->reader->needsDateFormatting() )
+        if ($this->reader->needsDateFormatting())
         {
             // Parse the date with carbon
             return $this->parseDateAsCarbon();
@@ -508,7 +507,7 @@ class ExcelParser {
     protected function parseDateAsCarbon()
     {
         // If has a date
-        if ( $cellContent = $this->cell->getCalculatedValue() )
+        if ($cellContent = $this->cell->getCalculatedValue())
         {
             // Convert excel time to php date object
             $date = PHPExcel_Shared_Date::ExcelToPHPObject($this->cell->getCalculatedValue())->format('Y-m-d H:i:s');
@@ -533,9 +532,9 @@ class ExcelParser {
         return (string) PHPExcel_Style_NumberFormat::toFormattedString(
             $this->cell->getCalculatedValue(),
             $this->cell->getWorksheet()->getParent()
-                       ->getCellXfByIndex($this->cell->getXfIndex())
-                       ->getNumberFormat()
-                       ->getFormatCode()
+                ->getCellXfByIndex($this->cell->getXfIndex())
+                ->getNumberFormat()
+                ->getFormatCode()
         );
     }
 
@@ -547,14 +546,7 @@ class ExcelParser {
     protected function cellIsDate($index)
     {
         // if is a date or if is a date column
-        if ( $this->reader->getDateColumns() )
-        {
-            return in_array($index, $this->reader->getDateColumns());
-        }
-        else
-        {
-            return PHPExcel_Shared_Date::isDateTime($this->cell);
-        }
+        return PHPExcel_Shared_Date::isDateTime($this->cell) || in_array($index, $this->reader->getDateColumns());
     }
 
     /**

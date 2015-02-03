@@ -8,13 +8,6 @@ This package uses the latest stable version (0.5)
 
 ## Installation
 
-Run
-```
-composer require thujohn/pdf
-```
-
-OR
-
 Add `thujohn/pdf` to `composer.json`.
 ```
 "thujohn/pdf": "dev-master"

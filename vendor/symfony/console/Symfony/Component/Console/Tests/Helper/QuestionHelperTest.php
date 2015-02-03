@@ -19,9 +19,6 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
-/**
- * @group tty
- */
 class QuestionHelperTest extends \PHPUnit_Framework_TestCase
 {
     public function testAskChoice()
@@ -128,9 +125,12 @@ class QuestionHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('FooBundle', $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
     }
 
+    /**
+     * @group tty
+     */
     public function testAskHiddenResponse()
     {
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
             $this->markTestSkipped('This test is not supported on Windows');
         }
 

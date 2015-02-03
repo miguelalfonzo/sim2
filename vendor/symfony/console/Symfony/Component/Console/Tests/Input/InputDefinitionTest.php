@@ -373,10 +373,8 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo1 ... [fooN]', $definition->getSynopsis(), '->getSynopsis() returns a synopsis of arguments and options');
     }
 
-    public function testLegacyAsText()
+    public function testAsText()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $definition = new InputDefinition(array(
             new InputArgument('foo', InputArgument::OPTIONAL, 'The foo argument'),
             new InputArgument('baz', InputArgument::OPTIONAL, 'The baz argument', true),
@@ -390,10 +388,8 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertStringEqualsFile(self::$fixtures.'/definition_astext.txt', $definition->asText(), '->asText() returns a textual representation of the InputDefinition');
     }
 
-    public function testLegacyAsXml()
+    public function testAsXml()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $definition = new InputDefinition(array(
             new InputArgument('foo', InputArgument::OPTIONAL, 'The foo argument'),
             new InputArgument('baz', InputArgument::OPTIONAL, 'The baz argument', true),
@@ -402,7 +398,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
             new InputOption('baz', null, InputOption::VALUE_OPTIONAL, 'The baz option', false),
             new InputOption('bar', 'b', InputOption::VALUE_OPTIONAL, 'The bar option', 'bar'),
         ));
-        $this->assertXmlStringEqualsXmlFile(self::$fixtures.'/definition_asxml.txt', $definition->asXml(), '->asXml() returns an XML representation of the InputDefinition');
+        $this->assertXmlStringEqualsXmlFile(self::$fixtures.'/definition_asxml.txt', $definition->asXml(), '->asText() returns a textual representation of the InputDefinition');
     }
 
     protected function initializeArguments()

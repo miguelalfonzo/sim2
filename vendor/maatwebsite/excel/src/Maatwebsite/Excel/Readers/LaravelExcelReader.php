@@ -209,13 +209,12 @@ class LaravelExcelReader {
      * Load a file
      * @param  string        $file
      * @param string|boolean $encoding
-     * @param bool           $noBasePath
      * @return LaravelExcelReader
      */
-    public function load($file, $encoding = false, $noBasePath = false)
+    public function load($file, $encoding = false)
     {
         // init the loading
-        $this->_init($file, $encoding, $noBasePath);
+        $this->_init($file, $encoding);
 
         // Only fetch selected sheets if necessary
         if ($this->sheetsSelected())
@@ -578,12 +577,12 @@ class LaravelExcelReader {
      * Init the loading
      * @param      $file
      * @param bool $encoding
-     * @param bool $noBasePath
+     * @return void
      */
-    protected function _init($file, $encoding = false, $noBasePath = false)
+    protected function _init($file, $encoding = false)
     {
         // Set the extension
-        $this->_setFile($file, $noBasePath)
+        $this->_setFile($file)
               ->setExtension()
               ->setTitle()
               ->_setFormat()
@@ -643,13 +642,12 @@ class LaravelExcelReader {
     /**
      * Set the file
      * @param string $file
-     * @param bool   $noBasePath
      * @return $this
      */
-    protected function _setFile($file, $noBasePath = false)
+    protected function _setFile($file)
     {
         // check if we have a correct path
-        if (!$noBasePath && !realpath($file))
+        if (!realpath($file))
             $file = base_path($file);
 
         $this->file = $file;
@@ -876,31 +874,8 @@ class LaravelExcelReader {
      */
     public function getTotalRowsOfFile()
     {
-        // Get worksheet info
-        $spreadsheetInfo = $this->getSheetInfoForActive();
-
-        // return total rows
-        return $spreadsheetInfo['totalRows'];
-    }
-
-    /**
-     * Get sheet info for active sheet
-     * @return mixed
-     */
-    public function getSheetInfoForActive()
-    {
         $spreadsheetInfo = $this->reader->listWorksheetInfo($this->file);
-
-        // Loop through the info
-        foreach($spreadsheetInfo as $key => $value)
-        {
-            // When we hit the right worksheet
-            if($value['worksheetName'] == $this->getActiveSheet()->getTitle())
-                $index = $key;
-        }
-
-        // return total rows
-        return $spreadsheetInfo[$index];
+        return $spreadsheetInfo[0]['totalRows'];
     }
 
     /**
@@ -1078,9 +1053,6 @@ class LaravelExcelReader {
 
         // Set default date columns
         $this->dateColumns = Config::get('excel::import.dates.columns', array());
-        
-        // Set default include charts
-        $this->reader->setIncludeCharts(Config::get('excel::import.includeCharts', false));
     }
 
     /**

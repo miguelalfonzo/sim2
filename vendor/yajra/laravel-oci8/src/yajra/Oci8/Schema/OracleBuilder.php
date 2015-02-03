@@ -1,17 +1,18 @@
 <?php namespace yajra\Oci8\Schema;
 
-use Closure;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
+use Closure;
 
 class OracleBuilder extends Builder {
 
 	public $helper;
 
-	/**
-	 * @param Connection $connection
-	 */
-	public function __construct(Connection $connection)
+    /**
+     * @param Connection $connection
+     */
+    public function __construct(Connection $connection)
 	{
 		$this->connection = $connection;
 		$this->grammar = $connection->getSchemaGrammar();
@@ -21,8 +22,8 @@ class OracleBuilder extends Builder {
 	/**
 	 * Create a new table on the schema.
 	 *
-	 * @param  string $table
-	 * @param  Closure $callback
+	 * @param  string   $table
+	 * @param  Closure  $callback
 	 * @return \Illuminate\Database\Schema\Blueprint
 	 */
 	public function create($table, Closure $callback)
@@ -41,7 +42,7 @@ class OracleBuilder extends Builder {
 	/**
 	 * Drop a table from the schema.
 	 *
-	 * @param  string $table
+	 * @param  string  $table
 	 * @return \Illuminate\Database\Schema\Blueprint
 	 */
 	public function drop($table)
@@ -64,15 +65,14 @@ class OracleBuilder extends Builder {
 	/**
 	 * Create a new command set with a Closure.
 	 *
-	 * @param  string $table
-	 * @param  Closure $callback
+	 * @param  string   $table
+	 * @param  Closure  $callback
 	 * @return \Illuminate\Database\Schema\Blueprint
 	 */
 	protected function createBlueprint($table, Closure $callback = null)
 	{
 		$blueprint = new OracleBlueprint($table, $callback);
 		$blueprint->setTablePrefix($this->connection->getTablePrefix());
-
 		return $blueprint;
 	}
 

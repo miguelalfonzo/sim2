@@ -142,10 +142,8 @@ class Grammar extends BaseGrammar {
 				$clauses[] = $this->compileJoinConstraint($clause);
 			}
 
-			foreach ($join->bindings as $index => $binding)
+			foreach ($join->bindings as $binding)
 			{
-				unset($join->bindings[$index]);
-
 				$query->addBinding($binding, 'join');
 			}
 
@@ -463,7 +461,7 @@ class Grammar extends BaseGrammar {
 	{
 		$sql = implode(' ', array_map(array($this, 'compileHaving'), $havings));
 
-		return 'having '.preg_replace('/and |or /', '', $sql, 1);
+		return 'having '.preg_replace('/and /', '', $sql, 1);
 	}
 
 	/**
@@ -555,21 +553,6 @@ class Grammar extends BaseGrammar {
 		foreach ($query->unions as $union)
 		{
 			$sql .= $this->compileUnion($union);
-		}
-
-		if (isset($query->unionOrders))
-		{
-			$sql .= ' '.$this->compileOrders($query, $query->unionOrders);
-		}
-
-		if (isset($query->unionLimit))
-		{
-			$sql .= ' '.$this->compileLimit($query, $query->unionLimit);
-		}
-
-		if (isset($query->unionOffset))
-		{
-			$sql .= ' '.$this->compileOffset($query, $query->unionOffset);
 		}
 
 		return ltrim($sql);

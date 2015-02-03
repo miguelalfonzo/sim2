@@ -44,7 +44,7 @@ class ExceptionHandler
     /**
      * Registers the exception handler.
      *
-     * @param bool $debug
+     * @param bool    $debug
      *
      * @return ExceptionHandler The registered exception handler
      */
@@ -123,10 +123,8 @@ class ExceptionHandler
      * this method will use it to create and send the response. If not,
      * it will fallback to plain PHP functions.
      *
-     * @param \Exception $exception An \Exception instance
-     *
-     * @see sendPhpResponse()
-     * @see createResponse()
+     * @see sendPhpResponse
+     * @see createResponse
      */
     private function failSafeHandle(\Exception $exception)
     {
@@ -235,7 +233,7 @@ EOF
             } catch (\Exception $e) {
                 // something nasty happened and we cannot throw an exception anymore
                 if ($this->debug) {
-                    $title = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage());
+                    $title = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($exception), $exception->getMessage());
                 } else {
                     $title = 'Whoops, looks like something went wrong.';
                 }

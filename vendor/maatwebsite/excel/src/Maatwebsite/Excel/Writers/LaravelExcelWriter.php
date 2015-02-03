@@ -248,10 +248,9 @@ class LaravelExcelWriter {
     /**
      * Export the spreadsheet
      * @param string $ext
-     * @param array  $headers
-     * @throws LaravelExcelException
+     * @return void
      */
-    public function export($ext = 'xls', Array $headers = array())
+    public function export($ext = 'xls')
     {
         // Set the extension
         $this->ext = $ext;
@@ -260,48 +259,46 @@ class LaravelExcelWriter {
         $this->_render();
 
         // Download the file
-        $this->_download($headers);
+        $this->_download();
     }
 
     /**
      * Convert and existing file to newly requested extension
-     * @param       $ext
-     * @param array $headers
+     * @param $ext
      */
-    public function convert($ext, Array $headers = array())
+    public function convert($ext)
     {
-        $this->export($ext, $headers);
+        $this->export($ext);
     }
 
     /**
      * Export and download the spreadsheet
      * @param  string $ext
-     * @param array   $headers
+     * @return void
      */
-    public function download($ext = 'xls', Array $headers = array())
+    public function download($ext = 'xls')
     {
-        $this->export($ext, $headers);
+        $this->export($ext);
     }
 
     /**
      * Download a file
-     * @param array $headers
      * @throws LaravelExcelException
+     * @return void
      */
-    protected function _download(Array $headers = array())
+    protected function _download()
     {
         // Set the headers
-        $this->_setHeaders(
-            $headers,
-            array(
-                'Content-Type'        => $this->contentType,
-                'Content-Disposition' => 'attachment; filename="' . $this->filename . '.' . $this->ext . '"',
-                'Expires'             => 'Mon, 26 Jul 1997 05:00:00 GMT', // Date in the past
-                'Last-Modified'       => Carbon::now()->format('D, d M Y H:i:s'),
-                'Cache-Control'       => 'cache, must-revalidate',
-                'Pragma'              => 'public'
-            )
-        );
+        $this->_setHeaders(array(
+
+            'Content-Type'        => $this->contentType,
+            'Content-Disposition' => 'attachment; filename="' . $this->filename . '.' . $this->ext . '"',
+            'Expires'             => 'Mon, 26 Jul 1997 05:00:00 GMT', // Date in the past
+            'Last-Modified'       => Carbon::now()->format('D, d M Y H:i:s'),
+            'Cache-Control'       => 'cache, must-revalidate',
+            'Pragma'              => 'public'
+
+        ));
 
         // Check if writer isset
         if (!$this->writer)
@@ -469,11 +466,6 @@ class LaravelExcelWriter {
      */
     protected function _setWriter()
     {
-        // Set pdf renderer
-        if ($this->format == 'PDF')
-            $this->setPdfRenderer();
-
-        // Create the writer
         $this->writer = PHPExcel_IOFactory::createWriter($this->excel, $this->format);
 
         // Set CSV delimiter
@@ -485,30 +477,9 @@ class LaravelExcelWriter {
         }
 
         // Calculation settings
-        $this->writer->setPreCalculateFormulas(Config::get('excel::export.calculate', false));
-
-        // Include Charts
-        $this->writer->setIncludeCharts(Config::get('excel::export.includeCharts', false));
+        $this->writer->setPreCalculateFormulas(Config::get('excel::export.calculate', true));
 
         return $this->writer;
-    }
-
-    /**
-     * Set the pdf renderer
-     * @throws \Exception
-     */
-    protected function setPdfRenderer()
-    {
-        // Get the driver name
-        $driver = Config::get('excel::export.pdf.driver');
-        $path = Config::get('excel::export.pdf.drivers.' . $driver . '.path');
-
-        // Disable autoloading for dompdf
-        define("DOMPDF_ENABLE_AUTOLOAD", false);
-
-        // Set the pdf renderer
-        if (!\PHPExcel_Settings::setPdfRenderer($driver, $path))
-            throw new \Exception("{$driver} could not be found. Make sure you've included it in your composer.json");
     }
 
     /**
@@ -516,12 +487,9 @@ class LaravelExcelWriter {
      * @param $headers
      * @throws LaravelExcelException
      */
-    protected function _setHeaders(Array $headers = array(), Array $default)
+    protected function _setHeaders($headers)
     {
         if (headers_sent()) throw new LaravelExcelException('[ERROR]: Headers already sent');
-
-        // Merge the default headers with the overruled headers
-        $headers = array_merge($default, $headers);
 
         foreach ($headers as $header => $value)
         {
@@ -578,6 +546,15 @@ class LaravelExcelWriter {
         {
             // Call the method from the excel object with the given params
             $return = call_user_func_array(array($this->excel, $method), $params);
+
+            return $return ? $return : $this;
+        }
+
+        // Call a php excel sheet method
+        elseif (method_exists($this->excel->getActiveSheet(), $method))
+        {
+            // Call the method from the excel object with the given params
+            $return = call_user_func_array(array($this->excel->getActiveSheet(), $method), $params);
 
             return $return ? $return : $this;
         }
