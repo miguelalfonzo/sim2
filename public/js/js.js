@@ -1,4 +1,9 @@
 var server = "";
+var w = document.location.pathname;
+var q= w.split("/public/");
+
+server =  q.length >0 ? q[0]+"/public/" : "";
+
 //Funciones Globales
 var datef = new Date();
 var dateactual = (datef.getMonth()+1)+'-'+datef.getFullYear();
