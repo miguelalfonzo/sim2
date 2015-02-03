@@ -1,4 +1,4 @@
-var server = "http://localhost/BitBucket/bago_dmkt_rg/public/";
+var server = "";
 //Funciones Globales
 var datef = new Date();
 var dateactual = (datef.getMonth()+1)+'-'+datef.getFullYear();
