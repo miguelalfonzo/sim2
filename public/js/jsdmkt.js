@@ -776,7 +776,7 @@ function newSolicitude() {
             callback: function (result) {
                 if (result) {
 
-                    $.post(server + 'cancelar-solicitud-sup', {idsolicitude: aux.attr('data-idsolicitude')})
+                    $.post(server + 'cancelar-solicitud-sup', {idsolicitude: aux.attr('data-idsolicitude'),_token :$(aux).attr('data-token')})
                         .done(function (data) {
 
 
