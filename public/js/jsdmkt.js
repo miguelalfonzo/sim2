@@ -663,7 +663,7 @@ function newSolicitude() {
     /**------------------------------------------------ SUPERVISOR ---------------------------------------------------*/
 
     /* list solicitude pending or depending of type state */
-    if(userType === 'S')
+    if(userType === 'S' && $('#state_view').val() != undefined)
         listSolicitude('sup', $('#state_view').val());
 
 
