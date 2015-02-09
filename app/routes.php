@@ -13,12 +13,8 @@
 
 
 /** Login */
-// route to show the login form
-
 Route::get('/', array('uses' => 'Dmkt\LoginController@showLogin'));
-
 Route::get('login', array('uses' => 'Dmkt\LoginController@showLogin'));
-// route to process the form
 Route::post('login', array('uses' => 'Dmkt\LoginController@doLogin'));
 Route::get('logout', array('uses' => 'Dmkt\LoginController@doLogout'));
 
@@ -29,7 +25,6 @@ Route::get('recharge', function(){
 Route::get('getclients', 'Dmkt\SolicitudeController@getClients');
 
 /** Auth */
-
 Route::group(array('before' => 'rm'), function () {
     /** Rep. Medico */
     Route::get('show_rm', 'Dmkt\SolicitudeController@show_rm');
@@ -39,7 +34,6 @@ Route::group(array('before' => 'rm'), function () {
     Route::get('listar-solicitudes-rm/{id}', 'Dmkt\SolicitudeController@listSolicitude');
     Route::get('getfondos/{id}', 'Dmkt\SolicitudeController@Fondo');
     Route::post('buscar-solicitudes-rm', 'Dmkt\SolicitudeController@searchSolicituds');
-
     // Expense
     Route::get('registrar-gasto/{token}', 'Expense\ExpenseController@show');
     Route::post('register-expense', 'Expense\ExpenseController@registerExpense');
@@ -48,7 +42,6 @@ Route::group(array('before' => 'rm'), function () {
     Route::get('edit-expense', 'Expense\ExpenseController@editExpense');
     Route::get('end-expense/{token}', 'Expense\ExpenseController@finishExpense');
     Route::get('ver-gasto/{token}', 'Expense\ExpenseController@viewExpense');
-
     // Ruc
     Route::post('consultarRuc', 'Expense\RucController@show');
     Route::get('ruc', function () {
@@ -61,16 +54,13 @@ Route::group(array('before' => 'rm'), function () {
     Route::get('ver-gasto-fondo/{token}','Expense\ExpenseController@viewExpenseFondo');
 });
 Route::group(array('before' => 'auth'), function () {
-
     Route::post('registrar-solicitud', 'Dmkt\SolicitudeController@registerSolicitude');
     Route::get('editar-solicitud/{id}', 'Dmkt\SolicitudeController@editSolicitude');
     Route::post('editar-solicitud', 'Dmkt\SolicitudeController@formEditSolicitude');
-
 });
 
 Route::group(array('before' => 'sup'), function () {
     /** Supervisor */
-
     Route::get('show_sup', 'Dmkt\SolicitudeController@show_sup');
     Route::get('nueva-solicitud-sup', 'Dmkt\SolicitudeController@newSolicitude');
     Route::get('ver-solicitud-sup/{id}', 'Dmkt\SolicitudeController@viewSolicitudeSup');
@@ -84,23 +74,18 @@ Route::group(array('before' => 'sup'), function () {
     Route::post('cancelar-solicitud-sup', 'Dmkt\SolicitudeController@cancelSolicitudeSup');
     Route::get('desbloquear-solicitud-sup/{token}', 'Dmkt\SolicitudeController@disBlockSolicitudeSup');
 });
-
-
 /*------------------ Test --------------**/
 Route::get('prueba', 'Dmkt\FondoController@test');
-
 
 /**
  * |-------------------------------------------------------------------------------------------- |
  * | Fondo Institucional |
  * |-------------------------------------------------------------------------------------------- |
  */
-
 Route::group(array ('before' => 'ager') ,function(){
 
     Route::get('registrar-fondo','Dmkt\FondoController@getRegister');
     Route::post('registrar-fondo','Dmkt\FondoController@postRegister');
-
     Route::get('get-fondo/{id}','Dmkt\FondoController@getFondo');
     Route::post('delete-fondo','Dmkt\FondoController@delFondo');
     Route::post('update-fondo','Dmkt\FondoController@updateFondo');
@@ -119,7 +104,6 @@ Route::get('list-fondos/{date}','Dmkt\FondoController@getFondos');
  * |-------------------------------------------------------------------------------------------- |
  */
 Route::group(array('before' => 'gerprod'), function () {
-
     Route::get('show_gerprod', 'Dmkt\SolicitudeController@show_gerprod');
     Route::get('listar-solicitudes-gerprod/{id}', 'Dmkt\SolicitudeController@listSolicitudeGerProd');
     Route::get('ver-solicitud-gerprod/{id}', 'Dmkt\SolicitudeController@viewSolicitudeGerProd');
@@ -137,7 +121,6 @@ Route::group(array('before' => 'gerprod'), function () {
  * |-------------------------------------------------------------------------------------------- |
  */
 Route::group(array('before' => 'gercom'), function () {
-
     Route::get('show_gercom', 'Dmkt\SolicitudeController@show_gercom');
     Route::get('listar-solicitudes-gercom/{id}', 'Dmkt\SolicitudeController@listSolicitudeGerCom');
     Route::get('ver-solicitud-gercom/{id}', 'Dmkt\SolicitudeController@viewSolicitudeGerCom');
@@ -145,6 +128,7 @@ Route::group(array('before' => 'gercom'), function () {
     Route::get('aprobar-solicitud', 'Dmkt\SolicitudeController@redirectApprovedSolicitude');
     Route::post('buscar-solicitudes-gercom', 'Dmkt\SolicitudeController@searchSolicitudsGerCom');
     Route::post('rechazar-solicitud-gercom', 'Dmkt\SolicitudeController@denySolicitudeGerCom');
+    Route::get('cancelar-solicitud-gercom/{token}', 'Dmkt\SolicitudeController@disBlockSolicitudeGerCom');
 
 });
 
@@ -155,7 +139,6 @@ Route::group(array('before' => 'gercom'), function () {
  */
 
 Route::group(array('before' => 'cont'), function () {
-
     Route::get('show_cont', 'Dmkt\SolicitudeController@show_cont');
     Route::get('ver-solicitud-cont/{id}', 'Dmkt\SolicitudeController@viewSolicitudeCont');
     Route::get('listar-solicitudes-cont/{id}', 'Dmkt\SolicitudeController@listSolicitudeCont');
@@ -163,13 +146,10 @@ Route::group(array('before' => 'cont'), function () {
     Route::post('enable-deposit', 'Dmkt\SolicitudeController@enableDeposit');
     Route::get('revisar-asiento-solicitud/{token}', 'Dmkt\SolicitudeController@viewSeatSolicitude');
     Route::get('generar-asiento-solicitud/{token}', 'Dmkt\SolicitudeController@viewGenerateSeatSolicitude');
-    Route::post('generate-seat-solicitude', 'Dmkt\SolicitudeController@generateSeatSolicitude');
-
-    
+    Route::post('generate-seat-solicitude', 'Dmkt\SolicitudeController@generateSeatSolicitude');  
     Route::get('revisar-asiento-gasto/{token}', 'Dmkt\SolicitudeController@viewSeatExpense');
     Route::get('generar-asiento-gasto/{token}', 'Dmkt\SolicitudeController@viewGenerateSeatExpense');
     Route::post('generate-seat-expense', 'Dmkt\SolicitudeController@generateSeatExpense');
-
     //RM
     Route::get('revisar-gasto/{token}', 'Expense\ExpenseController@showCont');
     Route::post('consultarRucCont', 'Expense\RucController@show');
@@ -181,7 +161,6 @@ Route::group(array('before' => 'cont'), function () {
 // App::error(function (ModelNotFoundException $e) {
 //     return View::make('notfound');
 // });
-
 App::missing(function ($exception) {
    // return Redirect::to('show_rm');
 });
@@ -195,7 +174,6 @@ App::missing(function ($exception) {
  */
 
 Route::group(array('before' => 'tes'), function(){
-
     Route::get('show_tes', 'Deposit\DepositController@show_tes');
     Route::get('listar-solicitudes-tes/{id}', 'Deposit\DepositController@listSolicitudeTes');
     Route::get('ver-solicitud-tes/{id}', 'Deposit\DepositController@viewSolicitudeTes');
@@ -205,11 +183,7 @@ Route::group(array('before' => 'tes'), function(){
     Route::post('deposit-fondo','Deposit\DepositController@depositFondoTes');
     Route::get('list-fondos-tesoreria/{date}','Dmkt\FondoController@getFondosTesoreria');
 });
-
-/* =============================================================================================== */
-
-
-//test
+//Test
 Route::get('hola', 'Expense\ExpenseController@test');
 Route::get('a/{token}', 'Expense\ExpenseController@reportExpense');
 Route::get('report-fondo/{token}','Expense\ExpenseController@reportExpenseFondo');

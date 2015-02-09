@@ -153,7 +153,6 @@ return array(
 	*/
 
 	'aliases' => array(
-
 		'App'               => 'Illuminate\Support\Facades\App',
 		'Artisan'           => 'Illuminate\Support\Facades\Artisan',
 		'Auth'              => 'Illuminate\Support\Facades\Auth',
@@ -196,5 +195,4 @@ return array(
         'PDF' => 'Thujohn\Pdf\PdfFacade',
         'Excel' => 'Maatwebsite\Excel\Facades\Excel',
 	),
-
 );

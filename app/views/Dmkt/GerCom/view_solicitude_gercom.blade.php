@@ -206,10 +206,12 @@
 
                     <a id="deny_solicitude_gercom" name="button1id" class="btn btn-primary deny_solicitude">Rechazar
                     </a>
-                    @endif
+                    <a id="button2id" href="{{URL::to('cancelar-solicitud-gercom').'/'.$solicitude->token}}" name="button2id"
+           class="btn btn-primary">Cancelar</a>
+                    @else
                     <a id="button2id" href="{{URL::to('show_sup')}}" name="button2id"
                        class="btn btn-primary">Cancelar</a>
-
+                    @endif
                 </div>
             </div>
         </form>

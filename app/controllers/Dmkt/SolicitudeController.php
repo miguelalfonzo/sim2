@@ -257,7 +257,6 @@ class SolicitudeController extends BaseController
 
     public function editSolicitude($token)
     {
-
         $families = Marca::orderBy('descripcion', 'Asc')->get();
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $id = $solicitude->idsolicitud;
@@ -265,13 +264,10 @@ class SolicitudeController extends BaseController
         $clients = Client::whereIn('clcodigo', $clients)->get(array('clcodigo', 'clnombre'));
         $families2 = DB::table('DMKT_RG_SOLICITUD_FAMILIA')->where('idsolicitud', $id)->lists('idfamilia');
         $families2 = Marca::whereIn('id', $families2)->get(array('id', 'descripcion'));
-
         $typesolicituds = TypeSolicitude::all();
         $typePayments = TypePayment::all();
         $fondos = Fondo::all();
-
         $data = [
-
             'solicitude' => $solicitude,
             'clients' => $clients,
             'families' => $families,
@@ -280,8 +276,6 @@ class SolicitudeController extends BaseController
             'fondos' => $fondos,
             'typePayments' => $typePayments
         ];
-        //echo json_encode($data);
-
         return View::make('Dmkt.Rm.register_solicitude', $data);
     }
 
@@ -621,7 +615,8 @@ class SolicitudeController extends BaseController
     public function derivedSolicitude($token,$derive=0)
     {
 
-        Solicitude::where('token', $token)->update(array('derived' => 1 ,'idfondo' => 31));
+        Solicitude::where('token', $token)->update(array('derived' => 1 ,'idfondo' => 31, 'blocked' => 0));
+        
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
 
         $id = $solicitude->idsolicitud;
@@ -820,15 +815,19 @@ class SolicitudeController extends BaseController
             'fondos' => $fondos
 
         ];
+        //echo json_encode($data); die;
         return View::make('Dmkt.GerProd.view_solicitude_gerprod', $data);
     }
 
     public function disBlockSolicitudeGerProd($token)
     {
-
+        //Desbloquenado La solicitud al presionar el boton Cancelar
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
+        $solicitude->blocked = 0 ;
+        $solicitude->save();
         SolicitudeGer::where('idsolicitud', $solicitude->idsolicitud) // desblockeamos la solicitud para que el otro gerente no lo pueda editar
         ->update(array('blocked' => 0));
+
         return Redirect::to('show_gerprod');
 
     }
@@ -1081,6 +1080,17 @@ class SolicitudeController extends BaseController
 
         $view = View::make('Dmkt.GerCom.view_solicituds_gercom')->with('solicituds', $solicituds);
         return $view;
+
+    }
+
+     public function disBlockSolicitudeGerCom($token)
+    {
+        //Desbloquenado La solicitud al presionar el boton Cancelar
+        $solicitude = Solicitude::where('token', $token)->firstOrFail();
+        $solicitude->blocked = 0 ;
+        $solicitude->save();
+
+        return Redirect::to('show_gercom');
 
     }
 
