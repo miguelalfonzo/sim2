@@ -23,8 +23,7 @@ class FondoController extends BaseController
     {
         //$data = DB::table('FONDOINSTITUCIONAL')->select('repmed','institucion','cuenta','supervisor','total')->toJson();
         /*$dato = FondoInstitucional::all();
-        
-        
+              
         Excel::create('Filename4', function($excel) use($dato) {
         
         $excel->sheet('Sheetname', function($sheet) use($dato) {
@@ -32,8 +31,7 @@ class FondoController extends BaseController
         $sheet->fromArray($dato);
         $sheet->row(1, array(
         'test1', 'test2', 'test4' , 'test5','test3'
-        ));
-        
+        ));    
         });
         
         })->export('xls');*/
@@ -49,9 +47,7 @@ class FondoController extends BaseController
             echo json_encode($results);
         });
         
-        
         // Demo::display();
-        
         
     }
     

@@ -933,7 +933,7 @@ $(function(){
         $(".search-ruc").on("click",function(){
             if($(this).attr('data-sol'))
             {
-                rout_ruc = 'consultarRuc';
+                rout_ruc = 'http://app.bagoperu.com.pe/snt_service/json/';
             }
             else
             {
@@ -959,12 +959,11 @@ $(function(){
             else
             {
                 var l = Ladda.create(document.getElementById('razon'));
-                data.ruc    = ruc;
                 data._token = $("input[name=_token]").val();
                 $.ajax({
-                    type: 'post',
-                    url: server+rout_ruc,
-                    data: data,
+                    type: 'get',
+                    url: rout_ruc + ruc + '/',
+                    cache: false,
                     beforeSend:function(){
                         l.start();
                         $("#razon").css("color","#5c5c5c");
@@ -992,6 +991,8 @@ $(function(){
                         $("#ruc-hide").val(ruc);
                         $("#razon").html(response['razonSocial']);
                     }
+                    $("#ruc-hide").val(ruc);
+                    $("#razon").html(response.razon_social);
                     l.stop();
                     $("#ruc").attr("disabled",false);
                 });
