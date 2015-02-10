@@ -201,7 +201,7 @@ class SolicitudeController extends BaseController
                     $solicitude_families->save();
                 }
 
-                if(isset($fondo) && $fondo == 31 ) // si es de tipo actividad "otros" lo deriva a los gerentes
+                if(isset($fondo) && $fondo == FONDO_DERIVADO ) // si es de tipo actividad "otros" lo deriva a los gerentes
                     $this->derivedSolicitude($token,1);
 
                 return $typeUser;
@@ -615,7 +615,7 @@ class SolicitudeController extends BaseController
     public function derivedSolicitude($token,$derive=0)
     {
 
-        Solicitude::where('token', $token)->update(array('derived' => 1 ,'idfondo' => 31, 'blocked' => 0));
+        Solicitude::where('token', $token)->update(array('derived' => 1 ,'idfondo' => FONDO_DERIVADO, 'blocked' => 0));
         
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
 

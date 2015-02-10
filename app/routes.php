@@ -1,6 +1,12 @@
 <?php
 
+
+
 /*
+
+use Common/BrandExpense;
+use Common/Fondo;
+
 |--------------------------------------------------------------------------
 | Application Routes
 |--------------------------------------------------------------------------
@@ -188,3 +194,12 @@ Route::get('hola', 'Expense\ExpenseController@test');
 Route::get('a/{token}', 'Expense\ExpenseController@reportExpense');
 Route::get('report-fondo/{token}','Expense\ExpenseController@reportExpenseFondo');
 Route::get('report', 'ExpenseController@reportExpense');
+
+
+// Test
+
+/*Route::get('test_expense', function()
+{
+
+    return Fondo::all();
+});*/

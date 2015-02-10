@@ -145,9 +145,9 @@
                         @foreach($fondos as $sub)
                             @if($sub->idfondo != 31 && $sub->idfondo !=1)
                                 @if($sub->idfondo == $solicitude->idfondo)
-                                <option selected value="{{$sub->idfondo}}">{{$sub->nombre}} -> {{$sub->saldo}}</option>
+                                <option selected value="{{$sub->idfondo}}">{{$sub->nombre_mkt}} -> {{$sub->saldo}}</option>
                                 @else
-                                <option value="{{$sub->idfondo}}">{{$sub->nombre}} -> {{$sub->saldo}}</option>
+                                <option value="{{$sub->idfondo}}">{{$sub->nombre_mkt}} -> {{$sub->saldo}}</option>
                                 @endif
                             @endif
                         @endforeach
