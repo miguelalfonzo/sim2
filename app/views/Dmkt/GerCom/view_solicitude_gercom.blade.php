@@ -100,7 +100,7 @@
 
                 <div class="col-sm-12 col-md-12">
                     <input id="textinput" name="textinput" type="text" placeholder=""
-                           value="{{$solicitude->subtype->nombre}}" readonly
+                           value="{{$solicitude->subtype->nombre_mkt}}" readonly
                            class="form-control input-md">
 
                 </div>
