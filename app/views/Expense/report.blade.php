@@ -62,7 +62,7 @@
                                     @endforeach
                                     {{mb_convert_case(trim($stringN,'-'),MB_CASE_TITLE,'UTF-8')}}
                                 </td>
-                                <td>{{$value->monto}}</td>
+                                <td>{{(real)$value->monto}}</td>
                             </tr>    
                         @endforeach
                         <!-- <tr>
