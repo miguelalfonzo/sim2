@@ -15,7 +15,7 @@
             <section style="text-align:center;margin-top:2.5em;">
                 <strong><p style="display:inline">Fecha:</strong>&nbsp;{{$date['toDay']}}</p>
                 <strong><p style="display:inline">Autorizado por:</strong>&nbsp;{{mb_convert_case($name,MB_CASE_TITLE,'UTF-8')}}</p>
-                <strong><p style="display:inline">Fondo:</strong>&nbsp;{{mb_convert_case($solicitude->subtype->nombre,MB_CASE_TITLE,'UTF-8')}}</p>
+                <strong><p style="display:inline">Fondo:</strong>&nbsp;{{mb_convert_case($solicitude->subtype->nombre_mkt,MB_CASE_TITLE,'UTF-8')}}</p>
                 <strong><p style="display:inline">Código Comercial:</strong>&nbsp;{{$solicitude->idsolicitud}}</p>
                 <strong><p style="display:inline">N° de Depósito:</strong>&nbsp;101</p>
             </section>

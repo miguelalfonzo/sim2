@@ -160,7 +160,7 @@
 									<tbody>
 										<tr>
 											<th class="name_account">Fondo</th>
-											<th class="number_account">1413360</th>
+											<th class="number_account">{{$solicitude->subtype->cuenta_mkt}}</th>
 											<th class="date_ini">{{$date['toDay']}}</th>
 											<th class="dc">D</th>
 											<th class="total">{{$solicitude->monto}}</th>
@@ -176,7 +176,7 @@
 										</tr>
 										<tr>
 											<th class="name_account">Bancos</th>
-											<th class="number_account">1041100</th>
+											<th class="number_account">{{$solicitude->subtype->cuenta_cont}}</th>
 											<th class="date_ini">{{$date['toDay']}}</th>
 											<th class="dc">C</th>
 											<th class="total">{{$solicitude->monto}}</th>

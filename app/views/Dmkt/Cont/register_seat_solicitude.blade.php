@@ -40,7 +40,7 @@
 					<div class="col-xs-12 col-sm-6 col-md-4">
 						<div class="form-expense">
 							<label>Fondo</label>
-							<input type="text" class="form-control" value="{{mb_convert_case($solicitude->subtype->nombre, MB_CASE_TITLE, 'UTF-8')}}" disabled>
+							<input type="text" class="form-control" value="{{mb_convert_case($solicitude->subtype->nombre_mkt, MB_CASE_TITLE, 'UTF-8')}}" disabled>
 						</div>
 					</div>
 					<div class="col-xs-12 col-sm-6 col-md-4">
@@ -138,7 +138,7 @@
 									<tbody>
 										<tr>
 											<th class="name_account">Fondo</th>
-											<th class="number_account">1413360</th>
+											<th class="number_account">{{$solicitude->subtype->cuenta_mkt}}</th>
 											<th class="date_ini">{{$date['toDay']}}</th>
 											<th class="dc">D</th>
 											<th class="total">{{$solicitude->monto}}</th>
@@ -154,7 +154,7 @@
 										</tr>
 										<tr>
 											<th class="name_account">Bancos</th>
-											<th class="number_account">1041100</th>
+											<th class="number_account">{{$solicitude->subtype->cuenta_cont}}</th>
 											<th class="date_ini">{{$date['toDay']}}</th>
 											<th class="dc">C</th>
 											<th class="total">{{$solicitude->monto}}</th>
