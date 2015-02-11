@@ -124,17 +124,27 @@
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Fondo</label>
 
     <div class="col-sm-12 col-md-12">
+        @if($solicitude->estado == PENDIENTE)
         <select id="sub_type_activity" name="sub_type_activity" class="form-control">
             @foreach($fondos as $sub)
                 @if(isset($solicitude->idfondo) && $sub->idfondo == $solicitude->subtype->idfondo)
-                    <option selected value="{{$sub->idfondo}}">{{$sub->nombre}}</option>
+                    <option selected value="{{$sub->idfondo}}">{{$sub->nombre_mkt}}</option>
                 @else
-                    @if($sub->idfondo == 1)
-                    <option value="{{$sub->idfondo}}">{{$sub->nombre}}</option>
+                    @if($sub->idfondo == FONDO_SUPERVISOR)
+                    <option value="{{$sub->idfondo}}">{{$sub->nombre_mkt}}</option>
                     @endif
                 @endif
             @endforeach
         </select>
+        @else
+        <select id="sub_type_activity" name="sub_type_activity" class="form-control" disabled>
+            @foreach($fondos as $sub)
+                @if($solicitude->idfondo == $sub->idfondo)
+                    <option selected value="{{$sub->idfondo}}">{{$sub->nombre_mkt}}</option>
+                @endif
+            @endforeach
+        </select>
+        @endif
     </div>
 </div>
 <div class="form-group col-sm-6 col-md-4 col-lg-4">
