@@ -975,26 +975,26 @@ $(function(){
                         $("#ruc").attr("disabled",false);
                     }
                 }).done(function (response){
-                    if(response == 0)
-                    {
-                        $("#razon").html("Ruc menor a 11 digitos.");
-                    }
-                    else if(response == 1)
-                    {
-                        $("#ruc").addClass("error-incomplete");
-                        $("#razon").val(1);
-                        $("#razon").html("No existe el Ruc consultado.");
-                    }
-                    else
-                    {
+                    if(response.error == undefined){
                         $("#razon").val(2);
                         $("#ruc-hide").val(ruc);
-                        $("#razon").html(response['razonSocial']);
+                        $("#razon").html(response['razon_social']);
+                    }else{
+                        if(response.code == 1){
+                            $("#razon").html("RUC menor a 11 digitos.");
+                        }
+                        if(response.code == 2){
+                            $("#ruc").addClass("error-incomplete");
+                            $("#razon").val(1);
+                            $("#razon").html("No existe el RUC consultado.");
+                        }if(response.code == 4){
+                            $("#razon").html(response.error + ". "+ response.msg);
+                        }
+                        $("#ruc-hide").val(ruc);
+                        //$("#razon").html(response.razon_social);
+                        l.stop();
+                        $("#ruc").attr("disabled",false);
                     }
-                    $("#ruc-hide").val(ruc);
-                    $("#razon").html(response.razon_social);
-                    l.stop();
-                    $("#ruc").attr("disabled",false);
                 });
             }
         });
