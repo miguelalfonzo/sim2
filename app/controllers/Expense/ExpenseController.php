@@ -19,6 +19,7 @@ use \Redirect;
 use \PDF;
 use \Client;
 use \Dmkt\TypeRetention;
+use \Log;
 
 class ExpenseController extends BaseController{
 
@@ -142,7 +143,7 @@ class ExpenseController extends BaseController{
 	}
 
 	public function registerExpense(){
-
+		Log::error('inicio');
 		$inputs         = Input::all();
         if($inputs['type']=='S')
 		$row_solicitude = Solicitude::where('token',$inputs['token'])->firstOrFail();

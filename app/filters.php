@@ -207,6 +207,46 @@ Route::filter('active-user',function(){
         return Redirect::to('login');
     }
 });
+
+Route::filter('rm|cont', function () 
+{
+    if (Auth::check()) 
+    {
+        if (! Auth::user()->type == 'R' || Auth::user()->type == 'C' )
+        {
+            if (Auth::user()->type == 'S')
+            {
+                return Redirect::to('show_sup');
+            }
+            else if (Auth::user()->type == 'P')
+            {
+                return Redirect::to('show_gerprod');
+            }
+            else if(Auth::user()->type == 'G')
+            {
+                return Redirect::to('show_gercom');
+            }
+            else if (Auth::user()->type == 'T')
+            {
+                return Redirect::to('show_tes');
+            }    
+            else if (Auth::user()->type == 'AG')
+            {
+                return Redirect::to('registrar-fondo');
+            }
+            else
+            {
+                return Redirect::to('login');           
+            }        
+        }
+    }
+    else
+    {
+        return Redirect::to('login');
+    }
+});
+
+
 /*
 |--------------------------------------------------------------------------
 | Guest Filter

@@ -937,7 +937,7 @@ $(function(){
             }
             else
             {
-                rout_ruc = 'consultarRucCont';
+                rout_ruc = 'http://app.bagoperu.com.pe/snt_service/json/';
             }
             $(".message-expense").text("");
             $("#razon").removeClass('error-incomplete');

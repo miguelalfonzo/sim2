@@ -42,7 +42,6 @@ Route::group(array('before' => 'rm'), function () {
     Route::post('buscar-solicitudes-rm', 'Dmkt\SolicitudeController@searchSolicituds');
     // Expense
     Route::get('registrar-gasto/{token}', 'Expense\ExpenseController@show');
-    Route::post('register-expense', 'Expense\ExpenseController@registerExpense');
     Route::post('delete-expense', 'Expense\ExpenseController@deleteExpense');
     Route::post('update-expense', 'Expense\ExpenseController@updateExpense');
     Route::get('edit-expense', 'Expense\ExpenseController@editExpense');
@@ -195,7 +194,9 @@ Route::get('a/{token}', 'Expense\ExpenseController@reportExpense');
 Route::get('report-fondo/{token}','Expense\ExpenseController@reportExpenseFondo');
 Route::get('report', 'ExpenseController@reportExpense');
 
-
+Route::group(array('before' => 'rm|cont'), function () {
+    Route::post('register-expense', 'Expense\ExpenseController@registerExpense');
+});
 // Test
 
 /*Route::get('test_expense', function()
