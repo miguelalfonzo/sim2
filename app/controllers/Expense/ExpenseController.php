@@ -143,7 +143,7 @@ class ExpenseController extends BaseController{
 	}
 
 	public function registerExpense(){
-		Log::error('inicio');
+		Log::error('registerExpense');
 		$inputs         = Input::all();
         if($inputs['type']=='S')
 		$row_solicitude = Solicitude::where('token',$inputs['token'])->firstOrFail();
@@ -389,7 +389,7 @@ class ExpenseController extends BaseController{
 			'charge'     => $charge,
 			'expense'    => $expense
 		];
-		$html = View::make('Expense.report',$data);
+		$html = View::make('Expense.report',$data)->render();
 		return PDF::load($html, 'A4', 'landscape')->show();
 	}
     public function reportExpenseFondo($token){

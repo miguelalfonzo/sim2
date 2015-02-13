@@ -194,7 +194,7 @@
 				</section>
 				<section class="row reg-expense align-center" style="margin:1.5em 0">
 					<div class="col-xs-12 col-sm-12 col-md-12">
-						<a href="#" id="seat-solicitude" class="btn btn-success" style="margin:-2em 2em .5em 0">Generar Asiento Solicitud</a>
+						<a id="seat-solicitude" class="btn btn-success" style="margin:-2em 2em .5em 0">Generar Asiento Solicitud</a>
 						<a href="{{URL::to('revisar-asiento-solicitud')}}/{{$solicitude->token}}" class="btn btn-danger" style="margin:-2em 2em .5em 0">Atras</a>
 					</div>
 				</section>

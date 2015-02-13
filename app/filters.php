@@ -1,5 +1,7 @@
 <?php
 
+use \Log;
+
 /*
 |--------------------------------------------------------------------------
 | Application & Route Filters
@@ -208,8 +210,9 @@ Route::filter('active-user',function(){
     }
 });
 
-Route::filter('rm|cont', function () 
+Route::filter('rm_cont', function () 
 {
+    Log::error('filter rm|cont inicio');
     if (Auth::check()) 
     {
         if (! Auth::user()->type == 'R' || Auth::user()->type == 'C' )

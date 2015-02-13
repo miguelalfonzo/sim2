@@ -194,7 +194,8 @@ Route::get('a/{token}', 'Expense\ExpenseController@reportExpense');
 Route::get('report-fondo/{token}','Expense\ExpenseController@reportExpenseFondo');
 Route::get('report', 'ExpenseController@reportExpense');
 
-Route::group(array('before' => 'rm|cont'), function () {
+Route::group(array('before' => 'rm_cont'), function ()
+{
     Route::post('register-expense', 'Expense\ExpenseController@registerExpense');
 });
 // Test
