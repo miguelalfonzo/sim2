@@ -19,6 +19,7 @@ use \Redirect;
 use \PDF;
 use \Client;
 use \Dmkt\TypeRetention;
+use \Log;
 
 class ExpenseController extends BaseController{
 
@@ -142,6 +143,7 @@ class ExpenseController extends BaseController{
 	}
 
 	public function registerExpense(){
+
 		$result = array(); 
 		$inputs = Input::all();
 
@@ -414,7 +416,7 @@ class ExpenseController extends BaseController{
 			'charge'     => $charge,
 			'expense'    => $expense
 		];
-		$html = View::make('Expense.report',$data);
+		$html = View::make('Expense.report',$data)->render();
 		return PDF::load($html, 'A4', 'landscape')->show();
 	}
     public function reportExpenseFondo($token){

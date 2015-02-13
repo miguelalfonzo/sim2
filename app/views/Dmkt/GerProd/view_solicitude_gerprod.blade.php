@@ -138,7 +138,7 @@
             @if($solicitude->estado != PENDIENTE)
 
                     <input id="textinput" name="amount_fac" type="text" placeholder=""
-                           value="{{$solicitude->fondo->nombre}}" readonly
+                           value="{{$solicitude->fondo->nombre_mkt}}" readonly
                            class="form-control input-md">
             @else
               <select id="sub_type_activity" name="sub_type_activity" class="form-control">
@@ -158,7 +158,7 @@
         <select id="sub_type_activity" name="sub_type_activity" class="form-control">
             @foreach($fondos as $sub)
                 @if($sub->idfondo != 31 && $sub->idfondo !=1)
-                    <option value="{{$sub->idfondo}}">{{$sub->nombre}} -> {{$sub->saldo}}</option>
+                    <option value="{{$sub->idfondo}}">{{$sub->nombre_mkt}} -> {{$sub->saldo}}</option>
                 @endif
             @endforeach
         </select>

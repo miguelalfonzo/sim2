@@ -223,6 +223,7 @@ $(function(){
         //Generate Seat Solicitude
         $("#seat-solicitude").on("click",function(e){
             e.preventDefault();
+            var data = {};
             data._token = $("input[name=_token]").val();
             var name_account = [];
             var number_account = [];
@@ -250,9 +251,11 @@ $(function(){
             bootbox.confirm("¿Esta seguro que desea Generar el Asiento Contable?", function(result) {
                 if(result)
                 {
+
                     $.post(server+'generate-seat-solicitude', data)
                     .done( function (data){
-                        if(data == 1)
+                        data = JSON.parse(data);
+                        if(data.Status == 1)
                         {
                             bootbox.alert("<p class='green'>Se generó el asiento contable correctamente.</p>", function(){
                                 window.location.href = server+'show_cont';
@@ -260,7 +263,7 @@ $(function(){
                         }
                         else
                         {
-                            bootbox.alert("<p class='red'>Error, no se puede generar el asiento contable.</p>");
+                            bootbox.alert("<p class='red'>" + data.Description + "</p>");
                         }
                     });
                 }
@@ -968,14 +971,15 @@ $(function(){
     
         //Search Social Reason in SUNAT once introduced the RUC
         $(".search-ruc").on("click",function(){
-            if($(this).attr('data-sol'))
+            /*if($(this).attr('data-sol'))
             {
                 rout_ruc = 'http://app.bagoperu.com.pe/snt_service/json/';
             }
             else
             {
-                rout_ruc = 'consultarRucCont';
-            }
+                rout_ruc = 'http://app.bagoperu.com.pe/snt_service/json/';
+            }*/
+            rout_ruc = 'http://app.bagoperu.com.pe/snt_service/json/';
             $(".message-expense").text("");
             $("#razon").removeClass('error-incomplete');
             var ruc = $("#ruc").val();
@@ -1040,8 +1044,7 @@ $(function(){
         {
             return $.ajax({
                 type: 'post',
-                url: server+'register-expense',
-                datatype: 'json',
+                url: server+'register-expense', 
                 asynch: false,
                 data: data,
                 beforeSend: function(){

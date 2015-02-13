@@ -9,13 +9,13 @@
     <div class="background">
         <header style="margin-top:-2em;">
             <img src="img/logo-report.png" alt="" style="width:170px;margin-left:-5em;">
-            <p><strong>REPORTE DE GASTOS PUBLICIDAD Y PROMOCIÓN SEGÚN PRESUPUESTO</strong></p>
+            <h1><p><strong>REPORTE DE GASTOS PUBLICIDAD Y PROMOCIÓN SEGÚN PRESUPUESTO</strong></p><h1>
         </header>
         <main>
             <section style="text-align:center;margin-top:2.5em;">
                 <strong><p style="display:inline">Fecha:</strong>&nbsp;{{$date['toDay']}}</p>
                 <strong><p style="display:inline">Autorizado por:</strong>&nbsp;{{mb_convert_case($name,MB_CASE_TITLE,'UTF-8')}}</p>
-                <strong><p style="display:inline">Fondo:</strong>&nbsp;{{mb_convert_case($solicitude->subtype->nombre,MB_CASE_TITLE,'UTF-8')}}</p>
+                <strong><p style="display:inline">Fondo:</strong>&nbsp;{{mb_convert_case($solicitude->subtype->nombre_mkt,MB_CASE_TITLE,'UTF-8')}}</p>
                 <strong><p style="display:inline">Código Comercial:</strong>&nbsp;{{$solicitude->idsolicitud}}</p>
                 <strong><p style="display:inline">N° de Depósito:</strong>&nbsp;101</p>
             </section>
@@ -62,7 +62,7 @@
                                     @endforeach
                                     {{mb_convert_case(trim($stringN,'-'),MB_CASE_TITLE,'UTF-8')}}
                                 </td>
-                                <td>{{$value->monto}}</td>
+                                <td>{{$solicitude->typemoney->simbolo}}{{(real)$value->monto}}</td>
                             </tr>    
                         @endforeach
                         <!-- <tr>

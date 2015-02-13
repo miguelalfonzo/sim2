@@ -18,7 +18,7 @@
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Fondo</label>
-						<input type="text" class="form-control" value="{{mb_convert_case($solicitude->subtype->nombre, MB_CASE_TITLE, 'UTF-8')}}" disabled>
+						<input type="text" class="form-control" value="{{mb_convert_case($solicitude->subtype->nombre_mkt, MB_CASE_TITLE, 'UTF-8')}}" disabled>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
@@ -197,7 +197,7 @@
 			<section class="row reg-expense" style="margin:0">
 				<div class="col-xs-12 col-sm-12 col-md-12">
 					<div class="form-expense">
-						<button id="save-expense" type="button" class="btn btn-primary">Registrar</button>
+						<button id="save-expense" data-type="S" type="button" class="btn btn-primary">Registrar</button>
 						<div class="inline"><p class="inline message-expense"></p></div>
 					</div>
 				</div>
@@ -227,7 +227,7 @@
 												<th class="razon">{{$val->razon}}</th>
 												<th class="voucher_number">{{$val->num_prefijo.'-'.$val->num_serie}}</th>
 												<th class="date_movement">{{date('d/m/Y',strtotime($val->fecha_movimiento))}}</th>
-												<th class="total"><span class="type_moeny">{{$solicitude->typemoney->simbolo}}&nbsp;<span class="total_expense">{{$val->monto}}</span></th>
+												<th class="total"><span class="type_moeny">{{$solicitude->typemoney->simbolo}}&nbsp;<span class="total_expense">{{(real)$val->monto}}</span></th>
 												<th><a class="edit-expense" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
 											</tr>	
 										@endforeach

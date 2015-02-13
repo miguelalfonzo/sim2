@@ -22,6 +22,8 @@ use \Excel;
 use \Response;
 use \Illuminate\Database\Query\Builder;
 use \Expense\Expense;
+use \Expense\Entry;
+use \Log;
 
 class SolicitudeController extends BaseController
 {
@@ -84,7 +86,6 @@ class SolicitudeController extends BaseController
 
     public function newSolicitude()
     {
-
         $families = Marca::orderBy('descripcion', 'Asc')->get();
         $typePayments = TypePayment::all();
         $fondos = Fondo::all();
@@ -472,20 +473,28 @@ class SolicitudeController extends BaseController
 
     public function viewSolicitudeSup($token)
     {
-        $sol = Solicitude :: where('token', $token)->firstOrFail();
+        $sol = Solicitude::where('token', $token)->firstOrFail();
 
         if ($sol->user->type == 'R' && $sol->estado == PENDIENTE)
+        {
             Solicitude::where('token', $token)->update(array('blocked' => 1));
+        }
 
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $typePayments = TypePayment::all();
         $managers = Manager::all();
         $fondos = Fondo::all();
+        foreach($solicitude->families as $v)
+        {
+            $gerentes[] = $v->marca->manager;
+        }
+        Log::error(json_encode($gerentes));
         $data = [
             'solicitude' => $solicitude,
             'managers' => $managers,
             'typePayments' => $typePayments,
-            'fondos' => $fondos
+            'fondos' => $fondos,
+            'gerentes' => $gerentes
         ];
         return View::make('Dmkt.Sup.view_solicitude_sup', $data);
     }
@@ -613,23 +622,21 @@ class SolicitudeController extends BaseController
    }
 
     public function derivedSolicitude($token,$derive=0)
-    {
-
-        Solicitude::where('token', $token)->update(array('derived' => 1 ,'idfondo' => FONDO_DERIVADO, 'blocked' => 0));
-        
+    {   
+        Solicitude::where('token', $token)->update(array('derived' => 1 , 'blocked' => 0));
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
-
         $id = $solicitude->idsolicitud;
         $sol = Solicitude::find($id);
-        foreach ($sol->families as $v) {
+        foreach ($sol->families as $v) 
+        {
             $solGer = new SolicitudeGer;
             $solGer->idsolicitud_gerente = $solGer->searchId() + 1;
             $solGer->idsolicitud = $id;
             $solGer->idgerprod = $v->marca->manager->id;
             $solGer->save();
-        }
 
-        if($derive == 0)return Redirect::to('show_sup');
+        }
+        return Redirect::to('show_sup');
     }
 
     public function listSolicitudeSup($id)
@@ -745,8 +752,11 @@ class SolicitudeController extends BaseController
 
     public function show_gerprod()
     {
+        Log::error('show_gerprod');
         $state = Session::get('state');
         $states = State::orderBy('idestado', 'ASC')->get();
+        Log::error(json_encode($state));
+        Log::error(json_encode($states));
         $data = [
 
             'states' => $states,
@@ -940,8 +950,10 @@ class SolicitudeController extends BaseController
 
     public function show_gercom()
     {
+        Log::error('show_gercom');
         $state = Session::get('state');
         $states = State::orderBy('idestado', 'ASC')->get();
+        Log::error(json_encode($state));
         $data = [
             'state' => $state,
             'states' => $states
@@ -1210,17 +1222,43 @@ class SolicitudeController extends BaseController
     }
 
     public function generateSeatSolicitude()
-    {
-
-        $inputs  = Input::all();
-        $leyenda = trim($inputs['leyenda']);
-        //FALTA
-        // return 0;
-        $solicitude = Solicitude::where('idsolicitud', $inputs['idsolicitude']);
-        $solicitude->asiento = 2;
-        $data = $this->objectToArray($solicitude);
-        $solicitude->update($data);
-        return 1;
+    {   
+        try
+        {
+            $middleRpta = array();
+            $inputs  = Input::all();
+            $fec_origin = Solicitude::where('idsolicitud',$inputs['idsolicitude'])->select('created_at')->get();
+            DB::beginTransaction();
+            for($i=0;$i<count($inputs['name_account']);$i++)
+            {
+                $tbEntry = new Entry;
+                $id = $tbEntry->searchId()+1;
+                $tbEntry->idasiento = $id;
+                $tbEntry->num_cuenta = $inputs['number_account'][$i];
+                $tbEntry->fec_origen = $fec_origin[0]->created_at;
+                $tbEntry->d_c = $inputs['dc'][$i];
+                $tbEntry->importe = $inputs['total'][$i];
+                $tbEntry->leyenda = trim($inputs['leyenda']);
+                $tbEntry->idsolicitud = $inputs['idsolicitude'];
+                $tbEntry->updated_at = null;
+                $tbEntry->save();
+            }
+            Solicitude::where('idsolicitud', $inputs['idsolicitude'])->update(array('asiento' => 2));                     
+            DB::commit();
+            /*
+            $data = $this->objectToArray($solicitude);
+            $solicitude->update($data);
+            */
+            $middleRpta['Status'] = 1;
+        }
+        catch (Exception $e)
+        {
+            Log::error($e);
+            $middleRpta['Status'] = 2;
+            $middleRpta['Description'] = 'Internal Server Error';
+            DB::rollback();
+        }
+        return json_encode($middleRpta);
     }
 
     public function generateSeatExpense()

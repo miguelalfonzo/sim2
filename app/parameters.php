@@ -1,5 +1,4 @@
 <?php 
 
-const FONDO_DERIVADO = 24;
 const FONDO_SUPERVISOR = 15;
 const DOCUMENTO_NO_SUSTENTABLE_ID = 7;

@@ -384,15 +384,10 @@
                             <label class="col-md-4 col-lg-4 control-label" for="selectbasic"></label>
 
                             <div class="col-md-5 col-lg-5">
-                                @foreach($solicitude->families as $v)
-                                <?php $gerentes[] = $v->marca->manager->descripcion ?>
-                                @endforeach
-                                <?php  $gerentes = array_unique($gerentes) ?>
-
-                               <ul>
-                                   @foreach($gerentes as  $gerente)
-                                   <li>{{ $gerente }}</li>
-                                   @endforeach
+                                <ul>
+                                    @foreach($gerentes as  $gerente)
+                                    <li style="display:inline">{{ $gerente->descripcion }}</li><br>
+                                    @endforeach
                                 </ul>
                             </div>
                         </div>

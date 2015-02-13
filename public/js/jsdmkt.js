@@ -1013,8 +1013,8 @@ function newSolicitude() {
 
     /** --------------------------------------------- TESORERIA ------------------------------------------------- **/
 
-    if(userType === 'T'){
-        console.log('tesooo');
+    if(userType === 'T')
+    {
         listSolicitude('tes',APROBADO);
         listFondos('fondos-tesoreria');
     }
@@ -1043,9 +1043,7 @@ function newSolicitude() {
         $(this).parent().removeClass('has-error');
     });
 
-    $.getJSON(server+'representatives', function (data) {
-        representatives = data;
-    });
+    
 
     $(".change_before_rep").on("keyup",function(){
         $(this).autocomplete({

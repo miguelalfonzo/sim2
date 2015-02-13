@@ -56,7 +56,7 @@
                     <div class="form-group col-sm-6 col-md-4">
                         <label class="col-sm-8 col-md-8 control-label" for="selectbasic">Fondo</label>
                         <div class="col-sm-12 col-md-12">
-                            <input id="textinput" type="text" value="{{$solicitude->subtype->nombre}}" class="form-control input-md" readonly>
+                            <input id="textinput" type="text" value="{{$solicitude->subtype->nombre_mkt}}" class="form-control input-md" readonly>
                         </div>
                     </div>
                     <div class="form-group col-sm-6 col-md-4">
