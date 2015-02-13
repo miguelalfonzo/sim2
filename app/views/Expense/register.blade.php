@@ -218,7 +218,7 @@
 								<tbody>
 									@if(isset($expense))
 										@foreach($expense as $val)
-											<tr>
+											<tr data-id="{{$val->idgasto}}">
 												<th class="proof-type">{{mb_convert_case($val->idProofType->descripcion,MB_CASE_TITLE,'UTF-8')}}</th>
 												<th class="ruc">{{$val->ruc}}</th>
 												<th class="razon">{{$val->razon}}</th>

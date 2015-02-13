@@ -143,22 +143,36 @@ class ExpenseController extends BaseController{
 	}
 
 	public function registerExpense(){
-		$inputs         = Input::all();
-        if($inputs['type']=='S')
-		$row_solicitude = Solicitude::where('token',$inputs['token'])->firstOrFail();
-        if($inputs['type']=='F')
-        $row_fondo = $inputs['idfondo'];
-		$row_expense    = Expense::where('ruc',$inputs['ruc'])->where('num_prefijo',$inputs['number_prefix'])
-						  ->where('num_serie',$inputs['number_serie'])->get();
 
-		if(count($row_expense)>0)
-		{
-			return -1;
+		$result = array(); 
+		$inputs = Input::all();
+
+        if($inputs['type']=='S')
+			$row_solicitude = Solicitude::where('token',$inputs['token'])->firstOrFail();
+        if($inputs['type']=='F')
+        	$row_fondo = $inputs['idfondo'];
+
+    	$resultCode = null;
+
+    	if($inputs['ruc'] != null && $inputs['number_prefix'] != null && $inputs['number_serie'] != null && $inputs['proof_type'] == DOCUMENTO_NO_SUSTENTABLE_ID){
+    		$row_expense    = Expense::where('ruc',$inputs['ruc'])->where('num_prefijo',$inputs['number_prefix'])
+						  ->where('num_serie',$inputs['number_serie'])->get();
+		
+			if(count($row_expense)>0)
+			{
+				$resultCode = -1;
+			}
 		}
+		if($resultCode == -1)
+			return array(
+				'code' 	=> $resultCode,
+				'error' => '',
+				'msg'	=> ''
+			);
 		else
 		{
 			$expense = new Expense;
-			//Header Expense
+			
 			$expense->num_prefijo = $inputs['number_prefix'];
 			$expense->num_serie = $inputs['number_serie'];
 			$expense->ruc = $inputs['ruc'];
@@ -201,8 +215,9 @@ class ExpenseController extends BaseController{
 			$description = $inputs['description'];
 			// $type_expense = $expenseJson->type_expense;
 			$total_item = $inputs['total_item'];
-
-			if($expense->save())
+			$result_save = $expense->save();
+			
+			if($result_save)
 			{
 				try {
 					DB::transaction (function() use ($idgasto,$quantity,$description,$total_item){
@@ -218,19 +233,32 @@ class ExpenseController extends BaseController{
 						}
 					});
 				} catch (Exception $e) {
-					return 0;
+					return array(
+						'code'	=> 0,
+						'error'	=> '',
+						'msg' 	=> '',
+					);
 				}
-				return 1;
+				return array(
+					'code'		=> 1,
+					'gastoId'	=> $expense->idgasto
+				);
 			}
+			
 		}
+		
 	}
 
 	public function deleteExpense(){
-		$inputs = Input::all();
-		$voucher_number = explode("-",$inputs['voucher_number']);
-		$expense_row 	= Expense::where('ruc',$inputs['ruc'])->where('num_prefijo',$voucher_number[0])
-						  ->where('num_serie',$voucher_number[1])->firstOrFail();
-		$delete_row     = Expense::where('idgasto',$expense_row->idgasto)->delete();
+		$inputs 	= Input::all();
+		$gastoId 	= $inputs["gastoId"];
+		$delete_row = Expense::find($gastoId)->delete();
+		
+		//$voucher_number = explode("-",$inputs['voucher_number']);
+		
+		//$expense_row 	= Expense::where('ruc',$inputs['ruc'])->where('num_prefijo',$voucher_number[0])
+		//				  ->where('num_serie',$voucher_number[1])->firstOrFail();
+		//$delete_row     = Expense::where('idgasto',$expense_row->gatoId)->delete();
 		return "OK";
 	}
 

@@ -12,3 +12,4 @@ const error = 'Error';
 const desc_error = 'System Error: Information in log file';
 const status = 'Status';
 const description = 'Description';
+const DOCUMENTO_NO_SUSTENTABLE_ID = 7;
