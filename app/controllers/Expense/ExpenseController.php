@@ -143,7 +143,6 @@ class ExpenseController extends BaseController{
 	}
 
 	public function registerExpense(){
-		Log::error('registerExpense');
 		$inputs         = Input::all();
         if($inputs['type']=='S')
 		$row_solicitude = Solicitude::where('token',$inputs['token'])->firstOrFail();

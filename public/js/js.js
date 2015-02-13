@@ -230,9 +230,6 @@ $(function(){
             var dc = [];
             var total = [];
             var leyenda = [];
-            $("#table-seat-solicitude tbody .name_account").each(function(index){
-                name_account[index] = $(this).text();
-            });
             $("#table-seat-solicitude tbody .number_account").each(function(index){
                 number_account[index] = $(this).text();
             });
@@ -242,7 +239,6 @@ $(function(){
             $("#table-seat-solicitude tbody .total").each(function(index){
                 total[index] = parseFloat($(this).text());
             });
-            data.name_account = name_account;
             data.number_account = number_account;
             data.dc = dc;
             data.total = total;

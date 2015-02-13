@@ -260,51 +260,43 @@ function newSolicitude() {
 
     $('.register_solicitude').on('click', (function (e) {
         var aux = 0;
-        validate = 0;
+        var validate = 0;
         var obj = [];
         var clients_input = [];
         var families_input = [];
         for (var i = 0, l = clients.length; i < l; i++) {
             obj[i] = clients[i].clcodigo + ' - ' + clients[i].clnombre;
         }
-
-
         if (!title.val()) {
             title.parent().addClass('has-error');
             title.attr('placeholder', 'Ingrese nombre de la solicitud');
             title.addClass('input-placeholder-error');
-            console.log(validate = 1);
         }
         if (!amount.val()) {
             amount.parent().addClass('has-error');
             amount.attr('placeholder', 'Ingrese monto');
             amount.addClass('input-placeholder-error');
-            console.log(validate = 1);
         }
         if (!delivery_date.val()) {
             delivery_date.parent().addClass('has-error');
             delivery_date.attr('placeholder', 'Ingrese Fecha');
             delivery_date.addClass('input-placeholder-error');
-            console.log(validate = 1);
         }
         if (!input_client.val()) {
             input_client.parent().addClass('has-error');
             input_client.attr('placeholder', 'Ingrese Cliente');
             input_client.addClass('input-placeholder-error');
-            console.log(validate = 1);
         }
         if(select_type_solicitude.val() == 2){
             if (!amount_fac.val()) {
                 amount_fac.parent().addClass('has-error');
                 amount_fac.attr('placeholder', 'Ingrese Monto de la Factura');
                 amount_fac.addClass('input-placeholder-error');
-                console.log(validate = 1);
             }
             if(!input_file_factura.val() && isSetImage.val()==null){
                 input_file_factura.parent().addClass('has-error');
                 input_file_factura.attr('placeholder', 'Ingrese Imagen');
                 input_file_factura.addClass('input-placeholder-error');
-                console.log(validate = 1);
             }
         }
 
@@ -316,50 +308,33 @@ function newSolicitude() {
                 clients_input[index] = input;
 
                 var ban = obj.indexOf(input);
-                if (ban != -1) {
-                    //field no correct
-
-                } else {
+                if (ban == -1) 
+                {
                     aux = 1;
-                    console.log(validate = 1);
-
                     $(this).parent().addClass('has-error has-feedback');
                     $(this).parent().children('.span-alert').addClass('span-alert glyphicon glyphicon-remove form-control-feedback');
                 }
-
             });
-
-
         }, 100);
-
-        setTimeout(function () {
-
-            //validate fields not select
+        setTimeout(function ()
+        {
             $('.input-client').each(function (index) {
                 var input = $(this).val();
-
                 if (!$(this).attr('data-valor')) {
-
                     aux = 1;
-                    console.log(validate = 1);
                     $(this).parent().addClass('has-error has-feedback');
                     $(this).parent().children('.span-alert').addClass('span-alert glyphicon glyphicon-remove form-control-feedback');
                     $(this).val('');
                     $(this).attr('placeholder','Seleccione cliente');
                     $(this).addClass('input-placeholder-error');
                 }
-
             });
-
-
         }, 100);
         setTimeout(function () {
             //Validate of fields duplicate in clients
             for (var i = 0; i < clients_input.length; i++) {
                 $('.input-client').each(function (index) {
-
                     if (index != i && clients_input[i] === $(this).val()) {
-                        console.log(validate = 1);
                         var ind = clients_input.indexOf($(this).val());
                         clients_input[index] = '';
 
@@ -372,61 +347,54 @@ function newSolicitude() {
                 });
             }
         }, 200);
-
-        setTimeout(function () {
-
+        setTimeout(function () 
+        {
             var families = $('.selectfamily');
-            families.each(function (index) {
-                families_input[index] = $(this).val();
-
+            families.each(function (index) 
+            {
+            families_input[index] = $(this).val();
             });
-
-            //Validate fields select family duplicates are not
-            for (var i = 0; i < families_input.length; i++) {
-                families.each(function (index) {
-
-                    if (index != i && families_input[i] === $(this).val()) {
-                        console.log(validate = 1);
+            for (var i = 0; i < families_input.length; i++) 
+            {
+                families.each(function (index) 
+                {
+                    if (index != i && families_input[i] === $(this).val()) 
+                    {
                         var ind = families_input.indexOf($(this).val());
                         families_input[index] = '';
-
                         $(this).css('border-color', 'red');
                         $(".families_repeat").text('Datos Repetidos').css('color', 'red');
                     }
                 });
             }
-            console.log(validate);
-
             if (validate == 0) {
-                console.log('entro');
                 var form = $('#form-register-solicitude');
                 var formData = new FormData(form[0]);
                 var rute = form.attr('action');
                 var message1 = 'Registrando';
                 var message2 = '<strong style="color: green">Solicitud Registrada</strong>';
-                if (rute == 'editar-solicitud') {
+                if (rute == 'editar-solicitud') 
+                {
                     message1 = 'Actualizando';
                     message2 = '<strong style="color: green">Solicitud Actualizada</strong>'
                 }
-
-                $.ajax({
+                $.ajax(
+                {
                     url: server + rute,
                     type: 'POST',
                     data: formData,
-                    // async: false,
                     cache: false,
                     contentType: false,
                     processData: false,
-                    beforeSend: function () {
+                    beforeSend: function()
+                    {
                         loadingUI(message1);
                     }
 
-                }).done(function (data) {
-                    console.log(data);
+                }).done(function (data)
+                {
                     $.unblockUI();
-
                     if (data == 'R') {
-
                         bootbox.alert(message2, function() {
                             window.location.href = server + 'show_rm'
                         });
