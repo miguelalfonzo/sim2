@@ -1214,7 +1214,7 @@ class SolicitudeController extends BaseController
             {
                 $fec_origin = Solicitude::where('idsolicitud',$inputs['idsolicitude'])->select('created_at')->get();
                 DB::beginTransaction();
-                for($i=0;$i<count($inputs['name_account']);$i++)
+                for($i=0;$i<count($inputs['number_account']);$i++)
                 {
                     $tbEntry = new Entry;
                     $id = $tbEntry->searchId()+1;
