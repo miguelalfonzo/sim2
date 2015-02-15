@@ -70,7 +70,15 @@ class FondoController extends BaseController
     function postRegister()
     {
         
-        $inputs             = Input::all();
+        $inputs = Input::all();
+        $mes = explode('-', $inputs['mes']);
+        $periodo = $mes[1].$mes[0];
+        $verifyMonth = FondoInstitucional::where('periodo', $periodo)->where('terminado', TERMINADO)->get();
+        if(count($verifyMonth) != 0)
+        {
+            return 'blocked';
+        }
+
         $fondo              = new FondoInstitucional;
         $fondo->idfondo     = $fondo->searchId() + 1;
         $fondo->institucion = $inputs['institucion'];
@@ -81,6 +89,7 @@ class FondoController extends BaseController
         $fondo->idrm        = $inputs['codrepmed'];
         $token              = sha1(md5(uniqid($fondo->idfondo, true)));
         $fondo->token       = $token;
+        $fondo->periodo     = $periodo;
         $fondo->save();
         $start  = $inputs['start'];
         $fondos = $this->getFondos($start);
@@ -90,34 +99,9 @@ class FondoController extends BaseController
     
     function getFondos($start, $export = 0)
     {
-        
-        $startArray = explode("-", $start);
-        $endDay     = $this::getLastDayOfMonth($startArray[0], $startArray[1]);
-        $st         = $start;
-        $start      = '01-' . $st;
-        $end        = $st[0];
-        /* $mes   = array(
-        '1' => 31,
-        '2' => 28,
-        '3' => 31,
-        '4' => 30,
-        '5' => 31,
-        '6' => 30,
-        '7' => 31,
-        '8' => 31,
-        '9' => 30,
-        '10' => 31,
-        '11' => 30,
-        '12' => 31
-        );*/
-        
-        //$end = $mes[$end] . '-' . $st;
-        $end = $endDay . '-' . $st;
-        
-        $whereRamQuery = "created_at between to_date('$start' ,'DD-MM-YYYY') and to_date('$end' ,'DD-MM-YYYY')+1";
-        
+        $periodo = $this->periodo($start);
         if ($export) {
-            $fondos = FondoInstitucional::whereRaw($whereRamQuery)->get(array(
+            $fondos = FondoInstitucional::where('periodo', $periodo)->get(array(
                 'institucion',
                 'repmed',
                 'cuenta',
@@ -126,13 +110,15 @@ class FondoController extends BaseController
             ));
             return $fondos;
         } else {
-            $fondos = FondoInstitucional::whereRaw($whereRamQuery)->get();
-            $view   = View::make('Dmkt.AsisGer.list_fondos')->with('fondos', $fondos)->with('sum', $fondos->sum('total'));
-            $data   = array(
-                'view' => $view,
-                'total' => $fondos->sum('total')
-            );
-            return $view;
+            $fondos = FondoInstitucional::where('periodo', $periodo)->get();
+            $estado = 0;
+            foreach ($fondos as $fondo) {
+                if($fondo->terminado == TERMINADO)
+                {
+                    $estado = TERMINADO;
+                }
+            }
+            return View::make('Dmkt.AsisGer.list_fondos')->with('fondos', $fondos)->with('sum', $fondos->sum('total'))->with('estado', $estado);
         }
         
     }
@@ -232,6 +218,7 @@ class FondoController extends BaseController
     }
     function endFondos($start)
     {
+
         $startArray = explode("-", $start);
         $endDay     = $this::getLastDayOfMonth($startArray[0], $startArray[1]);
         $st         = $start;
@@ -317,12 +304,10 @@ class FondoController extends BaseController
     }
     function exportExcelFondos($start)
     {
-        
         $data = $this->getFondos($start, 1);
         $dato = $data->toArray();
         $sum  = $data->sum('total');
         $mes  = array(
-            
             '01' => 'enero',
             '02' => 'febrero',
             '03' => 'marzo',
@@ -336,18 +321,18 @@ class FondoController extends BaseController
             '11' => 'noviembre',
             '12' => 'diciembre'
         );
-        $st   = $start;
-        $end  = $st[0] . $st[1];
-        $mes  = $mes[$end];
-        $anio = $start;
-        Excel::create('Filename4', function($excel) use ($dato, $sum, $mes, $anio)
+        $st   = explode('-', $start);
+        $mes  = $mes[str_pad($st[0], 2, '0', STR_PAD_LEFT)];
+        $anio = $st[1];
+        
+        Excel::create('Fondo - '.str_pad($st[0], 2, '0', STR_PAD_LEFT).$anio , function($excel) use ($dato, $sum, $mes, $anio)
         {
             
             $excel->sheet($mes, function($sheet) use ($dato, $sum, $mes, $anio)
             {
                 $sheet->mergeCells('A1:E1');
                 $sheet->row(1, array(
-                    'FONDO INSTITUCIONAL ' . strtoupper($mes) . ' - ' . substr($anio, 3)
+                    'FONDO INSTITUCIONAL ' . strtoupper($mes) . ' - ' . $anio
                 ));
                 $sheet->row(1, function($row)
                 {
@@ -430,5 +415,11 @@ class FondoController extends BaseController
     function getLastDayOfMonth($month, $year)
     {
         return date('d', mktime(0, 0, 0, $month + 1, 1, $year) - 1);
+    }
+
+    private function periodo($date)
+    {
+        $periodo = explode('-', $date);
+        return $periodo[1].str_pad($periodo[0], 2, '0', STR_PAD_LEFT);
     }
 }

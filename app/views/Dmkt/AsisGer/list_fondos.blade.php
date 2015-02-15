@@ -1,4 +1,16 @@
-<div class="form-group col-xs-12 col-sm-3 col-md-3 total-fondo" style="">
+
+
+<div class="form-group col-xs-3 col-sm-2 col-md-1 pull-right fondo_r" >
+       <a id="export-fondo" class="btn btn-sm btn-primary ladda-button" href=""
+                                    data-style="zoom-in" data-size="l"><i class="glyphicon glyphicon-print"></i> Exportar</a>
+</div>
+@if($estado != TERMINADO)
+<div class="form-group col-xs-3 col-sm-2 col-md-1 pull-right fondo_r" >
+       <a id="terminate-fondo" class="btn btn-sm btn-danger" href=""
+                                    data-style="zoom-in" data-size="l"><i class="glyphicon glyphicon-download"></i> Terminar</a>
+</div>
+@endif
+<div class="form-group col-xs-12 col-sm-3 col-md-3 total-fondo fondo_r" style="">
 
                           <input id="" name="total" type="text" placeholder=""
                                  value="Total : {{$sum}}"
@@ -6,7 +18,7 @@
 
 
 </div>
-<div class="table-responsive">
+<div class="table-responsive fondo_r">
  <table class="table table-hover table-bordered table-condensed dataTable" id="table_solicitude_fondos" style="width: 100%">
     <thead>
     <tr>

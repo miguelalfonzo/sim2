@@ -1032,6 +1032,7 @@ function newSolicitude() {
     var fondo_cuenta = $('#fondo_cuenta');
     var fondo_supervisor = $('#fondo_supervisor');
     var fondo_institucion = $('#fondo_institucion');
+    var date_reg_fondo = $('#date_reg_fondo');
 
     fondo_repmed.on('focus', function () {
         $(this).parent().removeClass('has-error');
@@ -1040,6 +1041,9 @@ function newSolicitude() {
         $(this).parent().removeClass('has-error');
     });
     fondo_total.on('focus', function () {
+        $(this).parent().removeClass('has-error');
+    });
+    date_reg_fondo.on('focus', function () {
         $(this).parent().removeClass('has-error');
     });
 
@@ -1113,46 +1117,44 @@ function newSolicitude() {
         response(matches);
     }
 
-
-    $.get(server + 'list-fondos/'+ dateactual).done(function(data)
-        {
-
+    var urlFondos = $("#fondos").data('url');
+    if(urlFondos){
+        $.get(server + 'list-fondos/'+ dateactual)
+        .done( function(data) {
             $('#datefondo').val(dateactual);
-            $('#export-fondo').attr('href', server + 'exportfondos/' + dateactual);
-            //$('#table_solicitude_fondos_wrapper').remove();
+            $('#table_solicitude_fondos_wrapper').remove();
             $('.table-solicituds-fondos').append(data);
+            $('#export-fondo').attr('href', server + 'exportfondos/' + dateactual);
             $('#table_solicitude_fondos').dataTable({
-                    "order": [
-                        [ 0, "desc" ]
-                    ],
-                    "bLengthChange": false,
-                    'iDisplayLength': 7,
-                    "oLanguage": {
-                        "sSearch": "Buscar: ",
-                        "sZeroRecords": "No hay fondos",
-                        "sInfoEmpty": " ",
-                        "sInfo": 'Mostrando _END_ de _TOTAL_',
-                        "oPaginate": {
-                            "sPrevious": "Anterior",
-                            "sNext" : "Siguiente"
-                        }
+                "order": [
+                    [ 0, "desc" ]
+                ],
+                "bLengthChange": false,
+                'iDisplayLength': 7,
+                "oLanguage": {
+                    "sSearch": "Buscar: ",
+                    "sZeroRecords": "No hay fondos",
+                    "sInfoEmpty": " ",
+                    "sInfo": 'Mostrando _END_ de _TOTAL_',
+                    "oPaginate": {
+                        "sPrevious": "Anterior",
+                        "sNext" : "Siguiente"
                     }
                 }
-            );
-
-
-        }
-    );
+            });
+        });
+    }
+    
     fondo_total.numeric();
 
     $(document).on('click','.register_fondo',function(){
         console.log(fondo_repmed.attr('disabled'));
         validate = 0;
         var aux = this;
-        if(!fondo_repmed.val()){
-            fondo_repmed.parent().addClass('has-error');
-            fondo_repmed.attr('placeholder', 'Ingrese Representante');
-            fondo_repmed.addClass('input-placeholder-error');
+        if(!date_reg_fondo.val()){
+            date_reg_fondo.parent().addClass('has-error');
+            date_reg_fondo.attr('placeholder', 'Ingrese Mes');
+            date_reg_fondo.addClass('input-placeholder-error');
             console.log(validate = 1);
         }
         if(!fondo_total.val()){
@@ -1183,52 +1185,59 @@ function newSolicitude() {
                 'total' : fondo_total.val(),
                 'cuenta': fondo_cuenta.val(),
                 '_token' : $('#_token').val(),
-                'start' : dateactual
+                'start' : dateactual,
+                'mes' : date_reg_fondo.val()
             };
             $('#datefondo').val(dateactual);
             console.log(dateactual);
 
             var l = Ladda.create(aux);
             l.start();
-            $.post(server + 'registrar-fondo',dato).done(function(data)
-                {
+            $.post(server + 'registrar-fondo',dato)
+            .done(function(data){
+                if(data === 'blocked'){
+                    bootbox.alert("<p class='red'>El mes se encuentra cerrado.</p>");
+                    fondo_institucion.val('');
+                    fondo_repmed.val('');
+                    fondo_supervisor.val('');
+                    fondo_total.val('');
+                    fondo_cuenta.val('');
+                    l.stop();
+                    removeinput($('#edit-rep'));
+                }
+                else{
                     $('html, body').animate({scrollTop: $('.table-solicituds-fondos').offset().top -10 }, 'slow');
                     fondo_institucion.val('');
                     fondo_repmed.val('');
                     fondo_supervisor.val('');
                     fondo_total.val('');
-                    // $('#fondo_cuenta').val('');
-                    $('#total-fondo').val('');
-
-                    // $('#_token').val('');
+                    fondo_cuenta.val('');
                     l.stop();
                     removeinput($('#edit-rep'));
-                    $('.total-fondo').remove();
+                    $('.table-solicituds-fondos > .fondo_r').remove();
                     $('#table_solicitude_fondos_wrapper').remove();
                     $('.table-solicituds-fondos').append(data);
                     $('#table_solicitude_fondos').dataTable({
-                            "order": [
-                                [ 3, "desc" ]
-                            ],
-                            "bLengthChange": false,
-                            'iDisplayLength': 7,
-                            "oLanguage": {
-                                "sSearch": "Buscar: ",
-                                "sZeroRecords": "No hay fondos",
-                                "sInfoEmpty": " ",
-                                "sInfo": 'Mostrando _END_ de _TOTAL_',
-                                "oPaginate": {
-                                    "sPrevious": "Anterior",
-                                    "sNext" : "Siguiente"
-                                }
+                        "order": [
+                            [ 0, "desc" ]
+                        ],
+                        "bLengthChange": false,
+                        'iDisplayLength': 7,
+                        "oLanguage": {
+                            "sSearch": "Buscar: ",
+                            "sZeroRecords": "No hay fondos",
+                            "sInfoEmpty": " ",
+                            "sInfo": 'Mostrando _END_ de _TOTAL_',
+                            "oPaginate": {
+                                "sPrevious": "Anterior",
+                                "sNext" : "Siguiente"
                             }
                         }
-                    );
+                    });
                 }
-            )
+                
+            });
         }
-
-
     });
 
     $(document).on('click' , '.delete-fondo' , function(e){
@@ -1377,70 +1386,57 @@ function newSolicitude() {
     });
     var date_options2 = {
         format: "mm-yyyy",
+        startDate: "01/2014",
         minViewMode: 1,
         language: "es",
         autoclose: true
     };
 
+    $("#date_reg_fondo").datepicker(date_options2);
+
+    //aquí
     $("#datefondo").datepicker(date_options2).on('changeDate', function (e) {
-
-
         var datefondo = $(this).val();
         var type = $(this).attr('data-type');
         if(datefondo!='') {
-            $('#export-fondo').show();
             $('#export-fondo').attr('href', server + 'exportfondos/' + datefondo);
+            searchFondos(datefondo,type);
         }
         else{
             $('#export-fondo').hide()
+            $('#terminate-fondo').hide();
         }
-        $(".date-fondo").removeClass('has-error');
-
-        searchFondos(datefondo,type);
-        if (isNaN(e.date)) {
-
-            $("#year").val('');
-            $("#month").val('');
-        } else {
-
-            $("#year").val(e.format('yyyy'));
-            $("#month").val(parseInt(e.format('mm')));
-        }
-        //evento obligatorio para configuración
-        $("#month").change();
-
     });
-    function searchFondos(datefondo , aux) {
 
+    function searchFondos(datefondo , aux) {
+        console.log(datefondo+ "-"+aux);
         $('#loading-fondo').attr('class','show');
-        $.get(server + 'list-'+aux+'/' + datefondo).done(function (data) { console.log('table_solicitude_'+aux+'_wrapper');
+        $('.table-solicituds-fondos > .fondo_r').remove();
+        $.get(server + 'list-'+aux+'/' + datefondo)
+        .done(function (data) {
+            console.log(data);
             $('#loading-fondo').attr('class','hide');
-            $('#total-fondo-hiden').remove();
-            $('.total-fondo').remove();
             $('#table_solicitude_'+aux+'_wrapper').remove();
-            $('.table_solicitude_'+aux).append(data);
+            $('.table-solicituds-'+aux).append(data);
             $('#table_solicitude_'+aux).dataTable({
-                    "order": [
-                        [3, "desc"]
-                    ],
-                    "bLengthChange": false,
-                    'iDisplayLength': 7,
-                    "oLanguage": {
-                        "sSearch": "Buscar: ",
-                        "sZeroRecords": "No hay fondos",
-                        "sInfoEmpty": " ",
-                        "sInfo": 'Mostrando _END_ de _TOTAL_',
-                        "oPaginate": {
-                            "sPrevious": "Anterior",
-                            "sNext": "Siguiente"
-                        }
+                "order": [
+                    [3, "desc"]
+                ],
+                "bLengthChange": false,
+                'iDisplayLength': 7,
+                "oLanguage": {
+                    "sSearch": "Buscar: ",
+                    "sZeroRecords": "No hay fondos",
+                    "sInfoEmpty": " ",
+                    "sInfo": 'Mostrando _END_ de _TOTAL_',
+                    "oPaginate": {
+                        "sPrevious": "Anterior",
+                        "sNext": "Siguiente"
                     }
                 }
-            );
-
-
+            });
             $('#total-fondo').val($('#total-fondo-hiden').val());
-        })
+        });
     }
 
     if(userType === 'AG'){

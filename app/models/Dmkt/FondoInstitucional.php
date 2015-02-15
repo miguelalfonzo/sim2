@@ -12,7 +12,7 @@ use \Eloquent;
 class FondoInstitucional extends Eloquent{
 
 
-    protected $table = 'FONDOINSTITUCIONAL';
+    protected $table = 'DMKT_RG_FONDOINSTITUCIONAL';
     protected $primaryKey = 'idfondo';
 
     function searchId(){
