@@ -217,9 +217,7 @@
                 <form class="form-horizontal">
                     {{Form::token()}}
                     <fieldset>
-
                         <!-- Form Name -->
-
 
                         <!-- Select Basic -->
                         <div class="form-group">

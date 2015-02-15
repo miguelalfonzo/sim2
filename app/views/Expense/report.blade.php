@@ -9,7 +9,7 @@
     <div class="background">
         <header style="margin-top:-2em;">
             <img src="img/logo-report.png" alt="" style="width:170px;margin-left:-5em;">
-            <p><strong>REPORTE DE GASTOS PUBLICIDAD Y PROMOCIÓN SEGÚN PRESUPUESTO</strong></p>
+            <h1><p><strong>REPORTE DE GASTOS PUBLICIDAD Y PROMOCIÓN SEGÚN PRESUPUESTO</strong></p><h1>
         </header>
         <main>
             <section style="text-align:center;margin-top:2.5em;">
@@ -62,7 +62,7 @@
                                     @endforeach
                                     {{mb_convert_case(trim($stringN,'-'),MB_CASE_TITLE,'UTF-8')}}
                                 </td>
-                                <td>{{(real)$value->monto}}</td>
+                                <td>{{$solicitude->typemoney->simbolo}}{{(real)$value->monto}}</td>
                             </tr>    
                         @endforeach
                         <!-- <tr>

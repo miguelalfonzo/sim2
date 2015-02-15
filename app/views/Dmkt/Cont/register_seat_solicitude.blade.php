@@ -144,9 +144,9 @@
 											<th class="total">{{$solicitude->monto}}</th>
 											<th class="leyenda">
 												@if($solicitude->aproved->type == 'S')
-													{{$solicitude->aproved->sup->nombres.' '.$solicitude->aproved->sup->apellidos.' '.$solicitude->titulo}}
+													{{$solicitude->aproved->sup->nombres.' '.$solicitude->aproved->sup->apellidos.' '.$solicitude->titulo.' '.$clientes}}
 												@else
-													{{$solicitude->aproved->gerprod->descripcion.' '.$solicitude->titulo}}
+													{{$solicitude->aproved->gerprod->descripcion.' '.$solicitude->titulo.' '.$clientes}}
 												@endif
 											</th>
 											<th><a class="edit-seat-solicitude" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
@@ -160,9 +160,9 @@
 											<th class="total">{{$solicitude->monto}}</th>
 											<th class="leyenda">
 												@if($solicitude->aproved->type == 'S')
-													{{$solicitude->aproved->sup->nombres.' '.$solicitude->aproved->sup->apellidos.' '.$solicitude->titulo}}
+													{{$solicitude->aproved->sup->nombres.' '.$solicitude->aproved->sup->apellidos.' '.$solicitude->titulo.$clientes}}
 												@else
-													{{$solicitude->aproved->gerprod->descripcion.' '.$solicitude->titulo}}
+													{{$solicitude->aproved->gerprod->descripcion.' '.$solicitude->titulo.' '.$clientes}}
 												@endif
 											</th>
 											<th><a class="edit-seat-solicitude" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
@@ -173,13 +173,13 @@
 												<th class="name_account">{{mb_convert_case($solicitude->typeRetention->descripcion,MB_CASE_TITLE,'UTF-8')}}</th>
 												<th class="number_account">{{$solicitude->typeRetention->cta_contable}}</th>
 												<th class="date_ini">{{$date['toDay']}}</th>
-												<th class="dc">C</th>
+												<th class="dc">D</th>
 												<th class="total">{{$solicitude->retencion}}</th>
 												<th class="leyenda">
 													@if($solicitude->aproved->type == 'S')
-														{{$solicitude->aproved->sup->nombres.' '.$solicitude->aproved->sup->apellidos.' '.$solicitude->titulo}}
+														{{$solicitude->aproved->sup->nombres.' '.$solicitude->aproved->sup->apellidos.' '.$solicitude->titulo.' '.$clientes}}
 													@else
-														{{$solicitude->aproved->gerprod->descripcion.' '.$solicitude->titulo}}
+														{{$solicitude->aproved->gerprod->descripcion.' '.$solicitude->titulo.' '.$clientes}}
 													@endif
 												</th>
 												<th><a class="edit-seat-solicitude" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
@@ -194,7 +194,7 @@
 				</section>
 				<section class="row reg-expense align-center" style="margin:1.5em 0">
 					<div class="col-xs-12 col-sm-12 col-md-12">
-						<a href="#" id="seat-solicitude" class="btn btn-success" style="margin:-2em 2em .5em 0">Generar Asiento Solicitud</a>
+						<a id="seat-solicitude" class="btn btn-success" style="margin:-2em 2em .5em 0">Generar Asiento Solicitud</a>
 						<a href="{{URL::to('revisar-asiento-solicitud')}}/{{$solicitude->token}}" class="btn btn-danger" style="margin:-2em 2em .5em 0">Atras</a>
 					</div>
 				</section>

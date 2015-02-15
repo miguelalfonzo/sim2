@@ -17,11 +17,9 @@ class SolicitudeClient extends Eloquent{
         }else{
             return $lastId->idsolicitud_clientes;
         }
-
     }
-
-    function client(){
-
+    function client()
+    {
         return $this->hasOne('Dmkt\Client','clcodigo','idcliente');
     }
 

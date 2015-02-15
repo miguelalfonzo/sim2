@@ -22,6 +22,8 @@ use \Excel;
 use \Response;
 use \Illuminate\Database\Query\Builder;
 use \Expense\Expense;
+use \Expense\Entry;
+use \Log;
 
 class SolicitudeController extends BaseController
 {
@@ -79,12 +81,10 @@ class SolicitudeController extends BaseController
 
         $clients = Client::take(1030)->get(array('clcodigo', 'clnombre'));
         return Response::json($clients);
-        //return json_encode($clients);
     }
 
     public function newSolicitude()
     {
-
         $families = Marca::orderBy('descripcion', 'Asc')->get();
         $typePayments = TypePayment::all();
         $fondos = Fondo::all();
@@ -95,45 +95,34 @@ class SolicitudeController extends BaseController
             'typesolicituds' => $typesolicituds,
             'typePayments' => $typePayments
         ];
-
         return View::make('Dmkt.Rm.register_solicitude', $data);
-
     }
 
     public function registerSolicitude()
     {
-
         $inputs = Input::all();
         $image = Input::file('file');
-
         $rules = array(
             'titulo'         => 'required',
             'monto'             => 'required|numeric',
-
         );
-        $validator = Validator::make(Input::all(), $rules);
-        if ($validator->fails()) {
-
-            // get the error messages from the validator
+        $validator = Validator::make($inputs, $rules);
+        if ($validator->fails()) 
+        {
             $messages = $validator->messages();
-
-            // redirect our user back to the form with the errors from the validator
-            //return Redirect::to('show_rm')->with('errors', $messages);
             return $messages;
-        }else{
-
+        }
+        else
+        {
             $solicitude = new Solicitude;
             $typeUser = Auth::user()->type;
-            if (isset($image)) {
-
+            if (isset($image)) 
+            {
                 $filename = uniqid() . '.' . $image->getClientOriginalExtension();
-                //$filename = $image->getClientOriginalName();
-                $path = public_path('img/reembolso/' . $filename);
-                Image::make($image->getRealPath())->resize(800, 600)->save($path);
+                $path = public_path( IMAGE_PATH . $filename);
+                Image::make($image->getRealPath())->resize(WIDTH,HEIGHT)->save($path);
                 $solicitude->image = $filename;
             }
-
-
             $date = $inputs['delivery_date'];
             list($d, $m, $y) = explode('/', $date);
             $d = mktime(11, 14, 54, $m, $d, $y);
@@ -143,47 +132,44 @@ class SolicitudeController extends BaseController
             $solicitude->descripcion = $inputs['description'];
             $solicitude->titulo = $inputs['titulo'];
             $solicitude->monto = $inputs['monto'];
-
             $solicitude->iduser = Auth::user()->id;
             $solicitude->monto_factura = $inputs['amount_fac'];
             $solicitude->fecha_entrega = $date;
             $solicitude->idtiposolicitud = $inputs['type_solicitude'];
             $token = sha1(md5(uniqid($solicitude->idsolicitud, true)));
             $solicitude->token =  $token;
-
-            if (isset($inputs['sub_type_activity'])) {
+            if (isset($inputs['sub_type_activity'])) 
+            {
                 $fondo = $inputs['sub_type_activity'];
                 $solicitude->idfondo = $inputs['sub_type_activity'];
             }
-
             $solicitude->tipo_moneda = $inputs['money'];
-            if ($inputs['type_payment'] == 2) {
+            if ($inputs['type_payment'] == 2) 
+            {
                 $solicitude->numruc = $inputs['ruc'];
-            } else if ($inputs['type_payment'] == 3) {
+            } 
+            else if ($inputs['type_payment'] == 3) 
+            {
                 $solicitude->numcuenta = $inputs['number_account'];
             }
             $solicitude->idtipopago = $inputs['type_payment'];
             $solicitude->estado = PENDIENTE;
-
-
-            if ($solicitude->save()) {
+            if ($solicitude->save()) 
+            {
                 $data = array(
-
                     'name' => $inputs['titulo'],
                     'description' => $inputs['description'],
                     'monto' => $inputs['monto'],
                     'money' => $inputs['money']
-
                 );
-
                 /*
                 Mail::send('emails.template', $data, function ($message) {
                     $message->to('cesarhm1687@gmail.com');
                     $message->subject('Nueva Solicitud');
-
                 });*/
                 $clients = $inputs['clients'];
-                foreach ($clients as $client) {
+                foreach ($clients as $client) 
+                {
                     $cod = explode(' ', $client);
                     $solicitude_clients = new SolicitudeClient;
                     $solicitude_clients->idsolicitud_clientes = $solicitude_clients->searchId() + 1;
@@ -192,24 +178,17 @@ class SolicitudeController extends BaseController
                     $solicitude_clients->save();
                 }
                 $families = $inputs['families'];
-                foreach ($families as $family) {
-
+                foreach ($families as $family) 
+                {
                     $solicitude_families = new SolicitudeFamily;
                     $solicitude_families->idsolicitud_familia = $solicitude_families->searchId() + 1;
                     $solicitude_families->idsolicitud = $solicitude->searchId();
                     $solicitude_families->idfamilia = $family;
                     $solicitude_families->save();
                 }
-
-                if(isset($fondo) && $fondo == FONDO_DERIVADO ) // si es de tipo actividad "otros" lo deriva a los gerentes
-                    $this->derivedSolicitude($token,1);
-
                 return $typeUser;
-
             }
         }
-
-
     }
 
     public function listSolicitude($state)
@@ -472,20 +451,27 @@ class SolicitudeController extends BaseController
 
     public function viewSolicitudeSup($token)
     {
-        $sol = Solicitude :: where('token', $token)->firstOrFail();
+        $sol = Solicitude::where('token', $token)->firstOrFail();
 
         if ($sol->user->type == 'R' && $sol->estado == PENDIENTE)
+        {
             Solicitude::where('token', $token)->update(array('blocked' => 1));
+        }
 
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $typePayments = TypePayment::all();
         $managers = Manager::all();
         $fondos = Fondo::all();
+        foreach($solicitude->families as $v)
+        {
+            $gerentes[] = $v->marca->manager;
+        }
         $data = [
             'solicitude' => $solicitude,
             'managers' => $managers,
             'typePayments' => $typePayments,
-            'fondos' => $fondos
+            'fondos' => $fondos,
+            'gerentes' => $gerentes
         ];
         return View::make('Dmkt.Sup.view_solicitude_sup', $data);
     }
@@ -613,23 +599,21 @@ class SolicitudeController extends BaseController
    }
 
     public function derivedSolicitude($token,$derive=0)
-    {
-
-        Solicitude::where('token', $token)->update(array('derived' => 1 ,'idfondo' => FONDO_DERIVADO, 'blocked' => 0));
-        
+    {   
+        Solicitude::where('token', $token)->update(array('derived' => 1 , 'blocked' => 0));
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
-
         $id = $solicitude->idsolicitud;
         $sol = Solicitude::find($id);
-        foreach ($sol->families as $v) {
+        foreach ($sol->families as $v) 
+        {
             $solGer = new SolicitudeGer;
             $solGer->idsolicitud_gerente = $solGer->searchId() + 1;
             $solGer->idsolicitud = $id;
             $solGer->idgerprod = $v->marca->manager->id;
             $solGer->save();
-        }
 
-        if($derive == 0)return Redirect::to('show_sup');
+        }
+        return Redirect::to('show_sup');
     }
 
     public function listSolicitudeSup($id)
@@ -1140,25 +1124,28 @@ class SolicitudeController extends BaseController
                     ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
                     ->get();
 
-            } else {
+            } 
+            else 
+            {
                 $solicituds = Solicitude::where('estado', $estado)
                     ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
                     ->get();
             }
-
-
-        } else {
+        } 
+        else 
+        {
             if ($estado != 10) {
                 $solicituds = Solicitude::where('estado', $estado)
                     ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
                     ->get();
-            } else {
+            } 
+            else 
+            {
                 $solicituds = Solicitude::where('estado', $estado)
                     ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
                     ->get();
             }
         }
-
         $view = View::make('Dmkt.Cont.view_solicituds_cont')->with('solicituds', $solicituds);
         return $view;
 
@@ -1190,10 +1177,17 @@ class SolicitudeController extends BaseController
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $expense = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
         $date = $this->getDay();
+        $clientes = array();
+        foreach($solicitude->clients as $client)
+        {
+            array_push($clientes,$client->client->clnombre);
+        }
+        $clientes = implode(',',$clientes);
         $data = [ 
             'solicitude' => $solicitude,
             'expense' => $expense,
-            'date' => $date
+            'date' => $date,
+            'clientes' => $clientes
         ];
         return View::make('Dmkt.Cont.register_seat_solicitude', $data);
     }
@@ -1210,17 +1204,46 @@ class SolicitudeController extends BaseController
     }
 
     public function generateSeatSolicitude()
-    {
-
-        $inputs  = Input::all();
-        $leyenda = trim($inputs['leyenda']);
-        //FALTA
-        // return 0;
-        $solicitude = Solicitude::where('idsolicitud', $inputs['idsolicitude']);
-        $solicitude->asiento = 2;
-        $data = $this->objectToArray($solicitude);
-        $solicitude->update($data);
-        return 1;
+    {   
+        try
+        {
+            $middleRpta = array();
+            $inputs  = Input::all();
+            $middleRpta = $this->validateInput($inputs,'number_account,dc,total,leyenda,idsolicitude');
+            if ($middleRpta[status] == ok)
+            {
+                $fec_origin = Solicitude::where('idsolicitud',$inputs['idsolicitude'])->select('created_at')->get();
+                DB::beginTransaction();
+                for($i=0;$i<count($inputs['number_account']);$i++)
+                {
+                    $tbEntry = new Entry;
+                    $id = $tbEntry->searchId()+1;
+                    $tbEntry->idasiento = $id;
+                    $tbEntry->num_cuenta = $inputs['number_account'][$i];
+                    $tbEntry->fec_origen = $fec_origin[0]->created_at;
+                    $tbEntry->d_c = $inputs['dc'][$i];
+                    $tbEntry->importe = $inputs['total'][$i];
+                    $tbEntry->leyenda = trim($inputs['leyenda']);
+                    $tbEntry->idsolicitud = $inputs['idsolicitude'];
+                    $tbEntry->tipo_asiento = TIPO_ASIENTO_ANTICIPO;
+                    $tbEntry->updated_at = null;
+                    $tbEntry->save();
+                }
+                Solicitude::where('idsolicitud', $inputs['idsolicitude'])->update(array('asiento' => SOLICITUD_ASIENTO));                     
+                DB::commit();
+                /*
+                $data = $this->objectToArray($solicitude);
+                $solicitude->update($data);
+                */
+                $middleRpta[status] = 1;
+            }
+        }
+        catch (Exception $e)
+        {
+            $middleRpta = $this->internalException($e);
+            DB::rollback();
+        }
+        return json_encode($middleRpta);
     }
 
     public function generateSeatExpense()
