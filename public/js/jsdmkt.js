@@ -260,7 +260,6 @@ function newSolicitude() {
 
     $('.register_solicitude').on('click', (function (e) {
         var aux = 0;
-        var validate = 0;
         var obj = [];
         var clients_input = [];
         var families_input = [];
@@ -367,7 +366,8 @@ function newSolicitude() {
                     }
                 });
             }
-            if (validate == 0) {
+            if (aux == 0) 
+            {
                 var form = $('#form-register-solicitude');
                 var formData = new FormData(form[0]);
                 var rute = form.attr('action');
@@ -407,6 +407,10 @@ function newSolicitude() {
                                 window.location.href = server + 'show_sup'
                             }
                             , 200);
+                    }
+                    else{
+                        console.log(data);
+                        responseUI("Faltan Ingresar Campos", 'red');
                     }
 
                 }).fail(function (e) {

@@ -102,10 +102,44 @@ class SolicitudeController extends BaseController
     {
         $inputs = Input::all();
         $image = Input::file('file');
-        $rules = array(
-            'titulo'         => 'required',
-            'monto'             => 'required|numeric',
-        );
+        Log::error(json_encode($image));
+        Log::error(json_encode(filesize($image)));
+        Log::error(json_encode($inputs));
+        foreach ($inputs['clients'] as $client)
+        {
+            Log::error($client);
+            if (empty($client))
+            {
+                return "Ingrese todos los campos de Cliente";
+            }
+        }
+        if ($inputs['type_solicitude'] == 1 || $inputs['type_solicitude'] == 3)
+        {
+            $rules = array(
+            'titulo'        => 'required',
+            'monto'         => 'required|numeric',
+            'delivery_date' => 'required|date_format:"d/m/Y"',
+            'clients'       => 'required'
+            );
+        }
+        else if($inputs['type_solicitude'] == 2)
+        {
+            if (filesize($image) == FALSE)
+            {
+                return "Ingrese un archivo de imagen";
+            }
+            $rules = array(
+            'titulo'        => 'required',
+            'monto'         => 'required|numeric',
+            'amount_fac'     => 'required|numeric',
+            'delivery_date' => 'required|date_format:"d/m/Y"',
+            'clients'       => 'required'
+            );   
+        }
+        else
+        {
+            return "Tipo de Solicitud no Existente";
+        }
         $validator = Validator::make($inputs, $rules);
         if ($validator->fails()) 
         {
