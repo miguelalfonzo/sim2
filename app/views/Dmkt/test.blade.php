@@ -76,6 +76,14 @@ $(document).on("click", ".elementCancel", function(){
 				});
 			}
 		});
+	}else{
+		trElement.children().each(function(i,data){
+			if($(data).attr("class") != undefined){
+				$(data).html($(data).attr("data-data"));
+			}else{
+				$(data).html('<a class="elementEdit" data-sol="1" href="#"><span class="glyphicon glyphicon-pencil"></span></a> <a class="elementDelete" href="#"><span class="glyphicon glyphicon-remove"></span></a>');
+			}
+		});
 	}
 });
 
@@ -103,7 +111,7 @@ $(document).on("click", ".elementEdit", function(){
 	trElement.children().each(function(i,data){
 		var tempData = $(data).html();
 		if($(data).attr("class") != undefined){
-			var input = $('<input type="text"></input>');
+			var input = $('<input type="text" style="width: 100%;"></input>');
 			input.val(tempData);
 			$(data).html(input);
 		}else{
