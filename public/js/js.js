@@ -967,15 +967,11 @@ $(function(){
     
         //Search Social Reason in SUNAT once introduced the RUC
         $(".search-ruc").on("click",function(){
-            /*if($(this).attr('data-sol'))
-            {
-                rout_ruc = 'http://app.bagoperu.com.pe/snt_service/json/';
-            }
-            else
-            {
-                rout_ruc = 'http://app.bagoperu.com.pe/snt_service/json/';
-            }*/
-            rout_ruc = 'http://app.bagoperu.com.pe/snt_service/json/';
+
+            var port = location.port;
+            port = port == "" ? port : ":"+port;
+
+            rout_ruc = 'http://app.bagoperu.com.pe'+ port +'/snt_service/json/';
             $(".message-expense").text("");
             $("#razon").removeClass('error-incomplete');
             var ruc = $("#ruc").val();

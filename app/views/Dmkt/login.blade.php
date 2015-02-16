@@ -48,11 +48,11 @@
                                 </div>
                             </div>
                         </div> -->
-                        <div class="form-group last">
-                            <div class="col-sm-offset-3 col-sm-9">
-                                <button type="submit" class="btn btn-success btn-sm">Ingresar</button>
-                                <button type="reset" class="btn btn-default btn-sm">Limpiar</button>
-                                <a href="http://intra.bagoperu.com.pe/produccion/intranet.php" class="btn btn-danger btn-sm">Regresar</a>
+                        <div class="form-group last" style="padding: 10px;" class="col-sm-3 control-label">
+                            <div class="btn-group btn-group-justified">
+                                <button type="submit" class="btn btn-success btn-lg"  style="width: 33.33%; float: left !important; font-size: 12pt;">Ingresar</button>
+                                <button type="reset" class="btn btn-default btn-lg"  style="width: 33.33%; float: left !important; font-size: 12pt;">Limpiar</button>
+                                <a href="http://intra.bagoperu.com.pe/produccion/intranet.php" class="btn btn-danger btn-lg"  style="width: 33.33%; float: left !important; font-size: 12pt;">Regresar</a>
                             </div>
                         </div>
                    {{ Form::close() }}
