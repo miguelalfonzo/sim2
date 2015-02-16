@@ -1,5 +1,5 @@
-<div class="table-responsive" style="margin-top: 50px">
- <table class="table table-hover table-bordered table-condensed dataTable" id="table_solicitude_fondos-tesoreria" style="width: 100%">
+<div class="table-responsive fondo_r" style="margin-top: 50px">
+ <table class="table table-hover table-bordered table-condensed dataTable" id="table_solicitude_fondos-contabilidad" style="width: 100%">
     <thead>
     <tr>
         <th>#</th>
@@ -18,16 +18,13 @@
         <td>{{$i}}</td>
         <td style="text-align: center">{{$fondo->institucion}}</td>
         <td>{{$fondo->repmed}}</td>
-        <td style="text-align: center">
-            {{$fondo->cuenta }}
-        </td>
-
+        <td style="text-align: center">{{$fondo->cuenta }}</td>
         <td style="text-align: center">{{$fondo->total}}</td>
         <td style="text-align: center">{{$fondo->supervisor}}</td>
         <td>
             <div class="div-icons-solicituds">
                 @if($fondo->asiento == 0)
-                <a href="{{URL::to('')}}" class="deposit-fondo" data-idfondo="{{$fondo->idfondo}}" data-toggle="modal" data-target="#myModal" ><span class="glyphicon glyphicon-book"></span></a>
+                <a class="deposit-fondo" data-idfondo="{{$fondo->idfondo}}" data-toggle="modal" data-target="#myModal" ><span class="glyphicon glyphicon-book"></span></a>
                 @else
                 <span><strong>Asiento</strong></span>
                 @endif
@@ -39,6 +36,8 @@
     </tbody>
 
 </table>
+</div>
+<!--
 <script>
 var data          = {};
 $('#register-deposit-fondo').on('click' ,function(e){
@@ -118,6 +117,7 @@ $('#register-deposit-fondo').on('click' ,function(e){
             }
 })
 </script>
+
   <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -140,3 +140,4 @@ $('#register-deposit-fondo').on('click' ,function(e){
                     </div>
   </div>
   </div>
+-->

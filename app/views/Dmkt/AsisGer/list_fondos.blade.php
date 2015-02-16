@@ -1,10 +1,12 @@
 
-
+@if($export == EXPORTAR)
 <div class="form-group col-xs-3 col-sm-2 col-md-1 pull-right fondo_r" >
        <a id="export-fondo" class="btn btn-sm btn-primary ladda-button" href=""
                                     data-style="zoom-in" data-size="l"><i class="glyphicon glyphicon-print"></i> Exportar</a>
 </div>
-@if($estado != TERMINADO)
+@endif
+
+@if($estado != TERMINADO && $export == EXPORTAR)
 <div class="form-group col-xs-3 col-sm-2 col-md-1 pull-right fondo_r" >
        <a id="terminate-fondo" class="btn btn-sm btn-danger" href=""
                                     data-style="zoom-in" data-size="l"><i class="glyphicon glyphicon-download"></i> Terminar</a>
@@ -28,7 +30,9 @@
         <th>N° Cuenta Bagó. Bco Credito</th>
         <th>Total a depositar</th>
         <th>Supervisor</th>
+        @if($estado != TERMINADO)
         <th>Edicion</th>
+        @endif
     </tr>
     </thead>
     <tbody>
@@ -44,12 +48,14 @@
 
         <td style="text-align: center">{{$fondo->total}}</td>
         <td style="text-align: center">{{$fondo->supervisor}}</td>
+         @if($estado != TERMINADO)
         <td>
             <div class="div-icons-solicituds">
                 <a href="#" class="edit-fondo" data-idfondo="{{$fondo->idfondo}}"><span class="glyphicon glyphicon-pencil"></span></a>
                 <a  href="#" class ="delete-fondo" data-idfondo="{{$fondo->idfondo}}" data-token="{{csrf_token()}}"><span class="glyphicon glyphicon-remove"></span></a>
             </div>
         </td>
+        @endif
     </tr>
     <?php $total += $fondo->total ; $i++?>
     @endforeach

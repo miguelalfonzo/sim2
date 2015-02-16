@@ -97,7 +97,7 @@ class FondoController extends BaseController
         
     }
     
-    function getFondos($start, $export = 0)
+    public function getFondos($start, $export = 0)
     {
         $periodo = $this->periodo($start);
         if ($export) {
@@ -112,13 +112,18 @@ class FondoController extends BaseController
         } else {
             $fondos = FondoInstitucional::where('periodo', $periodo)->get();
             $estado = 0;
-            foreach ($fondos as $fondo) {
-                if($fondo->terminado == TERMINADO)
-                {
-                    $estado = TERMINADO;
+            $export = 0;
+            if(count($fondos) > 0)
+            {
+                $export = EXPORTAR;
+                foreach ($fondos as $fondo) {
+                    if($fondo->terminado == TERMINADO)
+                    {
+                        $estado = TERMINADO;
+                    }
                 }
             }
-            return View::make('Dmkt.AsisGer.list_fondos')->with('fondos', $fondos)->with('sum', $fondos->sum('total'))->with('estado', $estado);
+            return View::make('Dmkt.AsisGer.list_fondos')->with('fondos', $fondos)->with('sum', $fondos->sum('total'))->with('estado', $estado)->with('export', $export);
         }
         
     }
@@ -171,33 +176,10 @@ class FondoController extends BaseController
     }
     function getFondosContabilidad($start, $export = 0)
     {
-        $startArray = explode("-", $start);
-        $endDay     = $this::getLastDayOfMonth($startArray[0], $startArray[1]);
-        
-        $st    = $start;
-        $start = '01-' . $st;
-        $end   = $st[0] . $st[1];
-        /* $mes   = array(
-        
-        '01' => 31,
-        '02' => 28,
-        '03' => 31,
-        '04' => 30,
-        '05' => 31,
-        '06' => 30,
-        '07' => 31,
-        '08' => 31,
-        '09' => 30,
-        '10' => 31,
-        '11' => 30,
-        '12' => 31
-        );
-        
-        $end = $mes[$end] . '-' . $st;*/
-        $end   = $endDay . "-" . $st;
+        $periodo = $this->periodo($start);
         
         if ($export) {
-            $fondos = FondoInstitucional::whereRaw("created_at between to_date('$start' ,'DD-MM-YYYY') and to_date('$end' ,'DD-MM-YYYY')+1")->get(array(
+            $fondos = FondoInstitucional::where("periodo", $periodo)->get(array(
                 'institucion',
                 'repmed',
                 'cuenta',
@@ -206,7 +188,7 @@ class FondoController extends BaseController
             ));
             return $fondos;
         } else {
-            $fondos = FondoInstitucional::whereRaw("created_at between to_date('$start' ,'DD-MM-YYYY') and to_date('$end' ,'DD-MM-YYYY')+1")->where('depositado', 1)->get();
+            $fondos = FondoInstitucional::where("periodo", $periodo)->where('terminado', TERMINADO)->get();
             $view   = View::make('Dmkt.Cont.list_fondos')->with('fondos', $fondos)->with('sum', $fondos->sum('total'));
             $data   = array(
                 'view' => $view,
@@ -218,34 +200,10 @@ class FondoController extends BaseController
     }
     function endFondos($start)
     {
-
-        $startArray = explode("-", $start);
-        $endDay     = $this::getLastDayOfMonth($startArray[0], $startArray[1]);
-        $st         = $start;
-        $start      = '01-' . $st;
-        $end        = $st[0] . $st[1];
-        /* $mes   = array(
-        
-        '01' => 31,
-        '02' => 28,
-        '03' => 31,
-        '04' => 30,
-        '05' => 31,
-        '06' => 30,
-        '07' => 31,
-        '08' => 31,
-        '09' => 30,
-        '10' => 31,
-        '11' => 30,
-        '12' => 31
-        );
-        
-        $end = $mes[$end] . '-' . $st; */
-        $end        = $endDay . '-' . $st;
-        FondoInstitucional::whereRaw("created_at between to_date('$start' ,'DD-MM-YYYY') and to_date('$end' ,'DD-MM-YYYY')+1")->update(array(
-            'terminado' => 1
-        ));
-        return 'Fondos Terminados';
+        $periodo = $this->periodo($start);
+        FondoInstitucional::where("periodo", $periodo)->update(array('terminado' => TERMINADO));
+        $fondos = $this->getFondos($start);
+        return $fondos;
     }
     function getFondo($id)
     {

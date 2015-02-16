@@ -84,10 +84,10 @@
                               </div>
                         <!-- Fondos -->
                               <div class="tab-pane fade" id="fondos">
-                              <div class="panel-body table_solicitude_fondos-contabilidad">
+                              <div class="panel-body table_solicitude_fondos-contabilidad table-solicituds-fondos-contabilidad">
                                <div id="" class="form-group col-xs-6 col-sm-3 col-md-3">
                                 					<div class="input-group">
-                                						<input type="text" id="datefondo" readonly class="form-control" data-type="fondos-tesoreria"><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                						<input type="text" id="datefondo" readonly class="form-control" data-type="fondos-contabilidad"><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
                                 					</div>
                                    </div>
                               </div>
