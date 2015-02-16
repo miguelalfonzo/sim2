@@ -21,6 +21,10 @@ class LoginController extends BaseController{
         return View::make('Dmkt.login');
     }
 
+    public function test(){
+        return View::make('Dmkt.test');
+    }
+
 
     public function doLogin()
     {

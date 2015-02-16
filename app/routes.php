@@ -17,6 +17,7 @@ use Common/Fondo;
 |
 */
 
+Route::get('test', array('uses' => 'Dmkt\LoginController@test'));
 
 /** Login */
 Route::get('/', array('uses' => 'Dmkt\LoginController@showLogin'));
