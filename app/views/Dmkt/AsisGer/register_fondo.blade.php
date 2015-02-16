@@ -18,23 +18,17 @@
    <div class="tab-content">
    <!-- Registro de Fondos -->
    <div class="tab-pane fade active in" id="fondos" data-url="fondos">
+
    <div class="panel panel-default " style="margin-top: 10px">
    <div class="panel-heading">
        <h3 class="panel-title" style="height: 15px"></h3>
        <small style="float: right; margin-top: -15px"><a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" class="icon-collapse"><span class="glyphicon glyphicon-chevron-down"></span></a></small>
-
    </div>
-
    <div id="collapseOne" class="panel-collapse collapse in">
    			<div class="panel-body">
-
-               <div>
-
-
+            <div>
                <input value="" id="idfondo" name="idfondo" type="hidden">
-
                <input value="{{csrf_token()}}" name="_token" id="_token" type="hidden">
-        
                <div class="col-xs-12 col-sm-6 col-md-4">
                 <div class="form-expense">
                   <label>Mes a Registrar</label>
@@ -95,10 +89,7 @@
 
                <!-- Button (Double) -->
                <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
-
-
                    <div class="col-sm-12 col-md-12" style="text-align: center">
-
                            <button id="" name="button1id" class="btn btn-primary register_fondo ladda-button" data-style="zoom-in" data-size="l">Registrar
                            </button>
                            <button id="" name="button1id" class="btn btn-primary btn_edit_fondo ladda-button" data-style="zoom-in" data-size="l">Actualizar
@@ -107,12 +98,9 @@
                            </button>
                    </div>
                </div>
-
-
-               </div>
-               </div>
-   		</div>
-
+            </div>
+        </div>
+   </div>
    </div>
    <div class="panel panel-default">
    <div class="panel-heading">
