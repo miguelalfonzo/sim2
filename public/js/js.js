@@ -243,12 +243,18 @@ $(function(){
             data.dc = dc;
             data.total = total;
             data.leyenda = $("#table-seat-solicitude tbody .leyenda:eq(0)").text();
-            data.idsolicitude = parseInt($("#idsolicitud").val(),10);
+            var url = server+'generate-seat-solicitude';
+            if($(this).data('url')){
+                url = server + 'generate-seat-fondo';
+                data.idfondo = parseInt($("#idfondo").val(),10);
+            }
+            else{
+                data.idsolicitude = parseInt($("#idsolicitud").val(),10);
+            }
             bootbox.confirm("¿Esta seguro que desea Generar el Asiento Contable?", function(result) {
                 if(result)
                 {
-
-                    $.post(server+'generate-seat-solicitude', data)
+                    $.post(url, data)
                     .done( function (data){
                         data = JSON.parse(data);
                         if(data.Status == 1)

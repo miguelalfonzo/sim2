@@ -3,6 +3,7 @@
 const FONDO_SUPERVISOR = 15;
 
 const TERMINADO = 1;
+const PDTE_DEPOSITO = 0;
 const TIPO_ASIENTO_ANTICIPO = 'A';
 const SOLICITUD_ASIENTO = 2;
 const IMAGE_PATH = 'img/reembolso/';
@@ -16,3 +17,11 @@ const status = 'Status';
 const description = 'Description';
 const DOCUMENTO_NO_SUSTENTABLE_ID = 7;
 const EXPORTAR = 1;
+
+const FONDO_DEPOSITADO = 1;
+const FONDO_REGISTRADO = 1;
+
+const CTA_FONDO_INSTITUCIONAL = 1413360;
+const CTA_BANCOS_SOLES = 1041100;
+const ASIENTO_FONDO = 1;
+const ASIENTO_FONDO_GASTO = 2;

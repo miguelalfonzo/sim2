@@ -15,7 +15,10 @@ use \Redirect;
 use \Auth;
 use \Validator;
 use \Excel;
-
+use \Common\Fondo;
+use \Common\LedgerAccount;
+use \Expense\Entry;
+use \Dmkt\FondoInstitucional;
 
 class FondoController extends BaseController
 {
@@ -69,10 +72,8 @@ class FondoController extends BaseController
     
     function postRegister()
     {
-        
         $inputs = Input::all();
-        $mes = explode('-', $inputs['mes']);
-        $periodo = $mes[1].$mes[0];
+        $periodo = $this->period($inputs['mes']);
         $verifyMonth = FondoInstitucional::where('periodo', $periodo)->where('terminado', TERMINADO)->get();
         if(count($verifyMonth) != 0)
         {
@@ -99,7 +100,7 @@ class FondoController extends BaseController
     
     public function getFondos($start, $export = 0)
     {
-        $periodo = $this->periodo($start);
+        $periodo = $this->period($start);
         if ($export) {
             $fondos = FondoInstitucional::where('periodo', $periodo)->get(array(
                 'institucion',
@@ -129,54 +130,7 @@ class FondoController extends BaseController
     }
     function getFondosTesoreria($start, $export = 0)
     {
-        $startArray = explode("-", $start);
-        $endDay     = $this::getLastDayOfMonth($startArray[0], $startArray[1]);
-        $st         = $start;
-        $start      = '01-' . $st;
-        $end        = $st[0] . $st[1];
-        
-        /*$mes   = array(
-        
-        '01' => 31,
-        '02' => 28,
-        '03' => 31,
-        '04' => 30,
-        '05' => 31,
-        '06' => 30,
-        '07' => 31,
-        '08' => 31,
-        '09' => 30,
-        '10' => 31,
-        '11' => 30,
-        '12' => 31
-        );*/
-        
-        //$end = $mes[$end] . '-' . $st;
-        $end = $endDay . '-' . $st;
-        
-        if ($export) {
-            $fondos = FondoInstitucional::whereRaw("created_at between to_date('$start' ,'DD-MM-YYYY') and to_date('$end' ,'DD-MM-YYYY')+1")->get(array(
-                'institucion',
-                'repmed',
-                'cuenta',
-                'supervisor',
-                'total'
-            ));
-            return $fondos;
-        } else {
-            $fondos = FondoInstitucional::whereRaw("created_at between to_date('$start' ,'DD-MM-YYYY') and to_date('$end' ,'DD-MM-YYYY')+1")->get();
-            $view   = View::make('Treasury.list_fondos')->with('fondos', $fondos)->with('sum', $fondos->sum('total'));
-            $data   = array(
-                'view' => $view,
-                'total' => $fondos->sum('total')
-            );
-            return $view;
-        }
-        
-    }
-    function getFondosContabilidad($start, $export = 0)
-    {
-        $periodo = $this->periodo($start);
+        $periodo = $this->period($start);
         
         if ($export) {
             $fondos = FondoInstitucional::where("periodo", $periodo)->get(array(
@@ -189,18 +143,36 @@ class FondoController extends BaseController
             return $fondos;
         } else {
             $fondos = FondoInstitucional::where("periodo", $periodo)->where('terminado', TERMINADO)->get();
-            $view   = View::make('Dmkt.Cont.list_fondos')->with('fondos', $fondos)->with('sum', $fondos->sum('total'));
-            $data   = array(
-                'view' => $view,
-                'total' => $fondos->sum('total')
-            );
+            $estado = 1;
+            foreach ($fondos as $fondo) {
+                if($fondo->depositado == PDTE_DEPOSITO)
+                {
+                    $estado = PDTE_DEPOSITO;
+                }
+            }
+            $view   = View::make('Treasury.list_fondos')->with('fondos', $fondos)->with('sum', $fondos->sum('total'))->with('estado', $estado);
             return $view;
         }
         
     }
+    function getFondosContabilidad($start, $state)
+    {
+        $periodo = $this->period($start);
+        
+        if($state == '1') {
+            $state = FONDO_DEPOSITADO;
+            $fondos = FondoInstitucional::where("periodo", $periodo)->where('terminado', TERMINADO)->where('depositado', $state)->get();
+        }
+        else {
+            $state = FONDO_REGISTRADO;
+            $fondos = FondoInstitucional::where("periodo", $periodo)->where('terminado', TERMINADO)->where('registrado', $state)->get();
+        }
+        $view   = View::make('Dmkt.Cont.list_fondos')->with('fondos', $fondos)->with('sum', $fondos->sum('total'))->with('state', $state);
+        return $view;
+    }
     function endFondos($start)
     {
-        $periodo = $this->periodo($start);
+        $periodo = $this->period($start);
         FondoInstitucional::where("periodo", $periodo)->update(array('terminado' => TERMINADO));
         $fondos = $this->getFondos($start);
         return $fondos;
@@ -358,26 +330,77 @@ class FondoController extends BaseController
         return View::make('Dmkt.Rm.list_fondos_rm')->with('fondos', $fondos);
         
     }
-    public function viewGenerateFondo($token)
-    {
-        $fondo   = FondoInstitucional::where('token', $token)->firstOrFail();
-        $expense = Expense::where('idfondo', $fondo->idfondo)->get();
-        $date    = $this->getDay();
-        $data    = array(
-            'fondo' => $fondo,
-            'expense' => $expense,
-            'date' => $date
-        );
-        return View::make('Dmkt.Cont.register_seat_fondo', $data);
-    }
+    
     function getLastDayOfMonth($month, $year)
     {
         return date('d', mktime(0, 0, 0, $month + 1, 1, $year) - 1);
     }
 
-    private function periodo($date)
+    public function viewGenerateSeatFondo($token)
     {
-        $periodo = explode('-', $date);
-        return $periodo[1].str_pad($periodo[0], 2, '0', STR_PAD_LEFT);
+        $fondo = FondoInstitucional::where('token', $token)->firstOrFail();
+        $monthYear = $this->monthYear($fondo->periodo);
+        $getDay = $this->getDay();
+        $cuenta = Fondo::where('cuenta_mkt', CTA_FONDO_INSTITUCIONAL)->get();
+        $banco = LedgerAccount::where('num_cuenta', CTA_BANCOS_SOLES)->get();
+        return View::make('Dmkt.Cont.register_seat_fondo')->with('fondo', $fondo)->with('mes', $monthYear)->with('getDay', $getDay)->with('cuenta', $cuenta)->with('banco',$banco);
+    }
+
+    public function generateSeatFondo()
+    {   
+        $middleRpta = array();
+        $inputs  = Input::all();
+        $middleRpta[status] = 1;
+        foreach ($inputs['number_account'] as $account) {
+            $fondo = Fondo::where('cuenta_mkt', $account)->get();
+            if(count($fondo) == 0){
+                $cuentaContable = LedgerAccount::where('num_cuenta', $account)->get();
+                if(count($cuentaContable) == 0){
+                    $middleRpta[status] = error;
+                    $middleRpta[description] = "Las cuenta $account no se encuentra registrada en la Base de datos.";
+                }
+            }
+        }
+        try {
+            DB::transaction (function() use ($inputs){
+                for($i=0;$i<count($inputs['number_account']);$i++)
+                {
+                    $entry = new Entry;
+                    $idasiento = $entry->searchId()+1;
+                    $entry->idasiento = $idasiento;
+                    $entry->num_cuenta = $inputs['number_account'][$i];
+                    $entry->fec_origen = $this->getDay()['toDay'];
+                    $entry->d_c = $inputs['dc'][$i];
+                    $entry->importe = $inputs['total'][$i];
+                    $entry->leyenda = $inputs['leyenda'];
+                    $entry->save();
+                }
+                FondoInstitucional::where('idfondo', $inputs['idfondo'])->update(array('asiento' => SOLICITUD_ASIENTO));
+            });
+        } catch (Exception $e) {
+            $middleRpta = $this->internalException($e);
+        }
+        return json_encode($middleRpta);
+    }
+
+    private function period($date)
+    {
+        $period = explode('-', $date);
+        return $period[1].str_pad($period[0], 2, '0', STR_PAD_LEFT);
+    }
+
+    private function monthYear($period)
+    {
+        $month = substr($period, -2);
+        $year = substr($period, 0, 4);
+        return $month.'/'.$year;
+    }
+
+    private function getDay(){
+        $currentDate = getdate();
+        $toDay = $currentDate['mday']."/".str_pad($currentDate['mon'],2,'0',STR_PAD_LEFT)."/".$currentDate['year'];
+        $lastDay = '06/'.str_pad(($currentDate['mon']+1),2,'0',STR_PAD_LEFT).'/'.$currentDate['year'];
+        $date = ['toDay'=>$toDay,'lastDay'=> $lastDay];
+        return $date;
     }
 }

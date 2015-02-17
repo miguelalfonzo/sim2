@@ -137,10 +137,10 @@
 
             @foreach($fondos as $sub)
                 @if(isset($solicitude->idfondo) && $sub->idfondo == $solicitude->subtype->idfondo)
-                    <option selected value="{{$sub->idfondo}}">{{$sub->nombre}}</option>
+                    <option selected value="{{$sub->idfondo}}">{{$sub->nombre_mkt}}</option>
                 @else
-                    @if($sub->idfondo == 1 || $sub->idfondo == 31) <!-- AREK Y OTROS -->
-                    <option value="{{$sub->idfondo}}">{{$sub->nombre}}</option>
+                    @if($sub->idfondo == FONDO_SUPERVISOR) <!-- AREK Y OTROS -->
+                    <option value="{{$sub->idfondo}}">{{$sub->nombre_mkt}}</option>
                     @endif
 
                 @endif

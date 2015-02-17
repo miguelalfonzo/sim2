@@ -24,9 +24,13 @@
         <td>
             <div class="div-icons-solicituds">
                 @if($fondo->asiento == 0)
-                <a class="deposit-fondo" data-idfondo="{{$fondo->idfondo}}" data-toggle="modal" data-target="#myModal" ><span class="glyphicon glyphicon-book"></span></a>
+                    @if($state == FONDO_DEPOSITADO)
+                        <a href="{{url('/')}}/generar-asiento-fondo/{{$fondo->token}}"><span class="glyphicon glyphicon-book"></span></a>
+                    @else
+                        <a href="{{url('/')}}/generar-asiento-fondo-gasto/{{$fondo->token}}"><span class="glyphicon glyphicon-book"></span></a>
+                    @endif
                 @else
-                <span><strong>Asiento</strong></span>
+                    <span><strong>Asiento Generado</strong></span>
                 @endif
             </div>
         </td>
