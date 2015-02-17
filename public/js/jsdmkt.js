@@ -456,16 +456,20 @@ function newSolicitude() {
 
     }
 
-    function listFondos(user){
-        console.log(user);
+    function listFondos(user, state){
+        console.log(user, state);
+        var url = server + 'list-'+user +'/'+dateactual + '/' + state;
+        if(user != 'fondos-contabilidad') {
+            url = server + 'list-'+user +'/'+dateactual;
+        }
         $.ajax({
-            url: server + 'list-'+user +'/'+dateactual,
+            url: url,
             type: 'GET',
             dataType: 'html'
 
         }).done(function (data) {
             console.log('.table_solicitude_' + user);
-            $(".table-responsive fondo_r").remove();
+            $(".fondo_r").remove();
             $('.table_solicitude_'+user).append(data);
             $("#datefondo").val(dateactual);
             $('#table_solicitude_'+user).dataTable({
@@ -976,7 +980,7 @@ function newSolicitude() {
 
     if(userType === 'C'){
         listSolicitude('cont',APROBADO);
-        listFondos('fondos-contabilidad');
+        listFondos('fondos-contabilidad', $('#estado_fondo_cont').val());
         $("#datefondo").val(dateactual);
     }
 
@@ -1419,7 +1423,11 @@ function newSolicitude() {
         $('#loading-fondo').attr('class','show');
         $('.table-solicituds-fondos > .fondo_r').remove();
         $('.fondo_r').remove();
-        $.get(server + 'list-'+aux+'/' + datefondo)
+        var url = server + 'list-'+aux+'/' + datefondo;
+        if(aux === 'fondos-contabilidad') {
+            url = server + 'list-'+aux+'/' + datefondo + '/' + $('#estado_fondo_cont').val();
+        }
+        $.get(url)
         .done(function (data) {
             $('#loading-fondo').attr('class','hide');
             $('.table_solicituds_'+aux+' > .fondo_r').remove();
@@ -1749,5 +1757,4 @@ function newSolicitude() {
         $("#message-op-number").html('');
         $("#op-number").val('');
     });
-
 }
