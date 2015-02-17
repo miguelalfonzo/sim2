@@ -16,7 +16,7 @@ use \Auth;
 use \Validator;
 use \Excel;
 use \Common\Fondo;
-use \Common\LedgerAccount;
+use \Dmkt\Account;
 use \Expense\Entry;
 use \Dmkt\FondoInstitucional;
 
@@ -342,7 +342,7 @@ class FondoController extends BaseController
         $monthYear = $this->monthYear($fondo->periodo);
         $getDay = $this->getDay();
         $cuenta = Fondo::where('cuenta_mkt', CTA_FONDO_INSTITUCIONAL)->get();
-        $banco = LedgerAccount::where('num_cuenta', CTA_BANCOS_SOLES)->get();
+        $banco = Account::where('num_cuenta', CTA_BANCOS_SOLES)->get();
         return View::make('Dmkt.Cont.register_seat_fondo')->with('fondo', $fondo)->with('mes', $monthYear)->with('getDay', $getDay)->with('cuenta', $cuenta)->with('banco',$banco);
     }
 
@@ -354,7 +354,7 @@ class FondoController extends BaseController
         foreach ($inputs['number_account'] as $account) {
             $fondo = Fondo::where('cuenta_mkt', $account)->get();
             if(count($fondo) == 0){
-                $cuentaContable = LedgerAccount::where('num_cuenta', $account)->get();
+                $cuentaContable = Account::where('num_cuenta', $account)->get();
                 if(count($cuentaContable) == 0){
                     $middleRpta[status] = error;
                     $middleRpta[description] = "Las cuenta $account no se encuentra registrada en la Base de datos.";
