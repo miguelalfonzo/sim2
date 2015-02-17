@@ -3,6 +3,7 @@
 const FONDO_SUPERVISOR = 15;
 
 const TERMINADO = 1;
+const PDTE_DEPOSITO = 0;
 const TIPO_ASIENTO_ANTICIPO = 'A';
 const SOLICITUD_ASIENTO = 2;
 const IMAGE_PATH = 'img/reembolso/';

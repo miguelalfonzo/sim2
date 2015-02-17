@@ -129,33 +129,10 @@ class FondoController extends BaseController
     }
     function getFondosTesoreria($start, $export = 0)
     {
-        $startArray = explode("-", $start);
-        $endDay     = $this::getLastDayOfMonth($startArray[0], $startArray[1]);
-        $st         = $start;
-        $start      = '01-' . $st;
-        $end        = $st[0] . $st[1];
-        
-        /*$mes   = array(
-        
-        '01' => 31,
-        '02' => 28,
-        '03' => 31,
-        '04' => 30,
-        '05' => 31,
-        '06' => 30,
-        '07' => 31,
-        '08' => 31,
-        '09' => 30,
-        '10' => 31,
-        '11' => 30,
-        '12' => 31
-        );*/
-        
-        //$end = $mes[$end] . '-' . $st;
-        $end = $endDay . '-' . $st;
+        $periodo = $this->periodo($start);
         
         if ($export) {
-            $fondos = FondoInstitucional::whereRaw("created_at between to_date('$start' ,'DD-MM-YYYY') and to_date('$end' ,'DD-MM-YYYY')+1")->get(array(
+            $fondos = FondoInstitucional::where("periodo", $periodo)->get(array(
                 'institucion',
                 'repmed',
                 'cuenta',
@@ -164,12 +141,15 @@ class FondoController extends BaseController
             ));
             return $fondos;
         } else {
-            $fondos = FondoInstitucional::whereRaw("created_at between to_date('$start' ,'DD-MM-YYYY') and to_date('$end' ,'DD-MM-YYYY')+1")->get();
-            $view   = View::make('Treasury.list_fondos')->with('fondos', $fondos)->with('sum', $fondos->sum('total'));
-            $data   = array(
-                'view' => $view,
-                'total' => $fondos->sum('total')
-            );
+            $fondos = FondoInstitucional::where("periodo", $periodo)->where('terminado', TERMINADO)->get();
+            $estado = 1;
+            foreach ($fondos as $fondo) {
+                if($fondo->depositado == PDTE_DEPOSITO)
+                {
+                    $estado = PDTE_DEPOSITO;
+                }
+            }
+            $view   = View::make('Treasury.list_fondos')->with('fondos', $fondos)->with('sum', $fondos->sum('total'))->with('estado', $estado);
             return $view;
         }
         

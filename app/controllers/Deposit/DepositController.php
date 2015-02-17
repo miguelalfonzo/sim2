@@ -149,8 +149,11 @@ class DepositController extends BaseController{
                 }
                 else
                 {
+                    //Update estado
                     $fondo = FondoInstitucional::find($idfondo);
                     $fondo->depositado = 1;
+                    $fondo->save();
+                    //New Deposit
                     $newDeposit = new Deposit;
                     $id = $newDeposit->lastId()+1;
                     $newDeposit->iddeposito        = $id;
@@ -158,19 +161,25 @@ class DepositController extends BaseController{
                     $newDeposit->num_transferencia = $deposit['op_number'];
                     $newDeposit->idfondo       = $idfondo;
                     $newDeposit->save();
-                    $fondo->save();
-                    return $this->getFondos();
                 }
             });
-            return 1;
+            return $this->getFondos($deposit['date_fondo']);
         } catch (Exception $e) {
-            return $e;
+            return 'error';
         }
     }
-    public function getFondos(){
-
-        $fondos = FondoInstitucional::where('terminado',1)->get();
-        $view = View::make('Treasury.list_fondos')->with('fondos',$fondos);
+    public function getFondos($mes){
+        $mes = explode('-', $mes);
+        $periodo = $mes[1].str_pad($mes[0], 2, '0', STR_PAD_LEFT);
+        $fondos = FondoInstitucional::where('terminado', TERMINADO)->where('periodo', $periodo)->get();
+        $estado = 1;
+        foreach ($fondos as $fondo) {
+            if($fondo->depositado == PDTE_DEPOSITO)
+            {
+                $estado = PDTE_DEPOSITO;
+            }
+        }
+        $view = View::make('Treasury.list_fondos')->with('fondos',$fondos)->with('estado', $estado);
         return $view;
 
     }
