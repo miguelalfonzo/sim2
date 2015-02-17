@@ -30,10 +30,7 @@ class SolicitudeController extends BaseController
     public function __construct()
     {
         parent::__construct();
-
         $this->beforeFilter('active-user');
-
-
     }
 
     private function getDay(){
@@ -959,11 +956,14 @@ class SolicitudeController extends BaseController
     public function show_gercom()
     {
         $state = Session::get('state');
+        $estado = Session::get('Estado');
+        Log::error(json_encode($estado));
         $states = State::orderBy('idestado', 'ASC')->get();
-        $data = [
+        $data = array(
             'state' => $state,
-            'states' => $states
-        ];
+            'states' => $states,
+            'estado' => $estado
+        );
         return View::make('Dmkt.GerCom.show_gercom', $data);
     }
 
@@ -982,6 +982,21 @@ class SolicitudeController extends BaseController
 
     }
 
+    public function gercomAsignarResponsable()
+    {
+        $inputs = Input::all();
+        $rules = array('responsable' => 'required' );   
+        $validator = Validator::make($inputs, $rules);
+        if ($validator->fails()) 
+        {
+            $messages = $validator->messages();
+            return $messages;
+        }   
+        Solicitude::where('token',$inputs['token'])->update( array('idresponse' => $inputs['responsable']) );
+        $state = array('Status' => 1 , 'Description' => 'Se asigno la solicitud correctamente');
+        return Redirect::to('show_gercom')->with('Estado',$state);
+    }
+
     public function viewSolicitudeGerCom($token)
     {
 
@@ -991,8 +1006,35 @@ class SolicitudeController extends BaseController
         $sol->blocked = 1;
         $data = $this->objectToArray($sol);
         $sol->update($data);
+        if ($solicitude->estado == APROBADO && $solicitude->asiento == 1)
+        {
+            $resp = array();
+            $asistentes = User::where('type','AG')->get();
+            foreach ($asistentes as $asistente)
+            {
+                array_push($resp, $asistente->person);
+            }
+            if($solicitude->user->type == 'R')
+            {
+                array_push( $resp, Solicitude::where('token', $token)->select('iduser')->first()->rm );
+                
+            }
+            elseif($solicitude->user->type == 'S')
+            {
+                array_push( $resp, Solicitude::where('token', $token)->select('iduser')->first()->rm );
+            }
+            else
+            {
 
-        return View::make('Dmkt.GerCom.view_solicitude_gercom')->with('solicitude', $solicitude);
+            }
+            
+            $info = array( 'solicitude' => $solicitude, 'responsables' => $resp );
+        }
+        else
+        {
+            $info = array('solicitude' => $solicitude);
+        }
+        return View::make('Dmkt.GerCom.view_solicitude_gercom',$info);
     }
 
     public function approvedSolicitude()
@@ -1217,12 +1259,21 @@ class SolicitudeController extends BaseController
             array_push($clientes,$client->client->clnombre);
         }
         $clientes = implode(',',$clientes);
-        $data = [ 
+        if ($solicitude->tipo_moneda == SOLES)
+        {
+            $banco = Account::where('alias',BANCOS)->where('num_cuenta',CUENTA_SOLES)->first();
+        }
+        elseif ($solicitude->tipo_moneda == DOLARES) {
+            $banco = Account::where('alias',BANCOS)->where('num_cuenta',CUENTA_DOLARES)->first();
+        }
+        $data = array(
             'solicitude' => $solicitude,
             'expense' => $expense,
             'date' => $date,
-            'clientes' => $clientes
-        ];
+            'clientes' => $clientes,
+            'bancos'   => $banco
+        );
+        Log::error(json_encode($data));
         return View::make('Dmkt.Cont.register_seat_solicitude', $data);
     }
 
@@ -1263,12 +1314,8 @@ class SolicitudeController extends BaseController
                     $tbEntry->updated_at = null;
                     $tbEntry->save();
                 }
-                Solicitude::where('idsolicitud', $inputs['idsolicitude'])->update(array('asiento' => SOLICITUD_ASIENTO));                     
+                Solicitude::where('idsolicitud', $inputs['idsolicitude'])->update(array('asiento' => SOLICITUD_ASIENTO));                    
                 DB::commit();
-                /*
-                $data = $this->objectToArray($solicitude);
-                $solicitude->update($data);
-                */
                 $middleRpta[status] = 1;
             }
         }

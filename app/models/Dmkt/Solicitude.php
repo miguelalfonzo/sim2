@@ -79,4 +79,12 @@ class Solicitude extends Eloquent{
     function deposit(){
         return $this->hasOne('Common\Deposit','iddeposito', 'iddeposito');
     }
+
+    function rm(){
+        return $this->hasOne('Dmkt\Rm','iduser','iduser')->select('nombres,apellidos,iduser');
+    }
+
+    function sup(){
+        return $this->hasOne('Dmkt\Sup','iduser','iduser')->select('nombres,apellidos,iduser');;
+    }
 }

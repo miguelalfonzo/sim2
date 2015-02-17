@@ -159,7 +159,7 @@
 									</thead>
 									<tbody>
 										<tr>
-											<th class="name_account">Fondo</th>
+											<th class="name_account">{{$solicitude->subtype->nombre_mkt}}</th>
 											<th class="number_account">{{$solicitude->subtype->cuenta_mkt}}</th>
 											<th class="date_ini">{{$date['toDay']}}</th>
 											<th class="dc">D</th>
@@ -175,7 +175,7 @@
 											<th><a class="delete-seat-solicitude" href="#"><span class="glyphicon glyphicon-remove"></span></a></th>
 										</tr>
 										<tr>
-											<th class="name_account">Bancos</th>
+											<th class="name_account">{{$solicitude->subtype->nombre_cont}}</th>
 											<th class="number_account">{{$solicitude->subtype->cuenta_cont}}</th>
 											<th class="date_ini">{{$date['toDay']}}</th>
 											<th class="dc">C</th>

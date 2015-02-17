@@ -1220,6 +1220,24 @@ function newSolicitude() {
             });
         }
     });
+    
+    $( '#gercom-asign-resp' ).on( 'submit', function(e) {
+        e.preventDefault();
+        console.log(this);
+        $.post(
+            $( this ).prop( 'action' ),
+            {
+                "_token": $( this ).find( 'input[name=_token]' ).val(),
+                "token": $( this ).find( 'input[name=token]' ).val(),
+                "setting_value": $( '#token' ).val()
+            },
+            function ( data )
+            {
+
+            }, 
+            'json'
+        );
+    });
 
     $(document).on('click' , '.delete-fondo' , function(e){
         e.preventDefault();

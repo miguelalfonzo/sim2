@@ -1,7 +1,4 @@
 <?php
-
-
-
 /*
 
 use Common/BrandExpense;
@@ -135,6 +132,7 @@ Route::group(array('before' => 'gercom'), function () {
     Route::post('buscar-solicitudes-gercom', 'Dmkt\SolicitudeController@searchSolicitudsGerCom');
     Route::post('rechazar-solicitud-gercom', 'Dmkt\SolicitudeController@denySolicitudeGerCom');
     Route::get('cancelar-solicitud-gercom/{token}', 'Dmkt\SolicitudeController@disBlockSolicitudeGerCom');
+    Route::post('gercom-asignar-responsable','Dmkt\SolicitudeController@gercomAsignarResponsable');
 
 });
 

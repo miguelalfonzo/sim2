@@ -74,4 +74,13 @@
         </div>
     </div>
 </div>
+@if(isset($estado))
+    <script type="text/javascript">
+        @if($estado['Status'] == 1)
+            $(document).ready(function() {
+                responseUI("{{$estado['Description']}}","green");
+            });
+        @endif
+    </script>
+@endif
 @stop
