@@ -160,7 +160,9 @@ Route::group(array('before' => 'cont'), function () {
     Route::get('edit-expense-cont', 'Expense\ExpenseController@editExpense');
     Route::post('update-expense-cont', 'Expense\ExpenseController@updateExpense');
     //Fondos
-    Route::get('list-fondos-contabilidad/{date}','Dmkt\FondoController@getFondosContabilidad');
+    Route::get('list-fondos-contabilidad/{date}/{estado}','Dmkt\FondoController@getFondosContabilidad');
+    Route::get('generar-asiento-fondo/{token}', 'Dmkt\FondoController@viewGenerateSeatFondo');
+    Route::post('generate-seat-fondo', 'Dmkt\FondoController@generateSeatFondo');
 });
 // App::error(function (ModelNotFoundException $e) {
 //     return View::make('notfound');
