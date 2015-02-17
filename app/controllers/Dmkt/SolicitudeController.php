@@ -2,28 +2,30 @@
 
 namespace Dmkt;
 
-use \Common\State;
-use \Common\Fondo;
-use \Common\TypePayment;
-use \BaseController;
-use \View;
 use \DB;
-use \Input;
-use \Redirect;
+use \Log;
 use \Demo;
 use \Mail;
-use \Image;
+use \View;
 use \Hash;
 use \User;
 use \Auth;
-use \Session;
-use \Validator;
 use \Excel;
+use \Image;
+use \Input;
+use \Session;
+use \Redirect;
 use \Response;
-use \Illuminate\Database\Query\Builder;
+use \Validator;
+use \BaseController;
+use \Common\State;
+use \Common\Fondo;
+use \Common\TypePayment;
 use \Expense\Expense;
 use \Expense\Entry;
-use \Log;
+use \Expense\ProofType;
+use \Expense\ExpenseItem;
+use \Illuminate\Database\Query\Builder;
 
 class SolicitudeController extends BaseController
 {
@@ -1080,6 +1082,39 @@ class SolicitudeController extends BaseController
 
     /** ---------------------------------------------  Contabilidad -------------------------------------------------*/
 
+//$data           = ExpenseItem::where('idgasto','=',intval($idExpense->idgasto))->get();
+    public function viewGenerateSeatExpense($token){
+        $solicitude = Solicitude::where('token', $token)->firstOrFail();
+        $expense    = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
+        $typeProof  = ProofType::all();
+        $clientes   = array();
+        $date       = $this->getDay();
+        foreach($solicitude->clients as $client)
+        {
+            array_push($clientes,$client->client->clnombre);
+        }
+        $clientes    = implode(',',$clientes);
+        $documentList     = json_decode($expense->toJson());
+        $expenseItem = array();
+        foreach ($documentList as $documentListKey => $documentElement) {
+            $itemList = ExpenseItem::where('idgasto','=',intval($documentElement->idgasto))->get();
+            $itemList = json_decode($itemList->toJson());
+            $documentElement->itemList = $itemList;
+            $documentElement->count = count($itemList);
+            //$expenseItem = array_merge($expenseItem, $expenseItemList);
+        }
+        print_r($documentList);
+        
+        $data = [ 
+            'solicitude'  => $solicitude,
+            'expenseItem' => $documentList,
+            'date'        => $date,
+            'clientes'    => $clientes,
+            'typeProof'   => $typeProof
+        ];
+
+        return View::make('Dmkt.Cont.SeatExpense', $data);
+    }
 
     public function show_cont()
     {

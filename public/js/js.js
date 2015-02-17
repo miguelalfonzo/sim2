@@ -570,6 +570,7 @@ $(function(){
                     loadingUI('Cargando Datos');
                 },
                 error:function(){
+                    console.log("error");
                     $.blockUI();
                     $(".message-expense").text('No se pueden recuperar los datos del servidor.').show();
                 }
