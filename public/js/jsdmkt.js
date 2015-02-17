@@ -1227,20 +1227,35 @@ function newSolicitude() {
     
     $( '#gercom-asign-resp' ).on( 'submit', function(e) {
         e.preventDefault();
-        console.log(this);
+        $( this ).find('input[name=responsable]').each(function()
+        {
+            if (this.checked)
+            {
+                console.log(this);
+                responsable = this.value;
+            }
+        });
         $.post(
             $( this ).prop( 'action' ),
             {
                 "_token": $( this ).find( 'input[name=_token]' ).val(),
                 "token": $( this ).find( 'input[name=token]' ).val(),
-                "setting_value": $( '#token' ).val()
+                "responsable": responsable
             },
             function ( data )
             {
-
+                $('#gerdev').hide();
+                console.log(data);
+                responseUI('Solicitud Registrada Correctamente','green');
+                setTimeout(function()
+                {
+                    location.href =server + 'show_gercom';
+                }, 1000);
+                
             }, 
             'json'
         );
+        return false;
     });
 
     $(document).on('click' , '.delete-fondo' , function(e){

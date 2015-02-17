@@ -989,12 +989,12 @@ class SolicitudeController extends BaseController
         $validator = Validator::make($inputs, $rules);
         if ($validator->fails()) 
         {
-            $messages = $validator->messages();
-            return $messages;
+            $state = $validator->messages();
+            return json_encode($state);
         }   
         Solicitude::where('token',$inputs['token'])->update( array('idresponse' => $inputs['responsable']) );
         $state = array('Status' => 1 , 'Description' => 'Se asigno la solicitud correctamente');
-        return Redirect::to('show_gercom')->with('Estado',$state);
+        return json_encode($state);
     }
 
     public function viewSolicitudeGerCom($token)
