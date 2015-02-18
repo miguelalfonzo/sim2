@@ -40,7 +40,7 @@
                    @if($solicitude->blocked == 1)
                         <a href="#"  class="cancel-solicitude active-link" data-idsolicitude = "{{$solicitude->idsolicitud}}" data-token="{{csrf_token()}}" ><span class="glyphicon glyphicon-remove"></span></a>
                    @else
-                        <a href="#" class="cancel-solicitude" data-idsolicitude = "{{$solicitude->idsolicitud}}" data-token="{{csrf_token()}}" ><span class="glyphicon glyphicon-remove"></span></a>
+                        <a href="#" class="cancel-solicitude" data-idsolicitude = "{{$solicitude->idsolicitud}}" data-token="{{csrf_token()}}" disabled><span class="glyphicon glyphicon-remove"></span></a>
                    @endif
                 @endif
 
