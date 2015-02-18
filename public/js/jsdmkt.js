@@ -390,7 +390,6 @@ function newSolicitude() {
                     {
                         loadingUI(message1);
                     }
-
                 }).done(function (data)
                 {
                     $.unblockUI();
@@ -400,7 +399,7 @@ function newSolicitude() {
                         });
 
                     }
-                    if(data == 'S'){
+                    else if(data == 'S'){
                         responseUI(message2, 'green');
                         setTimeout(
                             function () {
@@ -409,7 +408,6 @@ function newSolicitude() {
                             , 200);
                     }
                     else{
-                        console.log(data);
                         responseUI("Faltan Ingresar Campos", 'red');
                     }
 
@@ -1225,37 +1223,60 @@ function newSolicitude() {
         }
     });
     
-    $( '#gercom-asign-resp' ).on( 'submit', function(e) {
+    $( '#gercom-asign-resp' ).on( 'submit', function(e) 
+    {
         e.preventDefault();
+        responsable = '';
         $( this ).find('input[name=responsable]').each(function()
         {
             if (this.checked)
             {
-                console.log(this);
                 responsable = this.value;
             }
         });
-        $.post(
-            $( this ).prop( 'action' ),
+        if (responsable == '')
+        {
+                $('#myModalLabel').text('Debe Seleccionar un Responsable');
+                $('#myModalLabel')[0].style.color = "red";
+        }
+        else
+        {   
+            $('#gerdev').modal('hide');
+            $('#myModalLabel').text('Se asignara como responsable a :');
+            $('#myModalLabel')[0].style.color = "";  
+            
+            $.ajax(
             {
-                "_token": $( this ).find( 'input[name=_token]' ).val(),
-                "token": $( this ).find( 'input[name=token]' ).val(),
-                "responsable": responsable
-            },
-            function ( data )
-            {
-                $('#gerdev').hide();
-                console.log(data);
-                responseUI('Solicitud Registrada Correctamente','green');
-                setTimeout(function()
+                type: 'post',
+                url :  $( this ).prop( 'action' ),
+                data: 
                 {
-                    location.href =server + 'show_gercom';
-                }, 1000);
-                
-            }, 
-            'json'
-        );
-        return false;
+                        "_token": $( this ).find( 'input[name=_token]' ).val(),
+                        "token": $( this ).find( 'input[name=token]' ).val(),
+                        "responsable": responsable
+                },
+                error: function()
+                {
+                        $('#gerdev').modal('hide');
+                        responseUI('Error del Sistema','red');
+                },
+                success: function ( data )
+                {   
+                    if (data.Status == 'Error')
+                    {
+                        responseUI('Hubo un error al intentar asignar el responsable','red');
+                    }
+                    else if (data.Status == 'Ok')
+                    {
+                        responseUI('Responsable asignado correctamente','green');
+                        setTimeout(function()
+                        {
+                            location.href = server + 'show_gercom';
+                        },900);
+                    }
+                }
+            });
+        }
     });
 
     $(document).on('click' , '.delete-fondo' , function(e){

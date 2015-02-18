@@ -7,6 +7,7 @@ use \Common\Fondo;
 use \Common\TypePayment;
 use \BaseController;
 use \View;
+use \Exception;
 use \DB;
 use \Input;
 use \Redirect;
@@ -957,7 +958,6 @@ class SolicitudeController extends BaseController
     {
         $state = Session::get('state');
         $estado = Session::get('Estado');
-        Log::error(json_encode($estado));
         $states = State::orderBy('idestado', 'ASC')->get();
         $data = array(
             'state' => $state,
@@ -984,28 +984,38 @@ class SolicitudeController extends BaseController
 
     public function gercomAsignarResponsable()
     {
-        $inputs = Input::all();
-        $rules = array('responsable' => 'required' );   
-        $validator = Validator::make($inputs, $rules);
-        if ($validator->fails()) 
+        try
         {
-            $state = $validator->messages();
-            return json_encode($state);
-        }   
-        Solicitude::where('token',$inputs['token'])->update( array('idresponse' => $inputs['responsable']) );
-        $state = array('Status' => 1 , 'Description' => 'Se asigno la solicitud correctamente');
-        return json_encode($state);
+            $middleRpta = array();
+            $inputs = Input::all();
+            $rules = array('responsable' => 'required|integer|min:1' );   
+            $validator = Validator::make($inputs, $rules);
+            if ($validator->fails()) 
+            {
+                $middleRpta = $validator->messages();
+            }
+            else
+            {
+                Solicitude::where('token',$inputs['token'])->update( array('idresponse' => $inputs['responsable']) );
+                $middleRpta = array( status => ok , description => 'Se asigno la solicitud correctamente');
+            }
+        }
+        catch (Exception $e)
+        {
+            $middleRpta = $this->internalException($e);
+        }
+        return $middleRpta;
     }
 
     public function viewSolicitudeGerCom($token)
     {
-
-
         $solicitude = Solicitude::where('token', $token)->first();
         $sol = Solicitude::where('token', $token);
         $sol->blocked = 1;
         $data = $this->objectToArray($sol);
         $sol->update($data);
+        $info = array();
+        $info[status] = ok;
         if ($solicitude->estado == APROBADO && $solicitude->asiento == 1)
         {
             $resp = array();
@@ -1014,21 +1024,30 @@ class SolicitudeController extends BaseController
             {
                 array_push($resp, $asistente->person);
             }
-            if($solicitude->user->type == 'R')
+            if(isset($solicitude->user->type))
             {
-                array_push( $resp, Solicitude::where('token', $token)->select('iduser')->first()->rm );
-                
-            }
-            elseif($solicitude->user->type == 'S')
-            {
-                array_push( $resp, Solicitude::where('token', $token)->select('iduser')->first()->rm );
+                if($solicitude->user->type == 'R')
+                {
+                    array_push( $resp, Solicitude::where('token', $token)->select('iduser')->first()->rm );
+                    
+                }
+                elseif($solicitude->user->type == 'S')
+                {
+                    array_push( $resp, Solicitude::where('token', $token)->select('iduser')->first()->sup );
+                }
+                else
+                {
+                    $info[status] = warning;
+                    $info[description] = 'No se encontro a un Representante Medico o Supervisor';                
+                }
             }
             else
             {
-
+                $info[status] = warning;
+                $info[description] = 'No se encontro al Tipo de Solicitante';  
             }
-            
-            $info = array( 'solicitude' => $solicitude, 'responsables' => $resp );
+            $info['solicitude'] = $solicitude;
+            $info['responsables'] = $resp;
         }
         else
         {
@@ -1050,7 +1069,6 @@ class SolicitudeController extends BaseController
         $solicitude->monto = $inputs['monto'];
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
-        //SolicitudeFamily::where('idsolicitud', $idSol)->delete();
         $amount_assigned = $inputs['amount_assigned'];
         $families = SolicitudeFamily::where('idsolicitud', $idSol)->get();
         $i = 0;
@@ -1069,7 +1087,6 @@ class SolicitudeController extends BaseController
     }
     public function denySolicitudeGerCom()
     {
-
         $inputs = Input::all();
         $id = $inputs['idsolicitude'];
         $solicitude = Solicitude::where('idsolicitud', $id);
@@ -1081,7 +1098,6 @@ class SolicitudeController extends BaseController
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
         return Redirect::to('show_gercom')->with('state', RECHAZADO);
-
     }
 
     public function searchSolicitudsGerCom()

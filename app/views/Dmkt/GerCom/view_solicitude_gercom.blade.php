@@ -7,6 +7,9 @@
             <h3 class="panel-title">Ver Solicitud Gerente Comercial</h3>
         </div>
         <div class="panel-body">
+            <form id="form_make_activity" class="" method="post" action="">
+            {{Form::token()}}
+            <input type="hidden" value="{{$solicitude->token}}" name="token">
             <input id="textinput" name="idsolicitude" type="hidden" placeholder="" value="{{$solicitude->idsolicitud}}">
             <div class="form-group col-sm-6 col-md-4">
                 <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo Solicitud</label>
@@ -111,16 +114,28 @@
                 <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Solicitante</label>
                 <div class="col-sm-12 col-md-12 col-lg-12">
                     <div class="input-group">
-                        @if($solicitude->user->type == 'R')
-                        <span class="input-group-addon">R</span>
-                        <input id="textinput" name="titulo" type="text" placeholder=""
-                               value="{{$solicitude->user->rm->nombres}}" readonly
-                               class="form-control input-md">
+                        @if(isset($solicitude->user->type))
+                            @if($solicitude->user->type == 'R')
+                            <span class="input-group-addon">Representante Medico</span>
+                            <input id="textinput" name="titulo" type="text" placeholder=""
+                                   value="{{ucwords($solicitude->user->rm->nombres.' '.$solicitude->user->rm->apellidos)}}" readonly
+                                   class="form-control input-md">
+                            @elseif($solicitude->user->type == 'S')
+                            <span class="input-group-addon">Supervisor</span>
+                            <input id="textinput" name="titulo" type="text" placeholder=""
+                                   value="{{ucwords($solicitude->user->sup->nombres.' '.$solicitude->user->sup->apellidos)}}" readonly
+                                   class="form-control input-md">
+                            @else
+                            <span class="input-group-addon">{{$solicitude->user->type}}</span>
+                            <input id="textinput" name="titulo" type="text" placeholder=""
+                                   value="{{ucwords($solicitude->user->person->nombres.' '.$solicitude->user->person->apellidos)}}" readonly
+                                class="form-control input-md">
+                            @endif
                         @else
-                        <span class="input-group-addon">S</span>
-                        <input id="textinput" name="titulo" type="text" placeholder=""
-                               value="{{$solicitude->user->sup->nombres}}" readonly
-                               class="form-control input-md">
+                            <span class="input-group-addon">No Registrado</span>
+                            <input id="textinput" name="titulo" type="text" placeholder=""
+                                   value="Usuario no registrado" readonly
+                                   class="form-control input-md">
                         @endif
                     </div>
                 </div>
@@ -154,6 +169,7 @@
                     @endif
                 </div>
             </div>
+            </form>
 
             @if($solicitude->estado == APROBADO && $solicitude->asiento == 1)
             <form id="gercom-asign-resp" method="post" action="{{url('gercom-asignar-responsable')}}">
@@ -174,7 +190,7 @@
                                         <div class="col-xs-6">
                                             <ul>
                                                 @foreach($responsables as $responsable)
-                                                <li  style="display:inline">{{Form::radio('responsable',$responsable->iduser)}} {{$responsable->apellidos.' '.$responsable->nombres}}</li><br>
+                                                <li  style="display:inline">{{Form::radio('responsable',$responsable->iduser)}} {{ucwords($responsable->nombres.' '.$responsable->apellidos)}}</li><br>
                                                 @endforeach
                                             </ul>
                                         </div>
@@ -195,4 +211,15 @@
         </div>
     </div>
 </div>
+@if(isset($Status))
+    {{Log::error(json_encode($Status))}}
+    <script type="text/javascript">
+        @if($Status <> ok)
+            $(document).ready(function() 
+            {
+                bootbox.alert('<h4 style="color: red">{{$Description}}</h4>');
+            });
+        @endif
+    </script>
+@endif
 @stop
