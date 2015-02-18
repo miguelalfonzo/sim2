@@ -23,7 +23,7 @@
                 <strong><p style="display:inline">Colaborador Bagó:</strong>&nbsp;{{$fondo->repmed}}</p>
 
                 <strong><p style="display:inline">Cargo:</strong>&nbsp;Representante Med.</p>
-                <strong><p style="display:inline">Fecha de Depósito:</strong>&nbsp;{{date_format(date_create($fondo->deposit->created_at), 'd/m/Y h:i:s' )}}</p>
+                <strong><p style="display:inline">Fecha de Depósito:</strong>&nbsp;{{date_format(date_create($fondo->deposit->created_at), 'd/m/Y' )}}</p>
             </section>
             <section style="margin-top:2em;">
                 <table class="table">

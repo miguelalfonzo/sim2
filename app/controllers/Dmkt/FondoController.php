@@ -167,7 +167,7 @@ class FondoController extends BaseController
             $state = FONDO_REGISTRADO;
             $fondos = FondoInstitucional::where("periodo", $periodo)->where('terminado', TERMINADO)->where('registrado', $state)->get();
         }
-        $view   = View::make('Dmkt.Cont.list_fondos')->with('fondos', $fondos)->with('sum', $fondos->sum('total'))->with('state', $state);
+        $view   = View::make('Dmkt.Cont.list_fondos')->with('fondos', $fondos)->with('sum', $fondos->sum('total'));
         return $view;
     }
     function endFondos($start)
@@ -325,10 +325,8 @@ class FondoController extends BaseController
     }
     function listFondosRep()
     {
-        
-        $fondos = FondoInstitucional::where('idrm', Auth::user()->rm->idrm)->where('depositado', 1)->get();
+        $fondos = FondoInstitucional::where('idrm', Auth::user()->rm->idrm)->where('depositado', 1)->orderBy('periodo')->get();
         return View::make('Dmkt.Rm.list_fondos_rm')->with('fondos', $fondos);
-        
     }
     
     function getLastDayOfMonth($month, $year)

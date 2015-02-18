@@ -26,6 +26,12 @@ class FondoInstitucional extends Eloquent{
 
     }
 
+    public function monthYear($period) {
+        $month = substr($period, -2);
+        $year = substr($period, 0, 4);
+        return $month.'/'.$year;
+    }
+
     public function deposit(){
 
         return $this->hasOne('Common\Deposit','idfondo','idfondo');

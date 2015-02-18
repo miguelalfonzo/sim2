@@ -561,11 +561,10 @@ function newSolicitude() {
 
     function listFondosRm(){
         $.get(server + 'list-fondos-rm').done(function(data){
-
             $('.table_fondos_rm').append(data);
             $('#table_fondos_rm').dataTable({
                     "order": [
-                        [ 3, "desc" ]
+                        [ 0, "desc" ]
                     ],
                     "bLengthChange": false,
                     'iDisplayLength': 7,

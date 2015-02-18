@@ -23,14 +23,18 @@
         <td style="text-align: center">{{$fondo->supervisor}}</td>
         <td>
             <div class="div-icons-solicituds">
-                @if($fondo->asiento == 0)
-                    @if($state == FONDO_DEPOSITADO)
+                @if($fondo->registrado != FONDO_REGISTRADO)
+                    @if($fondo->asiento == 0)
                         <a href="{{url('/')}}/generar-asiento-fondo/{{$fondo->token}}"><span class="glyphicon glyphicon-book"></span></a>
                     @else
-                        <a href="{{url('/')}}/generar-asiento-fondo-gasto/{{$fondo->token}}"><span class="glyphicon glyphicon-book"></span></a>
+                        <span><strong>Asiento Generado</strong></span>
                     @endif
                 @else
-                    <span><strong>Asiento Generado</strong></span>
+                    @if($fondo->asiento == 1)
+                        <a href="{{url('/')}}/generar-asiento-fondo-gasto/{{$fondo->token}}"><span class="glyphicon glyphicon-book"></span></a>
+                    @else
+                        <span><strong>Asiento Generado</strong></span>
+                    @endif
                 @endif
             </div>
         </td>
@@ -38,7 +42,6 @@
     <?php $total += $fondo->total ; $i++?>
     @endforeach
     </tbody>
-
 </table>
 </div>
 <!--

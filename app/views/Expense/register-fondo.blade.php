@@ -9,8 +9,8 @@
 			<section class="row reg-expense" style="margin:0">
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
-						<label>Rep. Medico</label>
-						<input type="text" class="form-control" value="{{mb_convert_case($fondo->repmed, MB_CASE_TITLE, 'UTF-8')}}" disabled>
+						<label>Mes Depositado</label>
+						<input type="text" class="form-control" value="{{$fondo->monthYear($fondo->periodo)}}" disabled>
 						<input type="hidden" id="idfondo" value="{{$fondo->idfondo}}">
 						{{Form::token()}}
 					</div>
@@ -141,7 +141,6 @@
 											</th>
 											<th><a class="delete-item" href="#"><span class="glyphicon glyphicon-remove"></span></a></th>
 										</tr>
-
 									</tbody>
 								</table>
 								<aside class="col-xs-12 col-sm-6 col-md-4" style="padding:0;">
