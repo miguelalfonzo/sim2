@@ -26,7 +26,7 @@
                     @if($fondo->registrado == 1)
                        <a target="_blank"  href="{{URL::to('ver-gasto-fondo')}}/{{$fondo->token}}" ><span class="glyphicon glyphicon-eye-open"></span></a>
                        <a target="_blank"  href="{{URL::to('report-fondo')}}/{{$fondo->token}}"><span class="glyphicon glyphicon-print"></span></a>
-                    @else
+                    @elseif($fondo->asiento == ASIENTO_FONDO)
                        <a href="{{URL::to('registrar-gasto-fondo')}}/{{$fondo->token}}" class="" data-idfondo="{{$fondo->idfondo}}"><span class="glyphicon glyphicon-usd"></span></a>
                     @endif
                 </div>

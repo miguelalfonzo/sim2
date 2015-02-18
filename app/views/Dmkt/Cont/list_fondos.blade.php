@@ -24,13 +24,13 @@
         <td>
             <div class="div-icons-solicituds">
                 @if($fondo->registrado != FONDO_REGISTRADO)
-                    @if($fondo->asiento == 0)
-                        <a href="{{url('/')}}/generar-asiento-fondo/{{$fondo->token}}"><span class="glyphicon glyphicon-book"></span></a>
-                    @else
+                    @if($fondo->depositado == FONDO_DEPOSITADO)
                         <span><strong>Asiento Generado</strong></span>
+                    @else
+                        <a href="{{url('/')}}/generar-asiento-fondo/{{$fondo->token}}"><span class="glyphicon glyphicon-book"></span></a>
                     @endif
                 @else
-                    @if($fondo->asiento == 1)
+                    @if($fondo->asiento == ASIENTO_FONDO)
                         <a href="{{url('/')}}/generar-asiento-fondo-gasto/{{$fondo->token}}"><span class="glyphicon glyphicon-book"></span></a>
                     @else
                         <span><strong>Asiento Generado</strong></span>

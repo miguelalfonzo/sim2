@@ -1471,6 +1471,12 @@ function newSolicitude() {
         }
     });
 
+    $("#estado_fondo_cont").on("change", function(e){
+        var datefondo = $("#datefondo").val();
+        var aux = 'fondos-contabilidad';
+        searchFondos(datefondo, aux);
+    });
+
     function searchFondos(datefondo , aux) {
         console.log(datefondo+ "-"+aux);
         $('#loading-fondo').attr('class','show');

@@ -161,7 +161,7 @@ class FondoController extends BaseController
         
         if($state == '1') {
             $state = FONDO_DEPOSITADO;
-            $fondos = FondoInstitucional::where("periodo", $periodo)->where('terminado', TERMINADO)->where('depositado', $state)->get();
+            $fondos = FondoInstitucional::where("periodo", $periodo)->where('terminado', TERMINADO)->where('depositado', $state)->where('registrado','<>', FONDO_REGISTRADO)->get();
         }
         else {
             $state = FONDO_REGISTRADO;
@@ -325,7 +325,7 @@ class FondoController extends BaseController
     }
     function listFondosRep()
     {
-        $fondos = FondoInstitucional::where('idrm', Auth::user()->rm->idrm)->where('depositado', 1)->orderBy('periodo')->get();
+        $fondos = FondoInstitucional::where('idrm', Auth::user()->rm->idrm)->where('depositado', 1)->where('asiento', ASIENTO_FONDO)->orderBy('periodo')->get();
         return View::make('Dmkt.Rm.list_fondos_rm')->with('fondos', $fondos);
     }
     
@@ -373,7 +373,7 @@ class FondoController extends BaseController
                     $entry->leyenda = $inputs['leyenda'];
                     $entry->save();
                 }
-                FondoInstitucional::where('idfondo', $inputs['idfondo'])->update(array('asiento' => SOLICITUD_ASIENTO));
+                FondoInstitucional::where('idfondo', $inputs['idfondo'])->update(array('asiento' => ASIENTO_FONDO));
             });
         } catch (Exception $e) {
             $middleRpta = $this->internalException($e);
