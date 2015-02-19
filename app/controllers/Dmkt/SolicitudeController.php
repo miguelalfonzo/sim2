@@ -25,6 +25,7 @@ use \Illuminate\Database\Query\Builder;
 use \Expense\Expense;
 use \Expense\Entry;
 use \Log;
+use \URL;
 
 class SolicitudeController extends BaseController
 {
@@ -63,11 +64,8 @@ class SolicitudeController extends BaseController
         }
         return $result;
     }
-
-
-
+    
     /** ----------------------------------  Representante Medico ---------------------------------- */
-
     public function show_rm()
     {
         $states = State::orderBy('idestado', 'ASC')->get();
@@ -257,12 +255,11 @@ class SolicitudeController extends BaseController
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $managers = Manager::all();
         $typePayments = TypePayment::all();
-        $data = [
+        $data = array(
             'solicitude' => $solicitude,
             'managers' => $managers,
             'typePayments' => $typePayments
-        ];
-
+        );
         return View::make('Dmkt.Rm.view_solicitude', $data);
     }
 
@@ -483,29 +480,74 @@ class SolicitudeController extends BaseController
 
     public function viewSolicitudeSup($token)
     {
-        $sol = Solicitude::where('token', $token)->firstOrFail();
-
-        if ($sol->user->type == 'R' && $sol->estado == PENDIENTE)
+        try
         {
-            Solicitude::where('token', $token)->update(array('blocked' => 1));
+            $sol = Solicitude::where('token', $token)->firstOrFail();
+            if ($sol->user->type == 'R' && $sol->estado == PENDIENTE)
+            {
+                Solicitude::where('token', $token)->update(array('blocked' => 1));
+            }
+            $solicitude = Solicitude::where('token', $token)->firstOrFail();
+            $typePayments = TypePayment::all();
+            $managers = Manager::all();
+            $fondos = Fondo::all();
+            foreach($solicitude->families as $v)
+            {
+                $gerentes[] = $v->marca->manager;
+            }
+            $data = array(
+                'solicitude' => $solicitude,
+                'managers' => $managers,
+                'typePayments' => $typePayments,
+                'fondos' => $fondos,
+                'gerentes' => $gerentes
+            );
+            $responsables = $this->findResponsables($solicitude,$token);
+            if (isset($responsables['Data']))
+            {
+                $data['responsables'] = $responsables['Data'];
+            }
+            return View::make('Dmkt.Sup.view_solicitude_sup', $data);
         }
-
-        $solicitude = Solicitude::where('token', $token)->firstOrFail();
-        $typePayments = TypePayment::all();
-        $managers = Manager::all();
-        $fondos = Fondo::all();
-        foreach($solicitude->families as $v)
+        catch (Exception $e)
         {
-            $gerentes[] = $v->marca->manager;
+            $this->internalException($e);
         }
-        $data = [
-            'solicitude' => $solicitude,
-            'managers' => $managers,
-            'typePayments' => $typePayments,
-            'fondos' => $fondos,
-            'gerentes' => $gerentes
-        ];
-        return View::make('Dmkt.Sup.view_solicitude_sup', $data);
+    }
+    private function findResponsables($solicitude,$token)
+    {
+        try
+        {
+            $rpta = array();
+            if ($solicitude->estado == APROBADO && $solicitude->asiento == 1 && Auth::user()->id == $solicitude->idaproved && !isset($solicitude->idresponse))
+            {
+                $responsables = array();
+                $asistentes = User::where('type','AG')->get();
+                foreach ($asistentes as $asistente)
+                {
+                    array_push($responsables, $asistente->person);
+                }
+                if($solicitude->user->type == 'R')
+                {
+                    array_push( $responsables, Solicitude::where('token', $token)->select('iduser')->first()->rm );
+                }
+                elseif($solicitude->user->type == 'S')
+                {
+                    $rms = Solicitude::where('token', $token)->select('idaproved')->first()->aprovedSup->Reps;
+                    Log::error(json_encode($rms));
+                    foreach ( $rms as $rm )
+                    {
+                         array_push( $responsables, $rm );
+                    }
+                }
+                $rpta['Data'] = $responsables;
+            }
+        }
+        catch (Exception $e)
+        {
+            $rpta = $this->internalException($e);
+        }
+        return $rpta;
     }
 
     public function registerSolicitudeGerProd()
@@ -813,37 +855,40 @@ class SolicitudeController extends BaseController
         if($solicitude->estado == PENDIENTE)
             Solicitude::where('token', $token)->update(array('blocked' => 1));
 
-        $solicitudeBlocked = SolicitudeGer::where('idsolicitud', $solicitude->idsolicitud)->where('idgerprod', $userid)->firstOrFail(); //vemos si la solicitud esta blokeada
-        //echo json_encode($solicitudeBlocked);die;
-        if ($solicitudeBlocked->blocked == 0) {
-            SolicitudeGer::where('idsolicitud', $solicitude->idsolicitud) // blockeamos la solicitud para que el otro gerente no lo pueda editar
+        $solicitudeBlocked = SolicitudeGer::where('idsolicitud', $solicitude->idsolicitud)->where('idgerprod', $userid)->firstOrFail();
+        if ($solicitudeBlocked->blocked == 0) 
+        {
+            SolicitudeGer::where('idsolicitud', $solicitude->idsolicitud)
             ->where('idgerprod', '<>', $userid)
                 ->update(array('blocked' => 1));
-        } else {
+        }
+        else
+        {
             $block = true;
         }
         $fondos = Fondo::all();
         $typePayments = TypePayment::all();
-        $data = [
+        $data = array(
             'solicitude' => $solicitude,
             'block' => $block,
             'typePayments' => $typePayments,
             'fondos' => $fondos
-
-        ];
-        //echo json_encode($data); die;
+        );
+        $responsables = $this->findResponsables($solicitude,$token);
+        if (isset($responsables['Data']))
+        {
+            $data['responsables'] = $responsables['Data'];
+        }
         return View::make('Dmkt.GerProd.view_solicitude_gerprod', $data);
     }
 
     public function disBlockSolicitudeGerProd($token)
     {
-        //Desbloquenado La solicitud al presionar el boton Cancelar
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $solicitude->blocked = 0 ;
         $solicitude->save();
-        SolicitudeGer::where('idsolicitud', $solicitude->idsolicitud) // desblockeamos la solicitud para que el otro gerente no lo pueda editar
+        SolicitudeGer::where('idsolicitud', $solicitude->idsolicitud)
         ->update(array('blocked' => 0));
-
         return Redirect::to('show_gerprod');
 
     }
@@ -969,8 +1014,6 @@ class SolicitudeController extends BaseController
 
     public function listSolicitudeGerCom($id)
     {
-
-
         if ($id == 0) {
             $solicituds = Solicitude::all();
         } else {
@@ -979,10 +1022,9 @@ class SolicitudeController extends BaseController
 
         $view = View::make('Dmkt.GerCom.view_solicituds_gercom')->with('solicituds', $solicituds);
         return $view;
-
     }
 
-    public function gercomAsignarResponsable()
+    public function asignarResponsableSolicitud()
     {
         try
         {
@@ -1014,45 +1056,7 @@ class SolicitudeController extends BaseController
         $sol->blocked = 1;
         $data = $this->objectToArray($sol);
         $sol->update($data);
-        $info = array();
-        $info[status] = ok;
-        if ($solicitude->estado == APROBADO && $solicitude->asiento == 1)
-        {
-            $resp = array();
-            $asistentes = User::where('type','AG')->get();
-            foreach ($asistentes as $asistente)
-            {
-                array_push($resp, $asistente->person);
-            }
-            if(isset($solicitude->user->type))
-            {
-                if($solicitude->user->type == 'R')
-                {
-                    array_push( $resp, Solicitude::where('token', $token)->select('iduser')->first()->rm );
-                    
-                }
-                elseif($solicitude->user->type == 'S')
-                {
-                    array_push( $resp, Solicitude::where('token', $token)->select('iduser')->first()->sup );
-                }
-                else
-                {
-                    $info[status] = warning;
-                    $info[description] = 'No se encontro a un Representante Medico o Supervisor';                
-                }
-            }
-            else
-            {
-                $info[status] = warning;
-                $info[description] = 'No se encontro al Tipo de Solicitante';  
-            }
-            $info['solicitude'] = $solicitude;
-            $info['responsables'] = $resp;
-        }
-        else
-        {
-            $info = array('solicitude' => $solicitude);
-        }
+        $info = array('solicitude' => $solicitude);
         return View::make('Dmkt.GerCom.view_solicitude_gercom',$info);
     }
 
@@ -1251,7 +1255,7 @@ class SolicitudeController extends BaseController
             'solicitude' => $solicitude,
             'typeRetention' => $typeRetention
         ];
-
+        Log::error(json_encode($solicitude));
         return View::make('Dmkt.Cont.view_solicitude_cont', $data);
     }
 
@@ -1399,7 +1403,8 @@ class SolicitudeController extends BaseController
     /** ---------------------------  Asistente de  Gerencia  ---------------------------- **/
     public function listSolicitudeAGer(){
 
-        $solicituds = Solicitude::where('estado',DEPOSITADO)->where('idtipopago',2)->where('asiento',2)->get();
+        //$solicituds = Solicitude::where('estado',DEPOSITADO)->where('idtipopago',2)->where('asiento',2)->get();
+        $solicituds = Solicitude::where('estado',APROBADO)->where('idresponse',Auth::user()->id)->get();
         return View::make('Dmkt.AsisGer.list_solicitudes')->with('solicituds',$solicituds);
     }
     public function viewSolicitudeAGer($token){

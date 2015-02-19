@@ -36,10 +36,8 @@
                     <a  href="{{URL::to('ver-gasto'.'/'.$solicitude->token)}}"><span class="glyphicon glyphicon-usd"></span></a>
                 @endif
                 @if($solicitude->estado == PENDIENTE && $solicitude->derive == 0)
-                    <a href="{{URL::to('editar-solicitud').'/'.$solicitude->token}}"><span class="glyphicon glyphicon-pencil"></span></a>
-                   @if($solicitude->blocked == 1)
-                        <a href="#"  class="cancel-solicitude active-link" data-idsolicitude = "{{$solicitude->idsolicitud}}" data-token="{{csrf_token()}}" ><span class="glyphicon glyphicon-remove"></span></a>
-                   @else
+                   @if(!$solicitude->blocked == 1)
+                        <a href="{{URL::to('editar-solicitud').'/'.$solicitude->token}}"><span class="glyphicon glyphicon-pencil"></span></a>
                         <a href="#" class="cancel-solicitude" data-idsolicitude = "{{$solicitude->idsolicitud}}" data-token="{{csrf_token()}}" disabled><span class="glyphicon glyphicon-remove"></span></a>
                    @endif
                 @endif

@@ -199,6 +199,10 @@ Route::group(array('before' => 'rm_cont'), function ()
 {
     Route::post('register-expense', 'Expense\ExpenseController@registerExpense');
 });
+Route::group(array('before' => 'sup_gerprod'), function ()
+{
+    Route::post('asignar-solicitud-responsable', 'Dmkt\SolicitudeController@asignarResponsableSolicitud');
+});
 // Test
 
 /*Route::get('test_expense', function()

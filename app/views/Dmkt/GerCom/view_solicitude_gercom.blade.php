@@ -152,9 +152,6 @@
             <!-- Button (Double) -->
             <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
                 <div class="col-sm-12 col-md-12" style="text-align: center">
-                    @if($solicitude->estado == APROBADO && $solicitude->asiento == 1)
-                    <a class="btn btn-primary" data-toggle="modal" data-target="#gerdev">Seleccionar Responsable</a>
-                    @endif
                     @if($solicitude->estado == ACEPTADO)
                     <a id="" name="button1id" data-token ="{{$solicitude->token}}"
                        class="btn btn-primary approved_solicitude">Aprobar
@@ -170,56 +167,7 @@
                 </div>
             </div>
             </form>
-
-            @if($solicitude->estado == APROBADO && $solicitude->asiento == 1)
-            <form id="gercom-asign-resp" method="post" action="{{url('gercom-asignar-responsable')}}">
-            {{Form::token()}}
-            <div class="modal fade" id="gerdev" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">         
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
-                            class="sr-only">Close</span></button>
-                            <h4 class="modal-title" id="myModalLabel">Se asignara como responsable a :</h4>
-                        </div>
-                        <div class="modal-body">
-                            <form class="form-horizontal">
-                                <fieldset>
-                                    <div class="form-group">
-                                        <label class="col-md-4 col-lg-4 control-label" for="selectbasic"></label>
-                                        <div class="col-xs-6">
-                                            <ul>
-                                                @foreach($responsables as $responsable)
-                                                <li  style="display:inline">{{Form::radio('responsable',$responsable->iduser)}} {{ucwords($responsable->nombres.' '.$responsable->apellidos)}}</li><br>
-                                                @endforeach
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </fieldset>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <input type="hidden" value="{{$solicitude->token}}" name="token">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                            {{ Form::submit('Asignar',array('class' => 'btn btn-primary')) }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            </form>
-            @endif
         </div>
     </div>
-</div>
-@if(isset($Status))
-    {{Log::error(json_encode($Status))}}
-    <script type="text/javascript">
-        @if($Status <> ok)
-            $(document).ready(function() 
-            {
-                bootbox.alert('<h4 style="color: red">{{$Description}}</h4>');
-            });
-        @endif
-    </script>
-@endif
+</div> 
 @stop

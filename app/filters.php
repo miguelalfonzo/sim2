@@ -17,7 +17,6 @@ App::before(function ($request) {
 
 });
 
-
 App::after(function ($request, $response) {
     //
 });
@@ -33,7 +32,6 @@ App::after(function ($request, $response) {
 |
 */
 
-
 Route::filter('auth', function () {
     if (Auth::guest()) {
         if (Request::ajax()) {
@@ -43,8 +41,6 @@ Route::filter('auth', function () {
         }
     }
 });
-
-
 
 Route::filter('rm', function () {
 
@@ -62,10 +58,7 @@ Route::filter('rm', function () {
                 return Redirect::to('show_tes');
              if (Auth::user()->type != 'R' && Auth::user()->type == 'AG')
                  return Redirect::to('registrar-fondo');
-
-
     } else {
-
         return Redirect::to('login');
     }
 });
@@ -84,10 +77,7 @@ Route::filter('sup', function () {
             return Redirect::to('show_gercom');
         if (Auth::user()->type != 'S' && Auth::user()->type == 'AG')
             return Redirect::to('registrar-fondo');
-
-
     } else {
-
         return Redirect::to('login');
     }
 });
@@ -106,9 +96,7 @@ Route::filter('gerprod', function () {
             return Redirect::to('show_gercom');
         if (Auth::user()->type != 'P' && Auth::user()->type == 'AG')
             return Redirect::to('registrar-fondo');
-
     } else {
-
         return Redirect::to('login');
     }
 });
@@ -127,9 +115,7 @@ Route::filter('cont', function () {
             return Redirect::to('show_tes');
         if (Auth::user()->type != 'C' && Auth::user()->type == 'AG')
             return Redirect::to('registrar-fondo');
-
     } else {
-
         return Redirect::to('login');
     }
 });
@@ -148,9 +134,7 @@ Route::filter('tes', function () {
             return Redirect::to('show_cont');
         if (Auth::user()->type != 'T' && Auth::user()->type == 'AG')
             return Redirect::to('registrar-fondo');
-
     } else {
-
         return Redirect::to('login');
     }
 });
@@ -169,9 +153,7 @@ Route::filter('gercom', function () {
             return Redirect::to('show_cont');
         if (Auth::user()->type != 'G' && Auth::user()->type == 'AG')
             return Redirect::to('registrar-fondo');
-
     } else {
-
         return Redirect::to('login');
     }
 });
@@ -192,12 +174,9 @@ Route::filter('ager' , function(){
             return Redirect::to('show_gercom');
         if (Auth::user()->type != 'AG' && Auth::user()->type == 'C')
             return Redirect::to('show_cont');
-
     } else {
-
         return Redirect::to('login');
     }
-
 });
 
 Route::filter('auth.basic', function () {
@@ -212,10 +191,9 @@ Route::filter('active-user',function(){
 
 Route::filter('rm_cont', function () 
 {
-    Log::error('filter rm|cont inicio');
     if (Auth::check()) 
     {
-        if (! Auth::user()->type == 'R' || Auth::user()->type == 'C' )
+        if (! (Auth::user()->type == 'R' || Auth::user()->type == 'C' ))
         {
             if (Auth::user()->type == 'S')
             {
@@ -236,6 +214,44 @@ Route::filter('rm_cont', function ()
             else if (Auth::user()->type == 'AG')
             {
                 return Redirect::to('registrar-fondo');
+            }
+            else
+            {
+                return Redirect::to('login');           
+            }        
+        }
+    }
+    else
+    {
+        return Redirect::to('login');
+    }
+});
+
+Route::filter('sup_gerprod', function () 
+{
+    if (Auth::check()) 
+    {
+        if (! (Auth::user()->type == 'S' || Auth::user()->type == 'P' ))
+        {
+            if (Auth::user()->type == 'C')
+            {
+                return Redirect::to('show_cont');
+            }
+            else if(Auth::user()->type == 'G')
+            {
+                return Redirect::to('show_gercom');
+            }
+            else if (Auth::user()->type == 'T')
+            {
+                return Redirect::to('show_tes');
+            }    
+            else if (Auth::user()->type == 'AG')
+            {
+                return Redirect::to('registrar-fondo');
+            }
+            else if (Auth::user()->type == 'R')
+            { 
+                return Redirect::to('show_rm');
             }
             else
             {

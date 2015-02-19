@@ -175,7 +175,13 @@
                 <h4 class="modal-title" id="myModalLabel">Comprobante</h4>
             </div>
             <div class="modal-body">
-                <img class="img-responsive" src="{{URL::to('img').'/reembolso/'.$solicitude->image}}">
+                @if (empty($solicitude->image))
+                    <h3>No se ingreso una imagen</h3>
+                @elseif (!file_exists(URL::to('img').'/reembolso/'.$solicitude->image))
+                    <h3>No se encontro la imagen en el sistema</h3>
+                @else
+                    <img class="img-responsive" src="{{URL::to('img').'/reembolso/'.$solicitude->image}}">
+                @endif
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
@@ -231,17 +237,24 @@
                     <h3 class="panel-title">Clientes</h3>
                 </div>
                 <div class="panel-body">
-
                     @foreach($solicitude->clients as $client)
+                    @if(!is_null($client->idcliente))
                     <div class="form-group ">
-
-
                         <div class="">
                             <input id="textinput" name="textinput" type="text" placeholder=""
                                    value="{{$client->client->clnombre}}" readonly
                                    class="form-control input-md ">
                         </div>
                     </div>
+                    @else
+                    <div class="form-group ">
+                        <div class="">
+                            <input id="textinput" name="textinput" type="text" placeholder=""
+                                   value="No hay cliente asignado" readonly
+                                   class="form-control input-md ">
+                        </div>
+                    </div>
+                    @endif
                     @endforeach
                 </div>
             </div>

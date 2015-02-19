@@ -1222,7 +1222,7 @@ function newSolicitude() {
         }
     });
     
-    $( '#gercom-asign-resp' ).on( 'submit', function(e) 
+    $( '#form_asign-sol-resp' ).on( 'submit', function(e) 
     {
         e.preventDefault();
         responsable = '';
@@ -1233,16 +1233,17 @@ function newSolicitude() {
                 responsable = this.value;
             }
         });
+        var label = $(this).find('#myModalLabel');
         if (responsable == '')
         {
-                $('#myModalLabel').text('Debe Seleccionar un Responsable');
-                $('#myModalLabel')[0].style.color = "red";
+                label.text('Debe Seleccionar un Responsable');
+                label[0].style.color = "red";
         }
         else
         {   
-            $('#gerdev').modal('hide');
-            $('#myModalLabel').text('Se asignara como responsable a :');
-            $('#myModalLabel')[0].style.color = "";  
+            $('#modal_asign_sol_resp').modal('hide');
+            label.text('Se asignara como responsable a :');
+            label[0].style.color = "";  
             
             $.ajax(
             {

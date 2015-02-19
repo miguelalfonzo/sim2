@@ -87,4 +87,8 @@ class Solicitude extends Eloquent{
     function sup(){
         return $this->hasOne('Dmkt\Sup','iduser','iduser')->select('nombres,apellidos,iduser');;
     }
+
+    function aprovedSup(){
+        return $this->hasOne('Dmkt\Sup','iduser','idaproved');
+    }
 }
