@@ -113,6 +113,7 @@
 												<th><a class="delete-seat-solicitude" href="#"><span class="glyphicon glyphicon-remove"></span></a></th>
 											@endforeach
 										</tr>
+
 										</tr>
 											@foreach($banco as $bank)
 												<th class="name_account">{{$bank->alias}}</th>

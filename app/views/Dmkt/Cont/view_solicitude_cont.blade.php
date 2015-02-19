@@ -72,12 +72,20 @@
                         <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Solicitante</label>
                         <div class="col-sm-12 col-md-12 col-lg-12">
                             <div class="input-group">
-                                @if($solicitude->user->type == 'R')
-                                <span class="input-group-addon">R</span>
-                                <input id="textinput" type="text" value="{{$solicitude->user->rm->nombres}}" class="form-control input-md" readonly>
+                                @if(!is_null($solicitude->iduser))
+                                    @if($solicitude->user->type == 'R')
+                                    <span class="input-group-addon">Representante Medico</span>
+                                    <input id="textinput" type="text" value="{{$solicitude->user->rm->nombres}}" class="form-control input-md" readonly>
+                                    @elseif($solicitude->user->type == 'S')
+                                    <span class="input-group-addon">Supervisor</span>
+                                    <input id="textinput" type="text" value="{{$solicitude->user->sup->nombres}}" class="form-control input-md" readonly>
+                                    @else
+                                    <span class="input-group-addon">$solicitude->user->type</span>
+                                    <input id="textinput" type="text" value="Usuario no autorizado" class="form-control input-md" readonly>
+                                    @endif
                                 @else
-                                <span class="input-group-addon">S</span>
-                                <input id="textinput" type="text" value="{{$solicitude->user->sup->nombres}}" class="form-control input-md" readonly>
+                                    <span class="input-group-addon">Inexistente</span>
+                                    <input id="textinput" type="text" value="No existe el usuario solicitante" class="form-control input-md" readonly> 
                                 @endif
                             </div>
                         </div>

@@ -16,7 +16,7 @@ use \Auth;
 use \Validator;
 use \Excel;
 use \Common\Fondo;
-use \Common\LedgerAccount;
+use \Dmkt\Account;
 use \Expense\Entry;
 use \Dmkt\FondoInstitucional;
 
@@ -161,13 +161,13 @@ class FondoController extends BaseController
         
         if($state == '1') {
             $state = FONDO_DEPOSITADO;
-            $fondos = FondoInstitucional::where("periodo", $periodo)->where('terminado', TERMINADO)->where('depositado', $state)->get();
+            $fondos = FondoInstitucional::where("periodo", $periodo)->where('terminado', TERMINADO)->where('depositado', $state)->where('registrado','<>', FONDO_REGISTRADO)->get();
         }
         else {
             $state = FONDO_REGISTRADO;
             $fondos = FondoInstitucional::where("periodo", $periodo)->where('terminado', TERMINADO)->where('registrado', $state)->get();
         }
-        $view   = View::make('Dmkt.Cont.list_fondos')->with('fondos', $fondos)->with('sum', $fondos->sum('total'))->with('state', $state);
+        $view   = View::make('Dmkt.Cont.list_fondos')->with('fondos', $fondos)->with('sum', $fondos->sum('total'));
         return $view;
     }
     function endFondos($start)
@@ -325,10 +325,8 @@ class FondoController extends BaseController
     }
     function listFondosRep()
     {
-        
-        $fondos = FondoInstitucional::where('idrm', Auth::user()->rm->idrm)->where('depositado', 1)->get();
+        $fondos = FondoInstitucional::where('idrm', Auth::user()->rm->idrm)->where('depositado', 1)->where('asiento', ASIENTO_FONDO)->orderBy('periodo')->get();
         return View::make('Dmkt.Rm.list_fondos_rm')->with('fondos', $fondos);
-        
     }
     
     function getLastDayOfMonth($month, $year)
@@ -342,7 +340,7 @@ class FondoController extends BaseController
         $monthYear = $this->monthYear($fondo->periodo);
         $getDay = $this->getDay();
         $cuenta = Fondo::where('cuenta_mkt', CTA_FONDO_INSTITUCIONAL)->get();
-        $banco = LedgerAccount::where('num_cuenta', CTA_BANCOS_SOLES)->get();
+        $banco = Account::where('num_cuenta', CTA_BANCOS_SOLES)->get();
         return View::make('Dmkt.Cont.register_seat_fondo')->with('fondo', $fondo)->with('mes', $monthYear)->with('getDay', $getDay)->with('cuenta', $cuenta)->with('banco',$banco);
     }
 
@@ -354,7 +352,7 @@ class FondoController extends BaseController
         foreach ($inputs['number_account'] as $account) {
             $fondo = Fondo::where('cuenta_mkt', $account)->get();
             if(count($fondo) == 0){
-                $cuentaContable = LedgerAccount::where('num_cuenta', $account)->get();
+                $cuentaContable = Account::where('num_cuenta', $account)->get();
                 if(count($cuentaContable) == 0){
                     $middleRpta[status] = error;
                     $middleRpta[description] = "Las cuenta $account no se encuentra registrada en la Base de datos.";
@@ -375,7 +373,7 @@ class FondoController extends BaseController
                     $entry->leyenda = $inputs['leyenda'];
                     $entry->save();
                 }
-                FondoInstitucional::where('idfondo', $inputs['idfondo'])->update(array('asiento' => SOLICITUD_ASIENTO));
+                FondoInstitucional::where('idfondo', $inputs['idfondo'])->update(array('asiento' => ASIENTO_FONDO));
             });
         } catch (Exception $e) {
             $middleRpta = $this->internalException($e);

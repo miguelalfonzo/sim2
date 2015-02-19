@@ -26,8 +26,8 @@
 <body>
 <header>
     {{ HTML::link('/show_rm', '', array('id' => 'logo', 'title' => 'Bagó Perú', 'alt' => 'Bagó Perú')) }}
-    <a id="logout" href="{{URL::to('logout')}}" title="Cerrar sesión" alt="Cerrar sesión">
-       <bdi>{{Auth::user()->username}}  | <span class="closed-session">Cerrar sesión</span><span class="off"></span></bdi>
+    <a id="logout" href="{{URL::to('logout')}}" title="Cear sesión" alt="Cerrar) sesión">
+       <bdi>{{strtoupper(Auth::user()->username)}}  | <span class="closed-session">Cerrar sesión</span><span class="off"></span></bdi>
         <img src="{{URL::to('/')}}/img/user.png"></a>
 
 

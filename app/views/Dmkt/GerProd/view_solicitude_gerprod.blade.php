@@ -193,49 +193,6 @@
 
     </div>
 </div>
-
-<!--------------------------   Solicitante    ------------------------->
-<div class="form-group col-sm-6 col-md-4 col-lg-4">
-
-    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Solicitante</label>
-
-    <div class="col-sm-12 col-md-12 col-lg-12">
-        <div class="input-group">
-            @if($solicitude->user->type == 'R')
-            <span class="input-group-addon">R</span>
-            <input id="textinput" name="titulo" type="text" placeholder=""
-                   value="{{$solicitude->user->rm->nombres}}" readonly
-                   class="form-control input-md">
-            @else
-            <span class="input-group-addon">S</span>
-            <input id="textinput" name="titulo" type="text" placeholder=""
-                   value="{{$solicitude->user->sup->nombres}}" readonly
-                   class="form-control input-md">
-            @endif
-        </div>
-
-    </div>
-</div>
-<!--
-<div class="form-group col-sm-6 col-md-4 col-lg-4">
-
-    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Responsable</label>
-
-    <div class="col-sm-12 col-md-12 col-lg-12">
-        <div class="input-group">
-            <select  class="form-control">
-             @if($solicitude->user->type == 'R')
-                <option value="{{$solicitude->user->id}}">{{$solicitude->user->rm->nombres}}</option>
-             @else
-                <option value="{{$solicitude->user->id}}">{{$solicitude->user->sup->nombres}}</option>
-             @endif
-            <option value="25">Asistente de Gerencia</option>
-            </select>
-
-        </div>
-
-    </div>
-</div>-->
 <div class="form-group col-sm-6 col-md-4 col-lg-4">
 
     <label class="col-sm-8 col-md-8 ol-lg-8 control-label" for="textinput">Observacion</label>
@@ -381,21 +338,21 @@
 <div class="form-group col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px">
 
     <div class="col-sm-12 col-md-12 col-lg-12" style="text-align: center">
-        @if($solicitude->estado == PENDIENTE)
-        @if($block == false)
-        <a id="test" name="button1id"
-           class="btn btn-primary accepted_solicitude_gerprod">Aceptar</a>
-        <a id="deny_solicitude_gerprod" name="button1id" class="btn btn-primary deny_solicitude_gerprod">Rechazar
-        </a>
-        <a id="button2id" href="{{URL::to('cancelar-solicitud-gerprod').'/'.$solicitude->token}}" name="button2id"
-           class="btn btn-primary">Cancelar</a>
-        @else
-        <a id="button2id" href="{{URL::to('show_gerprod')}}" name="button2id"
-           class="btn btn-primary">Cancelar</a>
-
+        @if(isset($responsables))
+            <a class="btn btn-primary" data-toggle="modal" data-target="#modal_asign_sol_resp">Seleccionar Responsable</a>
         @endif
-
-
+        @if($solicitude->estado == PENDIENTE)
+            @if($block == false)
+            <a id="test" name="button1id"
+               class="btn btn-primary accepted_solicitude_gerprod">Aceptar</a>
+            <a id="deny_solicitude_gerprod" name="button1id" class="btn btn-primary deny_solicitude_gerprod">Rechazar
+            </a>
+            <a id="button2id" href="{{URL::to('cancelar-solicitud-gerprod').'/'.$solicitude->token}}" name="button2id"
+               class="btn btn-primary">Cancelar</a>
+            @else
+            <a id="button2id" href="{{URL::to('show_gerprod')}}" name="button2id"
+               class="btn btn-primary">Cancelar</a>
+            @endif
         @else
         <a id="button2id" href="{{URL::to('show_gerprod')}}" name="button2id"
            class="btn btn-primary">Cancelar</a>
@@ -404,6 +361,43 @@
 </div>
 </form>
 </div>
+@if( isset($responsables) )
+<form id="form_asign-sol-resp" method="post" action="{{url('asignar-solicitud-responsable')}}">
+{{Form::token()}}
+<div class="modal fade" id="modal_asign_sol_resp" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">         
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">Se asignara como responsable a :</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <fieldset>
+                        <div class="form-group">
+                            <label class="col-md-4 col-lg-4 control-label" for="selectbasic"></label>
+                            <div class="col-xs-6">
+                                <ul>
+                                    @foreach($responsables as $responsable)
+                                    <li  style="display:inline">{{Form::radio('responsable',$responsable->iduser)}} {{ucwords($responsable->nombres.' '.$responsable->apellidos)}}</li><br>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" value="{{$solicitude->token}}" name="token">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                {{ Form::submit('Asignar',array('class' => 'btn btn-primary')) }}
+            </div>
+        </div>
+    </div>
+</div>
+</form>
+@endif
 </div>
 </div>
 

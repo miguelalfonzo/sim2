@@ -113,13 +113,21 @@
                     <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Solicitante</label>
                     <div class="col-sm-12 col-md-12 col-lg-12">
                         <div class="input-group">
-                            @if($solicitude->user->type == 'R')
-                            <span class="input-group-addon">R</span>
-                            <input id="textinput" type="text" value="{{$solicitude->user->rm->nombres}}" class="form-control input-md" readonly>
-                            @else
-                            <span class="input-group-addon">S</span>
-                            <input id="textinput" type="text" value="{{$solicitude->user->sup->nombres}}" class="form-control input-md" readonly>
-                            @endif
+                            @if(!is_null($solicitude->iduser))
+                                    @if($solicitude->user->type == 'R')
+                                    <span class="input-group-addon">Representante Medico</span>
+                                    <input id="textinput" type="text" value="{{$solicitude->user->rm->nombres}}" class="form-control input-md" readonly>
+                                    @elseif($solicitude->user->type == 'S')
+                                    <span class="input-group-addon">Supervisor</span>
+                                    <input id="textinput" type="text" value="{{$solicitude->user->sup->nombres}}" class="form-control input-md" readonly>
+                                    @else
+                                    <span class="input-group-addon">$solicitude->user->type</span>
+                                    <input id="textinput" type="text" value="Usuario no autorizado" class="form-control input-md" readonly>
+                                    @endif
+                                @else
+                                    <span class="input-group-addon">Inexistente</span>
+                                    <input id="textinput" type="text" value="No existe el usuario solicitante" class="form-control input-md" readonly> 
+                                @endif
                         </div>
                     </div>
                 </div>
@@ -134,13 +142,14 @@
                 <!-- Button (Double) -->
                 <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
                     <div class="col-sm-12 col-md-12" style="text-align: center">
-                        @if($solicitude->estado == 3)
+                        @if($solicitude->estado == 3 && !is_null($solicitude->idresponse) )
                             <button class="btn btn-success" data-toggle="modal" data-target="#myModal" >Registrar Depósito</button>
                         @endif
                         <a id="button2id" href="{{URL::to('show_tes')}}" name="button2id" class="btn btn-primary">Cancelar</a>
                     </div>
                 </div>
                 <!-- Modal -->
+                @if($solicitude->estado == 3 && !is_null($solicitude->idresponse) )
                 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -161,6 +170,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
             </div>
         </div>
     </div>

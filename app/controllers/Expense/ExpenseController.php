@@ -77,30 +77,28 @@ class ExpenseController extends BaseController{
 	}
     public function showRegisterFondo($token){
 
-        $date         = $this->getDay();
-        $typeProof    = ProofType::all();
-        $typeExpense  = ExpenseType::orderBy('idtipogasto','asc')->get();
-        $fondo = FondoInstitucional::where('token',$token)->firstOrFail();
-        $expense      = Expense::where('idfondo',$fondo->idfondo)->get();
-
-
+        $date        = $this->getDay();
+        $typeProof   = ProofType::all();
+        $typeExpense = ExpenseType::orderBy('idtipogasto','asc')->get();
+        $fondo       = FondoInstitucional::where('token',$token)->firstOrFail();
+        $expense     = Expense::where('idfondo',$fondo->idfondo)->get();
+        
         $balance     = $fondo->total;
         if(count($expense)>0)
         {
-            $balance         = 0;
+            $balance = 0;
             foreach ($expense as $key => $value) {
                 $balance += $value->monto;
             }
             $balance= $fondo->total - $balance;
         }
         $data = [
-            'fondo'   => $fondo,
-            'typeProof'    => $typeProof,
-            'typeExpense'  => $typeExpense,
-            'date'         => $date,
-            'balance' => $balance,
-            'expense' => $expense
-
+            'fondo'       => $fondo,
+            'typeProof'   => $typeProof,
+            'typeExpense' => $typeExpense,
+            'date'        => $date,
+            'balance'     => $balance,
+            'expense'     => $expense
         ];
         return View::make('Expense.register-fondo',$data);
     }

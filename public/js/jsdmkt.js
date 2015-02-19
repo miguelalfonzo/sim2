@@ -390,7 +390,6 @@ function newSolicitude() {
                     {
                         loadingUI(message1);
                     }
-
                 }).done(function (data)
                 {
                     $.unblockUI();
@@ -400,7 +399,7 @@ function newSolicitude() {
                         });
 
                     }
-                    if(data == 'S'){
+                    else if(data == 'S'){
                         responseUI(message2, 'green');
                         setTimeout(
                             function () {
@@ -409,7 +408,6 @@ function newSolicitude() {
                             , 200);
                     }
                     else{
-                        console.log(data);
                         responseUI("Faltan Ingresar Campos", 'red');
                     }
 
@@ -561,11 +559,10 @@ function newSolicitude() {
 
     function listFondosRm(){
         $.get(server + 'list-fondos-rm').done(function(data){
-
             $('.table_fondos_rm').append(data);
             $('#table_fondos_rm').dataTable({
                     "order": [
-                        [ 3, "desc" ]
+                        [ 0, "desc" ]
                     ],
                     "bLengthChange": false,
                     'iDisplayLength': 7,
@@ -1224,6 +1221,63 @@ function newSolicitude() {
             });
         }
     });
+    
+    $( '#form_asign-sol-resp' ).on( 'submit', function(e) 
+    {
+        e.preventDefault();
+        responsable = '';
+        $( this ).find('input[name=responsable]').each(function()
+        {
+            if (this.checked)
+            {
+                responsable = this.value;
+            }
+        });
+        var label = $(this).find('#myModalLabel');
+        if (responsable == '')
+        {
+                label.text('Debe Seleccionar un Responsable');
+                label[0].style.color = "red";
+        }
+        else
+        {   
+            $('#modal_asign_sol_resp').modal('hide');
+            label.text('Se asignara como responsable a :');
+            label[0].style.color = "";  
+            
+            $.ajax(
+            {
+                type: 'post',
+                url :  $( this ).prop( 'action' ),
+                data: 
+                {
+                        "_token": $( this ).find( 'input[name=_token]' ).val(),
+                        "token": $( this ).find( 'input[name=token]' ).val(),
+                        "responsable": responsable
+                },
+                error: function()
+                {
+                        $('#gerdev').modal('hide');
+                        responseUI('Error del Sistema','red');
+                },
+                success: function ( data )
+                {   
+                    if (data.Status == 'Error')
+                    {
+                        responseUI('Hubo un error al intentar asignar el responsable','red');
+                    }
+                    else if (data.Status == 'Ok')
+                    {
+                        responseUI('Responsable asignado correctamente','green');
+                        setTimeout(function()
+                        {
+                            location.href = server + 'show_gercom';
+                        },900);
+                    }
+                }
+            });
+        }
+    });
 
     $(document).on('click' , '.delete-fondo' , function(e){
         e.preventDefault();
@@ -1416,6 +1470,12 @@ function newSolicitude() {
         if(datefondo!='') {
             searchFondos(datefondo,type);
         }
+    });
+
+    $("#estado_fondo_cont").on("change", function(e){
+        var datefondo = $("#datefondo").val();
+        var aux = 'fondos-contabilidad';
+        searchFondos(datefondo, aux);
     });
 
     function searchFondos(datefondo , aux) {
