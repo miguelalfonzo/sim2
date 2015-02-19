@@ -2,10 +2,6 @@
 
 namespace Dmkt;
 
-use \Common\State;
-use \Common\Fondo;
-use \Common\TypePayment;
-use \BaseController;
 use \View;
 use \Exception;
 use \DB;
