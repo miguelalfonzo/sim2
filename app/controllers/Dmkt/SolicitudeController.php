@@ -2,17 +2,12 @@
 
 namespace Dmkt;
 
-use \Common\State;
-use \Common\Fondo;
-use \Common\TypePayment;
-use \BaseController;
 use \View;
 use \Exception;
 use \DB;
 use \Log;
 use \Demo;
 use \Mail;
-use \View;
 use \Hash;
 use \User;
 use \Auth;
