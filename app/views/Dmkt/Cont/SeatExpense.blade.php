@@ -1,10 +1,19 @@
 @extends('template.main')
 @section('solicitude')
+
+<style type="text/css">
+.table-responsive
+{
+    overflow-x: auto;
+}
+</style>
+
 <div class="content">
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h3 class="panel-title"><strong>Generar Asiento de Solicitud</strong></h3><strong class="user">Usuario : {{Auth::user()->username}}</strong>
 			</div>
+			<input value="{{csrf_token()}}" name="_token" id="_token" type="hidden">
 			<div class="panel-body">
 				<section class="row reg-expense" style="margin:0">
 					<div class="col-xs-12 col-sm-6 col-md-4">
@@ -77,140 +86,155 @@
 					</div>
 				</section>
 				<hr>
-
-				<section class="row expense_items" style="margin:0">
-					<div class="col-xs-12 col-sm-12 col-md-12">
-						<div class="form-expense">
-							<div class="table-responsive">
-								<table id="table-expense_items" class="table table-bordered">
-									<thead>
-										<tr>
-											<th>N° Gasto</th>
-										    <th>Comprobante</th>
-										    <th>RUC</th>
-										    <th>Razon Social</th>
-										    <th>N° Documento</th>
-										    <th>Descripcion</th>
-										    <th>Sub Total</th>
-										    <th>imp_serv</th>
-										    <th>IGV</th>
-										    <th>Total</th>
-										    <th>fecha_movimiento</th>
-										    <th>idigv</th>
-										    <th>tipo</th>
-										</tr>
-									</thead>
-									<tbody>
-									@foreach($expenseItem as $expenseValue)
-										<tr>
-											<td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->idgasto }}</td>
-										    @foreach($typeProof as $val)
-										    	@if($expenseValue->idcomprobante == $val->idcomprobante)
-										    <td rowspan="{{ $expenseValue->count }}" data-id="{{ $val->idcomprobante }}">{{ $val->descripcion }}</td>
-										    	@endif
-											@endforeach
-										    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->num_prefijo }}-{{ $expenseValue->num_serie }}</td>
-										    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->ruc }}</td>
-										    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->razon }}</td>
-										    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->descripcion }}</td>
-										    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->sub_tot }}</td>
-										    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->imp_serv }}</td>
-										    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->igv }}</td>
-										    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->monto }}</td>
-										    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->fecha_movimiento }}</td>
-										    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->idigv }}</td>
-										    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->tipo }}</td>
-										</tr>
-									@endforeach
-
-									</tbody>
-								</table>
-							</div>
-						</div>
-					</div>
-				</section>
+				<div>
+					<ul id="myTab" class="nav nav-tabs nav-justified">
+					  <li role="presentation" class="active"><a href="#tab_seats">Asientos</a></li>
+					  <li role="presentation"><a href="#tab_documents">Documentos</a></li>
+					</ul>
+				</div>
 				
-				<section class="row reg-expense" style="margin:0">
-					<div class="col-xs-12 col-sm-12 col-md-12">
-						<div class="form-expense">
-							<div class="table-responsive">
-								<table id="table-seat-solicitude" class="table table-bordered">
-									<thead>
-										<tr>
-											<th>Cuenta</th>
-											<th>N° de Cuenta</th>
-											<th>Fecha de Origen</th>
-											<th>D/C</th>
-											<th>Importe</th>
-											<th>Leyenda Variable</th>
-											<th>Editar</th>
-											<th>Eliminar</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr>
-											<th class="name_account">Fondo</th>
-											<th class="number_account">{{$solicitude->subtype->cuenta_mkt}}</th>
-											<th class="date_ini">{{$date['toDay']}}</th>
-											<th class="dc">D</th>
-											<th class="total">{{$solicitude->monto}}</th>
-											<th class="leyenda">
-												@if($solicitude->aproved->type == 'S')
-													{{$solicitude->aproved->sup->nombres.' '.$solicitude->aproved->sup->apellidos.' '.$solicitude->titulo.' '.$clientes}}
-												@else
-													{{$solicitude->aproved->gerprod->descripcion.' '.$solicitude->titulo.' '.$clientes}}
-												@endif
-											</th>
-											<th><a class="edit-seat-solicitude" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
-											<th><a class="delete-seat-solicitude" href="#"><span class="glyphicon glyphicon-remove"></span></a></th>
-										</tr>
-										<tr>
-											<th class="name_account">Bancos</th>
-											<th class="number_account">{{$solicitude->subtype->cuenta_cont}}</th>
-											<th class="date_ini">{{$date['toDay']}}</th>
-											<th class="dc">C</th>
-											<th class="total">{{$solicitude->monto}}</th>
-											<th class="leyenda">
-												@if($solicitude->aproved->type == 'S')
-													{{$solicitude->aproved->sup->nombres.' '.$solicitude->aproved->sup->apellidos.' '.$solicitude->titulo.$clientes}}
-												@else
-													{{$solicitude->aproved->gerprod->descripcion.' '.$solicitude->titulo.' '.$clientes}}
-												@endif
-											</th>
-											<th><a class="edit-seat-solicitude" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
-											<th><a class="delete-seat-solicitude" href="#"><span class="glyphicon glyphicon-remove"></span></a></th>
-										</tr>
-										@if(isset($solicitude->retencion))
-											<tr>
-												<th class="name_account">{{mb_convert_case($solicitude->typeRetention->descripcion,MB_CASE_TITLE,'UTF-8')}}</th>
-												<th class="number_account">{{$solicitude->typeRetention->cta_contable}}</th>
-												<th class="date_ini">{{$date['toDay']}}</th>
-												<th class="dc">D</th>
-												<th class="total">{{$solicitude->retencion}}</th>
-												<th class="leyenda">
-													@if($solicitude->aproved->type == 'S')
-														{{$solicitude->aproved->sup->nombres.' '.$solicitude->aproved->sup->apellidos.' '.$solicitude->titulo.' '.$clientes}}
-													@else
-														{{$solicitude->aproved->gerprod->descripcion.' '.$solicitude->titulo.' '.$clientes}}
-													@endif
-												</th>
-												<th><a class="edit-seat-solicitude" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
-												<th><a class="delete-seat-solicitude" href="#"><span class="glyphicon glyphicon-remove"></span></a></th>
-											</tr>
-										@endif
-									</tbody>
-								</table>
+
+				<div id="myTabContent" class="tab-content">
+  					<div role="tabpanel" class="tab-pane fade active in" id="tab_seats" aria-labelledby="tab_seats-tab">
+						<section class="row seats" style="margin:0">
+							<div class="col-xs-12 col-sm-12 col-md-12">
+								<div class="form-expense">
+									<div class="table-responsive">
+										<table class="table table-bordered">
+											<thead>
+												<tr>
+													<th>N° Cuenta</th>
+													<th>CC</th>
+													<th>N° Origen</th>
+													<th>Fec. Origen</th>
+													<th>IVA</th>
+													<th>Cod.  Prov.</th>
+													<th>Nombre Del proveedor</th>
+													<th>Cod.</th>
+													<th>RUC</th>
+													<th>Prefijo</th>
+													<th>Cbte. Proveedor</th>
+													<th>D/C</th>
+													<th>Importe</th>
+													<th>Leyenda Fj</th>
+													<th>Leyenda Variable</th>
+													<th>Tipo  Resp.</th>
+													<th>Opciones</th>
+												</tr>
+											</thead>
+											<tbody>
+												@foreach($seats as $seatItem)
+												<tr>
+													<td class="editable">{{ $seatItem->numero_cuenta }}</td>
+													<td>{{ $seatItem->codigo_sunat }}</td>
+													<td></td>
+													<td>{{ $seatItem->fec_origen }}</td>
+													<td>{{ $seatItem->iva }}</td>
+													<td>{{ $seatItem->cod_prov }}</td>
+													<td>{{ $seatItem->nombre_proveedor }}</td>
+													<td>{{ $seatItem->cod }}</td>
+													<td>{{ $seatItem->ruc }}</td>
+													<td>{{ $seatItem->prefijo }}</td>
+													<td>{{ $seatItem->cbte_proveedor }}</td>
+													<td>{{ $seatItem->dc }}</td>
+													<td>{{ $seatItem->importe }}</td>
+													<td>{{ $seatItem->leyenda }}</td>
+													<td>{{ $seatItem->leyenda_variable }}</td>
+													<td>{{ $seatItem->tipo_responsable }}</td>
+
+													<td><a class="edit-seat" href="#"><span class="glyphicon glyphicon-pencil"></span></a> <a class="delete-seat" href="#"><span class="glyphicon glyphicon-remove"></span></a></td>
+												</tr>
+												@endforeach
+											</tbody>
+										</table>
+									</div>
+								</div>
 							</div>
-						</div>
+						</section>
 					</div>
-				</section>
+					<div role="tabpanel" class="tab-pane fade" id="tab_documents" aria-labelledby="tab_documents-tab">
+						<section class="row expense_items" style="margin:0">
+							<div class="col-xs-12 col-sm-12 col-md-12">
+								<div class="form-expense">
+									<div class="table-responsive">
+										<table class="table table-bordered">
+											<thead>
+												<tr>
+												    <th>Comprobante</th>
+												    <th>N° Documento</th>
+												    <th>RUC</th>
+												    <th>Razon Social</th>
+												    <th>Descripcion</th>
+												    <th>Fecha</th>
+												    <th>Sub Total</th>
+												    <th>IGV</th>
+												    <th>Imp Serv</th>
+												    <th>Total</th>
+												    <th>Cantidad</th>
+												    <th>Descripcion</th>
+												    <th>Importe</th>
+												</tr>
+											</thead>
+											<tbody>
+											@foreach($expenseItem as $expenseValue)
+												<tr data-id="{{ $expenseValue->idgasto }}">
+												    @foreach($typeProof as $val)
+												    	@if($expenseValue->idcomprobante == $val->idcomprobante)
+												    <td rowspan="{{ $expenseValue->count }}" data-id="{{ $val->idcomprobante }}">{{ $val->descripcion }}</td>
+												    	@endif
+													@endforeach
+												    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->num_prefijo }}-{{ $expenseValue->num_serie }}</td>
+												    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->ruc }}</td>
+												    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->razon }}</td>
+												    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->descripcion }}</td>
+												    <td rowspan="{{ $expenseValue->count }}">{{ date("Y/m/d",strtotime($expenseValue->fecha_movimiento)) }}</td>
+												    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->sub_tot }}</td>
+												    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->igv }}</td>
+												    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->imp_serv }}</td>
+												    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->monto }}</td>
+												    @foreach($expenseValue->itemList as $expenseItem)
+												    	<td>{{ $expenseItem->cantidad }}</td>
+												    	<td>{{ $expenseItem->descripcion }}</td>
+												    	<td>{{ $expenseItem->importe }}</td>
+												    	</tr><tr>
+												    @endforeach
+												</tr>
+											@endforeach
+
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</section>
+					</div>
+				</div>
+
+				
 				<section class="row reg-expense align-center" style="margin:1.5em 0">
 					<div class="col-xs-12 col-sm-12 col-md-12">
-						<a id="seat-solicitude" class="btn btn-success" style="margin:-2em 2em .5em 0">Generar Asiento Solicitud</a>
+						<a id="saveSeatExpense" class="btn btn-success" style="margin:-2em 2em .5em 0">Generar Asiento Solicitud</a>
 						<a id="cancel-seat-cont" href="#" class="btn btn-danger" style="margin:-2em 2em .5em 0">Atras</a>
 					</div>
 				</section>
 			</div>
 		</div>
 	</div>
+
+	<script>
+		$(document).ready(function(){
+			GBDMKT = typeof(GBDMKT) === 'undefined' ? {} : GBDMKT;
+			GBDMKT.seatsList = {{ json_encode($seats) }};
+		@if(isset($error))
+			@foreach($error as $errorItem)
+				bootbox.alert("{{ $errorItem['error'] }}: {{ $errorItem['msg'] }}<br> ");
+			@endforeach
+		@endif
+			$('#myTab a').click(function (e) {
+			  e.preventDefault()
+			  $(this).tab('show')
+			})
+		});
+		
+	</script>
 @stop

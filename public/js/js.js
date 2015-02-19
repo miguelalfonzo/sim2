@@ -1285,4 +1285,32 @@ $(function(){
                 return true;
             }
         }
+        $(document).off("click", "#saveSeatExpense");
+        $(document).on("click", "#saveSeatExpense", function(){
+            var data = {};
+            data.seatList = GBDMKT.seatsList;
+            data._token   = $("input[name=_token]").val();
+            $.ajax({
+                type: 'post',
+                url: server+"guardar-asiento-gasto",
+                data: data,
+                async: false,
+                beforeSend: function(){
+                    loadingUI('Actualizando ...');
+                },
+                error: function(){
+                    console.log("error al registrar asientos");
+                }
+            }).done( function (result) {
+                if(result > 0)
+                {
+                    
+                    //responseUI("Gasto Actualizado","green");
+                }
+                else
+                {
+                    //responseUI("No se ha actualizado el gasto","red");
+                }
+            });
+        });
 });
