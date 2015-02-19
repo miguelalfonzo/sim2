@@ -3,7 +3,11 @@
 <div class="content">
 	<div class="panel panel-default">
 		<div class="panel-heading">
+			@if (Auth::user()->type == 'R')
 			<h3 class="panel-title"><strong>Registro de Gastos</strong></h3><strong class="user">Usuario : {{Auth::user()->Rm->nombres}}</strong>
+			@elseif (Auth::user()->type == 'AG')
+			<h3 class="panel-title"><strong>Registro de Gastos</strong></h3><strong class="user">Usuario : {{ucwords(Auth::user()->person->nombres.' '.Auth::user()->person->apellidos)}}</strong>
+			@endif
 		</div>
 		<div class="panel-body">
 			<section class="row reg-expense" style="margin:0">

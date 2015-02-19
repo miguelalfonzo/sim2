@@ -12,7 +12,6 @@ use \DB;
 use \Log;
 use \Demo;
 use \Mail;
-use \View;
 use \Hash;
 use \User;
 use \Auth;
@@ -23,10 +22,6 @@ use \Session;
 use \Redirect;
 use \Response;
 use \Validator;
-use \BaseController;
-use \Common\State;
-use \Common\Fondo;
-use \Common\TypePayment;
 use \Expense\Expense;
 use \Expense\Entry;
 use \Expense\ProofType;
@@ -420,7 +415,6 @@ class SolicitudeController extends BaseController
 
     public function searchSolicituds()
     {
-
         $inputs = Input::all();
         $estado = $inputs['idstate'];
         $start = $inputs['date_start'];
@@ -432,45 +426,66 @@ class SolicitudeController extends BaseController
         $idUser = Auth::user()->id;
         if ($start != null && $end != null) {
             if ($estado != 10) {
-
                 $solicituds = Solicitude::select('*')
                     ->where('estado', $estado)
                     ->where('iduser', $idUser)
                     ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
                     ->get();
 
+                $rSolicituds = Solicitude::select('*')
+                    ->where('estado', $estado)
+                    ->where('iduser', '<>' , $idUser)
+                    ->where('idresponse',Auth::user()->id)
+                    ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                    ->get();
             } else {
-
                 $solicituds = Solicitude::select('*')
                     ->where('iduser', $idUser)
+                    ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                    ->get();
+
+                $rSolicituds = Solicitude::select('*')
+                    ->where('iduser', '<>' , $idUser)
+                    ->where('idresponse',Auth::user()->id)
                     ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
                     ->get();
             }
-
-        } else {
-            if ($estado != 10) {
-
+        } 
+        else 
+        {
+            if ($estado != 10) 
+            {
                 $solicituds = Solicitude::select('*')
                     ->where('estado', $estado)
                     ->where('iduser', $idUser)
+                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                    ->get();
+
+                $rSolicituds = Solicitude::select('*')
+                    ->where('estado', $estado)
+                    ->where('iduser', '<>' ,$idUser)
+                    ->where('idresponse',Auth::user()->id)
                     ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
                     ->get();
             } else {
 
                 $solicituds = Solicitude::select('*')
                     ->where('iduser', $idUser)
+                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                    ->get();
+
+                $rSolicituds = Solicitude::select('*')
+                    ->where('iduser', '<>' ,$idUser)
+                    ->where('idresponse',Auth::user()->id)
                     ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
                     ->get();
             }
         }
-
-
-        $view = View::make('Dmkt.Rm.view_solicituds_rm')->with('solicituds', $solicituds);
+        $view = View::make('Dmkt.Rm.view_solicituds_rm')->with(array('solicituds' => $solicituds,'rSolicitudes' => $rSolicituds));
         return $view;
     }
 
     /** -----------------------------------------------  Supervisor  -------------------------------------------------------- */
-
     public function show_sup()
     {
 
@@ -1599,15 +1614,15 @@ class SolicitudeController extends BaseController
     }
 
     /** ---------------------------  Asistente de  Gerencia  ---------------------------- **/
-    public function listSolicitudeAGer(){
-
+    public function listSolicitudeAGer()
+    {
         //$solicituds = Solicitude::where('estado',DEPOSITADO)->where('idtipopago',2)->where('asiento',2)->get();
-        $solicituds = Solicitude::where('estado',APROBADO)->where('idresponse',Auth::user()->id)->get();
+        $solicituds = Solicitude::where( 'idresponse', Auth::user()->id )->get();
         return View::make('Dmkt.AsisGer.list_solicitudes')->with('solicituds',$solicituds);
     }
-    public function viewSolicitudeAGer($token){
+    public function viewSolicitudeAGer($token)
+    {
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
-        return View::make('Treasury.view_solicitude_tes')->with('solicitude', $solicitude);
-
+        return View::make('Dmkt.AsisGer.view_solicitude_ager')->with('solicitude', $solicitude);
     }
 }

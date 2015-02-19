@@ -160,7 +160,6 @@ Route::filter('gercom', function () {
 
 //Asistente de Gerencia
 Route::filter('ager' , function(){
-
     if (Auth::check()) {
         if (Auth::user()->type != 'AG' && Auth::user()->type == 'R')
             return Redirect::to('show_rm');
@@ -189,11 +188,11 @@ Route::filter('active-user',function(){
     }
 });
 
-Route::filter('rm_cont', function () 
+Route::filter('rm_cont_ager', function () 
 {
     if (Auth::check()) 
     {
-        if (! (Auth::user()->type == 'R' || Auth::user()->type == 'C' ))
+        if (! (Auth::user()->type == 'R' || Auth::user()->type == 'C' || Auth::user()->type == 'AG' ))
         {
             if (Auth::user()->type == 'S')
             {
@@ -211,10 +210,6 @@ Route::filter('rm_cont', function ()
             {
                 return Redirect::to('show_tes');
             }    
-            else if (Auth::user()->type == 'AG')
-            {
-                return Redirect::to('registrar-fondo');
-            }
             else
             {
                 return Redirect::to('login');           
@@ -253,6 +248,44 @@ Route::filter('sup_gerprod', function ()
             { 
                 return Redirect::to('show_rm');
             }
+            else
+            {
+                return Redirect::to('login');           
+            }        
+        }
+    }
+    else
+    {
+        return Redirect::to('login');
+    }
+});
+
+Route::filter('rm_ager', function () 
+{
+    if (Auth::check()) 
+    {
+        if (! (Auth::user()->type == 'R' || Auth::user()->type == 'AG' ))
+        {
+            if (Auth::user()->type == 'S')
+            {
+                return Redirect::to('show_sup');
+            }
+            else if (Auth::user()->type == 'P')
+            {
+                return Redirect::to('show_gerprod');
+            }
+            else if (Auth::user()->type == 'C')
+            {
+                return Redirect::to('show_cont');
+            }
+            else if(Auth::user()->type == 'G')
+            {
+                return Redirect::to('show_gercom');
+            }
+            else if (Auth::user()->type == 'T')
+            {
+                return Redirect::to('show_tes');
+            }    
             else
             {
                 return Redirect::to('login');           

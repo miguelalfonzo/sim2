@@ -3,7 +3,7 @@
     <div class="content">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">Ver Solicitud Tesorería</h3><strong class="user">Usuario : {{Auth::user()->username}}</strong>
+                <h3 class="panel-title">Ver Solicitud Asistente de Gerencia</h3><strong class="user">Usuario : {{Auth::user()->username}}</strong>
             </div>
             <div class="panel-body">
                 <div class="form-group col-sm-6 col-md-4">
@@ -37,7 +37,7 @@
                     </div>
                 </div>
                 <div class="form-group col-sm-12 col-md-4">
-                    <div class=col-md-12>
+                    <div class="col-md-12">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h3 class="panel-title">Productos</h3>
@@ -113,12 +113,28 @@
                     <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Solicitante</label>
                     <div class="col-sm-12 col-md-12 col-lg-12">
                         <div class="input-group">
-                            @if($solicitude->user->type == 'R')
-                            <span class="input-group-addon">R</span>
-                            <input id="textinput" type="text" value="{{$solicitude->user->rm->nombres}}" class="form-control input-md" readonly>
+                            @if(isset($solicitude->user->type))
+                                @if($solicitude->user->type == 'R')
+                                <span class="input-group-addon">Representante Medico</span>
+                                <input id="textinput" name="titulo" type="text" placeholder=""
+                                       value="{{ucwords($solicitude->user->rm->nombres.' '.$solicitude->user->rm->apellidos)}}" readonly
+                                       class="form-control input-md">
+                                @elseif($solicitude->user->type == 'S')
+                                <span class="input-group-addon">Supervisor</span>
+                                <input id="textinput" name="titulo" type="text" placeholder=""
+                                       value="{{ucwords($solicitude->user->sup->nombres.' '.$solicitude->user->sup->apellidos)}}" readonly
+                                       class="form-control input-md">
+                                @else
+                                <span class="input-group-addon">{{$solicitude->user->type}}</span>
+                                <input id="textinput" name="titulo" type="text" placeholder=""
+                                       value="{{ucwords($solicitude->user->person->nombres.' '.$solicitude->user->person->apellidos)}}" readonly
+                                    class="form-control input-md">
+                                @endif
                             @else
-                            <span class="input-group-addon">S</span>
-                            <input id="textinput" type="text" value="{{$solicitude->user->sup->nombres}}" class="form-control input-md" readonly>
+                                <span class="input-group-addon">No Registrado</span>
+                                <input id="textinput" name="titulo" type="text" placeholder=""
+                                       value="Usuario no registrado" readonly
+                                       class="form-control input-md">
                             @endif
                         </div>
                     </div>
@@ -131,36 +147,13 @@
                         </div>
                     </div>
                 </div>
-                <!-- Button (Double) -->
+                
                 <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
                     <div class="col-sm-12 col-md-12" style="text-align: center">
-                        @if($solicitude->estado == 3)
-                            <button class="btn btn-success" data-toggle="modal" data-target="#myModal" >Registrar Depósito</button>
-                        @endif
                         <a id="button2id" href="{{URL::to('show_tes')}}" name="button2id" class="btn btn-primary">Cancelar</a>
                     </div>
                 </div>
-                <!-- Modal -->
-                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                                <h4 class="modal-title" id="myModalLabel">Registro del Depósito</h4>
-                            </div>
-                            <div class="modal-body">
-                                <label for="op-number">Número de Operación, Transacción, Cheque:</label>
-                                <input id="op-number" type="text" class="form-control">
-                                <p id="message-op-number" style="margin-top:1em;color:#a94442;"></p>
-                            </div>
-                            <div class="modal-footer">
-                                <!-- <a id="register-deposit" href="{{URL::to('depositar')}}/{{$solicitude->token}}" class="btn btn-success" style="margin-right: 1em;">Confirmar Operación</a> -->
-                                <a id="" href="#" class="btn btn-success register-deposit" data-deposit = "solicitude" style="margin-right: 1em;">Confirmar Operación</a>
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        
             </div>
         </div>
     </div>
