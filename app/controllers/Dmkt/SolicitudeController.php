@@ -9,30 +9,22 @@ use \BaseController;
 use \View;
 use \Exception;
 use \DB;
-use \Log;
+use \Input;
+use \Redirect;
 use \Demo;
 use \Mail;
-use \View;
+use \Image;
 use \Hash;
 use \User;
 use \Auth;
-use \Excel;
-use \Image;
-use \Input;
 use \Session;
-use \Redirect;
-use \Response;
 use \Validator;
-use \BaseController;
-use \Common\State;
-use \Common\Fondo;
-use \Common\TypePayment;
+use \Excel;
+use \Response;
+use \Illuminate\Database\Query\Builder;
 use \Expense\Expense;
 use \Expense\Entry;
-use \Expense\ProofType;
-use \Expense\ExpenseItem;
-use \Illuminate\Database\Query\Builder;
-use \URL;
+use \Log;
 
 class SolicitudeController extends BaseController
 {
@@ -71,8 +63,11 @@ class SolicitudeController extends BaseController
         }
         return $result;
     }
-    
+
+
+
     /** ----------------------------------  Representante Medico ---------------------------------- */
+
     public function show_rm()
     {
         $states = State::orderBy('idestado', 'ASC')->get();
@@ -262,11 +257,12 @@ class SolicitudeController extends BaseController
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $managers = Manager::all();
         $typePayments = TypePayment::all();
-        $data = array(
+        $data = [
             'solicitude' => $solicitude,
             'managers' => $managers,
             'typePayments' => $typePayments
-        );
+        ];
+
         return View::make('Dmkt.Rm.view_solicitude', $data);
     }
 
@@ -487,74 +483,29 @@ class SolicitudeController extends BaseController
 
     public function viewSolicitudeSup($token)
     {
-        try
+        $sol = Solicitude::where('token', $token)->firstOrFail();
+
+        if ($sol->user->type == 'R' && $sol->estado == PENDIENTE)
         {
-            $sol = Solicitude::where('token', $token)->firstOrFail();
-            if ($sol->user->type == 'R' && $sol->estado == PENDIENTE)
-            {
-                Solicitude::where('token', $token)->update(array('blocked' => 1));
-            }
-            $solicitude = Solicitude::where('token', $token)->firstOrFail();
-            $typePayments = TypePayment::all();
-            $managers = Manager::all();
-            $fondos = Fondo::all();
-            foreach($solicitude->families as $v)
-            {
-                $gerentes[] = $v->marca->manager;
-            }
-            $data = array(
-                'solicitude' => $solicitude,
-                'managers' => $managers,
-                'typePayments' => $typePayments,
-                'fondos' => $fondos,
-                'gerentes' => $gerentes
-            );
-            $responsables = $this->findResponsables($solicitude,$token);
-            if (isset($responsables['Data']))
-            {
-                $data['responsables'] = $responsables['Data'];
-            }
-            return View::make('Dmkt.Sup.view_solicitude_sup', $data);
+            Solicitude::where('token', $token)->update(array('blocked' => 1));
         }
-        catch (Exception $e)
+
+        $solicitude = Solicitude::where('token', $token)->firstOrFail();
+        $typePayments = TypePayment::all();
+        $managers = Manager::all();
+        $fondos = Fondo::all();
+        foreach($solicitude->families as $v)
         {
-            $this->internalException($e);
+            $gerentes[] = $v->marca->manager;
         }
-    }
-    private function findResponsables($solicitude,$token)
-    {
-        try
-        {
-            $rpta = array();
-            if ($solicitude->estado == APROBADO && $solicitude->asiento == 1 && Auth::user()->id == $solicitude->idaproved && !isset($solicitude->idresponse))
-            {
-                $responsables = array();
-                $asistentes = User::where('type','AG')->get();
-                foreach ($asistentes as $asistente)
-                {
-                    array_push($responsables, $asistente->person);
-                }
-                if($solicitude->user->type == 'R')
-                {
-                    array_push( $responsables, Solicitude::where('token', $token)->select('iduser')->first()->rm );
-                }
-                elseif($solicitude->user->type == 'S')
-                {
-                    $rms = Solicitude::where('token', $token)->select('idaproved')->first()->aprovedSup->Reps;
-                    Log::error(json_encode($rms));
-                    foreach ( $rms as $rm )
-                    {
-                         array_push( $responsables, $rm );
-                    }
-                }
-                $rpta['Data'] = $responsables;
-            }
-        }
-        catch (Exception $e)
-        {
-            $rpta = $this->internalException($e);
-        }
-        return $rpta;
+        $data = [
+            'solicitude' => $solicitude,
+            'managers' => $managers,
+            'typePayments' => $typePayments,
+            'fondos' => $fondos,
+            'gerentes' => $gerentes
+        ];
+        return View::make('Dmkt.Sup.view_solicitude_sup', $data);
     }
 
     public function registerSolicitudeGerProd()
@@ -862,40 +813,37 @@ class SolicitudeController extends BaseController
         if($solicitude->estado == PENDIENTE)
             Solicitude::where('token', $token)->update(array('blocked' => 1));
 
-        $solicitudeBlocked = SolicitudeGer::where('idsolicitud', $solicitude->idsolicitud)->where('idgerprod', $userid)->firstOrFail();
-        if ($solicitudeBlocked->blocked == 0) 
-        {
-            SolicitudeGer::where('idsolicitud', $solicitude->idsolicitud)
+        $solicitudeBlocked = SolicitudeGer::where('idsolicitud', $solicitude->idsolicitud)->where('idgerprod', $userid)->firstOrFail(); //vemos si la solicitud esta blokeada
+        //echo json_encode($solicitudeBlocked);die;
+        if ($solicitudeBlocked->blocked == 0) {
+            SolicitudeGer::where('idsolicitud', $solicitude->idsolicitud) // blockeamos la solicitud para que el otro gerente no lo pueda editar
             ->where('idgerprod', '<>', $userid)
                 ->update(array('blocked' => 1));
-        }
-        else
-        {
+        } else {
             $block = true;
         }
         $fondos = Fondo::all();
         $typePayments = TypePayment::all();
-        $data = array(
+        $data = [
             'solicitude' => $solicitude,
             'block' => $block,
             'typePayments' => $typePayments,
             'fondos' => $fondos
-        );
-        $responsables = $this->findResponsables($solicitude,$token);
-        if (isset($responsables['Data']))
-        {
-            $data['responsables'] = $responsables['Data'];
-        }
+
+        ];
+        //echo json_encode($data); die;
         return View::make('Dmkt.GerProd.view_solicitude_gerprod', $data);
     }
 
     public function disBlockSolicitudeGerProd($token)
     {
+        //Desbloquenado La solicitud al presionar el boton Cancelar
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $solicitude->blocked = 0 ;
         $solicitude->save();
-        SolicitudeGer::where('idsolicitud', $solicitude->idsolicitud)
+        SolicitudeGer::where('idsolicitud', $solicitude->idsolicitud) // desblockeamos la solicitud para que el otro gerente no lo pueda editar
         ->update(array('blocked' => 0));
+
         return Redirect::to('show_gerprod');
 
     }
@@ -1021,6 +969,8 @@ class SolicitudeController extends BaseController
 
     public function listSolicitudeGerCom($id)
     {
+
+
         if ($id == 0) {
             $solicituds = Solicitude::all();
         } else {
@@ -1029,9 +979,10 @@ class SolicitudeController extends BaseController
 
         $view = View::make('Dmkt.GerCom.view_solicituds_gercom')->with('solicituds', $solicituds);
         return $view;
+
     }
 
-    public function asignarResponsableSolicitud()
+    public function gercomAsignarResponsable()
     {
         try
         {
@@ -1063,7 +1014,45 @@ class SolicitudeController extends BaseController
         $sol->blocked = 1;
         $data = $this->objectToArray($sol);
         $sol->update($data);
-        $info = array('solicitude' => $solicitude);
+        $info = array();
+        $info[status] = ok;
+        if ($solicitude->estado == APROBADO && $solicitude->asiento == 1)
+        {
+            $resp = array();
+            $asistentes = User::where('type','AG')->get();
+            foreach ($asistentes as $asistente)
+            {
+                array_push($resp, $asistente->person);
+            }
+            if(isset($solicitude->user->type))
+            {
+                if($solicitude->user->type == 'R')
+                {
+                    array_push( $resp, Solicitude::where('token', $token)->select('iduser')->first()->rm );
+                    
+                }
+                elseif($solicitude->user->type == 'S')
+                {
+                    array_push( $resp, Solicitude::where('token', $token)->select('iduser')->first()->sup );
+                }
+                else
+                {
+                    $info[status] = warning;
+                    $info[description] = 'No se encontro a un Representante Medico o Supervisor';                
+                }
+            }
+            else
+            {
+                $info[status] = warning;
+                $info[description] = 'No se encontro al Tipo de Solicitante';  
+            }
+            $info['solicitude'] = $solicitude;
+            $info['responsables'] = $resp;
+        }
+        else
+        {
+            $info = array('solicitude' => $solicitude);
+        }
         return View::make('Dmkt.GerCom.view_solicitude_gercom',$info);
     }
 
@@ -1183,197 +1172,6 @@ class SolicitudeController extends BaseController
 
     /** ---------------------------------------------  Contabilidad -------------------------------------------------*/
 
-    public function getTypeDoc($id){
-        return json_decode(ProofType::find($id)->toJson());
-    }
-    public function createSeatElement($tempId, $solicitudId, $account_number, $cod_snt, $fecha_origen, $iva, $cod_prov, $nom_prov, $cod, $ruc, $serie, $numero, $dc, $monto, $marca, $descripcion, $tipo_responsable){
-        $seat = array(
-            'tempId'            => $tempId,      // Temporal
-            'solicitudId'       => intval($solicitudId),
-            'numero_cuenta'     => $account_number,
-            'codigo_sunat'      => $cod_snt,
-            'fec_origen'        => $fecha_origen,
-            'iva'               => $iva,
-            'cod_prov'          => $cod_prov,
-            'nombre_proveedor'  => $nom_prov,
-            'cod'               => $cod,
-            'ruc'               => $ruc,
-            'prefijo'           => $serie,
-            'cbte_proveedor'    => $numero,
-            'dc'                => $dc,
-            'importe'           => $monto,
-            'leyenda'           => $marca,
-            'leyenda_variable'  => $descripcion,
-            'tipo_responsable'  => $tipo_responsable
-        );
-        return $seat;
-    }
-    public function generateSeatExpenseData($solicitude){
-        
-        $result         = array();
-        $seatList       = array();
-        $advanceSeat    = json_decode(Entry::where('idsolicitud', $solicitude->idsolicitud)->where('d_c', ASIENTO_GASTO_BASE)->first()->toJson());
-        $accountElement = Fondo::where('cuenta_mkt', $advanceSeat->num_cuenta)->first();
-        $account        = count($accountElement) == 0 ? array() : json_decode($accountElement->toJson());
-        
-        $account_number = '';
-        $marcaNumber    = '';
-
-        if(count($account) > 0){
-            $account_number = $account->cuenta_cont;
-            $marcaNumber    = $account->marca;
-        }else{
-            $errorTemp = array(
-                'error' => ERROR_NOT_FOUND_MATCH_ACCOUNT_MKT_CNT,
-                'msg'   => MESSAGE_NOT_FOUND_MATCH_ACCOUNT_MKT_CNT
-            );
-            if(!isset($result['error']) || !in_array($errorTemp, $result['error']))
-                $result['error'][] = $errorTemp;
-        }
-        $tempId=1;
-        foreach($solicitude->documentList as $documentKey => $documentElement){
-            
-            $comprobante             = $this->getTypeDoc($documentElement->idcomprobante);
-            $comprobante->marcaArray =  explode(",", $comprobante->marca);
-
-            $marca = '';
-            if($marcaNumber == ''){
-                $errorTemp = array(
-                    'error' => ERROR_NOT_FOUND_MARCA,
-                    'msg'   => MESSAGE_NOT_FOUND_MARCA
-                );
-                if(!isset($result['error']) || !in_array($errorTemp, $result['error']))
-                    $result['error'][] = $errorTemp;
-            }else{
-                if (count($comprobante->marcaArray) == 2 && (boolean) $comprobante->igv == true) {
-                    $marca = $marcaNumber == '' ? '' : $marcaNumber.$comprobante->marcaArray[1];
-                }else{
-                    $marca = $marcaNumber == '' ? '' : $marcaNumber.$comprobante->marcaArray[0];
-                }
-            }
-            $seatListTemp = array();
-            $fecha_origen =  date("d/m/Y", strtotime($documentElement->fecha_movimiento));
-            // COMPROBANTES CON IGV
-            if((boolean) $comprobante->igv === true){
-                $itemLength = count($documentElement->itemList)-1;
-                foreach ($documentElement->itemList as $itemKey => $itemElement) {
-                    
-                    $seat = $this->createSeatElement($tempId++, $solicitude->idsolicitud, $account_number, $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_BASE, ASIENTO_GASTO_COD_PROV_IGV, $documentElement->razon, ASIENTO_GASTO_COD_IGV, $documentElement->ruc, $documentElement->num_prefijo, $documentElement->num_serie, ASIENTO_GASTO_BASE, $itemElement->importe, $marca, 'M TEMPLE '.$itemElement->cantidad .' '.$itemElement->descripcion, 1);
-                    
-                    array_push($seatListTemp, $seat);
-                    if($itemLength == $itemKey){
-                        $seat = $this->createSeatElement($tempId++, $solicitude->idsolicitud, $account_number, $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_IGV, ASIENTO_GASTO_COD_PROV_IGV, $documentElement->razon, ASIENTO_GASTO_COD_IGV, $documentElement->ruc, $documentElement->num_prefijo, $documentElement->num_serie, ASIENTO_GASTO_BASE, $documentElement->igv, $marca, $documentElement->razon, 1);
-
-                        array_push($seatListTemp, $seat);
-                    }
-
-                } 
-            // TODOS LOS OTROS DOCUMENTOS
-            }else{
-                $seat = $this->createSeatElement($tempId++, $solicitude->idsolicitud, $account_number, $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_BASE, ASIENTO_GASTO_COD_PROV, $documentElement->razon, ASIENTO_GASTO_COD, $documentElement->ruc, $documentElement->num_prefijo, $documentElement->num_serie, ASIENTO_GASTO_BASE, $documentElement->monto, $marca, 'M TEMPLE '. $documentElement->descripcion, 1);
-                array_push($seatListTemp, $seat);
-            }
-            $seatList = array_merge($seatList, $seatListTemp);
-        }
-        $result['seatList'] = $seatList;
-        return $result;
-    }
-    public function viewGenerateSeatExpense($token){
-        $solicitude = Solicitude::where('token', $token)->firstOrFail();
-        $expense    = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
-        $typeProof  = ProofType::all();
-        $clientes   = array();
-        $date       = $this->getDay();
-        foreach($solicitude->clients as $client)
-        {
-            array_push($clientes,$client->client->clnombre);
-        }
-        $clientes     = implode(',',$clientes);
-        $documentList = json_decode($expense->toJson());
-        $expenseItem  = array();
-        foreach ($documentList as $documentListKey => $documentElement) {
-            $itemList                  = ExpenseItem::where('idgasto','=',intval($documentElement->idgasto))->get();
-            $itemList                  = json_decode($itemList->toJson());
-            $documentElement->itemList = $itemList;
-            $documentElement->count    = count($itemList);
-        }
-        $solicitud               = json_decode($solicitude->toJson());
-        $solicitud->documentList = $documentList;
-        $resultSeats = $this->generateSeatExpenseData($solicitud);
-        $seatList = $resultSeats['seatList'];
-
-        $data = array(
-            'solicitude'  => $solicitude,
-            'expenseItem' => $documentList,
-            'date'        => $date,
-            'clientes'    => $clientes,
-            'typeProof'   => $typeProof,
-            'seats'       => json_decode(json_encode($seatList))
-        );
-
-        if(isset($resultSeats['error'])){
-            $tempArray          = array();
-            $tempArray['error'] = $resultSeats['error'];
-            $data = array_merge($data, $tempArray);
-        }
-
-        return View::make('Dmkt.Cont.SeatExpense', $data);
-    }
-
-    public function saveSeatExpense(){
-        try
-        {
-            $result = array();
-            $dataInputs  = Input::all();
-            $solicitudeId = null;
-            DB::beginTransaction();
-            foreach ($dataInputs['seatList'] as $key => $seatItem) {
-                $solicitudeId       = $seatItem['solicitudId'];
-                list($day, $month, $year) = explode('/', $seatItem['fec_origen']);
-                $dateTemp = mktime(11, 14, 54, $month, $day, $year);
-                $fec_origen = date("Y/m/d", $dateTemp);
-                $seat = new Entry;
-                $seat->idasiento    = $seat->searchId()+1;
-                $seat->num_cuenta   = $seatItem['numero_cuenta'];
-                $seat->cc           = $seatItem['codigo_sunat'];
-                $seat->fec_origen   = $fec_origen;
-                $seat->iva          = $seatItem['iva'];
-                $seat->cod_pro      = $seatItem['cod_prov'];
-                $seat->nom_prov     = $seatItem['nombre_proveedor'];
-                $seat->cod          = $seatItem['cod'];
-                $seat->ruc          = $seatItem['ruc'];
-                $seat->prefijo      = $seatItem['prefijo'];
-                $seat->cbte_prov    = $seatItem['cbte_proveedor'];
-                $seat->d_c          = $seatItem['dc'];
-                $seat->importe      = $seatItem['importe'];
-                $seat->leyenda_fj   = $seatItem['leyenda'];
-                $seat->leyenda      = $seatItem['leyenda_variable'];
-                $seat->tipo_resp    = $seatItem['tipo_responsable'];
-                $seat->idsolicitud  = $solicitudeId;
-                $seat->tipo_asiento = ASIENTO_GASTO_TIPO;
-                //$seat->idfondo      = null;
-               // dd($seat);
-                $seat->save();
-            }
-            if($solicitudeId != null){
-                Solicitude::where('idsolicitud', $solicitudeId )->update(array('estado' => ESTADO_GENERADO));
-                DB::commit();
-                $result['msg'] = 'Asientos Registrados';
-            }else{
-                $result['error'] = 'ERROR';
-                $result['msg']   = 'No se pudo registrar asientos';
-                //$result
-            }
-        }
-        catch (Exception $e)
-        {
-            $result['error'] = 'ERROR';
-            $result['msg']   = 'No se pudo registrar asientos';
-            $temp = $this->internalException($e);
-            DB::rollback();
-        }
-        return json_encode($result);
-    }
 
     public function show_cont()
     {
@@ -1453,7 +1251,7 @@ class SolicitudeController extends BaseController
             'solicitude' => $solicitude,
             'typeRetention' => $typeRetention
         ];
-        Log::error(json_encode($solicitude));
+
         return View::make('Dmkt.Cont.view_solicitude_cont', $data);
     }
 
@@ -1601,8 +1399,7 @@ class SolicitudeController extends BaseController
     /** ---------------------------  Asistente de  Gerencia  ---------------------------- **/
     public function listSolicitudeAGer(){
 
-        //$solicituds = Solicitude::where('estado',DEPOSITADO)->where('idtipopago',2)->where('asiento',2)->get();
-        $solicituds = Solicitude::where('estado',APROBADO)->where('idresponse',Auth::user()->id)->get();
+        $solicituds = Solicitude::where('estado',DEPOSITADO)->where('idtipopago',2)->where('asiento',2)->get();
         return View::make('Dmkt.AsisGer.list_solicitudes')->with('solicituds',$solicituds);
     }
     public function viewSolicitudeAGer($token){

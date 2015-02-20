@@ -337,11 +337,10 @@ class FondoController extends BaseController
     public function viewGenerateSeatFondo($token)
     {
         $fondo = FondoInstitucional::where('token', $token)->firstOrFail();
-        $monthYear = $this->monthYear($fondo->periodo);
         $getDay = $this->getDay();
         $cuenta = Fondo::where('cuenta_mkt', CTA_FONDO_INSTITUCIONAL)->get();
         $banco = Account::where('num_cuenta', CTA_BANCOS_SOLES)->get();
-        return View::make('Dmkt.Cont.register_seat_fondo')->with('fondo', $fondo)->with('mes', $monthYear)->with('getDay', $getDay)->with('cuenta', $cuenta)->with('banco',$banco);
+        return View::make('Dmkt.Cont.register_seat_fondo')->with('fondo', $fondo)->with('getDay', $getDay)->with('cuenta', $cuenta)->with('banco',$banco);
     }
 
     public function generateSeatFondo()
@@ -355,7 +354,7 @@ class FondoController extends BaseController
                 $cuentaContable = Account::where('num_cuenta', $account)->get();
                 if(count($cuentaContable) == 0){
                     $middleRpta[status] = error;
-                    $middleRpta[description] = "Las cuenta $account no se encuentra registrada en la Base de datos.";
+                    $middleRpta[description] = "La cuenta $account no se encuentra registrada en la Base de datos.";
                 }
             }
         }
@@ -385,13 +384,6 @@ class FondoController extends BaseController
     {
         $period = explode('-', $date);
         return $period[1].str_pad($period[0], 2, '0', STR_PAD_LEFT);
-    }
-
-    private function monthYear($period)
-    {
-        $month = substr($period, -2);
-        $year = substr($period, 0, 4);
-        return $month.'/'.$year;
     }
 
     private function getDay(){

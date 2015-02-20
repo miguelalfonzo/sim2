@@ -18,7 +18,7 @@
 							<label>Mes Depositado</label>
 							<div class="input-group">
                                 <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-                                <input type="text" value="{{$mes}}" class="form-control" maxlength="10" disabled>
+                                <input type="text" value="{{$fondo->monthYear($fondo->periodo)}}" class="form-control" maxlength="10" disabled>
                             </div>
 						</div>
 					</div>
