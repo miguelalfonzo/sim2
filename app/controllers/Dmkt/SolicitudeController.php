@@ -18,7 +18,6 @@ use \Input;
 use \Session;
 use \Redirect;
 use \Response;
-use \Common\State;
 use \Validator;
 use \Expense\Expense;
 use \Expense\Entry;
@@ -26,6 +25,9 @@ use \Expense\ProofType;
 use \Expense\ExpenseItem;
 use \Illuminate\Database\Query\Builder;
 use \URL;
+use \Common\State;
+use \Common\Fondo;
+use \Common\TypePayment;
 
 class SolicitudeController extends BaseController
 {
