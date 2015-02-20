@@ -2,6 +2,7 @@
 
 namespace Dmkt;
 
+use \BaseController;
 use \View;
 use \Exception;
 use \DB;
@@ -17,6 +18,7 @@ use \Input;
 use \Session;
 use \Redirect;
 use \Response;
+use \Common\State;
 use \Validator;
 use \Expense\Expense;
 use \Expense\Entry;
