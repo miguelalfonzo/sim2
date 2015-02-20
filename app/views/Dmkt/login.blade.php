@@ -55,6 +55,14 @@
                                 <a href="http://intra.bagoperu.com.pe/produccion/intranet.php" class="btn btn-danger btn-lg"  style="width: 33.33%; float: left !important; font-size: 12pt;">Regresar</a>
                             </div>
                         </div>
+
+                        @if(Session::has('error_login'))
+                            <p style="color:red; text-align: center;"><strong>Usuario y/o contraseña incorrecto.</strong></p>
+                        @endif
+                        @if(isset($message))
+                            <p style="color:red; text-align: center;"><strong>{{ $message }}</strong></p>
+                        @endif
+
                    {{ Form::close() }}
                 </div>
                 <!-- <div class="panel-footer">

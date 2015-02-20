@@ -58,43 +58,45 @@ class LoginController extends BaseController{
                     if($app->idapp == 2) // 2 : Aplicacion descargo de marketing
                         $aplication = true;
                 }
-                if($aplication){
+                if($aplication)
+                {
                     $typeUser = Auth::user()->type;
 
                     if($typeUser == 'R'){
                         return Redirect::to('show_rm');
                     }
-                    if($typeUser == 'S'){
+                    else if($typeUser == 'S'){
                         return Redirect::to('show_sup');
                     }
-                    if($typeUser == 'P'){
+                    else if($typeUser == 'P'){
                         return Redirect::to('show_gerprod');
                     }
-                    if($typeUser == 'C'){
+                    elseif($typeUser == 'C'){
                         return Redirect::to('show_cont');
                     }
-                    if($typeUser == 'T'){
+                    else if($typeUser == 'T'){
                         return Redirect::to('show_tes');
                     }
-                    if($typeUser == 'G'){
+                    else if($typeUser == 'G'){
                         return Redirect::to('show_gercom');
                     }
-                    if($typeUser == 'AG'){
+                    else if($typeUser == 'AG'){
                         return Redirect::to('registrar-fondo');
                     }
-                }else{
-
-                    return Redirect::to('login'); // no tiene permiso para esta aplicacion
+                    else
+                    {
+                        return View::make('Dmkt.login')->with( array('message' => 'Usuario no autorizado') );
+                    }
                 }
-
-
-            } else {
-
-                // validation not successful, send back to form
-                return Redirect::to('login');
-
+                else
+                {
+                    return View::make('Dmkt.login')->with( array('message'=> 'Usuario no autorizado') );
+                }
+            } 
+            else 
+            {
+                return Redirect::to('login')->with('error_login', true);            
             }
-
         }
     }
 

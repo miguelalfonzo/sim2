@@ -354,6 +354,7 @@ class ExpenseController extends BaseController{
 	}
 
 	public function finishExpense($token){
+		Log::error('finishExpense');
 		$solicitude  = Solicitude::where('token',$token)->update(array('estado'=>REGISTRADO));
 		if(count($solicitude) == 1)
 		{
