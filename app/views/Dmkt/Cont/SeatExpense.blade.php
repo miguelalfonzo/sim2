@@ -100,7 +100,7 @@
 							<div class="col-xs-12 col-sm-12 col-md-12">
 								<div class="form-expense">
 									<div class="table-responsive">
-										<table class="table table-bordered">
+										<table class="table table-bordered table-hover table-condensed tb_style">
 											<thead>
 												<tr>
 													<th>N° Cuenta</th>
@@ -124,7 +124,7 @@
 											</thead>
 											<tbody>
 												@foreach($seats as $seatItem)
-												<tr>
+												<tr class="{{ $seatItem->type == 'IGV' ? 'info' : ($seatItem->type == 'SER' ? 'warning' : ($seatItem->type == 'REP' ? 'danger' : '')) }}">
 													<td class="editable">{{ $seatItem->numero_cuenta }}</td>
 													<td>{{ $seatItem->codigo_sunat }}</td>
 													<td></td>
@@ -157,7 +157,7 @@
 							<div class="col-xs-12 col-sm-12 col-md-12">
 								<div class="form-expense">
 									<div class="table-responsive">
-										<table class="table table-bordered">
+										<table class="table table-bordered table-condensed tb_style">
 											<thead>
 												<tr>
 												    <th>Comprobante</th>
