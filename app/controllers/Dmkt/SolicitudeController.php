@@ -1231,8 +1231,11 @@ class SolicitudeController extends BaseController
         $advanceSeat    = json_decode(Entry::where('idsolicitud', $solicitude->idsolicitud)->where('d_c', ASIENTO_GASTO_BASE)->first()->toJson());
         $accountElement = Fondo::where('cuenta_mkt', $advanceSeat->num_cuenta)->first();
         $account        = count($accountElement) == 0 ? array() : json_decode($accountElement->toJson());
-        //$responsable = $solicitude->tipo_responsable;
-        //$userElement = User::
+        //var_dump($solicitude);
+        $userElement    = User::where('id', $solicitude->idresponse)->first();
+        //var_dump($userElement);
+        //$user           = count($userElement) == 0 ? array() : json_decode($userElement->toJson());
+
         $account_number = '';
         $marcaNumber    = '';
 
@@ -1252,7 +1255,6 @@ class SolicitudeController extends BaseController
             
             $comprobante             = $this->getTypeDoc($documentElement->idcomprobante);
             $comprobante->marcaArray =  explode(",", $comprobante->marca);
-
 
             $marca = '';
             if($marcaNumber == ''){
