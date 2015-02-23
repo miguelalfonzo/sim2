@@ -400,24 +400,21 @@ function newSolicitude() {
 
                     }
                     else if(data == 'S'){
-                        responseUI(message2, 'green');
-                        setTimeout(
-                            function () {
-                                window.location.href = server + 'show_sup'
-                            }
-                            , 200);
+                        responseUI('Solicitud Registrada', 'green');
+                        setTimeout(function()
+                        {
+                            window.location.href = server + 'show_sup';
+                        },500);
                     }
-                    else{
+                    else
+                    {
                         responseUI("Faltan Ingresar Campos", 'red');
                     }
-
                 }).fail(function (e) {
                     $.unblockUI();
                     alert('error');
                 });
-
             }
-
         }, 300);
         e.preventDefault();
     }));

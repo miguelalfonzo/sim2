@@ -146,55 +146,73 @@ $(function(){
             window.location.href = server+"show_cont";
         });
         //Add row seat solicitude
-        $("#add-seat-solicitude").on("click", function(e){
+        $("#add-seat-solicitude").on("click", function(e)
+        {
+            var button = this;
             e.preventDefault();
-            var error = 0;
             if(!$("#name_account").val())
             {
                 $("#name_account").attr("placeholder","No ha ingresado la cuenta.").addClass("error-incomplete");
-                error = 1;
             }
             if(!$("#number_account").val())
             {
                 $("#number_account").attr("placeholder","No ha ingresado el Número de la cuenta.").addClass("error-incomplete");
-                error = 1;
             }
             if(!$("#total").val())
             {
                 $("#total").attr("placeholder","No ha ingresado el Importe.").addClass("error-incomplete");
-                error = 1;
             }
-            if(error == 1)
+            if( $("#total").val() && $("#number_account").val() && $("#name_account").val())
             {
-                return;
+                if($("#add-seat-solicitude").text() === 'Actualizar Detalle')
+                {
+                    bootbox.confirm("¿Esta seguro que desea Actualizar el registro del Gasto?", function(result) 
+                    { 
+                        if (result) 
+                        {
+                            $("#table-seat-solicitude tbody tr").each(function(index)
+                            {
+                                if($(this).hasClass('select-row'))
+                                {
+                                    $('.name_account:eq('+index+')').text($("#name_account").val());
+                                    $('.number_account:eq('+index+')').text($("#number_account").val());
+                                    $('.dc:eq('+index+')').text($("#dc").val());
+                                    $('.total:eq('+index+')').text($("#total").val());
+                                }
+                            });
+                        }
+                        cleanRegistro(button);
+                    });
+                }
+                else
+                {
+                    bootbox.confirm("¿Esta seguro que desea Agregar este Registro?", function(result) 
+                    { 
+                        if (result) 
+                        {
+                            var row_seat = $("#table-seat-solicitude tbody tr:first").clone(true,true);
+                            row_seat.find('.name_account').text($("#name_account").val());
+                            row_seat.find('.number_account').text($("#number_account").val());
+                            row_seat.find('.dc').text($("#dc").val());
+                            row_seat.find('.total').text($("#total").val());
+                            $("#table-seat-solicitude tbody").append(row_seat);
+                        }
+                        cleanRegistro(button);
+                    });
+                }    
             }
-            if($("#add-seat-solicitude").text() === 'Actualizar Detalle')
-            {
-                $("#table-seat-solicitude tbody tr").each(function(index){
-                    if($(this).hasClass('select-row'))
-                    {
-                        $('.name_account:eq('+index+')').text($("#name_account").val());
-                        $('.number_account:eq('+index+')').text($("#number_account").val());
-                        $('.dc:eq('+index+')').text($("#dc").val());
-                        $('.total:eq('+index+')').text($("#total").val());
-                    }
-                });
-            }
-            else
-            {
-                var row_seat = $("#table-seat-solicitude tbody tr:first").clone(true,true);
-                row_seat.find('.name_account').text($("#name_account").val());
-                row_seat.find('.number_account').text($("#number_account").val());
-                row_seat.find('.dc').text($("#dc").val());
-                row_seat.find('.total').text($("#total").val());
-                $("#table-seat-solicitude tbody").append(row_seat);
-            }
+        });
+
+        //Registro de Asiento de Anticipo
+        function cleanRegistro (button)
+        {
             $("#name_account").val('');
             $("#number_account").val('');
             $("#total").val('');
             $("#table-seat-solicitude tbody tr").removeClass('select-row');
-            $(this).html('Agregar Detalle');
-        });
+            $(button).html('Agregar Detalle');
+        } 
+
         //Record end Solicitude
         $("#finish-expense").on("click",function(e){
             e.preventDefault();
