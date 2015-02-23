@@ -3,7 +3,7 @@ var w = document.location.pathname;
 var q= w.split("/public/");
 
 server =  q.length >0 ? q[0]+"/public/" : "";
-
+var IGV = 0.18;
 //Funciones Globales
 var datef = new Date();
 var dateactual = (datef.getMonth()+1)+'-'+datef.getFullYear();
@@ -1170,8 +1170,8 @@ $(function(){
             {
                 if($("#proof-type").val()==='1' || $("#proof-type").val()==='4' || $("#proof-type").val()==='6')
                 {
-                    sub_total_expense = total_expense/1.18;
-                    igv = sub_total_expense*0.18;
+                    sub_total_expense = total_expense;
+                    igv = sub_total_expense*IGV;
                     if(!imp_service) imp_service = 0;
                     total_expense = sub_total_expense + igv + imp_service;
                     $("#sub-tot").val(sub_total_expense.toFixed(2));
