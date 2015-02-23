@@ -119,7 +119,7 @@
 											<th class="w-desc-item">Descripción</th>
 											<!-- <th class="w-type-expense">Tipo de Gasto</th> -->
 											<th class="w-total-item">Valor de Venta</th>
-											<th class="w-reparo">Reparo</th>
+											<!-- <th class="w-reparo">Reparo</th> -->
 											<th>Eliminar</th>
 										</tr>
 									</thead>
@@ -140,9 +140,9 @@
 											      	<input class="form-control" type="text" maxlength="8">
 											    </div>
 											</th>
-											<th>
+											<!-- <th>
 												<input class="reparo" type="checkbox" style="margin-top:.5em;"><br>
-											</th>
+											</th> -->
 											<th><a class="delete-item" href="#"><span class="glyphicon glyphicon-remove"></span></a></th>
 										</tr>
 										
@@ -193,6 +193,25 @@
 					    </div>
 					</div>
 				</div>
+
+				<div id="dreparo" class="col-xs-12 col-sm-6 col-md-4">
+					<div class="form-expense">
+						<label>Reparo</label>
+						<div class="input-group">
+							<div class="btn-group" role="group" aria-label="...">
+								<label class="btn btn-default">
+							 		<input value="1" type="radio" name="reparo" style="margin-top:.5em;"> 
+									Si
+								</label>
+								<label class="btn btn-default">
+									<input value="0" type="radio" name="reparo" style="margin-top:.5em;" checked>
+								No
+								</label> 
+							</div>
+					    </div>
+					</div>
+				</div>
+
 			</section>
 			<section class="row reg-expense" style="margin:0">
 				<div class="col-xs-12 col-sm-12 col-md-12">

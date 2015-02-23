@@ -58,13 +58,20 @@ table thead th, table th
 	text-align: left;
 }
 
-#table-expense, #table-seat-solicitude
+#table-expense, #table-seat-solicitude,
 {
 	font-size: .9em;
 }	
 
 #table-expense thead, #table-seat-solicitude thead
 {
+	background: #073F70;
+	color: white;
+}
+.tb_style{
+	font-size: .9em;
+}
+.tb_Style thead{
 	background: #073F70;
 	color: white;
 }

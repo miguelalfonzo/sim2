@@ -39,12 +39,9 @@ Route::group(array('before' => 'rm'), function () {
     Route::get('getfondos/{id}', 'Dmkt\SolicitudeController@Fondo');
     Route::post('buscar-solicitudes-rm', 'Dmkt\SolicitudeController@searchSolicituds');
     // Expense
-    Route::get('registrar-gasto/{token}', 'Expense\ExpenseController@show');
     Route::post('delete-expense', 'Expense\ExpenseController@deleteExpense');
     Route::post('update-expense', 'Expense\ExpenseController@updateExpense');
     Route::get('edit-expense', 'Expense\ExpenseController@editExpense');
-    Route::get('end-expense/{token}', 'Expense\ExpenseController@finishExpense');
-    Route::get('ver-gasto/{token}', 'Expense\ExpenseController@viewExpense');
     // Ruc
     Route::post('consultarRuc', 'Expense\RucController@show');
     Route::get('ruc', function () {
@@ -196,7 +193,7 @@ Route::get('a/{token}', 'Expense\ExpenseController@reportExpense');
 Route::get('report-fondo/{token}','Expense\ExpenseController@reportExpenseFondo');
 Route::get('report', 'ExpenseController@reportExpense');
 
-Route::group(array('before' => 'rm_cont'), function ()
+Route::group(array('before' => 'rm_cont_ager'), function ()
 {
     Route::post('register-expense', 'Expense\ExpenseController@registerExpense');
 });
@@ -204,6 +201,13 @@ Route::group(array('before' => 'sup_gerprod'), function ()
 {
     Route::post('asignar-solicitud-responsable', 'Dmkt\SolicitudeController@asignarResponsableSolicitud');
 });
+Route::group(array('before' => 'rm_ager'), function ()
+{
+    Route::get('registrar-gasto/{token}', 'Expense\ExpenseController@show');
+    Route::get('end-expense/{token}', 'Expense\ExpenseController@finishExpense');
+    Route::get('ver-gasto/{token}', 'Expense\ExpenseController@viewExpense');  
+});
+
 // Test
 
 /*Route::get('test_expense', function()

@@ -314,6 +314,7 @@ class ExpenseController extends BaseController{
 	        $date = date("Y/m/d", $d);
 	        $expenseEdit->fecha_movimiento = $date;
 	        $expenseEdit->descripcion = $inputs['desc_expense'];
+	        //$expenseEdit->reparo = $inputs['rep'];
 	        $data = $this->objectToArray($expenseEdit);
 	        //Detail Expense
 			$quantity = $inputs['quantity'];
@@ -321,7 +322,10 @@ class ExpenseController extends BaseController{
 			$reparo = array();
 			if(isset($inputs['rep']))
 			{
-				$reparo = $inputs['rep'];
+				if (!empty($inputs['rep']))
+				{
+					$reparo = $inputs['rep'];
+				}
 			}
 			// $type_expense = $expenseJson->type_expense;
 			$total_item = $inputs['total_item'];
@@ -337,10 +341,6 @@ class ExpenseController extends BaseController{
 							$expense_detail->cantidad = $quantity[$i];
 							$expense_detail->descripcion = $description[$i];
 							// $expense_detail->tipo_gasto = $type_expense[$i];
-							if(isset($reparo[$i]))
-							{
-								$expense_detail->reparo = $reparo[$i];
-							}
 							$expense_detail->importe = $total_item[$i];
 							$expense_detail->save();	
 						}
@@ -354,6 +354,7 @@ class ExpenseController extends BaseController{
 	}
 
 	public function finishExpense($token){
+		Log::error('finishExpense');
 		$solicitude  = Solicitude::where('token',$token)->update(array('estado'=>REGISTRADO));
 		if(count($solicitude) == 1)
 		{

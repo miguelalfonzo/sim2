@@ -592,6 +592,15 @@ $(function(){
                     $("#razon").attr("data-edit",1);
                     $("#number-prefix").val(data_response.expense.num_prefijo).attr("disabled",true);
                     $("#number-serie").val(data_response.expense.num_serie).attr("disabled",true);
+                    /*if ( data_response.expense.reparo == true )
+                    {                   
+                        $('#dreparo').find('input[name=reparo]')[0].checked = true;
+                    }
+                    else
+                    {
+                        $('#dreparo').find('input[name=reparo]')[1].checked = true;
+                    }*/
+
                     date = data_response.date.split('-');
                     date = date[2].substring(0,2)+'/'+date[1]+'/'+date[0];
                     $("#date").val(date);
@@ -602,13 +611,13 @@ $(function(){
                         row_add.find('.description input').val(value.descripcion);
                         row_add.find('.type-expense').val(value.tipo_gasto);
                         row_add.find('.total-item input').val(value.importe);
-                        if($(".reparo"))
+                        /*if($(".reparo"))
                         {
                             if(value.reparo == 1)
                             {
                                 row_add.find('.reparo').attr('checked', true);
                             }
-                        }
+                        }*/
                         $("#table-items tbody").append(row_add);
                         $(".total-item input").numeric({negative:false});
                         $(".quantity input").numeric({negative:false});
@@ -777,21 +786,18 @@ $(function(){
                         error_json = 1;
                     }
                 });
-                var rep = [];
-                if($(".reparo"))
+                var rep;
+                if ( !$('#dreparo').find('input[name=reparo]').length == 0)
                 {
-                    $(".reparo").each(function(index){
-                        if($(this).is(":checked"))
-                        {
-                            rep[index] = 1;
-                        }
-                        else
-                        {
-                            rep[index] = 0;
-                        }
-                    });
+                    if( $('#dreparo').find('input[name=reparo]')[0].checked == true )
+                    {
+                        rep = 1 ;
+                    }
+                    else
+                    {
+                        rep = 0 ;
+                    }
                 }
-
                 (data_quantity.length>0) ? data.quantity = data_quantity : error_json = 1;
                 data.description = arr_description;
                 (data_total_item.length>0) ? data.total_item = data_total_item : error_json = 1;
@@ -812,6 +818,7 @@ $(function(){
                         data.imp_service = imp_service;
                         data.igv = igv;
                     }
+
                     tot_expense = parseFloat($("#total-expense").val());
                     data.total_expense = tot_expense;
                     var tot_expenses = calculateTot($(".total").parent(),'.total_expense');

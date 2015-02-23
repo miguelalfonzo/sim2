@@ -48,6 +48,9 @@ const ERROR_NOT_FOUND_MATCH_ACCOUNT_MKT_CNT   	= 'No se encontro cuenta relacion
 const MESSAGE_NOT_FOUND_MATCH_ACCOUNT_MKT_CNT 	= 'Verificar relación entre las cuentas de Marketing y Contabilidad';
 const ERROR_NOT_FOUND_MARCA					  	= 'No se encontro Marca';
 const MESSAGE_NOT_FOUND_MARCA				  	= 'Verificar relación entre las Cuentas de Contabilidad y las Marcas';
+const CUENTA_REPARO_COMPRAS						= '6411000';
+const CUENTA_REPARO_GOBIERNO					= '4011100';
+
 
 //ESTADOS
 const ESTADO_GENERADO	= 7;
