@@ -1521,7 +1521,6 @@ class SolicitudeController extends BaseController
             'clientes' => $clientes,
             'bancos'   => $banco
         );
-        Log::error(json_encode($data));
         return View::make('Dmkt.Cont.register_seat_solicitude', $data);
     }
 

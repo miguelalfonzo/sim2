@@ -144,9 +144,9 @@
 											<th class="total">{{$solicitude->monto}}</th>
 											<th class="leyenda">
 												@if($solicitude->aproved->type == 'S')
-													{{$solicitude->aproved->sup->nombres.' '.$solicitude->aproved->sup->apellidos.' '.$solicitude->titulo.' '.$clientes}}
+													{{$solicitude->aproved->sup->nombres.'-'.$solicitude->aproved->sup->apellidos.'-'.$solicitude->titulo.'-'.$clientes}}
 												@else
-													{{$solicitude->aproved->gerprod->descripcion.' '.$solicitude->titulo.' '.$clientes}}
+													{{$solicitude->aproved->gerprod->descripcion.'-'.$solicitude->titulo.'-'.$clientes}}
 												@endif
 											</th>
 											<th><a class="edit-seat-solicitude" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
@@ -160,9 +160,9 @@
 											<th class="total">{{$solicitude->monto}}</th>
 											<th class="leyenda">
 												@if($solicitude->aproved->type == 'S')
-													{{$solicitude->aproved->sup->nombres.' '.$solicitude->aproved->sup->apellidos.' '.$solicitude->titulo.$clientes}}
+													{{$solicitude->aproved->sup->nombres.'-'.$solicitude->aproved->sup->apellidos.'-'.$solicitude->titulo.$clientes}}
 												@else
-													{{$solicitude->aproved->gerprod->descripcion.' '.$solicitude->titulo.' '.$clientes}}
+													{{$solicitude->aproved->gerprod->descripcion.'-'.$solicitude->titulo.'-'.$clientes}}
 												@endif
 											</th>
 											<th><a class="edit-seat-solicitude" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
@@ -177,9 +177,9 @@
 												<th class="total">{{$solicitude->retencion}}</th>
 												<th class="leyenda">
 													@if($solicitude->aproved->type == 'S')
-														{{$solicitude->aproved->sup->nombres.' '.$solicitude->aproved->sup->apellidos.' '.$solicitude->titulo.' '.$clientes}}
+														{{$solicitude->aproved->sup->nombres.'-'.$solicitude->aproved->sup->apellidos.'-'.$solicitude->titulo.'-'.$clientes}}
 													@else
-														{{$solicitude->aproved->gerprod->descripcion.' '.$solicitude->titulo.' '.$clientes}}
+														{{$solicitude->aproved->gerprod->descripcion.'-'.$solicitude->titulo.'-'.$clientes}}
 													@endif
 												</th>
 												<th><a class="edit-seat-solicitude" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
