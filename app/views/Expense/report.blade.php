@@ -40,7 +40,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($expense as $value)
+                        @foreach($expenses as $value)
                             <tr>
                                 
                                 <td>{{date('d/m/Y',strtotime($value->fecha_movimiento))}}</td>
@@ -94,7 +94,7 @@
                                 <td class="border-white"></td>
                                 <td class="border-white other"></td>
                                 <td class="border align-left"><strong>Total Reportado</strong></td>
-                                <td class="border"><strong><span class="symbol">{{$solicitude->typemoney->simbolo}}</span><span class="total-expense">&nbsp;{{$solicitude->monto}}</span></strong></td>
+                                <td class="border"><strong><span class="symbol">{{$solicitude->typemoney->simbolo}}</span><span class="total-expense">&nbsp;{{$total}}</span></strong></td>
                             </tr>
                             <tr>
                                 <td></td>
@@ -104,7 +104,7 @@
                                 <td></td>
                                 <td class="other"></td>
                                 <td class="border align-left">Total Depositado</td>
-                                <td class="border"><strong><span class="symbol">{{$solicitude->typemoney->simbolo}}</span><span class="total-expense">&nbsp;{{$solicitude->monto}}</span></strong></td>
+                                <td class="border"><strong><span class="symbol">{{$solicitude->typemoney->simbolo}}</span><span class="total-expense">&nbsp;{{$solicitude->deposit->total}}</span></strong></td>
                             </tr>
                             <tr>
                                 <td></td>
@@ -124,7 +124,11 @@
                                 <td></td>
                                 <td class="other"></td>
                                 <td class="border bottom align-left">Saldo a favor Compañía</td>
-                                <td class="border bottom">-</td>
+                                @if ($solicitude->deposit->total - $total > 0)
+                                    <td class="border bottom">{{$solicitude->deposit->total - $total}}</td>
+                                @else
+                                    <td class="border bottom">-</td>
+                                @endif
                             </tr>
                             <tr>
                                 <td></td>
@@ -134,7 +138,11 @@
                                 <td></td>
                                 <td class="other"></td>
                                 <td class="border bottom align-left">Saldo a favor del Empleado</td>
-                                <td class="border bottom">-</td>
+                                @if ($solicitude->deposit->total - $total < 0)
+                                    <td class="border bottom">{{$solicitude->deposit->total - $total}}</td>
+                                @else
+                                    <td class="border bottom">-</td>
+                                @endif
                             </tr>
                         </tfoot>
                     </tbody>

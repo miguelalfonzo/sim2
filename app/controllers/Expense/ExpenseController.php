@@ -20,6 +20,7 @@ use \PDF;
 use \Client;
 use \Dmkt\TypeRetention;
 use \Log;
+use \Common\Deposit;
 
 class ExpenseController extends BaseController{
 
@@ -372,11 +373,18 @@ class ExpenseController extends BaseController{
 		$solicitude = Solicitude::where('token',$token)->firstOrFail();
 		if(count($solicitude)>0)
 		{
-			$expense = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
+			$expenses = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
 		}
+		$gasto_total = 0;
+		foreach ($expenses as $expense)
+		{
+			$gasto_total += $expense->monto;
+		}
+
 		$data = [
 			'solicitude' => $solicitude,
-			'expense'    => $expense
+			'expenses'    => $expenses,
+			'total'      => $gasto_total
 		];
 		return View::make('Expense.view',$data);
 	}
@@ -396,7 +404,7 @@ class ExpenseController extends BaseController{
 
 	public function reportExpense($token){
 		$solicitude = Solicitude::where('token',$token)->firstOrFail();
-		$expense = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
+		$expenses = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
 		$aproved_user = User::where('id',$solicitude->idaproved)->firstOrFail();
 		if($aproved_user->type === 'P')
 		{
@@ -408,13 +416,19 @@ class ExpenseController extends BaseController{
 			$name_aproved = $aproved_user->sup->nombres;
 			$charge = "Supervisor";
 		}
-		$data = [
+		$total = 0;
+		foreach($expenses as $expense)
+		{
+			$total += $expense->monto;
+		}
+		$data = array(
 			'solicitude' => $solicitude,
 			'date'       => $this->getDay(),
 			'name'       => $name_aproved,
 			'charge'     => $charge,
-			'expense'    => $expense
-		];
+			'expenses'   => $expenses,
+			'total'      => $total
+		);
 		$html = View::make('Expense.report',$data)->render();
 		return PDF::load($html, 'A4', 'landscape')->show();
 	}

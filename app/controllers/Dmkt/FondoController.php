@@ -19,6 +19,7 @@ use \Common\Fondo;
 use \Dmkt\Account;
 use \Expense\Entry;
 use \Dmkt\FondoInstitucional;
+use \Log;
 
 class FondoController extends BaseController
 {
@@ -157,11 +158,14 @@ class FondoController extends BaseController
     }
     function getFondosContabilidad($start, $state)
     {
+        Log::error($start);
+        Log::error($state);
         $periodo = $this->period($start);
         
         if($state == '1') {
             $state = FONDO_DEPOSITADO;
             $fondos = FondoInstitucional::where("periodo", $periodo)->where('terminado', TERMINADO)->where('depositado', $state)->where('registrado','<>', FONDO_REGISTRADO)->get();
+            Log::error(json_encode($fondos));
         }
         else {
             $state = FONDO_REGISTRADO;
