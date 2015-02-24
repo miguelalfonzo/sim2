@@ -124,25 +124,25 @@
 											</thead>
 											<tbody>
 												@foreach($seats as $seatItem)
-												<tr class="{{ $seatItem->type == 'IGV' ? 'info' : ($seatItem->type == 'SER' ? 'warning' : ($seatItem->type == 'REP' ? 'danger' : '')) }}">
-													<td class="editable">{{ $seatItem->numero_cuenta }}</td>
-													<td>{{ $seatItem->codigo_sunat }}</td>
-													<td></td>
-													<td>{{ $seatItem->fec_origen }}</td>
-													<td>{{ $seatItem->iva }}</td>
-													<td>{{ $seatItem->cod_prov }}</td>
-													<td>{{ $seatItem->nombre_proveedor }}</td>
-													<td>{{ $seatItem->cod }}</td>
-													<td>{{ $seatItem->ruc }}</td>
-													<td>{{ $seatItem->prefijo }}</td>
-													<td>{{ $seatItem->cbte_proveedor }}</td>
-													<td>{{ $seatItem->dc }}</td>
-													<td>{{ $seatItem->importe }}</td>
-													<td>{{ $seatItem->leyenda }}</td>
-													<td>{{ $seatItem->leyenda_variable }}</td>
-													<td>{{ $seatItem->tipo_responsable }}</td>
+												<tr data-id="{{ $seatItem->tempId }}" class="{{ $seatItem->type == 'IGV' ? 'info' : ($seatItem->type == 'SER' ? 'warning' : ($seatItem->type == 'REP' ? 'danger' : ($seatItem->type == 'CAN' ? 'success' : ''))) }}">
+													<td class="cuenta editable" data-cuenta_mkt="{{ $seatItem->cuentaMkt }}">{{ $seatItem->numero_cuenta }}</td>
+													<td class="codigo_sunat">{{ $seatItem->codigo_sunat }}</td>
+													<td class="numero_origen"></td>
+													<td class="fecha_origen">{{ $seatItem->fec_origen }}</td>
+													<td class="iva">{{ $seatItem->iva }}</td>
+													<td class="cod_prov">{{ $seatItem->cod_prov }}</td>
+													<td class="nombre_proveedor">{{ $seatItem->nombre_proveedor }}</td>
+													<td class="cod">{{ $seatItem->cod }}</td>
+													<td class="ruc">{{ $seatItem->ruc }}</td>
+													<td class="prefijo">{{ $seatItem->prefijo }}</td>
+													<td class="cbte_proveedor">{{ $seatItem->cbte_proveedor }}</td>
+													<td class="dc">{{ $seatItem->dc }}</td>
+													<td class="importe">{{ $seatItem->importe }}</td>
+													<td class="leyenda">{{ $seatItem->leyenda }}</td>
+													<td class="leyenda_variable">{{ $seatItem->leyenda_variable }}</td>
+													<td class="tipo_responsable">{{ $seatItem->tipo_responsable }}</td>
 
-													<td><a class="edit-seat" href="#"><span class="glyphicon glyphicon-pencil"></span></a> <a class="delete-seat" href="#"><span class="glyphicon glyphicon-remove"></span></a></td>
+													<td><a class="edit-seat" href="#" {{ $seatItem->type != '' ? 'style="display:none;"' : ''  }}><span class="glyphicon glyphicon-pencil"></span></a></td>
 												</tr>
 												@endforeach
 											</tbody>

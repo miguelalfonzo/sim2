@@ -1,8 +1,8 @@
 var server = "";
-var w = document.location.pathname;
-var q= w.split("/public/");
+var pathname = document.location.pathname;
+var pathnameArray= pathname.split("/public/");
 
-server =  q.length >0 ? q[0]+"/public/" : "";
+server =  pathnameArray.length >0 ? pathnameArray[0]+"/public/" : "";
 var IGV = 0.18;
 //Funciones Globales
 var datef = new Date();
@@ -1312,6 +1312,7 @@ $(function(){
         }
         $(document).off("click", "#saveSeatExpense");
         $(document).on("click", "#saveSeatExpense", function(){
+            var button = $(this);
             var data = {};
             data.seatList = GBDMKT.seatsList;
             data._token   = $("input[name=_token]").val();
@@ -1327,15 +1328,111 @@ $(function(){
                     console.log("error al registrar asientos");
                 }
             }).done( function (result) {
-                if(result > 0)
+                if(!result.hasOwnProperty("error"))
                 {
                     
-                    //responseUI("Gasto Actualizado","green");
+                    responseUI("Gasto Actualizado","green");
+                    button.hide('slow');
+                    $(".edit-seat").hide('slow');
                 }
                 else
                 {
-                    //responseUI("No se ha actualizado el gasto","red");
+                    responseUI("No se ha actualizado el gasto","red");
                 }
             });
+        });
+
+        // EDIT SEAT CONT
+        $(document).off("click", ".edit-seat-save");
+        $(document).on("click", ".edit-seat-save", function(e){
+            e.preventDefault(this);
+            trElement = $(this).parent().parent();
+            trElement.find(".editable").each(function(i,data){
+                var editElement = $(data);
+                var typeElement = editElement.attr("class").replace("editable", "").trim();
+
+                if(typeElement == 'cuenta'){
+                    var selectElement = editElement.find('select').find(":selected");
+                    var marcarElement = trElement.find('.leyenda');
+                    var marca = selectElement.attr('data-marca') + marcarElement.text().substr(-1);
+                    var cuenta_cont = selectElement.attr('value');
+                    $(GBDMKT.seatsList).each(function(i,data){
+                        if(data.tempId == trElement.attr('data-id')){
+                            data.numero_cuenta = cuenta_cont;
+                            editElement.html(cuenta_cont);
+                            data.leyenda = marca;
+                            marcarElement.html(marca);
+                            return false;
+                        }
+                    });
+                }
+            });
+            var optionController = trElement.children().last();
+            optionController.html(optionController.attr('data-html'));
+
+        });
+
+        $(document).off("click", ".edit-seat-cancel");
+        $(document).on("click", ".edit-seat-cancel", function(e){
+            e.preventDefault(this);
+            trElement = $(this).parent().parent();
+            trElement.find(".editable").each(function(i,data){
+                var editElement = $(data);
+                var typeElement = editElement.attr("class").replace("editable", "").trim();
+
+                if(typeElement == 'cuenta'){
+                    editElement.html(editElement.attr('data-html'));
+                }
+            });
+            var optionController = trElement.children().last();
+            optionController.html(optionController.attr('data-html'));
+        });
+
+        $(document).off("click", ".edit-seat");
+        $(document).on("click", ".edit-seat", function(e){
+            e.preventDefault();
+            var trElement = $(this).parent().parent();
+            trElement.find(".editable").each(function(i,data){
+                var editElement = $(data);
+                var typeElement = editElement.attr("class").replace("editable", "").trim();
+
+                if(typeElement == 'cuenta'){
+                    var data = {};
+                    data.cuentaMkt = editElement.attr("data-cuenta_mkt");
+                    data._token   = $("input[name=_token]").val();
+                     $.ajax({
+                        type: 'post',
+                        url: server+"get-account",
+                        data: data,
+                        async: false,
+                        error: function(){
+                            console.log("ERROR: No se pudo obtener cuentas.");
+                        }
+                    }).done( function (result) {
+                    e=result;
+                        if(!result.hasOwnProperty("error"))
+                        {
+                            var select_temp = $('<select></select>');
+                            $(result.account).each(function(i,option){
+                                var tempOption = $('<option value="'+ option.cuenta_cont +'">'+ option.cuenta_mkt +' | '+ option.cuenta_cont +' | '+ option.nombre_cont +'</option>');
+                                tempOption.attr('data-marca', option.marca)
+                                select_temp.append(tempOption);
+                            });
+                            editElement.attr('data-html', editElement.html());
+                            editElement.html('');
+                            editElement.append(select_temp);
+                        }
+                        else
+                        {
+                            bootbox.alert(result.error + ": " + result.msg);
+                        }
+                    });
+                }
+            });
+            var optionController = trElement.children().last();
+            optionController.attr('data-html', optionController.html());
+            optionController.html('<a class="edit-seat-save" href="#"><span class="glyphicon glyphicon-ok"></span></a>&nbsp;&nbsp;'+
+                                  '<a class="edit-seat-cancel" href="#"><span class="glyphicon glyphicon-remove"></span></a>')
+
         });
 });
