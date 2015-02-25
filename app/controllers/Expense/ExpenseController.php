@@ -21,6 +21,7 @@ use \Client;
 use \Dmkt\TypeRetention;
 use \Log;
 use \Common\Deposit;
+use \BagoUser;
 
 class ExpenseController extends BaseController{
 
@@ -417,7 +418,16 @@ class ExpenseController extends BaseController{
 		{
 			$created_by = 'Usuario no Autorizado';
 		}
-
+		$dni = new BagoUser;
+		$dni = $dni->dni($solicitude->user->username);
+		if ($dni['Status'] == 'Ok')
+		{
+			$dni = $dni['Data'];
+		}
+		else
+		{
+			$dni = $dni['Status'].' : '.$dni['Description'];
+		}
 		$expenses = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
 		$aproved_user = User::where('id',$solicitude->idaproved)->firstOrFail();
 		if($aproved_user->type === 'P')
@@ -435,10 +445,12 @@ class ExpenseController extends BaseController{
 		{
 			$total += $expense->monto;
 		}
+
 		$data = array(
 			'solicitude' => $solicitude,
 			'date'       => $this->getDay(),
 			'name'       => $name_aproved,
+			'dni' 		 => $dni,
 			'created_by' => $created_by,
 			'charge'     => $charge,
 			'expenses'   => $expenses,
