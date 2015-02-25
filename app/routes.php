@@ -161,6 +161,7 @@ Route::group(array('before' => 'cont'), function () {
     Route::get('list-fondos-contabilidad/{date}/{estado}','Dmkt\FondoController@getFondosContabilidad');
     Route::get('generar-asiento-fondo/{token}', 'Dmkt\FondoController@viewGenerateSeatFondo');
     Route::post('generate-seat-fondo', 'Dmkt\FondoController@generateSeatFondo');
+    Route::post('get-account', 'Dmkt\SolicitudeController@getCuentaContHandler');
 });
 // App::error(function (ModelNotFoundException $e) {
 //     return View::make('notfound');

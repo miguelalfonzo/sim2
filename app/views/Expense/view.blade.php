@@ -22,13 +22,19 @@
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Código de Depósito</label>
-						<input type="text" class="form-control" value="101" disabled>
+						<input type="text" class="form-control" value="{{$solicitude->iddeposito}}" disabled>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Autorizado por</label>
-						<input type="text" class="form-control" value="Lucy Alfaro" disabled>
+						@if( $solicitude->user->type == 'R' )
+							<input type="text" class="form-control" value="{{$solicitude->rm->nombres.' '.$solicitude->rm->apellidos}}" disabled>
+						@elseif ($solicitude->user->type == 'S')
+							<input type="text" class="form-control" value="{{$solicitude->sup->nombres.' '.$solicitude->sup->apellidos}}" disabled>
+						@else
+						    <input type="text" class="form-control" value="Usuario no autorizado" disabled>
+						@endif
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
@@ -36,7 +42,7 @@
 						<label>Monto Depositado</label>
 						<div class="input-group">
 					    	<div id="type-money" class="input-group-addon">{{$solicitude->typemoney->simbolo}}</div>
-					      	<input id="deposit" class="form-control" type="text" value="{{$solicitude->monto}}" disabled>
+					      	<input id="deposit" class="form-control" type="text" value="{{$solicitude->deposit->total}}" disabled>
 					    </div>
 					</div>
 				</div>
@@ -45,7 +51,7 @@
 						<label>Monto Restante</label>
 						<div class="input-group">
 					    	<div class="input-group-addon">{{$solicitude->typemoney->simbolo}}</div>
-					      	<input id="balance" class="form-control" type="text" value="0" disabled>
+					      	<input id="balance" class="form-control" type="text" value="{{$solicitude->deposit->total - $total}}" disabled>
 					    </div>
 					</div>
 				</div>
@@ -66,8 +72,8 @@
 									</tr>
 								</thead>
 								<tbody>
-									@if(isset($expense))
-										@foreach($expense as $val)
+									@if(isset($expenses))
+										@foreach($expenses as $val)
 											<tr>
 												<th class="proof-type">{{mb_convert_case($val->idProofType->descripcion,MB_CASE_TITLE,'UTF-8')}}</th>
 												<th class="ruc">{{$val->ruc}}</th>
