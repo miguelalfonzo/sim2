@@ -91,4 +91,8 @@ class Solicitude extends Eloquent{
     function aprovedSup(){
         return $this->hasOne('Dmkt\Sup','iduser','idaproved');
     }
+
+    function aprovedGerProd(){
+        return $this->hasOne('Dmkt\Manager','iduser','idaproved');
+    }
 }

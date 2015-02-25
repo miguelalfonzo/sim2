@@ -20,7 +20,7 @@
                 <strong><p style="display:inline">N° de Depósito:</strong>&nbsp;101</p>
             </section>
             <section style="text-align:center;margin-top:2em;">
-                <strong><p style="display:inline">Colaborador Bagó:</strong>&nbsp;{{mb_convert_case($name,MB_CASE_TITLE,'UTF-8')}}</p>
+                <strong><p style="display:inline">Colaborador Bagó:</strong>&nbsp;{{mb_convert_case($created_by,MB_CASE_TITLE,'UTF-8')}}</p>
                 <strong><p style="display:inline">Ciudad:</strong>&nbsp;Lima</p>
                 <strong><p style="display:inline">Cargo:</strong>&nbsp;{{mb_convert_case($charge,MB_CASE_TITLE,'UTF-8')}}</p>
                 <strong><p style="display:inline">Fecha de Depósito:</strong>&nbsp;{{$date['toDay']}}</p>
@@ -154,7 +154,7 @@
             <p class="firma">V°B° SUPERVISOR</p>
             <p class="firma">V°B° GERENTE COMERCIAL</p>
             <div>DNI:&nbsp;<span class="dni">{{$solicitude->user->username}}</span></div>
-            <div>NOMBRE:&nbsp;<span class="dni">{{$solicitude->user->email}}</span></div>
+            <div>NOMBRE:&nbsp;<span class="dni">{{$created_by}}</span></div>
         </footer>
     </div>
 </body>
