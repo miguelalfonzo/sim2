@@ -74,4 +74,15 @@ class BaseController extends Controller {
         return $rpta;
     }
 
+    public function postman(){
+        $data = array('firstname'=>'Manuel');
+        Mail::send('emails.notification', $data, function($message){
+            $message->to('manueltemple@gmail.com', 'Manuel Temple')->subject('Hello!');
+        });
+        // Mail::send('emails.welcome', $data, function($message)
+        // {
+        //     $message->to('manueltemple@gmail.com', 'Manuel Temple')->subject('Hello!');
+        // });
+    }
+
 }

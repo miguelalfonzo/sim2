@@ -16,6 +16,8 @@ use Common/Fondo;
 
 Route::get('test', array('uses' => 'Dmkt\LoginController@test'));
 
+Route::get('sendmail', array('uses' => 'BaseController@postman'));
+
 /** Login */
 Route::get('/', array('uses' => 'Dmkt\LoginController@showLogin'));
 Route::get('login', array('uses' => 'Dmkt\LoginController@showLogin'));
