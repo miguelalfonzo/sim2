@@ -26,6 +26,9 @@
         <td>
             <div class="div-icons-solicituds">
                 <a href="{{URL::to('ver-solicitud-tes').'/'.$solicitude->token}}"><span class="glyphicon glyphicon-eye-open"></span></a>
+                @if($solicitude->estado == APROBADO)
+                    <a href="#"><span class="glyphicon glyphicon-usd"></span></a>
+                @endif
             </div>
         </td>
     </tr>

@@ -942,7 +942,6 @@ $(function(){
                                                     $(".total_expense:eq("+index+")").text(tot_expense);
                                                     $("#save-expense").html("Registrar");
                                                     $("#table-expense tbody tr").removeClass("select-row");
-                                                    $("")
                                                     responseUI("Gasto Actualizado","green");
                                                 }
                                                 else
@@ -1175,6 +1174,10 @@ $(function(){
         //Calculate the IGV
         function calcularIGV()
         {
+            var typeUser = 'R';
+            if($(".user").attr('data-typeUser')){
+                typeUser = 'C';
+            };
             //Total variables proof
             var total_item = $(".total-item input");
             var sub_total_expense = 0;
@@ -1191,9 +1194,15 @@ $(function(){
             {
                 if($("#proof-type").val()==='1' || $("#proof-type").val()==='4' || $("#proof-type").val()==='6')
                 {
-                    igv = total_expense*IGV;
-                    sub_total_expense = total_expense - igv;
                     if(!imp_service) imp_service = 0;
+                    if(typeUser === 'R'){
+                        igv = total_expense*IGV;
+                        sub_total_expense = total_expense - igv;
+                    }else{
+                        sub_total_expense = total_expense;
+                        igv = sub_total_expense * IGV;
+                    }
+                    
                     total_expense = sub_total_expense + igv + imp_service;
                     $("#sub-tot").val(sub_total_expense.toFixed(2));
                     $("#igv").val(igv.toFixed(2));
