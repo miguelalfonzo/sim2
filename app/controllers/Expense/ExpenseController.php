@@ -316,7 +316,7 @@ class ExpenseController extends BaseController{
 	        $date = date("Y/m/d", $d);
 	        $expenseEdit->fecha_movimiento = $date;
 	        $expenseEdit->descripcion = $inputs['desc_expense'];
-	        $expenseEdit->reparo = $inputs['rep'];
+	        //$expenseEdit->reparo = $inputs['rep'];
 	        $data = $this->objectToArray($expenseEdit);
 	        //Detail Expense
 			$quantity = $inputs['quantity'];

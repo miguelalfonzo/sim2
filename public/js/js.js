@@ -633,13 +633,13 @@ $(function(){
                         row_add.find('.description input').val(value.descripcion);
                         row_add.find('.type-expense').val(value.tipo_gasto);
                         row_add.find('.total-item input').val(value.importe);
-                        if($(".reparo"))
+                        /*if($(".reparo"))
                         {
                             if(value.reparo == 1)
                             {
                                 row_add.find('.reparo').attr('checked', true);
                             }
-                        }
+                        }*/
                         $("#table-items tbody").append(row_add);
                         $(".total-item input").numeric({negative:false});
                         $(".quantity input").numeric({negative:false});
@@ -1192,8 +1192,8 @@ $(function(){
             {
                 if($("#proof-type").val()==='1' || $("#proof-type").val()==='4' || $("#proof-type").val()==='6')
                 {
-                    sub_total_expense = total_expense;
-                    igv = sub_total_expense*IGV;
+                    igv = total_expense*IGV;
+                    sub_total_expense = total_expense - igv;
                     if(!imp_service) imp_service = 0;
                     total_expense = sub_total_expense + igv + imp_service;
                     $("#sub-tot").val(sub_total_expense.toFixed(2));
