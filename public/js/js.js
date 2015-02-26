@@ -126,17 +126,21 @@ $(function(){
             calcularBalance();
         });
         //Datepicker date all classes
-        var toDate = $(".date").val();
-        $(".date").datepicker({
-            language: 'es',
-            startDate: toDate == "" ? "{{$data['date']['toDay']}}" : toDate,
-            endDate: $("#last-date").val(),
-            format: 'dd/mm/yyyy'
-        });
-        //selected a date hide the datepicker
-        $(".date").on("change",function(){
-            $(this).datepicker('hide');
-        });
+        if(!($('.date>input:not([readonly]').length == 0)){
+            var toDate = $(".date>input").val();
+
+            $(".date").datepicker({
+                language: 'es',
+                startDate: toDate == "" ? "{{$data['date']['toDay']}}" : toDate,
+                endDate: $("#last-date").val(),
+                format: 'dd/mm/yyyy'
+            });
+            //selected a date hide the datepicker
+            $(".date").on("change",function(){
+                $(this).datepicker('hide');
+            });
+            $(".date").datepicker( "setDate" , typeof($("#last-date").val()) != 'undefined' ? $("#last-date").val() : toDate);
+        }
         //Cancel the view button to register expense
         $("#cancel-expense").on("click",function(e){
             e.preventDefault();
@@ -1461,14 +1465,14 @@ $(function(){
             e.preventDefault();
             var id_sol = $(this).parent().parent().parent().find('.id_solicitud').text();
             var sol_titulo = $(this).parent().parent().parent().find('.sol_titulo').val();
+            var token = $(this).parent().parent().parent().find('#sol_token').val();
             var beneficiario = $(this).parent().parent().parent().find('.benef').val();
             var total_deposit = $(this).parent().parent().parent().find('.total_deposit').text();
-            var token = $(this).parent().parent().parent().find('#sol_token').val();
             $("#id-solicitude").text(id_sol);
             $("#sol-titulo").val(sol_titulo);
+            $("#token").val(token);
             $("#beneficiario").val(beneficiario);
             $("#total-deposit").val(total_deposit);
-            $("#token").val(token);
             $('#enable_deposit_Modal').modal();
         });
 });

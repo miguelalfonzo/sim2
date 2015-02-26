@@ -410,6 +410,7 @@ function newSolicitude() {
                     }
                     else
                     {
+                        console.log("qqqqqqqqq");
                         responseUI("Faltan Ingresar Campos", 'red');
                     }
                 }).fail(function (e) {

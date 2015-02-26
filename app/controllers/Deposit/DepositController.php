@@ -43,10 +43,11 @@ class DepositController extends BaseController{
         if ($id == 0) {
             $solicituds = Solicitude::all();
         } else {
-            $solicituds = Solicitude::where('estado', '=', APROBADO)->where('asiento','=',1)->whereNotNull('idresponse')->get();
+
+            $solicituds = Solicitude::whereNotNull('idresponse')->where('estado', '=', APROBADO)->where('asiento','=',ENABLE_DEPOSIT)->get();
         }
-        //return json_encode($solicituds);
-        return View::make('Treasury.view_solicituds_tes')->with('solicituds', $solicituds);
+        $view = View::make('Treasury.view_solicituds_tes')->with('solicituds', $solicituds);
+        return $view;
     }
 
     public function viewSolicitudeTes($token)
@@ -69,16 +70,17 @@ class DepositController extends BaseController{
 
         if ($start != null && $end != null) {
             if ($estado != 0) {
-                $solicituds = Solicitude::where('estado',$estado)
-                	->where('asiento',1)
-                    ->whereNotNull('idresponse')
+
+                $solicituds = Solicitude::whereNotNull('idresponse')
+                    ->where('estado',$estado)
+                	->where('asiento',ENABLE_DEPOSIT)
                     ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
                     ->get();
 
             } else {
-                $solicituds = Solicitude::where('estado', $estado)
-                	->where('asiento',1)
-                    ->whereNotNull('idresponse')
+                $solicituds = Solicitude::whereNotNull('idresponse')
+                    ->where('estado', $estado)
+                	->where('asiento',ENABLE_DEPOSIT)
                     ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
                     ->get();
             }
@@ -86,15 +88,15 @@ class DepositController extends BaseController{
 
         } else {
             if ($estado != 0) {
-                $solicituds = Solicitude::where('estado', $estado)
-                	->where('asiento',1)
-                    ->whereNotNull('idresponse')
+                $solicituds = Solicitude::whereNotNull('idresponse')
+                    ->where('estado', $estado)
+                	->where('asiento',ENABLE_DEPOSIT)
                     ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
                     ->get();
             } else {
-                $solicituds = Solicitude::where('estado', $estado)
-                	->where('asiento',1)
-                    ->whereNotNull('idresponse')
+                $solicituds = Solicitude::whereNotNull('idresponse')
+                    ->where('estado', $estado)
+                	->where('asiento',ENABLE_DEPOSIT)
                     ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
                     ->get();
             }
