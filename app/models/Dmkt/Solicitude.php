@@ -60,6 +60,10 @@ class Solicitude extends Eloquent{
         return $this->belongsTo('User','iduser');
     }
 
+    function response(){
+        return $this->belongsTo('User','idresponse');
+    }
+
     function typePayment(){
         return $this->hasOne('Common\TypePayment','idtipopago','idtipopago');
 

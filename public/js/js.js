@@ -376,7 +376,8 @@ $(function(){
         });
 
         //Register Deposit
-        $(".register-deposit").on("click",function(e){
+        $(document).off("click", ".register-deposit");
+        $(document).on("click",".register-deposit",function(e){
             e.preventDefault();
             console.log('register');
 
@@ -410,6 +411,7 @@ $(function(){
                     if(parseInt(data,10) === 1)
                     {
                         $('#myModal').modal('hide');
+                        $("#enable_deposit_Modal").modal('hide');
                         bootbox.alert("<p class='green'>Se registro el codigo de deposito correctamente.</p>", function(){
                             if(type_deposit === 'fondo'){
                                 $.ajax({
@@ -944,7 +946,6 @@ $(function(){
                                                     $(".total_expense:eq("+index+")").text(tot_expense);
                                                     $("#save-expense").html("Registrar");
                                                     $("#table-expense tbody tr").removeClass("select-row");
-                                                    $("")
                                                     responseUI("Gasto Actualizado","green");
                                                 }
                                                 else
@@ -1177,6 +1178,10 @@ $(function(){
         //Calculate the IGV
         function calcularIGV()
         {
+            var typeUser = 'R';
+            if($(".user").attr('data-typeUser')){
+                typeUser = 'C';
+            };
             //Total variables proof
             var total_item = $(".total-item input");
             var sub_total_expense = 0;
@@ -1193,9 +1198,15 @@ $(function(){
             {
                 if($("#proof-type").val()==='1' || $("#proof-type").val()==='4' || $("#proof-type").val()==='6')
                 {
-                    igv = total_expense*IGV;
-                    sub_total_expense = total_expense - igv;
                     if(!imp_service) imp_service = 0;
+                    if(typeUser === 'R'){
+                        igv = total_expense*IGV;
+                        sub_total_expense = total_expense - igv;
+                    }else{
+                        sub_total_expense = total_expense;
+                        igv = sub_total_expense * IGV;
+                    }
+                    
                     total_expense = sub_total_expense + igv + imp_service;
                     $("#sub-tot").val(sub_total_expense.toFixed(2));
                     $("#igv").val(igv.toFixed(2));
@@ -1439,5 +1450,21 @@ $(function(){
             optionController.html('<a class="edit-seat-save" href="#"><span class="glyphicon glyphicon-ok"></span></a>&nbsp;&nbsp;'+
                                   '<a class="edit-seat-cancel" href="#"><span class="glyphicon glyphicon-remove"></span></a>')
 
+        });
+        
+        $(document).off("click", ".modal_deposit");
+        $(document).on("click", ".modal_deposit", function(e){
+            e.preventDefault();
+            var id_sol = $(this).parent().parent().parent().find('.id_solicitud').text();
+            var sol_titulo = $(this).parent().parent().parent().find('.sol_titulo').val();
+            var beneficiario = $(this).parent().parent().parent().find('.benef').val();
+            var total_deposit = $(this).parent().parent().parent().find('.total_deposit').text();
+            var token = $(this).parent().parent().parent().find('#sol_token').val();
+            $("#id-solicitude").text(id_sol);
+            $("#sol-titulo").val(sol_titulo);
+            $("#beneficiario").val(beneficiario);
+            $("#total-deposit").val(total_deposit);
+            $("#token").val(token);
+            $('#enable_deposit_Modal').modal();
         });
 });

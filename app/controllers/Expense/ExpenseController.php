@@ -336,6 +336,7 @@ class ExpenseController extends BaseController{
 			}
 			// $type_expense = $expenseJson->type_expense;
 			$total_item = $inputs['total_item'];
+
 			if($expenseEdit->update($data))
 			{
 				$expense_detail_edit = ExpenseItem::where('idgasto',$idgasto)->delete();
