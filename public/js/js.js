@@ -1191,8 +1191,8 @@ $(function(){
             {
                 if($("#proof-type").val()==='1' || $("#proof-type").val()==='4' || $("#proof-type").val()==='6')
                 {
-                    sub_total_expense = total_expense;
-                    igv = sub_total_expense*IGV;
+                    igv = total_expense*IGV;
+                    sub_total_expense = total_expense - igv;
                     if(!imp_service) imp_service = 0;
                     total_expense = sub_total_expense + igv + imp_service;
                     $("#sub-tot").val(sub_total_expense.toFixed(2));

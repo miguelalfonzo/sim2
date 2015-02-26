@@ -149,7 +149,6 @@ Route::group(array('before' => 'cont'), function () {
     Route::get('generar-asiento-solicitud/{token}', 'Dmkt\SolicitudeController@viewGenerateSeatSolicitude');
     Route::post('generate-seat-solicitude', 'Dmkt\SolicitudeController@generateSeatSolicitude');  
     Route::get('revisar-asiento-gasto/{token}', 'Dmkt\SolicitudeController@viewSeatExpense');
-    //aquo
     Route::get('generar-asiento-gasto/{token}', 'Dmkt\SolicitudeController@viewGenerateSeatExpense');
     Route::post('guardar-asiento-gasto', 'Dmkt\SolicitudeController@saveSeatExpense');
     Route::post('generate-seat-expense', 'Dmkt\SolicitudeController@generateSeatExpense');

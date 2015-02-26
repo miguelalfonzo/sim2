@@ -148,9 +148,6 @@
 										
 									</tbody>
 								</table>
-								<aside class="col-xs-12 col-sm-6 col-md-4" style="padding:0;">
-									<button id="add-item" type="button" class="btn btn-dafault">Agregar Item</button>
-								</aside>
 							</div>
 						</div>
 					</div>
