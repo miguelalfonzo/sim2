@@ -149,6 +149,7 @@ Route::group(array('before' => 'cont'), function () {
     Route::get('generar-asiento-solicitud/{token}', 'Dmkt\SolicitudeController@viewGenerateSeatSolicitude');
     Route::post('generate-seat-solicitude', 'Dmkt\SolicitudeController@generateSeatSolicitude');  
     Route::get('revisar-asiento-gasto/{token}', 'Dmkt\SolicitudeController@viewSeatExpense');
+    //aquo
     Route::get('generar-asiento-gasto/{token}', 'Dmkt\SolicitudeController@viewGenerateSeatExpense');
     Route::post('guardar-asiento-gasto', 'Dmkt\SolicitudeController@saveSeatExpense');
     Route::post('generate-seat-expense', 'Dmkt\SolicitudeController@generateSeatExpense');
@@ -160,6 +161,7 @@ Route::group(array('before' => 'cont'), function () {
     //Fondos
     Route::get('list-fondos-contabilidad/{date}/{estado}','Dmkt\FondoController@getFondosContabilidad');
     Route::get('generar-asiento-fondo/{token}', 'Dmkt\FondoController@viewGenerateSeatFondo');
+    Route::get('generar-asiento-fondo-gasto/{token}', 'Dmkt\SolicitudeController@viewGenerateSeatExpense');
     Route::post('generate-seat-fondo', 'Dmkt\FondoController@generateSeatFondo');
     Route::post('get-account', 'Dmkt\SolicitudeController@getCuentaContHandler');
 });

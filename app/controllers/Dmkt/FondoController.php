@@ -374,6 +374,8 @@ class FondoController extends BaseController
                     $entry->d_c = $inputs['dc'][$i];
                     $entry->importe = $inputs['total'][$i];
                     $entry->leyenda = $inputs['leyenda'];
+                    $entry->idfondo = $inputs['idfondo'];
+                    $entry->tipo_asiento = TIPO_ASIENTO_ANTICIPO;
                     $entry->save();
                 }
                 FondoInstitucional::where('idfondo', $inputs['idfondo'])->update(array('asiento' => ASIENTO_FONDO));

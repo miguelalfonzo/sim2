@@ -8,6 +8,7 @@
 
 namespace Dmkt;
 use \Eloquent;
+use \Dmkt\Rm;
 
 class FondoInstitucional extends Eloquent{
 
@@ -35,5 +36,10 @@ class FondoInstitucional extends Eloquent{
     public function deposit(){
 
         return $this->hasOne('Common\Deposit','idfondo','idfondo');
+    }
+
+    public function iduser($idrm){
+        $response = Rm::where('idrm',$idrm)->first();
+        return $response->iduser;
     }
 }
