@@ -1298,12 +1298,12 @@ class SolicitudeController extends BaseController
             $username .= strtoupper(explode(' ', $userElement->sup->apellidos)[0]);
         }
         elseif($userType == 'P'){
-            $tempNameArray = explode(' ', $user->gerProd->descripcion);
+            $tempNameArray = explode(' ', $userElement->gerProd->descripcion);
             $username .= strtoupper(substr($tempNameArray[0], 0, 1) .' ');
             $username .= strtoupper($tempNameArray[1]);
         }else{
-            $username .= strtoupper(substr($user->person->nombres, 0, 1) .' ');
-            $username .= strtoupper(explode(' ', $user->person->apellidos)[0]);
+            $username .= strtoupper(substr($userElement->person->nombres, 0, 1) .' ');
+            $username .= strtoupper(explode(' ', $userElement->person->apellidos)[0]);
         }
         
         $tempId=1;
