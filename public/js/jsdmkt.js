@@ -159,6 +159,7 @@ function newSolicitude() {
             }
             response(matches);
         }
+        
 
         var idclient = '#idclient';
         if ($(idclient + client).length) {
@@ -176,7 +177,8 @@ function newSolicitude() {
                     $(this).parent().children('.span-alert').removeClass('glyphicon glyphicon-remove form-control-feedback');
                     $(this).parent().addClass('has-success has-feedback');
                     $(this).parent().children('.span-alert').addClass('glyphicon glyphicon-ok form-control-feedback');
-                    $(this).attr('readonly', 'readonly');
+                    //DESACTIVADO PARA PERMITIR EDITAR CLIENTE
+                    //$(this).attr('readonly', 'readonly');
                     $(this).attr('data-valor','all');
                     return false;
                 }
@@ -1813,5 +1815,11 @@ function newSolicitude() {
     $(document).on('show.bs.modal', '#myModal', function (e) {
         $("#message-op-number").html('');
         $("#op-number").val('');
+    });
+    $(document).off('focus', '.input-client');
+    $(document).on('focus', '.input-client', function(){
+        $(this).val("");
+        $(this).attr("data-valor","");
+        $(this).attr("value","");
     });
 }
