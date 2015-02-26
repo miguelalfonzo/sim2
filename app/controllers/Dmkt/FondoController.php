@@ -20,6 +20,7 @@ use \Dmkt\Account;
 use \Expense\Entry;
 use \Dmkt\FondoInstitucional;
 use \Log;
+use \Expense\ProofType;
 
 class FondoController extends BaseController
 {
@@ -398,5 +399,13 @@ class FondoController extends BaseController
         $lastDay = '06/'.str_pad(($currentDate['mon']+1),2,'0',STR_PAD_LEFT).'/'.$currentDate['year'];
         $date = ['toDay'=>$toDay,'lastDay'=> $lastDay];
         return $date;
+    }
+
+    public function listDocuments()
+    {
+        $docs = ProofType::all();
+        Log::error(json_encode($docs));
+        $view = View::make('DMKT.Cont.list_documents')->with('docs',$docs);
+        return $view;
     }
 }

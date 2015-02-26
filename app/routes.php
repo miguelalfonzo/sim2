@@ -163,6 +163,9 @@ Route::group(array('before' => 'cont'), function () {
     Route::get('generar-asiento-fondo-gasto/{token}', 'Dmkt\SolicitudeController@viewGenerateSeatExpense');
     Route::post('generate-seat-fondo', 'Dmkt\FondoController@generateSeatFondo');
     Route::post('get-account', 'Dmkt\SolicitudeController@getCuentaContHandler');
+
+    Route::get('list-documents', 'Dmkt\FondoController@listDocuments');
+
 });
 // App::error(function (ModelNotFoundException $e) {
 //     return View::make('notfound');

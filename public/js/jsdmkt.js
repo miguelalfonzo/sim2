@@ -454,7 +454,6 @@ function newSolicitude() {
     }
 
     function listFondos(user, state){
-        console.log(user, state);
         var url = server + 'list-'+user +'/'+dateactual + '/' + state;
         if(user != 'fondos-contabilidad') {
             url = server + 'list-'+user +'/'+dateactual;
@@ -465,7 +464,6 @@ function newSolicitude() {
             dataType: 'html'
 
         }).done(function (data) {
-            console.log('.table_solicitude_' + user);
             $(".fondo_r").remove();
             $('.table_solicitude_'+user).append(data);
             $("#datefondo").val(dateactual);
@@ -487,6 +485,37 @@ function newSolicitude() {
                     }
                 }
             );
+        });
+    }
+
+    function listDocuments(){
+        var url = server + 'list-documents';
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'html'
+
+        }).done(function (data) {
+            $(".fondo_d").remove();
+            $('.table_document_contabilidad').append(data);
+            $('#table_document_contabilidad').dataTable(
+            {
+                "order": [ [ 0, "desc" ] ],
+                "bLengthChange": false,
+                'iDisplayLength': 7,
+                "oLanguage": 
+                {
+                    "sSearch": "Buscar: ",
+                    "sZeroRecords": "No hay fondos",
+                    "sInfoEmpty": "No hay fondos",
+                    "sInfo": 'Mostrando _END_ de _TOTAL_',
+                    "oPaginate": 
+                    {
+                        "sPrevious": "Anterior",
+                        "sNext" : "Siguiente"
+                    }
+                }
+            });
         });
     }
 
@@ -977,6 +1006,7 @@ function newSolicitude() {
     if(userType === 'C'){
         listSolicitude('cont',APROBADO);
         listFondos('fondos-contabilidad', $('#estado_fondo_cont').val());
+        listDocuments();
         $("#datefondo").val(dateactual);
     }
 
