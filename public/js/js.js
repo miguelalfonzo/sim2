@@ -308,6 +308,10 @@ $(function(){
                 callback: function(result) {
                     if (result) {
                         element.parent().parent().remove();
+                        if ( !$('#add-seat-solicitude').length == 0 )
+                        {
+                            cleanRegistro($('#add-seat-solicitude'));
+                        }
                     }
                 }
             });

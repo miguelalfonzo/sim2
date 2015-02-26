@@ -67,8 +67,6 @@ class SolicitudeController extends BaseController
         return $result;
     }
 
-
-
     /** ----------------------------------  Representante Medico ---------------------------------- */
 
     public function show_rm()
@@ -521,13 +519,18 @@ class SolicitudeController extends BaseController
         {
             $gerentes[] = $v->marca->manager;
         }
-        $data = [
+        $data = array(
             'solicitude' => $solicitude,
             'managers' => $managers,
             'typePayments' => $typePayments,
             'fondos' => $fondos,
             'gerentes' => $gerentes
-        ];
+        );
+        $responsables = $this->findResponsables($solicitude,$token);
+        if (isset($responsables['Data']))
+        {
+            $data['responsables'] = $responsables['Data'];
+        }
         return View::make('Dmkt.Sup.view_solicitude_sup', $data);
     }
 
@@ -837,24 +840,29 @@ class SolicitudeController extends BaseController
             Solicitude::where('token', $token)->update(array('blocked' => 1));
 
         $solicitudeBlocked = SolicitudeGer::where('idsolicitud', $solicitude->idsolicitud)->where('idgerprod', $userid)->firstOrFail(); //vemos si la solicitud esta blokeada
-        //echo json_encode($solicitudeBlocked);die;
+       
         if ($solicitudeBlocked->blocked == 0) {
             SolicitudeGer::where('idsolicitud', $solicitude->idsolicitud) // blockeamos la solicitud para que el otro gerente no lo pueda editar
             ->where('idgerprod', '<>', $userid)
                 ->update(array('blocked' => 1));
-        } else {
+        } 
+        else 
+        {
             $block = true;
         }
         $fondos = Fondo::all();
         $typePayments = TypePayment::all();
-        $data = [
+        $data = array(
             'solicitude' => $solicitude,
             'block' => $block,
             'typePayments' => $typePayments,
             'fondos' => $fondos
-
-        ];
-        //echo json_encode($data); die;
+        );
+        $responsables = $this->findResponsables($solicitude,$token);
+        if (isset($responsables['Data']))
+        {
+            $data['responsables'] = $responsables['Data'];
+        }
         return View::make('Dmkt.GerProd.view_solicitude_gerprod', $data);
     }
 
@@ -1811,4 +1819,67 @@ class SolicitudeController extends BaseController
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         return View::make('Dmkt.AsisGer.view_solicitude_ager')->with('solicitude', $solicitude);
     }
+
+
+    private function findResponsables($solicitude,$token)
+    {
+        try
+        {
+            $rpta = array();
+            if ($solicitude->estado == APROBADO && $solicitude->asiento == 1 && Auth::user()->id == $solicitude->idaproved && !isset($solicitude->idresponse))
+            {
+                $responsables = array();
+                $asistentes = User::where('type','AG')->get();
+                foreach ($asistentes as $asistente)
+                {
+                    array_push($responsables, $asistente->person);
+                }
+                if($solicitude->user->type == 'R')
+                {
+                    array_push( $responsables, Solicitude::where('token', $token)->select('iduser')->first()->rm );
+                }
+                elseif($solicitude->user->type == 'S')
+                {
+                    $rms = Solicitude::where('token', $token)->select('idaproved')->first()->aprovedSup->Reps;
+                    Log::error(json_encode($rms));
+                    foreach ( $rms as $rm )
+                    {
+                         array_push( $responsables, $rm );
+                    }
+                }
+                $rpta['Data'] = $responsables;
+            }
+        }
+        catch (Exception $e)
+        {
+            $rpta = $this->internalException($e);
+        }
+        return $rpta;
+    }
+
+    public function asignarResponsableSolicitud()
+    {
+        try
+        {
+            $middleRpta = array();
+            $inputs = Input::all();
+            $rules = array('responsable' => 'required|integer|min:1' );   
+            $validator = Validator::make($inputs, $rules);
+            if ($validator->fails()) 
+            {
+                $middleRpta = $validator->messages();
+            }
+            else
+            {
+                Solicitude::where('token',$inputs['token'])->update( array('idresponse' => $inputs['responsable']) );
+                $middleRpta = array( status => ok , description => 'Se asigno la solicitud correctamente');
+            }
+        }
+        catch (Exception $e)
+        {
+            $middleRpta = $this->internalException($e);
+        }
+        return $middleRpta;
+    }
+
 }
