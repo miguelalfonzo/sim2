@@ -88,8 +88,9 @@ $(function(){
     $(document).on("click","#token-expense",function(e){
         e.preventDefault();
         var token = $(this).attr('data-url');
-        window.location.href = server+'token-solicitude-gasto/'+token;
+        window.location.href = server+'generar-asiento-gasto/'+token;
     });
+    
     //Default events
         //Calculate the IGV loading
         if(parseFloat($(".total-item").val())) calcularIGV();
