@@ -10,17 +10,19 @@
         <th>Edicion</th>
     </tr>
     </thead>
+    @if(count($solicituds) > 0)
     <tbody>
+    
     @foreach($solicituds as $solicitude)
     <tr>
         <td style="text-align: center" class="id_solicitud" data-type-response="{{$solicitude->response->type}}">{{$solicitude->idsolicitud}}</td>
         <input type="hidden" id="sol_token" value="{{$solicitude->token}}">
         @if(!is_null($solicitude->response))
             @if($solicitude->response->type == 'R')
-            <input type="hidden" value="{{$solicitude->user->rm->nombres}}" class="benef">
+            <input type="hidden" value="{{$solicitude->response->Rm->nombres}}" class="benef">
             <input type="hidden" value="{{$solicitude->titulo}}" class="sol_titulo">
             @elseif($solicitude->response->type == 'S')
-            <input type="hidden" value="{{$solicitude->user->sup->nombres}}" class="benef">
+            <input type="hidden" value="{{$solicitude->response->Sup->nombres}}" class="benef">
             <input type="hidden" value="{{$solicitude->titulo}}" class="sol_titulo">
             @else
             <input type="hidden" value="Usuario no autorizado" class="benef">
@@ -47,8 +49,10 @@
     </tr>
     @endforeach
     </tbody>
+    @endif
 </table>
 <!-- Modal -->
+@if(count($solicituds) > 0)
 @if($solicitude->estado == APROBADO && !is_null($solicitude->idresponse) )
 <div class="modal fade" id="enable_deposit_Modal" tabindex="-1" role="dialog" aria-labelledby="enable_deposit_ModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -100,4 +104,5 @@
         </div>
     </div>
 </div>
+@endif
 @endif
