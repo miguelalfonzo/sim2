@@ -193,7 +193,7 @@
             @foreach($clients as $client)
             <li>
                 <div style="position: relative" class="has-success has-feedback">
-                    <input id="idclient1" name="clients[]" type="text" placeholder="" style="margin-bottom: 10px" readonly
+                    <input id="idclient1" name="clients[]" type="text" placeholder="" style="margin-bottom: 10px"
                            class="form-control input-md project input-client" data-valor="{{$client->clcodigo}}"
                            value="{{isset($client->clnombre) ? $client->clcodigo.' - '.$client->clnombre : null }}">
 
