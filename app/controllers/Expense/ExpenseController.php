@@ -21,6 +21,7 @@ use \Client;
 use \Dmkt\TypeRetention;
 use \Log;
 use \Common\Deposit;
+use \BagoUser;
 
 class ExpenseController extends BaseController{
 
@@ -404,6 +405,29 @@ class ExpenseController extends BaseController{
 
 	public function reportExpense($token){
 		$solicitude = Solicitude::where('token',$token)->firstOrFail();
+		$created_by = '';
+		if($solicitude->user->type == 'R')
+		{
+			$created_by = $solicitude->rm->nombres.' '.$solicitude->rm->apellidos;
+		}
+		else if ($solicitude->user->type == 'S')
+		{
+			$created_by = $solicitude->sup->nombres.' '.$solicitude->sup->apellidos;
+		}
+		else
+		{
+			$created_by = 'Usuario no Autorizado';
+		}
+		$dni = new BagoUser;
+		$dni = $dni->dni($solicitude->user->username);
+		if ($dni['Status'] == 'Ok')
+		{
+			$dni = $dni['Data'];
+		}
+		else
+		{
+			$dni = $dni['Status'].' : '.$dni['Description'];
+		}
 		$expenses = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
 		$aproved_user = User::where('id',$solicitude->idaproved)->firstOrFail();
 		if($aproved_user->type === 'P')
@@ -421,10 +445,13 @@ class ExpenseController extends BaseController{
 		{
 			$total += $expense->monto;
 		}
+
 		$data = array(
 			'solicitude' => $solicitude,
 			'date'       => $this->getDay(),
 			'name'       => $name_aproved,
+			'dni' 		 => $dni,
+			'created_by' => $created_by,
 			'charge'     => $charge,
 			'expenses'   => $expenses,
 			'total'      => $total

@@ -28,10 +28,10 @@
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Autorizado por</label>
-						@if( $solicitude->user->type == 'R' )
-							<input type="text" class="form-control" value="{{$solicitude->rm->nombres.' '.$solicitude->rm->apellidos}}" disabled>
-						@elseif ($solicitude->user->type == 'S')
-							<input type="text" class="form-control" value="{{$solicitude->sup->nombres.' '.$solicitude->sup->apellidos}}" disabled>
+						@if( $solicitude->aproved->type == 'S' )
+							<input type="text" class="form-control" value="{{ucwords($solicitude->aprovedSup->nombres.' '.$solicitude->aprovedSup->apellidos)}}" disabled>
+						@elseif ($solicitude->aproved->type == 'P')
+							<input type="text" class="form-control" value="{{ucwords(strtolower($solicitude->aprovedGerProd->descripcion))}}" disabled>
 						@else
 						    <input type="text" class="form-control" value="Usuario no autorizado" disabled>
 						@endif

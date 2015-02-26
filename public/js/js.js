@@ -83,12 +83,12 @@ $(function(){
     $(document).on("click","#token-solicitude",function(e){
         e.preventDefault();
         var token = $(this).attr('data-url');
-        window.location.href = server+'revisar-asiento-solicitud/'+token;
+        window.location.href = server+'generar-asiento-solicitud/'+token;
     });
     $(document).on("click","#token-expense",function(e){
         e.preventDefault();
         var token = $(this).attr('data-url');
-        window.location.href = server+'generar-asiento-gasto/'+token;
+        window.location.href = server+'token-solicitude-gasto/'+token;
     });
     //Default events
         //Calculate the IGV loading
@@ -610,15 +610,18 @@ $(function(){
                     $("#razon").attr("data-edit",1);
                     $("#number-prefix").val(data_response.expense.num_prefijo).attr("disabled",true);
                     $("#number-serie").val(data_response.expense.num_serie).attr("disabled",true);
-                    /*if ( data_response.expense.reparo == true )
-                    {                   
-                        $('#dreparo').find('input[name=reparo]')[0].checked = true;
-                    }
-                    else
-                    {
-                        $('#dreparo').find('input[name=reparo]')[1].checked = true;
-                    }*/
 
+					if ( !$('#dreparo').find('input[name=reparo]').length == 0)
+					{
+						if ( data_response.expense.reparo == true )
+						{                   
+							$('#dreparo').find('input[name=reparo]')[0].checked = true;
+						}
+						else
+						{
+							$('#dreparo').find('input[name=reparo]')[1].checked = true;
+						}
+					}
                     date = data_response.date.split('-');
                     date = date[2].substring(0,2)+'/'+date[1]+'/'+date[0];
                     $("#date").val(date);
