@@ -34,7 +34,23 @@ class ExpenseController extends BaseController{
 		// $currentDate = getdate();
 		// $toDay = $currentDate['mday']."/".str_pad($currentDate['mon'],2,'0',STR_PAD_LEFT)."/".$currentDate['year'];
 		// $lastDay = '06/'.str_pad(($currentDate['mon']+1),2,'0',STR_PAD_LEFT).'/'.$currentDate['year'];
-		$date = ['toDay'=>$toDay,'lastDay'=> $lastDay];
+		$date = array(
+			'toDay'		=> $toDay,
+			'lastDay'	=> $lastDay
+		);
+		return $date;
+	}
+
+	private function getDayAll(){
+		$lastDay = date('j/m/Y');
+		$now=date('Y/m/j');
+		$nuevafecha = strtotime('-2 month', strtotime($now));
+		$toDay = date ('j/m/Y' , $nuevafecha);
+
+		$date = array(
+			'toDay'		=> $toDay,
+			'lastDay'	=> $lastDay
+		);
 		return $date;
 	}
 
@@ -112,7 +128,7 @@ class ExpenseController extends BaseController{
 
 	public function showCont($token)
 	{
-		$date         = $this->getDay();
+		$date         = $this->getDayAll();
 		$typeProof    = ProofType::all();
 		$typeExpense  = ExpenseType::orderBy('idtipogasto','asc')->get();
 		$solicitude   = Solicitude::where('token',$token)->firstOrFail();

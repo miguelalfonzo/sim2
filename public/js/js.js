@@ -126,17 +126,21 @@ $(function(){
             calcularBalance();
         });
         //Datepicker date all classes
-        var toDate = $(".date").val();
-        $(".date").datepicker({
-            language: 'es',
-            startDate: toDate == "" ? "{{$data['date']['toDay']}}" : toDate,
-            endDate: $("#last-date").val(),
-            format: 'dd/mm/yyyy'
-        });
-        //selected a date hide the datepicker
-        $(".date").on("change",function(){
-            $(this).datepicker('hide');
-        });
+        if(!($('.date>input:not([readonly]').length == 0)){
+            var toDate = $(".date>input").val();
+
+            $(".date").datepicker({
+                language: 'es',
+                startDate: toDate == "" ? "{{$data['date']['toDay']}}" : toDate,
+                endDate: $("#last-date").val(),
+                format: 'dd/mm/yyyy'
+            });
+            //selected a date hide the datepicker
+            $(".date").on("change",function(){
+                $(this).datepicker('hide');
+            });
+            $(".date").datepicker( "setDate" , typeof($("#last-date").val()) != 'undefined' ? $("#last-date").val() : toDate);
+        }
         //Cancel the view button to register expense
         $("#cancel-expense").on("click",function(e){
             e.preventDefault();
