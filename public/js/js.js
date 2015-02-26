@@ -375,7 +375,8 @@ $(function(){
         });
 
         //Register Deposit
-        $(".register-deposit").on("click",function(e){
+        $(document).off("click", ".register-deposit");
+        $(document).on("click",".register-deposit",function(e){
             e.preventDefault();
             console.log('register');
 
@@ -409,6 +410,7 @@ $(function(){
                     if(parseInt(data,10) === 1)
                     {
                         $('#myModal').modal('hide');
+                        $("#enable_deposit_Modal").modal('hide');
                         bootbox.alert("<p class='green'>Se registro el codigo de deposito correctamente.</p>", function(){
                             if(type_deposit === 'fondo'){
                                 $.ajax({
@@ -1447,5 +1449,21 @@ $(function(){
             optionController.html('<a class="edit-seat-save" href="#"><span class="glyphicon glyphicon-ok"></span></a>&nbsp;&nbsp;'+
                                   '<a class="edit-seat-cancel" href="#"><span class="glyphicon glyphicon-remove"></span></a>')
 
+        });
+        
+        $(document).off("click", ".modal_deposit");
+        $(document).on("click", ".modal_deposit", function(e){
+            e.preventDefault();
+            var id_sol = $(this).parent().parent().parent().find('.id_solicitud').text();
+            var sol_titulo = $(this).parent().parent().parent().find('.sol_titulo').val();
+            var beneficiario = $(this).parent().parent().parent().find('.benef').val();
+            var total_deposit = $(this).parent().parent().parent().find('.total_deposit').text();
+            var token = $(this).parent().parent().parent().find('#sol_token').val();
+            $("#id-solicitude").text(id_sol);
+            $("#sol-titulo").val(sol_titulo);
+            $("#beneficiario").val(beneficiario);
+            $("#total-deposit").val(total_deposit);
+            $("#token").val(token);
+            $('#enable_deposit_Modal').modal();
         });
 });
