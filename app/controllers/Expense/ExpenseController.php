@@ -26,9 +26,14 @@ use \BagoUser;
 class ExpenseController extends BaseController{
 
 	private function getDay(){
-		$currentDate = getdate();
-		$toDay = $currentDate['mday']."/".str_pad($currentDate['mon'],2,'0',STR_PAD_LEFT)."/".$currentDate['year'];
-		$lastDay = '06/'.str_pad(($currentDate['mon']+1),2,'0',STR_PAD_LEFT).'/'.$currentDate['year'];
+		$lastDay = date('j/m/Y');
+		$now=date('Y/m/j');
+		$nuevafecha = strtotime('-7 day', strtotime($now));
+		$toDay = date ('j/m/Y' , $nuevafecha);
+		
+		// $currentDate = getdate();
+		// $toDay = $currentDate['mday']."/".str_pad($currentDate['mon'],2,'0',STR_PAD_LEFT)."/".$currentDate['year'];
+		// $lastDay = '06/'.str_pad(($currentDate['mon']+1),2,'0',STR_PAD_LEFT).'/'.$currentDate['year'];
 		$date = ['toDay'=>$toDay,'lastDay'=> $lastDay];
 		return $date;
 	}

@@ -126,9 +126,10 @@ $(function(){
             calcularBalance();
         });
         //Datepicker date all classes
+        var toDate = $(".date").val();
         $(".date").datepicker({
             language: 'es',
-            startDate: "{{$data['date']['toDay']}}",
+            startDate: toDate == "" ? "{{$data['date']['toDay']}}" : toDate,
             endDate: $("#last-date").val(),
             format: 'dd/mm/yyyy'
         });

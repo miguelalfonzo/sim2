@@ -6244,3 +6244,6 @@ button.close {
         display: none !important
     }
 }
+.date>input, #date_start, #date_end{
+    cursor:pointer !important;
+}
