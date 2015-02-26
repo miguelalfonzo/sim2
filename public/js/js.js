@@ -304,6 +304,10 @@ $(function(){
                 callback: function(result) {
                     if (result) {
                         element.parent().parent().remove();
+                        if ( !$('#add-seat-solicitude').length == 0 )
+                        {
+                            cleanRegistro($('#add-seat-solicitude'));
+                        }
                     }
                 }
             });
@@ -1457,14 +1461,14 @@ $(function(){
             e.preventDefault();
             var id_sol = $(this).parent().parent().parent().find('.id_solicitud').text();
             var sol_titulo = $(this).parent().parent().parent().find('.sol_titulo').val();
+            var token = $(this).parent().parent().parent().find('#sol_token').val();
             var beneficiario = $(this).parent().parent().parent().find('.benef').val();
             var total_deposit = $(this).parent().parent().parent().find('.total_deposit').text();
-            var token = $(this).parent().parent().parent().find('#sol_token').val();
             $("#id-solicitude").text(id_sol);
             $("#sol-titulo").val(sol_titulo);
+            $("#token").val(token);
             $("#beneficiario").val(beneficiario);
             $("#total-deposit").val(total_deposit);
-            $("#token").val(token);
             $('#enable_deposit_Modal').modal();
         });
 });

@@ -43,9 +43,9 @@ class DepositController extends BaseController{
         if ($id == 0) {
             $solicituds = Solicitude::all();
         } else {
+
             $solicituds = Solicitude::whereNotNull('idresponse')->where('estado', '=', APROBADO)->where('asiento','=',ENABLE_DEPOSIT)->get();
         }
-        
         $view = View::make('Treasury.view_solicituds_tes')->with('solicituds', $solicituds);
         return $view;
     }
@@ -70,6 +70,7 @@ class DepositController extends BaseController{
 
         if ($start != null && $end != null) {
             if ($estado != 0) {
+
                 $solicituds = Solicitude::whereNotNull('idresponse')
                     ->where('estado',$estado)
                 	->where('asiento',ENABLE_DEPOSIT)
