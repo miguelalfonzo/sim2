@@ -22,6 +22,7 @@ use \Dmkt\TypeRetention;
 use \Log;
 use \Common\Deposit;
 use \BagoUser;
+use \Exception;
 
 class ExpenseController extends BaseController{
 
@@ -504,5 +505,45 @@ class ExpenseController extends BaseController{
 			$data = TypeRetention::all();
 			$data = "↵												LUCY ALFARO asdasdadasdad											";
 			echo trim($data,"↵");
+	}
+
+	public function manageDocument()
+	{
+		try
+		{
+			DB::beginTransaction();
+			$data = array();
+			$now = getdate();
+			$dateNow = $now['year'].'-'.$now['mon'].'-'.$now['mday'].' '.$now['hours'].':'.$now['minutes'].':'.$now['seconds'];
+			$input = Input::all();
+			
+			if ($input['type'] == 'Update')
+			{
+				$document = ProofType::where('idcomprobante',$input['pk'])->first();
+				$document->descripcion = strtoupper($input['desc']);
+				$document->marca = strtoupper($input['marca']);
+				$document->igv = $input['igv'];
+				$document->save();
+			}
+			else
+			{
+				$document = new ProofType;
+				$document->idcomprobante = $document->lastId()+1;
+				$document->descripcion = strtoupper($input['desc']);
+				$document->cta_sunat = $input['sunat'];
+				$document->marca = strtoupper($input['marca']);
+				$document->igv = $input['igv'];
+				$document->save();
+			}
+			$data["Status"] = "Ok";				
+			DB::commit();
+		}
+		catch (Exception $e)
+		{
+			Log::error($e);
+			$data["Status"] = "Error";	
+			DB::rollback();
+		}
+		return $data;
 	}
 }
