@@ -1475,4 +1475,19 @@ $(function(){
             $("#total-deposit").val(total_deposit);
             $('#enable_deposit_Modal').modal();
         });
+
+        $(document).off("click", "#detail_solicitude");
+        $(document).on("click", "#detail_solicitude", function(e){
+            e.preventDefault();
+            if($("#collapseOne").hasClass('in')){
+                $("#text_solicitude").text('Mostrar ');
+                $("#detail_solicitude span:last-child").removeClass('glyphicon-chevron-up');
+                $("#detail_solicitude span:last-child").addClass('glyphicon-chevron-down');
+            }else{
+                $("#text_solicitude").text('Ocultar ');
+                $("#detail_solicitude span:last-child").removeClass('glyphicon-chevron-down');
+                $("#detail_solicitude span:last-child").addClass('glyphicon-chevron-up');
+            }
+            $("#collapseOne").collapse('toggle');
+        });
 });
