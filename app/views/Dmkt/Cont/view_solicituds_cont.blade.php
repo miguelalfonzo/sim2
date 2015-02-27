@@ -21,9 +21,9 @@
         <td style="text-align: center">
             <span class="label" style="background-color: {{$solicitude->state->color}}">{{$solicitude->state->nombre}}</span>
             @if($solicitude->retencion != null && $solicitude->asiento == 2)
-             <span class="label" style="background-color: {{$solicitude->state->color}}">RETENCION Y ANTICIPO</span>
+             <span class="label" style="background-color: {{$solicitude->state->color}}">{{ESTADO_RA}}</span>
             @elseif($solicitude->retencion != null && $solicitude->estado == APROBADO)
-             <span class="label" style="background-color: {{$solicitude->state->color}}">RETENCION</span>
+             <span class="label" style="background-color: {{$solicitude->state->color}}">{{ESTADO_R}}</span>
             @endif
 
 

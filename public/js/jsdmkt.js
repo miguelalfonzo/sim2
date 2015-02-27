@@ -457,7 +457,6 @@ function newSolicitude() {
     }
 
     function listFondos(user, state){
-        console.log(user, state);
         var url = server + 'list-'+user +'/'+dateactual + '/' + state;
         if(user != 'fondos-contabilidad') {
             url = server + 'list-'+user +'/'+dateactual;
@@ -468,7 +467,6 @@ function newSolicitude() {
             dataType: 'html'
 
         }).done(function (data) {
-            console.log('.table_solicitude_' + user);
             $(".fondo_r").remove();
             $('.table_solicitude_'+user).append(data);
             $("#datefondo").val(dateactual);
@@ -490,6 +488,37 @@ function newSolicitude() {
                     }
                 }
             );
+        });
+    }
+
+    function listDocuments(){
+        var url = server + 'list-documents';
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'html'
+
+        }).done(function (data) {
+            $(".fondo_d").remove();
+            $('.table_document_contabilidad').append(data);
+            $('#table_document_contabilidad').dataTable(
+            {
+                "order": [ [ 0, "desc" ] ],
+                "bLengthChange": false,
+                'iDisplayLength': 7,
+                "oLanguage": 
+                {
+                    "sSearch": "Buscar: ",
+                    "sZeroRecords": "No hay fondos",
+                    "sInfoEmpty": "No hay fondos",
+                    "sInfo": 'Mostrando _END_ de _TOTAL_',
+                    "oPaginate": 
+                    {
+                        "sPrevious": "Anterior",
+                        "sNext" : "Siguiente"
+                    }
+                }
+            });
         });
     }
 
@@ -980,6 +1009,7 @@ function newSolicitude() {
     if(userType === 'C'){
         listSolicitude('cont',APROBADO);
         listFondos('fondos-contabilidad', $('#estado_fondo_cont').val());
+        listDocuments();
         $("#datefondo").val(dateactual);
     }
 
@@ -1778,7 +1808,6 @@ function newSolicitude() {
         }
         else
         {
-            console.log(server + url, data);
             $.post(server + url, data)
             .done(function (data){
                 if(data === 'error')
@@ -1824,5 +1853,190 @@ function newSolicitude() {
         $(this).val("");
         $(this).attr("data-valor","");
         $(this).attr("value","");
+    });
+
+    $(document).off("click",".elementCancel");
+    $(document).on("click",".elementCancel", function()
+    {
+        listDocuments();
+    });
+
+    $(document).off("click", ".elementEdit");
+    $(document).on("click", ".elementEdit", function()
+    {
+        $("#add-doc").hide();
+        var trElement = $(this).parent().parent();
+        a = $(this); 
+        trElement.children().each(function(i,data)
+        {
+            var tempData = $(data).html();
+            if( !($(data).attr("id") == "icons" || $(data).attr("id") == "pk" || $(data).attr("id") == "sunat" ) )
+            {
+                inputcell(data,tempData);
+            }
+            else if ( $(data).attr("id") == "icons" )
+            {
+
+                $(data).html('<a class="elementSave" data-sol="1" href="#">'
+                    + '<span class="glyphicon glyphicon-floppy-disk"></span></a>'
+                    + '<a class="elementCancel" href="#"><span class="glyphicon glyphicon-remove"></span></a>');
+            }
+            $(data).attr("data-data", tempData);
+        });
+    });
+
+    function inputcell(data,tempData)
+    {
+        if ($(data).attr("id") == "igv")
+        {
+            var input = $('<select style="width: 100%;">'
+                        + '<option>Si</option>'
+                        + '<option>No</option>'
+                        + '</select>');
+        }
+        else if ($(data).attr("id") == "marca")
+        {
+            var input = $('<input maxlength="3" type="text" style="width: 100%;"></input>');
+        }
+        else
+        {
+          var input = $('<input type="text" style="width: 100%;"></input>');
+        }
+                input.val(tempData);
+                $(data).html(input);  
+    }
+
+    $(document).off("click", ".elementSave");
+    $(document).on("click", ".elementSave", function()
+    {
+        var data_json = {} ;
+        data_json.type = 'Update';
+        data_json._token = $('input[name=_token]').val();
+        var aux = false;
+        trElement     = $(this).parent().parent();
+        var z=trElement.children().first();
+        if (z.html() == "")
+        {
+            aux = true;
+            data_json.type = 'Insert';
+        }
+        else
+        {
+            data_json.pk = trElement.children().first().html();
+        }
+        trElement.children().each(function(i,data)
+        {
+            if (!aux)
+            {
+                if( !($(data).attr("id") == "icons" || $(data).attr("id") == "pk" || $(data).attr("id") == "sunat" ) )
+                {
+
+                    var input = $(data).children().first();
+                    //$(data).html(input.val());
+                    if(input.parent().attr("id")!='pk' && input.val()==""){
+                        input.focus();
+                        data_json.type = "Error";
+                    }
+                    if ( input.val() == 'No' )
+                    {
+                        data_json[$(data).attr("id")] = 0;
+                    }
+                    else if ( input.val() == 'Si' )
+                    {
+                        data_json[$(data).attr("id")] = 1;
+                    }
+                    else
+                    {
+                        data_json[$(data).attr("id")] = input.val();
+                    }
+                }
+            }
+            else
+            {
+                if( !($(data).attr("id") == "icons"))
+                {
+                    var input = $(data).children().first();
+                    if(input.parent().attr("id")!='pk' && input.val()==""){
+                        input.focus();
+                        data_json.type = "Error";
+                    }
+                    //$(data).html(input.val());
+                    if ( input.val() == 'No' )
+                    {
+                        data_json[$(data).attr("id")] = 0;
+                    }
+                    else if ( input.val() == 'Si' )
+                    {
+                        data_json[$(data).attr("id")] = 1;
+                    }
+                    else
+                    {
+                        data_json[$(data).attr("id")] = input.val();
+                    }
+                }
+                /*else if($(data).attr("id") == "icons")
+                {
+                    $(data) .html('<a class="elementEdit" data-sol="1" href="#"><span class="glyphicon glyphicon-pencil">'
+                        + '</span></a> <a class="elementDelete" href="#"><span class="glyphicon glyphicon-remove"></span></a>');
+                }*/
+            }
+           
+        });
+        if (data_json.type != "Error")
+        {
+            $.ajax(
+            {
+                type: 'post',
+                url :  'cont-document-manage',
+                data: data_json,
+                error: function()
+                {
+                    responseUI('Error del Sistema','red');
+                },
+                success: function ( data )
+                {   
+                    if (data.Status == 'Ok')
+                    {
+                        responseUI('Datos Registrados','green');
+                        listDocuments();
+                    }
+                    else
+                    {
+                        responseUI('<font color="black">Warning:Verificar la consistencia de la Informacion</font>','yellow');    
+                    }
+                }        
+            });
+        }
+        else
+        {
+            bootbox.alert("complete los datos");
+            //$(".fondo_d tbody tr").last().remove();
+            //$("#add-doc").show();
+        }
+    });
+
+    $(document).off("click", "#add-doc");
+    $(document).on("click", "#add-doc", function()
+    {
+        var style = 'style="text-align: center"';
+        $(this).hide();
+        $(".fondo_d tbody").append('<tr class="new">'
+            + '<td id="pk" ' +style + ' disabled></td>'
+            + '<td id="desc" ' +style + '> <input style="width: 100%;" type="text"> </td>'
+            + '<td id="sunat" ' +style + '> <input style="width: 100%;" type="text"></td>'
+            + '<td id="marca" ' +style + '> <input maxlength="3" style="width: 100%;" type="text"> </td>'
+            + '<td id="igv" ' +style + '> <select style="width: 100%;"><option>Si</option><option>No</option></select> </td>'
+            + '<td id="icons" ' +style + '> '
+            + '<a class="elementSave" data-sol="1" href="#"><span class="glyphicon glyphicon-floppy-disk"></span></a>'
+            + '<a class="elementBack" href="#"><span class="glyphicon glyphicon-remove"></span></a>'
+            + '</td>'
+            + '</tr>')
+    });
+
+    $(document).off("click", ".elementBack");
+    $(document).on("click", ".elementBack", function()
+    {
+        $(".fondo_d tbody tr").last().remove();
+        $("#add-doc").show();
     });
 }

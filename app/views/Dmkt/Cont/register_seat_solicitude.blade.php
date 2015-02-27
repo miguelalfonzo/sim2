@@ -89,20 +89,20 @@
 				</section>
 				<hr>
 				<section class="row reg-expense" style="margin:0">
-					<div class="col-xs-12 col-sm-6 col-md-4">
+					<div class="col-xs-12 col-sm-6 col-md-4" style="display:none">
 						<div class="form-expense">
 							<label for="name_account">Cuenta</label>
 							<input id="name_account" type="text" class="form-control">
 							{{Form::token()}}
 						</div>
 					</div>
-					<div class="col-xs-12 col-sm-6 col-md-4">
+					<div class="col-xs-12 col-sm-6 col-md-4" style="display:none">
 						<div class="form-expense">
 							<label for="number_account">N° de Cuenta</label>
 							<input id="number_account" type="text" class="form-control">
 						</div>
 					</div>
-					<div class="col-xs-12 col-sm-6 col-md-4">
+					<div class="col-xs-12 col-sm-6 col-md-4" style="display:none">
 						<div class="form-expense">
 							<label for="dc">Tipo de Cuenta</label>
 							<select class="form-control" id="dc">
@@ -111,13 +111,13 @@
 							</select>
 						</div>
 					</div>
-					<div class="col-xs-12 col-sm-6 col-md-4">
+					<div class="col-xs-12 col-sm-6 col-md-4" style="display:none" style="display:none">
 						<div class="form-expense">
 							<label for="total">Importe</label>
 							<input id="total" type="text" class="form-control">
 						</div>
 					</div>
-					<div class="col-xs-12 col-sm-6 col-md-4">
+					<div class="col-xs-12 col-sm-6 col-md-4" style="display:none">
 						<div class="form-expense">
 							<a href="#" id="add-seat-solicitude" class="btn btn-info" style="margin-top:1.75em;">Agregar Detalle</a>
 						</div>
@@ -136,8 +136,8 @@
 											<th>D/C</th>
 											<th>Importe</th>
 											<th>Leyenda Variable</th>
-											<th>Editar</th>
-											<th>Eliminar</th>
+											<th style="display:none">Editar</th>
+											<th style="display:none">Eliminar</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -154,8 +154,8 @@
 													{{$solicitude->aproved->gerprod->descripcion.'-'.$solicitude->titulo.'-'.$clientes}}
 												@endif
 											</th>
-											<th><a class="edit-seat-solicitude" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
-											<th><a class="delete-seat-solicitude" href="#"><span class="glyphicon glyphicon-remove"></span></a></th>
+											<th style="display:none"><a class="edit-seat-solicitude" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
+											<th style="display:none"><a class="delete-seat-solicitude" href="#"><span class="glyphicon glyphicon-remove"></span></a></th>
 										</tr>
 										<tr>
 											<th class="name_account">{{$bancos->nombre}}</th>
@@ -170,8 +170,8 @@
 													{{$solicitude->aproved->gerprod->descripcion.'-'.$solicitude->titulo.'-'.$clientes}}
 												@endif
 											</th>
-											<th><a class="edit-seat-solicitude" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
-											<th><a class="delete-seat-solicitude" href="#"><span class="glyphicon glyphicon-remove"></span></a></th>
+											<th style="display:none"><a class="edit-seat-solicitude" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
+											<th style="display:none"><a class="delete-seat-solicitude" href="#"><span class="glyphicon glyphicon-remove"></span></a></th>
 										</tr>
 										@if(isset($solicitude->retencion))
 											<tr>
@@ -187,8 +187,8 @@
 														{{$solicitude->aproved->gerprod->descripcion.'-'.$solicitude->titulo.'-'.$clientes}}
 													@endif
 												</th>
-												<th><a class="edit-seat-solicitude" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
-												<th><a class="delete-seat-solicitude" href="#"><span class="glyphicon glyphicon-remove"></span></a></th>
+												<th style="display:none"><a class="edit-seat-solicitude" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
+												<th style="display:none"><a class="delete-seat-solicitude" href="#"><span class="glyphicon glyphicon-remove"></span></a></th>
 											</tr>
 										@endif
 									</tbody>

@@ -22,7 +22,7 @@
             {{$solicitude->state->nombre}}
             </span>
            @if($solicitude->state->idestado == PENDIENTE && $solicitude->derived == 1)
-            <span class="label" style='margin-left:2px ;background-color: {{$solicitude->state->color}}'>DERIVADO</span>
+            <span class="label" style='margin-left:2px ;background-color: {{$solicitude->state->color}}'>{{ESTADO_D}}</span>
            @endif
         </td>
         <td style="text-align: center">{{ date_format(date_create($solicitude->created_at), 'd/m/Y' )}}</td>
