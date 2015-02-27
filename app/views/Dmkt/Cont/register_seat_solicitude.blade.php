@@ -6,7 +6,12 @@
 				<h3 class="panel-title"><strong>Generar Asiento de Solicitud</strong></h3><strong class="user">Usuario : {{Auth::user()->username}}</strong>
 			</div>
 			<div class="panel-body">
-				<section class="row reg-expense" style="margin:0">
+				<aside class="row reg-expense" style="margin-bottom: 0.5em;">
+					<div class="col-xs-12 col-sm-6 col-md-4">
+						<a id="detail_solicitude"><span id="text_solicitude">Mostrar </span>Detalle de Solicitud <span class="glyphicon glyphicon-chevron-down"></span></a>
+					</div>
+				</aside>
+				<section id="collapseOne" class="row reg-expense collapse" style="margin:0">
 					<div class="col-xs-12 col-sm-6 col-md-4">
 						<div class="form-expense">
 							<label>Código de la Solicitud</label>
