@@ -13,6 +13,11 @@
                     <i class="fa fa-user"></i> Fondos Institucionales
                 </a>
             </li>
+            <li>
+                <a href="#mantenimiento" role="tab" data-toggle="tab">
+                    <i class="fa fa-user"></i> Mantenimiento de Documentos
+                </a>
+            </li>
         </ul>
         <div class="tab-content">
             <!-- Solicitudes -->
@@ -84,6 +89,24 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Mantenimiento de Documentos -->
+
+            <div class="tab-pane fade" id="mantenimiento">
+                <div class="panel panel-default">
+                    <div class="panel-body panel-default table_document_contabilidad">
+                        <div id="" class="form-group col-xs-6 col-sm-3 col-md-3">
+                            
+                        </div>
+                        
+                        <!-- Table -->
+                        
+                    </div>
+                </div>
+            </div>
+
+            <!-- -->
+
         </div>
     </div>
 </div>

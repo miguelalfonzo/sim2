@@ -108,7 +108,7 @@
 				<div style="padding:0 15px">
 					<div class="panel panel-info">
 						<div class="panel-heading">
-							<span class="text-left">Número de Items</span>
+							<span class="text-left">Detalle del Comprobante</span>
 						</div>
 						<div class="panel-body">
 							<div class="table-responsive">

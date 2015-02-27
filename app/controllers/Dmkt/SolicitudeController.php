@@ -515,10 +515,12 @@ class SolicitudeController extends BaseController
         $typePayments = TypePayment::all();
         $managers = Manager::all();
         $fondos = Fondo::all();
+
         foreach($solicitude->families as $v)
         {
             $gerentes[] = $v->marca->manager;
         }
+
         $data = array(
             'solicitude' => $solicitude,
             'managers' => $managers,
