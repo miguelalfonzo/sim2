@@ -14,9 +14,11 @@ use Common/Fondo;
 |
 */
 
+/* TEST */
 Route::get('test', array('uses' => 'Dmkt\LoginController@test'));
-
+Route::get('set_status', array('uses' => 'BaseController@setStatus'));
 Route::get('sendmail', array('uses' => 'BaseController@postman'));
+/* TEST */
 
 /** Login */
 Route::get('/', array('uses' => 'Dmkt\LoginController@showLogin'));

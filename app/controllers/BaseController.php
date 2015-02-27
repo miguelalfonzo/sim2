@@ -1,5 +1,7 @@
 <?php
 
+use \System\SolicitudeHistory;
+
 class BaseController extends Controller {
 
     /**
@@ -83,6 +85,23 @@ class BaseController extends Controller {
         // {
         //     $message->to('manueltemple@gmail.com', 'Manuel Temple')->subject('Hello!');
         // });
+    }
+
+    public function setStatus(){
+        $this->updateStatusSolicitude("SOLICITUD PENDIENTE DE REVISION", "NINGUNO", "PENDIENTE", "NINGUNO", "RM", "1", 0);
+    }
+
+    public function updateStatusSolicitude($description, $status_from, $status_to, $user_from, $user_to, $idsolicitude, $notified){
+        $statusSolicitude               = new SolicitudeHistory;
+        $statusSolicitude->id           = $statusSolicitude->lastId();
+        $statusSolicitude->description  = $description;
+        $statusSolicitude->status_from  = $status_from;
+        $statusSolicitude->status_to    = $status_to;
+        $statusSolicitude->user_from    = $user_from;
+        $statusSolicitude->user_to      = $user_to;
+        $statusSolicitude->idsolicitude = $idsolicitude;
+        $statusSolicitude->notified     = $notified;
+        return $statusSolicitude->save();
     }
 
 }
