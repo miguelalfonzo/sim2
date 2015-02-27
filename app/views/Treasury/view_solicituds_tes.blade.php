@@ -18,10 +18,10 @@
                 <input type="hidden" id="sol_token" value="{{$solicitude->token}}">
                 @if(!is_null($solicitude->response))
                     @if($solicitude->response->type == 'R')
-                    <input type="hidden" value="{{$solicitude->response->Rm->nombres}}" class="benef">
+                    <input type="hidden" value="{{$solicitude->response->Rm->nombres.' '.$solicitude->response->Rm->apellidos}}" class="benef">
                     <input type="hidden" value="{{$solicitude->titulo}}" class="sol_titulo">
-                    @elseif($solicitude->response->type == 'S')
-                    <input type="hidden" value="{{$solicitude->response->Sup->nombres}}" class="benef">
+                    @elseif($solicitude->response->type == 'AG')
+                    <input type="hidden" value="{{$solicitude->response->person->nombres.' '.$solicitude->response->person->apellidos}}" class="benef">
                     <input type="hidden" value="{{$solicitude->titulo}}" class="sol_titulo">
                     @else
                     <input type="hidden" value="Usuario no autorizado" class="benef">
