@@ -189,7 +189,6 @@ class SolicitudeController extends BaseController
             $solicitude->estado = PENDIENTE;
             if ($solicitude->save()) 
             {
-                dd($solicitude);die();
                 $data = array(
                     'name' => $inputs['titulo'],
                     'description' => $inputs['description'],
