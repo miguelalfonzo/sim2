@@ -75,10 +75,10 @@
                                 @if(!is_null($solicitude->iduser))
                                     @if($solicitude->user->type == 'R')
                                     <span class="input-group-addon">Representante Medico</span>
-                                    <input id="textinput" type="text" value="{{$solicitude->user->rm->nombres}}" class="form-control input-md" readonly>
+                                    <input id="textinput" type="text" value="{{$solicitude->user->rm->nombres.' '.$solicitude->user->rm->apellidos}}" class="form-control input-md" readonly>
                                     @elseif($solicitude->user->type == 'S')
                                     <span class="input-group-addon">Supervisor</span>
-                                    <input id="textinput" type="text" value="{{$solicitude->user->sup->nombres}}" class="form-control input-md" readonly>
+                                    <input id="textinput" type="text" value="{{$solicitude->user->sup->nombres.' '.$solicitude->user->sup->apellidos}}" class="form-control input-md" readonly>
                                     @else
                                     <span class="input-group-addon">$solicitude->user->type</span>
                                     <input id="textinput" type="text" value="Usuario no autorizado" class="form-control input-md" readonly>
