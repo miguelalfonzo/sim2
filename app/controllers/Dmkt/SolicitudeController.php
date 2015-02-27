@@ -189,7 +189,6 @@ class SolicitudeController extends BaseController
             $solicitude->estado = PENDIENTE;
             if ($solicitude->save()) 
             {
-                dd($solicitude);die();
                 $data = array(
                     'name' => $inputs['titulo'],
                     'description' => $inputs['description'],
@@ -516,10 +515,12 @@ class SolicitudeController extends BaseController
         $typePayments = TypePayment::all();
         $managers = Manager::all();
         $fondos = Fondo::all();
+
         foreach($solicitude->families as $v)
         {
             $gerentes[] = $v->marca->manager;
         }
+
         $data = array(
             'solicitude' => $solicitude,
             'managers' => $managers,

@@ -380,6 +380,7 @@ function newSolicitude() {
                     message1 = 'Actualizando';
                     message2 = '<strong style="color: green">Solicitud Actualizada</strong>'
                 }
+                console.log(rute, formData);
                 $.ajax(
                 {
                     url: server + rute,
@@ -394,6 +395,7 @@ function newSolicitude() {
                     }
                 }).done(function (data)
                 {
+                    console.log(data);
                     $.unblockUI();
                     if (data == 'R') {
                         bootbox.alert(message2, function() {

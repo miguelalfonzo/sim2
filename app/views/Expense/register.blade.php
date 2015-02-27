@@ -10,7 +10,12 @@
 			@endif
 		</div>
 		<div class="panel-body">
-			<section class="row reg-expense" style="margin:0">
+			<aside class="row reg-expense" style="margin-bottom: 0.5em;">
+				<div class="col-xs-12 col-sm-6 col-md-4">
+					<a id="detail_solicitude"><span id="text_solicitude">Ocultar </span>Detalle de Solicitud <span class="glyphicon glyphicon-chevron-up"></span></a>
+				</div>
+			</aside>
+			<section id="collapseOne" class="row reg-expense collapse in" style="margin:0">
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Solicitud</label>
@@ -54,6 +59,11 @@
 					      	<input id="balance" class="form-control" type="text" value="{{$balance}}" disabled>
 					    </div>
 					</div>
+				</div>
+			</section>
+			<section class="row reg-expense" style="margin:0">
+				<div class="col-md-12">
+					<hr>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
@@ -112,7 +122,7 @@
 				<div style="padding:0 15px">
 					<div class="panel panel-info">
 						<div class="panel-heading">
-							<span class="text-left">Número de Items</span>
+							<span class="text-left">Detalle del Comprobante</span>
 						</div>
 						<div class="panel-body">
 							<div class="table-responsive">

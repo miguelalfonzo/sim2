@@ -8,10 +8,10 @@
 			<div class="panel-body">
 				<aside class="row reg-expense" style="margin-bottom: 0.5em;">
 					<div class="col-xs-12 col-sm-6 col-md-4">
-						<a id="detail_solicitude"><span id="text_solicitude">Mostrar </span>Detalle de Solicitud <span class="glyphicon glyphicon-chevron-down"></span></a>
+						<a id="detail_solicitude"><span id="text_solicitude">Ocultar </span>Detalle de Solicitud <span class="glyphicon glyphicon-chevron-up"></span></a>
 					</div>
 				</aside>
-				<section id="collapseOne" class="row reg-expense collapse" style="margin:0">
+				<section id="collapseOne" class="row reg-expense collapse in" style="margin:0">
 					<div class="col-xs-12 col-sm-6 col-md-4">
 						<div class="form-expense">
 							<label>Código de la Solicitud</label>
