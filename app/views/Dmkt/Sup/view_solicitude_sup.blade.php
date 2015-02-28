@@ -93,10 +93,10 @@
                     <select id="sub_type_activity" name="sub_type_activity" class="form-control">
                         @foreach($fondos as $sub)
                             @if(isset($solicitude->idfondo) && $sub->idfondo == $solicitude->subtype->idfondo)
-                                <option selected value="{{$sub->idfondo}}">{{$sub->nombre_mkt}}</option>
+                                <option selected value="{{$sub->idfondo}}">{{$sub->nombre_mkt}} -> {{$sub->saldo}}</option>
                             @else
                                 @if($sub->idfondo == FONDO_SUPERVISOR)
-                                <option value="{{$sub->idfondo}}">{{$sub->nombre_mkt}}</option>
+                                <option value="{{$sub->idfondo}}">{{$sub->nombre_mkt}} -> {{$sub->saldo}}</option>
                                 @endif
                             @endif
                         @endforeach
@@ -105,7 +105,7 @@
                     <select id="sub_type_activity" name="sub_type_activity" class="form-control" disabled>
                         @foreach($fondos as $sub)
                             @if($solicitude->idfondo == $sub->idfondo)
-                                <option selected value="{{$sub->idfondo}}">{{$sub->nombre_mkt}}</option>
+                                <option selected value="{{$sub->idfondo}}">{{$sub->nombre_mkt}} -> {{$sub->saldo}}</option>
                             @endif
                         @endforeach
                     </select>

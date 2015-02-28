@@ -1112,6 +1112,12 @@ class SolicitudeController extends BaseController
             $family->update($data);
             $i++;
         }
+        $fondo_aux = Fondo::where('idfondo', $sol->idfondo)->first();
+        $saldo = $fondo_aux->saldo;
+        $fondo = Fondo::where('idfondo', $sol->idfondo);
+        $fondo->saldo = $saldo - $sol->monto;
+        $data = $this->objectToArray($fondo);
+        $fondo->update($data);
 
        return 'ok';
     }
