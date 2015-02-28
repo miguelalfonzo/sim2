@@ -106,6 +106,9 @@ class DepositController extends BaseController{
         return $view;
     }
 
+    /**
+     * idkc2015 - cambio de estado a depositado
+     */
     public function depositSolicitudeTes()
     {
         $deposit = Input::all();
@@ -142,7 +145,7 @@ class DepositController extends BaseController{
             return 0;
         }
     }
-
+    
     public function depositFondoTes(){
         $deposit = Input::all();
         try {

@@ -378,6 +378,9 @@ class ExpenseController extends BaseController{
 		}
 	}
 
+	/**
+	 * idkc2015 - cambio de estado a registrado
+	 */
 	public function finishExpense($token){
 		Log::error('finishExpense');
 		$solicitude  = Solicitude::where('token',$token)->update(array('estado'=>REGISTRADO));
