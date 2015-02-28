@@ -905,6 +905,7 @@ class SolicitudeController extends BaseController
 
     }
 
+    //idkc2015 cambio de estado -> de aceptado a aprobado
     public function acceptedSolicitudeGerProd()
     {
 
@@ -991,6 +992,9 @@ class SolicitudeController extends BaseController
         }
     }
 
+    /**
+     * idkc2015 - cambio de estado a Cancelado
+     */
     public function denySolicitudeGerProd()
     {
 
@@ -1120,6 +1124,9 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.GerCom.view_solicitude_gercom',$info);
     }
 
+    /**
+     * idkc2015 - solicitud aprobada
+     */
     public function approvedSolicitude()
     {
 
@@ -1155,6 +1162,9 @@ class SolicitudeController extends BaseController
     public function redirectApprovedSolicitude(){
         return Redirect::to('show_gercom')->with('state',APROBADO);
     }
+    /**
+     * idkc2015 - cambio de estado a Cancelado
+     */
     public function denySolicitudeGerCom()
     {
         $inputs = Input::all();
@@ -1558,6 +1568,9 @@ class SolicitudeController extends BaseController
         
     }
 
+    /**
+     * idkc2015 - cambio de estado a generado
+     */
     public function saveSeatExpense(){
         try
         {
@@ -1753,6 +1766,9 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.Cont.register_seat_expense', $data);
     }
 
+    /**
+     * idkc2015 - gasto habilitado
+     */
     public function generateSeatSolicitude()
     {   
         try
@@ -1792,6 +1808,9 @@ class SolicitudeController extends BaseController
         return json_encode($middleRpta);
     }
 
+    /**
+     * idkc2015 - cambio a generado
+     */
     public function generateSeatExpense()
     {
         $inputs = Input::all();
@@ -1804,6 +1823,9 @@ class SolicitudeController extends BaseController
         return 0;
     }
 
+    /**
+     * idkc2015 cambio de estado - de aprobado a deposito habilitado
+     */
     public function enableDeposit()
     {
         $inputs = Input::all();
@@ -1896,6 +1918,9 @@ class SolicitudeController extends BaseController
         return $rpta;
     }
 
+    /**
+     * idkc2015 - habilitar responsable - responsable habilitado
+     */
     public function asignarResponsableSolicitud()
     {
         try
