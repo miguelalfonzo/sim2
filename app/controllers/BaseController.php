@@ -88,12 +88,12 @@ class BaseController extends Controller {
     }
 
     public function setStatus(){
-        $this->updateStatusSolicitude("SOLICITUD PENDIENTE DE REVISION", "NINGUNO", "PENDIENTE", "NINGUNO", "RM", "1", 0);
+        $this->updateStatusSolicitude('PENDIENTE DE REVISIONhollll', 'NINGUNO', 'PENDIENTE', 'NINGUNO', 'RM', 1, 0);
     }
 
     public function updateStatusSolicitude($description, $status_from, $status_to, $user_from, $user_to, $idsolicitude, $notified){
         $statusSolicitude               = new SolicitudeHistory;
-        $statusSolicitude->id           = $statusSolicitude->lastId();
+        $statusSolicitude->id           = $statusSolicitude->lastId()+1;
         $statusSolicitude->description  = $description;
         $statusSolicitude->status_from  = $status_from;
         $statusSolicitude->status_to    = $status_to;
