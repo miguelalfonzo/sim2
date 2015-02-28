@@ -189,17 +189,15 @@ class SolicitudeController extends BaseController
             $solicitude->estado = PENDIENTE;
             if ($solicitude->save()) 
             {
+                $user = User::where('id', Auth::user()->id)->first();
+                $this->setStatus($solicitude->titulo .' - '. $solicitude->descripcion, '', $solicitude->estado, '', $user->type, $aux_idsol);
                 $data = array(
                     'name' => $inputs['titulo'],
                     'description' => $inputs['description'],
                     'monto' => $inputs['monto'],
                     'money' => $inputs['money']
                 );
-                /*
-                Mail::send('emails.template', $data, function ($message) {
-                    $message->to('cesarhm1687@gmail.com');
-                    $message->subject('Nueva Solicitud');
-                });*/
+                
                 $clients = $inputs['clients'];
                 foreach ($clients as $client) 
                 {
@@ -396,13 +394,16 @@ class SolicitudeController extends BaseController
     public function cancelSolicitude()
     {
 
-        $inputs = Input::all();
-        $id = $inputs['idsolicitude'];
-        $solicitude = Solicitude::where('idsolicitud', $id);
+        $inputs             = Input::all();
+        $id                 = $inputs['idsolicitude'];
+        $solicitude         = Solicitude::where('idsolicitud', $id);
+        $oldOolicitude      = Solicitude::where('idsolicitud', $id)->first();
+        $oldStatus          = $oldOolicitude->estado;
         $solicitude->estado = CANCELADO;
-        $data = $this->objectToArray($solicitude);
+        $data               = $this->objectToArray($solicitude);
         $solicitude->update($data);
-
+        $user = User::where('id', Auth::user()->id)->first();
+        $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, CANCELADO, $user->type, $user->type, $id);
         return $this->listSolicitude(PENDIENTE);
 
     }
@@ -613,6 +614,11 @@ class SolicitudeController extends BaseController
 
         $inputs = Input::all();
         $id = $inputs['idsolicitude'];
+        
+        $oldOolicitude      = Solicitude::where('idsolicitud', $id)->first();
+        $oldStatus          = $oldOolicitude->estado;
+        $idSol              = $oldOolicitude->idsolicitud;
+
         $solicitude = Solicitude::where('idsolicitud', $id);
         $solicitude->idsolicitud = (int)$id;
         $solicitude->observacion = $inputs['observacion'];
@@ -620,6 +626,10 @@ class SolicitudeController extends BaseController
         $solicitude->blocked = 0;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
+
+        $user = User::where('id', Auth::user()->id)->first();
+        $userTo = User::where('id', $oldOolicitude->iduser)->first();
+        $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, RECHAZADO, $user->type, $userTo->type, $idSol);
         return Redirect::to('show_sup')->with('state', RECHAZADO);
 
     }
@@ -628,31 +638,35 @@ class SolicitudeController extends BaseController
     {
 
         $inputs = Input::all();
+            
+        $idSol = $inputs['idsolicitude'];
+        $oldOolicitude      = Solicitude::where('idsolicitud', $idSol)->first();
+        $oldStatus          = $oldOolicitude->estado;
 
-            $idSol = $inputs['idsolicitude'];
-            $solicitude = Solicitude::where('idsolicitud', $idSol);
-            $solicitude->estado = ACEPTADO;
-            $solicitude->idaproved = Auth::user()->id;
-            $solicitude->monto = $inputs['monto'];
-            $solicitude->idfondo = $inputs['sub_type_activity'];
-            $solicitude->observacion = $inputs['observacion'];
-            $solicitude->blocked = 0;
-            $data = $this->objectToArray($solicitude);
-            $solicitude->update($data);
+        $solicitude = Solicitude::where('idsolicitud', $idSol);
+        $solicitude->estado = ACEPTADO;
+        $solicitude->idaproved = Auth::user()->id;
+        $solicitude->monto = $inputs['monto'];
+        $solicitude->idfondo = $inputs['sub_type_activity'];
+        $solicitude->observacion = $inputs['observacion'];
+        $solicitude->blocked = 0;
+        $data = $this->objectToArray($solicitude);
+        $solicitude->update($data);
 
-            $amount_assigned = $inputs['amount_assigned'];
-            $families = SolicitudeFamily::where('idsolicitud', $idSol)->get();
-            $i = 0;
-            foreach ($families as $fam) {
-                $family = SolicitudeFamily::where('idsolicitud_familia', $fam->idsolicitud_familia);
-                $family->monto_asignado = $amount_assigned[$i];
-                $data = $this->objectToArray($family);
-                $family->update($data);
-                $i++;
-            }
-            return 'ok';
+        $amount_assigned = $inputs['amount_assigned'];
+        $families = SolicitudeFamily::where('idsolicitud', $idSol)->get();
+        $i = 0;
+        foreach ($families as $fam) {
+            $family = SolicitudeFamily::where('idsolicitud_familia', $fam->idsolicitud_familia);
+            $family->monto_asignado = $amount_assigned[$i];
+            $data = $this->objectToArray($family);
+            $family->update($data);
+            $i++;
+        }
 
-
+        $user = User::where('id', Auth::user()->id)->first();
+        $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, ACEPTADO, $user->type, $user->type, $idSol);
+        return 'ok';
     }
    public function redirectAcceptedSolicitude(){
        return Redirect::to('show_sup')->with('state', ACEPTADO);
@@ -660,10 +674,15 @@ class SolicitudeController extends BaseController
 
     public function derivedSolicitude($token,$derive=0)
     {   
+        $oldOolicitude      = Solicitude::where('token', $token)->first();
+        $oldStatus          = $oldOolicitude->estado;
+        $idSol              = $oldOolicitude->idsolicitud;
+
         Solicitude::where('token', $token)->update(array('derived' => 1 , 'blocked' => 0));
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $id = $solicitude->idsolicitud;
         $sol = Solicitude::find($id);
+        $user = User::where('id', Auth::user()->id)->first();
         foreach ($sol->families as $v) 
         {
             $solGer = new SolicitudeGer;
@@ -671,8 +690,10 @@ class SolicitudeController extends BaseController
             $solGer->idsolicitud = $id;
             $solGer->idgerprod = $v->marca->manager->id;
             $solGer->save();
-
+            $userTo = User::where('id', $v->marca->manager->iduser)->first();
+            $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, DERIVADO, $user->type, $userTo->type, $idSol);
         }
+
         return Redirect::to('show_sup');
     }
 
@@ -766,10 +787,20 @@ class SolicitudeController extends BaseController
 
         $inputs = Input::all();
         $id = $inputs['idsolicitude'];
+        
+        $oldOolicitude      = Solicitude::where('idsolicitud', $id)->first();
+        $oldStatus          = $oldOolicitude->estado;
+        $idSol              = $oldOolicitude->idsolicitud;
+
         $solicitude = Solicitude::where('idsolicitud', $id);
         $solicitude->estado = CANCELADO;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
+
+
+        $user = User::where('id', Auth::user()->id)->first();
+        $userTo = User::where('id', $oldOolicitude->iduser)->first();
+        $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, CANCELADO, $user->type, $userTo->type, $idSol);
         return $this->listSolicitudeSup(PENDIENTE);
 
     }
@@ -972,6 +1003,11 @@ class SolicitudeController extends BaseController
 
         $inputs = Input::all();
         $id = $inputs['idsolicitude'];
+
+        $oldOolicitude      = Solicitude::where('idsolicitud', $id)->first();
+        $oldStatus          = $oldOolicitude->estado;
+        $idSol              = $oldOolicitude->idsolicitud;
+
         $solicitude = Solicitude::where('idsolicitud', $id);
         $solicitude->idsolicitud = (int)$id;
         $solicitude->idaproved = Auth::user()->id;
@@ -980,6 +1016,10 @@ class SolicitudeController extends BaseController
         $solicitude->estado = RECHAZADO;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
+
+        $user = User::where('id', Auth::user()->id)->first();
+        $userTo = User::where('id', $oldOolicitude->iduser)->first();
+        $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, RECHAZADO, $user->type, $userTo->type, $idSol);
         return Redirect::to('show_gerprod')->with('state', RECHAZADO);
 
     }

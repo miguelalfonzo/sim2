@@ -17,6 +17,7 @@ define('GENERADO', 7);
 define('CANCELADO', 8);
 define('RECHAZADO', 9);
 define('BLOQUEADO', 10);
+define('DERIVADO', 11);
 /*
 |--------------------------------------------------------------------------
 | Register The Laravel Class Loader

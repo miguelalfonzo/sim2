@@ -87,8 +87,9 @@ class BaseController extends Controller {
         // });
     }
 
-    public function setStatus(){
-        $this->updateStatusSolicitude('PENDIENTE DE REVISIONhollll', 'NINGUNO', 'PENDIENTE', 'NINGUNO', 'RM', 1, 0);
+    public function setStatus($description, $status_from, $status_to, $user_from, $user_to, $idsolicitude){
+        //$this->updateStatusSolicitude('PENDIENTE DE REVISIONhollll', 'NINGUNO', 'PENDIENTE', 'NINGUNO', 'RM', 1, 0);
+        $this->updateStatusSolicitude($description, $status_from, $status_to, $user_from, $user_to, $idsolicitude, 0);
     }
 
     public function updateStatusSolicitude($description, $status_from, $status_to, $user_from, $user_to, $idsolicitude, $notified){

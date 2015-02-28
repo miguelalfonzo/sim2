@@ -497,15 +497,15 @@ class ExpenseController extends BaseController{
 
     }
 
-	public function test(){
- 		// 	$html = View::make('Expense.report');
-		// return PDF::load($html, 'A4', 'landscape')->show();
-		// $solicituds = Solicitude::where('estado', '=', APROBADO)->where('asiento','=',1)->get();
-		// echo json_encode($solicituds);die;
-			$data = TypeRetention::all();
-			$data = "↵												LUCY ALFARO asdasdadasdad											";
-			echo trim($data,"↵");
-	}
+	// public function test(){
+ // 		// 	$html = View::make('Expense.report');
+	// 	// return PDF::load($html, 'A4', 'landscape')->show();
+	// 	// $solicituds = Solicitude::where('estado', '=', APROBADO)->where('asiento','=',1)->get();
+	// 	// echo json_encode($solicituds);die;
+	// 		$data = TypeRetention::all();
+	// 		$data = "↵												LUCY ALFARO asdasdadasdad											";
+	// 		echo trim($data,"↵");
+	// }
 
 	public function manageDocument()
 	{
