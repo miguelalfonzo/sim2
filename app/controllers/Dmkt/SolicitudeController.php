@@ -189,8 +189,7 @@ class SolicitudeController extends BaseController
             $solicitude->estado = PENDIENTE;
             if ($solicitude->save()) 
             {
-                $user = User::where('id', Auth::user()->id)->first();
-                $this->setStatus($solicitude->titulo .' - '. $solicitude->descripcion, '', $solicitude->estado, '', $user->type, $aux_idsol);
+                $this->setStatus($solicitude->titulo .' - '. $solicitude->descripcion, '', PENDIENTE, Auth::user()->id, Auth::user()->id, $aux_idsol);
                 $data = array(
                     'name' => $inputs['titulo'],
                     'description' => $inputs['description'],
@@ -402,8 +401,8 @@ class SolicitudeController extends BaseController
         $solicitude->estado = CANCELADO;
         $data               = $this->objectToArray($solicitude);
         $solicitude->update($data);
-        $user = User::where('id', Auth::user()->id)->first();
-        $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, CANCELADO, $user->type, $user->type, $id);
+
+        $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, CANCELADO, Auth::user()->id, $oldOolicitude->iduser, $id);
         return $this->listSolicitude(PENDIENTE);
 
     }
@@ -627,9 +626,7 @@ class SolicitudeController extends BaseController
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
 
-        $user = User::where('id', Auth::user()->id)->first();
-        $userTo = User::where('id', $oldOolicitude->iduser)->first();
-        $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, RECHAZADO, $user->type, $userTo->type, $idSol);
+        $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, RECHAZADO, Auth::user()->id,  $oldOolicitude->iduser, $idSol);
         return Redirect::to('show_sup')->with('state', RECHAZADO);
 
     }
@@ -665,7 +662,7 @@ class SolicitudeController extends BaseController
         }
 
         $user = User::where('id', Auth::user()->id)->first();
-        $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, ACEPTADO, $user->type, $user->type, $idSol);
+        $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, ACEPTADO, Auth::user()->id, Auth::user()->id, $idSol);
         return 'ok';
     }
    public function redirectAcceptedSolicitude(){
@@ -682,7 +679,7 @@ class SolicitudeController extends BaseController
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $id = $solicitude->idsolicitud;
         $sol = Solicitude::find($id);
-        $user = User::where('id', Auth::user()->id)->first();
+        
         foreach ($sol->families as $v) 
         {
             $solGer = new SolicitudeGer;
@@ -690,8 +687,7 @@ class SolicitudeController extends BaseController
             $solGer->idsolicitud = $id;
             $solGer->idgerprod = $v->marca->manager->id;
             $solGer->save();
-            $userTo = User::where('id', $v->marca->manager->iduser)->first();
-            $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, DERIVADO, $user->type, $userTo->type, $idSol);
+            $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, DERIVADO, Auth::user()->id, $v->marca->manager->iduser, $idSol);
         }
 
         return Redirect::to('show_sup');
@@ -797,10 +793,7 @@ class SolicitudeController extends BaseController
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
 
-
-        $user = User::where('id', Auth::user()->id)->first();
-        $userTo = User::where('id', $oldOolicitude->iduser)->first();
-        $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, CANCELADO, $user->type, $userTo->type, $idSol);
+        $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, CANCELADO, Auth::user()->id, $oldOolicitude->iduser, $idSol);
         return $this->listSolicitudeSup(PENDIENTE);
 
     }
@@ -1017,9 +1010,7 @@ class SolicitudeController extends BaseController
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
 
-        $user = User::where('id', Auth::user()->id)->first();
-        $userTo = User::where('id', $oldOolicitude->iduser)->first();
-        $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, RECHAZADO, $user->type, $userTo->type, $idSol);
+        $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, RECHAZADO, Auth::user()->id, $oldOolicitude->iduser, $idSol);
         return Redirect::to('show_gerprod')->with('state', RECHAZADO);
 
     }

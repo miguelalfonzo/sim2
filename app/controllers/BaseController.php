@@ -87,9 +87,12 @@ class BaseController extends Controller {
         // });
     }
 
-    public function setStatus($description, $status_from, $status_to, $user_from, $user_to, $idsolicitude){
-        //$this->updateStatusSolicitude('PENDIENTE DE REVISIONhollll', 'NINGUNO', 'PENDIENTE', 'NINGUNO', 'RM', 1, 0);
-        $this->updateStatusSolicitude($description, $status_from, $status_to, $user_from, $user_to, $idsolicitude, 0);
+    public function setStatus($description, $status_from, $status_to, $user_from_id, $user_to_id, $idsolicitude){
+        $fromStatus = State::where('idestado', $status_from);
+        $toStatus = State::where('idestado', $status_to);
+        $fromUser = User::where('id', $user_from_id)->first();
+        $toUser = User::where('id', $user_to_id)->first();
+        $this->updateStatusSolicitude($description, $fromStatus, $toStatus, $fromUser->type, $toUser->type, $idsolicitude, 0);
     }
 
     public function updateStatusSolicitude($description, $status_from, $status_to, $user_from, $user_to, $idsolicitude, $notified){
