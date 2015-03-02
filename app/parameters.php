@@ -74,3 +74,7 @@ const ESTADO_RA = "RETENCION Y ANTICIPO";
 const USER_CONTABILIDAD = 19;
 const USER_GERENTE_COMERCIAL = 17;
 const USER_TESORERIA = 20;
+
+// EMAIL DE PRUEBAS
+const POSTMAN_USER_EMAIL	= 'manueltemple@gmail.com';
+const POSTMAN_USER_NAME		= 'Manuel Temple';

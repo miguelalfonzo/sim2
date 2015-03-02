@@ -3,6 +3,7 @@
 use \System\SolicitudeHistory;
 use \User;
 use \Common\State;
+use \Dmkt\Solicitude;
 
 class BaseController extends Controller {
 
@@ -78,31 +79,39 @@ class BaseController extends Controller {
         return $rpta;
     }
 
-    public function postman($name, $idsolicitud, $description, $fromEstado, $toEstado, $fromName){
-        $data = array(
-            'fromUser'          => $fromName,
-            'description'       => $description,
-            'solicitud_estado'  => $toEstado,
-            'solicitud_id'      => $idsolicitud
-        );
+    public function postman($idsolicitud, $fromEstado, $toEstado){
+        $solicitud = Solicitude::where('idsolicitud', $idsolicitud)->first();
+        $msg= '';
         $subject = 'Solicitud N° '.$idsolicitud;
+
+        $data = array(
+            'solicitud_id'          => $idsolicitud,
+            'msg'                   => $msg,
+            'solicitud_estado'      => $toEstado,
+            'solicitud_titulo'      => $solicitud->titulo,
+            'solicitud_descripcion' => $solicitud->descripcion,
+            'solicitud_tipo_moneda' => $solicitud->typemoney->simbolo,
+            'solicitud_monto'       => $solicitud->monto
+        );
         Mail::send('emails.notification', $data, function($message) use ($subject){
-            $message->to('jatuncar@bagoperu.com.pe', 'José Atuncar')->subject($subject);
+            $message->to(POSTMAN_USER_EMAIL, POSTMAN_USER_NAME)->subject($subject);
         });
     }
 
     public function setStatus($description, $status_from, $status_to, $user_from_id, $user_to_id, $idsolicitude){
         $fromStatus = State::where('idestado', $status_from)->first();
-        $toStatus = State::where('idestado', $status_to)->first();
+        $toStatus   = State::where('idestado', $status_to)->first();
 
-        $fromUser = User::where('id', $user_from_id)->first();
-        $toUser = User::where('id', $user_to_id)->first();
+        $fromUser   = User::where('id', $user_from_id)->first();
+        $toUser     = User::where('id', $user_to_id)->first();
 
-        $toName = $toUser->getName();
-        $fromName = $fromUser != null ? $fromUser->getName() : '';
+        //$toName         = $toUser->getName();
+        //$fromName       = $fromUser != null ? $fromUser->getName() : '';
         $statusNameFrom = $fromStatus == null ? '' : $fromStatus->nombre;
-        $statusNameTo = $toStatus == null ? '' : $toStatus->nombre;
-        $this->postman($idsolicitude, $description, $statusNameFrom, $statusNameTo, $fromName);
+        $statusNameTo   = $toStatus == null ? '' : $toStatus->nombre;
+        
+        // POSTMAN: send email
+        $this->postman($idsolicitude, $statusNameFrom, $statusNameTo);
         
         $idestadoFrom = $fromStatus == null ? null : $fromStatus->idestado;
         $idestadoTo = $toStatus == null ? null : $toStatus->idestado;

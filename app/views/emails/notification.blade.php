@@ -1,5 +1,6 @@
-<h1>Solicitud N° {{ $solicitud_id}}: {{ $estado }}</h1>
- 
-<p>{{ $solicitud_nombre }}</p>
+<h1>Solicitud N° {{ $solicitud_id}}: {{ $solicitud_estado }}</h1>
+
+<p>{{ $msg }}</p> 
+<p>{{ $solicitud_titulo }}</p>
 <p>{{ $solicitud_descripcion }}</p>
-<p>{{ $solicitud_monto }}</p>
+<p>Monto: {{ $solicitud_tipo_moneda }} {{ $solicitud_monto }}</p>
