@@ -215,7 +215,11 @@ class SolicitudeController extends BaseController
                     $solicitude_families->idfamilia = $family;
                     $solicitude_families->save();
                 }
-                $this->setStatus($solicitude->titulo .' - '. $solicitude->descripcion, '', PENDIENTE, Auth::user()->id, Auth::user()->id, $aux_idsol);
+                //$userSup = ;
+                $userRm     = User::where('id', Auth::user()->id)->first();
+                $sup    = Sup::where('idsup', $userRm->rm->idsup)->first();
+
+                $this->setStatus($solicitude->titulo .' - '. $solicitude->descripcion, '', PENDIENTE, Auth::user()->id, $sup->iduser, $aux_idsol);
                 return $typeUser;
             }
         }
