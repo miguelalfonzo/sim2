@@ -126,7 +126,7 @@ $(function(){
             calcularBalance();
         });
         //Datepicker date all classes
-        //if(!($('.date>input:not([readonly]').length == 0)){
+        if(!($('.date>input:not([disabled]').length == 0)){
             var toDate = $(".date>input").val();
 
             $(".date").datepicker({
@@ -140,7 +140,7 @@ $(function(){
                 $(this).datepicker('hide');
             });
             $(".date").datepicker( "setDate" , typeof($("#last-date").val()) != 'undefined' ? $("#last-date").val() : toDate);
-        // }
+        }
         //Cancel the view button to register expense
         $("#cancel-expense").on("click",function(e){
             e.preventDefault();

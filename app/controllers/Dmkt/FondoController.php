@@ -404,7 +404,7 @@ class FondoController extends BaseController
     public function listDocuments()
     {
         $docs = ProofType::orderBy('idcomprobante')->get();
-        $view = View::make('DMKT.Cont.list_documents')->with('docs',$docs);
+        $view = View::make('Dmkt.Cont.list_documents')->with('docs',$docs);
         return $view;
     }
 }
