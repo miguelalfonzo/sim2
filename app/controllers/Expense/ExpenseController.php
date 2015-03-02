@@ -2,6 +2,7 @@
 
 namespace Expense;
 
+use \Auth;
 use \BaseController;
 use Dmkt\FondoInstitucional;
 use \View;
@@ -382,7 +383,7 @@ class ExpenseController extends BaseController{
 	public function finishExpense($token){
 		Log::error('finishExpense');
 
-		$oldOolicitude      = Solicitude::where('token',$deposit['token'])->first();
+		$oldOolicitude      = Solicitude::where('token',$token)->first();
         $oldStatus          = $oldOolicitude->estado;
         $idSol              = $oldOolicitude->idsolicitud;
 
