@@ -314,7 +314,7 @@ class ExpenseController extends BaseController{
 			$expenseEdit->monto = $inputs['total_expense'];
             if($inputs['proof_type'] == '1' || $inputs['proof_type'] == '4' || $inputs['proof_type'] == '6')
             {
-                if($inputs['igv'] || $inputs['imp_service'])
+                if(isset($inputs['igv']) || isset($inputs['imp_service']))
                 {
                     $expenseEdit->igv = $inputs['igv'];
                     $expenseEdit->imp_serv = $inputs['imp_service'];
@@ -339,28 +339,27 @@ class ExpenseController extends BaseController{
 	        $date = date("Y/m/d", $d);
 	        $expenseEdit->fecha_movimiento = $date;
 	        $expenseEdit->descripcion = $inputs['desc_expense'];
-	        
+	        if(isset($inputs['rep']))
+			{
+				if (is_numeric($inputs['rep']))
+				{
+					$expenseEdit->reparo = $inputs['rep'];
+				}
+			}
 	        $data = $this->objectToArray($expenseEdit);
 	        //Detail Expense
 			$quantity = $inputs['quantity'];
 			$description = $inputs['description'];
-			$reparo = array();
-			if(isset($inputs['rep']))
-			{
-				if (!empty($inputs['rep']))
-				{
-					$reparo = $inputs['rep'];
-				}
-			}
+			
 			// $type_expense = $expenseJson->type_expense;
-			$expenseEdit->reparo = $reparo;
+			
 			$total_item = $inputs['total_item'];
 
 			if($expenseEdit->update($data))
 			{
 				$expense_detail_edit = ExpenseItem::where('idgasto',$idgasto)->delete();
 				try {
-					DB::transaction (function() use ($idgasto,$quantity,$description,$total_item, $reparo){
+					DB::transaction (function() use ($idgasto,$quantity,$description,$total_item){
 						for($i=0;$i<count($quantity);$i++)
 						{
 							$expense_detail = new ExpenseItem;
@@ -373,6 +372,7 @@ class ExpenseController extends BaseController{
 						}
 					});
 				} catch (Exception $e) {
+					Log::error($e);
 					return 0;
 				}
 				return 1;
