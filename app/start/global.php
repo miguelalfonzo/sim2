@@ -18,6 +18,9 @@ define('CANCELADO', 8);
 define('RECHAZADO', 9);
 define('BLOQUEADO', 10);
 define('DERIVADO', 11);
+define('GASTO_HABILITADO', 12);
+define('DEPOSITO_HABILITADO', 13);
+define('RESPONSABLE_HABILITADO', 14);
 /*
 |--------------------------------------------------------------------------
 | Register The Laravel Class Loader

@@ -1,6 +1,8 @@
 <?php
 
 use \System\SolicitudeHistory;
+use \User;
+use \Common\State;
 
 class BaseController extends Controller {
 
@@ -76,22 +78,28 @@ class BaseController extends Controller {
         return $rpta;
     }
 
-    public function postman(){
-        $data = array('firstname'=>'Manuel');
-        Mail::send('emails.notification', $data, function($message){
-            $message->to('manueltemple@gmail.com', 'Manuel Temple')->subject('Hello!');
+    public function postman($name, $idsolicitud, $description, $fromEstado, $toEstado, $fromName){
+        $data = array(
+            'firstname'     => $name,
+            'fromUser'      => $fromName,
+            'description'   => $description .' | '.  $fromEstado .' - '. $toEstado .' |',
+            'idsolicitude'   => $idsolicitud
+        );
+        $subject = 'Solicitud N° '.$idsolicitud;
+        Mail::send('emails.notification', $data, function($message) use ($subject){
+            $message->to('manueltemple@gmail.com', 'Manuel Temple')->subject($subject);
         });
-        // Mail::send('emails.welcome', $data, function($message)
-        // {
-        //     $message->to('manueltemple@gmail.com', 'Manuel Temple')->subject('Hello!');
-        // });
     }
 
     public function setStatus($description, $status_from, $status_to, $user_from_id, $user_to_id, $idsolicitude){
         $fromStatus = State::where('idestado', $status_from);
         $toStatus = State::where('idestado', $status_to);
+        //dd($fromStatus);dd($toStatus);die();
         $fromUser = User::where('id', $user_from_id)->first();
         $toUser = User::where('id', $user_to_id)->first();
+        $toName = $toUser->getName();
+        $fromName = $fromUser != null ? $fromUser->getName() : '';
+        $this->postman($toName, $idsolicitude, $description, $status_from,   $status_to, $fromName);
         $this->updateStatusSolicitude($description, $fromStatus, $toStatus, $fromUser->type, $toUser->type, $idsolicitude, 0);
     }
 

@@ -378,14 +378,18 @@ class ExpenseController extends BaseController{
 		}
 	}
 
-	/**
-	 * idkc2015 - cambio de estado a registrado
-	 */
+	// IDKC: CHANGE STATUS => REGISTRADO
 	public function finishExpense($token){
 		Log::error('finishExpense');
+
+		$oldOolicitude      = Solicitude::where('token',$deposit['token'])->first();
+        $oldStatus          = $oldOolicitude->estado;
+        $idSol              = $oldOolicitude->idsolicitud;
+
 		$solicitude  = Solicitude::where('token',$token)->update(array('estado'=>REGISTRADO));
 		if(count($solicitude) == 1)
 		{
+			$this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, REGISTRADO, Auth::user()->id, USER_CONTABILIDAD, $idSol);
 			$states = State::orderBy('idestado', 'ASC')->get();
         	return Redirect::to('show_rm')->with('states', $states);
 		}

@@ -105,10 +105,8 @@ class DepositController extends BaseController{
         $view = View::make('Treasury.view_solicituds_tes')->with('solicituds', $solicituds);
         return $view;
     }
-
-    /**
-     * idkc2015 - cambio de estado a depositado
-     */
+    
+    // IDKC: CHANGE STATUS => DEPOSITADO
     public function depositSolicitudeTes()
     {
         $deposit = Input::all();
@@ -132,11 +130,18 @@ class DepositController extends BaseController{
                     
                     if($newDeposit->save())
                     {
+                        $oldOolicitude      = Solicitude::where('token',$deposit['token'])->first();
+                        $oldStatus          = $oldOolicitude->estado;
+                        $idSol              = $oldOolicitude->idsolicitud;
+
                         $solicitudeUpd             = Solicitude::where('token',$deposit['token']);
                         $solicitudeUpd->estado     = DEPOSITADO;
                         $solicitudeUpd->iddeposito = $id;
                         $data                      = $this->objectToArray($solicitudeUpd);
                         $solicitudeUpd->update($data);
+                        
+                        $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, DEPOSITADO, Auth::user()->id, USER_CONTABILIDAD, $idSol);
+                        //$this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, DEPOSITADO, Auth::user()->id, $oldOolicitude->iduser, $idSol);
                     }
                 }
             });

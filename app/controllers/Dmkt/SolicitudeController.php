@@ -905,12 +905,16 @@ class SolicitudeController extends BaseController
 
     }
 
-    //idkc2015 cambio de estado -> de aceptado a aprobado
+    // IDKC: CHANGE STATUS ACEPTADO => APROBADO
     public function acceptedSolicitudeGerProd()
     {
 
         $inputs = Input::all();
         $idSol = $inputs['idsolicitude'];
+
+        $oldOolicitude      = Solicitude::where('idsolicitud', $idSol)->first();
+        $oldStatus          = $oldOolicitude->estado;
+
         $solicitude = Solicitude::where('idsolicitud', $idSol);
         $solicitude->estado = ACEPTADO;
         $solicitude->idaproved = Auth::user()->id;
@@ -921,6 +925,8 @@ class SolicitudeController extends BaseController
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
 
+        $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, ACEPTADO, Auth::user()->id, USER_GERENTE_COMERCIAL, $idSol);
+        //$this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, ACEPTADO, Auth::user()->id, $oldOolicitude->iduser, $idSol);
         $amount_assigned = $inputs['amount_assigned'];
         $families = SolicitudeFamily::where('idsolicitud', $idSol)->get();
         $i = 0;
@@ -931,7 +937,8 @@ class SolicitudeController extends BaseController
             $family->update($data);
             $i++;
         }
-        //echo json_encode($families);die;
+        //echo json_encode($families);die;          // IDKC: sino sirve... borrar!
+        // IDKC: y si retorna error?
         return 'ok';
 
     }
@@ -992,9 +999,7 @@ class SolicitudeController extends BaseController
         }
     }
 
-    /**
-     * idkc2015 - cambio de estado a Cancelado
-     */
+    // IDKC: CHANGE STATUS => RECHAZADO
     public function denySolicitudeGerProd()
     {
 
@@ -1124,14 +1129,16 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.GerCom.view_solicitude_gercom',$info);
     }
 
-    /**
-     * idkc2015 - solicitud aprobada
-     */
+    // IDKC: CHANGE STATUS => APROBADA
     public function approvedSolicitude()
     {
 
         $inputs = Input::all();
         $token = $inputs['token'];
+        
+        $oldOolicitude      = Solicitude::where('token',$deposit['token'])->first();
+        $oldStatus          = $oldOolicitude->estado;
+        
         $sol = Solicitude::where('token', $token)->first();
         $idSol = $sol->idsolicitud;
         $solicitude = Solicitude::where('token', $token);
@@ -1157,18 +1164,24 @@ class SolicitudeController extends BaseController
         $data = $this->objectToArray($fondo);
         $fondo->update($data);
 
+        $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, APROBADO, Auth::user()->id, USER_CONTABILIDAD, $idSol);
+
        return 'ok';
     }
     public function redirectApprovedSolicitude(){
         return Redirect::to('show_gercom')->with('state',APROBADO);
     }
-    /**
-     * idkc2015 - cambio de estado a Cancelado
-     */
+
+    // IDKC: CHANGE STATUS => RECHAZADO
     public function denySolicitudeGerCom()
     {
         $inputs = Input::all();
         $id = $inputs['idsolicitude'];
+
+        $oldOolicitude      = Solicitude::where('idsolicitud', $id)->first();
+        $oldStatus          = $oldOolicitude->estado;
+        $idSol              = $oldOolicitude->idsolicitud;
+
         $solicitude = Solicitude::where('idsolicitud', $id);
         $solicitude->idsolicitud = (int)$id;
         $solicitude->idaproved = Auth::user()->id;
@@ -1177,6 +1190,9 @@ class SolicitudeController extends BaseController
         $solicitude->blocked = 0;
         $data = $this->objectToArray($solicitude);
         $solicitude->update($data);
+        
+        $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, RECHAZADO, Auth::user()->id, $oldOolicitude->iduser, $idSol);
+
         return Redirect::to('show_gercom')->with('state', RECHAZADO);
     }
 
@@ -1568,9 +1584,7 @@ class SolicitudeController extends BaseController
         
     }
 
-    /**
-     * idkc2015 - cambio de estado a generado
-     */
+    // IDKC: CHANGE STATUS => GENERADO
     public function saveSeatExpense(){
         try
         {
@@ -1613,10 +1627,17 @@ class SolicitudeController extends BaseController
                 $seat->save();
             }
             if($solicitudeId != null){
+                $oldOolicitude      = Solicitude::where('idsolicitud', $solicitudeId)->first();
+                $oldStatus          = $oldOolicitude->estado;
+                $idSol              = $oldOolicitude->idsolicitud;
+
                 Solicitude::where('idsolicitud', $solicitudeId )->update(array('estado' => ESTADO_GENERADO));
+
+                $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, ESTADO_GENERADO, Auth::user()->id, $oldOolicitude->iduser, $idSol);
                 DB::commit();
                 $result['msg'] = 'Asientos Registrados';
             }else if($fondoId != null){
+                // IDKC: FALTA NOTIFICACIONES EN FONDOS INSTITUCIONES
                 FondoInstitucional::where('idfondo', $fondoId)->update(array('asiento' => ASIENTO_FONDO_GASTO));
                 DB::commit();
                 $result['msg'] = 'Asientos Registrados';
@@ -1766,9 +1787,7 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.Cont.register_seat_expense', $data);
     }
 
-    /**
-     * idkc2015 - gasto habilitado
-     */
+    // IDKC: CHANGE STATUS => GASTO HABILITADO
     public function generateSeatSolicitude()
     {   
         try
@@ -1780,6 +1799,11 @@ class SolicitudeController extends BaseController
             {
                 $fec_origin = Solicitude::where('idsolicitud',$inputs['idsolicitude'])->select('created_at')->get();
                 DB::beginTransaction();
+
+                $oldOolicitude      = Solicitude::where('idsolicitude',$inputs['idsolicitude'])->first();
+                $oldStatus          = $oldOolicitude->estado;
+                $idSol              = $oldOolicitude->idsolicitud;
+
                 for($i=0;$i<count($inputs['number_account']);$i++)
                 {
                     $tbEntry = new Entry;
@@ -1795,7 +1819,9 @@ class SolicitudeController extends BaseController
                     $tbEntry->updated_at = null;
                     $tbEntry->save();
                 }
-                Solicitude::where('idsolicitud', $inputs['idsolicitude'])->update(array('asiento' => SOLICITUD_ASIENTO));                    
+                Solicitude::where('idsolicitud', $inputs['idsolicitude'])->update(array('asiento' => SOLICITUD_ASIENTO));
+
+                $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, GASTO_HABILITADO, Auth::user()->id, $oldOolicitude->iduser, $idSol);                    
                 DB::commit();
                 $middleRpta[status] = 1;
             }
@@ -1808,24 +1834,26 @@ class SolicitudeController extends BaseController
         return json_encode($middleRpta);
     }
 
-    /**
-     * idkc2015 - cambio a generado
-     */
+    // IDKC: CHANGE STATUS => GENERADO
     public function generateSeatExpense()
     {
         $inputs = Input::all();
+
+        $oldOolicitude      = Solicitude::where('idsolicitude', $inputs['idsolicitude'])->first();
+        $oldStatus          = $oldOolicitude->estado;
+        $idSol              = $oldOolicitude->idsolicitud;
+
         $solicitude = Solicitude::find($inputs['idsolicitude']);
-        $solicitude->estado = 7;
+        $solicitude->estado = GENERADO;
         if($solicitude->update())
         {
             return 1;
+            $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, DEPOSITADO, Auth::user()->id, USER_CONTABILIDAD, $idSol);
         }
         return 0;
     }
 
-    /**
-     * idkc2015 cambio de estado - de aprobado a deposito habilitado
-     */
+    // IDKC: CHANGE STATUS => DEPOSITO HABILITADO
     public function enableDeposit()
     {
         $inputs = Input::all();
@@ -1850,6 +1878,11 @@ class SolicitudeController extends BaseController
         $id = $inputs['idsolicitude'];
         $solicitude = Solicitude::where('idsolicitud', $id);
         $solicitude->retencion = $val_ret;
+
+        $oldOolicitude      = Solicitude::where('idsolicitud', $id)->first();
+        $oldStatus          = $oldOolicitude->estado;
+        $idSol              = $oldOolicitude->idsolicitud;
+
         if($val_ret != null)
         {
             $solicitude->idtiporetencion = $idtyperetention;    
@@ -1859,6 +1892,7 @@ class SolicitudeController extends BaseController
 
         if($solicitude->update($data))
         {
+            $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, DEPOSITO_HAILITADO, Auth::user()->id, USER_TESORERIA, $idSol);
             return 1;
         }
         else
@@ -1918,9 +1952,7 @@ class SolicitudeController extends BaseController
         return $rpta;
     }
 
-    /**
-     * idkc2015 - habilitar responsable - responsable habilitado
-     */
+    // IDKC: CHANGE STATUS => RESPONSABLE HABILITADO
     public function asignarResponsableSolicitud()
     {
         try
@@ -1935,8 +1967,14 @@ class SolicitudeController extends BaseController
             }
             else
             {
+                $oldOolicitude      = Solicitude::where('token',$deposit['token'])->first();
+                $oldStatus          = $oldOolicitude->estado;
+                $idSol              = $oldOolicitude->idsolicitud;
+
                 Solicitude::where('token',$inputs['token'])->update( array('idresponse' => $inputs['responsable']) );
                 $middleRpta = array( status => ok , description => 'Se asigno la solicitud correctamente');
+
+                $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, RESPONSABLE_HABILITADO, Auth::user()->id, $oldOolicitude->iduser, $idSol);
             }
         }
         catch (Exception $e)
