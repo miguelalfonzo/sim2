@@ -92,15 +92,22 @@ class BaseController extends Controller {
     }
 
     public function setStatus($description, $status_from, $status_to, $user_from_id, $user_to_id, $idsolicitude){
-        $fromStatus = State::where('idestado', $status_from);
-        $toStatus = State::where('idestado', $status_to);
-        //dd($fromStatus);dd($toStatus);die();
+        $fromStatus = State::where('idestado', $status_from)->first();
+        $toStatus = State::where('idestado', $status_to)->first();
+
         $fromUser = User::where('id', $user_from_id)->first();
         $toUser = User::where('id', $user_to_id)->first();
+
         $toName = $toUser->getName();
         $fromName = $fromUser != null ? $fromUser->getName() : '';
-        $this->postman($toName, $idsolicitude, $description, $status_from,   $status_to, $fromName);
-        $this->updateStatusSolicitude($description, $fromStatus, $toStatus, $fromUser->type, $toUser->type, $idsolicitude, 0);
+        $statusNameFrom = $fromStatus == null ? '' : $fromStatus->nombre;
+        $statusNameTo = $toStatus == null ? '' : $toStatus->nombre;
+        $this->postman($toName, $idsolicitude, $description, $statusNameFrom, $statusNameTo, $fromName);
+        
+        $idestadoFrom = $fromStatus == null ? null : $fromStatus->idestado;
+        $idestadoTo = $toStatus == null ? null : $toStatus->idestado;
+
+        $this->updateStatusSolicitude($description, $idestadoFrom, $idestadoTo, $fromUser->type, $toUser->type, $idsolicitude, 0);
     }
 
     public function updateStatusSolicitude($description, $status_from, $status_to, $user_from, $user_to, $idsolicitude, $notified){

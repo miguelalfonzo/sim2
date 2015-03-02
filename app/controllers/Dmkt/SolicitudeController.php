@@ -189,7 +189,6 @@ class SolicitudeController extends BaseController
             $solicitude->estado = PENDIENTE;
             if ($solicitude->save()) 
             {
-                $this->setStatus($solicitude->titulo .' - '. $solicitude->descripcion, '', PENDIENTE, Auth::user()->id, Auth::user()->id, $aux_idsol);
                 $data = array(
                     'name' => $inputs['titulo'],
                     'description' => $inputs['description'],
@@ -216,6 +215,7 @@ class SolicitudeController extends BaseController
                     $solicitude_families->idfamilia = $family;
                     $solicitude_families->save();
                 }
+                $this->setStatus($solicitude->titulo .' - '. $solicitude->descripcion, '', PENDIENTE, Auth::user()->id, Auth::user()->id, $aux_idsol);
                 return $typeUser;
             }
         }
@@ -1136,7 +1136,7 @@ class SolicitudeController extends BaseController
         $inputs = Input::all();
         $token = $inputs['token'];
         
-        $oldOolicitude      = Solicitude::where('token',$deposit['token'])->first();
+        $oldOolicitude      = Solicitude::where('token', $inputs['token'])->first();
         $oldStatus          = $oldOolicitude->estado;
         
         $sol = Solicitude::where('token', $token)->first();
@@ -1892,7 +1892,7 @@ class SolicitudeController extends BaseController
 
         if($solicitude->update($data))
         {
-            $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, DEPOSITO_HAILITADO, Auth::user()->id, USER_TESORERIA, $idSol);
+            $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, DEPOSITO_HABILITADO, Auth::user()->id, USER_TESORERIA, $idSol);
             return 1;
         }
         else
@@ -1967,7 +1967,7 @@ class SolicitudeController extends BaseController
             }
             else
             {
-                $oldOolicitude      = Solicitude::where('token',$deposit['token'])->first();
+                $oldOolicitude      = Solicitude::where('token', $inputs['token'])->first();
                 $oldStatus          = $oldOolicitude->estado;
                 $idSol              = $oldOolicitude->idsolicitud;
 
