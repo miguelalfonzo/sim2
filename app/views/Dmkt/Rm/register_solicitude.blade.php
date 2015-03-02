@@ -158,7 +158,7 @@
             <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
             <input id="delivery_date" type="text" name="delivery_date"
                    value="{{isset($solicitude)? date_format(date_create($solicitude->fecha_entrega), 'd/m/Y' ) : null }}"
-                   class="form-control" maxlength="10" placeholder="">
+                   class="form-control" maxlength="10" placeholder="" readonly>
         </div>
 
     </div>

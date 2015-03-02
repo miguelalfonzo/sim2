@@ -1,5 +1,5 @@
-<h1>Hola, {{ $firstname }}!</h1>
+<h1>Solicitud N° {{ $solicitud_id}}: {{ $estado }}</h1>
  
-<p>{{ $fromUser }} te envia la siguiente solicitud:</p>
-<p>{{ $description }}</p>
-<p>{{ $estados }}</p>
+<p>{{ $solicitud_nombre }}</p>
+<p>{{ $solicitud_descripcion }}</p>
+<p>{{ $solicitud_monto }}</p>

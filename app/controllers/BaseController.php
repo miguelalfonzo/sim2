@@ -80,11 +80,10 @@ class BaseController extends Controller {
 
     public function postman($name, $idsolicitud, $description, $fromEstado, $toEstado, $fromName){
         $data = array(
-            'firstname'     => $name,
-            'fromUser'      => $fromName,
-            'description'   => $description,
-            'estados'       => '| '.  $fromEstado .' - '. $toEstado .' |',
-            'idsolicitude'   => $idsolicitud
+            'fromUser'          => $fromName,
+            'description'       => $description,
+            'solicitud_estado'  => $toEstado,
+            'solicitud_id'      => $idsolicitud
         );
         $subject = 'Solicitud N° '.$idsolicitud;
         Mail::send('emails.notification', $data, function($message) use ($subject){
@@ -103,7 +102,7 @@ class BaseController extends Controller {
         $fromName = $fromUser != null ? $fromUser->getName() : '';
         $statusNameFrom = $fromStatus == null ? '' : $fromStatus->nombre;
         $statusNameTo = $toStatus == null ? '' : $toStatus->nombre;
-        $this->postman($toName, $idsolicitude, $description, $statusNameFrom, $statusNameTo, $fromName);
+        $this->postman($idsolicitude, $description, $statusNameFrom, $statusNameTo, $fromName);
         
         $idestadoFrom = $fromStatus == null ? null : $fromStatus->idestado;
         $idestadoTo = $toStatus == null ? null : $toStatus->idestado;
