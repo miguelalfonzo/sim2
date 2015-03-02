@@ -1800,7 +1800,7 @@ class SolicitudeController extends BaseController
                 $fec_origin = Solicitude::where('idsolicitud',$inputs['idsolicitude'])->select('created_at')->get();
                 DB::beginTransaction();
 
-                $oldOolicitude      = Solicitude::where('idsolicitude',$inputs['idsolicitude'])->first();
+                $oldOolicitude      = Solicitude::where('idsolicitud', $inputs['idsolicitude'])->first();
                 $oldStatus          = $oldOolicitude->estado;
                 $idSol              = $oldOolicitude->idsolicitud;
 
