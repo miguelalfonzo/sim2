@@ -26,7 +26,9 @@
                                     <div class="">
                                         <select id="idState" name="idstate" class="form-control selectestatesolicitude">
                                             @foreach($states as $state)
-                                                <option value="{{$state->idestado}}">{{$state->nombre}}</option>
+                                                @if($state->idestado == PENDIENTE || $state->idestado == ACEPTADO || $state->idestado == APROBADO || $state->idestado == DEPOSITADO || $state->idestado == REGISTRADO || $state->idestado == ENTREGADO || $state->idestado == GENERADO || $state->idestado == CANCELADO || $state->idestado == RECHAZADO || $state->idestado == TODOS)
+                                                    <option value="{{$state->idestado}}">{{$state->nombre}}</option>
+                                                @endif
                                             @endforeach
                                         </select>
                                     </div>

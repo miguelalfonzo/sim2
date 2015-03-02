@@ -16,11 +16,13 @@
                                 <select id="idState" name="idstate"
                                         class="form-control selectestatesolicitude">
                                     @foreach($states as $state1)
-                                    @if($state1->idestado == $state)
-                                    <option  selected value="{{$state1->idestado}}">{{$state1->nombre}}</option>
-                                    @else
-                                    <option value="{{$state1->idestado}}">{{$state1->nombre}}</option>
-                                    @endif
+                                        @if($state1->idestado == PENDIENTE || $state1->idestado == ACEPTADO || $state1->idestado == APROBADO || $state1->idestado == DEPOSITADO || $state1->idestado == REGISTRADO || $state1->idestado == ENTREGADO || $state1->idestado == GENERADO || $state1->idestado == CANCELADO || $state1->idestado == RECHAZADO || $state1->idestado == TODOS)
+                                            @if($state1->idestado == $state1)
+                                            <option  selected value="{{$state1->idestado}}">{{$state1->nombre}}</option>
+                                            @else
+                                            <option value="{{$state1->idestado}}">{{$state1->nombre}}</option>
+                                            @endif
+                                        @endif
                                     @endforeach
                                 </select>
                             </div>
