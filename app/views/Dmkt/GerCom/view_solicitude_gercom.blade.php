@@ -106,7 +106,7 @@
                     @if($solicitude->estado == 2)
                     <textarea id="textinput" name="observacion" placeholder="" class="form-control"></textarea>
                     @else
-                    <textarea id="textinput" name="observacion" placeholder="" class="form-control" disabled></textarea>
+                    <textarea id="textinput" name="observacion" placeholder="" class="form-control" disabled>{{ $solicitude->observacion }}</textarea>
                     @endif
                 </div>
             </div>
