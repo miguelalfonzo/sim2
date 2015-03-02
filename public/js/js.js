@@ -125,7 +125,9 @@ $(function(){
             calcularIGV();
             calcularBalance();
         });
-        //Datepicker date all classes
+        // Datepicker date all classes
+        // FIX COLOR IN INPUTS READONLY
+        $('.date>input[readonly]').css('background-color', "#fff");
         if(!($('.date>input:not([disabled]').length == 0)){
             var toDate = $(".date>input").val();
 
