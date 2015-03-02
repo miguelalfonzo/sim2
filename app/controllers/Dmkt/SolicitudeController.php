@@ -1213,7 +1213,7 @@ class SolicitudeController extends BaseController
         if ($start != null && $end != null) {
             if ($estado != 10) {
                 if ($estado == RECHAZADO) {
-                    $solicituds = Solicitude::where('estado', $estado)->where('idaproved', 16)
+                    $solicituds = Solicitude::where('estado', $estado)->where('idaproved', Auth::user()->id)
                         ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
                         ->get();
                 } else {
@@ -1234,7 +1234,7 @@ class SolicitudeController extends BaseController
         } else {
             if ($estado != 10) {
                 if ($estado == RECHAZADO) {
-                    $solicituds = Solicitude::where('estado', $estado)->where('idaproved', 16) // id gerente comercial
+                    $solicituds = Solicitude::where('estado', $estado)->where('idaproved', Auth::user()->id)
                     ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
                         ->get();
                 } else {

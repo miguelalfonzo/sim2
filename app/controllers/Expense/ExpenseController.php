@@ -339,7 +339,7 @@ class ExpenseController extends BaseController{
 	        $date = date("Y/m/d", $d);
 	        $expenseEdit->fecha_movimiento = $date;
 	        $expenseEdit->descripcion = $inputs['desc_expense'];
-	        //$expenseEdit->reparo = $inputs['rep'];
+	        
 	        $data = $this->objectToArray($expenseEdit);
 	        //Detail Expense
 			$quantity = $inputs['quantity'];
@@ -353,6 +353,7 @@ class ExpenseController extends BaseController{
 				}
 			}
 			// $type_expense = $expenseJson->type_expense;
+			$expenseEdit->reparo = $reparo;
 			$total_item = $inputs['total_item'];
 
 			if($expenseEdit->update($data))
