@@ -82,12 +82,13 @@ class BaseController extends Controller {
         $data = array(
             'firstname'     => $name,
             'fromUser'      => $fromName,
-            'description'   => $description .' | '.  $fromEstado .' - '. $toEstado .' |',
+            'description'   => $description,
+            'estados'       => '| '.  $fromEstado .' - '. $toEstado .' |',
             'idsolicitude'   => $idsolicitud
         );
         $subject = 'Solicitud N° '.$idsolicitud;
         Mail::send('emails.notification', $data, function($message) use ($subject){
-            $message->to('manueltemple@gmail.com', 'Manuel Temple')->subject($subject);
+            $message->to('jatuncar@bagoperu.com.pe', 'José Atuncar')->subject($subject);
         });
     }
 
