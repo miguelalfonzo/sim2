@@ -161,7 +161,7 @@
                               class="form-control"></textarea>
                     @else
                     <textarea id="textinput" name="observacion" placeholder=""
-                              class="form-control" disabled></textarea>
+                              class="form-control" disabled>{{ $solicitude->observacion }}</textarea>
                     @endif
                 </div>
             </div>

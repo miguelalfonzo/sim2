@@ -869,6 +869,7 @@ class SolicitudeController extends BaseController
         $block = false;
         $userid = Auth::user()->gerprod->id;
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
+        
         if($solicitude->estado == PENDIENTE)
             Solicitude::where('token', $token)->update(array('blocked' => 1));
 

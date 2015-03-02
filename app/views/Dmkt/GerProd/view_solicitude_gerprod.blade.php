@@ -138,7 +138,7 @@
             @if($solicitude->estado != PENDIENTE)
 
                     <input id="textinput" name="amount_fac" type="text" placeholder=""
-                           value="{{$solicitude->fondo->nombre_mkt}}" readonly
+                           value="{{ $solicitude->fondo == null ? '' : $solicitude->fondo->nombre_mkt }}" readonly
                            class="form-control input-md">
             @else
               <select id="sub_type_activity" name="sub_type_activity" class="form-control">
