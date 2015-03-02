@@ -343,6 +343,7 @@ function newSolicitude() {
                         $(this).parent().addClass('has-error has-feedback');
                         $(this).parent().children('.span-alert').addClass('span-alert glyphicon glyphicon-remove form-control-feedback');
                         $(".clients_repeat").text('Datos Repetidos').css('color', 'red');
+                        aux=1;
                     }
 
                 });
@@ -353,7 +354,7 @@ function newSolicitude() {
             var families = $('.selectfamily');
             families.each(function (index) 
             {
-            families_input[index] = $(this).val();
+                families_input[index] = $(this).val();
             });
             for (var i = 0; i < families_input.length; i++) 
             {
@@ -365,6 +366,7 @@ function newSolicitude() {
                         families_input[index] = '';
                         $(this).css('border-color', 'red');
                         $(".families_repeat").text('Datos Repetidos').css('color', 'red');
+                        aux=1;
                     }
                 });
             }
