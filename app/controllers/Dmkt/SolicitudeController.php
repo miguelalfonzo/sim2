@@ -515,10 +515,12 @@ class SolicitudeController extends BaseController
         $typePayments = TypePayment::all();
         $managers = Manager::all();
         $fondos = Fondo::all();
-
+        $gerentes = array();
         foreach($solicitude->families as $v)
         {
-            $gerentes[] = $v->marca->manager;
+            $manager_temp = $v->marca->manager;
+            if (!in_array($manager_temp,$gerentes))
+                $gerentes[] = $manager_temp;    
         }
 
         $data = array(
@@ -679,14 +681,19 @@ class SolicitudeController extends BaseController
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $id = $solicitude->idsolicitud;
         $sol = Solicitude::find($id);
-        
+        $gerentes = array();
         foreach ($sol->families as $v) 
         {
-            $solGer = new SolicitudeGer;
-            $solGer->idsolicitud_gerente = $solGer->searchId() + 1;
-            $solGer->idsolicitud = $id;
-            $solGer->idgerprod = $v->marca->manager->id;
-            $solGer->save();
+            $manager_temp = $v->marca->manager;
+            if (!in_array($manager_temp,$gerentes))
+            {
+                $gerentes[] = $manager_temp;
+                $solGer = new SolicitudeGer;
+                $solGer->idsolicitud_gerente = $solGer->searchId() + 1;
+                $solGer->idsolicitud = $id;
+                $solGer->idgerprod = $v->marca->manager->id;
+                $solGer->save();
+            }
             $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, DERIVADO, Auth::user()->id, $v->marca->manager->iduser, $idSol);
         }
 
