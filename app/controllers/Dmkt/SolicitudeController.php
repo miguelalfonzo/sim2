@@ -217,9 +217,15 @@ class SolicitudeController extends BaseController
                 }
                 //$userSup = ;
                 $userRm     = User::where('id', Auth::user()->id)->first();
-                $sup    = Sup::where('idsup', $userRm->rm->idsup)->first();
+                $toUserId;
+                if($userRm->type == 'R'){
+                    $sup    = Sup::where('idsup', $userRm->rm->idsup)->first();
+                    $toUserId = $sup->iduser;
+                }elseif($userRm->type == 'S'){
+                    $toUserId    = Auth::user()->id;
+                }
 
-                $this->setStatus($solicitude->titulo .' - '. $solicitude->descripcion, '', PENDIENTE, Auth::user()->id, $sup->iduser, $aux_idsol);
+                $this->setStatus($solicitude->titulo .' - '. $solicitude->descripcion, '', PENDIENTE, Auth::user()->id, $toUserId, $aux_idsol);
                 return $typeUser;
             }
         }
