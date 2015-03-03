@@ -79,23 +79,30 @@ class BaseController extends Controller {
         return $rpta;
     }
 
-    public function postman($idsolicitud, $fromEstado, $toEstado){
+    public function postman($idsolicitud, $fromEstado, $toEstado, $toUser){
         $solicitud = Solicitude::where('idsolicitud', $idsolicitud)->first();
-        $msg= '';
-        $subject = 'Solicitud N° '.$idsolicitud;
+        $msg        = '';
+        $subject    = 'Solicitud N° '.$idsolicitud;
+        $user_name  = $toUser != null ? $toUser->getName() : '';
+        $user_email = $toUser != null ? $toUser->email : '';
+        
+        if($user_name != '' && $user_email != ''){
+            $data = array(
+                'solicitud_id'          => $idsolicitud,
+                'msg'                   => $msg,
+                'solicitud_estado'      => $toEstado,
+                'solicitud_titulo'      => $solicitud->titulo,
+                'solicitud_descripcion' => $solicitud->descripcion,
+                'solicitud_tipo_moneda' => $solicitud->typemoney->simbolo,
+                'solicitud_monto'       => $solicitud->monto
+            );
 
-        $data = array(
-            'solicitud_id'          => $idsolicitud,
-            'msg'                   => $msg,
-            'solicitud_estado'      => $toEstado,
-            'solicitud_titulo'      => $solicitud->titulo,
-            'solicitud_descripcion' => $solicitud->descripcion,
-            'solicitud_tipo_moneda' => $solicitud->typemoney->simbolo,
-            'solicitud_monto'       => $solicitud->monto
-        );
-        Mail::send('emails.notification', $data, function($message) use ($subject){
-            $message->to(POSTMAN_USER_EMAIL, POSTMAN_USER_NAME)->subject($subject);
-        });
+            Mail::send('emails.notification', $data, function($message) use ($subject, $user_name, $user_email){
+                $message->to($user_email, $user_name)->subject($subject);
+            });
+        }else{
+            Log::error("IDKC [BaseController:109]: No se pudo enviar email, debido a que el usuario o password son Incorrectos");
+        }
     }
 
     public function setStatus($description, $status_from, $status_to, $user_from_id, $user_to_id, $idsolicitude){
@@ -104,14 +111,17 @@ class BaseController extends Controller {
 
         $fromUser   = User::where('id', $user_from_id)->first();
         $toUser     = User::where('id', $user_to_id)->first();
-
+        // dd($user_to_id);
+        //$toUser->email
+        //$toUser->getName()
+        
         //$toName         = $toUser->getName();
         //$fromName       = $fromUser != null ? $fromUser->getName() : '';
         $statusNameFrom = $fromStatus == null ? '' : $fromStatus->nombre;
         $statusNameTo   = $toStatus == null ? '' : $toStatus->nombre;
         
         // POSTMAN: send email
-        $this->postman($idsolicitude, $statusNameFrom, $statusNameTo);
+        $this->postman($idsolicitude, $statusNameFrom, $statusNameTo, $toUser);
         
         $idestadoFrom = $fromStatus == null ? null : $fromStatus->idestado;
         $idestadoTo = $toStatus == null ? null : $toStatus->idestado;

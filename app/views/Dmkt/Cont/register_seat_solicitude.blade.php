@@ -162,7 +162,7 @@
 											<th class="number_account">{{$bancos->num_cuenta}}</th>
 											<th class="date_ini">{{$date['toDay']}}</th>
 											<th class="dc">C</th>
-											<th class="total">{{$solicitude->monto}}</th>
+											<th class="total">{{ $solicitude->retencion ? $solicitude->monto - $solicitude->retencion : $solicitude->monto }}</th>
 											<th class="leyenda">
 												@if($solicitude->aproved->type == 'S')
 													{{$solicitude->aproved->sup->nombres.'-'.$solicitude->aproved->sup->apellidos.'-'.$solicitude->titulo.$clientes}}
