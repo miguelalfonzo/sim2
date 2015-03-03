@@ -138,8 +138,8 @@
                 <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Solicitante</label>
                 <div class="col-sm-12 col-md-12 col-lg-12">
                     <div class="input-group date">
-                        <span class="input-group-addon">R</span>
-                        <input id="textinput" name="titulo" type="text" value="{{$solicitude->user->rm->nombres.' '.$solicitude->user->rm->apellidos}}" readonly
+                        <span class="input-group-addon">Representante</span>
+                        <input id="textinput" name="titulo" type="text" value="{{$solicitude->user->rm->nombres.' '.$solicitude->user->rm->apellidos}}" disabled
                            class="form-control input-md">
                     </div>
                 </div>
@@ -149,7 +149,7 @@
                 <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Solicitante</label>
                 <div class="col-sm-12 col-md-12 col-lg-12">
                     <div class="input-group date">
-                        <span class="input-group-addon">S</span>
+                        <span class="input-group-addon">Supervisor</span>
                         <input id="textinput" name="titulo" type="text" value="{{$solicitude->user->Sup->nombres}}" readonly
                            class="form-control input-md">
                     </div>
