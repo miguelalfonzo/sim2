@@ -1784,7 +1784,7 @@ function newSolicitude() {
         var data = {};
         $("#op_number").val('');
         $("#message-op-number").text('');
-        var op_number  = $("#op-number").val();
+        var op_number  = $("#op-number2").val();
         var type_deposit = $(this).attr('data-deposit');
         var date_fondo = $('#datefondo').val();
         if(type_deposit ==='fondo'){

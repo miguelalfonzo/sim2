@@ -46,7 +46,7 @@
                 <div class="modal-body">
                     <input id="idfondo" type="hidden" value="">
                     <label for="op-number">Número de Operación, Transacción, Cheque:</label>
-                    <input id="op-number" type="text" class="form-control">
+                    <input id="op-number2" type="text" class="form-control">
                     <p id="message-op-number" style="margin-top:1em;color:#a94442;"></p>
                 </div>
                 <div class="modal-footer">

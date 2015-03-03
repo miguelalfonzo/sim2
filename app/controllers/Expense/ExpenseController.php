@@ -495,11 +495,11 @@ class ExpenseController extends BaseController{
 
         $fondo = FondoInstitucional::where('token',$token)->firstOrFail();
         $expense = Expense::where('idfondo',$fondo->idfondo)->get();
-        $data = [
-            'fondo' => $fondo,
-            'date'       => $this->getDay(),
-            'expense'    => $expense
-        ];
+        $data = array(
+            'fondo'    => $fondo,
+            'date'     => $this->getDay(),
+            'expense'  => $expense
+        );
         $html = View::make('Expense.report-fondo',$data);
         return PDF::load($html, 'A4', 'landscape')->show();
 

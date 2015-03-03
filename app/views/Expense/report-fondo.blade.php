@@ -13,7 +13,7 @@
         </header>
         <main>
             <section style="text-align:center;margin-top:2.5em;">
-                <strong><p style="display:inline">Fecha:</strong>&nbsp;{{$date['toDay']}}</p>
+                <strong><p style="display:inline">Fecha:</strong>&nbsp;{{$date['lastDay']}}</p>
                 <strong><p style="display:inline">Ciudad:</strong>&nbsp;Lima</p>
                 <strong><p style="display:inline">Institucion:</strong>&nbsp;{{$fondo->institucion}}</p>
                 <strong><p style="display:inline">Código Comercial:</strong>&nbsp;{{$fondo->idfondo}}</p>
