@@ -111,7 +111,7 @@ class BaseController extends Controller {
 
         $fromUser   = User::where('id', $user_from_id)->first();
         $toUser     = User::where('id', $user_to_id)->first();
-        // dd($user_to_id);
+        /*dd($toUser);*/
         //$toUser->email
         //$toUser->getName()
         
