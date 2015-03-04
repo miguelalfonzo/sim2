@@ -178,7 +178,7 @@
 												<th class="name_account">{{mb_convert_case($solicitude->typeRetention->descripcion,MB_CASE_TITLE,'UTF-8')}}</th>
 												<th class="number_account">{{$solicitude->typeRetention->cta_contable}}</th>
 												<th class="date_ini">{{$date['toDay']}}</th>
-												<th class="dc">D</th>
+												<th class="dc">C</th>
 												<th class="total">{{$solicitude->retencion}}</th>
 												<th class="leyenda">
 													@if($solicitude->aproved->type == 'S')

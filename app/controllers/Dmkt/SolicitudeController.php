@@ -101,12 +101,8 @@ class SolicitudeController extends BaseController
     {
         $inputs = Input::all();
         $image = Input::file('file');
-        Log::error(json_encode($image));
-        Log::error(json_encode(filesize($image)));
-        Log::error(json_encode($inputs));
         foreach ($inputs['clients'] as $client)
         {
-            Log::error($client);
             if (empty($client))
             {
                 return "Ingrese todos los campos de Cliente";

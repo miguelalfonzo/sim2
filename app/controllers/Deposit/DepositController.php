@@ -121,10 +121,15 @@ class DepositController extends BaseController{
                 }
                 else
                 {
+                    $retencion = 0;
+                    if (!$solicitude->retencion == null)
+                    {
+                        $retencion = $solicitude->retencion;
+                    }
                     $newDeposit = new Deposit;
                     $id = $newDeposit->lastId()+1;
                     $newDeposit->iddeposito        = $id;
-                    $newDeposit->total             = $solicitude->monto;
+                    $newDeposit->total             = ($solicitude->monto - $retencion);
                     $newDeposit->num_transferencia = $deposit['op_number'];
                     $newDeposit->idsolicitud       = $solicitude->idsolicitud;  
                     

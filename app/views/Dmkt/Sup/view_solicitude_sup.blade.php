@@ -150,7 +150,7 @@
                 <div class="col-sm-12 col-md-12 col-lg-12">
                     <div class="input-group date">
                         <span class="input-group-addon">Supervisor</span>
-                        <input id="textinput" name="titulo" type="text" value="{{$solicitude->user->Sup->nombres}}" readonly
+                        <input id="textinput" name="titulo" type="text" value="{{$solicitude->user->Sup->nombres.' '.$solicitude->user->Sup->apellidos}}" disabled
                            class="form-control input-md">
                     </div>
                 </div>

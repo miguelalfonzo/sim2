@@ -125,45 +125,7 @@
 
     </div>
 </div>
-
-@if(Auth::user()->type === 'S')
-<div class="form-group col-sm-6 col-md-4">
-
-    <label class="col-sm-8 col-md-8 control-label" for="textinput">Fondo</label>
-
-    <div class="col-sm-12 col-md-12">
-
-            <select id="sub_type_activity" name="sub_type_activity" class="form-control">
-
-            @foreach($fondos as $sub)
-                @if(isset($solicitude->idfondo) && $sub->idfondo == $solicitude->subtype->idfondo)
-                    <option selected value="{{$sub->idfondo}}">{{$sub->nombre_mkt}}</option>
-                @else
-                    @if($sub->idfondo == FONDO_SUPERVISOR) <!-- AREK Y OTROS -->
-                    <option value="{{$sub->idfondo}}">{{$sub->nombre_mkt}}</option>
-                    @endif
-
-                @endif
-            @endforeach
-            </select>
-    </div>
-</div>
-@endif
-
-<div class="form-group col-sm-6 col-md-4">
-    <label class="col-sm-8 col-md-8 control-label" for="textinput">Fecha de Entrega</label>
-    <div class="col-sm-12 col-md-12">
-
-        <div class="input-group date">
-            <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-            <input id="delivery_date" type="text" name="delivery_date"
-                   value="{{isset($solicitude)? date_format(date_create($solicitude->fecha_entrega), 'd/m/Y' ) : null }}"
-                   class="form-control" maxlength="10" placeholder="" readonly>
-        </div>
-
-    </div>
-</div>
-@if(!isset($solicitude))
+@if (!isset($solicitude))
 <div class="solicitude_factura form-group col-sm-6 col-md-4">
 
     <label class="col-sm-12 col-md-12 control-label" for="textinput">Factura <small>(solo imagenes)</small></label>
@@ -183,6 +145,44 @@
 </div>
 @endif
 
+
+<!-- @if(Auth::user()->type === 'S')
+<div class="form-group col-sm-6 col-md-4">
+
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Fondo</label>
+
+    <div class="col-sm-12 col-md-12">
+
+            <select id="sub_type_activity" name="sub_type_activity" class="form-control">
+
+            @foreach($fondos as $sub)
+                @if(isset($solicitude->idfondo) && $sub->idfondo == $solicitude->subtype->idfondo)
+                    <option selected value="{{$sub->idfondo}}">{{$sub->nombre_mkt}}</option>
+                @else
+                    @if($sub->idfondo == FONDO_SUPERVISOR)
+                    <option value="{{$sub->idfondo}}">{{$sub->nombre_mkt}}</option>
+                    @endif
+
+                @endif
+            @endforeach
+            </select>
+    </div>
+</div>
+@endif -->
+
+<div class="form-group col-sm-6 col-md-4">
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Fecha de Entrega</label>
+    <div class="col-sm-12 col-md-12">
+
+        <div class="input-group date">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+            <input id="delivery_date" type="text" name="delivery_date"
+                   value="{{isset($solicitude)? date_format(date_create($solicitude->fecha_entrega), 'd/m/Y' ) : null }}"
+                   class="form-control" maxlength="10" placeholder="" readonly>
+        </div>
+
+    </div>
+</div>
 <div class="form-group col-sm-12 col-md-12" style="padding: 0">
     <div class="form-group col-sm-6 col-md-4 ">
         <label class="col-sm-8 col-md-8 control-label" for="textinput">Cliente</label>
@@ -293,23 +293,26 @@
                 <h4 class="modal-title" id="myModalLabel">Comprobante</h4>
             </div>
             <div class="modal-body">
-                <img id="imgSalida" class="img-responsive" src="{{URL::to('img').'/reembolso/'.$solicitude->image}}">
+                @if (empty($solicitude->image))
+                    <h3>No se ingreso una imagen</h3>
+                @elseif (!file_exists(public_path().'/'.IMAGE_PATH.$solicitude->image))
+                    <h3>No se encontro la imagen en el sistema</h3>
+                @else
+                    <img id="imgSalida" class="img-responsive" src="{{asset(IMAGE_PATH.$solicitude->image)}}">
+                @endif
+                
             </div>
             <div class="modal-footer">
 
-                <div class="solicitude_factura form-group col-sm-6 col-md-10" style="padding-right: 30px">
-                    <label class="col-sm-8 col-md-2 control-label" for="textinput">Factura <small>(solo imagenes)</small></label>
+                <div class="solicitude_factura form-group col-sm-10 col-md-10" style="padding-right: 30px">
+                    <label class="col-sm-6 col-md-4 control-label" for="textinput">Subir Otra Factura</label>
 
-                    <div class="col-sm-12 col-md-10">
-
-                        <div class="input-group">
-                            <input id="isSetImage"type="hidden" value="{{$solicitude->image}}"><!-- para validar si es que hay una imagen cuando se va a editar -->
-                            <input type="file" id="input-file-factura" name="file" class="form-control"  >
-                        </div>
-
+                    <div class="col-sm-5 col-md-7">
+                            <input id="isSetImage" type="hidden" value="{{$solicitude->image}}"><!-- para validar si es que hay una imagen cuando se va a editar -->
+                            <input type="file" id="input-file-factura" name="file" class="form-control" style="padding:1px" >
                     </div>
                 </div>
-                <div class="form-group col-sm-2 col-md-2">
+                <div class="form-group col-sm-1 col-md-1">
                     <button type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
                 </div>
 

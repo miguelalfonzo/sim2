@@ -3,7 +3,7 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>Documento</th>
+                <th>Tipo de Documento</th>
                 <th>Cuenta SUNAT</th>
                 <th>Tipo</th>
                 <th>IGV</th>

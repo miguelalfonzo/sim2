@@ -2,8 +2,10 @@
     <thead>
     <tr>
         <th>#</th>
+        <th style="display:none">Retencion</th>
         <th>Solicitud</th>
-        <th>Monto a Depositar</th>
+        <th>Deposito</th>
+        <th style="display:none">Solicitado</th>
         <th>Estado</th>
         <th>Fecha</th>
         <th>Tipo de Solicitud</th>
@@ -28,12 +30,29 @@
                     <input type="hidden" value="{{$solicitude->titulo}}" class="sol_titulo">
                     @endif
                 @endif
+                <td style="display:none" class="tes-ret">
+                @if ($solicitude->retencion == null)
+                    0
+                @else
+                    {{$solicitude->retencion}}
+                @endif
+                </td>
                 <td>{{$solicitude->titulo}}</td>
-                <td style="text-align: center" class="total_deposit">
-                    {{$solicitude->typemoney->simbolo.$solicitude->monto }}
+                <td  style="text-align: center">
+                @if (!$solicitude->retencion == null)
+                    {{$solicitude->typemoney->simbolo.' '.($solicitude->monto - $solicitude->retencion)}}
+                @else
+                    {{$solicitude->typemoney->simbolo.' '.$solicitude->monto }}
+                @endif
+                </td>    
+                <td style="display:none; text-align:center" class="total_deposit">
+                    {{$solicitude->typemoney->simbolo.' '.$solicitude->monto }}
                 </td>
                 <td style="text-align: center">
                     <span class="label" style="background-color: {{$solicitude->state->color}}">{{$solicitude->state->nombre}}</span>
+                    @if(!$solicitude->retencion == null)
+                        <span class="label" style="background-color: {{$solicitude->state->color}}">RETENCION</span>
+                    @endif
                 </td>
                 <td style="text-align: center">{{ date_format(date_create($solicitude->created_at), 'd/m/Y' )}}</td>
                 <td style="text-align: center">{{$solicitude->typesolicitude->nombre}}</td>
@@ -84,11 +103,24 @@
                         </div>
                         <div class="col-xs-12 col-sm-6 col-md-6">
                             <div class="form-expense">
+                                <label>Monto Solicitado</label>
+                                <input id="tes-mon-sol" class="form-control" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 col-md-6">
+                            <div class="form-expense">
+                                <label>Retencion</label>
+                                <input id="tes-mon-ret" class="form-control" type="text" disabled>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 col-md-6">
+                            <div class="form-expense">
                                 <label>Monto a Depositar</label>
                                 <input id="total-deposit" class="form-control" type="text" disabled>
                             </div>
                         </div>
-                        </div>
+
+                    </div>
                         <div class="row">
                              <div class="col-xs-12 col-sm-12 col-md-12">
                                 <div class="form-expense">

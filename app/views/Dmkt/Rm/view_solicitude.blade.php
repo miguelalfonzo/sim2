@@ -143,19 +143,15 @@
 </div>
 
 <!-- Observation-->
+@if(!$solicitude->estado == PENDIENTE)
 <div class="form-group col-sm-6 col-md-4 col-lg-4">
     <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="selectbasic">Observacion</label>
-
     <div class="col-sm-12 col-md-12 col-lg-12">
-        @if($solicitude->estado == PENDIENTE)
-        <textarea id="textinput" name="observacion" placeholder="" disabled
-                  class="form-control"></textarea>
-        @else
         <textarea id="textinput" name="observacion" placeholder=""
-                  class="form-control" disabled>{{$solicitude->observacion}}</textarea>
-        @endif
+        class="form-control" disabled>{{$solicitude->observacion}}</textarea>
     </div>
 </div>
+@endif
 
 
 @if(isset($solicitude) && $solicitude->idtiposolicitud == ACEPTADO)
@@ -177,10 +173,10 @@
             <div class="modal-body">
                 @if (empty($solicitude->image))
                     <h3>No se ingreso una imagen</h3>
-                @elseif (!file_exists(URL::to('img').'/reembolso/'.$solicitude->image))
+                @elseif (!file_exists(public_path().'/'.IMAGE_PATH.$solicitude->image))
                     <h3>No se encontro la imagen en el sistema</h3>
                 @else
-                    <img class="img-responsive" src="{{URL::to('img').'/reembolso/'.$solicitude->image}}">
+                    <img class="img-responsive" src="{{asset(IMAGE_PATH.$solicitude->image)}}">
                 @endif
             </div>
             <div class="modal-footer">

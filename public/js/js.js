@@ -459,7 +459,7 @@ $(function(){
                     }
                     else
                     {
-                        $("#message-op-number").text("No se ha podido registrar el depósito.");
+                        responseUI("<font color='black'>Ya existe un deposito registrado</font>","yellow");
                     }
                 });
             }
@@ -1465,16 +1465,35 @@ $(function(){
         $(document).off("click", ".modal_deposit");
         $(document).on("click", ".modal_deposit", function(e){
             e.preventDefault();
-            var id_sol = $(this).parent().parent().parent().find('.id_solicitud').text();
-            var sol_titulo = $(this).parent().parent().parent().find('.sol_titulo').val();
-            var token = $(this).parent().parent().parent().find('#sol_token').val();
-            var beneficiario = $(this).parent().parent().parent().find('.benef').val();
-            var total_deposit = $(this).parent().parent().parent().find('.total_deposit').text();
+            var td = $(this).parent().parent().parent();
+            console.log(td);
+            var id_sol = td.find('.id_solicitud').text();
+            var sol_titulo = td.find('.sol_titulo').val();
+            var token = td.find('#sol_token').val();
+            var beneficiario = td.find('.benef').val();
+            var total_deposit = td.find('.total_deposit').text().trim().split(" ");
+            var retencion = td.find('.tes-ret').html().trim();
+            if ( retencion == 0 )
+            {
+                $("#tes-mon-ret").parent()[0].style.display = "none";
+            }
+            else
+            {
+                $("#tes-mon-ret").parent()[0].style.display = "";   
+            }
+            console.log(retencion);
+            console.log(total_deposit);
+            /*if ( $('#enable_deposit_ModalLabel').hasClass('in'))
+            {
+
+            }*/
+            $("#tes-mon-sol").val(total_deposit[0] + " " + total_deposit[1]);
+            $("#tes-mon-ret").val(total_deposit[0] + " " + retencion);
             $("#id-solicitude").text(id_sol);
             $("#sol-titulo").val(sol_titulo);
             $("#token").val(token);
             $("#beneficiario").val(beneficiario);
-            $("#total-deposit").val(total_deposit);
+            $("#total-deposit").val(total_deposit[0] + " " + (total_deposit[1] - retencion));
             $('#enable_deposit_Modal').modal();
         });
 

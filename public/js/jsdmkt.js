@@ -382,7 +382,7 @@ function newSolicitude() {
                     message1 = 'Actualizando';
                     message2 = '<strong style="color: green">Solicitud Actualizada</strong>'
                 }
-                console.log(rute, formData);
+
                 $.ajax(
                 {
                     url: server + rute,

@@ -21,6 +21,12 @@
                     </div>
                 </div>
                 <div class="form-group col-sm-6 col-md-4">
+                    <label class="col-sm-8 col-md-8 control-label" for="selectbasic">Fondo</label>
+                    <div class="col-sm-12 col-md-12">
+                        <input id="textinput" type="text" value="{{$solicitude->subtype->nombre_mkt}}" class="form-control input-md" readonly>
+                    </div>
+                </div>
+                <div class="form-group col-sm-6 col-md-4">
                     <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto Solicitado</label>
                     <div class="col-sm-12 col-md-12">
                         @if($solicitude->estado == 2)
@@ -36,6 +42,106 @@
                         @endif
                     </div>
                 </div>
+                @if (!$solicitude->retencion == null)
+                <div class="form-group col-sm-6 col-md-4">
+                    <label class="col-sm-8 col-md-8 control-label" for="textinput">Retenciones</label>
+                    <div class="col-sm-12 col-md-12">
+                        @if($solicitude->estado == 2)
+                        <div class="input-group">
+                            <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
+                            <input type="text" value="{{$solicitude->retencion}}" class="form-control input-md">
+                        </div>
+                        @else
+                        <div class="input-group">
+                            <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
+                            <input id="idamount" type="text" value="{{$solicitude->retencion}}" class="form-control input-md" disabled>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+                @endif
+
+                <div class="form-group col-sm-6 col-md-4">
+                    <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto a Depositar</label>
+                    <div class="col-sm-12 col-md-12">
+                        <div class="input-group">
+                            <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
+                            @if($solicitude->estado == 2)
+                                <input type="text" value="{{($solicitude->monto -$solicitude->retencion)}}" class="form-control input-md">
+                            @else
+                                <input type="text" disabled="true" value="{{($solicitude->monto -$solicitude->retencion)}}" class="form-control input-md">
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                
+                
+                <div class="form-group col-sm-6 col-md-4">
+                    <label class="col-sm-8 col-md-8 control-label" for="textinput">Fecha de Entrega</label>
+                    <div class="col-sm-12 col-md-12">
+                        <div class="input-group date">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                            <input id="date" type="text" value="{{ date_format(date_create($solicitude->fecha_entrega), 'd/m/Y' )}}" class="form-control" maxlength="10" disabled>
+                        </div>
+                    </div>
+                </div>
+
+                 <div class="form-group col-sm-6 col-md-4 col-lg-4">
+                    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Solicitante</label>
+                    <div class="col-sm-12 col-md-12 col-lg-12">
+                        <div class="input-group">
+                            @if(!is_null($solicitude->iduser))
+                                    @if($solicitude->user->type == 'R')
+                                    <span class="input-group-addon">Representante Medico</span>
+                                    <input id="textinput" type="text" value="{{$solicitude->user->rm->nombres.' '.$solicitude->user->rm->apellidos}}" class="form-control input-md" readonly>
+                                    @elseif($solicitude->user->type == 'S')
+                                    <span class="input-group-addon">Supervisor</span>
+                                    <input id="textinput" type="text" value="{{$solicitude->user->sup->nombres.' '.$solicitude->user->sup->apellidos}}" class="form-control input-md" readonly>
+                                    @else
+                                    <span class="input-group-addon">$solicitude->user->type</span>
+                                    <input id="textinput" type="text" value="Usuario no autorizado" class="form-control input-md" readonly>
+                                    @endif
+                                @else
+                                    <span class="input-group-addon">Inexistente</span>
+                                    <input id="textinput" type="text" value="No existe el usuario solicitante" class="form-control input-md" readonly> 
+                                @endif
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group col-sm-6 col-md-4">
+                    <label class="col-sm-8 col-md-8 control-label" for="textinput">Observacion</label>
+                    <div class="col-sm-12 col-md-12">
+                        @if($solicitude->estado == 2)
+                        <textarea id="textinput" class="form-control"></textarea>
+                        @else
+                        <textarea id="textinput" class="form-control" disabled></textarea>
+                        @endif
+                    </div>
+                </div>
+
+
+                 <div class="form-group col-sm-6 col-md-4">
+                    <div class=col-md-12>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Clientes</h3>
+                            </div>
+                            <div class="panel-body">
+                                @foreach($solicitude->clients as $client)
+                                <div class="form-group" style="padding: 0 10px">
+                                    <div class="">
+                                        <input id="textinput" type="text" value="{{$client->client->clnombre}}" class="form-control input-md" readonly>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
                 <div class="form-group col-sm-12 col-md-4">
                     <div class=col-md-12>
                         <div class="panel panel-default">
@@ -66,71 +172,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-group col-sm-6 col-md-4">
-                    <label class="col-sm-8 col-md-8 control-label" for="selectbasic">Fondo</label>
-                    <div class="col-sm-12 col-md-12">
-                        <input id="textinput" type="text" value="{{$solicitude->subtype->nombre_mkt}}" class="form-control input-md" readonly>
-                    </div>
-                </div>
-                <div class="form-group col-sm-6 col-md-4">
-                    <label class="col-sm-8 col-md-8 control-label" for="textinput">Fecha de Entrega</label>
-                    <div class="col-sm-12 col-md-12">
-                        <div class="input-group date">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-                            <input id="date" type="text" value="{{ date_format(date_create($solicitude->fecha_entrega), 'd/m/Y' )}}" class="form-control" maxlength="10" readonly>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group col-sm-6 col-md-4">
-                    <div class=col-md-12>
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Clientes</h3>
-                            </div>
-                            <div class="panel-body">
-                                @foreach($solicitude->clients as $client)
-                                <div class="form-group" style="padding: 0 10px">
-                                    <div class="">
-                                        <input id="textinput" type="text" value="{{$client->client->clnombre}}" class="form-control input-md" readonly>
-                                    </div>
-                                </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group col-sm-6 col-md-4">
-                    <label class="col-sm-8 col-md-8 control-label" for="textinput">Observacion</label>
-                    <div class="col-sm-12 col-md-12">
-                        @if($solicitude->estado == 2)
-                        <textarea id="textinput" class="form-control"></textarea>
-                        @else
-                        <textarea id="textinput" class="form-control" disabled></textarea>
-                        @endif
-                    </div>
-                </div>
-                <div class="form-group col-sm-6 col-md-4 col-lg-4">
-                    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Solicitante</label>
-                    <div class="col-sm-12 col-md-12 col-lg-12">
-                        <div class="input-group">
-                            @if(!is_null($solicitude->iduser))
-                                    @if($solicitude->user->type == 'R')
-                                    <span class="input-group-addon">Representante Medico</span>
-                                    <input id="textinput" type="text" value="{{$solicitude->user->rm->nombres}}" class="form-control input-md" readonly>
-                                    @elseif($solicitude->user->type == 'S')
-                                    <span class="input-group-addon">Supervisor</span>
-                                    <input id="textinput" type="text" value="{{$solicitude->user->sup->nombres}}" class="form-control input-md" readonly>
-                                    @else
-                                    <span class="input-group-addon">$solicitude->user->type</span>
-                                    <input id="textinput" type="text" value="Usuario no autorizado" class="form-control input-md" readonly>
-                                    @endif
-                                @else
-                                    <span class="input-group-addon">Inexistente</span>
-                                    <input id="textinput" type="text" value="No existe el usuario solicitante" class="form-control input-md" readonly> 
-                                @endif
-                        </div>
-                    </div>
-                </div>
+               
                 <div class="col-sm-12 col-md-12" style="margin-top: 10px">
                     <div class="form-group col-sm-12 col-md-12">
                         <label class="col-sm-8 col-md-8 control-label" for="textarea">Descripcion de la Solicitud</label>
