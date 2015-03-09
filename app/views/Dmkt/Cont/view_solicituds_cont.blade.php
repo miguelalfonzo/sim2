@@ -23,7 +23,7 @@
             @if($solicitude->retencion != null && $solicitude->asiento == 2)
              <span class="label" style="background-color: {{$solicitude->state->color}}">{{ESTADO_R}}</span>
              <span class="label" style="background-color: {{$solicitude->state->color}}">{{ESTADO_AA}}</span>
-            @elseif($solicitude->retencion != null && $solicitude->estado == APROBADO)
+            @elseif($solicitude->retencion != null)
              <span class="label" style="background-color: {{$solicitude->state->color}}">{{ESTADO_R}}</span>
             @endif
 

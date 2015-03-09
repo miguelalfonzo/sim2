@@ -55,12 +55,19 @@ class BaseController extends Controller {
         return $rpta;
     }
 
-    protected function internalException($exception)
+    protected function internalException($exception,$function)
     {
         $rpta = array();
         $rpta[status] = error;
         $rpta[description] = desc_error;
         Log::error($exception);
+        Mail::send('soporte', array( 'msg' => $exception ), 
+            function($message) use($function)
+            {
+                $message->to(SOPORTE_EMAIL);
+                $message->subject(error.'-Function: '.$function);      
+            }
+        );
         return $rpta;
     }
 
@@ -80,53 +87,78 @@ class BaseController extends Controller {
     }
 
     public function postman($idsolicitud, $fromEstado, $toEstado, $toUser){
-        $solicitud = Solicitude::where('idsolicitud', $idsolicitud)->first();
-        $msg        = '';
-        $subject    = 'Solicitud N° '.$idsolicitud;
-        $user_name  = $toUser != null ? $toUser->getName() : '';
-        $user_email = $toUser != null ? $toUser->email : '';
-        
-        if($user_name != '' && $user_email != ''){
-            $data = array(
-                'solicitud_id'          => $idsolicitud,
-                'msg'                   => $msg,
-                'solicitud_estado'      => $toEstado,
-                'solicitud_titulo'      => $solicitud->titulo,
-                'solicitud_descripcion' => $solicitud->descripcion,
-                'solicitud_tipo_moneda' => $solicitud->typemoney->simbolo,
-                'solicitud_monto'       => $solicitud->monto
-            );
+        try 
+        {
+            $solicitud = Solicitude::where('idsolicitud', $idsolicitud)->first();
+            $msg        = '';
+            $subject    = 'Solicitud N° '.$idsolicitud;
+            $user_name  = $toUser != null ? $toUser->getName() : '';
+            $user_email = $toUser != null ? $toUser->email : '';
+            if($user_name != '' && $user_email != ''){
+                $data = array(
+                    'solicitud_id'          => $idsolicitud,
+                    'msg'                   => $msg,
+                    'solicitud_estado'      => $toEstado,
+                    'solicitud_titulo'      => $solicitud->titulo,
+                    'solicitud_descripcion' => $solicitud->descripcion,
+                    'solicitud_tipo_moneda' => $solicitud->typemoney->simbolo,
+                    'solicitud_monto'       => $solicitud->monto
+                );
 
-            Mail::send('emails.notification', $data, function($message) use ($subject, $user_name, $user_email){
-                $message->to($user_email, $user_name)->subject($subject);
-            });
-        }else{
-            Log::error("IDKC [BaseController:109]: No se pudo enviar email, debido a que el usuario o password son Incorrectos");
+                Mail::send('emails.notification', $data, function($message) use ($subject, $user_name, $user_email){
+                    $message->to($user_email, $user_name)->subject($subject);
+                });
+            }
+            else
+            {
+                Mail::send('soporte', array( 'subject' => 'No se pudo enviar email, debido a que el usuario o password son Incorrectos' ), function($message) use ($subject)
+                {
+                    $message->to(SOPORTE_EMAIL)->subject('PostMan [BaseController:89]:');
+                });
+                Log::error("IDKC [BaseController:109]: No se pudo enviar email, debido a que el usuario o password son Incorrectos");
+            }
+            $rpta = $this->setRpta();
         }
+        catch (Exception $e)
+        {
+            $rpta = $this->internalException($e,__FUNCTION__);
+        }
+        return $rpta;
     }
 
     public function setStatus($description, $status_from, $status_to, $user_from_id, $user_to_id, $idsolicitude){
-        $fromStatus = State::where('idestado', $status_from)->first();
-        $toStatus   = State::where('idestado', $status_to)->first();
+        try
+        {
+            DB::beginTransaction();
+            $fromStatus = State::where('idestado', $status_from)->first();
+            $toStatus   = State::where('idestado', $status_to)->first();
+            $fromUser   = User::where('id', $user_from_id)->first();
+            $toUser     = User::where('id', $user_to_id)->first();
+            /*dd($toUser);*/
+            //$toUser->email
+            //$toUser->getName()   
+            //$toName         = $toUser->getName();
+            //$fromName       = $fromUser != null ? $fromUser->getName() : '';
+            $statusNameFrom = $fromStatus == null ? '' : $fromStatus->nombre;
+            $statusNameTo   = $toStatus == null ? '' : $toStatus->nombre;
+            // POSTMAN: send email
+            $rpta = $this->postman($idsolicitude, $statusNameFrom, $statusNameTo, $toUser);
+            if ($rpta[status] == ok)
+            {
+                $idestadoFrom = $fromStatus == null ? null : $fromStatus->idestado;
+                $idestadoTo = $toStatus == null ? null : $toStatus->idestado;
+                $this->updateStatusSolicitude($description, $idestadoFrom, $idestadoTo, $fromUser->type, $toUser->type, $idsolicitude, 0);
+                $rpta = $this->setRpta();
+                DB::commit();
+            }
+        }
+        catch (Exception $e)
+        {
+            DB::rollback();
+            $rpta = $this->internalException($e,__FUNCTION__);
+        }
+        return $rpta;
 
-        $fromUser   = User::where('id', $user_from_id)->first();
-        $toUser     = User::where('id', $user_to_id)->first();
-        /*dd($toUser);*/
-        //$toUser->email
-        //$toUser->getName()
-        
-        //$toName         = $toUser->getName();
-        //$fromName       = $fromUser != null ? $fromUser->getName() : '';
-        $statusNameFrom = $fromStatus == null ? '' : $fromStatus->nombre;
-        $statusNameTo   = $toStatus == null ? '' : $toStatus->nombre;
-        
-        // POSTMAN: send email
-        $this->postman($idsolicitude, $statusNameFrom, $statusNameTo, $toUser);
-        
-        $idestadoFrom = $fromStatus == null ? null : $fromStatus->idestado;
-        $idestadoTo = $toStatus == null ? null : $toStatus->idestado;
-
-        $this->updateStatusSolicitude($description, $idestadoFrom, $idestadoTo, $fromUser->type, $toUser->type, $idsolicitude, 0);
     }
 
     public function updateStatusSolicitude($description, $status_from, $status_to, $user_from, $user_to, $idsolicitude, $notified){
@@ -140,6 +172,12 @@ class BaseController extends Controller {
         $statusSolicitude->idsolicitude = $idsolicitude;
         $statusSolicitude->notified     = $notified;
         return $statusSolicitude->save();
+    }
+
+    protected function setRpta( $data='' )
+    {
+        $rpta = array(status => ok, 'Data' => $data);
+        return $rpta;
     }
 
 }

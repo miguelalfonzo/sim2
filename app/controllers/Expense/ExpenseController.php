@@ -381,20 +381,32 @@ class ExpenseController extends BaseController{
 	}
 
 	// IDKC: CHANGE STATUS => REGISTRADO
-	public function finishExpense($token){
-		Log::error('finishExpense');
-
-		$oldOolicitude      = Solicitude::where('token',$token)->first();
-        $oldStatus          = $oldOolicitude->estado;
-        $idSol              = $oldOolicitude->idsolicitud;
-
-		$solicitude  = Solicitude::where('token',$token)->update(array('estado'=>REGISTRADO));
-		if(count($solicitude) == 1)
+	public function finishExpense($token)
+	{
+		try
 		{
-			$this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, REGISTRADO, Auth::user()->id, USER_CONTABILIDAD, $idSol);
-			$states = State::orderBy('idestado', 'ASC')->get();
-        	return Redirect::to('show_rm')->with('states', $states);
+			DB::beginTransaction();
+			$oldOolicitude      = Solicitude::where('token',$token)->first();
+	        $oldStatus          = $oldOolicitude->estado;
+	        $idSol              = $oldOolicitude->idsolicitud;
+			$solicitude  = Solicitude::where('token',$token)->update(array('estado'=>REGISTRADO));
+			if(count($solicitude) == 1)
+			{
+				$rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, REGISTRADO, Auth::user()->id, USER_CONTABILIDAD, $idSol);
+				if ( $rpta[status] == ok )
+				{
+					DB::commit();
+				}		
+			}
 		}
+		catch (Exception $e)
+		{
+			DB::rollback();
+			$rpta = $this->internalException($e,__FUNCTION__);
+		}
+		$states = State::orderBy('idestado', 'ASC')->get();
+	    return Redirect::to('show_rm')->with('states', $states);
+
 	}
 
     public function finishExpenseFondo($idfondo){

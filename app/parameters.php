@@ -79,3 +79,4 @@ const USER_TESORERIA = 42;
 // EMAIL DE PRUEBAS
 const POSTMAN_USER_EMAIL	= 'manueltemple@gmail.com';
 const POSTMAN_USER_NAME		= 'Manuel Temple';
+const SOPORTE_EMAIL         = 'jortiz@esinergy.com';

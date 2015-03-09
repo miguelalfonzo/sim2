@@ -358,7 +358,7 @@ $(function(){
                         data.ret2         = $("#ret2").val();
                         $.post(server+'enable-deposit', data)
                         .done(function (data){
-                            if(data == 1)
+                            if(data.Status == "Ok")
                             {
                                 bootbox.alert("<p class='green'>Se habilito el depósito correctamente.</p>", function(){
                                     window.location.href = server+'show_cont';

@@ -21,6 +21,7 @@ use \Expense\Entry;
 use \Dmkt\FondoInstitucional;
 use \Log;
 use \Expense\ProofType;
+use \Exception;
 
 class FondoController extends BaseController
 {
@@ -382,7 +383,7 @@ class FondoController extends BaseController
                 FondoInstitucional::where('idfondo', $inputs['idfondo'])->update(array('asiento' => ASIENTO_FONDO));
             });
         } catch (Exception $e) {
-            $middleRpta = $this->internalException($e);
+            $middleRpta = $this->internalException($e,__FUNCTION__);
         }
         return json_encode($middleRpta);
     }

@@ -109,51 +109,60 @@ class DepositController extends BaseController{
     // IDKC: CHANGE STATUS => DEPOSITADO
     public function depositSolicitudeTes()
     {
-        $deposit = Input::all();
-
-        try {
-            DB::transaction (function() use ($deposit) {
-                $solicitude = Solicitude::where('token',$deposit['token'])->firstOrFail();
-                $row_deposit = Deposit::where('idsolicitud',$solicitude->idsolicitud)->get();
-                if(count($row_deposit)>0)
+        try
+        {
+            $deposit = Input::all();
+            DB::beginTransaction();
+            $solicitude = Solicitude::where('token',$deposit['token'])->firstOrFail();
+            $row_deposit = Deposit::where('idsolicitud',$solicitude->idsolicitud)->get();
+            if(count($row_deposit)>0)
+            {
+                DB::rollback();
+                return 0;
+            }
+            else
+            {
+                $retencion = 0;
+                if (!$solicitude->retencion == null)
                 {
-                    return 0;
+                    $retencion = $solicitude->retencion;
                 }
-                else
+                $newDeposit = new Deposit;
+                $id = $newDeposit->lastId()+1;
+                $newDeposit->iddeposito        = $id;
+                $newDeposit->total             = ($solicitude->monto - $retencion);
+                $newDeposit->num_transferencia = $deposit['op_number'];
+                $newDeposit->idsolicitud       = $solicitude->idsolicitud;  
+                
+                if($newDeposit->save())
                 {
-                    $retencion = 0;
-                    if (!$solicitude->retencion == null)
-                    {
-                        $retencion = $solicitude->retencion;
-                    }
-                    $newDeposit = new Deposit;
-                    $id = $newDeposit->lastId()+1;
-                    $newDeposit->iddeposito        = $id;
-                    $newDeposit->total             = ($solicitude->monto - $retencion);
-                    $newDeposit->num_transferencia = $deposit['op_number'];
-                    $newDeposit->idsolicitud       = $solicitude->idsolicitud;  
+                    $oldOolicitude      = Solicitude::where('token',$deposit['token'])->first();
+                    $oldStatus          = $oldOolicitude->estado;
+                    $idSol              = $oldOolicitude->idsolicitud;
+
+                    $solicitudeUpd             = Solicitude::where('token',$deposit['token']);
+                    $solicitudeUpd->estado     = DEPOSITADO;
+                    $solicitudeUpd->iddeposito = $id;
+                    $data                      = $this->objectToArray($solicitudeUpd);
+                    $solicitudeUpd->update($data);
                     
-                    if($newDeposit->save())
+                    $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, DEPOSITADO, Auth::user()->id, USER_CONTABILIDAD, $idSol);
+                    if ( $rpta[status] == ok )
                     {
-                        $oldOolicitude      = Solicitude::where('token',$deposit['token'])->first();
-                        $oldStatus          = $oldOolicitude->estado;
-                        $idSol              = $oldOolicitude->idsolicitud;
-
-                        $solicitudeUpd             = Solicitude::where('token',$deposit['token']);
-                        $solicitudeUpd->estado     = DEPOSITADO;
-                        $solicitudeUpd->iddeposito = $id;
-                        $data                      = $this->objectToArray($solicitudeUpd);
-                        $solicitudeUpd->update($data);
-                        
-                        $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, DEPOSITADO, Auth::user()->id, USER_CONTABILIDAD, $idSol);
-                        //$this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, DEPOSITADO, Auth::user()->id, $oldOolicitude->iduser, $idSol);
+                        DB::commit();
+                        return 1;
                     }
+                    //$this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, DEPOSITADO, Auth::user()->id, $oldOolicitude->iduser, $idSol);
                 }
-            });
-            return 1;
-        } catch (Exception $e) {
-            return 0;
+            }
+            
         }
+        catch (Exception $e) 
+        {
+            DB::rollback();
+            $rpta = $this->internalException($e,__FUNCTION__);
+        }
+        return 0;
     }
     
     public function depositFondoTes(){

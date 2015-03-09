@@ -397,25 +397,27 @@ function newSolicitude() {
                     }
                 }).done(function (data)
                 {
-                    console.log(data);
                     $.unblockUI();
-                    if (data == 'R') {
-                        bootbox.alert(message2, function() {
-                            window.location.href = server + 'show_rm'
-                        });
-
-                    }
-                    else if(data == 'S'){
-                        responseUI('Solicitud Registrada', 'green');
-                        setTimeout(function()
-                        {
-                            window.location.href = server + 'show_sup';
-                        },500);
+                    if(data.Status == 'Ok')
+                    {
+                        if (data.Data == 'R') {
+                            responseUI('Solicitud Registrada', 'green');
+                            setTimeout(function()
+                            {
+                                window.location.href = server + 'show_rm';
+                            },500);
+                        }
+                        else if(data.Data == 'S'){
+                            responseUI('Solicitud Registrada', 'green');
+                            setTimeout(function()
+                            {
+                                window.location.href = server + 'show_sup';
+                            },500);
+                        }
                     }
                     else
                     {
-                        console.log("qqqqqqqqq");
-                        responseUI("Faltan Ingresar Campos", 'red');
+                        responseUI(data.Status + ': ' + data.Description,'red');
                     }
                 }).fail(function (e) {
                     $.unblockUI();
@@ -881,12 +883,12 @@ function newSolicitude() {
                     loadingUI(message);
                     $.post(server + 'aceptar-solicitud-gerprod', form_acepted_solicitude.serialize()).done(function(data){
                         $.unblockUI();
-                        if(data === 'ok'){
+                        if(data.Status === 'Ok'){
                             bootbox.alert('<h4 style="color: green">Solicitud Aceptada</h4>' , function(){
                                 window.location.href = server + 'aceptar-solicitud-gerprod';
                             });
                         }else{
-                            bootbox.alert('<h4 style="color: red">La solicitud no se puedo guardar</h4>' , function(){
+                            bootbox.alert('<h4 style="color: red">' + data.Status + ': '+ data.Description + '</h4>' , function(){
                                 //window.location.href = server + 'aceptar-solicitud-gerprod';
                             });
                         }
@@ -981,11 +983,14 @@ function newSolicitude() {
 
                     $.post(server + 'aprobar-solicitud', form_acepted_solicitude.serialize()).done(function(data){
                         $.unblockUI();
-                        if(data === 'ok'){
+                        if(data.Status === 'Ok')
+                        {
                             bootbox.alert('<h4 style="color: green">Solicitud Aprobada</h4>' , function(){
                                 window.location.href = server + 'aprobar-solicitud';
                             });
-                        }else{
+                        }
+                        else
+                        {
                             bootbox.alert('<h4 style="color: red">La solicitud no se puedo aprobar</h4>' , function(){
                                 //window.location.href = server + 'aceptar-solicitud-gerprod';
                             });
