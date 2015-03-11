@@ -13,9 +13,12 @@ class Entry extends Eloquent
     function searchId(){
 
         $lastId = Entry::orderBy('idasiento', 'DESC')->first();
-        if($lastId == null){
+        if($lastId == null)
+        {
             return 0;
-        }else{
+        }
+        else
+        {
             return $lastId->idasiento;
         }
 

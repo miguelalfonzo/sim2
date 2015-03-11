@@ -97,6 +97,7 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.Rm.register_solicitude', $data);
     }
 
+    // IDKC: CHANGE STATUS => PENDIENTE
     public function registerSolicitude()
     {
         try
@@ -397,6 +398,7 @@ class SolicitudeController extends BaseController
         return $rpta;
     }
 
+    // IDKC: CHANGE STATUS => CANCELADO
     public function cancelSolicitude()
     {
         try
@@ -625,6 +627,7 @@ class SolicitudeController extends BaseController
         }
     }
 
+    // IDKC: CHANGE STATUS => RECHAZADO
     public function denySolicitude()
     {
         try
@@ -660,6 +663,7 @@ class SolicitudeController extends BaseController
 
     }
 
+    // IDKC: CHANGE STATUS => ACEPTADO
     public function acceptedSolicitude()
     {
         try
@@ -689,7 +693,7 @@ class SolicitudeController extends BaseController
                 $i++;
             }
             $user = User::where('id', Auth::user()->id)->first();
-            $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, ACEPTADO, Auth::user()->id, Auth::user()->id, $idSol);
+            $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, ACEPTADO, Auth::user()->id, USER_GERENTE_COMERCIAL, $idSol);
             if ( $rpta[status] == ok )
             {
                 DB::commit();
@@ -708,6 +712,7 @@ class SolicitudeController extends BaseController
        return Redirect::to('show_sup')->with('state', ACEPTADO);
    }
 
+    // IDKC: CHANGE STATUS => PENDIENTE DERIVADO
     public function derivedSolicitude($token,$derive=0)
     {   
         try
@@ -834,6 +839,7 @@ class SolicitudeController extends BaseController
         }
     }
 
+    // IDKC: CHANGE STATUS => CANCELADO
     public function cancelSolicitudeSup()
     {
         try
@@ -1693,12 +1699,10 @@ class SolicitudeController extends BaseController
             DB::beginTransaction();
             $result = array();
             $dataInputs  = Input::all();
-            $solicitudeId = null;
-            $fondoId = null;
-            Log::error(json_encode($dataInputs));
+            $solicitudeId;
+            $fondoId;
             foreach ($dataInputs['seatList'] as $key => $seatItem) 
             {
-                Log::error($seatItem);
                 list($day, $month, $year) = explode('/', $seatItem['fec_origen']);
                 $dateTemp = mktime(11, 14, 54, $month, $day, $year);
                 $fec_origen = date("Y/m/d", $dateTemp);
@@ -1719,23 +1723,21 @@ class SolicitudeController extends BaseController
                 $seat->leyenda_fj   = $seatItem['leyenda'];
                 $seat->leyenda      = $seatItem['leyenda_variable'];
                 $seat->tipo_resp    = $seatItem['tipo_responsable'];
-                if(isset($seatItem['solicitudeId']))
+                if(isset($seatItem['solicitudId']))
                 {
                     $solicitudeId       = $seatItem['solicitudId'];
                     $seat->idsolicitud  = $solicitudeId;
-                }else{
+                }
+                else
+                {
                     $fondoId        = $seatItem['fondoId'];
                     $seat->idfondo  = $fondoId;
                 }
                 $seat->tipo_asiento = ASIENTO_GASTO_TIPO;
-                //$seat->idfondo      = null;
                 $seat->save();
-            }
-            Log::error('-----------');
-            Log::error(json_encode($solicitudeId));
-            Log::error(json_encode($fondoId));
-            
-            if($solicitudeId != null){
+            }        
+            if($solicitudeId != null)
+            {
                 $oldOolicitude      = Solicitude::where('idsolicitud', $solicitudeId)->first();
                 $oldStatus          = $oldOolicitude->estado;
                 $idSol              = $oldOolicitude->idsolicitud;
@@ -1748,12 +1750,15 @@ class SolicitudeController extends BaseController
                     DB::commit();
                     $result['msg'] = 'Asientos Registrados';
                 }
-            }else if($fondoId != null){
-                // IDKC: FALTA NOTIFICACIONES EN FONDOS INSTITUCIONES
+            }
+            else if($fondoId != null)
+            {
                 FondoInstitucional::where('idfondo', $fondoId)->update(array('asiento' => ASIENTO_FONDO_GASTO));
                 DB::commit();
                 $result['msg'] = 'Asientos Registrados';
-            }else{
+            }
+            else
+            {
                 DB::rollback();
                 $result['error'] = 'ERROR';
                 $result['msg']   = 'No se pudo registrar asientos';
@@ -1932,7 +1937,8 @@ class SolicitudeController extends BaseController
                     $tbEntry->save();
                 }
                 Solicitude::where('idsolicitud', $inputs['idsolicitude'])->update(array('asiento' => SOLICITUD_ASIENTO));
-                $middleRpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, GASTO_HABILITADO, Auth::user()->id, $oldOolicitude->iduser, $idSol);                    
+                $middleRpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, GASTO_HABILITADO, Auth::user()->id, $oldOolicitude->iduser, $idSol);
+                
                 if ($middleRpta[status] == ok)
                 {
                     DB::commit();
@@ -2012,6 +2018,7 @@ class SolicitudeController extends BaseController
             $oldOolicitude      = Solicitude::where('idsolicitud', $id)->first();
             $oldStatus          = $oldOolicitude->estado;
             $idSol              = $oldOolicitude->idsolicitud;
+            $userAproved          = $oldOolicitude->idaproved;
             if($val_ret != null)
             {
                 $solicitude->idtiporetencion = $idtyperetention;    
@@ -2020,7 +2027,8 @@ class SolicitudeController extends BaseController
             $data = $this->objectToArray($solicitude);
             if($solicitude->update($data))
             {
-                $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, DEPOSITO_HABILITADO, Auth::user()->id, USER_TESORERIA, $idSol);
+                $user_cod = User::where('id',$userAproved)->select('id')->first();
+                $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, DEPOSITO_HABILITADO, Auth::user()->id, $user_cod->id, $idSol);
                 if ($rpta[status] == ok)
                 {
                     DB::commit();
@@ -2114,7 +2122,7 @@ class SolicitudeController extends BaseController
                 Solicitude::where('token',$inputs['token'])->update( array('idresponse' => $inputs['responsable']) );
                 //$middleRpta = array( status => ok , description => 'Se asigno la solicitud correctamente');
 
-                $middleRpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, RESPONSABLE_HABILITADO, Auth::user()->id, $oldOolicitude->iduser, $idSol);
+                $middleRpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, RESPONSABLE_HABILITADO, Auth::user()->id, USER_TESORERIA, $idSol);
                 if ( $middleRpta[status] == ok )
                 {
                     DB::commit();

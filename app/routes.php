@@ -34,6 +34,7 @@ Route::get('getclients', 'Dmkt\SolicitudeController@getClients');
 
 /** Auth */
 Route::group(array('before' => 'rm'), function () {
+    
     /** Rep. Medico */
     Route::get('show_rm', 'Dmkt\SolicitudeController@show_rm');
     Route::get('nueva-solicitud-rm', 'Dmkt\SolicitudeController@newSolicitude');
@@ -42,10 +43,7 @@ Route::group(array('before' => 'rm'), function () {
     Route::get('listar-solicitudes-rm/{id}', 'Dmkt\SolicitudeController@listSolicitude');
     Route::get('getfondos/{id}', 'Dmkt\SolicitudeController@Fondo');
     Route::post('buscar-solicitudes-rm', 'Dmkt\SolicitudeController@searchSolicituds');
-    // Expense
-    Route::post('delete-expense', 'Expense\ExpenseController@deleteExpense');
-    Route::post('update-expense', 'Expense\ExpenseController@updateExpense');
-    Route::get('edit-expense', 'Expense\ExpenseController@editExpense');
+    
     // Ruc
     Route::post('consultarRuc', 'Expense\RucController@show');
     Route::get('ruc', function () {
@@ -214,7 +212,12 @@ Route::group(array('before' => 'rm_ager'), function ()
 {
     Route::get('registrar-gasto/{token}', 'Expense\ExpenseController@show');
     Route::get('end-expense/{token}', 'Expense\ExpenseController@finishExpense');
-    Route::get('ver-gasto/{token}', 'Expense\ExpenseController@viewExpense');  
+    Route::get('ver-gasto/{token}', 'Expense\ExpenseController@viewExpense');
+
+    // Expense
+    Route::get('edit-expense', 'Expense\ExpenseController@editExpense');
+    Route::post('delete-expense', 'Expense\ExpenseController@deleteExpense');
+    Route::post('update-expense', 'Expense\ExpenseController@updateExpense');
 });
 
 // Test
@@ -224,3 +227,5 @@ Route::group(array('before' => 'rm_ager'), function ()
 
     return Fondo::all();
 });*/
+Route::post('search-client', 'TestController@searchSeeker');
+Route::get('clientes-data','TestController@clientsTables');

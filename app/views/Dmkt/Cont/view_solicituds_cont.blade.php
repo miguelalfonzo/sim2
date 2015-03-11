@@ -20,14 +20,18 @@
         </td>
         <td style="text-align: center">
             <span class="label" style="background-color: {{$solicitude->state->color}}">{{$solicitude->state->nombre}}</span>
-            @if($solicitude->retencion != null && $solicitude->asiento == 2)
-             <span class="label" style="background-color: {{$solicitude->state->color}}">{{ESTADO_R}}</span>
-             <span class="label" style="background-color: {{$solicitude->state->color}}">{{ESTADO_AA}}</span>
-            @elseif($solicitude->retencion != null)
-             <span class="label" style="background-color: {{$solicitude->state->color}}">{{ESTADO_R}}</span>
-            @endif
-
-
+            @if($solicitude->estado != REGISTRADO && $solicitude->estado != GENERADO) 
+                @if($solicitude->retencion != null && $solicitude->asiento == 2)
+                 <span class="label" style="background-color: {{$solicitude->state->color}}">{{ESTADO_R}}</span>
+                 <span class="label" style="background-color: {{$solicitude->state->color}}">{{ESTADO_AA}}</span>
+                @elseif($solicitude->retencion != null)
+                 <span class="label" style="background-color: {{$solicitude->state->color}}">{{ESTADO_R}}</span>
+                @endif
+            @elseif ($solicitude->estado == REGISTRADO)
+                @if($solicitude->retencion != null)
+                 <span class="label" style="background-color: {{$solicitude->state->color}}">{{ESTADO_R}}</span>
+                @endif
+            @endif  
         </td>
         <td style="text-align: center">{{ date_format(date_create($solicitude->created_at), 'd/m/Y' )}}</td>
         <td style="text-align: center">{{$solicitude->typesolicitude->nombre}}</td>

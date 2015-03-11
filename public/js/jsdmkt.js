@@ -138,15 +138,42 @@ function newSolicitude() {
         }
 
     });
-    function load_client(client) {
+
+    function getSClients(request,response) 
+    {
+        console.log(request);
+        $.ajax(
+        {
+            type: 'post',
+            url: server+'search-client',
+            data:
+            {
+                "_token": $("input[name=_token]").val(),
+                "sVal": request
+            },
+            error: function()
+            {
+                    responseUI('Error del Sistema','red');
+            },
+        }).done( function (data)
+        {
+            if (!data.Status == 'Ok')
+            {
+                data.Data = '{"rn":"0","value":"0","label":"Error en la busqueda"}';   
+            }
+            
+        });
+
+        response(data.Data);    
+    }
+
+/*    function load_client(client) {
 
         function lightwell(request, response) {
             function hasMatch(s) {
                 return s.toLowerCase().indexOf(request.term.toLowerCase()) !== -1;
             }
-
             var i, l, obj, matches = [];
-
             if (request.term === "") {
                 response([]);
                 return;
@@ -163,11 +190,12 @@ function newSolicitude() {
 
         var idclient = '#idclient';
         if ($(idclient + client).length) {
+            console.log(this);
             $(idclient + client).autocomplete({
                 minLength: 0,
-                source: lightwell,
+                source: getClients,
                 focus: function (event, ui) {
-                    $(this).val(ui.item.clcodigo + ' - ' + ui.item.clnombre);
+                    $(this).val(ui.item.label + ' - ' + ui.item.value);
 
                     return false;
                 },
@@ -186,20 +214,20 @@ function newSolicitude() {
                 .data("ui-autocomplete")._renderItem = function (ul, item) {
                 return $("<li>")
                     .append("<a>" +
-                    "<br><span style='font-size: 80%;'>Codigo: " + item.clcodigo + "</span>" +
-                    "<br><span style='font-size: 60%;'>Cliente: " + item.clnombre + "</span></a>")
+                    "<br><span style='font-size: 80%;'>Codigo: " + item.label + "</span>" +
+                    "<br><span style='font-size: 60%;'>Cliente: " + item.value + "</span></a>")
                     .appendTo(ul);
             };
         }
     }
 
-    load_client(1);
+    load_client(1);*/
     var client = 2;
     $(document).on('click', '#btn-add-client', function () {
         $('<li><div style="position: relative"><input id="idclient' + client + '" name="clients[]" type="text" placeholder="" style="margin-bottom: 10px" class="form-control input-md input-client"><button type="button" class="btn-delete-client" style="z-index: 2"><span class="glyphicon glyphicon-remove"></span></button></div></li>').appendTo('#listclient');
         $(".btn-delete-client").show();
         setTimeout(function () {
-            load_client(client);
+            //load_client(client);
             client++;
         }, 200);
     });
@@ -2046,4 +2074,44 @@ function newSolicitude() {
         $(".fondo_d tbody tr").last().remove();
         $("#add-doc").show();
     });
+
+    $( document ).ready(function() 
+    {
+        $('.cliente-seeker').typeahead(
+        {
+            minLength: 1,
+            hightligth: true,
+            hint: false
+        },
+        {
+            name: 'label',
+            displayKey: 'label',
+            source: function (request , response)
+            {
+                $.ajax(
+                {
+                    type: 'post',
+                    url: server+'search-client',
+                    data:
+                    {
+                        "_token": $("input[name=_token]").val(),
+                        "sVal": request
+                    },
+                    error: function()
+                    {
+                            responseUI('Error del Sistema','red');
+                    },
+                }).done( function (data)
+                {
+                    if (!data.Status == 'Ok')
+                    {
+                        data.Data = '{"rn":"0","value":"0","label":"Error en la busqueda"}';   
+                    }
+                    response(data.Data);
+                });
+                       
+            }
+        });
+    });
+
 }

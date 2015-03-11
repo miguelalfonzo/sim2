@@ -80,9 +80,12 @@
             <div class="form-group col-sm-6 col-md-4 col-lg-4">
                 <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Monto Factura</label>
                 <div class="col-sm-12 col-md-12 col-lg-12">
-                    <input id="textinput" name="amount_fac" type="text" placeholder=""
+                    <div class="input-group">
+                        <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
+                        <input id="textinput" name="amount_fac" type="text" placeholder=""
                            value="{{$solicitude->monto_factura}}" readonly
                            class="form-control input-md">
+                    </div>
                 </div>
             </div>
             @endif
@@ -184,7 +187,13 @@
                             <h4 class="modal-title" id="myModalLabel">Comprobante</h4>
                         </div>
                         <div class="modal-body">
-                            <img class="img-responsive" src="{{URL::to('img').'/reembolso/'.$solicitude->image}}">
+                            @if (empty($solicitude->image))
+                                <h3>No se ingreso una imagen</h3>
+                            @elseif (!file_exists(public_path().'/'.IMAGE_PATH.$solicitude->image))
+                                <h3>No se encontro la imagen en el sistema</h3>
+                            @else
+                                <img class="img-responsive" src="{{asset(IMAGE_PATH.$solicitude->image)}}">
+                            @endif
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>

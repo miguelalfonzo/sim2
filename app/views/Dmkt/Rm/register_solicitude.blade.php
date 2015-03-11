@@ -33,6 +33,24 @@
     </div>
 </div>
 
+
+<!--  -->
+
+<div class="form-group col-sm-6 col-md-4">
+
+    <label class="col-sm-8 col-md-8 control-label" for="textinput">Pruebas</label>
+
+    <div class="col-sm-12 col-md-12">
+        <input id="idtitle" name="titulo" type="text" placeholder=""
+               value="{{isset($solicitude->titulo)? $solicitude->titulo : null }}"
+               class="form-control input-md cliente-seeker">
+
+    </div>
+</div>
+
+
+
+
 <div class="form-group col-sm-6 col-md-4">
 
     <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo Solicitud</label>

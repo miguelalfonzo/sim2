@@ -17,6 +17,7 @@
     {{ HTML::style('css/datepicker.css') }}
     {{ HTML::style('css/ladda-themeless.min.css') }}
     {{ HTML::style('css/stylos.css') }}
+    {{ HTML::style('css/typeahead.css') }}
     {{ HTML::style('css/main.css') }}
     {{ HTML::script('js/jquery_2.1.0.min.js') }}
     {{ HTML::script('js/jquery-ui.min.js') }}
@@ -80,5 +81,6 @@
 {{ HTML::script('js/js.js') }}
 {{ HTML::script('js/jsdmkt.js') }}
 {{ HTML::script('js/bootstrap-lightbox.js') }}
+{{ HTML::script('js/typeahead.js') }}
 </body>
 </html>

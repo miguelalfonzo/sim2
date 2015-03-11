@@ -129,7 +129,6 @@ class BaseController extends Controller {
     public function setStatus($description, $status_from, $status_to, $user_from_id, $user_to_id, $idsolicitude){
         try
         {
-            DB::beginTransaction();
             $fromStatus = State::where('idestado', $status_from)->first();
             $toStatus   = State::where('idestado', $status_to)->first();
             $fromUser   = User::where('id', $user_from_id)->first();
@@ -147,31 +146,38 @@ class BaseController extends Controller {
             {
                 $idestadoFrom = $fromStatus == null ? null : $fromStatus->idestado;
                 $idestadoTo = $toStatus == null ? null : $toStatus->idestado;
-                $this->updateStatusSolicitude($description, $idestadoFrom, $idestadoTo, $fromUser->type, $toUser->type, $idsolicitude, 0);
-                $rpta = $this->setRpta();
-                DB::commit();
-            }
+                $rpta = $this->updateStatusSolicitude($description, $idestadoFrom, $idestadoTo, $fromUser->type, $toUser->type, $idsolicitude, 0);
+             }
         }
         catch (Exception $e)
         {
-            DB::rollback();
             $rpta = $this->internalException($e,__FUNCTION__);
         }
         return $rpta;
 
     }
 
-    public function updateStatusSolicitude($description, $status_from, $status_to, $user_from, $user_to, $idsolicitude, $notified){
-        $statusSolicitude               = new SolicitudeHistory;
-        $statusSolicitude->id           = $statusSolicitude->lastId()+1;
-        $statusSolicitude->description  = $description;
-        $statusSolicitude->status_from  = $status_from;
-        $statusSolicitude->status_to    = $status_to;
-        $statusSolicitude->user_from    = $user_from;
-        $statusSolicitude->user_to      = $user_to;
-        $statusSolicitude->idsolicitude = $idsolicitude;
-        $statusSolicitude->notified     = $notified;
-        return $statusSolicitude->save();
+    public function updateStatusSolicitude($description, $status_from, $status_to, $user_from, $user_to, $idsolicitude, $notified)
+    {   
+        try
+        {
+            $statusSolicitude               = new SolicitudeHistory;
+            $statusSolicitude->id           = $statusSolicitude->lastId()+1;
+            $statusSolicitude->description  = $description;
+            $statusSolicitude->status_from  = $status_from;
+            $statusSolicitude->status_to    = $status_to;
+            $statusSolicitude->user_from    = $user_from;
+            $statusSolicitude->user_to      = $user_to;
+            $statusSolicitude->idsolicitude = $idsolicitude;
+            $statusSolicitude->notified     = $notified;
+            $statusSolicitude->save();
+            $rpta = $this->setRpta();
+        }
+        catch (Exception $e)
+        {
+            $rpta = $this->internalException($e,__FUNCTION__);
+        }
+        return $rpta;
     }
 
     protected function setRpta( $data='' )
