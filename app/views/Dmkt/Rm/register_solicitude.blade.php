@@ -34,7 +34,7 @@
 </div>
 
 
-<!--  -->
+<!--  
 
 <div class="form-group col-sm-6 col-md-4">
 
@@ -48,7 +48,7 @@
     </div>
 </div>
 
-
+-->
 
 
 <div class="form-group col-sm-6 col-md-4">

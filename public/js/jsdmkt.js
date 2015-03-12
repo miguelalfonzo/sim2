@@ -139,7 +139,7 @@ function newSolicitude() {
 
     });
 
-    function getSClients(request,response) 
+   /* function getSClients(request,response) 
     {
         console.log(request);
         $.ajax(
@@ -165,9 +165,9 @@ function newSolicitude() {
         });
 
         response(data.Data);    
-    }
+    }*/
 
-/*    function load_client(client) {
+    function load_client(client) {
 
         function lightwell(request, response) {
             function hasMatch(s) {
@@ -190,12 +190,11 @@ function newSolicitude() {
 
         var idclient = '#idclient';
         if ($(idclient + client).length) {
-            console.log(this);
             $(idclient + client).autocomplete({
                 minLength: 0,
-                source: getClients,
+                source: lightwell,
                 focus: function (event, ui) {
-                    $(this).val(ui.item.label + ' - ' + ui.item.value);
+                    $(this).val(ui.item.clcodigo + ' - ' + ui.item.clnombre);
 
                     return false;
                 },
@@ -214,20 +213,20 @@ function newSolicitude() {
                 .data("ui-autocomplete")._renderItem = function (ul, item) {
                 return $("<li>")
                     .append("<a>" +
-                    "<br><span style='font-size: 80%;'>Codigo: " + item.label + "</span>" +
-                    "<br><span style='font-size: 60%;'>Cliente: " + item.value + "</span></a>")
+                    "<br><span style='font-size: 80%;'>Codigo: " + item.clcodigo + "</span>" +
+                    "<br><span style='font-size: 60%;'>Cliente: " + item.clnombre + "</span></a>")
                     .appendTo(ul);
             };
         }
     }
 
-    load_client(1);*/
+    load_client(1);
     var client = 2;
     $(document).on('click', '#btn-add-client', function () {
         $('<li><div style="position: relative"><input id="idclient' + client + '" name="clients[]" type="text" placeholder="" style="margin-bottom: 10px" class="form-control input-md input-client"><button type="button" class="btn-delete-client" style="z-index: 2"><span class="glyphicon glyphicon-remove"></span></button></div></li>').appendTo('#listclient');
         $(".btn-delete-client").show();
         setTimeout(function () {
-            //load_client(client);
+            load_client(client);
             client++;
         }, 200);
     });
@@ -2079,13 +2078,26 @@ function newSolicitude() {
     {
         $('.cliente-seeker').typeahead(
         {
-            minLength: 1,
+            minLength: 3,
             hightligth: true,
             hint: false
         },
         {
-            name: 'label',
+            name: 'json',
             displayKey: 'label',
+            templates:  
+            {
+                empty: 
+                [
+                    '<div class="empty-message">',
+                    'no results found',
+                    '</div>'
+                ].join('\n'),
+                suggestion: function(data)
+                {
+                    return '<p><strong>' + data.value + '</strong> - ' + data.rn + '</p>';
+                }
+            },
             source: function (request , response)
             {
                 $.ajax(
@@ -2111,6 +2123,17 @@ function newSolicitude() {
                 });
                        
             }
+        }).on('typeahead:selected', function (evento, suggestion , dataset)
+        {
+            var input = $(this);
+            input.attr("name",dataset);
+            input.attr("table",suggestion.table);
+            input.attr("pk",suggestion.value);
+            console.log(input.val());
+            console.log(this);
+            console.log(evento);
+            console.log(suggestion);
+            console.log(dataset);
         });
     });
 
