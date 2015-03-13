@@ -28,6 +28,7 @@ use \URL;
 use \User;
 use \Validator;
 use \View;
+use \Common\StateRange;
 
 class SolicitudeController extends BaseController
 {
@@ -71,7 +72,7 @@ class SolicitudeController extends BaseController
 
     public function show_rm()
     {
-        $states = State::orderBy('idestado', 'ASC')->get();
+        $states = StateRange::order();
         return View::make('Dmkt.Rm.show_rm')->with('states', $states);
     }
 
@@ -243,33 +244,33 @@ class SolicitudeController extends BaseController
         return $rpta;
     }
 
-    public function listSolicitude($state)
+    public function listSolicitude($estado)
     {
 
         $today = getdate();
         $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
-        $lastday = date('t-m-Y', strtotime($m));
-        $firstday = date('01-m-Y', strtotime($m));
-
-        if (Auth::user()->type == 'R') {
-            if ($state== 0) {
-
-                $solicituds = Solicitude::where('iduser', Auth::user()->Rm->iduser)
-                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                    ->get();
-
-            } else {
-                $solicituds = Solicitude::where('iduser', Auth::user()->Rm->iduser)
-                    ->where('estado', $state)
-                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                    ->get();
-
-            }
-
-            $view = View::make('Dmkt.Rm.view_solicituds_rm')->with('solicituds', $solicituds);
-
-            return $view;
+        $end = date('t-m-Y', strtotime($m));
+        $start = date('01-m-Y', strtotime($m));
+        $user = Auth::user();
+        if ($user->type == 'S') 
+        {
+            $reps = $user->Sup->Reps;
+            $users_ids = array();
+            foreach ($reps as $rm)
+                $users_ids[] = $rm->iduser;
+            $users_ids[] = $user->id;
         }
+        else
+        {
+            $users_ids = array($user->id);
+        }
+        $solicituds = $this->searchTransaction($estado,$users_ids,$start,$end);
+        if ($user->type == 'S') 
+            $view = View::make('Dmkt.Sup.view_solicituds_sup')->with($solicituds);
+        else
+            $view = View::make('Dmkt.Rm.view_solicituds_rm')->with($solicituds);
+        
+        return $view;
     }
 
     public function viewSolicitude($token)
@@ -443,66 +444,90 @@ class SolicitudeController extends BaseController
         $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
         $lastday = date('t-m-Y', strtotime($m));
         $firstday = date('01-m-Y', strtotime($m));
-        $idUser = Auth::user()->id;
-        if ($start != null && $end != null) {
-            if ($estado != 10) {
-                $solicituds = Solicitude::select('*')
-                    ->where('estado', $estado)
-                    ->where('iduser', $idUser)
-                    ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
-                    ->get();
-
-                $rSolicituds = Solicitude::select('*')
-                    ->where('estado', $estado)
-                    ->where('iduser', '<>' , $idUser)
-                    ->where('idresponse',Auth::user()->id)
-                    ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
-                    ->get();
-            } else {
-                $solicituds = Solicitude::select('*')
-                    ->where('iduser', $idUser)
-                    ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
-                    ->get();
-
-                $rSolicituds = Solicitude::select('*')
-                    ->where('iduser', '<>' , $idUser)
-                    ->where('idresponse',Auth::user()->id)
-                    ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
-                    ->get();
-            }
-        } 
-        else 
+        $user = Auth::user();
+        if ($user->type == 'S') 
         {
-            if ($estado != 10) 
-            {
-                $solicituds = Solicitude::select('*')
-                    ->where('estado', $estado)
-                    ->where('iduser', $idUser)
-                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                    ->get();
-
-                $rSolicituds = Solicitude::select('*')
-                    ->where('estado', $estado)
-                    ->where('iduser', '<>' ,$idUser)
-                    ->where('idresponse',Auth::user()->id)
-                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                    ->get();
-            } else {
-
-                $solicituds = Solicitude::select('*')
-                    ->where('iduser', $idUser)
-                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                    ->get();
-
-                $rSolicituds = Solicitude::select('*')
-                    ->where('iduser', '<>' ,$idUser)
-                    ->where('idresponse',Auth::user()->id)
-                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                    ->get();
-            }
+            $reps = $user->Sup->Reps;
+            $users_ids = array();
+            foreach ($reps as $rm)
+                $users_ids[] = $rm->iduser;
+            $users_ids[] = $user->id;
         }
-        $view = View::make('Dmkt.Rm.view_solicituds_rm')->with(array('solicituds' => $solicituds,'rSolicitudes' => $rSolicituds));
+        else
+        {
+            $users_ids = array($user->id);
+        }
+        $solicituds = $this->searchTransaction($estado,$users_ids,$start,$end);
+        Log::error($solicituds);
+        if ($user->type == 'S') 
+        {
+            $view = View::make('Dmkt.Sup.view_solicituds_sup')->with($solicituds);
+        }
+        else
+            $view = View::make('Dmkt.Rm.view_solicituds_rm')->with($solicituds);
         return $view;
+    }
+
+    public function searchSolicitudsSup()
+    {
+
+        $inputs = Input::all();
+        $estado = $inputs['idstate'];
+        $start = $inputs['date_start'];
+        $end = $inputs['date_end'];
+        $today = getdate();
+        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
+        $lastday = date('t-m-Y', strtotime($m));
+        $firstday = date('01-m-Y', strtotime($m));
+
+        $user = Auth::user();
+        if ($user->type == 'S') 
+        {
+            $reps = $user->Sup->Reps;
+            $users_ids = array();
+            foreach ($reps as $rm)
+                $users_ids[] = $rm->iduser;
+            $users_ids[] = $user->id;
+            
+            $solicituds = $this->searchTransaction($estado,$idUser,$start,$end);
+
+            $view = View::make('Dmkt.Sup.view_solicituds_sup')->with($solicituds);
+            return $view;
+        }
+    }
+
+    private function searchTransaction($estado,$idUser,$start,$end)
+    {
+        $solicituds = Solicitude::select('*')
+        ->whereIn('iduser', $idUser);
+
+        $rSolicituds = Solicitude::select('*')
+        ->whereNotIn('iduser', $idUser)
+        ->where('idresponse',Auth::user()->id);
+
+        if ($start != null && $end != null) 
+            $solicituds->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1");
+            $rSolicituds->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1");
+        if ($estado != 10) 
+            $solicituds->whereHas('state', function ($q) use($estado)
+            {
+                $q->whereHas('rangeState', function ($t) use($estado)
+                {
+                    $t->where('id',$estado);
+                });
+            });
+            $rSolicituds->whereHas('state', function ($q) use($estado)
+            {
+                $q->whereHas('rangeState', function ($t) use($estado)
+                {
+                    $t->where('id',$estado);
+                });
+            });
+
+        $solicituds = $solicituds->get();
+        $rSolicituds = $rSolicituds->get();
+
+        return array('solicituds' => $solicituds, 'rSolicituds' => $rSolicituds);
     }
 
     /** -----------------------------------------------  Supervisor  -------------------------------------------------------- */
@@ -510,12 +535,13 @@ class SolicitudeController extends BaseController
     {
 
         $state = Session::get('state');
-        $states = State::orderBy('idestado', 'ASC')->get();
+        $states = StateRange::order();
         $data = [
 
             'states' => $states,
             'state' => $state
         ];
+        Log::error($state);
         return View::make('Dmkt.Sup.show_sup', $data);
 
     }
@@ -788,56 +814,7 @@ class SolicitudeController extends BaseController
 
     }
 
-    public function searchSolicitudsSup()
-    {
-
-        $inputs = Input::all();
-        $estado = $inputs['idstate'];
-        $start = $inputs['date_start'];
-        $end = $inputs['date_end'];
-        $today = getdate();
-        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
-        $lastday = date('t-m-Y', strtotime($m));
-        $firstday = date('01-m-Y', strtotime($m));
-
-        $user = Auth::user();
-        if ($user->type == 'S') {
-            $reps = $user->Sup->Reps;
-            $users_ids = [];
-            foreach ($reps as $rm)
-                $users_ids[] = $rm->iduser;
-            $users_ids[] = $user->id;
-            if ($start != null && $end != null) {
-                if ($estado != 10) {
-                    $solicituds = Solicitude::whereIn('iduser', $users_ids)
-                        ->where('estado', $estado)
-                        ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
-                        ->get();
-
-                } else {
-                    $solicituds = Solicitude::whereIn('iduser', $users_ids)
-                        ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
-                        ->get();
-                }
-
-
-            } else {
-                if ($estado != 10) {
-                    $solicituds = Solicitude::whereIn('iduser', $users_ids)
-                        ->where('estado', $estado)
-                        ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                        ->get();
-                } else {
-                    $solicituds = Solicitude::whereIn('iduser', $users_ids)
-                        ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                        ->get();
-                }
-            }
-
-            $view = View::make('Dmkt.Sup.view_solicituds_sup')->with('solicituds', $solicituds);
-            return $view;
-        }
-    }
+    
 
     // IDKC: CHANGE STATUS => CANCELADO
     public function cancelSolicitudeSup()
@@ -887,7 +864,7 @@ class SolicitudeController extends BaseController
     public function show_gerprod()
     {
         $state = Session::get('state');
-        $states = State::orderBy('idestado', 'ASC')->get();
+        $states = StateRange::order();
         $data = [
 
             'states' => $states,
@@ -1120,7 +1097,7 @@ class SolicitudeController extends BaseController
     {
         $state = Session::get('state');
         $estado = Session::get('Estado');
-        $states = State::orderBy('idestado', 'ASC')->get();
+        $states = StateRange::order();
         $data = array(
             'state' => $state,
             'states' => $states,
@@ -1777,7 +1754,7 @@ class SolicitudeController extends BaseController
     public function show_cont()
     {
         $state = Session::get('state');
-        $states = State::orderBy('idestado', 'ASC')->get();
+        $states = StateRange::order();
         $data = [
             'states' => $states,
             'state' => $state

@@ -298,6 +298,21 @@ Route::filter('rm_ager', function ()
     }
 });
 
+Route::filter('rm_ager', function () 
+{
+    if (Auth::check()) 
+    {
+        if (! (Auth::user()->type == 'R' || Auth::user()->type == 'AG' || Auth::user()->type == 'S' || Auth::user()->type == 'P' || Auth::user()->type == 'C' || Auth::user()->type == 'G' || Auth::user()->type == 'T'))
+        {
+            return Redirect::to('login');  
+        }
+    }
+    else
+    {
+        return Redirect::to('login');
+    }
+});
+
 
 /*
 |--------------------------------------------------------------------------

@@ -18,8 +18,10 @@
             <!-- Solicitudes -->
             <div class="tab-pane fade active in" id="solicitudes">
                 <div class="panel panel-default">
-                    <div class="panel-body table-solicituds-rm">
-                        <div class="col-md-12" style="padding: 0">
+                    
+                        @include('template/searchmenu')
+                        <!-- Search Header -->
+                        <!-- <div class="col-md-12" style="padding: 0">
                             <form method="post" action="" class="">
                                 {{Form::token()}}
                                 <div class="form-group col-sm-3 col-md-2" style="padding: 0">
@@ -62,10 +64,8 @@
                                     <a href="{{URL::to('nueva-solicitud-rm')}}" id="singlebutton" name="singlebutton" class="btn btn-primary">Nueva Solicitud</a>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <!-- Table -->
-
-                    </div>
                     <a id="show_leyenda" style="margin-left: 15px" href="#">Ver leyenda</a>
                     <a id="hide_leyenda" style="margin-left: 15px;display: none" href="#" >Ocultar leyenda</a>
                 </div>

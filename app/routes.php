@@ -40,9 +40,8 @@ Route::group(array('before' => 'rm'), function () {
     Route::get('nueva-solicitud-rm', 'Dmkt\SolicitudeController@newSolicitude');
     Route::get('ver-solicitud-rm/{token}', 'Dmkt\SolicitudeController@viewSolicitude');
     Route::post('cancelar-solicitud-rm', 'Dmkt\SolicitudeController@cancelSolicitude');
-    Route::get('listar-solicitudes-rm/{id}', 'Dmkt\SolicitudeController@listSolicitude');
     Route::get('getfondos/{id}', 'Dmkt\SolicitudeController@Fondo');
-    Route::post('buscar-solicitudes-rm', 'Dmkt\SolicitudeController@searchSolicituds');
+    
     
     // Ruc
     Route::post('consultarRuc', 'Expense\RucController@show');
@@ -220,6 +219,12 @@ Route::group(array('before' => 'rm_ager'), function ()
     Route::post('update-expense', 'Expense\ExpenseController@updateExpense');
 });
 
+Route::group(array('before' => 'sys_user'), function ()
+{
+    Route::post('buscar-solicitudes-rm', 'Dmkt\SolicitudeController@searchSolicituds');
+    Route::get('listar-solicitudes-rm/{id}', 'Dmkt\SolicitudeController@listSolicitude');
+});
+
 // Test
 
 /*Route::get('test_expense', function()
@@ -229,3 +234,4 @@ Route::group(array('before' => 'rm_ager'), function ()
 });*/
 Route::post('search-client', 'TestController@searchSeeker');
 Route::get('clientes-data','TestController@clientsTables');
+Route::get('tmp','TestController@tm');

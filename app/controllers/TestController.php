@@ -1,8 +1,28 @@
 <?php
 
+use Dmkt\Solicitude;
+
 class TestController extends BaseController 
 {
-
+	public function tm()
+	{
+		$id = 3;
+		$models = Solicitude::with('state.rangeState')->whereHas('state', function ($q) use($id)
+		{
+			$q->whereHas('rangeState', function ($t) use($id)
+			{
+				$t->where('id',$id);
+			});
+		})->get();
+		//$m = $models->has('id');
+		
+		/*foreach ($models as $model)
+		
+			Log::error($model->state->range_state);*/
+		
+		
+		return $models;
+	}
 
 	private function clientsTables()
 	{

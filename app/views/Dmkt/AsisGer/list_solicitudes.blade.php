@@ -18,10 +18,11 @@
         <td style="text-align: center">
             {{$solicitude->typemoney->simbolo.$solicitude->monto }}
         </td>
-        <td style="text-align: center">
+        @include('template/states')
+        <!-- <td style="text-align: center">
             <span class="label" style="background-color: {{$solicitude->state->color}}">{{$solicitude->state->nombre}}</span>
 
-        </td>
+        </td> -->
         <td style="text-align: center">{{ date_format(date_create($solicitude->created_at), 'd/m/Y' )}}</td>
         <td style="text-align: center">{{$solicitude->typesolicitude->nombre}}</td>
         <td>

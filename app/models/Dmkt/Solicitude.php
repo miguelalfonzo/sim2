@@ -37,6 +37,11 @@ class Solicitude extends Eloquent{
         return $this->hasOne('Common\State','idestado','estado');
     }
 
+    function rangeState(){
+        return $this->hasOne('Common\State','idestado','estado')
+        ->hasOne('Common\StateRange','id','idstate');    
+    }
+
     function typemoney(){
 
         return $this->hasOne('Common\TypeMoney','idtipomoneda','tipo_moneda');
@@ -99,4 +104,16 @@ class Solicitude extends Eloquent{
     function aprovedGerProd(){
         return $this->hasOne('Dmkt\Manager','iduser','idaproved');
     }
+
+    /*protected function solicitudsRange($user,$estado,$start,$end)
+    {
+        $solicituds = Solicitude::leftJoin('dmkt_rg_sub_estado as se','se.idestado','s.estado')
+        ->leftJoin('dmkt_rg_estado as e','e.id','se.idstate')
+        ->where('s.iduser',$user)
+        ->select('s.idsolicitud','s.typemoney','created_at','s.typesolicitude','s.estado','s.asiento','s.idresponse','s.derive','s.blocked')
+        if ($estado != 10)
+        {
+
+        }
+    }*/
 }

@@ -8,10 +8,13 @@
 namespace Common;
 use \Eloquent;
 
-class State extends Eloquent{
+class State extends Eloquent
+{
+    protected $table = 'DMKT_RG_SUB_ESTADO';
+    protected $primaryKey = 'idestado';
 
-    protected $table = 'DMKT_RG_ESTADO';
-    protected $primaryKey = 'IDESTADO';
-
-
+	function rangeState()
+	{
+        return $this->hasOne('Common\StateRange','id','idstate');
+    }
 }

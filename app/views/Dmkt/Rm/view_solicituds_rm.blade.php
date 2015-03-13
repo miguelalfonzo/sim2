@@ -16,12 +16,12 @@
         <td style="text-align: center">{{$solicitude->idsolicitud}}</td>
         <td>{{$solicitude->titulo}}</td>
         <td style="text-align: center">
-            {{$solicitude->typemoney->simbolo.$solicitude->monto }}
+            {{$solicitude->typemoney->simbolo.$solicitude->monto}}
         </td>
-        <td style="text-align: center">
-            <span class="label" style="background-color: {{$solicitude->state->color}}">{{$solicitude->state->nombre}}</span>
-
-        </td>
+        @include('template/states')
+        <!-- <td style="text-align: center">
+            <span class="label" style="background-color: {{$solicitude->state->rangeState->color}}">{{$solicitude->state->rangeState->nombre}}</span>
+        </td> -->    
         <td style="text-align: center">{{ date_format(date_create($solicitude->created_at), 'd/m/Y' )}}</td>
         <td style="text-align: center">{{$solicitude->typesolicitude->nombre}}</td>
         <td>
@@ -54,7 +54,7 @@
                 {{$rSolicitude->typemoney->simbolo.$rSolicitude->monto }}
             </td>
             <td style="text-align: center">
-                <span class="label" style="background-color: {{$rSolicitude->state->color}}">{{$rSolicitude->state->nombre}}</span>
+                <span class="label" style="background-color: {{$rSolicitude->state->rangeState->color}}">{{$rSolicitude->state->rangeState->nombre}}</span>
 
             </td>
             <td style="text-align: center">{{ date_format(date_create($rSolicitude->created_at), 'd/m/Y' )}}</td>

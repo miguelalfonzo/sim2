@@ -582,10 +582,11 @@ function newSolicitude() {
             l.start();
             var jqxhr = $.post(server + "buscar-solicitudes-"+typeUser, { idstate: $('#idState').val(), date_start: $('#date_start').val(), date_end: $('#date_end').val() ,_token : document.getElementsByName('_token')[0].value })
                 .done(function (data) {
-
-                    $('#table_solicitude_'+typeUser+'_wrapper').remove();
-                    $('.table-solicituds-'+typeUser).append(data);
-                    $('#table_solicitude_'+typeUser).dataTable({
+                    console.log(typeUser);
+                    console.log(userType);
+                    $('#table_solicitude_rm_wrapper').remove();
+                    $('.table-solicituds-rm').append(data);
+                    $('#table_solicitude_rm').dataTable({
                             "order": [
                                 [ 3, "desc" ]
                             ],
@@ -613,9 +614,10 @@ function newSolicitude() {
 
     /* List solicitude pending */
 
-    if(userType === 'R'){
+    if(userType === 'R' || userType === 'S'){
         listSolicitude('rm',PENDIENTE);
-        listFondosRm();
+        if(userType === 'R')
+            listFondosRm();
     }
     //
 
@@ -700,9 +702,9 @@ function newSolicitude() {
     /**------------------------------------------------ SUPERVISOR ---------------------------------------------------*/
 
     /* list solicitude pending or depending of type state */
-    if(userType === 'S' && $('#state_view').val() != undefined)
+    /*if(userType === 'S' && $('#state_view').val() != undefined)
         listSolicitude('sup', $('#state_view').val());
-
+*/
 
     var amount_families = $('.amount_families');
     amount_families.numeric({negative: false});
