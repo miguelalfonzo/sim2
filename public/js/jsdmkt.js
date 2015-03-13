@@ -39,6 +39,12 @@ function newSolicitude() {
     var RECHAZADO = 9;
     var BLOQUEADO = 10;
 
+    //NUEVOS ESTADOS
+    var R_PENDIENTE = 1;
+    var R_APROBADO = 2;
+    var R_REVISADO = 3;
+    var R_NO_AUTORIZADO = 4;
+
 
     // get clients
     $.getJSON(server + "getclients", function (data) {
@@ -138,34 +144,6 @@ function newSolicitude() {
         }
 
     });
-
-   /* function getSClients(request,response) 
-    {
-        console.log(request);
-        $.ajax(
-        {
-            type: 'post',
-            url: server+'search-client',
-            data:
-            {
-                "_token": $("input[name=_token]").val(),
-                "sVal": request
-            },
-            error: function()
-            {
-                    responseUI('Error del Sistema','red');
-            },
-        }).done( function (data)
-        {
-            if (!data.Status == 'Ok')
-            {
-                data.Data = '{"rn":"0","value":"0","label":"Error en la busqueda"}';   
-            }
-            
-        });
-
-        response(data.Data);    
-    }*/
 
     function load_client(client) {
 
@@ -457,34 +435,45 @@ function newSolicitude() {
 
 
     //Function list Solicitude
-    function listSolicitude(typeUser , state){
-        $.ajax({
-            url: server + 'listar-solicitudes-'+typeUser +'/' + state,
-            type: 'GET',
+    function listSolicitude(state)
+    { 
+        $.ajax(
+        {
+            url: server + 'buscar-solicitudes',
+            type: 'POST',
+            data:
+            { 
+                idstate: state,
+                date_start: $('#date_start').val(), 
+                date_end: $('#date_end').val(),
+                _token : document.getElementsByName('_token')[0].value 
+            },
             dataType: 'html'
-
-        }).done(function (data) {
-            $('.table-solicituds-'+typeUser).append(data);
-            $('#table_solicitude_'+typeUser).dataTable({
-                    "order": [
-                        [ 3, "desc" ] //order date
-                    ],
-                    "bLengthChange": false,
-                    'iDisplayLength': 7,
-                    "oLanguage": {
-                        "sSearch": "Buscar: ",
-                        "sZeroRecords": "No hay solicitudes",
-                        "sInfoEmpty": "No hay solicitudes",
-                        "sInfo": 'Mostrando _END_ de _TOTAL_',
-                        "oPaginate": {
-                            "sPrevious": "Anterior",
-                            "sNext" : "Siguiente"
-                        }
+        }).done(function (data) 
+        {
+            $('.table-solicituds').append(data);
+            $('#table_solicitude').dataTable(
+            {
+                "order": 
+                [
+                    [ 3, "desc" ] //order date
+                ],
+                "bLengthChange": false,
+                'iDisplayLength': 7,
+                "oLanguage": 
+                {
+                    "sSearch": "Buscar: ",
+                    "sZeroRecords": "No hay solicitudes",
+                    "sInfoEmpty": "No hay solicitudes",
+                    "sInfo": 'Mostrando _END_ de _TOTAL_',
+                    "oPaginate": 
+                    {
+                        "sPrevious": "Anterior",
+                        "sNext" : "Siguiente"
                     }
                 }
-            );
+            });
         });
-
     }
 
     function listFondos(user, state){
@@ -580,13 +569,11 @@ function newSolicitude() {
             date_end.attr('placeholder', '');
             var l = Ladda.create(search);
             l.start();
-            var jqxhr = $.post(server + "buscar-solicitudes-"+typeUser, { idstate: $('#idState').val(), date_start: $('#date_start').val(), date_end: $('#date_end').val() ,_token : document.getElementsByName('_token')[0].value })
+            var jqxhr = $.post(server + "buscar-solicitudes", { idstate: $('#idState').val(), date_start: $('#date_start').val(), date_end: $('#date_end').val() ,_token : document.getElementsByName('_token')[0].value })
                 .done(function (data) {
-                    console.log(typeUser);
-                    console.log(userType);
-                    $('#table_solicitude_rm_wrapper').remove();
-                    $('.table-solicituds-rm').append(data);
-                    $('#table_solicitude_rm').dataTable({
+                    $('#table_solicitude_wrapper').remove();
+                    $('.table-solicituds').append(data);
+                    $('#table_solicitude').dataTable({
                             "order": [
                                 [ 3, "desc" ]
                             ],
@@ -611,14 +598,15 @@ function newSolicitude() {
                 })
         }
     }
-
+    // -------------------------------------  REPRESENTANTE MEDICO -----------------------------
     /* List solicitude pending */
 
-    if(userType === 'R' || userType === 'S'){
-        listSolicitude('rm',PENDIENTE);
-        if(userType === 'R')
-            listFondosRm();
-    }
+    if ($('#state_view').val() == undefined)
+        listSolicitude(R_PENDIENTE);
+    else
+        listSolicitude($('#state_view').val());    
+    if(userType === 'R')
+        listFondosRm();
     //
 
     function listFondosRm(){
@@ -669,6 +657,7 @@ function newSolicitude() {
                     $.post(server + 'cancelar-solicitud-rm', {idsolicitude: $(aux).attr('data-idsolicitude') ,_token :$(aux).attr('data-token')})
                         .done(function (data) {
                             bootbox.alert('Solicitud Cancelada' , function(){
+                                $("#idState")[0].selectedIndex = R_NO_AUTORIZADO;
                                 $('#table_solicitude_rm_wrapper').remove();
                                 $('.table-solicituds-rm').append(data);
                                 $('#table_solicitude_rm').dataTable({
@@ -757,11 +746,17 @@ function newSolicitude() {
                     loadingUI(message);
                     $.post(server + 'aceptar-solicitud' , form_acepted_solicitude.serialize()).done(function(data){
                         $.unblockUI();
-                        bootbox.alert('<h4 style="color: green">Solicitud Aceptada</h4>' , function(){
-                            window.location.href = server + 'aceptar-solicitud';
-                        });
-
-
+                        if (data.Data = R_APROBADO)
+                        {
+                            bootbox.alert('<h4 style="color: green">Solicitud Aceptada</h4>' , function()
+                            {
+                                window.location.href = server + 'aceptar-solicitud';
+                            });
+                        }
+                        else
+                        {
+                            bootbox.alert('<h4 style="color: red">'+ data.Status + ': ' + data.Description + '</h4>');    
+                        }
                     });
                    /* setTimeout(function () {
 
@@ -785,7 +780,7 @@ function newSolicitude() {
     $('#deny_solicitude').on('click', function (e) {
 
         bootbox.confirm({
-            message : '¿Esta seguro que desea cancelar esta solicitud?',
+            message : '¿Esta seguro que desea rechazar esta solicitud?',
             buttons: {
                 'cancel' :{ label :'cancel' ,className: 'btn-primary'},
                 'confirm' :{ label :'aceptar' ,className: 'btn-default'}
@@ -797,9 +792,7 @@ function newSolicitude() {
                     form_acepted_solicitude.submit();
                 }
             }
-
         });
-
     });
 
     var cancel_solicitude_sup = '.cancel-solicitude-sup';
@@ -889,8 +882,8 @@ function newSolicitude() {
 
     /** ---------------------------------------------- GERENTE PRODUCTO -------------------------------------------- **/
 
-    if(userType === 'P')
-        listSolicitude('gerprod',$('#state_view').val());
+    /*if(userType === 'P' && $('#state_view').val() != undefined)
+        listSolicitude('gerprod',$('#state_view').val());*/
 
     /* solicitude accepted */
     var form_acepted_solicitude = $('#form_make_activity');
@@ -938,24 +931,7 @@ function newSolicitude() {
         }
     });
 
-    $('#deny_solicitude_gerprod').on('click', function (e) {
-
-        bootbox.confirm({
-            message : '¿Esta seguro que desea rechazar esta solicitud?',
-            buttons: {
-                'cancel': {label: 'cancelar', className: 'btn-primary'},
-                'confirm': {label: 'aceptar', className: 'btn-default'}
-            },
-            callback : function (result) {
-                if (result) {
-                    var url = server + 'rechazar-solicitud-gerprod';
-                    form_acepted_solicitude.attr('action', url);
-                    form_acepted_solicitude.submit();
-                }
-            }
-        });
-
-    });
+    
 
     var search_solicitude_gerprod = $('#search_solicitude_gerprod');
     search_solicitude_gerprod.on('click', function () {
@@ -965,8 +941,8 @@ function newSolicitude() {
 
     /** -------------------------------------------- GERENTE COMERCIAL --------------------------------------------- **/
 
-    if(userType === 'G')
-        listSolicitude('gercom',$('#state_view').val());
+    /*if(userType === 'G')
+        listSolicitude('gercom',$('#state_view').val());*/
 
     /* preview image */
 
@@ -1043,7 +1019,7 @@ function newSolicitude() {
     /** --------------------------------------------- CONTABILIDAD ------------------------------------------------- **/
 
     if(userType === 'C'){
-        listSolicitude('cont',APROBADO);
+        /*listSolicitude('cont',APROBADO);*/
         listFondos('fondos-contabilidad', $('#estado_fondo_cont').val());
         listDocuments();
         $("#datefondo").val(dateactual);
@@ -1059,7 +1035,7 @@ function newSolicitude() {
 
     if(userType === 'T')
     {
-        listSolicitude('tes',APROBADO);
+        /*listSolicitude('tes',APROBADO);*/
         listFondos('fondos-tesoreria');
     }
 
@@ -1198,33 +1174,28 @@ function newSolicitude() {
             date_reg_fondo.parent().addClass('has-error');
             date_reg_fondo.attr('placeholder', 'Ingrese Mes');
             date_reg_fondo.addClass('input-placeholder-error');
-            console.log(validate = 1);
         }
         if(!fondo_total.val()){
             fondo_total.parent().addClass('has-error');
             fondo_total.attr('placeholder', 'Ingrese Cantidad a depositar');
             fondo_total.addClass('input-placeholder-error');
-            console.log(validate = 1);
         }
         if(!fondo_cuenta.val()){
             fondo_cuenta.parent().addClass('has-error');
             fondo_cuenta.attr('placeholder', 'Ingrese Cuenta');
             fondo_cuenta.addClass('input-placeholder-error');
-            console.log(validate = 1);
         }
         if(!fondo_repmed.val()){
             fondo_repmed.val('');
             fondo_repmed.parent().addClass('has-error');
             fondo_repmed.attr('placeholder', 'Ingrese Representante');
             fondo_repmed.addClass('input-placeholder-error');
-            console.log(validate = 1);
         }
         if(fondo_repmed.attr('data-select') == 'false'){
             fondo_repmed.val('');
             fondo_repmed.parent().addClass('has-error');
             fondo_repmed.attr('placeholder', 'Ingrese Representante');
             fondo_repmed.addClass('input-placeholder-error');
-            console.log(validate = 1);
         }
         if(validate == 0){
             var dato = {
@@ -1547,7 +1518,6 @@ function newSolicitude() {
     });
 
     function searchFondos(datefondo , aux) {
-        console.log(datefondo+ "-"+aux);
         $('#loading-fondo').attr('class','show');
         $('.table-solicituds-fondos > .fondo_r').remove();
         $('.fondo_r').remove();
@@ -1680,20 +1650,17 @@ function newSolicitude() {
         if(!$('#username input').val()){
             $('#username span').text('Campo Obligatorio');
             validate = 1;
-            console.log(validate);
         }
         if(!$('#email input').val()){
             $('#email span').text('Campo Obligatorio');
 
             validate = 1;
-            console.log(validate);
         }else if(!regex_email.test($('#email input').val())){;
             $('#email span').text('Email Invalido');
         }
         if(!$('#password input').val() && $('#iduser').val()){
             $('#password span').text('Campo Obligatorio');
             validate = 1;
-            console.log(validate);
         }
 
         if(validate = 0){
@@ -2131,12 +2098,55 @@ function newSolicitude() {
             input.attr("name",dataset);
             input.attr("table",suggestion.table);
             input.attr("pk",suggestion.value);
-            console.log(input.val());
-            console.log(this);
-            console.log(evento);
-            console.log(suggestion);
-            console.log(dataset);
         });
     });
+
+
+       /* function getSClients(request,response) 
+    {
+        console.log(request);
+        $.ajax(
+        {
+            type: 'post',
+            url: server+'search-client',
+            data:
+            {
+                "_token": $("input[name=_token]").val(),
+                "sVal": request
+            },
+            error: function()
+            {
+                    responseUI('Error del Sistema','red');
+            },
+        }).done( function (data)
+        {
+            if (!data.Status == 'Ok')
+            {
+                data.Data = '{"rn":"0","value":"0","label":"Error en la busqueda"}';   
+            }
+            
+        });
+
+        response(data.Data);    
+    }*/
+
+        /*$('#deny_solicitude_gerprod').on('click', function (e) {
+
+        bootbox.confirm({
+            message : '¿Esta seguro que desea rechazar esta solicitud?',
+            buttons: {
+                'cancel': {label: 'cancelar', className: 'btn-primary'},
+                'confirm': {label: 'aceptar', className: 'btn-default'}
+            },
+            callback : function (result) {
+                if (result) 
+                {
+                    var url = server + 'rechazar-solicitud-gerprod';
+                    form_acepted_solicitude.attr('action', url);
+                    form_acepted_solicitude.submit();
+                }
+            }
+        });
+    });*/
 
 }

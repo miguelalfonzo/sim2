@@ -345,7 +345,7 @@
             @if($block == false)
             <a id="test" name="button1id"
                class="btn btn-primary accepted_solicitude_gerprod">Aceptar</a>
-            <a id="deny_solicitude_gerprod" name="button1id" class="btn btn-primary deny_solicitude_gerprod">Rechazar
+            <a id="deny_solicitude" name="button1id" class="btn btn-primary deny_solicitude_gerprod">Rechazar
             </a>
             <a id="button2id" href="{{URL::to('cancelar-solicitud-gerprod').'/'.$solicitude->token}}" name="button2id"
                class="btn btn-primary">Cancelar</a>

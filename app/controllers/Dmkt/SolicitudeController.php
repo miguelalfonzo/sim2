@@ -244,14 +244,24 @@ class SolicitudeController extends BaseController
         return $rpta;
     }
 
-    public function listSolicitude($estado)
+    public function searchSolicituds()
     {
-
+        $inputs = Input::all();
+        $user = Auth::user();
+        $estado = $inputs['idstate'];
         $today = getdate();
         $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
-        $end = date('t-m-Y', strtotime($m));
-        $start = date('01-m-Y', strtotime($m));
-        $user = Auth::user();
+        
+        if (Input::has('date_start'))
+            $start = $inputs['date_start'];
+        else
+            $start = date('01-m-Y', strtotime($m));
+        
+        if (Input::has('date_end'))
+            $end = $inputs['date_end'];
+        else
+            $end = date('t-m-Y', strtotime($m));
+
         if ($user->type == 'S') 
         {
             $reps = $user->Sup->Reps;
@@ -260,18 +270,66 @@ class SolicitudeController extends BaseController
                 $users_ids[] = $rm->iduser;
             $users_ids[] = $user->id;
         }
-        else
+        else if ($user->type == GER_PROD)
         {
-            $users_ids = array($user->id);
+            $solicitud_ids = [];
+            $solicituds = $user->GerProd->solicituds;
+            foreach ($solicituds as $sol)
+                $solicitud_ids[] = $sol->idsolicitud; // jalo los ids de las solicitudes pertenecientes al gerente de producto
+            $solicitud_ids[] = 0; // el cero va para que tenga al menos con que comparar, para que no salga error
+            $users_ids = $solicitud_ids;
         }
-        $solicituds = $this->searchTransaction($estado,$users_ids,$start,$end);
-        if ($user->type == 'S') 
-            $view = View::make('Dmkt.Sup.view_solicituds_sup')->with($solicituds);
         else
-            $view = View::make('Dmkt.Rm.view_solicituds_rm')->with($solicituds);
-        
+            $users_ids = array($user->id);
+        $solicituds = $this->searchTransaction($estado,$users_ids,$start,$end);
+        $view = View::make('template.solicituds')->with($solicituds);
         return $view;
     }
+
+    private function searchTransaction($estado,$idUser,$start,$end)
+    {
+        Log::error(Auth::user()->type);
+        $solicituds = Solicitude::select('*');
+        $rSolicituds = Solicitude::select('*');
+        if (Auth::user()->type == SUP || Auth::user()->type == REP_MED)
+        {
+            $solicituds->whereIn('iduser', $idUser);
+            $rSolicituds->whereNotIn('iduser', $idUser)
+            ->where('idresponse',Auth::user()->id);
+        }
+        else if (Auth::user()->type != GER_COM)
+        {
+            Log::error('gerprod');
+            $solicituds = Solicitude::whereIn('idsolicitud', $idUser);
+        }
+
+        if ($start != null && $end != null)
+            $solicituds->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1");
+            $rSolicituds->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1");
+
+        if ($estado != R_TODOS) 
+            $solicituds->whereHas('state', function ($q) use($estado)
+            {
+                $q->whereHas('rangeState', function ($t) use($estado)
+                {
+                    $t->where('id',$estado);
+                });
+            });
+            $rSolicituds->whereHas('state', function ($q) use($estado)
+            {
+                $q->whereHas('rangeState', function ($t) use($estado)
+                {
+                    $t->where('id',$estado);
+                });
+            });
+        $solicituds = $solicituds->get();
+        $rSolicituds = $rSolicituds->get();
+        if (Auth::user()->type != GER_PROD)
+            $solicituds->merge($rSolicituds);
+        return array('solicituds' => $solicituds);
+    }
+
+    
 
     public function viewSolicitude($token)
     {
@@ -424,8 +482,7 @@ class SolicitudeController extends BaseController
             DB::rollback();
             $rpta = $this->internalException($e,__FUNCTION__);
         }
-        return $this->listSolicitude(PENDIENTE);
-
+        return $this->listSolicitude(R_NO_AUTORIZADO);
     }
 
     public function subtypeactivity($id)
@@ -434,101 +491,6 @@ class SolicitudeController extends BaseController
         return json_encode($subtypeactivities);
     }
 
-    public function searchSolicituds()
-    {
-        $inputs = Input::all();
-        $estado = $inputs['idstate'];
-        $start = $inputs['date_start'];
-        $end = $inputs['date_end'];
-        $today = getdate();
-        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
-        $lastday = date('t-m-Y', strtotime($m));
-        $firstday = date('01-m-Y', strtotime($m));
-        $user = Auth::user();
-        if ($user->type == 'S') 
-        {
-            $reps = $user->Sup->Reps;
-            $users_ids = array();
-            foreach ($reps as $rm)
-                $users_ids[] = $rm->iduser;
-            $users_ids[] = $user->id;
-        }
-        else
-        {
-            $users_ids = array($user->id);
-        }
-        $solicituds = $this->searchTransaction($estado,$users_ids,$start,$end);
-        Log::error($solicituds);
-        if ($user->type == 'S') 
-        {
-            $view = View::make('Dmkt.Sup.view_solicituds_sup')->with($solicituds);
-        }
-        else
-            $view = View::make('Dmkt.Rm.view_solicituds_rm')->with($solicituds);
-        return $view;
-    }
-
-    public function searchSolicitudsSup()
-    {
-
-        $inputs = Input::all();
-        $estado = $inputs['idstate'];
-        $start = $inputs['date_start'];
-        $end = $inputs['date_end'];
-        $today = getdate();
-        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
-        $lastday = date('t-m-Y', strtotime($m));
-        $firstday = date('01-m-Y', strtotime($m));
-
-        $user = Auth::user();
-        if ($user->type == 'S') 
-        {
-            $reps = $user->Sup->Reps;
-            $users_ids = array();
-            foreach ($reps as $rm)
-                $users_ids[] = $rm->iduser;
-            $users_ids[] = $user->id;
-            
-            $solicituds = $this->searchTransaction($estado,$idUser,$start,$end);
-
-            $view = View::make('Dmkt.Sup.view_solicituds_sup')->with($solicituds);
-            return $view;
-        }
-    }
-
-    private function searchTransaction($estado,$idUser,$start,$end)
-    {
-        $solicituds = Solicitude::select('*')
-        ->whereIn('iduser', $idUser);
-
-        $rSolicituds = Solicitude::select('*')
-        ->whereNotIn('iduser', $idUser)
-        ->where('idresponse',Auth::user()->id);
-
-        if ($start != null && $end != null) 
-            $solicituds->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1");
-            $rSolicituds->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1");
-        if ($estado != 10) 
-            $solicituds->whereHas('state', function ($q) use($estado)
-            {
-                $q->whereHas('rangeState', function ($t) use($estado)
-                {
-                    $t->where('id',$estado);
-                });
-            });
-            $rSolicituds->whereHas('state', function ($q) use($estado)
-            {
-                $q->whereHas('rangeState', function ($t) use($estado)
-                {
-                    $t->where('id',$estado);
-                });
-            });
-
-        $solicituds = $solicituds->get();
-        $rSolicituds = $rSolicituds->get();
-
-        return array('solicituds' => $solicituds, 'rSolicituds' => $rSolicituds);
-    }
 
     /** -----------------------------------------------  Supervisor  -------------------------------------------------------- */
     public function show_sup()
@@ -536,11 +498,10 @@ class SolicitudeController extends BaseController
 
         $state = Session::get('state');
         $states = StateRange::order();
-        $data = [
-
+        $data = array(
             'states' => $states,
             'state' => $state
-        ];
+        );
         Log::error($state);
         return View::make('Dmkt.Sup.show_sup', $data);
 
@@ -659,13 +620,11 @@ class SolicitudeController extends BaseController
         try
         {
             DB::beginTransaction();
+            $user = Auth::user();
             $inputs = Input::all();
             $id = $inputs['idsolicitude'];
-            
             $oldOolicitude      = Solicitude::where('idsolicitud', $id)->first();
             $oldStatus          = $oldOolicitude->estado;
-            $idSol              = $oldOolicitude->idsolicitud;
-
             $solicitude = Solicitude::where('idsolicitud', $id);
             $solicitude->idsolicitud = (int)$id;
             $solicitude->observacion = $inputs['observacion'];
@@ -673,8 +632,7 @@ class SolicitudeController extends BaseController
             $solicitude->blocked = 0;
             $data = $this->objectToArray($solicitude);
             $solicitude->update($data);
-
-            $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, RECHAZADO, Auth::user()->id,  $oldOolicitude->iduser, $idSol);
+            $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, RECHAZADO, $user->id,  $oldOolicitude->iduser, $id);
             if ( $rpta[status] == ok )
             {
                 DB::commit();
@@ -685,9 +643,13 @@ class SolicitudeController extends BaseController
             DB::rollback();
             $rpta = $this->internalException($e,__FUNCTION__);
         }
-        return Redirect::to('show_sup')->with('state', RECHAZADO);
-
+        if ($rpta[status] == ok)
+            if ($user->type == SUP)
+                return Redirect::to('show_sup')->with('state',R_NO_AUTORIZADO);
+            else if ($user->type == GER_PROD)
+                return Redirect::to('show_gerprod')->with('state', R_NO_AUTORIZADO);    
     }
+
 
     // IDKC: CHANGE STATUS => ACEPTADO
     public function acceptedSolicitude()
@@ -722,6 +684,7 @@ class SolicitudeController extends BaseController
             $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, ACEPTADO, Auth::user()->id, USER_GERENTE_COMERCIAL, $idSol);
             if ( $rpta[status] == ok )
             {
+                $this->setRpta(R_APROBADO);
                 DB::commit();
             }
         }
@@ -735,7 +698,7 @@ class SolicitudeController extends BaseController
 
    public function redirectAcceptedSolicitude()
    {
-       return Redirect::to('show_sup')->with('state', ACEPTADO);
+       return Redirect::to('show_sup')->with('state', R_APROBADO);
    }
 
     // IDKC: CHANGE STATUS => PENDIENTE DERIVADO
@@ -780,84 +743,13 @@ class SolicitudeController extends BaseController
         return Redirect::to('show_sup');
     }
 
-    public function listSolicitudeSup($id)
-    {
-
-        $today = getdate();
-        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
-        $lastday = date('t-m-Y', strtotime($m));
-        $firstday = date('01-m-Y', strtotime($m));
-
-        if (Auth::user()->type == 'S') {
-            $reps = Auth::user()->Sup->Reps;
-            $users_ids = [];
-            foreach ($reps as $rm)
-                $users_ids[] = $rm->iduser;
-            $users_ids[] = Auth::user()->id;
-            if ($id == 10) {
-
-                $solicituds = Solicitude::whereIn('iduser', $users_ids)
-                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                    ->get();
-            } else {
-
-                $solicituds = Solicitude::whereIn('iduser', $users_ids)
-                    ->where('estado', $id)
-                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                    ->get();
-            }
-
-
-            $view = View::make('Dmkt.Sup.view_solicituds_sup')->with('solicituds', $solicituds);
-            return $view;
-        }
-
-    }
-
-    
-
-    // IDKC: CHANGE STATUS => CANCELADO
-    public function cancelSolicitudeSup()
-    {
-        try
-        {
-            DB::beginTransaction();
-            $inputs = Input::all();
-            $id = $inputs['idsolicitude'];
-            
-            $oldOolicitude      = Solicitude::where('idsolicitud', $id)->first();
-            $oldStatus          = $oldOolicitude->estado;
-            $idSol              = $oldOolicitude->idsolicitud;
-
-            $solicitude = Solicitude::where('idsolicitud', $id);
-            $solicitude->estado = CANCELADO;
-            $data = $this->objectToArray($solicitude);
-            $solicitude->update($data);
-
-            $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, CANCELADO, Auth::user()->id, $oldOolicitude->iduser, $idSol);
-            if ( $rpta[status] == ok)
-            {
-                DB::commit();
-            }
-        }
-        catch (Exception $e)
-        {
-            DB::rollback();
-            $rpta = $this->internalException($e,__FUNCTION__);
-        }
-        return $this->listSolicitudeSup(PENDIENTE);
-    }
-
     public function disBlockSolicitudeSup($token)
     {
-
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         Solicitude::where('idsolicitud', $solicitude->idsolicitud) // desbloqueamos la solicitud para que el rm lo pueda editar
         ->update(array('blocked' => 0));
         return Redirect::to('show_sup');
-
     }
-
 
     /** --------------------------------------------- Gerente de  Producto ----------------------------------------------- */
 
@@ -865,45 +757,12 @@ class SolicitudeController extends BaseController
     {
         $state = Session::get('state');
         $states = StateRange::order();
-        $data = [
-
+        $data = array(
             'states' => $states,
             'state' => $state
-        ];
+        );
+        Log::error($state);
         return View::make('Dmkt.GerProd.show_gerprod', $data);
-    }
-
-    public function listSolicitudeGerProd($id)
-    {
-
-        $today = getdate();
-        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
-        $lastday = date('t-m-Y', strtotime($m));
-        $firstday = date('01-m-Y', strtotime($m));
-        $user = Auth::user();
-        if ($user->type == 'P') {
-            $solicitud_ids = [];
-            $solicituds = $user->GerProd->solicituds;
-            foreach ($solicituds as $sol) {
-                $solicitud_ids[] = $sol->idsolicitud;
-            }
-
-            if(count($solicitud_ids)){ // si no hay solicitudes
-                if ($id == 0) {
-                    $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
-                        ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                        ->get();
-                } else {
-                    $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
-                        ->where('estado', $id)
-                        ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                        ->get();
-                }
-            }
-
-            $view = View::make('Dmkt.GerProd.view_solicituds_gerprod')->with('solicituds', $solicituds);
-            return $view;
-        }
     }
 
     public function viewSolicitudeGerProd($token)
@@ -1004,93 +863,6 @@ class SolicitudeController extends BaseController
         return Redirect::to('show_gerprod')->with('state', ACEPTADO);
     }
 
-    public function searchSolicitudsGerProd()
-    {
-
-        $inputs = Input::all();
-        $estado = $inputs['idstate'];
-        $start = $inputs['date_start'];
-        $end = $inputs['date_end'];
-        $today = getdate();
-        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
-        $lastday = date('t-m-Y', strtotime($m));
-        $firstday = date('01-m-Y', strtotime($m));
-        $user = Auth::user();
-
-        if ($user->type == 'P') {
-
-            $solicitud_ids = [];
-            $solicituds = $user->GerProd->solicituds;
-            foreach ($solicituds as $sol) {
-                $solicitud_ids[] = $sol->idsolicitud; // jalo los ids de las solicitudes pertenecientes al gerente de producto
-            }
-            $solicitud_ids[] = 0; // el cero va para que tenga al menos con que comparar, para que no salga error.
-            if ($start != null && $end != null) {
-                if ($estado != 10) {
-                    $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
-                        ->where('estado', $estado)
-                        ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
-                        ->get();
-
-                } else {
-                    $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
-                        ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
-                        ->get();
-                }
-
-
-            } else {
-                if ($estado != 10) {
-                    $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
-                        ->where('estado', $estado)
-                        ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                        ->get();
-                } else {
-                    $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
-                        ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                        ->get();
-                }
-            }
-
-            $view = View::make('Dmkt.GerProd.view_solicituds_gerprod')->with('solicituds', $solicituds);
-            return $view;
-        }
-    }
-
-    // IDKC: CHANGE STATUS => RECHAZADO
-    public function denySolicitudeGerProd()
-    {
-        try
-        {
-            DB::beginTransaction();
-            $inputs = Input::all();
-            $id = $inputs['idsolicitude'];
-            $oldOolicitude      = Solicitude::where('idsolicitud', $id)->first();
-            $oldStatus          = $oldOolicitude->estado;
-            $idSol              = $oldOolicitude->idsolicitud;
-            $solicitude = Solicitude::where('idsolicitud', $id);
-            $solicitude->idsolicitud = (int)$id;
-            $solicitude->idaproved = Auth::user()->id;
-            $solicitude->observacion = $inputs['observacion'];
-            $solicitude->blocked = 0;
-            $solicitude->estado = RECHAZADO;
-            $data = $this->objectToArray($solicitude);
-            $solicitude->update($data);
-            $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, RECHAZADO, Auth::user()->id, $oldOolicitude->iduser, $idSol);
-            if ( $rpta[status] == ok )
-            {
-                DB::commit();
-            }
-        }
-        catch (Exception $e)
-        {
-            DB::rollback();
-            $rpta = $this->internalException($e,__FUNCTION__);
-        }
-        return Redirect::to('show_gerprod')->with('state', RECHAZADO);
-    }
-
-
     /** ---------------------------------------------  Gerente Comercial  -------------------------------------------------*/
 
     public function show_gercom()
@@ -1104,21 +876,6 @@ class SolicitudeController extends BaseController
             'estado' => $estado
         );
         return View::make('Dmkt.GerCom.show_gercom', $data);
-    }
-
-    public function listSolicitudeGerCom($id)
-    {
-
-
-        if ($id == 0) {
-            $solicituds = Solicitude::all();
-        } else {
-            $solicituds = Solicitude::where('estado', '=', $id)->get();
-        }
-
-        $view = View::make('Dmkt.GerCom.view_solicituds_gercom')->with('solicituds', $solicituds);
-        return $view;
-
     }
 
     public function gercomAsignarResponsable()
@@ -1281,64 +1038,7 @@ class SolicitudeController extends BaseController
         return Redirect::to('show_gercom')->with('state', RECHAZADO);
     }
 
-    public function searchSolicitudsGerCom()
-    {
-
-        $inputs = Input::all();
-        $estado = $inputs['idstate'];
-        $start = $inputs['date_start'];
-        $end = $inputs['date_end'];
-        $today = getdate();
-        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
-        $lastday = date('t-m-Y', strtotime($m));
-        $firstday = date('01-m-Y', strtotime($m));
-        $user = Auth::user();
-
-
-        if ($start != null && $end != null) {
-            if ($estado != 10) {
-                if ($estado == RECHAZADO) {
-                    $solicituds = Solicitude::where('estado', $estado)->where('idaproved', Auth::user()->id)
-                        ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
-                        ->get();
-                } else {
-                    $solicituds = Solicitude::where('estado', $estado)
-                        ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
-                        ->get();
-                }
-
-
-            } else {
-
-                $solicituds = Solicitude::where('estado', $estado)
-                    ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
-                    ->get();
-            }
-
-
-        } else {
-            if ($estado != 10) {
-                if ($estado == RECHAZADO) {
-                    $solicituds = Solicitude::where('estado', $estado)->where('idaproved', Auth::user()->id)
-                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                        ->get();
-                } else {
-                    $solicituds = Solicitude::where('estado', $estado)
-                        ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                        ->get();
-                }
-
-            } else {
-                $solicituds = Solicitude::where('estado', $estado)
-                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                    ->get();
-            }
-        }
-
-        $view = View::make('Dmkt.GerCom.view_solicituds_gercom')->with('solicituds', $solicituds);
-        return $view;
-
-    }
+    
 
      public function disBlockSolicitudeGerCom($token)
     {
@@ -2113,5 +1813,324 @@ class SolicitudeController extends BaseController
         }
         return $middleRpta;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*public function listSolicitudeGerCom($id)
+    {
+
+
+        if ($id == 0) {
+            $solicituds = Solicitude::all();
+        } else {
+            $solicituds = Solicitude::where('estado', '=', $id)->get();
+        }
+
+        $view = View::make('Dmkt.GerCom.view_solicituds_gercom')->with('solicituds', $solicituds);
+        return $view;
+
+    }
+
+    public function searchSolicitudsGerCom()
+    {
+
+        $inputs = Input::all();
+        $estado = $inputs['idstate'];
+        $start = $inputs['date_start'];
+        $end = $inputs['date_end'];
+        $today = getdate();
+        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
+        $lastday = date('t-m-Y', strtotime($m));
+        $firstday = date('01-m-Y', strtotime($m));
+        $user = Auth::user();
+
+
+        if ($start != null && $end != null) {
+            if ($estado != 10) {
+                if ($estado == RECHAZADO) {
+                    $solicituds = Solicitude::where('estado', $estado)->where('idaproved', Auth::user()->id)
+                        ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                        ->get();
+                } else {
+                    $solicituds = Solicitude::where('estado', $estado)
+                        ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                        ->get();
+                }
+
+
+            } else {
+
+                $solicituds = Solicitude::where('estado', $estado)
+                    ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                    ->get();
+            }
+
+
+        } else {
+            if ($estado != 10) {
+                if ($estado == RECHAZADO) {
+                    $solicituds = Solicitude::where('estado', $estado)->where('idaproved', Auth::user()->id)
+                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                        ->get();
+                } else {
+                    $solicituds = Solicitude::where('estado', $estado)
+                        ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                        ->get();
+                }
+
+            } else {
+                $solicituds = Solicitude::where('estado', $estado)
+                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                    ->get();
+            }
+        }
+
+        $view = View::make('Dmkt.GerCom.view_solicituds_gercom')->with('solicituds', $solicituds);
+        return $view;
+
+    }*/
+
+    /*public function searchSolicitudsSup()
+    {
+
+        $inputs = Input::all();
+        $estado = $inputs['idstate'];
+        $start = $inputs['date_start'];
+        $end = $inputs['date_end'];
+        $today = getdate();
+        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
+        $lastday = date('t-m-Y', strtotime($m));
+        $firstday = date('01-m-Y', strtotime($m));
+        $user = Auth::user();
+        if ($user->type == 'S') 
+        {
+            $reps = $user->Sup->Reps;
+            $users_ids = array();
+            foreach ($reps as $rm)
+                $users_ids[] = $rm->iduser;
+            $users_ids[] = $user->id;
+            
+            $solicituds = $this->searchTransaction($estado,$idUser,$start,$end);
+
+            $view = View::make('Dmkt.Sup.view_solicituds_sup')->with($solicituds);
+            return $view;
+        }
+    }*/
+
+    /*public function listSolicitudeSup($id)
+    {
+        $today = getdate();
+        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
+        $lastday = date('t-m-Y', strtotime($m));
+        $firstday = date('01-m-Y', strtotime($m));
+        if (Auth::user()->type == 'S') {
+            $reps = Auth::user()->Sup->Reps;
+            $users_ids = [];
+            foreach ($reps as $rm)
+                $users_ids[] = $rm->iduser;
+            $users_ids[] = Auth::user()->id;
+            if ($id == 10) {
+                $solicituds = Solicitude::whereIn('iduser', $users_ids)
+                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                    ->get();
+            } else {
+                $solicituds = Solicitude::whereIn('iduser', $users_ids)
+                    ->where('estado', $id)
+                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                    ->get();
+            }
+            $view = View::make('Dmkt.Sup.view_solicituds_sup')->with('solicituds', $solicituds);
+            return $view;
+        }
+    }*/
+
+
+    /*public function searchSolicitudsGerProd()
+    {
+
+        $inputs = Input::all();
+        $estado = $inputs['idstate'];
+        $start = $inputs['date_start'];
+        $end = $inputs['date_end'];
+        $today = getdate();
+        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
+        $lastday = date('t-m-Y', strtotime($m));
+        $firstday = date('01-m-Y', strtotime($m));
+        $user = Auth::user();
+
+        if ($user->type == 'P') {
+
+            $solicitud_ids = [];
+            $solicituds = $user->GerProd->solicituds;
+            foreach ($solicituds as $sol)
+                $solicitud_ids[] = $sol->idsolicitud; // jalo los ids de las solicitudes pertenecientes al gerente de producto
+            $solicitud_ids[] = 0; // el cero va para que tenga al menos con que comparar, para que no salga error.
+            if ($start != null && $end != null) {
+                if ($estado != 10) {
+                    $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
+                        ->where('estado', $estado)
+                        ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                        ->get();
+
+                } else {
+                    $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
+                        ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                        ->get();
+                }
+
+
+            } else {
+                if ($estado != 10) {
+                    $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
+                        ->where('estado', $estado)
+                        ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                        ->get();
+                } else {
+                    $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
+                        ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                        ->get();
+                }
+            }
+
+            $view = View::make('Dmkt.GerProd.view_solicituds_gerprod')->with('solicituds', $solicituds);
+            return $view;
+        }
+    }*/
+
+    /*public function listSolicitudeGerProd($id)
+    {
+
+        $today = getdate();
+        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
+        $lastday = date('t-m-Y', strtotime($m));
+        $firstday = date('01-m-Y', strtotime($m));
+        $user = Auth::user();
+        if ($user->type == 'P') {
+            $solicitud_ids = [];
+            $solicituds = $user->GerProd->solicituds;
+            foreach ($solicituds as $sol) {
+                $solicitud_ids[] = $sol->idsolicitud;
+            }
+
+            if(count($solicitud_ids)){ // si no hay solicitudes
+                if ($id == 0) {
+                    $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
+                        ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                        ->get();
+                } else {
+                    $solicituds = Solicitude::whereIn('idsolicitud', $solicitud_ids)
+                        ->where('estado', $id)
+                        ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                        ->get();
+                }
+            }
+
+            $view = View::make('Dmkt.GerProd.view_solicituds_gerprod')->with('solicituds', $solicituds);
+            return $view;
+        }
+    }*/
+
+    // IDKC: CHANGE STATUS => CANCELADO
+    /*public function cancelSolicitudeSup()
+    {
+        try
+        {
+            DB::beginTransaction();
+            $inputs = Input::all();
+            $id = $inputs['idsolicitude'];
+            $solicitude = Solicitude::where('idsolicitud', $id);
+            $oldOolicitude      = Solicitude::where('idsolicitud', $id)->first();
+            $oldStatus          = $oldOolicitude->estado;
+            $solicitude->estado = CANCELADO;
+            $data               = $this->objectToArray($solicitude);
+            $solicitude->update($data);
+            $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, CANCELADO, Auth::user()->id, $oldOolicitude->iduser, $id);
+            if ( $rpta[status] == ok)
+            {
+                DB::commit();
+            }
+        }
+        catch (Exception $e)
+        {
+            DB::rollback();
+            $rpta = $this->internalException($e,__FUNCTION__);
+        }
+        return $this->listSolicitudeSup(NO_AUTORIZADO);
+    }*/
+
+       /*public function listSolicitude($estado)
+    {
+        $today = getdate();
+        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
+        $end = date('t-m-Y', strtotime($m));
+        $start = date('01-m-Y', strtotime($m));
+        $user = Auth::user();
+        if ($user->type == 'S') 
+        {
+            $reps = $user->Sup->Reps;
+            $users_ids = array();
+            foreach ($reps as $rm)
+                $users_ids[] = $rm->iduser;
+            $users_ids[] = $user->id;
+        }
+        else if ($user->type == 'P') 
+        {
+            $solicitud_ids = [];
+            $solicituds = $user->GerProd->solicituds;
+            foreach ($solicituds as $sol)
+                $solicitud_ids[] = $sol->idsolicitud;
+            $users_ids = $solicitud_ids;
+        }
+        else
+        {
+            $users_ids = array($user->id);
+        }
+        $solicituds = $this->searchTransaction($estado,$users_ids,$start,$end);
+        $view = View::make('template.solicituds')->with($solicituds);
+        return $view;
+    }*/
+
+     /*// IDKC: CHANGE STATUS => RECHAZADO
+    public function denySolicitudeGerProd()
+    {
+        try
+        {
+            DB::beginTransaction();
+            $inputs = Input::all();
+            $id = $inputs['idsolicitude'];
+            $oldOolicitude      = Solicitude::where('idsolicitud', $id)->first();
+            $oldStatus          = $oldOolicitude->estado;
+            //$idSol              = $oldOolicitude->idsolicitud;
+            $solicitude = Solicitude::where('idsolicitud', $id);
+            $solicitude->idsolicitud = (int)$id;
+            $solicitude->idaproved = Auth::user()->id;
+            $solicitude->observacion = $inputs['observacion'];
+            $solicitude->blocked = 0;
+            $solicitude->estado = RECHAZADO;
+            $data = $this->objectToArray($solicitude);
+            $solicitude->update($data);
+            $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, RECHAZADO, Auth::user()->id, $oldOolicitude->iduser, $idSol);
+            if ( $rpta[status] == ok )
+            {
+                DB::commit();
+            }
+        }
+        catch (Exception $e)
+        {
+            DB::rollback();
+            $rpta = $this->internalException($e,__FUNCTION__);
+        }
+        return Redirect::to('show_gerprod')->with('state', RECHAZADO);
+    }*/
 
 }

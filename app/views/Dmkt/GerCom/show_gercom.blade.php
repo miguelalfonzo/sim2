@@ -4,9 +4,14 @@
     <div class="col-md-12" style="">
         <!-- Default panel contents -->
         <div class="panel panel-default">
-            <div class="panel-heading"><h3 class="panel-title">Solicitudes Gerente Comercial</h3><small style="float: right; margin-top: -10px"><strong>Usuario : Gerente Comercial</strong></small></div>
-
-            <div class="panel-body table-solicituds-gercom">
+            <div class="panel-heading">
+                <h3 class="panel-title">Solicitudes Gerente Comercial</h3>
+                <small style="float: right; margin-top: -10px">
+                    <strong>Usuario : Gerente Comercial</strong>
+                </small>
+            </div>
+            @include('template/searchmenu')
+            <!-- <div class="panel-body table-solicituds-gercom">
                 <div class="col-md-12" style="padding: 0">
                     <form method="post" action="" class="">
                         {{Form::token()}}
@@ -27,7 +32,6 @@
                                 </select>
                             </div>
                         </div>
-
                         <div class="form-group col-sm-4 col-md-3">
                             <div class="" style="padding: 0">
                                 <div class="input-group ">
@@ -62,18 +66,13 @@
                         </div>
                     </form>
                     <div class="form-group col-sm-6 col-md-2 button-new-solicitude" style="text-align: right; padding: 0">
-
-
-
                     </div>
-
                 </div>
-                <!-- Table -->
-
-            </div>
+            </div> -->
         </div>
     </div>
 </div>
+@include('template/leyenda')
 @if(isset($estado))
     <script type="text/javascript">
         @if($estado['Status'] == 1)

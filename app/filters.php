@@ -345,3 +345,41 @@ Route::filter('csrf', function () {
         throw new Illuminate\Session\TokenMismatchException;
     }
 });
+
+Route::filter('rm_sup', function () 
+{
+    if (Auth::check()) 
+    {
+        if (! (Auth::user()->type == 'R' || Auth::user()->type == 'S' ))
+        {
+            if (Auth::user()->type == 'C')
+            {
+                return Redirect::to('show_cont');
+            }
+            else if(Auth::user()->type == 'G')
+            {
+                return Redirect::to('show_gercom');
+            }
+            else if (Auth::user()->type == 'T')
+            {
+                return Redirect::to('show_tes');
+            }    
+            else if (Auth::user()->type == 'AG')
+            {
+                return Redirect::to('registrar-fondo');
+            }
+            else if (Auth::user()->type == 'P')
+            {
+                return Redirect::to('show_gerprod');
+            }
+            else
+            {
+                return Redirect::to('login');           
+            }        
+        }
+    }
+    else
+    {
+        return Redirect::to('login');
+    }
+});

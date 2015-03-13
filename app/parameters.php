@@ -9,6 +9,7 @@ const SOLICITUD_ASIENTO = 2;
 const IMAGE_PATH = 'img/reembolso/';
 const WIDTH = 800;
 const HEIGHT = 600;
+const data = 'Data';
 const ok = 'Ok';
 const warning = 'Warning';
 const error = 'Error';
@@ -80,3 +81,18 @@ const USER_TESORERIA = 42;
 const POSTMAN_USER_EMAIL	= 'manueltemple@gmail.com';
 const POSTMAN_USER_NAME		= 'Manuel Temple';
 const SOPORTE_EMAIL         = 'jortiz@esinergy.com';
+
+const R_PENDIENTE = 1;
+const R_APROBADO = 2;
+const R_REVISADO = 3;
+const R_FINALIZADO = 4;
+const R_NO_AUTORIZADO = 5;
+const R_TODOS = 10;
+
+const REP_MED = 'R';
+const SUP = 'S';
+const GER_PROD = 'P';
+const GER_COM = 'G';
+const CONT = 'C';
+const TESORERIA = 'T';
+const ASIS_GER = 'AG';

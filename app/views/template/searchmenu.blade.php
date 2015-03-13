@@ -1,12 +1,39 @@
-<div class="panel-body table-solicituds-rm">
+<div class="panel-body table-solicituds">
     <div class="col-md-12" style="padding: 0">
         <form method="post" action="" class="">
             {{Form::token()}}
+            @if (Auth::user()->type != GER_COM)
+                <input type="hidden" id="state_view" value="{{isset($state) ? $state:R_PENDIENTE}}">
+            @else
+                <input type="hidden" id="state_view" value="{{isset($state) ? $state:R_APROBADO}}">
+            @endif
             <div class="form-group col-sm-3 col-md-2" style="padding: 0">
                 <div class="">
                     <select id="idState" name="idstate" class="form-control selectestatesolicitude">
-                        @foreach($states as $state)
-                            <option value="{{$state->id}}">{{$state->nombre}}</option>
+                        @foreach($states as $estado)
+                            @if (Auth::user()->type != GER_COM)
+                                @if(isset($state))
+                                    @if($state == $estado->id)
+                                        <option value="{{$estado->id}}" selected>{{$estado->nombre}}</option>
+                                    @else
+                                        <option value="{{$estado->id}}">{{$estado->nombre}}</option>
+                                    @endif
+                                @else    
+                                    <option value="{{$estado->id}}">{{$estado->nombre}}</option>
+                                @endif
+                            @else
+                                @if($estado->id == R_APROBADO || $estado->id == R_REVISADO || $estado->id == R_FINALIZADO)
+                                    @if(isset($state))
+                                        @if($state == $estado->id)
+                                            <option value="{{$estado->id}}" selected >{{$estado->nombre}}</option>
+                                        @else
+                                            <option value="{{$estado->id}}">{{$estado->nombre}}</option>
+                                        @endif
+                                    @else    
+                                        <option value="{{$estado->id}}">{{$estado->nombre}}</option>
+                                    @endif
+                                @endif
+                            @endif
                         @endforeach
                     </select>
                 </div>
@@ -35,10 +62,14 @@
                 </div>
             </div>
         </form>
-        <div class="form-group col-sm-6 col-md-2 button-new-solicitude" style="text-align: right; padding: 0">
-            <div class="" style="padding: 0">
-                <a href="{{URL::to('nueva-solicitud-rm')}}" id="singlebutton" name="singlebutton" class="btn btn-primary">Nueva Solicitud</a>
+        @if (Auth::user()->type == REP_MED || Auth::user()->type == SUP)
+            <div class="form-group col-sm-6 col-md-2 button-new-solicitude" style="text-align: right; padding: 0">
+                <div class="" style="padding: 0">
+                    <a href="{{URL::to('nueva-solicitud-rm')}}" id="singlebutton" name="singlebutton" class="btn btn-primary">
+                        Nueva Solicitud
+                    </a>
+                </div>
             </div>
-        </div>
+        @endif
     </div>
 </div>
