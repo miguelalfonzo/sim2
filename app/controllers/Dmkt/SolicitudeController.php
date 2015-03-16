@@ -246,49 +246,57 @@ class SolicitudeController extends BaseController
 
     public function searchSolicituds()
     {
-        $inputs = Input::all();
-        $user = Auth::user();
-        $today = getdate();
-        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
-        
-        if (Input::has('idstate'))
-            $estado = $inputs['idstate'];
-        else
-            $estado = R_TODOS;
-
-        if (Input::has('date_start'))
-            $start = $inputs['date_start'];
-        else
-            $start = date('01-m-Y', strtotime($m));
-        
-        if (Input::has('date_end'))
-            $end = $inputs['date_end'];
-        else
-            $end = date('t-m-Y', strtotime($m));
-
-        if ($user->type == 'S') 
+        try
         {
-            $reps = $user->Sup->Reps;
-            $users_ids = array();
-            foreach ($reps as $rm)
-                $users_ids[] = $rm->iduser;
-            $users_ids[] = $user->id;
-        }
-        else if ($user->type == GER_PROD)
-        {
-            $solicitud_ids = [];
-            $solicituds = $user->GerProd->solicituds;
-            foreach ($solicituds as $sol)
-                $solicitud_ids[] = $sol->idsolicitud; // jalo los ids de las solicitudes pertenecientes al gerente de producto
-            $solicitud_ids[] = 0; // el cero va para que tenga al menos con que comparar, para que no salga error
-            $users_ids = $solicitud_ids;
-        }
-        else
-            $users_ids = array($user->id);
+            $inputs = Input::all();
+            $user = Auth::user();
+            $today = getdate();
+            $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
+            
+            if (Input::has('idstate'))
+                $estado = $inputs['idstate'];
+            else
+                $estado = R_TODOS;
 
-        $solicituds = $this->searchTransaction($estado,$users_ids,$start,$end);
-        $view = View::make('template.solicituds')->with($solicituds);
-        return $view;
+            if (Input::has('date_start'))
+                $start = $inputs['date_start'];
+            else
+                $start = date('01-m-Y', strtotime($m));
+            
+            if (Input::has('date_end'))
+                $end = $inputs['date_end'];
+            else
+                $end = date('t-m-Y', strtotime($m));
+
+            if ($user->type == 'S') 
+            {
+                $reps = $user->Sup->Reps;
+                $users_ids = array();
+                foreach ($reps as $rm)
+                    $users_ids[] = $rm->iduser;
+                $users_ids[] = $user->id;
+            }
+            else if ($user->type == GER_PROD)
+            {
+                $solicitud_ids = [];
+                $solicituds = $user->GerProd->solicituds;
+                foreach ($solicituds as $sol)
+                    $solicitud_ids[] = $sol->idsolicitud; // jalo los ids de las solicitudes pertenecientes al gerente de producto
+                $solicitud_ids[] = 0; // el cero va para que tenga al menos con que comparar, para que no salga error
+                $users_ids = $solicitud_ids;
+            }
+            else
+                $users_ids = array($user->id);
+
+            $solicituds = $this->searchTransaction($estado,$users_ids,$start,$end);
+            $view = View::make('template.solicituds')->with($solicituds)->render();
+            $rpta = $this->setRpta($view);
+        }
+        catch (Exception $e)
+        {
+            $rpta = $this->internalException($e,__FUNCTION__);
+        }
+        return $rpta;
     }
 
     private function searchTransaction($estado,$idUser,$start,$end)
@@ -1007,10 +1015,7 @@ class SolicitudeController extends BaseController
             DB::rollback();
             $rpta = $this->internalException($e,__FUNCTION__);
         }
-        if ($rpta[status] == ok)
-            return Redirect::to('show_gercom');
-        else
-            return $rpta;
+        return $rpta;
     }
 
     // IDKC: CHANGE STATUS => RECHAZADO
@@ -1464,7 +1469,7 @@ class SolicitudeController extends BaseController
 
     public function show_cont()
     {
-        $state = Session::get('state');
+        $state = Session::pull('state');
         $states = StateRange::order();
         $data = [
             'states' => $states,
@@ -1664,6 +1669,7 @@ class SolicitudeController extends BaseController
                 $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, DEPOSITO_HABILITADO, Auth::user()->id, $user_cod->id, $idSol);
                 if ($rpta[status] == ok)
                 {
+                    Session::put('state',R_REVISADO);
                     DB::commit();
                 }
             }
@@ -1678,10 +1684,7 @@ class SolicitudeController extends BaseController
             DB::rollback();
             $rpta = $this->internalException($e,__FUNCTION__);
         }
-        if ($rpta[status] == ok)
-            return Redirect::to('show_cont')->with('state',R_REVISADO);
-        else
-            return $rpta;
+        return $rpta;
     }
 
     /** ---------------------------  Asistente de  Gerencia  ---------------------------- **/
@@ -1704,7 +1707,7 @@ class SolicitudeController extends BaseController
         try
         {
             $rpta = array();
-            if ($solicitude->estado == APROBADO && $solicitude->asiento == 1 && Auth::user()->id == $solicitude->idaproved && !isset($solicitude->idresponse))
+            if ($solicitude->estado == DEPOSITO_HABILITADO && is_null($solicitude->idresponse))
             {
                 $responsables = array();
                 $asistentes = User::where('type','AG')->get();

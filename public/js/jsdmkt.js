@@ -24,8 +24,6 @@ function newSolicitude() {
     var isSetImage = $('#isSetImage');
     var amount_error_families = $('#amount_error_families');
 
-
-
     var userType = $('#typeUser').val();//tipo de usuario se encuentra en main
     var TODOS = 0;
     var PENDIENTE =1 ;
@@ -447,32 +445,38 @@ function newSolicitude() {
                 date_start: $('#date_start').val(), 
                 date_end: $('#date_end').val(),
                 _token : document.getElementsByName('_token')[0].value 
-            },
-            dataType: 'html'
+            }
         }).done(function (data) 
         {
-            $('.table-solicituds').append(data);
-            $('#table_solicitude').dataTable(
+            if (data.Status == 'Ok' )
             {
-                "order": 
-                [
-                    [ 3, "desc" ] //order date
-                ],
-                "bLengthChange": false,
-                'iDisplayLength': 7,
-                "oLanguage": 
+                $('.table-solicituds').append(data.Data);
+                $('#table_solicitude').dataTable(
                 {
-                    "sSearch": "Buscar: ",
-                    "sZeroRecords": "No hay solicitudes",
-                    "sInfoEmpty": "No hay solicitudes",
-                    "sInfo": 'Mostrando _END_ de _TOTAL_',
-                    "oPaginate": 
+                    "order": 
+                    [
+                        [ 3, "desc" ] //order date
+                    ],
+                    "bLengthChange": false,
+                    'iDisplayLength': 7,
+                    "oLanguage": 
                     {
-                        "sPrevious": "Anterior",
-                        "sNext" : "Siguiente"
+                        "sSearch": "Buscar: ",
+                        "sZeroRecords": "No hay solicitudes",
+                        "sInfoEmpty": "No hay solicitudes",
+                        "sInfo": 'Mostrando _END_ de _TOTAL_',
+                        "oPaginate": 
+                        {
+                            "sPrevious": "Anterior",
+                            "sNext" : "Siguiente"
+                        }
                     }
-                }
-            });
+                });
+            }
+            else
+            {
+                alert(data.Status + ': ' + data.Description);
+            }
         });
     }
 
@@ -548,7 +552,8 @@ function newSolicitude() {
         var date_start = $('#date_start');
         var date_end = $('#date_end');
         var validate = 0;
-        if (!date_start.val() && date_end.val()) {
+        if (!date_start.val() && date_end.val()) 
+        {
             validate = 1;
             date_start.parent().addClass('has-error');
             date_start.attr('placeholder', 'Ingrese Fecha');
@@ -569,33 +574,52 @@ function newSolicitude() {
             date_end.attr('placeholder', '');
             var l = Ladda.create(search);
             l.start();
-            var jqxhr = $.post(server + "buscar-solicitudes", { idstate: $('#idState').val(), date_start: $('#date_start').val(), date_end: $('#date_end').val() ,_token : document.getElementsByName('_token')[0].value })
-                .done(function (data) {
-                    $('#table_solicitude_wrapper').remove();
-                    $('.table-solicituds').append(data);
-                    $('#table_solicitude').dataTable({
-                            "order": [
-                                [ 3, "desc" ]
-                            ],
-                            "bLengthChange": false,
-                            'iDisplayLength': 7,
-                            "oLanguage": {
-                                "sSearch": "Buscar: ",
-                                "sZeroRecords": "No hay solicitudes",
-                                "sInfoEmpty": "No hay solicitudes",
-                                "sInfo": 'Mostrando _END_ de _TOTAL_',
-                                "oPaginate": {
-                                    "sPrevious": "Anterior",
-                                    "sNext" : "Siguiente"
-                                }
+            var jqxhr = $.post(server + "buscar-solicitudes", 
+            { 
+                idstate: $('#idState').val(), 
+                date_start: $('#date_start').val(), 
+                date_end: $('#date_end').val() ,
+                _token : document.getElementsByName('_token')[0].value 
+            })
+            .done(function (data) 
+            {
+                //var data = JSON.parse(data);
+                $('#table_solicitude_wrapper').remove();
+                if (data.Status == 'Ok')
+                {
+                    $('.table-solicituds').append(data.Data);
+                    $('#table_solicitude').dataTable(
+                    {
+                        "order": [
+                            [ 3, "desc" ]
+                        ],
+                        "bLengthChange": false,
+                        'iDisplayLength': 7,
+                        "oLanguage": 
+                        {
+                            "sSearch": "Buscar: ",
+                            "sZeroRecords": "No hay solicitudes",
+                            "sInfoEmpty": "No hay solicitudes",
+                            "sInfo": 'Mostrando _END_ de _TOTAL_',
+                            "oPaginate": 
+                            {
+                                "sPrevious": "Anterior",
+                                "sNext" : "Siguiente"
                             }
                         }
-                    );
-                    l.stop();
-                })
-                .fail(function () {
-                    alert("error");
-                })
+                    });
+                }
+                else
+                {
+                    alert(data.Status + ': ' + data.Description);
+                }
+                l.stop();
+            })
+            .fail(function () 
+            {
+                l.stop();
+                alert("Error de Conexion al Servidor");
+            })
         }
     }
     // -------------------------------------  REPRESENTANTE MEDICO -----------------------------
@@ -988,7 +1012,14 @@ function newSolicitude() {
 
                     $.post(server + 'aprobar-solicitud', form_acepted_solicitude.serialize()).done(function(data){
                         $.unblockUI();
-                        if(data.Status === 'Ok')
+                        if(data.Status === 'Ok'){
+                            bootbox.alert('<h4 style="color: green">Solicitud Aceptada</h4>' , function(){
+                                window.location.href = server + 'show_gercom';
+                            });
+                        }else{
+                            bootbox.alert('<h4 style="color: red">' + data.Status + ': '+ data.Description + '</h4>');
+                        }
+                       /* if(data.Status === 'Ok')
                         {
                             bootbox.alert('<h4 style="color: green">Solicitud Aprobada</h4>' , function(){
                                 window.location.href = server + 'aprobar-solicitud';
@@ -996,15 +1027,11 @@ function newSolicitude() {
                         }
                         else
                         {
-                            bootbox.alert('<h4 style="color: red">La solicitud no se puedo aprobar</h4>' , function(){
+                            bootbox.alert('<h4 style="color: red">La solicitud no se pudo aprobar</h4>' , function(){
                                 //window.location.href = server + 'aceptar-solicitud-gerprod';
                             });
-                        }
-
+                        }*/
                     });
-
-
-
                 }
 
             });
@@ -1167,7 +1194,6 @@ function newSolicitude() {
     fondo_total.numeric();
 
     $(document).on('click','.register_fondo',function(){
-        console.log(fondo_repmed.attr('disabled'));
         validate = 0;
         var aux = this;
         if(!date_reg_fondo.val()){
@@ -1554,7 +1580,6 @@ function newSolicitude() {
     }
 
     if(userType === 'AG'){
-        console.log('ager');
         $.ajax({
             url: server + 'buscar-solicitudes',
             type: 'POST',
