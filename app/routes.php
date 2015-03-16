@@ -43,7 +43,6 @@ Route::group(array('before' => 'rm'), function ()
     Route::get('getfondos/{id}', 'Dmkt\SolicitudeController@Fondo');
     
     // Fondo
-    Route::get('list-fondos/{date}','Dmkt\FondoController@getFondos');
     Route::get('list-fondos-rm','Dmkt\FondoController@listFondosRep');
     Route::get('registrar-gasto-fondo/{token}', 'Expense\ExpenseController@showRegisterFondo');
     Route::get('end-expense-fondo/{id}','Expense\ExpenseController@finishExpenseFondo');
@@ -198,6 +197,7 @@ Route::group(array('before' => 'rm_ager'), function ()
     Route::get('registrar-gasto/{token}', 'Expense\ExpenseController@show');
     Route::get('end-expense/{token}', 'Expense\ExpenseController@finishExpense');
     Route::get('ver-gasto/{token}', 'Expense\ExpenseController@viewExpense');
+    Route::get('list-fondos/{date}','Dmkt\FondoController@getFondos');
 
     // Expense
     Route::get('edit-expense', 'Expense\ExpenseController@editExpense');

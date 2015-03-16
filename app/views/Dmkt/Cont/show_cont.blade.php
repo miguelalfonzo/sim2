@@ -5,17 +5,17 @@
         <ul class="nav nav-tabs" role="tablist">
             <li class="active">
                 <a href="#solicitudes" role="tab" data-toggle="tab">
-                    <icon class="fa fa-home"></icon> Solicitudes Aprobadas
+                    <icon class="fa fa-home"></icon>Solicitudes Aprobadas
                 </a>
             </li>
             <li>
                 <a href="#fondos" role="tab" data-toggle="tab">
-                    <i class="fa fa-user"></i> Fondos Institucionales
+                    <i class="fa fa-user"></i>Fondos Institucionales
                 </a>
             </li>
             <li>
                 <a href="#mantenimiento" role="tab" data-toggle="tab">
-                    <i class="fa fa-user"></i> Mantenimiento de Documentos
+                    <i class="fa fa-user"></i>Mantenimiento de Documentos
                 </a>
             </li>
         </ul>
@@ -23,7 +23,47 @@
             <!-- Solicitudes -->
             <div class="tab-pane fade active in" id="solicitudes">
                 <div class="panel panel-default" style="margin-top: 10px">
-       	            <div class="panel-body table-solicituds-cont">
+       	        @include('template/searchmenu')       
+     	        </div>
+            </div>
+            <!-- Fondos -->
+            <div class="tab-pane fade" id="fondos">
+                <div class="panel panel-default" style="margin-top: 10px">
+                    <div class="panel-body panel-default table_solicitude_fondos-contabilidad table-solicituds-fondos-contabilidad">
+                        <div id="" class="form-group col-xs-6 col-sm-3 col-md-3">
+        					<div class="input-group">
+        						<input type="text" id="datefondo" readonly class="form-control" data-type="fondos-contabilidad">
+                                    <span class="input-group-addon">
+                                        <i class="glyphicon glyphicon-calendar"></i>
+                                    </span>
+        					</div>
+                        </div>
+                        <div id="" class="form-group col-xs-6 col-sm-3 col-md-3">
+                            <select id="estado_fondo_cont" class="form-control">
+                                <option value="1">DEPOSITADO</option>
+                                <option value="2">REGISTRADO</option>
+                            </select>
+                        </div>
+                        <!-- Table -->
+                    </div>
+                </div>
+            </div>
+            <!-- Mantenimiento de Documentos -->
+            <div class="tab-pane fade" id="mantenimiento">
+                <div class="panel panel-default">
+                    <div class="panel-body panel-default table_document_contabilidad">
+                        <div id="" class="form-group col-xs-6 col-sm-3 col-md-3">
+                        </div>
+                        <!-- Table -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@stop
+
+<!-- <div class="panel-body table-solicituds-cont">
                         <div class="col-md-12" style="padding: 0">
                             <form method="post" action="" class="">
                                 {{Form::token()}}
@@ -64,50 +104,7 @@
                             </form>
                             <div class="form-group col-sm-6 col-md-2 button-new-solicitude" style="text-align: right; padding: 0"></div>
                         </div>
-                        <!-- Table -->
-
-                    </div>
-     	        </div>
-            </div>
-            <!-- Fondos -->
-            <div class="tab-pane fade" id="fondos">
-                <div class="panel panel-default" style="margin-top: 10px">
-                    <div class="panel-body panel-default table_solicitude_fondos-contabilidad table-solicituds-fondos-contabilidad">
-                        <div id="" class="form-group col-xs-6 col-sm-3 col-md-3">
-        					<div class="input-group">
-        						<input type="text" id="datefondo" readonly class="form-control" data-type="fondos-contabilidad"><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-        					</div>
-                        </div>
-                        <div id="" class="form-group col-xs-6 col-sm-3 col-md-3">
-                            <select id="estado_fondo_cont" class="form-control">
-                                <option value="1">DEPOSITADO</option>
-                                <option value="2">REGISTRADO</option>
-                            </select>
-                        </div>
-                        <!-- Table -->
                         
-                    </div>
-                </div>
-            </div>
+                        Table
 
-            <!-- Mantenimiento de Documentos -->
-
-            <div class="tab-pane fade" id="mantenimiento">
-                <div class="panel panel-default">
-                    <div class="panel-body panel-default table_document_contabilidad">
-                        <div id="" class="form-group col-xs-6 col-sm-3 col-md-3">
-                            
-                        </div>
-                        
-                        <!-- Table -->
-                        
-                    </div>
-                </div>
-            </div>
-
-            <!-- -->
-
-        </div>
-    </div>
-</div>
-@stop
+                    </div> -->

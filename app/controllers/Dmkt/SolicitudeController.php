@@ -248,10 +248,14 @@ class SolicitudeController extends BaseController
     {
         $inputs = Input::all();
         $user = Auth::user();
-        $estado = $inputs['idstate'];
         $today = getdate();
         $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
         
+        if (Input::has('idstate'))
+            $estado = $inputs['idstate'];
+        else
+            $estado = R_TODOS;
+
         if (Input::has('date_start'))
             $start = $inputs['date_start'];
         else
@@ -281,6 +285,7 @@ class SolicitudeController extends BaseController
         }
         else
             $users_ids = array($user->id);
+
         $solicituds = $this->searchTransaction($estado,$users_ids,$start,$end);
         $view = View::make('template.solicituds')->with($solicituds);
         return $view;
@@ -288,7 +293,6 @@ class SolicitudeController extends BaseController
 
     private function searchTransaction($estado,$idUser,$start,$end)
     {
-        Log::error(Auth::user()->type);
         $solicituds = Solicitude::select('*');
         $rSolicituds = Solicitude::select('*');
         if (Auth::user()->type == SUP || Auth::user()->type == REP_MED)
@@ -297,9 +301,17 @@ class SolicitudeController extends BaseController
             $rSolicituds->whereNotIn('iduser', $idUser)
             ->where('idresponse',Auth::user()->id);
         }
-        else if (Auth::user()->type != GER_COM)
+        elseif ( Auth::user()->type == TESORERIA ) 
         {
-            Log::error('gerprod');
+            $solicituds->where('asiento',ENABLE_DEPOSIT)
+            ->whereNotNull('idresponse');
+        }
+        elseif ( Auth::user()->type == ASIS_GER ) 
+        {
+            $solicituds->where('idresponse',$idUser);
+        }
+        else if ( !(Auth::user()->type == GER_COM || Auth::user()->type == CONT) )
+        {
             $solicituds = Solicitude::whereIn('idsolicitud', $idUser);
         }
 
@@ -322,9 +334,9 @@ class SolicitudeController extends BaseController
                     $t->where('id',$estado);
                 });
             });
-        $solicituds = $solicituds->get();
-        $rSolicituds = $rSolicituds->get();
-        if (Auth::user()->type != GER_PROD)
+        $solicituds = $solicituds->orderBy('idsolicitud', 'ASC')->get();
+        $rSolicituds = $rSolicituds->orderBy('idsolicitud', 'ASC')->get();
+        if ( Auth::user()->type == REP_MED || Auth::user()->type == SUP )
             $solicituds->merge($rSolicituds);
         return array('solicituds' => $solicituds);
     }
@@ -379,7 +391,6 @@ class SolicitudeController extends BaseController
             list($d, $m, $y) = explode('/', $date);
             $d = mktime(11, 14, 54, $m, $d, $y);
             $date = date("Y/m/d", $d);
-            Log::error($date);
             $id = $inputs['idsolicitude'];
             $sol = Solicitude::find($id);
             $solicitude = Solicitude::where('idsolicitud', $id);
@@ -502,7 +513,6 @@ class SolicitudeController extends BaseController
             'states' => $states,
             'state' => $state
         );
-        Log::error($state);
         return View::make('Dmkt.Sup.show_sup', $data);
 
     }
@@ -711,7 +721,7 @@ class SolicitudeController extends BaseController
             $oldStatus          = $oldOolicitude->estado;
             $idSol              = $oldOolicitude->idsolicitud;
 
-            Solicitude::where('token', $token)->update(array('derived' => 1 , 'blocked' => 0));
+            Solicitude::where('token', $token)->update(array('derived' => 1 , 'blocked' => 0 , 'estado' => DERIVADO));
             $solicitude = Solicitude::where('token', $token)->firstOrFail();
             $id = $solicitude->idsolicitud;
             $sol = Solicitude::find($id);
@@ -761,7 +771,6 @@ class SolicitudeController extends BaseController
             'states' => $states,
             'state' => $state
         );
-        Log::error($state);
         return View::make('Dmkt.GerProd.show_gerprod', $data);
     }
 
@@ -998,11 +1007,10 @@ class SolicitudeController extends BaseController
             DB::rollback();
             $rpta = $this->internalException($e,__FUNCTION__);
         }
-        return $rpta;
-    }
-    public function redirectApprovedSolicitude()
-    {
-        return Redirect::to('show_gercom')->with('state',APROBADO);
+        if ($rpta[status] == ok)
+            return Redirect::to('show_gercom');
+        else
+            return $rpta;
     }
 
     // IDKC: CHANGE STATUS => RECHAZADO
@@ -1035,7 +1043,10 @@ class SolicitudeController extends BaseController
             DB::rollback();
             $rpta = $this->internalException($e,__FUNCTION__);
         }
-        return Redirect::to('show_gercom')->with('state', RECHAZADO);
+        if ($rpta[status] == ok)
+            return Redirect::to('show_gercom')->with('state', R_NO_AUTORIZADO);
+        else
+            return $rpta;
     }
 
     
@@ -1462,64 +1473,8 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.Cont.show_cont', $data);
     }
 
-    public function listSolicitudeCont($id)
-    {
-        if ($id == 0) {
-            $solicituds = Solicitude::all();
-        } else {
-            $solicituds = Solicitude::where('estado', '=', $id)->get();
-        }
-
-        $view = View::make('Dmkt.Cont.view_solicituds_cont')->with('solicituds', $solicituds);
-        return $view;
-    }
-
-    public function searchSolicitudeCont()
-    {
-
-        $inputs = Input::all();
-        $estado = $inputs['idstate'];
-        $start = $inputs['date_start'];
-        $end = $inputs['date_end'];
-        $today = getdate();
-        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
-        $lastday = date('t-m-Y', strtotime($m));
-        $firstday = date('01-m-Y', strtotime($m));
-        $user = Auth::user();
-
-
-        if ($start != null && $end != null) {
-            if ($estado != 10) {
-                $solicituds = Solicitude::where('estado', $estado)
-                    ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
-                    ->get();
-
-            } 
-            else 
-            {
-                $solicituds = Solicitude::where('estado', $estado)
-                    ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
-                    ->get();
-            }
-        } 
-        else 
-        {
-            if ($estado != 10) {
-                $solicituds = Solicitude::where('estado', $estado)
-                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                    ->get();
-            } 
-            else 
-            {
-                $solicituds = Solicitude::where('estado', $estado)
-                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
-                    ->get();
-            }
-        }
-        $view = View::make('Dmkt.Cont.view_solicituds_cont')->with('solicituds', $solicituds);
-        return $view;
-
-    }
+    
+    
 
     public function viewSolicitudeCont($token)
     {
@@ -1691,6 +1646,7 @@ class SolicitudeController extends BaseController
             }
             $id = $inputs['idsolicitude'];
             $solicitude = Solicitude::where('idsolicitud', $id);
+            $solicitude->estado = DEPOSITO_HABILITADO;
             $solicitude->retencion = $val_ret;
             $oldOolicitude      = Solicitude::where('idsolicitud', $id)->first();
             $oldStatus          = $oldOolicitude->estado;
@@ -1700,7 +1656,7 @@ class SolicitudeController extends BaseController
             {
                 $solicitude->idtiporetencion = $idtyperetention;    
             }
-            $solicitude->asiento = 1;
+            $solicitude->asiento = ENABLE_DEPOSIT;
             $data = $this->objectToArray($solicitude);
             if($solicitude->update($data))
             {
@@ -1722,7 +1678,10 @@ class SolicitudeController extends BaseController
             DB::rollback();
             $rpta = $this->internalException($e,__FUNCTION__);
         }
-        return $rpta;
+        if ($rpta[status] == ok)
+            return Redirect::to('show_cont')->with('state',R_REVISADO);
+        else
+            return $rpta;
     }
 
     /** ---------------------------  Asistente de  Gerencia  ---------------------------- **/
@@ -1733,12 +1692,12 @@ class SolicitudeController extends BaseController
         $solicituds = Solicitude::where( 'idresponse', Auth::user()->id )->get();
         return View::make('Dmkt.AsisGer.list_solicitudes')->with('solicituds',$solicituds);
     }
+
     public function viewSolicitudeAGer($token)
     {
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         return View::make('Dmkt.AsisGer.view_solicitude_ager')->with('solicitude', $solicitude);
     }
-
 
     private function findResponsables($solicitude,$token)
     {
@@ -1813,16 +1772,6 @@ class SolicitudeController extends BaseController
         }
         return $middleRpta;
     }
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -2132,5 +2081,120 @@ class SolicitudeController extends BaseController
         }
         return Redirect::to('show_gerprod')->with('state', RECHAZADO);
     }*/
+
+    /*public function searchSolicitudeCont()
+    {
+
+        $inputs = Input::all();
+        $estado = $inputs['idstate'];
+        $start = $inputs['date_start'];
+        $end = $inputs['date_end'];
+        $today = getdate();
+        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
+        $lastday = date('t-m-Y', strtotime($m));
+        $firstday = date('01-m-Y', strtotime($m));
+        $user = Auth::user();
+
+
+        if ($start != null && $end != null) {
+            if ($estado != 10) {
+                $solicituds = Solicitude::where('estado', $estado)
+                    ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                    ->get();
+
+            } 
+            else 
+            {
+                $solicituds = Solicitude::where('estado', $estado)
+                    ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                    ->get();
+            }
+        } 
+        else 
+        {
+            if ($estado != 10) {
+                $solicituds = Solicitude::where('estado', $estado)
+                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                    ->get();
+            } 
+            else 
+            {
+                $solicituds = Solicitude::where('estado', $estado)
+                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                    ->get();
+            }
+        }
+        $view = View::make('Dmkt.Cont.view_solicituds_cont')->with('solicituds', $solicituds);
+        return $view;
+
+    }*/
+
+    /*public function redirectApprovedSolicitude()
+    {
+        return Redirect::to('show_gercom')->with('state',APROBADO);
+    }*/
+
+    /*public function searchSolicitudeTes()
+    {
+        $inputs = Input::all();
+        $estado = $inputs['idstate'];
+        $start = $inputs['date_start'];
+        $end = $inputs['date_end'];
+        $today = getdate();
+        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
+        $lastday = date('t-m-Y', strtotime($m));
+        $firstday = date('01-m-Y', strtotime($m));
+        $user = Auth::user();
+
+        if ($start != null && $end != null) {
+            if ($estado != 0) {
+
+                $solicituds = Solicitude::whereNotNull('idresponse')
+                    ->where('estado',$estado)
+                    ->where('asiento',ENABLE_DEPOSIT)
+                    ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                    ->get();
+
+            } else {
+                $solicituds = Solicitude::whereNotNull('idresponse')
+                    ->where('estado', $estado)
+                    ->where('asiento',ENABLE_DEPOSIT)
+                    ->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1")
+                    ->get();
+            }
+
+
+        } else {
+            if ($estado != 0) {
+                $solicituds = Solicitude::whereNotNull('idresponse')
+                    ->where('estado', $estado)
+                    ->where('asiento',ENABLE_DEPOSIT)
+                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                    ->get();
+            } else {
+                $solicituds = Solicitude::whereNotNull('idresponse')
+                    ->where('estado', $estado)
+                    ->where('asiento',ENABLE_DEPOSIT)
+                    ->whereRaw("created_at between to_date('$firstday' ,'DD-MM-YY') and to_date('$lastday' ,'DD-MM-YY')+1")
+                    ->get();
+            }
+        }
+
+        $view = View::make('Treasury.view_solicituds_tes')->with('solicituds', $solicituds);
+        return $view;
+    }*/
+
+    /*public function listSolicitudeCont($id)
+    {
+        if ($id == 0) {
+            $solicituds = Solicitude::all();
+        } else {
+            $solicituds = Solicitude::where('estado', '=', $id)->get();
+        }
+
+        $view = View::make('Dmkt.Cont.view_solicituds_cont')->with('solicituds', $solicituds);
+        return $view;
+    }*/
+
 
 }

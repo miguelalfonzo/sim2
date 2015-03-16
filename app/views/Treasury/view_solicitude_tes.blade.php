@@ -110,7 +110,7 @@
                     </div>
                 </div>
 
-                <div class="form-group col-sm-6 col-md-4">
+                <div class="form-group col-sm-6 col-md-4 col-lg-4">
                     <label class="col-sm-8 col-md-8 control-label" for="textinput">Observacion</label>
                     <div class="col-sm-12 col-md-12">
                         @if($solicitude->estado == 2)
@@ -122,7 +122,7 @@
                 </div>
 
 
-                 <div class="form-group col-sm-6 col-md-4">
+                 <div class="form-group col-sm-9 col-md-6">
                     <div class=col-md-12>
                         <div class="panel panel-default">
                             <div class="panel-heading">
@@ -142,7 +142,7 @@
                 </div>
 
 
-                <div class="form-group col-sm-12 col-md-4">
+                <div class="form-group col-sm-9 col-md-6">
                     <div class=col-md-12>
                         <div class="panel panel-default">
                             <div class="panel-heading">
@@ -184,14 +184,14 @@
                 <!-- Button (Double) -->
                 <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
                     <div class="col-sm-12 col-md-12" style="text-align: center">
-                        @if($solicitude->estado == 3 && !is_null($solicitude->idresponse) )
+                        @if($solicitude->asiento == ENABLE_DEPOSIT && !is_null($solicitude->idresponse) && $solicitude->estado != DEPOSITADO )
                             <button class="btn btn-success" data-toggle="modal" data-target="#myModal" >Registrar Depósito</button>
                         @endif
                         <a id="button2id" href="{{URL::to('show_tes')}}" name="button2id" class="btn btn-primary">Cancelar</a>
                     </div>
                 </div>
                 <!-- Modal -->
-                @if($solicitude->estado == 3 && !is_null($solicitude->idresponse) )
+                @if($solicitude->asiento == ENABLE_DEPOSIT && !is_null($solicitude->idresponse) && $solicitude->estado != DEPOSITADO )
                 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">

@@ -1556,8 +1556,12 @@ function newSolicitude() {
     if(userType === 'AG'){
         console.log('ager');
         $.ajax({
-            url: server + 'listar-solicitudes-ager',
-            type: 'GET',
+            url: server + 'buscar-solicitudes',
+            type: 'POST',
+            data:
+            {
+                _token: $("input[name=_token]").val()
+            },
             dataType: 'html'
 
         }).done(function (data) {

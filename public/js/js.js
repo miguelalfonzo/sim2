@@ -1463,12 +1463,14 @@ $(function(){
         });
         
         $(document).off("click", ".modal_deposit");
-        $(document).on("click", ".modal_deposit", function(e){
+        $(document).on("click", ".modal_deposit", function(e)
+        {
             e.preventDefault();
             var td = $(this).parent().parent().parent();
             console.log(td);
             var id_sol = td.find('.id_solicitud').text();
-            var sol_titulo = td.find('.sol_titulo').val();
+            console.log(id_sol);
+            var sol_titulo = td.find('.sol_titulo').text();
             var token = td.find('#sol_token').val();
             var beneficiario = td.find('.benef').val();
             var total_deposit = td.find('.total_deposit').text().trim().split(" ");
@@ -1481,8 +1483,6 @@ $(function(){
             {
                 $("#tes-mon-ret").parent()[0].style.display = "";   
             }
-            console.log(retencion);
-            console.log(total_deposit);
             /*if ( $('#enable_deposit_ModalLabel').hasClass('in'))
             {
 
@@ -1498,13 +1498,17 @@ $(function(){
         });
 
         $(document).off("click", "#detail_solicitude");
-        $(document).on("click", "#detail_solicitude", function(e){
+        $(document).on("click", "#detail_solicitude", function(e)
+        {
             e.preventDefault();
-            if($("#collapseOne").hasClass('in')){
+            if($("#collapseOne").hasClass('in'))
+            {
                 $("#text_solicitude").text('Mostrar ');
                 $("#detail_solicitude span:last-child").removeClass('glyphicon-chevron-up');
                 $("#detail_solicitude span:last-child").addClass('glyphicon-chevron-down');
-            }else{
+            }
+            else
+            {
                 $("#text_solicitude").text('Ocultar ');
                 $("#detail_solicitude span:last-child").removeClass('glyphicon-chevron-down');
                 $("#detail_solicitude span:last-child").addClass('glyphicon-chevron-up');

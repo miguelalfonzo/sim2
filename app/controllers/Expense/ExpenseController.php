@@ -414,6 +414,7 @@ class ExpenseController extends BaseController{
         $states = State::orderBy('idestado', 'ASC')->get();
         return Redirect::to('show_rm')->with('states', $states);
     }
+
 	public function viewExpense($token){
 		$solicitude = Solicitude::where('token',$token)->firstOrFail();
 		if(count($solicitude)>0)
@@ -518,16 +519,6 @@ class ExpenseController extends BaseController{
 
     }
 
-	// public function test(){
- // 		// 	$html = View::make('Expense.report');
-	// 	// return PDF::load($html, 'A4', 'landscape')->show();
-	// 	// $solicituds = Solicitude::where('estado', '=', APROBADO)->where('asiento','=',1)->get();
-	// 	// echo json_encode($solicituds);die;
-	// 		$data = TypeRetention::all();
-	// 		$data = "↵												LUCY ALFARO asdasdadasdad											";
-	// 		echo trim($data,"↵");
-	// }
-
 	public function manageDocument()
 	{
 		try
@@ -567,4 +558,15 @@ class ExpenseController extends BaseController{
 		}
 		return $data;
 	}
+
+
+	// public function test(){
+ // 		// 	$html = View::make('Expense.report');
+	// 	// return PDF::load($html, 'A4', 'landscape')->show();
+	// 	// $solicituds = Solicitude::where('estado', '=', APROBADO)->where('asiento','=',1)->get();
+	// 	// echo json_encode($solicituds);die;
+	// 		$data = TypeRetention::all();
+	// 		$data = "↵												LUCY ALFARO asdasdadasdad											";
+	// 		echo trim($data,"↵");
+	// }
 }

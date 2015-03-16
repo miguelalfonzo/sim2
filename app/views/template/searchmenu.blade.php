@@ -2,16 +2,18 @@
     <div class="col-md-12" style="padding: 0">
         <form method="post" action="" class="">
             {{Form::token()}}
-            @if (Auth::user()->type != GER_COM)
-                <input type="hidden" id="state_view" value="{{isset($state) ? $state:R_PENDIENTE}}">
-            @else
+            @if (Auth::user()->type == GER_COM || Auth::user()->type == CONT)
                 <input type="hidden" id="state_view" value="{{isset($state) ? $state:R_APROBADO}}">
+            @elseif ( Auth::user()->type == REP_MED || Auth::user()->type == SUP || Auth::user()->type == GER_PROD )
+                <input type="hidden" id="state_view" value="{{isset($state) ? $state:R_PENDIENTE}}">
+            @elseif ( Auth::user()->type == TESORERIA)
+                <input type="hidden" id="state_view" value="{{isset($state) ? $state:R_REVISADO}}">
             @endif
             <div class="form-group col-sm-3 col-md-2" style="padding: 0">
                 <div class="">
                     <select id="idState" name="idstate" class="form-control selectestatesolicitude">
                         @foreach($states as $estado)
-                            @if (Auth::user()->type != GER_COM)
+                            @if ( Auth::user()->type == REP_MED || Auth::user()->type == SUP || Auth::user()->type == GER_PROD )
                                 @if(isset($state))
                                     @if($state == $estado->id)
                                         <option value="{{$estado->id}}" selected>{{$estado->nombre}}</option>
@@ -21,7 +23,7 @@
                                 @else    
                                     <option value="{{$estado->id}}">{{$estado->nombre}}</option>
                                 @endif
-                            @else
+                            @elseif ( Auth::user()->type == GER_COM || Auth::user()->type == CONT )
                                 @if($estado->id == R_APROBADO || $estado->id == R_REVISADO || $estado->id == R_FINALIZADO)
                                     @if(isset($state))
                                         @if($state == $estado->id)
@@ -33,6 +35,10 @@
                                         <option value="{{$estado->id}}">{{$estado->nombre}}</option>
                                     @endif
                                 @endif
+                            @elseif ( Auth::user()->type == TESORERIA )
+                                @if( $estado->id == R_REVISADO )
+                                    <option value="{{$estado->id}}">{{$estado->nombre}}</option>
+                                @endif
                             @endif
                         @endforeach
                     </select>
@@ -42,7 +48,9 @@
                 <div class="" style="padding: 0">
                     <div class="input-group ">
                         <span class="input-group-addon">Desde</span>
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                        <span class="input-group-addon">
+                            <i class="glyphicon glyphicon-calendar"></i>
+                        </span>
                         <input id="date_start" type="text" name="date_start" value="{{isset($solicitude)? date_format(date_create($solicitude->fecha_entrega), 'd/m/Y' ) : null }}" class="form-control" maxlength="10" readonly>
                     </div>
                 </div>
@@ -51,7 +59,9 @@
                 <div class="" style="padding: 0">
                     <div class="input-group ">
                         <span class="input-group-addon">Hasta</span>
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                        <span class="input-group-addon">
+                            <i class="glyphicon glyphicon-calendar"></i>
+                        </span>
                         <input id="date_end" type="text" name="date_end" value="{{isset($solicitude)? date_format(date_create($solicitude->fecha_entrega), 'd/m/Y' ) : null }}" class="form-control" maxlength="10" readonly>
                     </div>
                 </div>
