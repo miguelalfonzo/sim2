@@ -691,29 +691,17 @@ function newSolicitude() {
 
                     $.post(server + 'cancelar-solicitud-rm', {idsolicitude: $(aux).attr('data-idsolicitude') ,_token :$(aux).attr('data-token')})
                         .done(function (data) {
-                            bootbox.alert('Solicitud Cancelada' , function(){
-                                $("#idState")[0].selectedIndex = R_NO_AUTORIZADO;
-                                $('#table_solicitude_rm_wrapper').remove();
-                                $('.table-solicituds-rm').append(data);
-                                $('#table_solicitude_rm').dataTable({
-                                        "order": [
-                                            [ 3, "desc" ]
-                                        ],
-                                        "bLengthChange": false,
-                                        'iDisplayLength': 7,
-                                        "oLanguage": {
-                                            "sSearch": "Buscar: ",
-                                            "sZeroRecords": "No hay solicitudes",
-                                            "sInfoEmpty": "No hay solicitudes",
-                                            "sInfo": 'Mostrando _END_ de _TOTAL_',
-                                            "oPaginate": {
-                                                "sPrevious": "Anterior",
-                                                "sNext" : "Siguiente"
-                                            }
-                                        }
-                                    }
-                                );
-                            });
+                            if (data.Status = 'Ok')
+                            {
+                                bootbox.alert('Solicitud Cancelada' , function()
+                                {    
+                                    window.location.href = server+'show_rm';
+                                });
+                            }
+                            else
+                            {
+                                alert(data.Status + ': ' + data.Description);
+                            }
                         });
                 }
             }

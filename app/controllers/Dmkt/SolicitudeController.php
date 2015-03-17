@@ -72,8 +72,11 @@ class SolicitudeController extends BaseController
 
     public function show_rm()
     {
-        $states = StateRange::order();
-        return View::make('Dmkt.Rm.show_rm')->with('states', $states);
+        $data = array(
+            'state' => Session::pull('state'),
+            'states' => StateRange::order()
+            );
+        return View::make('Dmkt.Rm.show_rm',$data);
     }
 
     public function getclients()
