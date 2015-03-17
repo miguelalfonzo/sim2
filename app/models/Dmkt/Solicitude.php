@@ -105,6 +105,10 @@ class Solicitude extends Eloquent{
         return $this->hasOne('Dmkt\Manager','iduser','idaproved');
     }
 
+    function history(){
+        return $this->hasMany('System\SolicitudeHistory','idsolicitude');
+    }
+
     /*protected function solicitudsRange($user,$estado,$start,$end)
     {
         $solicituds = Solicitude::leftJoin('dmkt_rg_sub_estado as se','se.idestado','s.estado')

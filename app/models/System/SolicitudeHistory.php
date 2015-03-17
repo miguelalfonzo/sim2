@@ -6,6 +6,7 @@ use \Eloquent;
 
 class SolicitudeHistory extends Eloquent{
 	protected $table = 'DMKT_RG_SOLICITUD_HISTORIAL';
+    protected $fillable = array('description','status_to');
 	protected $primaryKey = 'id';
 
 	public function lastId(){
@@ -16,4 +17,12 @@ class SolicitudeHistory extends Eloquent{
             return $lastId->id;
         }
 	}
+
+	public function lastState() {
+        return $this->belongsTo('Dmkt/Solicitude');
+    }
+
+    public function user(){
+    	return $this->hasOne('User','id','iduser_from');
+    }
 }

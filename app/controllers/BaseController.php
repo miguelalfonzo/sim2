@@ -146,7 +146,8 @@ class BaseController extends Controller {
             {
                 $idestadoFrom = $fromStatus == null ? null : $fromStatus->idestado;
                 $idestadoTo = $toStatus == null ? null : $toStatus->idestado;
-                $rpta = $this->updateStatusSolicitude($description, $idestadoFrom, $idestadoTo, $fromUser->type, $toUser->type, $idsolicitude, 0);
+                $rpta = $this->updateStatusSolicitude($description, $idestadoFrom, $idestadoTo, $fromUser, $toUser, $idsolicitude, 0);
+                //$rpta = $this->updateStatusSolicitude($description, $idestadoFrom, $idestadoTo, $fromUser->type, $toUser->type, $idsolicitude, 0);
              }
         }
         catch (Exception $e)
@@ -159,19 +160,43 @@ class BaseController extends Controller {
 
     public function updateStatusSolicitude($description, $status_from, $status_to, $user_from, $user_to, $idsolicitude, $notified)
     {   
+
         try
         {
-            $statusSolicitude               = new SolicitudeHistory;
-            $statusSolicitude->id           = $statusSolicitude->lastId()+1;
-            $statusSolicitude->description  = $description;
-            $statusSolicitude->status_from  = $status_from;
-            $statusSolicitude->status_to    = $status_to;
-            $statusSolicitude->user_from    = $user_from;
-            $statusSolicitude->user_to      = $user_to;
-            $statusSolicitude->idsolicitude = $idsolicitude;
-            $statusSolicitude->notified     = $notified;
-            $statusSolicitude->save();
+            //$record = Solicitude::where('idsolicitude',$idsolicitude)
+            $fData = array(
+                'status_to'   => $status_to,
+                'idsolicitude'=> $idsolicitude
+                );
+
+            $vData = array(
+                'description' => $description,
+                'status_from' => $status_from,
+                'user_from'   => $user_from->type,
+                'user_to'     => $user_to->type,
+                'iduser_from' => $user_from->id,
+                'notified'    => $notified
+                );
+            Log::error($user_from);
+            $statusSolicitude = SolicitudeHistory::firstOrNew($fData);
+            if (!isset($statusSolicitude->rn))
+            {
+                $statusSolicitude->id           = $statusSolicitude->lastId()+1;
+                $statusSolicitude->status_from  = $status_from;
+                $statusSolicitude->status_to    = $status_to;
+                $statusSolicitude->user_from    = $user_from->type;
+                $statusSolicitude->user_to      = $user_to->type;
+                $statusSolicitude->iduser_from  = $user_from->id;
+                $statusSolicitude->idsolicitude = $idsolicitude;
+                $statusSolicitude->notified     = $notified;
+                $statusSolicitude->save();
+            }
+            else
+            {
+                $statusSolicitude->update($vData);
+            }
             $rpta = $this->setRpta();
+            /**/
         }
         catch (Exception $e)
         {

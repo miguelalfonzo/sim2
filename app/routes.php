@@ -7,11 +7,12 @@ Route::get('sendmail', array('uses' => 'BaseController@postman'));
 Route::get('prueba', 'Dmkt\FondoController@test');
 Route::post('search-client', 'TestController@searchSeeker');
 Route::get('clientes-data','TestController@clientsTables');
-Route::get('tmp','TestController@tm');
 Route::get('hola', 'Expense\ExpenseController@test');
 Route::get('a/{token}', 'Expense\ExpenseController@reportExpense');
 Route::get('report-fondo/{token}','Expense\ExpenseController@reportExpenseFondo');
 Route::get('report', 'ExpenseController@reportExpense');
+Route::get('tmp','TestController@tm');
+Route::get('history','TestController@withHistory');
 
 /** Login */
 Route::get('/', array('uses' => 'Dmkt\LoginController@showLogin'));
@@ -22,13 +23,6 @@ Route::get('logout', array('uses' => 'Dmkt\LoginController@doLogout'));
 /** Descargos  */
 Route::get('recharge', function(){
     return View::make('recharge');
-});
-
-/** Auth */
-Route::group(array('before' => 'auth'), function () {
-    Route::post('registrar-solicitud', 'Dmkt\SolicitudeController@registerSolicitude');
-    Route::get('editar-solicitud/{id}', 'Dmkt\SolicitudeController@editSolicitude');
-    Route::post('editar-solicitud', 'Dmkt\SolicitudeController@formEditSolicitude');
 });
 
 /**
@@ -208,6 +202,9 @@ Route::group(array('before' => 'rm_sup'), function ()
 {    
     Route::get('nueva-solicitud-rm', 'Dmkt\SolicitudeController@newSolicitude');
     Route::post('cancelar-solicitud-rm', 'Dmkt\SolicitudeController@cancelSolicitude');
+    Route::post('registrar-solicitud', 'Dmkt\SolicitudeController@registerSolicitude');
+    Route::get('editar-solicitud/{id}', 'Dmkt\SolicitudeController@editSolicitude');
+    Route::post('editar-solicitud', 'Dmkt\SolicitudeController@formEditSolicitude');
 });
 
 Route::group(array('before' => 'sys_user'), function ()

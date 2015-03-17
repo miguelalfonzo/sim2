@@ -17,7 +17,7 @@
                     <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span>
                 </a>
             @endif
-            @if($solicitude->estado == PENDIENTE && $solicitude->derive == 0)
+            @if($solicitude->estado == PENDIENTE && $solicitude->derived == 0 && $solicitude->user->type = REP_MED)
                 @if(!$solicitude->blocked == 1)
                     <a href="{{URL::to('editar-solicitud').'/'.$solicitude->token}}">
                         <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-pencil"></span>
@@ -31,7 +31,7 @@
             <a  href="{{URL::to('ver-solicitud-sup').'/'.$solicitude->token}}">
                 <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span>
             </a>
-            @if($solicitude->estado == PENDIENTE && $solicitude->user->type == 'S')
+            @if($solicitude->estado == PENDIENTE && $solicitude->derived == 0 && $solicitude->user->type == SUP)
                 <a  href="{{URL::to('editar-solicitud').'/'.$solicitude->token}}">
                     <span style="padding: 0 5px; font-size: 1.3em"  class="glyphicon glyphicon-pencil"></span>
                 </a>

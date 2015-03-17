@@ -1,6 +1,8 @@
 <?php
 
 use Dmkt\Solicitude;
+use Dmkt\Rm;
+use Dmkt\Account;
 
 class TestController extends BaseController 
 {
@@ -19,9 +21,51 @@ class TestController extends BaseController
 		/*foreach ($models as $model)
 		
 			Log::error($model->state->range_state);*/
-		
+		Log::error(DB::getQueryLog());
 		
 		return $models;
+	}
+
+	public function withHistory()
+	{
+		$data = array('alias' => 'BANCOS');
+		
+
+
+		$account = Account::firstOrNew($data);
+		if (isset($account->rn))
+			return 'true';
+		else
+			return $account;
+
+		$account->idcuenta = $account->searchId() + 1;
+		$account->save();
+		//$account->save();
+
+		/*if (isset($account->rn))
+		{
+			$account->save
+		}*/
+		return $account;
+
+		/*$solicitude = Solicitude::with(array('history' => function($z)
+		{
+			$z->orderBy('created_at','DESC')->first();	
+		}))->get();*/
+		/*$solicituds = Solicitude::with(array('history' => function($q)
+        {
+            $q->orderBy('created_at','DESC')->first();  
+        }))->take(2)->get();*/
+        /*$rSolicituds = Solicitude::with(array('history' => function($q)
+        {
+            $q->orderBy('created_at','DESC')->first();  
+        }))->get();
+        $solicituds->merge($rSolicituds);*/
+        //Log::error(DB::getQueryLog());
+        //$solicituds = Solicitude::find(44)->history()->get();
+
+      /*  $solicituds = Rm::select('*')->where('iduser',39)->first();
+		return json_encode($solicituds->rmSup);*/
 	}
 
 	private function clientsTables()

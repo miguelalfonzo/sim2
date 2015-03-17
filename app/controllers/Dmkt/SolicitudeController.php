@@ -116,10 +116,10 @@ class SolicitudeController extends BaseController
             if ($inputs['type_solicitude'] == 1 || $inputs['type_solicitude'] == 3)
             {
                 $rules = array(
-                'titulo'        => 'required',
-                'monto'         => 'required|numeric',
-                'delivery_date' => 'required|date_format:"d/m/Y"',
-                'clients'       => 'required'
+                    'titulo'        => 'required',
+                    'monto'         => 'required|numeric',
+                    'delivery_date' => 'required|date_format:"d/m/Y"',
+                    'clients'       => 'required'
                 );
             }
             else if($inputs['type_solicitude'] == 2)
@@ -129,11 +129,11 @@ class SolicitudeController extends BaseController
                     return "Ingrese un archivo de imagen";
                 }
                 $rules = array(
-                'titulo'        => 'required',
-                'monto'         => 'required|numeric',
-                'amount_fac'     => 'required|numeric',
-                'delivery_date' => 'required|date_format:"d/m/Y"',
-                'clients'       => 'required'
+                    'titulo'        => 'required',
+                    'monto'         => 'required|numeric',
+                    'amount_fac'     => 'required|numeric',
+                    'delivery_date' => 'required|date_format:"d/m/Y"',
+                    'clients'       => 'required'
                 );   
             }
             else
@@ -196,7 +196,6 @@ class SolicitudeController extends BaseController
                         'monto' => $inputs['monto'],
                         'money' => $inputs['money']
                     );
-                    
                     $clients = $inputs['clients'];
                     foreach ($clients as $client) 
                     {
@@ -301,8 +300,14 @@ class SolicitudeController extends BaseController
 
     private function searchTransaction($estado,$idUser,$start,$end)
     {
-        $solicituds = Solicitude::select('*');
-        $rSolicituds = Solicitude::select('*');
+        $solicituds = Solicitude::with(array('history' => function($q)
+        {
+            $q->orderBy('created_at','DESC');  
+        }));
+        $rSolicituds = Solicitude::with(array('history' => function($q)
+        {
+            $q->orderBy('created_at','DESC');  
+        }));
         if (Auth::user()->type == SUP || Auth::user()->type == REP_MED)
         {
             $solicituds->whereIn('iduser', $idUser);
@@ -320,7 +325,7 @@ class SolicitudeController extends BaseController
         }
         else if ( !(Auth::user()->type == GER_COM || Auth::user()->type == CONT) )
         {
-            $solicituds = Solicitude::whereIn('idsolicitud', $idUser);
+            $solicituds->whereIn('idsolicitud', $idUser);
         }
 
         if ($start != null && $end != null)
@@ -465,8 +470,23 @@ class SolicitudeController extends BaseController
                 $solicitude_families->save();
             }
             $typeUser = Auth::user()->type;
-            $rpta = $this->setRpta($typeUser);
-            DB::commit();
+            $iduser_to = 0;
+            if ($typeUser = REP_MED)
+            {
+                $toUserId = Rm::where('iduser',Auth::user()->id)->first();
+                $toUserId = $toUserId->rmSup->iduser;
+            }
+            elseif ($typeUser = SUP)
+            {
+                $toUserId = Auth::user()->id;
+            }
+
+            $rpta = $this->setStatus($inputs['titulo'].' - '. $inputs['description'], '', PENDIENTE, Auth::user()->id, $toUserId, $inputs['idsolicitude']);
+            if ($rpta[status] = ok)
+            {         
+                $rpta = $this->setRpta($typeUser);
+                DB::commit();
+            }
         }
         catch(Exception $e)
         {
@@ -501,7 +521,8 @@ class SolicitudeController extends BaseController
             DB::rollback();
             $rpta = $this->internalException($e,__FUNCTION__);
         }
-        return $this->listSolicitude(R_NO_AUTORIZADO);
+        Session::put('state',R_NO_AUTORIZADO);
+        return $rpta;
     }
 
     public function subtypeactivity($id)
@@ -515,7 +536,7 @@ class SolicitudeController extends BaseController
     public function show_sup()
     {
 
-        $state = Session::get('state');
+        $state = Session::pull('state');
         $states = StateRange::order();
         $data = array(
             'states' => $states,
@@ -773,7 +794,7 @@ class SolicitudeController extends BaseController
 
     public function show_gerprod()
     {
-        $state = Session::get('state');
+        $state = Session::pull('state');
         $states = StateRange::order();
         $data = array(
             'states' => $states,
@@ -884,7 +905,7 @@ class SolicitudeController extends BaseController
 
     public function show_gercom()
     {
-        $state = Session::get('state');
+        $state = Session::pull('state');
         $estado = Session::get('Estado');
         $states = StateRange::order();
         $data = array(
@@ -1574,12 +1595,12 @@ class SolicitudeController extends BaseController
                     $tbEntry->save();
                 }
                 Solicitude::where('idsolicitud', $inputs['idsolicitude'])->update(array('asiento' => SOLICITUD_ASIENTO));
-                $middleRpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, GASTO_HABILITADO, Auth::user()->id, $oldOolicitude->iduser, $idSol);
-                
+                $middleRpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, GASTO_HABILITADO, Auth::user()->id, $oldOolicitude->iduser, $idSol);         
                 if ($middleRpta[status] == ok)
                 {
-                    DB::commit();
+                    Session::put('state',R_REVISADO);
                     $middleRpta[status] = 1;
+                    DB::commit();
                 }
             }
         }
@@ -1764,6 +1785,7 @@ class SolicitudeController extends BaseController
                 $middleRpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, RESPONSABLE_HABILITADO, Auth::user()->id, USER_TESORERIA, $idSol);
                 if ( $middleRpta[status] == ok )
                 {
+                    Session::put('state',R_REVISADO);
                     DB::commit();
                 }
             }

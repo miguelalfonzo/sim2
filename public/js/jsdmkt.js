@@ -43,6 +43,11 @@ function newSolicitude() {
     var R_REVISADO = 3;
     var R_NO_AUTORIZADO = 4;
 
+    //USERS
+    var REP_MED = 'R';
+    var SUP     = 'S';
+    var GER_PROD= 'P';
+    var GER_COM = 'G';
 
     // get clients
     $.getJSON(server + "getclients", function (data) {
@@ -623,12 +628,18 @@ function newSolicitude() {
         }
     }
     // -------------------------------------  REPRESENTANTE MEDICO -----------------------------
-    /* List solicitude pending */
-
-    if ($('#state_view').val() == undefined)
-        listSolicitude(R_PENDIENTE);
+    
+    if ($('#state_view').val() === undefined)
+    {
+        if (!userType === GER_COM)
+        {
+            listSolicitude(R_PENDIENTE);
+        }
+    }
     else
+    {
         listSolicitude($('#state_view').val());    
+    }
     if(userType === 'R')
         listFondosRm();
     //
@@ -1580,35 +1591,43 @@ function newSolicitude() {
     }
 
     if(userType === 'AG'){
-        $.ajax({
+        $.ajax(
+        {
             url: server + 'buscar-solicitudes',
             type: 'POST',
             data:
             {
                 _token: $("input[name=_token]").val()
-            },
-            dataType: 'html'
-
-        }).done(function (data) {
-            $('.table-solicituds-ager').append(data);
-            $('#table_solicitude_ager').dataTable({
+            }
+        }).done(function (data) 
+        {
+            if (data.Status = 'Ok' )
+            {
+                $('.table-solicituds-ager').append(data.Data);
+                $('#table_solicitude_ager').dataTable({
                     "order": [
                         [ 3, "desc" ] //order date
                     ],
                     "bLengthChange": false,
                     'iDisplayLength': 7,
-                    "oLanguage": {
+                    "oLanguage": 
+                    {
                         "sSearch": "Buscar: ",
                         "sZeroRecords": "No hay solicitudes",
                         "sInfoEmpty": "No hay solicitudes",
                         "sInfo": 'Mostrando _END_ de _TOTAL_',
-                        "oPaginate": {
+                        "oPaginate": 
+                        {
                             "sPrevious": "Anterior",
                             "sNext" : "Siguiente"
                         }
                     }
-                }
-            );
+                });
+            }
+            else
+            {
+                alert(data.Status + ': ' + data.Description);
+            }
         });
     }
 
