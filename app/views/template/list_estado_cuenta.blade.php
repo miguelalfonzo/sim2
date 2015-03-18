@@ -1,0 +1,36 @@
+<div class="table-responsive">
+    <table class="table table-hover table-bordered table-condensed dataTable" id="table_estado_cuenta" style="width: 100%">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Solicitud</th>
+                <th>Solicitado por</th>
+                <th>Aprobado por</th>
+                <th>Monto Depositado</th>
+                <th>Fecha Creación</th>
+            </tr>
+        </thead>
+        <tbody>
+        @if(!empty($solicituds))
+            @foreach($solicituds as  $cuenta)
+                <tr>
+                    <td class="text-center">{{$cuenta->idsolicitud}}</td>
+                    <td class="text-center">{{$cuenta->titulo}}</td>
+                    @if ($cuenta->user->type == REP_MED)
+                        <td class="text-center">{{$cuenta->rm->nombres}}</td>
+                    @else
+                        <td class="text-center">{{$cuenta->sup->nombres}}</td>
+                    @endif
+                    @if ($cuenta->aproved->type == SUP)
+                        <td class="text-center">{{$cuenta->aprovedSup->nombres}}</td>
+                    @else ($cuenta->aproved->type == GER_PROD)
+                        <td class="text-center">{{$cuenta->aprovedGerProd->descripcion}}</td>
+                    @endif
+                    <td class="text-center">{{$cuenta->deposit->total}}</td>
+                    <td class="text-center">{{$cuenta->created_at}}</td>
+                </tr>
+            @endforeach
+        @endif
+        </tbody>
+    </table>
+</div>

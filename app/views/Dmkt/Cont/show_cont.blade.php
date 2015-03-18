@@ -32,7 +32,7 @@
                     <div class="panel-body panel-default table_solicitude_fondos-contabilidad table-solicituds-fondos-contabilidad">
                         <div id="" class="form-group col-xs-6 col-sm-3 col-md-3">
         					<div class="input-group">
-        						<input type="text" id="datefondo" readonly class="form-control" data-type="fondos-contabilidad">
+        						<input type="text" id="date_month" class="form-control" style="background-color:#FFF" data-type="fondos-contabilidad" readonly>
                                     <span class="input-group-addon">
                                         <i class="glyphicon glyphicon-calendar"></i>
                                     </span>

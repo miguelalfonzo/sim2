@@ -227,7 +227,7 @@ $(function(){
             var type = $(this).attr('data-type');
             var idfondo = $(this).attr('data-idfondo');
             var balance = parseFloat($("#balance").val());
-            if(balance === 0)
+            if(balance >= 0)
             {
                 bootbox.confirm("¿Esta seguro que desea Finalizar el registro del gasto?", function(result) {
                     if(result)
@@ -378,19 +378,17 @@ $(function(){
             });
         });
         //Deposit Fondo
-        $(document).on('click','.deposit-fondo',function(){
-
+        $(document).on('click','.deposit-fondo',function()
+        {
             var idfondo = $(this).attr('data-idfondo');
             $('#idfondo').val(idfondo);
-
         });
 
         //Register Deposit
         $(document).off("click", ".register-deposit");
-        $(document).on("click",".register-deposit",function(e){
+        $(document).on("click",".register-deposit",function(e)
+        {
             e.preventDefault();
-            console.log('register');
-
             $("#op_number").val('');
             $("#message-op-number").text('');
             var op_number  = $("#op-number").val();

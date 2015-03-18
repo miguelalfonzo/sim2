@@ -290,9 +290,12 @@ class SolicitudeController extends BaseController
             else
                 $users_ids = array($user->id);
 
-            $solicituds = $this->searchTransaction($estado,$users_ids,$start,$end);
-            $view = View::make('template.solicituds')->with($solicituds)->render();
-            $rpta = $this->setRpta($view);
+            $rpta = $this->searchTransaction($estado,$users_ids,$start,$end);
+            if ($rpta[status] == ok)
+            {
+                $view = View::make('template.solicituds')->with($rpta[data])->render();
+                $rpta = $this->setRpta($view);
+            }
         }
         catch (Exception $e)
         {
@@ -300,64 +303,6 @@ class SolicitudeController extends BaseController
         }
         return $rpta;
     }
-
-    private function searchTransaction($estado,$idUser,$start,$end)
-    {
-        $solicituds = Solicitude::with(array('history' => function($q)
-        {
-            $q->orderBy('created_at','DESC');  
-        }));
-        $rSolicituds = Solicitude::with(array('history' => function($q)
-        {
-            $q->orderBy('created_at','DESC');  
-        }));
-        if (Auth::user()->type == SUP || Auth::user()->type == REP_MED)
-        {
-            $solicituds->whereIn('iduser', $idUser);
-            $rSolicituds->whereNotIn('iduser', $idUser)
-            ->where('idresponse',Auth::user()->id);
-        }
-        elseif ( Auth::user()->type == TESORERIA ) 
-        {
-            $solicituds->where('asiento',ENABLE_DEPOSIT)
-            ->whereNotNull('idresponse');
-        }
-        elseif ( Auth::user()->type == ASIS_GER ) 
-        {
-            $solicituds->where('idresponse',$idUser);
-        }
-        else if ( !(Auth::user()->type == GER_COM || Auth::user()->type == CONT) )
-        {
-            $solicituds->whereIn('idsolicitud', $idUser);
-        }
-
-        if ($start != null && $end != null)
-            $solicituds->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1");
-            $rSolicituds->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1");
-
-        if ($estado != R_TODOS) 
-            $solicituds->whereHas('state', function ($q) use($estado)
-            {
-                $q->whereHas('rangeState', function ($t) use($estado)
-                {
-                    $t->where('id',$estado);
-                });
-            });
-            $rSolicituds->whereHas('state', function ($q) use($estado)
-            {
-                $q->whereHas('rangeState', function ($t) use($estado)
-                {
-                    $t->where('id',$estado);
-                });
-            });
-        $solicituds = $solicituds->orderBy('idsolicitud', 'ASC')->get();
-        $rSolicituds = $rSolicituds->orderBy('idsolicitud', 'ASC')->get();
-        if ( Auth::user()->type == REP_MED || Auth::user()->type == SUP )
-            $solicituds->merge($rSolicituds);
-        return array('solicituds' => $solicituds);
-    }
-
-    
 
     public function viewSolicitude($token)
     {

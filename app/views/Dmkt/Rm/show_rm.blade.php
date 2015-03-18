@@ -14,6 +14,7 @@
                     Fondos Institucionales
                 </a>
             </li>
+            @include('template/li_estado_cuenta')
         </ul>
         <div class="tab-content" style="margin-top: .75em;">
             <!-- Solicitudes -->
@@ -31,6 +32,8 @@
                     </div>
                 </div>
             </div>
+            <!--Estados de Cuenta -->
+            @include('template/tb_estado_cuenta')
         </div>
     </div>
 </div>

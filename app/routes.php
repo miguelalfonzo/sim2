@@ -212,6 +212,7 @@ Route::group(array('before' => 'sys_user'), function ()
     Route::post('buscar-solicitudes', 'Dmkt\SolicitudeController@searchSolicituds');
     Route::get('listar-solicitudes/{estado}', 'Dmkt\SolicitudeController@listSolicitude');
     Route::get('getclients', 'Dmkt\SolicitudeController@getClients');
+    Route::post('list-account-state', 'Movements\MoveController@searchMove');
 });
 
 

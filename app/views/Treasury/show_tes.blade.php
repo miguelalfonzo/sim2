@@ -30,7 +30,7 @@
                     <div class="panel-body table_solicitude_fondos-tesoreria table-solicituds-fondos-tesoreria">
                         <div id="" class="form-group col-xs-6 col-sm-3 col-md-3">
                             <div class="input-group">
-                                <input type="text" id="datefondo" readonly class="form-control" data-type="fondos-tesoreria">
+                                <input type="text" id="date_month" class="form-control" style="background-color:#FFF" data-type="fondos-tesoreria" readonly>
                                     <span class="input-group-addon">
                                         <i class="glyphicon glyphicon-calendar"></i>
                                     </span>

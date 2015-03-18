@@ -33,7 +33,7 @@
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Código de Depósito</label>
-						<input type="text" class="form-control" value="101" disabled>
+						<input type="text" class="form-control" value="{{$solicitude->iddeposito}}" disabled>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">

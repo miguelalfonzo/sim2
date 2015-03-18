@@ -404,8 +404,8 @@ class ExpenseController extends BaseController{
 			DB::rollback();
 			$rpta = $this->internalException($e,__FUNCTION__);
 		}
-		$states = State::orderBy('idestado', 'ASC')->get();
-	    return Redirect::to('show_rm')->with('states', $states);
+		Session::put('state',R_REVISADO);
+	    return Redirect::to('show_rm');
 
 	}
 

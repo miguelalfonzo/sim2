@@ -3,7 +3,7 @@
         <tr>
             <th>#</th>
             <th>Solicitud</th>
-            <th>Revisado por</th>
+            <th>Visto Ultimo</th>
             @if(Auth::user()->type == TESORERIA)
                 <th style="display:none">Solicitado</th>
                 <th style="display:none">Retencion</th>

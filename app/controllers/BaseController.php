@@ -4,6 +4,7 @@ use \System\SolicitudeHistory;
 use \User;
 use \Common\State;
 use \Dmkt\Solicitude;
+use \Swift_TransportException;
 
 class BaseController extends Controller {
 
@@ -52,6 +53,22 @@ class BaseController extends Controller {
             $rpta = [];
             $rpta[status] = ok;
         }
+        return $rpta;
+    }
+
+    protected function warningException($exception,$function,$description)
+    {
+        $rpta = array();
+        $rpta[status] = warning;
+        $rpta[description] = $description;
+        Log::error($exception);
+        Mail::send('soporte', array( 'msg' => $exception ), 
+            function($message) use($function)
+            {
+                $message->to(SOPORTE_EMAIL);
+                $message->subject(warning.'-Function: '.$function);      
+            }
+        );
         return $rpta;
     }
 
@@ -119,6 +136,10 @@ class BaseController extends Controller {
             }
             $rpta = $this->setRpta();
         }
+        catch (Swift_TransportException $e)
+        {
+            $rpta = $this->warningException($e,__FUNCTION__,"Mail Host: Can't Establish a Conecction");
+        }
         catch (Exception $e)
         {
             $rpta = $this->internalException($e,__FUNCTION__);
@@ -142,7 +163,7 @@ class BaseController extends Controller {
             $statusNameTo   = $toStatus == null ? '' : $toStatus->nombre;
             // POSTMAN: send email
             $rpta = $this->postman($idsolicitude, $statusNameFrom, $statusNameTo, $toUser);
-            if ($rpta[status] == ok)
+            if ($rpta[status] == ok || $rpta[status] == warning)
             {
                 $idestadoFrom = $fromStatus == null ? null : $fromStatus->idestado;
                 $idestadoTo = $toStatus == null ? null : $toStatus->idestado;
@@ -160,7 +181,6 @@ class BaseController extends Controller {
 
     public function updateStatusSolicitude($description, $status_from, $status_to, $user_from, $user_to, $idsolicitude, $notified)
     {   
-
         try
         {
             //$record = Solicitude::where('idsolicitude',$idsolicitude)
@@ -177,7 +197,6 @@ class BaseController extends Controller {
                 'iduser_from' => $user_from->id,
                 'notified'    => $notified
                 );
-            Log::error($user_from);
             $statusSolicitude = SolicitudeHistory::firstOrNew($fData);
             if (!isset($statusSolicitude->rn))
             {
@@ -208,6 +227,69 @@ class BaseController extends Controller {
     protected function setRpta( $data='' )
     {
         $rpta = array(status => ok, 'Data' => $data);
+        return $rpta;
+    }
+
+    protected function searchTransaction($estado,$idUser,$start,$end)
+    {
+        try
+        {
+            $solicituds = Solicitude::with(array('history' => function($q)
+            {
+                $q->orderBy('created_at','DESC');  
+            }));
+            $rSolicituds = Solicitude::with(array('history' => function($q)
+            {
+                $q->orderBy('created_at','DESC');  
+            }));
+            if (Auth::user()->type == SUP || Auth::user()->type == REP_MED)
+            {
+                $solicituds->whereIn('iduser', $idUser);
+                $rSolicituds->whereNotIn('iduser', $idUser)
+                ->where('idresponse',Auth::user()->id);
+            }
+            elseif ( Auth::user()->type == TESORERIA ) 
+            {
+                $solicituds->where('asiento',ENABLE_DEPOSIT)
+                ->whereNotNull('idresponse');
+            }
+            elseif ( Auth::user()->type == ASIS_GER ) 
+            {
+                $solicituds->where('idresponse',$idUser);
+            }
+            else if ( !(Auth::user()->type == GER_COM || Auth::user()->type == CONT) )
+            {
+                $solicituds->whereIn('idsolicitud', $idUser);
+            }
+            if ($start != null && $end != null)
+                $solicituds->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1");
+                $rSolicituds->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1");
+
+            if ($estado != R_TODOS) 
+                $solicituds->whereHas('state', function ($q) use($estado)
+                {
+                    $q->whereHas('rangeState', function ($t) use($estado)
+                    {
+                        $t->where('id',$estado);
+                    });
+                });
+                $rSolicituds->whereHas('state', function ($q) use($estado)
+                {
+                    $q->whereHas('rangeState', function ($t) use($estado)
+                    {
+                        $t->where('id',$estado);
+                    });
+                });
+            $solicituds = $solicituds->orderBy('idsolicitud', 'ASC')->get();
+            $rSolicituds = $rSolicituds->orderBy('idsolicitud', 'ASC')->get();
+            if ( Auth::user()->type == REP_MED || Auth::user()->type == SUP )
+                $solicituds->merge($rSolicituds);
+            $rpta = $this->setRpta(array('solicituds' => $solicituds));
+        }
+        catch (Exception $e)
+        {
+            $rpta = $this->internalException($e,__FUNCTION__);
+        }
         return $rpta;
     }
 

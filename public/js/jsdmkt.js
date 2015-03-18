@@ -18,14 +18,15 @@ function newSolicitude() {
     var solicitude_number_account = $('#div_number_account');
     var number_account = $('#number_account');
     var idamount = $('#idamount');
-    var clients = [];
+    var select_type_solicitude = $('.selecttypesolicitude');
     var input_file_factura = $('#input-file-factura');
-    var validate = 0; // si cambia  a 1 hay errores
     var isSetImage = $('#isSetImage');
     var amount_error_families = $('#amount_error_families');
-
     var userType = $('#typeUser').val();//tipo de usuario se encuentra en main
-    var TODOS = 0;
+    var clients = [];
+    var validate = 0; // si cambia  a 1 hay errores
+    
+    //SUB-ESTADOS
     var PENDIENTE =1 ;
     var ACEPTADO = 2;
     var APROBADO = 3;
@@ -35,27 +36,37 @@ function newSolicitude() {
     var GENERADO = 7;
     var CANCELADO =  8;
     var RECHAZADO = 9;
-    var BLOQUEADO = 10;
-
+    var TODOS = 10;
+    
     //NUEVOS ESTADOS
     var R_PENDIENTE = 1;
     var R_APROBADO = 2;
     var R_REVISADO = 3;
     var R_NO_AUTORIZADO = 4;
-
+    var R_TODOS = 10;
     //USERS
-    var REP_MED = 'R';
-    var SUP     = 'S';
-    var GER_PROD= 'P';
-    var GER_COM = 'G';
+    var REP_MED   = 'R';
+    var SUP       = 'S';
+    var GER_PROD  = 'P';
+    var GER_COM   = 'G';
+    var CONT      = 'C';
+    var TESORERIA = 'T';
+    var ASIS_GER  = 'AG';
 
-    // get clients
+    var date_options2 = {
+        format: "mm-yyyy",
+        startDate: "01/2014",
+        minViewMode: 1,
+        language: "es",
+        autoclose: true
+    };
+
+    //NEW OR EDIT SOLICITUDE BY RM OR SUP CLIENTES
     $.getJSON(server + "getclients", function (data) {
         clients = data;
     });
-
-    // leyenda
-
+    
+    //LEYENDA
     $('#show_leyenda').on('click',function(){
         $('#leyenda').show();
         $(this).hide();
@@ -75,23 +86,19 @@ function newSolicitude() {
         $('#listfamily>li:first-child').clone(true, true).appendTo('#listfamily');
     });
 
-    // $('.selectestatesolicitude option[value=1]').attr('selected','selected');
-
     //delete a family
-    $(document).on("click", ".btn-delete-family", function () {
-
+    $(document).on("click", ".btn-delete-family", function () 
+    {
         $('#listfamily>li .porcentaje_error').css({"border": "0"});
         $(".option-des-1").removeClass('error');
         $('.families_repeat').text('');
         var k = $("#listfamily li").size();
-        if (k > 1) {
+        if (k > 1)
             var other = $(".btn-delete-family").index(this);
             $("#listfamily li").eq(other).remove();
             var p = $("#listfamily li").size();
-            if (p == 1) {
+            if (p == 1)
                 $(".btn-delete-family").hide();
-            }
-        }
     });
 
     //Validations
@@ -99,42 +106,36 @@ function newSolicitude() {
     idamount.numeric();
     amount_fac.numeric();
     number_account.numeric();
-
-
-    // Select type de solicitude
-    solicitude_factura.hide();
-    solicitude_monto.hide();
-
-    var select_type_solicitude = $('.selecttypesolicitude');
-    if (select_type_solicitude.val() == 2) {
-        solicitude_factura.show();
-        solicitude_monto.show();
+    
+    if (select_type_solicitude.val() != 2) 
+    {
+        solicitude_factura.hide();
+        solicitude_monto.hide();
+        /*solicitude_factura.show();
+        solicitude_monto.show();*/
     }
-    select_type_solicitude.on('change', (function () {
 
-        if ($(this).val() == 1) {
-
-            solicitude_factura.hide();
-            solicitude_monto.hide();
-        } else if ($(this).val() == 2) {
-
-            solicitude_factura.show();
-            solicitude_monto.show();
-
-        } else if ($(this).val() == 3) {
-
+    select_type_solicitude.on('change', function () 
+    {
+        if ( $(this).val() == 1 || $(this).val() == 3) 
+        {
             solicitude_factura.hide();
             solicitude_monto.hide();
         }
-
-    }));
+        else if ( $(this).val() == 2 )
+        {
+            solicitude_factura.show();
+            solicitude_monto.show();
+        } 
+    });
 
     //select type payment
     solicitude_number_account.hide();
     solicitude_ruc.hide();
-    if(select_type_payment.val()==2)  solicitude_ruc.show();
-    if(select_type_payment.val()==3)  solicitude_number_account.show();
-    select_type_payment.on('change', function(){
+    if(select_type_payment.val()!=2)  solicitude_ruc.hide();
+    if(select_type_payment.val()!=3)  solicitude_number_account.hide();
+    select_type_payment.on('change', function()
+    {
         if($(this).val() == 1){
             solicitude_ruc.hide();
             solicitude_number_account.hide();
@@ -145,7 +146,6 @@ function newSolicitude() {
             solicitude_ruc.hide();
             solicitude_number_account.show();
         }
-
     });
 
     function load_client(client) {
@@ -263,11 +263,8 @@ function newSolicitude() {
     input_file_factura.on('focus', function () {
         $(this).parent().removeClass('has-error');
     });
-    /* End Removing Errors */
-
 
     /* Validate send register solicitude */
-
     $('.register_solicitude').on('click', (function (e) {
         var aux = 0;
         var obj = [];
@@ -436,55 +433,6 @@ function newSolicitude() {
         e.preventDefault();
     }));
 
-
-    //Function list Solicitude
-    function listSolicitude(state)
-    { 
-        $.ajax(
-        {
-            url: server + 'buscar-solicitudes',
-            type: 'POST',
-            data:
-            { 
-                idstate: state,
-                date_start: $('#date_start').val(), 
-                date_end: $('#date_end').val(),
-                _token : document.getElementsByName('_token')[0].value 
-            }
-        }).done(function (data) 
-        {
-            if (data.Status == 'Ok' )
-            {
-                $('.table-solicituds').append(data.Data);
-                $('#table_solicitude').dataTable(
-                {
-                    "order": 
-                    [
-                        [ 3, "desc" ] //order date
-                    ],
-                    "bLengthChange": false,
-                    'iDisplayLength': 7,
-                    "oLanguage": 
-                    {
-                        "sSearch": "Buscar: ",
-                        "sZeroRecords": "No hay solicitudes",
-                        "sInfoEmpty": "No hay solicitudes",
-                        "sInfo": 'Mostrando _END_ de _TOTAL_',
-                        "oPaginate": 
-                        {
-                            "sPrevious": "Anterior",
-                            "sNext" : "Siguiente"
-                        }
-                    }
-                });
-            }
-            else
-            {
-                alert(data.Status + ': ' + data.Description);
-            }
-        });
-    }
-
     function listFondos(user, state){
         var url = server + 'list-'+user +'/'+dateactual + '/' + state;
         if(user != 'fondos-contabilidad') {
@@ -551,82 +499,6 @@ function newSolicitude() {
         });
     }
 
-    //Function search solicitude x date
-    function searchSolicitudeToDate(typeUser ,search ) {
-
-        var date_start = $('#date_start');
-        var date_end = $('#date_end');
-        var validate = 0;
-        if (!date_start.val() && date_end.val()) 
-        {
-            validate = 1;
-            date_start.parent().addClass('has-error');
-            date_start.attr('placeholder', 'Ingrese Fecha');
-            date_start.addClass('input-placeholder-error');
-
-        }
-        if (!date_end.val() && date_start.val()) {
-            validate = 1;
-            date_end.parent().addClass('has-error');
-            date_end.attr('placeholder', 'Ingrese Fecha');
-            date_end.addClass('input-placeholder-error');
-        }
-        if (validate == 0) {
-
-            date_start.parent().removeClass('has-error');
-            date_start.attr('placeholder', '');
-            date_end.parent().removeClass('has-error');
-            date_end.attr('placeholder', '');
-            var l = Ladda.create(search);
-            l.start();
-            var jqxhr = $.post(server + "buscar-solicitudes", 
-            { 
-                idstate: $('#idState').val(), 
-                date_start: $('#date_start').val(), 
-                date_end: $('#date_end').val() ,
-                _token : document.getElementsByName('_token')[0].value 
-            })
-            .done(function (data) 
-            {
-                //var data = JSON.parse(data);
-                $('#table_solicitude_wrapper').remove();
-                if (data.Status == 'Ok')
-                {
-                    $('.table-solicituds').append(data.Data);
-                    $('#table_solicitude').dataTable(
-                    {
-                        "order": [
-                            [ 3, "desc" ]
-                        ],
-                        "bLengthChange": false,
-                        'iDisplayLength': 7,
-                        "oLanguage": 
-                        {
-                            "sSearch": "Buscar: ",
-                            "sZeroRecords": "No hay solicitudes",
-                            "sInfoEmpty": "No hay solicitudes",
-                            "sInfo": 'Mostrando _END_ de _TOTAL_',
-                            "oPaginate": 
-                            {
-                                "sPrevious": "Anterior",
-                                "sNext" : "Siguiente"
-                            }
-                        }
-                    });
-                }
-                else
-                {
-                    alert(data.Status + ': ' + data.Description);
-                }
-                l.stop();
-            })
-            .fail(function () 
-            {
-                l.stop();
-                alert("Error de Conexion al Servidor");
-            })
-        }
-    }
     // -------------------------------------  REPRESENTANTE MEDICO -----------------------------
     
     if ($('#state_view').val() === undefined)
@@ -641,9 +513,11 @@ function newSolicitude() {
         listSolicitude($('#state_view').val());    
     }
     if(userType === 'R')
+    {
         listFondosRm();
-    //
-
+        /*listAccountState();*/
+    }
+    
     function listFondosRm(){
         $.get(server + 'list-fondos-rm').done(function(data){
             $('.table_fondos_rm').append(data);
@@ -665,15 +539,8 @@ function newSolicitude() {
                     }
                 }
             );
-
         });
     }
-
-
-    /* Filter all solicitude by date */
-    var search_solicitude = $('#search-solicitude');
-    search_solicitude.on('click', function(){ searchSolicitudeToDate('rm',this )});
-
 
     /* Cancel Solicitude */
     var cancel_solicitude = '.cancel-solicitude';
@@ -687,36 +554,28 @@ function newSolicitude() {
                 'confirm' :{ label :'Aceptar' ,className: 'btn-default'}
             },
             callback : function (result) {
-                if (result) {
-
+                if (result) 
+                {
                     $.post(server + 'cancelar-solicitud-rm', {idsolicitude: $(aux).attr('data-idsolicitude') ,_token :$(aux).attr('data-token')})
-                        .done(function (data) {
-                            if (data.Status = 'Ok')
-                            {
-                                bootbox.alert('Solicitud Cancelada' , function()
-                                {    
-                                    window.location.href = server+'show_rm';
-                                });
-                            }
-                            else
-                            {
-                                alert(data.Status + ': ' + data.Description);
-                            }
-                        });
+                    .done(function (data) {
+                        if (data.Status = 'Ok')
+                        {
+                            bootbox.alert('Solicitud Cancelada' , function()
+                            {    
+                                window.location.href = server+'show_rm';
+                            });
+                        }
+                        else
+                        {
+                            alert(data.Status + ': ' + data.Description);
+                        }
+                    });
                 }
             }
         })
-
     });
 
-
-
     /**------------------------------------------------ SUPERVISOR ---------------------------------------------------*/
-
-    /* list solicitude pending or depending of type state */
-    /*if(userType === 'S' && $('#state_view').val() != undefined)
-        listSolicitude('sup', $('#state_view').val());
-*/
 
     var amount_families = $('.amount_families');
     amount_families.numeric({negative: false});
@@ -1510,31 +1369,7 @@ function newSolicitude() {
         )
 
     });
-    var date_options2 = {
-        format: "mm-yyyy",
-        startDate: "01/2014",
-        minViewMode: 1,
-        language: "es",
-        autoclose: true
-    };
-
-    $("#date_reg_fondo").datepicker(date_options2).on('changeDate', function (e) {
-        var datefondo = $(this).val();
-        var type = $(this).attr('data-type');
-        if(datefondo!='') {
-            $("#datefondo").val(datefondo);
-            searchFondos(datefondo,type);
-        }
-    });
-
-    //change datefondo
-    $("#datefondo").datepicker(date_options2).on('changeDate', function (e) {
-        var datefondo = $(this).val();
-        var type = $(this).attr('data-type');
-        if(datefondo!='') {
-            searchFondos(datefondo,type);
-        }
-    });
+    
 
     $("#estado_fondo_cont").on("change", function(e){
         var datefondo = $("#datefondo").val();
@@ -1542,39 +1377,45 @@ function newSolicitude() {
         searchFondos(datefondo, aux);
     });
 
-    function searchFondos(datefondo , aux) {
+    function searchFondos(datefondo , aux) 
+    {
+        var url = server + 'list-'+aux+'/' + datefondo;
         $('#loading-fondo').attr('class','show');
         $('.table-solicituds-fondos > .fondo_r').remove();
         $('.fondo_r').remove();
-        var url = server + 'list-'+aux+'/' + datefondo;
-        if(aux === 'fondos-contabilidad') {
+        if(aux === 'fondos-contabilidad') 
+        {
             url = server + 'list-'+aux+'/' + datefondo + '/' + $('#estado_fondo_cont').val();
         }
         $.get(url)
-        .done(function (data) {
+        .done(function (data) 
+        {
             $('#loading-fondo').attr('class','hide');
             $('.table_solicituds_'+aux+' > .fondo_r').remove();
             $('#table_solicitude_'+aux+'_wrapper').remove();
             $('.table-solicituds-'+aux).append(data);
             $('#export-fondo').attr('href', server + 'exportfondos/' + datefondo);
-            $('#table_solicitude_'+aux).dataTable({
-                "order": [
+            $('#table_solicitude_'+aux).dataTable(
+            {
+                "order": 
+                [
                     [3, "desc"]
                 ],
                 "bLengthChange": false,
                 'iDisplayLength': 7,
-                "oLanguage": {
+                "oLanguage": 
+                {
                     "sSearch": "Buscar: ",
                     "sZeroRecords": "No hay fondos",
                     "sInfoEmpty": " ",
                     "sInfo": 'Mostrando _END_ de _TOTAL_',
-                    "oPaginate": {
+                    "oPaginate": 
+                    {
                         "sPrevious": "Anterior",
                         "sNext": "Siguiente"
                     }
                 }
             });
-            //$('#total-fondo').val($('#total-fondo-hiden').val());
         });
     }
 
@@ -1619,167 +1460,12 @@ function newSolicitude() {
         });
     }
 
-
-    /** --------------------------------------------- ADMIN ------------------------------------------------- **/
-
-        //quita los errores
-    $('#form-register-user input').on('focus',function(){
-        var span = $(this).parent().find('.error-incomplete').text('');
-
-    });
-
-    $('#username input').focusout(function(){
-
-        if($(this).val() && $(this).attr('id') != 'user-no'){
-            $('#username span:eq(2)').hide();
-            $('#username span:eq(0)').hide();
-            $.ajax({
-                url:server + 'search-user/'+ $(this).val(),
-                type:'GET',
-                beforeSend : function(){
-                    $('#username span:eq(1)').show();
-                }
-            }).done(function(data){
-                $('#username span:eq(1)').hide();
-                if(data === 'SI'){
-                    $('#username span:eq(0)').show();
-                    $('#username span:eq(0)').text('Usuario ya registrado');
-                }else{
-                    $('#username span:eq(2)').show();
-
-                }
-            })
-        }
-    });
-
-    $('#first_name input').on('focus',function(){
-        $('#first_name span').text('');
-    });
-    $('#last_name input').on('focus',function(){
-        $('#last_name span').text('');
-    });
-    $('#username input').on('focus', function(){
-        $('#username span').text('');
-    });
-    $('#email input').on('focus', function(){
-        $('#email span').text('');
-    });
-    $('#password input').on('focus',function(){
-        $('#password span').text('');
-    });
-
-    $('#register_user').on('click',function(e){
-        e.preventDefault();
-        var regex_email = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-
-        if(!$('#first_name input').val()){
-            $('#first_name span').text('Campo Obligatorio');
-            validate = 1;
-            console.log(validate);
-        }
-        if(!$('#last_name input').val()){
-            $('#last_name span').text('Campo Obligatorio');
-            validate = 1;
-            console.log(validate);
-        }
-        if(!$('#username input').val()){
-            $('#username span').text('Campo Obligatorio');
-            validate = 1;
-        }
-        if(!$('#email input').val()){
-            $('#email span').text('Campo Obligatorio');
-
-            validate = 1;
-        }else if(!regex_email.test($('#email input').val())){;
-            $('#email span').text('Email Invalido');
-        }
-        if(!$('#password input').val() && $('#iduser').val()){
-            $('#password span').text('Campo Obligatorio');
-            validate = 1;
-        }
-
-        if(validate = 0){
-            $('.registerUser').submit();
-        }else{
-            console.log('error');
-        }
-
-
-    });
-    $('#table-users').dataTable({
-            "order": [
-                [ 0, "desc" ]
-            ],
-            "bLengthChange": false,
-            'iDisplayLength': 7,
-            "oLanguage": {
-                "sSearch": "Buscar: ",
-                "sZeroRecords": "No hay usuarios",
-                "sInfo": 'Mostrando _END_ de _TOTAL_',
-                "oPaginate": {
-                    "sPrevious": "Anterior",
-                    "sNext" : "Siguiente"
-                }
-            }
-        }
-    );
-
-    $('.active-user').on('click',function(e){
-        e.preventDefault();
-        var _iduser = $(this).data('iduser');
-        var _token = $(this).data('token');
-        bootbox.confirm("¿Esta seguro que desea activar este usuario?", function (result) {
-
-            if(result){
-                $.post(server + 'active-user',{ 'iduser' : _iduser , '_token' :_token } ,function(data){
-                    alert('usuario activado');
-                    window.location.href = server + 'register';
-                })
-            }
-        })
-    });
-
-    $('.look-user').on('click',function(e){
-        e.preventDefault();
-        var _iduser = $(this).data('iduser');
-        var _token  = $(this).data('token');
-
-        bootbox.confirm("¿Esta seguro que desea desactivar este usuario?", function (result) {
-
-            if(result){
-                $.post(server + 'look-user',{ 'iduser' : _iduser , '_token' : _token} ,function(data){
-                    alert('usuario desactivado');
-                    window.location.href = server + 'register';
-                })
-            }
-        })
-    });
-
-    $('#div-change-password').hide();
-    if($('#iduser').val()){
-        $('#div-change-password').show();
-        $('#div-password').hide();
-        $('#change-password').on('change',function(){
-            if($(this).prop('checked')){
-                $('#div-password').show();
-            }else{
-                $('#div-password').hide();
-            }
-        });
-
-    }
-
     /** ------------------------------------------------------------------------------------------------------------ **/
 
-    input_file_factura.change(function (e) {
-
-        addImage(e);
-    });
     function addImage(e) {
+        console.log('imagechange');
         var file = e.target.files[0],
             imageType = /image.*/;
-
         if (!file.type.match(imageType)) {
             alert('ingrese solo imagenes');
         } else {
@@ -1787,15 +1473,20 @@ function newSolicitude() {
             reader.onload = fileOnload;
             reader.readAsDataURL(file);
         }
-
     }
+
+    input_file_factura.on("change", function(e)
+    {
+        console.log(e);
+        addImage(e);
+    });
+
+    
 
     function fileOnload(e) {
         var result = e.target.result;
         $('#imgSalida').attr("src", result);
     }
-
-    /* end preview image */
 
     /* Menu */
     var navItems = $('.admin-menu li > a');
@@ -1999,7 +1690,6 @@ function newSolicitude() {
                         input.focus();
                         data_json.type = "Error";
                     }
-                    //$(data).html(input.val());
                     if ( input.val() == 'No' )
                     {
                         data_json[$(data).attr("id")] = 0;
@@ -2013,13 +1703,7 @@ function newSolicitude() {
                         data_json[$(data).attr("id")] = input.val();
                     }
                 }
-                /*else if($(data).attr("id") == "icons")
-                {
-                    $(data) .html('<a class="elementEdit" data-sol="1" href="#"><span class="glyphicon glyphicon-pencil">'
-                        + '</span></a> <a class="elementDelete" href="#"><span class="glyphicon glyphicon-remove"></span></a>');
-                }*/
             }
-           
         });
         if (data_json.type != "Error")
         {
@@ -2049,8 +1733,6 @@ function newSolicitude() {
         else
         {
             bootbox.alert("complete los datos");
-            //$(".fondo_d tbody tr").last().remove();
-            //$("#add-doc").show();
         }
     });
 
@@ -2137,6 +1819,397 @@ function newSolicitude() {
         });
     });
 
+    function listAccountState(date)
+    {
+        date = typeof date !== 'undefined' ? date : null;
+        $.ajax(
+        {
+            type: 'post',
+            url: server+'list-account-state',
+            data:
+            {
+                "_token": $("input[name=_token]").val(),
+                "date": date
+            },
+            error: function(statusCode,errorThrown)
+            {
+                console.log(errorThrown);
+                if (statusCode.status == 0) 
+                {
+                    responseUI('<font color="black">Internet: Problemas de Conexion</font>','yellow');    
+                }
+                else
+                {
+                    responseUI('Error del Sistema','red');
+                }
+            }
+        }).done( function (data)
+        {
+            if (data.Status == 'Ok')
+            {
+                $('#table_estado_cuenta_wrapper').remove();
+                $('.table_estado_cuenta').append(data.Data);
+                $('#table_estado_cuenta').dataTable(
+                {
+                    "order": [
+                        [ 0, "desc" ]
+                    ],
+                    "bLengthChange": false,
+                    'iDisplabuscyLength': 7,
+                    "oLanguage": 
+                    {
+                        "sSearch": "Buscar: ",
+                        "sZeroRecords": "No hay Solicitudes Finalizadas",
+                        "sInfoEmpty": "",
+                        "sInfo": 'Mostrando _END_ de _TOTAL_',
+                        "oPaginate": 
+                        {
+                            "sPrevious": "Anterior",
+                            "sNext" : "Siguiente"
+                        }
+                    }
+                });
+            }
+            else
+            {
+                responseUI('Error del Sistema','red');
+            }
+        });   
+    }
+
+    $("#date_month").datepicker(date_options2).on('changeDate', function (e) {
+        var date = $(this).val();
+        var type = $(this).attr('data-type');
+        console.log(type == "estado-cuenta");
+        if(date!='')
+            if(type != "estado-cuenta")
+                searchFondos(date,type);
+            else
+                listAccountState(date);
+    });
+
+    /* Filter all solicitude by date */
+    var search_solicitude = $('#search-solicitude');
+    search_solicitude.on('click', function()
+    { 
+        listSolicitude();
+    });
+
+    //Function list Solicitude
+    function listSolicitude(state)
+    {
+        state = typeof state !== 'undefined' ? state : $('#idState').val();
+        //var l = Ladda.create($("#search-solicitude")[0]);
+        //l.start();
+        $.ajax(
+        {
+            url: server + 'buscar-solicitudes',
+            type: 'POST',
+            data:
+            { 
+                idstate: state,
+                date_start: $('#date_start').val(), 
+                date_end: $('#date_end').val(),
+                _token : document.getElementsByName('_token')[0].value 
+            }
+        }).done(function (data) 
+        {
+            //l.stop();
+            if (data.Status == 'Ok' )
+            {
+                $('#table_solicitude_wrapper').remove();
+                $('.table-solicituds').append(data.Data);
+                $('#table_solicitude').dataTable(
+                {
+                    "order": 
+                    [
+                        [ 3, "desc" ] //order date
+                    ],
+                    "bLengthChange": false,
+                    'iDisplayLength': 7,
+                    "oLanguage": 
+                    {
+                        "sSearch": "Buscar: ",
+                        "sZeroRecords": "No hay solicitudes",
+                        "sInfoEmpty": "No hay solicitudes",
+                        "sInfo": 'Mostrando _END_ de _TOTAL_',
+                        "oPaginate": 
+                        {
+                            "sPrevious": "Anterior",
+                            "sNext" : "Siguiente"
+                        }
+                    }
+                });
+            }
+            else
+            {
+                //l.stop();
+                responseUI(data.Status + ': ' + data.Description,'red');
+            }
+        });
+    }
+
+}
+
+
+//$(data).html(input.val());
+/*else if($(data).attr("id") == "icons")
+                {
+                    $(data) .html('<a class="elementEdit" data-sol="1" href="#"><span class="glyphicon glyphicon-pencil">'
+                        + '</span></a> <a class="elementDelete" href="#"><span class="glyphicon glyphicon-remove"></span></a>');
+                }*/
+//$(".fondo_d tbody tr").last().remove();
+            //$("#add-doc").show();
+// $('.selectestatesolicitude option[value=1]').attr('selected','selected');
+/* list solicitude pending or depending of type state */
+    /*if(userType === 'S' && $('#state_view').val() != undefined)
+        listSolicitude('sup', $('#state_view').val());
+*/
+
+    /** --------------------------------------------- ADMIN ------------------------------------------------- **/
+
+        //quita los errores
+    /*$('#form-register-user input').on('focus',function(){
+        var span = $(this).parent().find('.error-incomplete').text('');
+
+    });
+
+    $('#username input').focusout(function(){
+
+        if($(this).val() && $(this).attr('id') != 'user-no'){
+            $('#username span:eq(2)').hide();
+            $('#username span:eq(0)').hide();
+            $.ajax({
+                url:server + 'search-user/'+ $(this).val(),
+                type:'GET',
+                beforeSend : function(){
+                    $('#username span:eq(1)').show();
+                }
+            }).done(function(data){
+                $('#username span:eq(1)').hide();
+                if(data === 'SI'){
+                    $('#username span:eq(0)').show();
+                    $('#username span:eq(0)').text('Usuario ya registrado');
+                }else{
+                    $('#username span:eq(2)').show();
+
+                }
+            })
+        }
+    });
+
+    $('#first_name input').on('focus',function(){
+        $('#first_name span').text('');
+    });
+    $('#last_name input').on('focus',function(){
+        $('#last_name span').text('');
+    });
+    $('#username input').on('focus', function(){
+        $('#username span').text('');
+    });
+    $('#email input').on('focus', function(){
+        $('#email span').text('');
+    });
+    $('#password input').on('focus',function(){
+        $('#password span').text('');
+    });
+
+    $('#register_user').on('click',function(e){
+        e.preventDefault();
+        var regex_email = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+
+        if(!$('#first_name input').val()){
+            $('#first_name span').text('Campo Obligatorio');
+            validate = 1;
+            console.log(validate);
+        }
+        if(!$('#last_name input').val()){
+            $('#last_name span').text('Campo Obligatorio');
+            validate = 1;
+            console.log(validate);
+        }
+        if(!$('#username input').val()){
+            $('#username span').text('Campo Obligatorio');
+            validate = 1;
+        }
+        if(!$('#email input').val()){
+            $('#email span').text('Campo Obligatorio');
+
+            validate = 1;
+        }else if(!regex_email.test($('#email input').val())){;
+            $('#email span').text('Email Invalido');
+        }
+        if(!$('#password input').val() && $('#iduser').val()){
+            $('#password span').text('Campo Obligatorio');
+            validate = 1;
+        }
+
+        if(validate = 0){
+            $('.registerUser').submit();
+        }else{
+            console.log('error');
+        }
+
+
+    });
+    $('#table-users').dataTable({
+            "order": [
+                [ 0, "desc" ]
+            ],
+            "bLengthChange": false,
+            'iDisplayLength': 7,
+            "oLanguage": {
+                "sSearch": "Buscar: ",
+                "sZeroRecords": "No hay usuarios",
+                "sInfo": 'Mostrando _END_ de _TOTAL_',
+                "oPaginate": {
+                    "sPrevious": "Anterior",
+                    "sNext" : "Siguiente"
+                }
+            }
+        }
+    );
+
+    $('.active-user').on('click',function(e){
+        e.preventDefault();
+        var _iduser = $(this).data('iduser');
+        var _token = $(this).data('token');
+        bootbox.confirm("¿Esta seguro que desea activar este usuario?", function (result) {
+
+            if(result){
+                $.post(server + 'active-user',{ 'iduser' : _iduser , '_token' :_token } ,function(data){
+                    alert('usuario activado');
+                    window.location.href = server + 'register';
+                })
+            }
+        })
+    });
+
+    $('.look-user').on('click',function(e){
+        e.preventDefault();
+        var _iduser = $(this).data('iduser');
+        var _token  = $(this).data('token');
+
+        bootbox.confirm("¿Esta seguro que desea desactivar este usuario?", function (result) {
+
+            if(result){
+                $.post(server + 'look-user',{ 'iduser' : _iduser , '_token' : _token} ,function(data){
+                    alert('usuario desactivado');
+                    window.location.href = server + 'register';
+                })
+            }
+        })
+    });*/
+
+//------------------------------------------------------------------------------------------------------------
+
+/*$('#div-change-password').hide();
+    if($('#iduser').val()){
+        $('#div-change-password').show();
+        $('#div-password').hide();
+        $('#change-password').on('change',function(){
+            if($(this).prop('checked')){
+                $('#div-password').show();
+            }else{
+                $('#div-password').hide();
+            }
+        });
+    }*/
+
+//Function search solicitude x date
+    /*function searchSolicitudeToDate(typeUser ,search ) {
+
+        var date_start = $('#date_start');
+        var date_end = $('#date_end');
+        var validate = 0;
+        if (!date_start.val() && date_end.val()) 
+        {
+            validate = 1;
+            date_start.parent().addClass('has-error');
+            date_start.attr('placeholder', 'Ingrese Fecha');
+            date_start.addClass('input-placeholder-error');
+
+        }
+        if (!date_end.val() && date_start.val()) {
+            validate = 1;
+            date_end.parent().addClass('has-error');
+            date_end.attr('placeholder', 'Ingrese Fecha');
+            date_end.addClass('input-placeholder-error');
+        }
+        if (validate == 0) {
+
+            date_start.parent().removeClass('has-error');
+            date_start.attr('placeholder', '');
+            date_end.parent().removeClass('has-error');
+            date_end.attr('placeholder', '');
+            var l = Ladda.create(search);
+            l.start();
+            var jqxhr = $.post(server + "buscar-solicitudes", 
+            { 
+                idstate: $('#idState').val(), 
+                date_start: $('#date_start').val(), 
+                date_end: $('#date_end').val() ,
+                _token : document.getElementsByName('_token')[0].value 
+            })
+            .done(function (data) 
+            {
+                //var data = JSON.parse(data);
+                $('#table_solicitude_wrapper').remove();
+                if (data.Status == 'Ok')
+                {
+                    $('.table-solicituds').append(data.Data);
+                    $('#table_solicitude').dataTable(
+                    {
+                        "order": [
+                            [ 3, "desc" ]
+                        ],
+                        "bLengthChange": false,
+                        'iDisplayLength': 7,
+                        "oLanguage": 
+                        {
+                            "sSearch": "Buscar: ",
+                            "sZeroRecords": "No hay solicitudes",
+                            "sInfoEmpty": "No hay solicitudes",
+                            "sInfo": 'Mostrando _END_ de _TOTAL_',
+                            "oPaginate": 
+                            {
+                                "sPrevious": "Anterior",
+                                "sNext" : "Siguiente"
+                            }
+                        }
+                    });
+                }
+                else
+                {
+                    alert(data.Status + ': ' + data.Description);
+                }
+                l.stop();
+            })
+            .fail(function () 
+            {
+                l.stop();
+                alert("Error de Conexion al Servidor");
+            })
+        }
+    }
+}*/
+    //change datefondo
+    /*$("#date-estado-cuenta").datepicker(date_options2).on('changeDate', function (e) 
+    {
+        var date = $(this).val();
+        var type = $(this).attr('data-type');
+        console.log(date);
+        listAccountState(date);
+    });*/
+    //change datefondo
+    /*$("#datefondo").datepicker(date_options2).on('changeDate', function (e) {
+        var datefondo = $(this).val();
+        var type = $(this).attr('data-type');
+        if(datefondo!='') {
+            searchFondos(datefondo,type);
+        }
+    });*/
 
        /* function getSClients(request,response) 
     {
@@ -2184,5 +2257,3 @@ function newSolicitude() {
             }
         });
     });*/
-
-}

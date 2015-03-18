@@ -34,7 +34,7 @@
                   <label>Mes a Registrar</label>
                   <div class="input-group">
                     <span class="input-group-addon" ><i class="glyphicon glyphicon-calendar"></i></span>
-                    <input type="text" id="date_reg_fondo" readonly class="form-control" data-type="fondos">
+                    <input type="text" id="date_month" readonly class="form-control" data-type="fondos">
                   </div>
                 </div>
               </div>
@@ -113,7 +113,7 @@
 
         <div id="" class="form-group col-xs-6 col-sm-3 col-md-3">
                         <div class="input-group">
-                    <input type="text" id="datefondo" readonly class="form-control" data-type="fondos"><span class="input-group-addon" ><i class="glyphicon glyphicon-calendar"></i></span>
+                    <input type="text" id="date_month" readonly class="form-control" data-type="fondos"><span class="input-group-addon" ><i class="glyphicon glyphicon-calendar"></i></span>
                 </div>
         </div>
         
