@@ -67,21 +67,30 @@ class SolicitudeController extends BaseController
         }
         return $result;
     }
-
     /** ----------------------------------  Representante Medico ---------------------------------- */
-
-    public function show_rm()
+    public function show_user()
     {
+        if (Session::has('state'))
+            $state = Session::pull('state');
+        else
+        {
+            if (Auth::user()->type == GER_COM || Auth::user()->type == CONT)
+                $state = R_APROBADO;
+            else if ( Auth::user()->type == REP_MED || Auth::user()->type == SUP || Auth::user()->type == GER_PROD )
+                $state = R_PENDIENTE;
+            elseif ( Auth::user()->type == TESORERIA )
+                $state= R_REVISADO;
+        }
         $data = array(
-            'state' => Session::pull('state'),
-            'states' => StateRange::order()
+            'state'  => $state,
+            'states' => StateRange::order(),
+            'estado' => Session::pull('Estado')
             );
-        return View::make('Dmkt.Rm.show_rm',$data);
+        return View::make('template.show_user',$data);   
     }
 
     public function getclients()
     {
-
         $clients = Client::take(1030)->get(array('clcodigo', 'clnombre'));
         return Response::json($clients);
     }
@@ -251,51 +260,27 @@ class SolicitudeController extends BaseController
         try
         {
             $inputs = Input::all();
-            $user = Auth::user();
             $today = getdate();
-            $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];
-            
+            $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];      
             if (Input::has('idstate'))
                 $estado = $inputs['idstate'];
             else
                 $estado = R_TODOS;
-
+            Log::error('ESTADO: '.$estado);
             if (Input::has('date_start'))
                 $start = $inputs['date_start'];
             else
                 $start = date('01-m-Y', strtotime($m));
-            
             if (Input::has('date_end'))
                 $end = $inputs['date_end'];
             else
                 $end = date('t-m-Y', strtotime($m));
-
-            if ($user->type == 'S') 
-            {
-                $reps = $user->Sup->Reps;
-                $users_ids = array();
-                foreach ($reps as $rm)
-                    $users_ids[] = $rm->iduser;
-                $users_ids[] = $user->id;
-            }
-            else if ($user->type == GER_PROD)
-            {
-                $solicitud_ids = [];
-                $solicituds = $user->GerProd->solicituds;
-                foreach ($solicituds as $sol)
-                    $solicitud_ids[] = $sol->idsolicitud; // jalo los ids de las solicitudes pertenecientes al gerente de producto
-                $solicitud_ids[] = 0; // el cero va para que tenga al menos con que comparar, para que no salga error
-                $users_ids = $solicitud_ids;
-            }
-            else
-                $users_ids = array($user->id);
-
-            $rpta = $this->searchTransaction($estado,$users_ids,$start,$end);
+            $rpta = $this->userType();
             if ($rpta[status] == ok)
-            {
-                $view = View::make('template.solicituds')->with($rpta[data])->render();
-                $rpta = $this->setRpta($view);
-            }
+                $rpta = $this->searchTransaction($estado,$rpta[data],$start,$end);
+                if ($rpta[status] == ok)
+                    $view = View::make('template.solicituds')->with($rpta[data])->render();
+                    $rpta = $this->setRpta($view);
         }
         catch (Exception $e)
         {
@@ -479,21 +464,6 @@ class SolicitudeController extends BaseController
         return json_encode($subtypeactivities);
     }
 
-
-    /** -----------------------------------------------  Supervisor  -------------------------------------------------------- */
-    public function show_sup()
-    {
-
-        $state = Session::pull('state');
-        $states = StateRange::order();
-        $data = array(
-            'states' => $states,
-            'state' => $state
-        );
-        return View::make('Dmkt.Sup.show_sup', $data);
-
-    }
-
     public function viewSolicitudeSup($token)
     {
         $sol = Solicitude::where('token', $token)->firstOrFail();
@@ -566,15 +536,8 @@ class SolicitudeController extends BaseController
                 'description' => $inputs['description'],
                 'monto' => $inputs['monto'],
                 'money' => $inputs['money']
-
             );
 
-            /*
-            Mail::send('emails.template', $data, function ($message) {
-                $message->to('cesarhm1687@gmail.com');
-                $message->subject('Nueva Solicitud');
-
-            });*/
             $clients = $inputs['clients'];
             foreach ($clients as $client) {
                 $cod = explode(' ', $client);
@@ -631,10 +594,7 @@ class SolicitudeController extends BaseController
             $rpta = $this->internalException($e,__FUNCTION__);
         }
         if ($rpta[status] == ok)
-            if ($user->type == SUP)
-                return Redirect::to('show_sup')->with('state',R_NO_AUTORIZADO);
-            else if ($user->type == GER_PROD)
-                return Redirect::to('show_gerprod')->with('state', R_NO_AUTORIZADO);    
+            return Redirect::to('show_user')->with('state',R_NO_AUTORIZADO);    
     }
 
 
@@ -685,7 +645,7 @@ class SolicitudeController extends BaseController
 
    public function redirectAcceptedSolicitude()
    {
-       return Redirect::to('show_sup')->with('state', R_APROBADO);
+       return Redirect::to('show_user')->with('state', R_APROBADO);
    }
 
     // IDKC: CHANGE STATUS => PENDIENTE DERIVADO
@@ -727,7 +687,7 @@ class SolicitudeController extends BaseController
             DB::rollback();
             $rpta = $this->internalException($e,__FUNCTION__);
         }
-        return Redirect::to('show_sup');
+        return Redirect::to('show_user');
     }
 
     public function disBlockSolicitudeSup($token)
@@ -735,20 +695,7 @@ class SolicitudeController extends BaseController
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         Solicitude::where('idsolicitud', $solicitude->idsolicitud) // desbloqueamos la solicitud para que el rm lo pueda editar
         ->update(array('blocked' => 0));
-        return Redirect::to('show_sup');
-    }
-
-    /** --------------------------------------------- Gerente de  Producto ----------------------------------------------- */
-
-    public function show_gerprod()
-    {
-        $state = Session::pull('state');
-        $states = StateRange::order();
-        $data = array(
-            'states' => $states,
-            'state' => $state
-        );
-        return View::make('Dmkt.GerProd.show_gerprod', $data);
+        return Redirect::to('show_user');
     }
 
     public function viewSolicitudeGerProd($token)
@@ -796,9 +743,7 @@ class SolicitudeController extends BaseController
         $solicitude->save();
         SolicitudeGer::where('idsolicitud', $solicitude->idsolicitud) // desblockeamos la solicitud para que el otro gerente no lo pueda editar
         ->update(array('blocked' => 0));
-
-        return Redirect::to('show_gerprod');
-
+        return Redirect::to('show_user');
     }
 
     // IDKC: CHANGE STATUS ACEPTADO => APROBADO
@@ -846,22 +791,7 @@ class SolicitudeController extends BaseController
     }
 
     public function redirectAcceptedSolicitudeGerProd(){
-        return Redirect::to('show_gerprod')->with('state', ACEPTADO);
-    }
-
-    /** ---------------------------------------------  Gerente Comercial  -------------------------------------------------*/
-
-    public function show_gercom()
-    {
-        $state = Session::pull('state');
-        $estado = Session::get('Estado');
-        $states = StateRange::order();
-        $data = array(
-            'state' => $state,
-            'states' => $states,
-            'estado' => $estado
-        );
-        return View::make('Dmkt.GerCom.show_gercom', $data);
+        return Redirect::to('show_user')->with('state', ACEPTADO);
     }
 
     public function gercomAsignarResponsable()
@@ -1018,12 +948,10 @@ class SolicitudeController extends BaseController
             $rpta = $this->internalException($e,__FUNCTION__);
         }
         if ($rpta[status] == ok)
-            return Redirect::to('show_gercom')->with('state', R_NO_AUTORIZADO);
+            return Redirect::to('show_user')->with('state', R_NO_AUTORIZADO);
         else
             return $rpta;
     }
-
-    
 
      public function disBlockSolicitudeGerCom($token)
     {
@@ -1031,9 +959,7 @@ class SolicitudeController extends BaseController
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $solicitude->blocked = 0 ;
         $solicitude->save();
-
-        return Redirect::to('show_gercom');
-
+        return Redirect::to('show_user');
     }
 
     /** ---------------------------------------------  Contabilidad -------------------------------------------------*/
@@ -1295,11 +1221,9 @@ class SolicitudeController extends BaseController
             }
             $clientes = implode(',',$clientes);
         }
-        
         $typeProof  = ProofType::all();
         $date       = $this->getDay();
         $documentList = json_decode($expense->toJson());
-
         $expenseItem  = array();
         foreach ($documentList as $documentListKey => $documentElement) {
             $itemList                  = ExpenseItem::where('idgasto','=',intval($documentElement->idgasto))->get();
@@ -1307,7 +1231,6 @@ class SolicitudeController extends BaseController
             $documentElement->itemList = $itemList;
             $documentElement->count    = count($itemList);
         }
-
         if($type == EXPENSE_SOLICITUDE){
             $solicitud               = json_decode($solicitude->toJson());
             $solicitud->documentList = $documentList;
@@ -1339,7 +1262,6 @@ class SolicitudeController extends BaseController
                 'seats'       => json_decode(json_encode($seatList))
             );
         }
-
         if(isset($resultSeats['error'])){
             $tempArray          = array();
             $tempArray['error'] = $resultSeats['error'];
@@ -1351,7 +1273,6 @@ class SolicitudeController extends BaseController
         }else{
             return View::make('Dmkt.Cont.SeatExpenseFondo', $data);
         }
-        
     }
 
     // IDKC: CHANGE STATUS => GENERADO
@@ -1435,20 +1356,6 @@ class SolicitudeController extends BaseController
         }
         return json_encode($result);
     }
-
-    public function show_cont()
-    {
-        $state = Session::pull('state');
-        $states = StateRange::order();
-        $data = [
-            'states' => $states,
-            'state' => $state
-        ];
-        return View::make('Dmkt.Cont.show_cont', $data);
-    }
-
-    
-    
 
     public function viewSolicitudeCont($token)
     {
@@ -1658,9 +1565,8 @@ class SolicitudeController extends BaseController
 
     /** ---------------------------  Asistente de  Gerencia  ---------------------------- **/
 
-    public function listSolicitudeAGer(){
-
-        //$solicituds = Solicitude::where('estado',DEPOSITADO)->where('idtipopago',2)->where('asiento',2)->get();
+    public function listSolicitudeAGer()
+    {
         $solicituds = Solicitude::where( 'idresponse', Auth::user()->id )->get();
         return View::make('Dmkt.AsisGer.list_solicitudes')->with('solicituds',$solicituds);
     }
@@ -1726,10 +1632,7 @@ class SolicitudeController extends BaseController
                 $oldOolicitude      = Solicitude::where('token', $inputs['token'])->first();
                 $oldStatus          = $oldOolicitude->estado;
                 $idSol              = $oldOolicitude->idsolicitud;
-
                 Solicitude::where('token',$inputs['token'])->update( array('idresponse' => $inputs['responsable']) );
-                //$middleRpta = array( status => ok , description => 'Se asigno la solicitud correctamente');
-
                 $middleRpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, RESPONSABLE_HABILITADO, Auth::user()->id, USER_TESORERIA, $idSol);
                 if ( $middleRpta[status] == ok )
                 {
@@ -1745,9 +1648,18 @@ class SolicitudeController extends BaseController
         }
         return $middleRpta;
     }
+}
 
-
-
+    /*public function show_cont()
+    {
+        $state = Session::pull('state');
+        $states = StateRange::order();
+        $data = [
+            'states' => $states,
+            'state' => $state
+        ];
+        return View::make('Dmkt.Cont.show_cont', $data);
+    }*/
     /*public function listSolicitudeGerCom($id)
     {
 
@@ -2169,5 +2081,49 @@ class SolicitudeController extends BaseController
         return $view;
     }*/
 
+    /*public function show_rm()
+    {
+        $data = array(
+            'state' => Session::pull('state'),
+            'states' => StateRange::order()
+            );
+        return View::make('template.show_rm',$data);
+    }*/
+    /** ---------------------------------------------  Gerente Comercial  -------------------------------------------------*/
 
-}
+    /*public function show_gercom()
+    {
+        $state = Session::pull('state');
+        $estado = Session::pull('Estado');
+        $states = StateRange::order();
+        $data = array(
+            'state' => $state,
+            'states' => $states,
+            'estado' => $estado
+        );
+        return View::make('Dmkt.GerCom.show_gercom', $data);
+    }*/
+    /** -----------------------------------------------  Supervisor  -------------------------------------------------------- */
+    /*public function show_sup()
+    {
+
+        $state = Session::pull('state');
+        $states = StateRange::order();
+        $data = array(
+            'states' => $states,
+            'state' => $state
+        );
+        return View::make('template.show_sup', $data);
+    }*/
+    /** --------------------------------------------- Gerente de  Producto ----------------------------------------------- */
+
+    /*public function show_gerprod()
+    {
+        $state = Session::pull('state');
+        $states = StateRange::order();
+        $data = array(
+            'states' => $states,
+            'state' => $state
+        );
+        return View::make('Dmkt.GerProd.show_gerprod', $data);
+    }*/

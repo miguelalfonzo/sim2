@@ -154,11 +154,6 @@ class BaseController extends Controller {
             $toStatus   = State::where('idestado', $status_to)->first();
             $fromUser   = User::where('id', $user_from_id)->first();
             $toUser     = User::where('id', $user_to_id)->first();
-            /*dd($toUser);*/
-            //$toUser->email
-            //$toUser->getName()   
-            //$toName         = $toUser->getName();
-            //$fromName       = $fromUser != null ? $fromUser->getName() : '';
             $statusNameFrom = $fromStatus == null ? '' : $fromStatus->nombre;
             $statusNameTo   = $toStatus == null ? '' : $toStatus->nombre;
             // POSTMAN: send email
@@ -168,22 +163,19 @@ class BaseController extends Controller {
                 $idestadoFrom = $fromStatus == null ? null : $fromStatus->idestado;
                 $idestadoTo = $toStatus == null ? null : $toStatus->idestado;
                 $rpta = $this->updateStatusSolicitude($description, $idestadoFrom, $idestadoTo, $fromUser, $toUser, $idsolicitude, 0);
-                //$rpta = $this->updateStatusSolicitude($description, $idestadoFrom, $idestadoTo, $fromUser->type, $toUser->type, $idsolicitude, 0);
-             }
+            }
         }
         catch (Exception $e)
         {
             $rpta = $this->internalException($e,__FUNCTION__);
         }
         return $rpta;
-
     }
 
     public function updateStatusSolicitude($description, $status_from, $status_to, $user_from, $user_to, $idsolicitude, $notified)
     {   
         try
         {
-            //$record = Solicitude::where('idsolicitude',$idsolicitude)
             $fData = array(
                 'status_to'   => $status_to,
                 'idsolicitude'=> $idsolicitude
@@ -293,4 +285,39 @@ class BaseController extends Controller {
         return $rpta;
     }
 
+    protected function userType()
+    {
+        try
+        {
+            $user = Auth::user();
+            if ($user->type == SUP)
+            { 
+                $reps = $user->Sup->Reps;
+                $users_ids = array();
+                foreach ($reps as $rm)
+                    $users_ids[] = $rm->iduser;
+                $rpta = $this->setRpta($users_ids);
+            }
+            else if ($user->type == GER_PROD)
+            {
+                $solicitud_ids = [];
+                $solicituds = $user->GerProd->solicituds;
+                foreach ($solicituds as $sol)
+                    $solicitud_ids[] = $sol->idsolicitud; // jalo los ids de las solicitudes pertenecientes al gerente de producto
+                $solicitud_ids[] = 0; // el cero va para que tenga al menos con que comparar, para que no salga error
+                $rpta = $this->setRpta($solicitud_ids);
+            }
+            else if ($user->type == REP_MED)
+                $rpta = $this->setRpta(array($user->id));
+            else if (in_array($user->type,array(GER_COM,CONT,TESORERIA,ASIS_GER)))
+                $rpta = $this->setRpta(array());
+            else
+                $rpta = $this->warningException('Se ha solicitado buscar solicitudes por un usuario con rol no autorizado: '.$user->type,__FUNCTION__,'Unauthorized User');
+        }
+        catch (Exception $e)
+        {
+            $rpta = $this->internalException($e,__FUNCTION__);
+        }
+        return $rpta;
+    }
 }

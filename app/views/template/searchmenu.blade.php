@@ -2,13 +2,7 @@
     <div class="col-md-12" style="padding: 0">
         <form method="post" action="" class="">
             {{Form::token()}}
-            @if (Auth::user()->type == GER_COM || Auth::user()->type == CONT)
-                <input type="hidden" id="state_view" value="{{isset($state) ? $state:R_APROBADO}}">
-            @elseif ( Auth::user()->type == REP_MED || Auth::user()->type == SUP || Auth::user()->type == GER_PROD )
-                <input type="hidden" id="state_view" value="{{isset($state) ? $state:R_PENDIENTE}}">
-            @elseif ( Auth::user()->type == TESORERIA)
-                <input type="hidden" id="state_view" value="{{isset($state) ? $state:R_REVISADO}}">
-            @endif
+            <input type="hidden" id="state_view" value="{{$state}}">
             <div class="form-group col-sm-2 col-md-2" style="padding: 0">
                 <div>
                     <select id="idState" name="idstate" class="form-control selectestatesolicitude">

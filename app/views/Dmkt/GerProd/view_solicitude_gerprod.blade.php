@@ -95,7 +95,7 @@
     <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Monto Solicitado</label>
 
     <div class="col-sm-12 col-md-12 col-lg-12">
-        @if($solicitude->estado == PENDIENTE)
+        @if($solicitude->estado == DERIVADO)
         <div class="input-group">
             <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
             <input id="idamount" name="monto" type="text" placeholder="" value="{{$solicitude->monto}}"
@@ -135,7 +135,7 @@
 
         @if(isset($solicitude))
 
-            @if($solicitude->estado != PENDIENTE)
+            @if($solicitude->estado != DERIVADO)
 
                     <input id="textinput" name="amount_fac" type="text" placeholder=""
                            value="{{ $solicitude->fondo == null ? '' : $solicitude->fondo->nombre_mkt }}" readonly
@@ -198,7 +198,7 @@
     <label class="col-sm-8 col-md-8 ol-lg-8 control-label" for="textinput">Observacion</label>
 
     <div class="col-sm-12 col-md-12 col-lg-12">
-        @if($solicitude->estado == PENDIENTE)
+        @if($solicitude->estado == DERIVADO)
         <textarea id="textinput" name="observacion" placeholder=""
                   class="form-control"></textarea>
         @else
@@ -270,7 +270,7 @@
                         <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" style="padding: 0">
                             <div class="input-group">
                                 <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                                @if($solicitude->estado == PENDIENTE)
+                                @if($solicitude->estado == DERIVADO)
 
                                 <input id="" name="amount_assigned[]" type="text"
                                        class="form-control input-md amount_families"
@@ -341,7 +341,7 @@
         @if(isset($responsables))
             <a class="btn btn-primary" data-toggle="modal" data-target="#modal_asign_sol_resp">Seleccionar Responsable</a>
         @endif
-        @if($solicitude->estado == PENDIENTE)
+        @if($solicitude->estado == DERIVADO)
             @if($block == false)
             <a id="test" name="button1id"
                class="btn btn-primary accepted_solicitude_gerprod">Aceptar</a>
@@ -350,7 +350,7 @@
             <a id="button2id" href="{{URL::to('cancelar-solicitud-gerprod').'/'.$solicitude->token}}" name="button2id"
                class="btn btn-primary">Cancelar</a>
             @else
-            <a id="button2id" href="{{URL::to('show_gerprod')}}" name="button2id"
+            <a id="button2id" href="{{URL::to('show_user')}}" name="button2id"
                class="btn btn-primary">Cancelar</a>
             @endif
         @else

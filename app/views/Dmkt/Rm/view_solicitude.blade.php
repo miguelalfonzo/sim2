@@ -274,7 +274,7 @@
 
 
     <div class="col-sm-12 col-md-12 col-lg-12" style="text-align: center">
-        <a id="button2id" href="{{URL::to('show_rm')}}" name="button2id"
+        <a id="button2id" href="{{URL::to('show_user')}}" name="button2id"
            class="btn btn-primary">Cancelar</a>
     </div>
 </div>

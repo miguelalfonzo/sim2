@@ -34,21 +34,23 @@
                     @endif
                 @endif
                 <td class="sol_titulo">{{$solicitude->titulo}}</td>
-                <td>
-                    @if (is_object($solicitude->history[0]->user))    
-                        @if ($solicitude->history[0]->user->type == REP_MED)
-                            {{ucwords(strtolower($solicitude->history[0]->user->Rm->nombres.' '.$solicitude->history[0]->user->Rm->apellidos))}}
-                        @elseif ($solicitude->history[0]->user->type == SUP)
-                            {{ucwords(strtolower($solicitude->history[0]->user->Sup->nombres.' '.$solicitude->history[0]->user->Sup->apellidos))}}
-                        @elseif ($solicitude->history[0]->user->type == GER_PROD)
-                            {{ucwords(strtolower($solicitude->history[0]->user->GerProd->descripcion))}}
-                        @elseif ( in_array($solicitude->history[0]->user->type, array(GER_COM,CONT,TESORERIA,ASIS_GER) ))
-                            {{ucwords(strtolower($solicitude->history[0]->user->person->nombres.' '.$solicitude->history[0]->user->person->apellidos))}}
+                <td> 
+                    @if(count($solicitude->history) != 0)
+                        @if (is_object($solicitude->history[0]->user))    
+                            @if ($solicitude->history[0]->user->type == REP_MED)
+                                {{ucwords(strtolower($solicitude->history[0]->user->Rm->nombres.' '.$solicitude->history[0]->user->Rm->apellidos))}}
+                            @elseif ($solicitude->history[0]->user->type == SUP)
+                                {{ucwords(strtolower($solicitude->history[0]->user->Sup->nombres.' '.$solicitude->history[0]->user->Sup->apellidos))}}
+                            @elseif ($solicitude->history[0]->user->type == GER_PROD)
+                                {{ucwords(strtolower($solicitude->history[0]->user->GerProd->descripcion))}}
+                            @elseif ( in_array($solicitude->history[0]->user->type, array(GER_COM,CONT,TESORERIA,ASIS_GER) ))
+                                {{ucwords(strtolower($solicitude->history[0]->user->person->nombres.' '.$solicitude->history[0]->user->person->apellidos))}}
+                            @else
+                                Usuario no autorizado
+                            @endif
                         @else
-                            Usuario no autorizado
+                            -
                         @endif
-                    @else
-                        -
                     @endif
                 </td>
                 @if(Auth::user()->type == TESORERIA)

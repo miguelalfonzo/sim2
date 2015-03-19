@@ -33,6 +33,8 @@
                     value="{{isset($solicitude->titulo)? $solicitude->titulo : null }}">
                 </div>
             </div>
+            
+
             <div class="form-group col-sm-6 col-md-4">
                 <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo Solicitud</label>
                 <div class="col-sm-12 col-md-12">
@@ -47,6 +49,15 @@
                     </select>
                 </div>
             </div>
+            <!--  -->
+            <div class="form-group col-sm-6 col-md-4">
+                <label class="col-sm-8 col-md-8 control-label" for="textinput">Pruebas</label>
+                <div class="col-sm-12 col-md-12">
+                    <input id="idtitle" class="form-control input-md cliente-seeker" name="titulo" type="text" placeholder=""
+                    value="{{isset($solicitude->titulo)? $solicitude->titulo : null }}">
+                </div>
+            </div>
+            <!-- -->
             <div class="form-group col-sm-6 col-md-4">
                 <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo de Pago</label>
                 <div class="col-sm-12 col-md-12">
@@ -128,8 +139,8 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group col-sm-12 col-md-8" style="padding: 0">
-                <div class="form-group col-sm-9 col-md-6 ">
+            <!-- <div class="form-group col-sm-12 col-md-8" style="padding: 0"> -->
+                <div class="form-group col-sm-6 col-md-4 ">
                     <label class="col-sm-8 col-md-8 control-label" for="textinput">Cliente</label>
                     <ul id="listclient" class="col-sm-12 col-md-12">
                         @if(isset($clients))
@@ -161,7 +172,7 @@
                     <span class="col-sm-10 col-md-10 clients_repeat" style=""></span>
                     <button type="button" class="btn btn-default" id="btn-add-client">Agregar Otro Cliente</button>
                 </div>
-                <div class="form-group col-sm-9 col-md-6">
+                <div class="form-group col-sm-6 col-md-4">
                     <label class="col-sm-8 col-md-8 control-label" for="selectfamily">Familia</label>
                     <ul id="listfamily" class="col-sm-12 col-md-12" style="">
                         @if(isset($families2))
@@ -201,7 +212,7 @@
                     <span class="col-sm-10 col-md-10 families_repeat" style="margin-bottom: 10px ; margin-top: -10px"></span>
                     <button type="button" class="btn btn-default" id="btn-add-family">Agregar Otra Familia</button>
                 </div>
-            </div>
+            <!-- </div> -->
             @if(isset($solicitude) && $solicitude->idtiposolicitud == 2)
                 <div class="form-group col-sm-6 col-md-4">
                     <div class="col-sm-12 col-md-12">
@@ -262,15 +273,15 @@
                             <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">
                                 {{isset($solicitude) ? 'Actualizar' : 'Crear'}}
                             </button>
-                            <a id="button2id" href="{{URL::to('show_rm')}}" name="button2id" class="btn btn-primary">Cancelar</a>
+                            <a id="button2id" href="{{URL::to('show_user')}}" name="button2id" class="btn btn-primary">Cancelar</a>
                         @else
-                            <a id="button2id" href="{{URL::to('show_rm')}}" name="button2id" class="btn btn-primary">Cancelar</a>
+                            <a id="button2id" href="{{URL::to('show_user')}}" name="button2id" class="btn btn-primary">Cancelar</a>
                         @endif
                     @else
                         <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">
                             {{isset($solicitude) ? 'Actualizar' : 'Crear'}}
                         </button>
-                        <a id="button2id" href="{{URL::to('show_rm')}}" name="button2id" class="btn btn-primary">Cancelar</a>
+                        <a id="button2id" href="{{URL::to('show_user')}}" name="button2id" class="btn btn-primary">Cancelar</a>
                     @endif
                 </div>
             </div>

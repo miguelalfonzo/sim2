@@ -146,12 +146,12 @@ $(function(){
         //Cancel the view button to register expense
         $("#cancel-expense").on("click",function(e){
             e.preventDefault();
-            window.location.href = server+"show_rm";
+            window.location.href = server+"show_user";
         });
         //Cancel the view button to generate seat solicitude
         $("#cancel-seat-cont").on("click",function(e){
             e.preventDefault();
-            window.location.href = server+"show_cont";
+            window.location.href = server+"show_user";
         });
         //Add row seat solicitude
         $("#add-seat-solicitude").on("click", function(e)
@@ -286,7 +286,7 @@ $(function(){
                         if(data.Status == 1)
                         {
                             bootbox.alert("<p class='green'>Se generó el asiento contable correctamente.</p>", function(){
-                                window.location.href = server+'show_cont';
+                                window.location.href = server+'show_user';
                             });
                         }
                         else
@@ -332,7 +332,7 @@ $(function(){
                         if(data == 1)
                         {
                             bootbox.alert("<p class='green'>Se generó el asiento contable correctamente.</p>", function(){
-                                window.location.href = server+'show_cont';
+                                window.location.href = server+'show_user';
                             });
                         }
                         else
@@ -361,7 +361,7 @@ $(function(){
                             if(data.Status == "Ok")
                             {
                                 bootbox.alert("<p class='green'>Se habilito el depósito correctamente.</p>", function(){
-                                    window.location.href = server+'show_cont';
+                                    window.location.href = server+'show_user';
                                 });
                             }
                             else
@@ -450,7 +450,7 @@ $(function(){
                                     );
                                 });
                             }else{
-                                window.location.href = server+'show_tes';
+                                window.location.href = server+'show_user';
                             }
 
                         });
@@ -1474,17 +1474,9 @@ $(function(){
             var total_deposit = td.find('.total_deposit').text().trim().split(" ");
             var retencion = td.find('.tes-ret').html().trim();
             if ( retencion == 0 )
-            {
                 $("#tes-mon-ret").parent()[0].style.display = "none";
-            }
             else
-            {
-                $("#tes-mon-ret").parent()[0].style.display = "";   
-            }
-            /*if ( $('#enable_deposit_ModalLabel').hasClass('in'))
-            {
-
-            }*/
+                $("#tes-mon-ret").parent()[0].style.display = "";
             $("#tes-mon-sol").val(total_deposit[0] + " " + total_deposit[1]);
             $("#tes-mon-ret").val(total_deposit[0] + " " + retencion);
             $("#id-solicitude").text(id_sol);
@@ -1494,7 +1486,6 @@ $(function(){
             $("#total-deposit").val(total_deposit[0] + " " + (total_deposit[1] - retencion));
             $('#enable_deposit_Modal').modal();
         });
-
         $(document).off("click", "#detail_solicitude");
         $(document).on("click", "#detail_solicitude", function(e)
         {

@@ -34,69 +34,45 @@ class LoginController extends BaseController{
             'password' => 'required|min:3' // password can only be alphanumeric and has to be greater than 3 characters
         );
 
-        // run the validation rules on the inputs from the form
         $validator = Validator::make(Input::all(), $rules);
-
-        // if the validator fails, redirect back to the form
-
-        if ($validator->fails()) {
+        if ($validator->fails()) 
+        {
             return Redirect::to('login')
                 ->withErrors($validator) // send back all errors to the login form
                 ->withInput(Input::except('password')); // send back the input (not the password) so that we can repopulate the form
-        } else {
-
+        } 
+        else 
+        {
             // create our user data for the authentication
             $userdata = array(
                 'username' 	=> Input::get('username'),
                 'password' 	=> Input::get('password')
             );
 
-            if (Auth::attempt($userdata) && Auth::user()->active == 1 ) {
+            if (Auth::attempt($userdata) && Auth::user()->active == 1 ) 
+            {
                 $apps =  Auth::user()->apps;
                 $aplication = false;
-                foreach($apps as  $app){
+                foreach($apps as  $app)
+                {
                     if($app->idapp == 2) // 2 : Aplicacion descargo de marketing
                         $aplication = true;
                 }
                 if($aplication)
                 {
                     $typeUser = Auth::user()->type;
-
-                    if($typeUser == 'R'){
-                        return Redirect::to('show_rm');
-                    }
-                    else if($typeUser == 'S'){
-                        return Redirect::to('show_sup');
-                    }
-                    else if($typeUser == 'P'){
-                        return Redirect::to('show_gerprod');
-                    }
-                    elseif($typeUser == 'C'){
-                        return Redirect::to('show_cont');
-                    }
-                    else if($typeUser == 'T'){
-                        return Redirect::to('show_tes');
-                    }
-                    else if($typeUser == 'G'){
-                        return Redirect::to('show_gercom');
-                    }
-                    else if($typeUser == 'AG'){
+                    if( in_array( $typeUser, array( REP_MED,SUP,GER_PROD,GER_COM,CONT,TESORERIA )))
+                        return Redirect::to('show_user');
+                    else if($typeUser == ASIS_GER)
                         return Redirect::to('registrar-fondo');
-                    }
                     else
-                    {
                         return View::make('Dmkt.login')->with( array('message' => 'Usuario no autorizado') );
-                    }
                 }
                 else
-                {
                     return View::make('Dmkt.login')->with( array('message'=> 'Usuario no autorizado') );
-                }
             } 
-            else 
-            {
-                return Redirect::to('login')->with('error_login', true);            
-            }
+            else
+                return Redirect::to('login')->with('error_login', true);
         }
     }
 

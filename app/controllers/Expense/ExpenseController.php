@@ -24,6 +24,7 @@ use \Log;
 use \Common\Deposit;
 use \BagoUser;
 use \Exception;
+use \Session;
 
 class ExpenseController extends BaseController{
 
@@ -405,14 +406,14 @@ class ExpenseController extends BaseController{
 			$rpta = $this->internalException($e,__FUNCTION__);
 		}
 		Session::put('state',R_REVISADO);
-	    return Redirect::to('show_rm');
+	    return Redirect::to('show_user');
 
 	}
 
     public function finishExpenseFondo($idfondo){
         $fondo = FondoInstitucional::where('idfondo',$idfondo)->update(array('registrado'=>1));
         $states = State::orderBy('idestado', 'ASC')->get();
-        return Redirect::to('show_rm')->with('states', $states);
+        return Redirect::to('show_user')->with('states', $states);
     }
 
 	public function viewExpense($token){

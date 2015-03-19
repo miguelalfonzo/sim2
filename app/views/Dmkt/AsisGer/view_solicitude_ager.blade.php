@@ -131,7 +131,7 @@
                 
                 <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
                     <div class="col-sm-12 col-md-12" style="text-align: center">
-                        <a id="button2id" href="{{URL::to('show_tes')}}" name="button2id" class="btn btn-primary">Cancelar</a>
+                        <a id="button2id" href="{{URL::to('show_user')}}" name="button2id" class="btn btn-primary">Cancelar</a>
                     </div>
                 </div>
         

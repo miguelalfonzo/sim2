@@ -8,12 +8,9 @@ use \Input;
 class RucController extends BaseController{
     public function show(){
         $inputs = Input::all();
-    	$rucConsult = $inputs['ruc'];
-        
+    	$rucConsult = $inputs['ruc']; 
         if(strlen($rucConsult)<11)
-    	{
     		return 0;
-    	}
     	else
     	{
 			$rucClass = new RUC;
@@ -21,15 +18,12 @@ class RucController extends BaseController{
 			$reg = array();
 			if(is_array($data))
 			{
-				foreach ($data as $key => $value) {
+				foreach ($data as $key => $value)
 					$reg [$key] = $this->encodingString($value);
-				}
 				return $reg;
 			}
 			else
-			{
 				return 1;
-			}
     	}
     }
     

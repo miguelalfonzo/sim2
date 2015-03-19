@@ -187,7 +187,7 @@
                         @if($solicitude->asiento == ENABLE_DEPOSIT && !is_null($solicitude->idresponse) && $solicitude->estado != DEPOSITADO )
                             <button class="btn btn-success" data-toggle="modal" data-target="#myModal" >Registrar Depósito</button>
                         @endif
-                        <a id="button2id" href="{{URL::to('show_tes')}}" name="button2id" class="btn btn-primary">Cancelar</a>
+                        <a id="button2id" href="{{URL::to('show_user')}}" name="button2id" class="btn btn-primary">Cancelar</a>
                     </div>
                 </div>
                 <!-- Modal -->

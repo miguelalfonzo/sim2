@@ -302,7 +302,7 @@
                                class="btn btn-primary accepted_solicitude_sup">Aceptar
                             </a>
                         @endif
-                            <a id="button2id" href="{{URL::to('show_sup')}}" name="button2id"
+                            <a id="button2id" href="{{URL::to('show_user')}}" name="button2id"
                                class="btn btn-primary">Cancelar</a>
                     @endif
                 </div>

@@ -25,37 +25,6 @@ use \Exception;
 
 class FondoController extends BaseController
 {
-    public function test()
-    {
-        //$data = DB::table('FONDOINSTITUCIONAL')->select('repmed','institucion','cuenta','supervisor','total')->toJson();
-        /*$dato = FondoInstitucional::all();
-              
-        Excel::create('Filename4', function($excel) use($dato) {
-        
-        $excel->sheet('Sheetname', function($sheet) use($dato) {
-        
-        $sheet->fromArray($dato);
-        $sheet->row(1, array(
-        'test1', 'test2', 'test4' , 'test5','test3'
-        ));    
-        });
-        
-        })->export('xls');*/
-        Excel::load('testfondo.xlsx', function($reader)
-        {
-            
-            // Getting all results
-            //$reader->skip(1);
-            //$results = $reader->get();
-            
-            // ->all() is a wrapper for ->get() and will work the same
-            $results = $reader->all();
-            echo json_encode($results);
-        });
-        
-        // Demo::display();
-        
-    }
     
     function objectToArray($object)
     {
@@ -409,3 +378,35 @@ class FondoController extends BaseController
         return $view;
     }
 }
+
+/*public function test()
+    {
+        //$data = DB::table('FONDOINSTITUCIONAL')->select('repmed','institucion','cuenta','supervisor','total')->toJson();
+        $dato = FondoInstitucional::all();
+              
+        Excel::create('Filename4', function($excel) use($dato) {
+        
+        $excel->sheet('Sheetname', function($sheet) use($dato) {
+        
+        $sheet->fromArray($dato);
+        $sheet->row(1, array(
+        'test1', 'test2', 'test4' , 'test5','test3'
+        ));    
+        });
+        
+        })->export('xls');
+        Excel::load('testfondo.xlsx', function($reader)
+        {
+            
+            // Getting all results
+            //$reader->skip(1);
+            //$results = $reader->get();
+            
+            // ->all() is a wrapper for ->get() and will work the same
+            $results = $reader->all();
+            echo json_encode($results);
+        });
+        
+        // Demo::display();
+        
+    }*/

@@ -20,17 +20,24 @@ class MoveController extends BaseController
     public function searchMove()
     {
     	$date = Input::get('date');
-        $solicituds = array();
         if (!empty($date))
         {
             $dates = $this->setDates($date);
-            $rpta = $this->searchTransaction(R_FINALIZADO,array(Auth::user()->id),$dates['start'],$dates['end']);
+            $rpta = $this->userType();
             if ($rpta[status] == ok)
             {
-                $view = View::make('template.list_estado_cuenta')->with($rpta[data])->render();
-                $rpta = $this->setRpta($view);                
+                $rpta = $this->searchTransaction(R_FINALIZADO,$rpta[data],$dates['start'],$dates['end']);
+                if ($rpta[status] == ok)
+                {
+                    $view = View::make('template.list_estado_cuenta')->with($rpta[data])->render();
+                    $rpta = $this->setRpta($view);                
+                }
             }
     	}
+        else
+        {
+            $rpta = $this->warningException('El campo fecha se encuentra vacio',__FUNCTION__,'Empty Date');
+        }
         return $rpta;
     }
 

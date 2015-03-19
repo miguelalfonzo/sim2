@@ -28,17 +28,6 @@ class DepositController extends BaseController{
         return $array;
     }
 
-	public function show_tes()
-	{
-		$state = Session::get('state');
-        $states = StateRange::order();
-        $data = array(
-            'states' => $states,
-            'state' => $state
-        );
-		return View::make('Treasury.show_tes',$data);
-	}
-
     public function viewSolicitudeTes($token)
     {
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
@@ -151,7 +140,16 @@ class DepositController extends BaseController{
 
     }
 
-    
+    /*public function show_tes()
+    {
+        $state = Session::get('state');
+        $states = StateRange::order();
+        $data = array(
+            'states' => $states,
+            'state' => $state
+        );
+        return View::make('Treasury.show_tes',$data);
+    }*/    
     /*public function listSolicitudeTes($id)
     {
         if ($id == 0) {

@@ -8,6 +8,7 @@
                 <th>Aprobado por</th>
                 <th>Monto Depositado</th>
                 <th>Fecha Creación</th>
+                <th>Fecha de Culminación</th>
             </tr>
         </thead>
         <tbody>
@@ -17,17 +18,18 @@
                     <td class="text-center">{{$cuenta->idsolicitud}}</td>
                     <td class="text-center">{{$cuenta->titulo}}</td>
                     @if ($cuenta->user->type == REP_MED)
-                        <td class="text-center">{{$cuenta->rm->nombres}}</td>
+                        <td class="text-center">{{$cuenta->rm->nombres.' '.$cuenta->rm->apellidos}}</td>
                     @else
-                        <td class="text-center">{{$cuenta->sup->nombres}}</td>
+                        <td class="text-center">{{$cuenta->sup->nombres.' '.$cuenta->sup->apellidos}}</td>
                     @endif
                     @if ($cuenta->aproved->type == SUP)
-                        <td class="text-center">{{$cuenta->aprovedSup->nombres}}</td>
+                        <td class="text-center">{{$cuenta->aprovedSup->nombres.' '.$cuenta->aprovedSup->apellidos}}</td>
                     @else ($cuenta->aproved->type == GER_PROD)
                         <td class="text-center">{{$cuenta->aprovedGerProd->descripcion}}</td>
                     @endif
                     <td class="text-center">{{$cuenta->deposit->total}}</td>
                     <td class="text-center">{{$cuenta->created_at}}</td>
+                    <td class="text-center">{{$cuenta->updated_at}}</td>
                 </tr>
             @endforeach
         @endif

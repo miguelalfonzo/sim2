@@ -32,7 +32,7 @@ Route::get('recharge', function(){
  */
 Route::group(array('before' => 'rm'), function () 
 {    
-    Route::get('show_rm', 'Dmkt\SolicitudeController@show_rm');
+    //Route::get('show_rm', 'Dmkt\SolicitudeController@show_user');
     Route::get('ver-solicitud-rm/{token}', 'Dmkt\SolicitudeController@viewSolicitude');
     Route::get('getfondos/{id}', 'Dmkt\SolicitudeController@Fondo');
     
@@ -56,7 +56,7 @@ Route::group(array('before' => 'rm'), function ()
  */
 Route::group(array('before' => 'sup'), function () {
     
-    Route::get('show_sup', 'Dmkt\SolicitudeController@show_sup');
+    //Route::get('show_sup', 'Dmkt\SolicitudeController@show_user');
     Route::get('nueva-solicitud-sup', 'Dmkt\SolicitudeController@newSolicitude');
     Route::get('ver-solicitud-sup/{id}', 'Dmkt\SolicitudeController@viewSolicitudeSup');
     Route::get('listar-solicitudes-sup/{id}', 'Dmkt\SolicitudeController@listSolicitudeSup');
@@ -75,7 +75,7 @@ Route::group(array('before' => 'sup'), function () {
  * |-------------------------------------------------------------------------------------------- |
  */
 Route::group(array('before' => 'gerprod'), function () {
-    Route::get('show_gerprod', 'Dmkt\SolicitudeController@show_gerprod');
+    //Route::get('show_gerprod', 'Dmkt\SolicitudeController@show_user');
     Route::get('listar-solicitudes-gerprod/{id}', 'Dmkt\SolicitudeController@listSolicitudeGerProd');
     Route::get('ver-solicitud-gerprod/{id}', 'Dmkt\SolicitudeController@viewSolicitudeGerProd');
     Route::get('aprobar-solicitud/{token}', 'Dmkt\SolicitudeController@approvedSolicitude');
@@ -84,7 +84,6 @@ Route::group(array('before' => 'gerprod'), function () {
     Route::post('rechazar-solicitud-gerprod', 'Dmkt\SolicitudeController@denySolicitudeGerProd');
     Route::post('buscar-solicitudes-gerprod', 'Dmkt\SolicitudeController@searchSolicitudsGerProd');
     Route::get('cancelar-solicitud-gerprod/{token}', 'Dmkt\SolicitudeController@disBlockSolicitudeGerProd');
-
 });
 /**
  * |-------------------------------------------------------------------------------------------- |
@@ -92,7 +91,7 @@ Route::group(array('before' => 'gerprod'), function () {
  * |-------------------------------------------------------------------------------------------- |
  */
 Route::group(array('before' => 'gercom'), function () {
-    Route::get('show_gercom', 'Dmkt\SolicitudeController@show_gercom');
+    //Route::get('show_gercom', 'Dmkt\SolicitudeController@show_user');
     Route::get('listar-solicitudes-gercom/{id}', 'Dmkt\SolicitudeController@listSolicitudeGerCom');
     Route::get('ver-solicitud-gercom/{id}', 'Dmkt\SolicitudeController@viewSolicitudeGerCom');
     Route::post('aprobar-solicitud', 'Dmkt\SolicitudeController@approvedSolicitude');
@@ -101,7 +100,6 @@ Route::group(array('before' => 'gercom'), function () {
     Route::post('rechazar-solicitud-gercom', 'Dmkt\SolicitudeController@denySolicitudeGerCom');
     Route::get('cancelar-solicitud-gercom/{token}', 'Dmkt\SolicitudeController@disBlockSolicitudeGerCom');
     Route::post('gercom-asignar-responsable','Dmkt\SolicitudeController@gercomAsignarResponsable');
-
 });
 
 /**
@@ -111,7 +109,7 @@ Route::group(array('before' => 'gercom'), function () {
  */
 
 Route::group(array('before' => 'cont'), function () {
-    Route::get('show_cont', 'Dmkt\SolicitudeController@show_cont');
+    //Route::get('show_cont', 'Dmkt\SolicitudeController@show_cont');
     Route::get('ver-solicitud-cont/{id}', 'Dmkt\SolicitudeController@viewSolicitudeCont');
     Route::get('listar-solicitudes-cont/{id}', 'Dmkt\SolicitudeController@listSolicitudeCont');
     Route::post('buscar-solicitudes-cont', 'Dmkt\SolicitudeController@searchSolicitudeCont');
@@ -146,7 +144,7 @@ Route::group(array('before' => 'cont'), function () {
  */
 
 Route::group(array('before' => 'tes'), function(){
-    Route::get('show_tes', 'Deposit\DepositController@show_tes');
+    //Route::get('show_tes', 'Deposit\DepositController@show_tes');
     Route::get('listar-solicitudes-tes/{id}', 'Deposit\DepositController@listSolicitudeTes');
     Route::get('ver-solicitud-tes/{id}', 'Deposit\DepositController@viewSolicitudeTes');
     Route::post('buscar-solicitudes-tes', 'Deposit\DepositController@searchSolicitudeTes');
@@ -213,6 +211,7 @@ Route::group(array('before' => 'sys_user'), function ()
     Route::get('listar-solicitudes/{estado}', 'Dmkt\SolicitudeController@listSolicitude');
     Route::get('getclients', 'Dmkt\SolicitudeController@getClients');
     Route::post('list-account-state', 'Movements\MoveController@searchMove');
+    Route::get('show_user', 'Dmkt\SolicitudeController@show_user');
 });
 
 

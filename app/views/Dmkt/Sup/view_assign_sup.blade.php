@@ -191,11 +191,11 @@
                     </a>
                     <a id="deny_solicitude" name="button1id" class="btn btn-primary deny_solicitude">Rechazar
                     </a>
-                    <a id="button2id" href="{{URL::to('show_sup')}}" name="button2id"
+                    <a id="button2id" href="{{URL::to('show_user')}}" name="button2id"
                        class="btn btn-primary">Cancelar</a>
 
                     @else
-                    <a id="button2id" href="{{URL::to('show_sup')}}" name="button2id"
+                    <a id="button2id" href="{{URL::to('show_user')}}" name="button2id"
                        class="btn btn-primary">Cancelar</a>
                     @endif
                 </div>
