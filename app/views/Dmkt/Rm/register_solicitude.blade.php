@@ -12,7 +12,7 @@
                 <strong>Usuario : 
                 @if(Auth::user()->type == 'R') 
                     {{Auth::user()->rm->nombres.' '.Auth::user()->rm->apellidos}}
-                @else 
+                @else
                     {{Auth::user()->Sup->nombres.' '.Auth::user()->Sup->apellidos}} 
                 @endif
                 </strong>
@@ -49,14 +49,27 @@
                     </select>
                 </div>
             </div>
-            <!--  -->
+
             <div class="form-group col-sm-6 col-md-4">
-                <label class="col-sm-8 col-md-8 control-label" for="textinput">Pruebas</label>
+                <label class="col-sm-8 col-md-8 control-label" for="textinput">Etiqueta</label>
                 <div class="col-sm-12 col-md-12">
-                    <input id="idtitle" class="form-control input-md cliente-seeker" name="titulo" type="text" placeholder=""
-                    value="{{isset($solicitude->titulo)? $solicitude->titulo : null }}">
+                    <select class="form-control selectetiqueta" name="etiqueta">
+                        @foreach($etiquetas as $etiqueta)
+                            @if (isset($solicitude))
+                                @if ($solicitude->idetiqueta == $etiqueta->id)
+                                    <option selected value="{{$etiqueta->id}}">{{$etiqueta->nombre}}</option>
+                                @else
+                                    <option value="{{$etiqueta->id}}">{{$etiqueta->nombre}}</option>
+                                @endif
+                            @else
+                                <option value="{{$etiqueta->id}}">{{$etiqueta->nombre}}</option>
+                            @endif
+                        @endforeach
+                    </select>
                 </div>
             </div>
+            <!--  -->
+            <!--  -->
             <!-- -->
             <div class="form-group col-sm-6 col-md-4">
                 <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo de Pago</label>
@@ -140,16 +153,32 @@
                 </div>
             </div>
             <!-- <div class="form-group col-sm-12 col-md-8" style="padding: 0"> -->
+
+            <!-- <div class="form-group col-sm-6 col-md-4">
+                <label class="col-sm-8 col-md-8 control-label" for="textinput">Pruebas</label>
+                <div class="col-sm-12 col-md-12">
+                    <input id="idtitle" class="form-control input-md cliente-seeker" name="titulo" type="text" placeholder=""
+                    value="">
+                </div>
+            </div> -->
                 <div class="form-group col-sm-6 col-md-4 ">
                     <label class="col-sm-8 col-md-8 control-label" for="textinput">Cliente</label>
                     <ul id="listclient" class="col-sm-12 col-md-12">
-                        @if(isset($clients))
-                            @foreach($clients as $client)
+                        @if(isset($solicitude))
+                            @foreach($solicitude->clients as $client)
                                 <li>
                                     <div style="position: relative" class="has-success has-feedback">
-                                        <input id="idclient1" name="clients[]" type="text" placeholder="" style="margin-bottom: 10px"
-                                               class="form-control input-md project input-client" data-valor="{{$client->clcodigo}}"
-                                               value="{{isset($client->clnombre) ? $client->clcodigo.' - '.$client->clnombre : null }}">
+                                            @if($client->from_table == TB_DOCTOR)
+                                                <input type='text' id="idclient0" name="clients[]" type="text" style="margin-bottom: 10px"
+                                                   class="form-control input-md project input-client cliente-seeker" pk="{{$client->idcliente}}"
+                                                   value="{{$client->doctors->pefnombres.' '.$client->doctors->pefpaterno.' '.$client->doctors->pefmaterno}}"
+                                                   data-valor="all" table="{{$client->from_table}}" disabled>
+                                            @else
+                                                <input id="idclient0" name="clients[]" type="text" style="margin-bottom: 10px"
+                                                   class="form-control input-md project input-client cliente-seeker" pk="{{$client->client->clcodigo}}"
+                                                   value='{{isset($client->client->clnombre) ? $client->client->clcodigo.' - '.$client->client->clnombre : null }}'
+                                                   data-valor="all" table="VTA.CLIENTES" disabled>
+                                            @endif
                                         <button type='button' class='btn-delete-client' style="z-index: 2">
                                             <span class='glyphicon glyphicon-remove'></span>
                                         </button>
@@ -159,9 +188,9 @@
                         @else
                             <li>
                                 <div style="position: relative" class="">
-                                    <input id="idclient1" name="clients[]" type="text" placeholder="" style="margin-bottom: 10px"
-                                           class="form-control input-md input-client" data-valor=""
-                                           value="{{isset($client->clnombre) ? $client->clcodigo.' - '.$client->clnombre : null }}">
+                                        <input id="idclient0" name="clients[]" type="text" placeholder="" style="margin-bottom: 10px"
+                                               class="form-control input-md input-client cliente-seeker" data-valor=""
+                                               value="{{isset($client->clnombre) ? $client->clcodigo.' - '.$client->clnombre : null }}">
                                     <button type='button' class='btn-delete-client' style="display: none; z-index: 2">
                                         <span class='glyphicon glyphicon-remove'></span>
                                     </button>
@@ -270,7 +299,7 @@
                 <div class="col-sm-12 col-md-12" style="text-align: center">
                     @if(isset($solicitude))
                         @if($solicitude->blocked == 0)
-                            <button id="button1id" name="button1id" class="btn btn-primary register_solicitude">
+                            <button id="button1id" name="button1id" class="btn btn-primary">
                                 {{isset($solicitude) ? 'Actualizar' : 'Crear'}}
                             </button>
                             <a id="button2id" href="{{URL::to('show_user')}}" name="button2id" class="btn btn-primary">Cancelar</a>

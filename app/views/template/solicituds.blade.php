@@ -20,7 +20,7 @@
     <tbody>
         @foreach($solicituds as $solicitude)
             <tr>
-                <td style="text-align: center" class="id_solicitud">{{$solicitude->idsolicitud}}</td>
+                <td style="text-align:center" class="id_solicitud">{{$solicitude->idsolicitud}}</td>
                 @if ( Auth::user()->type == TESORERIA )
                     <input type="hidden" id="sol_token" value="{{$solicitude->token}}">  
                     @if(!is_null($solicitude->response))
@@ -33,8 +33,15 @@
                         @endif
                     @endif
                 @endif
-                <td class="sol_titulo">{{$solicitude->titulo}}</td>
-                <td> 
+                <td style="text-align:center" class="sol_titulo">
+                    @if (!is_null($solicitude->idetiqueta))
+                        <span class="label label-info" style="margin-right:1em;background-color:{{$solicitude->etiqueta->color}}">
+                            {{$solicitude->etiqueta->nombre}}
+                        </span>
+                    @endif
+                    <label>{{$solicitude->titulo}}</label>
+                </td>
+                <td style="text-align:center"> 
                     @if(count($solicitude->history) != 0)
                         @if (is_object($solicitude->history[0]->user))    
                             @if ($solicitude->history[0]->user->type == REP_MED)
@@ -54,7 +61,7 @@
                     @endif
                 </td>
                 @if(Auth::user()->type == TESORERIA)
-                    <td style="display:none; text-align:center" class="total_deposit">
+                    <td style="display:none;" class="total_deposit">
                         {{$solicitude->typemoney->simbolo.' '.$solicitude->monto }}
                     </td>
                     <td style="display:none" class="tes-ret">
@@ -64,7 +71,7 @@
                         {{$solicitude->retencion}}
                     @endif
                     </td>
-                    <td  style="text-align: center">
+                    <td  style="text-align:center">
                         @if (!$solicitude->retencion == null)
                             {{$solicitude->typemoney->simbolo.' '.($solicitude->monto - $solicitude->retencion)}}
                         @else
@@ -72,11 +79,11 @@
                         @endif
                     </td>
                 @else
-                    <td style="text-align: center" class="total_deposit">{{$solicitude->typemoney->simbolo.$solicitude->monto}}</td>
+                    <td style="text-align:center" class="total_deposit">{{$solicitude->typemoney->simbolo.$solicitude->monto}}</td>
                 @endif
                 @include('template/states')
-                <td style="text-align: center">{{ date_format(date_create($solicitude->created_at), 'd/m/Y' )}}</td>
-                <td style="text-align: center">{{$solicitude->typesolicitude->nombre}}</td>
+                <td style="text-align:center">{{ date_format(date_create($solicitude->created_at), 'd/m/Y' )}}</td>
+                <td style="text-align:center">{{$solicitude->typesolicitude->nombre}}</td>
                 @include('template/icons')
             </tr>
         @endforeach

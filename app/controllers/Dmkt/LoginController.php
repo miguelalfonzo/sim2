@@ -82,6 +82,4 @@ class LoginController extends BaseController{
         return Redirect::to('login'); // redirect the user to the login screen
     }
 
-
-
 }

@@ -146,91 +146,6 @@ function newSolicitude() {
         }
     });
 
-    function load_client(client) {
-
-        function lightwell(request, response) {
-            function hasMatch(s) {
-                return s.toLowerCase().indexOf(request.term.toLowerCase()) !== -1;
-            }
-            var i, l, obj, matches = [];
-            if (request.term === "") {
-                response([]);
-                return;
-            }
-            for (i = 0, l = clients.length; i < l; i++) {
-                obj = clients[i];
-                if (hasMatch(obj.clnombre)) {
-                    matches.push(obj);
-                }
-            }
-            response(matches);
-        }
-        
-
-        var idclient = '#idclient';
-        if ($(idclient + client).length) {
-            $(idclient + client).autocomplete({
-                minLength: 0,
-                source: lightwell,
-                focus: function (event, ui) {
-                    $(this).val(ui.item.clcodigo + ' - ' + ui.item.clnombre);
-
-                    return false;
-                },
-                select: function (event, ui) {
-                    // $( "#input-client" ).val( ui.item.label );
-                    $(this).parent().removeClass('has-error has-feedback');
-                    $(this).parent().children('.span-alert').removeClass('glyphicon glyphicon-remove form-control-feedback');
-                    $(this).parent().addClass('has-success has-feedback');
-                    $(this).parent().children('.span-alert').addClass('glyphicon glyphicon-ok form-control-feedback');
-                    //DESACTIVADO PARA PERMITIR EDITAR CLIENTE
-                    //$(this).attr('readonly', 'readonly');
-                    $(this).attr('data-valor','all');
-                    return false;
-                }
-            })
-                .data("ui-autocomplete")._renderItem = function (ul, item) {
-                return $("<li>")
-                    .append("<a>" +
-                    "<br><span style='font-size: 80%;'>Codigo: " + item.clcodigo + "</span>" +
-                    "<br><span style='font-size: 60%;'>Cliente: " + item.clnombre + "</span></a>")
-                    .appendTo(ul);
-            };
-        }
-    }
-
-    load_client(1);
-    var client = 2;
-    $(document).on('click', '#btn-add-client', function () {
-        $('<li><div style="position: relative"><input id="idclient' + client + '" name="clients[]" type="text" placeholder="" style="margin-bottom: 10px" class="form-control input-md input-client"><button type="button" class="btn-delete-client" style="z-index: 2"><span class="glyphicon glyphicon-remove"></span></button></div></li>').appendTo('#listclient');
-        $(".btn-delete-client").show();
-        setTimeout(function () {
-            load_client(client);
-            client++;
-        }, 200);
-    });
-    $(document).on("click", ".btn-delete-client", function () {
-        $('#listclient>li .porcentaje_error').css({"border": "0"});
-        $('.clients_repeat').text('');
-
-        $(".option-des-1").removeClass('error');
-        var k = $("#listclient li").size();
-        if (k > 1) {
-            var other = $(".btn-delete-client").index(this);
-            $("#listclient li").eq(other).remove();
-            var p = $("#listclient li").size();
-            if (p == 1) {
-                $(".btn-delete-client").on('click',function(){
-                   $('#idclient1').parent().removeClass('has-success has-feedback');
-                    $('#idclient1').attr('readonly',false);
-                    $('#idclient1').val('');
-                });
-            }
-        }
-    });
-
-    /* Removing Errors */
-
     title.on('focus', function () {
         $(this).parent().removeClass('has-error');
     });
@@ -262,172 +177,7 @@ function newSolicitude() {
         $(this).parent().removeClass('has-error');
     });
 
-    /* Validate send register solicitude */
-    $('.register_solicitude').on('click', (function (e) {
-        var aux = 0;
-        var obj = [];
-        var clients_input = [];
-        var families_input = [];
-        for (var i = 0, l = clients.length; i < l; i++) {
-            obj[i] = clients[i].clcodigo + ' - ' + clients[i].clnombre;
-        }
-        if (!title.val()) {
-            title.parent().addClass('has-error');
-            title.attr('placeholder', 'Ingrese nombre de la solicitud');
-            title.addClass('input-placeholder-error');
-        }
-        if (!amount.val()) {
-            amount.parent().addClass('has-error');
-            amount.attr('placeholder', 'Ingrese monto');
-            amount.addClass('input-placeholder-error');
-        }
-        if (!delivery_date.val()) {
-            delivery_date.parent().addClass('has-error');
-            delivery_date.attr('placeholder', 'Ingrese Fecha');
-            delivery_date.addClass('input-placeholder-error');
-        }
-        if (!input_client.val()) {
-            input_client.parent().addClass('has-error');
-            input_client.attr('placeholder', 'Ingrese Cliente');
-            input_client.addClass('input-placeholder-error');
-        }
-        if(select_type_solicitude.val() == 2){
-            if (!amount_fac.val()) {
-                amount_fac.parent().addClass('has-error');
-                amount_fac.attr('placeholder', 'Ingrese Monto de la Factura');
-                amount_fac.addClass('input-placeholder-error');
-            }
-            if(!input_file_factura.val() && isSetImage.val()==null){
-                input_file_factura.parent().addClass('has-error');
-                input_file_factura.attr('placeholder', 'Ingrese Imagen');
-                input_file_factura.addClass('input-placeholder-error');
-            }
-        }
-
-        setTimeout(function () {
-
-            //validate fields client are correct
-            $('.input-client').each(function (index) {
-                var input = $(this).val();
-                clients_input[index] = input;
-
-                var ban = obj.indexOf(input);
-                if (ban == -1) 
-                {
-                    aux = 1;
-                    $(this).parent().addClass('has-error has-feedback');
-                    $(this).parent().children('.span-alert').addClass('span-alert glyphicon glyphicon-remove form-control-feedback');
-                }
-            });
-        }, 100);
-        setTimeout(function ()
-        {
-            $('.input-client').each(function (index) {
-                var input = $(this).val();
-                if (!$(this).attr('data-valor')) {
-                    aux = 1;
-                    $(this).parent().addClass('has-error has-feedback');
-                    $(this).parent().children('.span-alert').addClass('span-alert glyphicon glyphicon-remove form-control-feedback');
-                    $(this).val('');
-                    $(this).attr('placeholder','Seleccione cliente');
-                    $(this).addClass('input-placeholder-error');
-                }
-            });
-        }, 100);
-        setTimeout(function () {
-            //Validate of fields duplicate in clients
-            for (var i = 0; i < clients_input.length; i++) {
-                $('.input-client').each(function (index) {
-                    if (index != i && clients_input[i] === $(this).val()) {
-                        var ind = clients_input.indexOf($(this).val());
-                        clients_input[index] = '';
-
-                        $(this).parent().removeClass('has-success has-feedback');
-                        $(this).parent().addClass('has-error has-feedback');
-                        $(this).parent().children('.span-alert').addClass('span-alert glyphicon glyphicon-remove form-control-feedback');
-                        $(".clients_repeat").text('Datos Repetidos').css('color', 'red');
-                        aux=1;
-                    }
-
-                });
-            }
-        }, 200);
-        setTimeout(function () 
-        {
-            var families = $('.selectfamily');
-            families.each(function (index) 
-            {
-                families_input[index] = $(this).val();
-            });
-            for (var i = 0; i < families_input.length; i++) 
-            {
-                families.each(function (index) 
-                {
-                    if (index != i && families_input[i] === $(this).val()) 
-                    {
-                        var ind = families_input.indexOf($(this).val());
-                        families_input[index] = '';
-                        $(this).css('border-color', 'red');
-                        $(".families_repeat").text('Datos Repetidos').css('color', 'red');
-                        aux=1;
-                    }
-                });
-            }
-            if (aux == 0) 
-            {
-                var form = $('#form-register-solicitude');
-                var formData = new FormData(form[0]);
-                var rute = form.attr('action');
-                var message1 = 'Registrando';
-                var message2 = '<strong style="color: green">Solicitud Registrada</strong>';
-                if (rute == 'editar-solicitud') 
-                {
-                    message1 = 'Actualizando';
-                    message2 = '<strong style="color: green">Solicitud Actualizada</strong>'
-                }
-
-                $.ajax(
-                {
-                    url: server + rute,
-                    type: 'POST',
-                    data: formData,
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    beforeSend: function()
-                    {
-                        loadingUI(message1);
-                    }
-                }).done(function (data)
-                {
-                    $.unblockUI();
-                    if(data.Status == 'Ok')
-                    {
-                        if (data.Data == REP_MED || data.Data == SUP ) 
-                        {
-                            responseUI('Solicitud Registrada', 'green');
-                            setTimeout(function()
-                            {
-                                window.location.href = server + 'show_user';
-                            },500);
-                        }
-                        else
-                        {
-                            responseUI('Rol Sin Definir: ' + data.Data , 'red');
-                        }
-                    }
-                    else
-                    {
-                        responseUI(data.Status + ': ' + data.Description,'red');
-                    }
-                }).fail(function (e) {
-                    $.unblockUI();
-                    alert('error');
-                });
-            }
-        }, 300);
-        e.preventDefault();
-    }));
+    
 
     function listFondos(user, state){
         var url = server + 'list-'+user +'/'+dateactual + '/' + state;
@@ -951,7 +701,7 @@ function newSolicitude() {
         $(this).parent().removeClass('has-error');
     });
 
-    $(".change_before_rep").on("keyup",function(){
+    /*$(".change_before_rep").on("keyup",function(){
         $(this).autocomplete({
             minLength: 3,
             source: findRepresentatives,
@@ -981,7 +731,7 @@ function newSolicitude() {
                 "<span style='font-size: 70%;'>"+ item.visvisitador + ' - ' +item.visnombre+' '+item.vispaterno + ' '+ item.vismaterno+ "</span></a>")
                 .appendTo(ul);
         };
-    });
+    });*/
 
     $('#edit-rep').hide();
     function removeinput(data){
@@ -1760,28 +1510,27 @@ function newSolicitude() {
         $("#add-doc").show();
     });
 
-    $( document ).ready(function() 
-    {
-        $('.cliente-seeker').typeahead(
+
+    function seeker(element){
+        console.log('seeeker');
+        element.typeahead(
         {
             minLength: 3,
             hightligth: true,
             hint: false
         },
         {
-            name: 'json',
+            name: 'clients',
             displayKey: 'label',
             templates:  
             {
                 empty: 
                 [
-                    '<div class="empty-message">',
-                    'no results found',
-                    '</div>'
+                    '<p><strong>&nbsp; No se encontro resultados  &nbsp;</strong></p>'
                 ].join('\n'),
                 suggestion: function(data)
                 {
-                    return '<p><strong>' + data.value + '</strong> - ' + data.rn + '</p>';
+                    return '<p><strong>' + data.label + '</strong></p>';
                 }
             },
             source: function (request , response)
@@ -1801,6 +1550,7 @@ function newSolicitude() {
                     },
                 }).done( function (data)
                 {
+                    console.log('source ok');
                     if (!data.Status == 'Ok')
                     {
                         data.Data = '{"rn":"0","value":"0","label":"Error en la busqueda"}';   
@@ -1812,10 +1562,120 @@ function newSolicitude() {
         }).on('typeahead:selected', function (evento, suggestion , dataset)
         {
             var input = $(this);
-            input.attr("name",dataset);
+            input.parent().after('<button type="button" class="btn-delete-client" style="z-index: 2"><span class="glyphicon glyphicon-remove"></span></button>');
+            input.parent().addClass('has-success has-feedback');
+            input.attr("name",dataset+'[]');
             input.attr("table",suggestion.table);
             input.attr("pk",suggestion.value);
+            input.removeClass('has-error has-feedback');
+            input.parent().children('.span-alert').addClass('glyphicon glyphicon-ok form-control-feedback');
+            input.attr('data-valor','all');
+            input.parent().children('.span-alert').removeClass('glyphicon glyphicon-remove form-control-feedback');
+            input.attr('disabled','disabled');
         });
+    }
+
+    function load_client(client) {
+
+        function lightwell(request, response) {
+            function hasMatch(s) {
+                return s.toLowerCase().indexOf(request.term.toLowerCase()) !== -1;
+            }
+            var i, l, obj, matches = [];
+            if (request.term === "") {
+                response([]);
+                return;
+            }
+            for (i = 0, l = clients.length; i < l; i++) {
+                obj = clients[i];
+                if (hasMatch(obj.clnombre)) {
+                    matches.push(obj);
+                }
+            }
+            response(matches);
+        }
+        var idclient = '#idclient';
+        /*if ($(idclient + client).length) {
+            $(idclient + client).autocomplete({
+                minLength: 0,
+                source: lightwell,
+                focus: function (event, ui) {
+                    $(this).val(ui.item.clcodigo + ' - ' + ui.item.clnombre);
+
+                    return false;
+                },
+                select: function (event, ui) {
+                    // $( "#input-client" ).val( ui.item.label );
+                    $(this).parent().removeClass('has-error has-feedback');
+                    $(this).parent().children('.span-alert').removeClass('glyphicon glyphicon-remove form-control-feedback');
+                    $(this).parent().addClass('has-success has-feedback');
+                    $(this).parent().children('.span-alert').addClass('glyphicon glyphicon-ok form-control-feedback');
+                    //DESACTIVADO PARA PERMITIR EDITAR CLIENTE
+                    //$(this).attr('readonly', 'readonly');
+                    $(this).attr('data-valor','all');
+                    return false;
+                }
+            })
+                .data("ui-autocomplete")._renderItem = function (ul, item) {
+                return $("<li>")
+                    .append("<a>" +
+                    "<br><span style='font-size: 80%;'>Codigo: " + item.clcodigo + "</span>" +
+                    "<br><span style='font-size: 60%;'>Cliente: " + item.clnombre + "</span></a>")
+                    .appendTo(ul);
+            };
+        }*/
+    }
+
+    /*load_client(1);
+    var client = 2;*/
+    $(document).off('click', '#btn-add-client');
+    $(document).on('click', '#btn-add-client', function () 
+    {
+        console.log(this);
+        $('<li>' +
+            '<div style="position: relative">' +
+                '<input id="idclient0" "name="clients[]" type="text" placeholder="" style="margin-bottom: 10px"' + 
+                'class="form-control input-md input-client cliente-seeker">' +
+                '<button type="button" class="btn-delete-client" style="z-index: 2">' +
+                '<span class="glyphicon glyphicon-remove">' +
+                '</span></button></div></li>').appendTo('#listclient');
+        var lastInput = $("#listclient").children().last().find("#idclient0");
+        seeker(lastInput);   
+    });
+
+    $(document).on("click", ".btn-delete-client", function () {
+        //console.log($(this);
+        console.log(this);
+        console.log($(this));
+        console.log($(this).parent());
+        var li = $(this).parent().parent();
+        var ul = li.parent();
+        console.log(li);
+        console.log(ul);
+        if (ul.children().length > 1)
+            li.remove(); 
+        /*$('#listclient>li .porcentaje_error').css({"border": "0"});
+        $('.clients_repeat').text('');
+
+        $(".option-des-1").removeClass('error');
+        var k = $("#listclient li").size();
+        if (k > 1) {
+            var other = $(".btn-delete-client").index(this);
+            $("#listclient li").eq(other).remove();
+            var p = $("#listclient li").size();
+            if (p == 1) {
+                $(".btn-delete-client").on('click',function(){
+                   $('#idclient1').parent().removeClass('has-success has-feedback');
+                    $('#idclient1').attr('readonly',false);
+                    $('#idclient1').val('');
+                });
+            }
+        }*/
+    });
+
+    $( document ).ready(function() 
+    {
+        seeker($('.cliente-seeker'));
     });
 
     function listAccountState(date)
@@ -1886,7 +1746,6 @@ function newSolicitude() {
             else
                 listAccountState(date);
     });
-
     /* Filter all solicitude by date */
     var search_solicitude = $('#search-solicitude');
     search_solicitude.on('click', function()
@@ -1942,15 +1801,192 @@ function newSolicitude() {
             }
             else
             {
-                //l.stop();
+                l.stop();
                 responseUI(data.Status + ': ' + data.Description,'red');
             }
         });
     }
 
+
+
+/* Validate send register solicitude */
+    $('#button1id').off('click');
+    $('#button1id').on('click', (function (e) {
+        e.preventDefault();
+        var aux = 0;
+        //var obj = [];
+        var clients_input = [];
+        var clients_table = [];
+        var families_input = [];
+        console.log('registro');
+        /*for (var i = 0, l = clients.length; i < l; i++) {
+            obj[i] = clients[i].clcodigo + ' - ' + clients[i].clnombre;
+        }*/
+        if (!title.val()) {
+            title.parent().addClass('has-error');
+            title.attr('placeholder', 'Ingrese nombre de la solicitud');
+            title.addClass('input-placeholder-error');
+        }
+        if (!amount.val()) {
+            amount.parent().addClass('has-error');
+            amount.attr('placeholder', 'Ingrese monto');
+            amount.addClass('input-placeholder-error');
+        }
+        if (!delivery_date.val()) {
+            delivery_date.parent().addClass('has-error');
+            delivery_date.attr('placeholder', 'Ingrese Fecha');
+            delivery_date.addClass('input-placeholder-error');
+        }
+        if (!input_client.val()) {
+            input_client.parent().addClass('has-error');
+            input_client.attr('placeholder', 'Ingrese Cliente');
+            input_client.addClass('input-placeholder-error');
+        }
+        if(select_type_solicitude.val() == 2){
+            if (!amount_fac.val()) {
+                amount_fac.parent().addClass('has-error');
+                amount_fac.attr('placeholder', 'Ingrese Monto de la Factura');
+                amount_fac.addClass('input-placeholder-error');
+            }
+            if(!input_file_factura.val() && isSetImage.val()==null){
+                input_file_factura.parent().addClass('has-error');
+                input_file_factura.attr('placeholder', 'Ingrese Imagen');
+                input_file_factura.addClass('input-placeholder-error');
+            }
+        }
+
+        setTimeout(function () {
+
+            //validate fields client are correct
+            $('.input-client').each(function (index) {
+                elem = $(this);
+                var input = elem.val();
+
+                clients_input[index] = elem.attr("pk");
+
+                clients_table[index] = elem.attr("table");
+                /*var ban = obj.indexOf(input);
+                if (ban == -1) 
+                {
+                    aux = 1;
+                    $(this).parent().addClass('has-error has-feedback');
+                    $(this).parent().children('.span-alert').addClass('span-alert glyphicon glyphicon-remove form-control-feedback');
+                }*/
+            });
+        }, 100);
+        setTimeout(function ()
+        {
+            $('.input-client').each(function (index) {
+                var input = $(this).val();
+                if (!$(this).attr('data-valor')) {
+                    aux = 1;
+                    $(this).parent().addClass('has-error has-feedback');
+                    $(this).parent().children('.span-alert').addClass('span-alert glyphicon glyphicon-remove form-control-feedback');
+                    $(this).val('');
+                    $(this).attr('placeholder','Seleccione cliente');
+                    $(this).addClass('input-placeholder-error');
+                }
+            });
+        }, 100);
+        setTimeout(function () {
+            //Validate of fields duplicate in clients
+            for (var i = 0; i < clients_input.length; i++) {
+                $('.input-client').each(function (index) {
+                    if (index != i && clients_input[i] === $(this).val()) {
+                        var ind = clients_input.indexOf($(this).val());
+                        clients_input[index] = '';
+
+                        $(this).parent().removeClass('has-success has-feedback');
+                        $(this).parent().addClass('has-error has-feedback');
+                        $(this).parent().children('.span-alert').addClass('span-alert glyphicon glyphicon-remove form-control-feedback');
+                        $(".clients_repeat").text('Datos Repetidos').css('color', 'red');
+                        aux=1;
+                    }
+
+                });
+            }
+        }, 200);
+        setTimeout(function () 
+        {
+            var families = $('.selectfamily');
+            families.each(function (index) 
+            {
+                families_input[index] = $(this).val();
+            });
+            for (var i = 0; i < families_input.length; i++) 
+            {
+                families.each(function (index) 
+                {
+                    if (index != i && families_input[i] === $(this).val()) 
+                    {
+                        var ind = families_input.indexOf($(this).val());
+                        families_input[index] = '';
+                        $(this).css('border-color', 'red');
+                        $(".families_repeat").text('Datos Repetidos').css('color', 'red');
+                        aux=1;
+                    }
+                });
+            }
+            if (aux == 0) 
+            {
+                var form = $('#form-register-solicitude');
+                var formData = new FormData(form[0]);
+                formData.append("clients[]",clients_input);
+                formData.append("tables[]",clients_table);
+                var rute = form.attr('action');
+                var message1 = 'Registrando';
+                var message2 = '<strong style="color: green">Solicitud Registrada</strong>';
+                if (rute == 'editar-solicitud') 
+                {
+                    message1 = 'Actualizando';
+                    message2 = '<strong style="color: green">Solicitud Actualizada</strong>'
+                }
+                console.log(formData);
+                $.ajax(
+                {
+                    url: server + rute,
+                    type: 'POST',
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function()
+                    {
+                        loadingUI(message1);
+                    }
+                }).done(function (data)
+                {
+                    $.unblockUI();
+                    if(data.Status == 'Ok')
+                    {
+                        if (data.Data == REP_MED || data.Data == SUP ) 
+                        {
+                            responseUI('Solicitud Registrada', 'green');
+                            setTimeout(function()
+                            {
+                                window.location.href = server + 'show_user';
+                            },500);
+                        }
+                        else
+                        {
+                            responseUI('Rol Sin Definir: ' + data.Data , 'red');
+                        }
+                    }
+                    else
+                    {
+                        responseUI(data.Status + ': ' + data.Description,'red');
+                    }
+                }).fail(function (e) {
+                    $.unblockUI();
+                    alert('error');
+                });
+            }
+        }, 300);
+        e.preventDefault();
+    }));
+
+
 }
-
-
 //$(data).html(input.val());
 /*else if($(data).attr("id") == "icons")
                 {

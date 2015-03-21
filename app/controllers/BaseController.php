@@ -234,18 +234,22 @@ class BaseController extends Controller {
             {
                 $q->orderBy('created_at','DESC');  
             }));
-            if (Auth::user()->type == SUP || Auth::user()->type == REP_MED)
+            if (Auth::user()->type == REP_MED)
             {
                 $solicituds->whereIn('iduser', $idUser);
                 $rSolicituds->whereNotIn('iduser', $idUser)
                 ->where('idresponse',Auth::user()->id);
             }
-            elseif ( Auth::user()->type == TESORERIA ) 
+            else if (Auth::user()->type == SUP)
+            {
+                $solicituds->whereIn('iduser', $idUser);
+            } 
+            else if ( Auth::user()->type == TESORERIA ) 
             {
                 $solicituds->where('asiento',ENABLE_DEPOSIT)
                 ->whereNotNull('idresponse');
             }
-            elseif ( Auth::user()->type == ASIS_GER ) 
+            else if ( Auth::user()->type == ASIS_GER ) 
             {
                 $solicituds->where('idresponse',$idUser);
             }
@@ -274,7 +278,7 @@ class BaseController extends Controller {
                 });
             $solicituds = $solicituds->orderBy('idsolicitud', 'ASC')->get();
             $rSolicituds = $rSolicituds->orderBy('idsolicitud', 'ASC')->get();
-            if ( Auth::user()->type == REP_MED || Auth::user()->type == SUP )
+            if ( Auth::user()->type == REP_MED )
                 $solicituds->merge($rSolicituds);
             $rpta = $this->setRpta(array('solicituds' => $solicituds));
         }
@@ -296,6 +300,7 @@ class BaseController extends Controller {
                 $users_ids = array();
                 foreach ($reps as $rm)
                     $users_ids[] = $rm->iduser;
+                $users_ids[] = $user->id;
                 $rpta = $this->setRpta($users_ids);
             }
             else if ($user->type == GER_PROD)

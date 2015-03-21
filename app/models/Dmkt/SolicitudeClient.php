@@ -23,4 +23,9 @@ class SolicitudeClient extends Eloquent{
         return $this->hasOne('Dmkt\Client','clcodigo','idcliente');
     }
 
+    function doctors()
+    {
+        return $this->hasOne('Dmkt\Doctor','pefcodpers','idcliente');
+    }
+
 }

@@ -92,11 +92,12 @@ class TestController extends BaseController
     	try
     	{
 	    	$inputs = Input::all();
+	    	//$inputs['sVal'] = 'rafael';
 	    	if (!empty($inputs['sVal']))
 	    	{
-		    	$json = json_decode($this->clientsTables());
-	    		/*$json =  '[{"name":"users","wheres":["id","email","username"],"selects":["username","id"],"types":["0","0"]}]';
-	    		$json = json_decode($json);*/
+		    	//$json = json_decode($this->clientsTables());
+	    		$json =  '[{"name":"FICPE.PERSONAFIS","wheres":{"likes":["PEFNRODOC1","(PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)"],"equal":[{"PEFESTADO":"1"}]},"selects":["PEFCODPERS","(\'CMP: \' || PEFNRODOC1 || \'-\' || PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)"]}]';
+	    		$json = json_decode($json);
 	    		$cAlias = array('value','label');
 		    	if (json_last_error() == JSON_ERROR_NONE)
 		    	{
@@ -105,8 +106,8 @@ class TestController extends BaseController
 			    	{
 			    		$select = '';
 			    		$query = DB::table($table->name);
-			    		foreach ( $table->wheres as $where)
-			    			$query->orWhereRaw(" UPPER(" .$where. ") like '%" .strtoupper($inputs['sVal']). "%' ");
+			    		foreach ( $table->wheres->likes as $like)
+			    			$query->orWhereRaw(" UPPER(" .$like. ") like '%" .strtoupper($inputs['sVal']). "%' ");
 			    		for ( $i=0; $i<2; $i++)
 			    			$select = $select. ' ' .$table->selects[$i]. ' as "' .$cAlias[$i]. '",';				
 			    		$select = substr($select,0,-1);

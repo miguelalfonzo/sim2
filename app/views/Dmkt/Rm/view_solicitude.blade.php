@@ -234,23 +234,31 @@
                 </div>
                 <div class="panel-body">
                     @foreach($solicitude->clients as $client)
-                    @if(!is_null($client->idcliente))
-                    <div class="form-group ">
-                        <div class="">
-                            <input id="textinput" name="textinput" type="text" placeholder=""
-                                   value="{{$client->client->clnombre}}" readonly
-                                   class="form-control input-md ">
+                        @if (is_null($client->idcliente))
+                        <div class="form-group ">
+                            <div class="">
+                                <input id="textinput" name="textinput" type="text" placeholder=""
+                                       value="No hay cliente asignado" readonly
+                                       class="form-control input-md ">
+                            </div>
                         </div>
-                    </div>
-                    @else
-                    <div class="form-group ">
-                        <div class="">
-                            <input id="textinput" name="textinput" type="text" placeholder=""
-                                   value="No hay cliente asignado" readonly
-                                   class="form-control input-md ">
+                        @elseif ($client->from_table == TB_DOCTOR)
+                        <div class="form-group ">
+                            <div class="">
+                                <input id="textinput" name="textinput" type="text" placeholder=""
+                                       value="{{$client->doctors->pefnombres.' '.$client->doctors->pefpaterno.' '.$client->doctors->pefmaterno}}" readonly
+                                       class="form-control input-md ">
+                            </div>
                         </div>
-                    </div>
-                    @endif
+                        @elseif(!is_null($client->idcliente))
+                        <div class="form-group ">
+                            <div class="">
+                                <input id="textinput" name="textinput" type="text" placeholder=""
+                                       value="{{$client->client->clnombre}}" readonly
+                                       class="form-control input-md ">
+                            </div>
+                        </div>
+                        @endif
                     @endforeach
                 </div>
             </div>

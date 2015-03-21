@@ -93,3 +93,5 @@ const GER_COM = 'G';
 const CONT = 'C';
 const TESORERIA = 'T';
 const ASIS_GER = 'AG';
+
+const TB_DOCTOR = 'FICPE.PERSONAFIS';

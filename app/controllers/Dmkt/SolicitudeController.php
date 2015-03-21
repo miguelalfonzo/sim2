@@ -29,6 +29,7 @@ use \User;
 use \Validator;
 use \View;
 use \Common\StateRange;
+use \Dmkt\Label;
 
 class SolicitudeController extends BaseController
 {
@@ -101,12 +102,14 @@ class SolicitudeController extends BaseController
         $typePayments = TypePayment::all();
         $fondos = Fondo::all();
         $typesolicituds = TypeSolicitude::all();
-        $data = [
-            'families' => $families,
-            'fondos' => $fondos,
+        $label = Label::all();
+        $data = array(
+            'etiquetas'       => $label,
+            'families'       => $families,
+            'fondos'         => $fondos,
             'typesolicituds' => $typesolicituds,
-            'typePayments' => $typePayments
-        ];
+            'typePayments'   => $typePayments
+        );
         return View::make('Dmkt.Rm.register_solicitude', $data);
     }
 
@@ -116,6 +119,7 @@ class SolicitudeController extends BaseController
         try
         {
             DB::beginTransaction();
+            //$a = $b;
             $inputs = Input::all();
             $image = Input::file('file');
             foreach ($inputs['clients'] as $client)
@@ -174,14 +178,15 @@ class SolicitudeController extends BaseController
                 $d = mktime(11, 14, 54, $m, $d, $y);
                 $date = date("Y/m/d", $d);
                 $aux_idsol = $solicitude->searchId() + 1;
-                $solicitude->idsolicitud = $aux_idsol;
-                $solicitude->descripcion = $inputs['description'];
-                $solicitude->titulo = $inputs['titulo'];
-                $solicitude->monto = $inputs['monto'];
-                $solicitude->iduser = Auth::user()->id;
-                $solicitude->monto_factura = $inputs['amount_fac'];
-                $solicitude->fecha_entrega = $date;
-                $solicitude->idtiposolicitud = $inputs['type_solicitude'];
+                $solicitude->idsolicitud       = $aux_idsol;
+                $solicitude->idetiqueta        = $inputs['etiqueta'];
+                $solicitude->descripcion       = $inputs['description'];
+                $solicitude->titulo            = $inputs['titulo'];
+                $solicitude->monto             = $inputs['monto'];
+                $solicitude->iduser            = Auth::user()->id;
+                $solicitude->monto_factura     = $inputs['amount_fac'];
+                $solicitude->fecha_entrega     = $date;
+                $solicitude->idtiposolicitud   = $inputs['type_solicitude'];
                 $token = sha1(md5(uniqid($solicitude->idsolicitud, true)));
                 $solicitude->token =  $token;
                 if (isset($inputs['sub_type_activity'])) 
@@ -208,14 +213,17 @@ class SolicitudeController extends BaseController
                         'monto' => $inputs['monto'],
                         'money' => $inputs['money']
                     );
-                    $clients = $inputs['clients'];
-                    foreach ($clients as $client) 
+                    $clients = explode(',',$inputs['clients'][0]);
+                    $tables = explode(',',$inputs['tables'][0]);
+                    Log::error($clients);
+                    Log::error($tables);
+                    for ($i=0;$i< count($clients);$i++) 
                     {
-                        $cod = explode(' ', $client);
                         $solicitude_clients = new SolicitudeClient;
                         $solicitude_clients->idsolicitud_clientes = $solicitude_clients->searchId() + 1;
                         $solicitude_clients->idsolicitud = $solicitude->searchId();
-                        $solicitude_clients->idcliente = $cod[0];
+                        $solicitude_clients->idcliente = $clients[$i];
+                        $solicitude_clients->from_table = $tables[$i];
                         $solicitude_clients->save();
                     }
                     $families = $inputs['families'];
@@ -248,6 +256,127 @@ class SolicitudeController extends BaseController
             }
         }
         catch (Exception $e)
+        {
+            DB::rollback();
+            $rpta = $this->internalException($e,__FUNCTION__);
+        }
+        return $rpta;
+    }
+
+    public function formEditSolicitude()
+    {
+        try
+        {
+            DB::beginTransaction();
+            $inputs = Input::all();
+            $date = $inputs['delivery_date'];
+            list($d, $m, $y) = explode('/', $date);
+            $d = mktime(11, 14, 54, $m, $d, $y);
+            $date = date("Y/m/d", $d);
+            $id = $inputs['idsolicitude'];
+            $sol = Solicitude::find($id);
+            $solicitude = Solicitude::where('idsolicitud', $id);
+            $image = Input::file('file');
+            
+            if (isset($image)) 
+            {
+                $path = public_path('img/reembolso/' . $sol->image);
+                @unlink($path);
+                $filename = uniqid() . '.' . $image->getClientOriginalExtension();
+                $path = public_path('img/reembolso/' . $filename);
+                Image::make($image->getRealPath())->resize(800, 600)->save($path);
+                $solicitude->image = $filename;
+            }
+            $solicitude->idetiqueta        = $inputs['etiqueta'];
+            $solicitude->descripcion    =  $inputs['description'];
+            $solicitude->titulo         =  $inputs['titulo'];
+            $solicitude->monto          =  $inputs['monto'];
+            $solicitude->estado         =  PENDIENTE;
+            $solicitude->fecha_entrega  =  $date;
+            $solicitude->monto_factura  =  $inputs['amount_fac'];
+            $solicitude->tipo_moneda    =  $inputs['money'];
+            $typeSolicitude             =  $inputs['type_solicitude'];
+
+            if ($sol->idtiposolicitud == 2 && ($typeSolicitude == 1 || $typeSolicitude == 3)) 
+            {
+                $path = public_path('img/reembolso/' . $sol->image);
+                @unlink($path);
+                $solicitude->monto_factura = null;
+            }
+            $solicitude->idtiposolicitud = $typeSolicitude;
+            $typePayment = $inputs['type_payment'];
+            if ($typePayment == 1) 
+            {
+                $solicitude->numruc = null;
+                $solicitude->numcuenta = null;
+            } 
+            else if ($typePayment == 2) 
+            {
+                $solicitude->numruc = $inputs['ruc'];
+                $solicitude->numcuenta = null;
+            } 
+            else if ($typePayment == 3) 
+            {
+                $solicitude->numcuenta = $inputs['number_account'];
+                $solicitude->numruc = null;
+            }
+
+            $solicitude->idtipopago = $inputs['type_payment'];
+            
+            if(isset($inputs['sub_type_activity']))
+            {
+                $fondo =$inputs['sub_type_activity'];
+                $solicitude->idfondo = $fondo;
+            }
+            $data = $this->objectToArray($solicitude);
+            $solicitude->update($data);
+            SolicitudeClient::where('idsolicitud', '=', $id)->delete();
+            SolicitudeFamily::where('idsolicitud', '=', $id)->delete();
+            $clients = $inputs['clients'];
+            $tables = $inputs['tables'];
+            $clients = explode(',',$inputs['clients'][0]);
+            $tables = explode(',',$inputs['tables'][0]);
+            Log::error($clients);
+            Log::error($tables);
+             
+            for ($i=0;$i< count($clients);$i++) 
+            {        
+                $solicitude_clients = new SolicitudeClient;
+                $solicitude_clients->idsolicitud_clientes = $solicitude_clients->searchId() + 1;
+                $solicitude_clients->idsolicitud = $id;
+                $solicitude_clients->idcliente = $clients[$i];
+                $solicitude_clients->from_table = $tables[$i];
+                $solicitude_clients->save();
+            }
+            $families = $inputs['families'];
+            foreach ($families as $family) 
+            {
+                $solicitude_families = new SolicitudeFamily;
+                $solicitude_families->idsolicitud_familia = $solicitude_families->searchId() + 1;
+                $solicitude_families->idsolicitud = $id;
+                $solicitude_families->idfamilia = $family;
+                $solicitude_families->save();
+            }
+            $typeUser = Auth::user()->type;
+            $iduser_to = 0;
+            if ($typeUser == REP_MED)
+            {
+                $toUserId = Rm::where('iduser',Auth::user()->id)->first();
+                $toUserId = $toUserId->rmSup->iduser;
+            }
+            elseif ($typeUser == SUP)
+            {
+                $toUserId = Auth::user()->id;
+            }
+
+            $rpta = $this->setStatus($inputs['titulo'].' - '. $inputs['description'], '', PENDIENTE, Auth::user()->id, $toUserId, $inputs['idsolicitude']);
+            if ($rpta[status] = ok)
+            {         
+                $rpta = $this->setRpta($typeUser);
+                DB::commit();
+            }
+        }
+        catch(Exception $e)
         {
             DB::rollback();
             $rpta = $this->internalException($e,__FUNCTION__);
@@ -309,124 +438,25 @@ class SolicitudeController extends BaseController
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $id = $solicitude->idsolicitud;
         $clients = DB::table('DMKT_RG_SOLICITUD_CLIENTES')->where('idsolicitud', $id)->lists('idcliente');
+
         $clients = Client::whereIn('clcodigo', $clients)->get(array('clcodigo', 'clnombre'));
         $families2 = DB::table('DMKT_RG_SOLICITUD_FAMILIA')->where('idsolicitud', $id)->lists('idfamilia');
         $families2 = Marca::whereIn('id', $families2)->get(array('id', 'descripcion'));
         $typesolicituds = TypeSolicitude::all();
         $typePayments = TypePayment::all();
+        $etiqueta = Label::all();
         $fondos = Fondo::all();
-        $data = [
-            'solicitude' => $solicitude,
-            'clients' => $clients,
-            'families' => $families,
-            'families2' => $families2,
-            'typesolicituds' => $typesolicituds,
-            'fondos' => $fondos,
-            'typePayments' => $typePayments
-        ];
+        $data = array(
+            'etiquetas'        => $etiqueta,
+            'solicitude'       => $solicitude,
+            'clients'          => $clients,
+            'families'         => $families,
+            'families2'        => $families2,
+            'typesolicituds'   => $typesolicituds,
+            'fondos'           => $fondos,
+            'typePayments'     => $typePayments
+        );
         return View::make('Dmkt.Rm.register_solicitude', $data);
-    }
-
-    public function formEditSolicitude()
-    {
-        try
-        {
-            DB::beginTransaction();
-            $inputs = Input::all();
-            $date = $inputs['delivery_date'];
-            list($d, $m, $y) = explode('/', $date);
-            $d = mktime(11, 14, 54, $m, $d, $y);
-            $date = date("Y/m/d", $d);
-            $id = $inputs['idsolicitude'];
-            $sol = Solicitude::find($id);
-            $solicitude = Solicitude::where('idsolicitud', $id);
-            $image = Input::file('file');
-            if (isset($image)) {
-                $path = public_path('img/reembolso/' . $sol->image);
-                @unlink($path);
-                $filename = uniqid() . '.' . $image->getClientOriginalExtension();
-                $path = public_path('img/reembolso/' . $filename);
-                Image::make($image->getRealPath())->resize(800, 600)->save($path);
-                $solicitude->image = $filename;
-            }
-            $solicitude->descripcion = $inputs['description'];
-            $solicitude->titulo = $inputs['titulo'];
-            $solicitude->monto = $inputs['monto'];
-            $solicitude->estado = PENDIENTE;
-            $solicitude->fecha_entrega = $date;
-            $solicitude->monto_factura = $inputs['amount_fac'];
-            $solicitude->tipo_moneda = $inputs['money'];
-            $typeSolicitude = $inputs['type_solicitude'];
-            if ($sol->idtiposolicitud == 2 && ($typeSolicitude == 1 || $typeSolicitude == 3)) {
-                $path = public_path('img/reembolso/' . $sol->image);
-                @unlink($path);
-                $solicitude->monto_factura = null;
-            }
-            $solicitude->idtiposolicitud = $typeSolicitude;
-            $typePayment = $inputs['type_payment'];
-            if ($typePayment == 1) {
-                $solicitude->numruc = null;
-                $solicitude->numcuenta = null;
-            } else if ($typePayment == 2) {
-                $solicitude->numruc = $inputs['ruc'];
-                $solicitude->numcuenta = null;
-            } else if ($typePayment == 3) {
-                $solicitude->numcuenta = $inputs['number_account'];
-                $solicitude->numruc = null;
-            }
-            $solicitude->idtipopago = $inputs['type_payment'];
-            if(isset($inputs['sub_type_activity'])){
-                $fondo =$inputs['sub_type_activity'];
-                $solicitude->idfondo = $fondo;
-            }
-            $data = $this->objectToArray($solicitude);
-            $solicitude->update($data);
-            SolicitudeClient::where('idsolicitud', '=', $id)->delete();
-            SolicitudeFamily::where('idsolicitud', '=', $id)->delete();
-            $clients = $inputs['clients'];
-            foreach ($clients as $client) 
-            {
-                $cod = explode(' ', $client);
-                $solicitude_clients = new SolicitudeClient;
-                $solicitude_clients->idsolicitud_clientes = $solicitude_clients->searchId() + 1;
-                $solicitude_clients->idsolicitud = $id;
-                $solicitude_clients->idcliente = $cod[0];
-                $solicitude_clients->save();
-            }
-            $families = $inputs['families'];
-            foreach ($families as $family) 
-            {
-                $solicitude_families = new SolicitudeFamily;
-                $solicitude_families->idsolicitud_familia = $solicitude_families->searchId() + 1;
-                $solicitude_families->idsolicitud = $id;
-                $solicitude_families->idfamilia = $family;
-                $solicitude_families->save();
-            }
-            $typeUser = Auth::user()->type;
-            $iduser_to = 0;
-            if ($typeUser = REP_MED)
-            {
-                $toUserId = Rm::where('iduser',Auth::user()->id)->first();
-                $toUserId = $toUserId->rmSup->iduser;
-            }
-            elseif ($typeUser = SUP)
-            {
-                $toUserId = Auth::user()->id;
-            }
-
-            $rpta = $this->setStatus($inputs['titulo'].' - '. $inputs['description'], '', PENDIENTE, Auth::user()->id, $toUserId, $inputs['idsolicitude']);
-            if ($rpta[status] = ok)
-            {         
-                $rpta = $this->setRpta($typeUser);
-                DB::commit();
-            }
-        }
-        catch(Exception $e)
-        {
-            DB::rollback();
-            $rpta = $this->internalException($e,__FUNCTION__);
-        }
-        return $rpta;
     }
 
     // IDKC: CHANGE STATUS => CANCELADO
@@ -559,8 +589,8 @@ class SolicitudeController extends BaseController
             }
             $typeUser = Auth::user()->type;
 
-            if ($typeUser == 'S')
-                return 'S';
+            if ($typeUser == SUP)
+                return SUP;
         }
     }
 

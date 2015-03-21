@@ -5,7 +5,9 @@ Route::get('test', array('uses' => 'Dmkt\LoginController@test'));
 Route::get('set_status', array('uses' => 'BaseController@setStatus'));
 Route::get('sendmail', array('uses' => 'BaseController@postman'));
 Route::get('prueba', 'Dmkt\FondoController@test');
+
 Route::post('search-client', 'TestController@searchSeeker');
+
 Route::get('clientes-data','TestController@clientsTables');
 Route::get('hola', 'Expense\ExpenseController@test');
 Route::get('a/{token}', 'Expense\ExpenseController@reportExpense');
