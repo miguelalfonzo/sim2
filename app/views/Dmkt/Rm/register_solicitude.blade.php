@@ -171,7 +171,7 @@
                                             @if($client->from_table == TB_DOCTOR)
                                                 <input type='text' id="idclient0" name="clients[]" type="text" style="margin-bottom: 10px"
                                                    class="form-control input-md project input-client cliente-seeker" pk="{{$client->idcliente}}"
-                                                   value="{{$client->doctors->pefnombres.' '.$client->doctors->pefpaterno.' '.$client->doctors->pefmaterno}}"
+                                                   value="DOCTOR: {{$client->doctors->pefnrodoc1.'-'.$client->doctors->pefnombres.' '.$client->doctors->pefpaterno.' '.$client->doctors->pefmaterno}}"
                                                    data-valor="all" table="{{$client->from_table}}" disabled>
                                             @else
                                                 <input id="idclient0" name="clients[]" type="text" style="margin-bottom: 10px"

@@ -171,7 +171,7 @@
             </div>
             @if(isset($solicitude) && $solicitude->idtiposolicitud == 2)
             <div class="form-group col-sm-6 col-md-4 col-lg-4">
-                <label class="col-sm-8 col-md-8 ol-lg-8 control-label" for="textinput">&nbsp;</label>
+                <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">&nbsp;</label>
                 <div class="col-sm-12 col-md-12 col-lg-12">
                     <a class="btn btn-primary btn-md" data-toggle="modal" data-target="#myFac">
                         Ver Comprobante
@@ -250,26 +250,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6">
-                    <div style="padding: 0 15px">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Clientes</h3>
-                            </div>
-                            <div class="panel-body">
-                                @foreach($solicitude->clients as $client)
-                                <div class="form-group" style="">
-                                    <div class="">
-                                        <input id="textinput" name="textinput" type="text" placeholder=""
-                                               value="{{$client->client->clnombre}}" readonly
-                                               class="form-control input-md">
-                                    </div>
-                                </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @include('template\list_clients')
+                
             </div>
             <input type="hidden" id="_token" value="{{csrf_token()}}">
             <div class="col-sm-12 col-md-12 col-lg-12" style="margin-top: 10px">

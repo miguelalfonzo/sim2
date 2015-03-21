@@ -122,28 +122,11 @@
                 </div>
 
 
-                 <div class="form-group col-sm-9 col-md-6">
-                    <div class=col-md-12>
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Clientes</h3>
-                            </div>
-                            <div class="panel-body">
-                                @foreach($solicitude->clients as $client)
-                                <div class="form-group" style="padding: 0 10px">
-                                    <div class="">
-                                        <input id="textinput" type="text" value="{{$client->client->clnombre}}" class="form-control input-md" readonly>
-                                    </div>
-                                </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+                 
+                <div class="col-sm-18 col-md-12">
 
                 <div class="form-group col-sm-9 col-md-6">
-                    <div class=col-md-12>
+                    <div class="col-md-12">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h3 class="panel-title">Productos</h3>
@@ -172,6 +155,8 @@
                         </div>
                     </div>
                 </div>
+                @include('template/list_clients')
+            </div>
                
                 <div class="col-sm-12 col-md-12" style="margin-top: 10px">
                     <div class="form-group col-sm-12 col-md-12">

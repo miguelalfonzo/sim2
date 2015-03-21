@@ -34,36 +34,6 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group col-sm-12 col-md-4">
-                <div class=col-md-12>
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Productos</h3>
-                        </div>
-                        <div class="panel-body">
-                            <?php $t=0;?>
-                            @foreach($solicitude->families as $family)
-                            <div class="form-group col-sm-12 col-md-12" style="padding: 0">
-                                <div class="col-sm-8 col-md-8">
-                                    <input id="textinput" name="textinput" type="text" placeholder="" value="{{$family->marca->descripcion}}" readonly
-                                    class="form-control input-md">
-                                </div>
-                                <div class="col-sm-4 col-md-4" style="padding: 0">
-                                    <div class="input-group">
-                                        <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                                        <input id="amount_assigned"  name="amount_assigned[]" type="text" class="form-control input-md amount_families" value="{{isset($family->monto_asignado)? $family->monto_asignado : round($solicitude->monto/count($solicitude->families),2)}}">
-                                    </div>
-                                </div>
-                            </div>
-                            <?php $t = $t + round($solicitude->monto/count($solicitude->families),2)?>
-                            @endforeach
-                            <div class="form-group col-sm-12 col-md-12">
-                                <span id="amount_error_families"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div class="form-group col-sm-6 col-md-4">
                 <label class="col-sm-8 col-md-8 control-label" for="selectbasic">Fondo</label>
                 <div class="col-sm-12 col-md-12">
@@ -79,35 +49,6 @@
                         <input id="date" type="text" name="delivery_date" value="{{ date_format(date_create($solicitude->fecha_entrega), 'd/m/Y' )}}"
                         class="form-control" maxlength="10" disabled placeholder="">
                     </div>
-                </div>
-            </div>
-            <div class="form-group col-sm-6 col-md-4">
-                <div class=col-md-12>
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Clientes</h3>
-                        </div>
-                        <div class="panel-body">
-                            @foreach($solicitude->clients as $client)
-                            <div class="form-group" style="padding: 0 10px">
-                                <div class="">
-                                    <input id="textinput" name="textinput" type="text" placeholder="" value="{{$client->client->clnombre}}" readonly
-                                    class="form-control input-md">
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group col-sm-6 col-md-4">
-                <label class="col-sm-8 col-md-8 control-label" for="textinput">Observacion</label>
-                <div class="col-sm-12 col-md-12">
-                    @if($solicitude->estado == 2)
-                    <textarea id="textinput" name="observacion" placeholder="" class="form-control"></textarea>
-                    @else
-                    <textarea id="textinput" name="observacion" placeholder="" class="form-control" disabled>{{ $solicitude->observacion }}</textarea>
-                    @endif
                 </div>
             </div>
             <div class="form-group col-sm-6 col-md-4 col-lg-4">
@@ -140,6 +81,51 @@
                     </div>
                 </div>
             </div>
+            <div class="form-group col-sm-6 col-md-4">
+                <label class="col-sm-8 col-md-8 control-label" for="textinput">Observacion</label>
+                <div class="col-sm-12 col-md-12">
+                    @if($solicitude->estado == 2)
+                    <textarea id="textinput" name="observacion" placeholder="" class="form-control"></textarea>
+                    @else
+                    <textarea id="textinput" name="observacion" placeholder="" class="form-control" disabled>{{ $solicitude->observacion }}</textarea>
+                    @endif
+                </div>
+            </div>
+            <div class="col-sm-18 col-md-12">
+            <div class="form-group col-sm-9 col-md-6">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Productos</h3>
+                        </div>
+                        <div class="panel-body">
+                            <?php $t=0;?>
+                            @foreach($solicitude->families as $family)
+                            <div class="form-group col-sm-12 col-md-12" style="padding: 0">
+                                <div class="col-sm-8 col-md-8">
+                                    <input id="textinput" name="textinput" type="text" placeholder="" value="{{$family->marca->descripcion}}" readonly
+                                    class="form-control input-md">
+                                </div>
+                                <div class="col-sm-4 col-md-4" style="padding: 0">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
+                                        <input id="amount_assigned"  name="amount_assigned[]" type="text" class="form-control input-md amount_families" value="{{isset($family->monto_asignado)? $family->monto_asignado : round($solicitude->monto/count($solicitude->families),2)}}">
+                                    </div>
+                                </div>
+                            </div>
+                            <?php $t = $t + round($solicitude->monto/count($solicitude->families),2)?>
+                            @endforeach
+                            <div class="form-group col-sm-12 col-md-12">
+                                <span id="amount_error_families"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            @include('template/list_clients')
+            </div>
+            
             <div class="col-sm-12 col-md-12" style="margin-top: 10px">
                 <div class="form-group col-sm-12 col-md-12">
                     <label class="col-sm-8 col-md-8 control-label" for="textarea">Descripcion de la
