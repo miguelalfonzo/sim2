@@ -1414,9 +1414,22 @@ class SolicitudeController extends BaseController
         $expense = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
         $date = $this->getDay();
         $clientes = array();
+        $nom = '';
         foreach($solicitude->clients as $client)
         {
-            array_push($clientes,$client->client->clnombre);
+            if ($client->from_table == TB_DOCTOR)
+            {
+                $nom = $client->doctors->pefnombres;            
+            }
+            elseif ($client->from_table == TB_INSTITUTE)
+            {
+                $nom = $client->institutes->pejrazon;
+            }
+            else
+            {
+                $nom = 'No encontrado';
+            }
+            array_push($clientes,$nom);
         }
         $clientes = implode(',',$clientes);
         if ($solicitude->tipo_moneda == SOLES)
