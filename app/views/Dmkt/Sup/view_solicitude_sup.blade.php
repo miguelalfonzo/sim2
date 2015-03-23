@@ -250,7 +250,7 @@
                         </div>
                     </div>
                 </div>
-                @include('template\list_clients')
+                @include('template.list_clients')
                 
             </div>
             <input type="hidden" id="_token" value="{{csrf_token()}}">

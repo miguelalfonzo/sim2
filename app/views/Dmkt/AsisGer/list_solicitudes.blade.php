@@ -18,7 +18,7 @@
         <td style="text-align: center">
             {{$solicitude->typemoney->simbolo.$solicitude->monto }}
         </td>
-        @include('template/states')
+        @include('template.states')
         <!-- <td style="text-align: center">
             <span class="label" style="background-color: {{$solicitude->state->color}}">{{$solicitude->state->nombre}}</span>
 

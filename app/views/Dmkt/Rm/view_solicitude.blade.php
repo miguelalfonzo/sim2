@@ -224,7 +224,7 @@
         </div>
     </div>
     <!-- Clients -->
-    @include('template\list_clients')
+    @include('template.list_clients')
 </div>
 
 <!-- Description Solicitude -->

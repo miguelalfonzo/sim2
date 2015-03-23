@@ -9,7 +9,7 @@
                     Solicitudes
                 </a>
             </li>
-            @include('template/li_estado_cuenta')
+            @include('template.li_estado_cuenta')
             <li>
                 <a href="#fondos" role="tab" data-toggle="tab">
                     <i class="fa fa-user"></i>
@@ -27,10 +27,10 @@
             <!-- Solicitudes -->
             <div class="tab-pane fade active in" id="solicitudes">
                 <div class="panel panel-default" style="margin-top: 10px">
-       	        @include('template/searchmenu')       
+       	        @include('template.searchmenu')       
      	        </div>
             </div>
-            @include('template/tb_estado_cuenta')
+            @include('template.tb_estado_cuenta')
             <!-- Fondos -->
             <div class="tab-pane fade" id="fondos">
                 <div class="panel panel-default" style="margin-top: 10px">

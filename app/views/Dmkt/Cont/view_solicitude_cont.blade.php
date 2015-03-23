@@ -132,7 +132,7 @@
                             </div>
                         </div>
                     </div>
-                    @include('template/list_clients')
+                    @include('template.list_clients')
                 </div                                                                                                                                                                                                                                                                                 >
 
 

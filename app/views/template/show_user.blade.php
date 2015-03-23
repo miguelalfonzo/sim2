@@ -10,7 +10,7 @@
                 </a>
             </li>
             @if (Auth::user()->type != TESORERIA)
-                @include('template/li_estado_cuenta')
+                @include('template.li_estado_cuenta')
             @endif
             @if ( Auth::user()->type == REP_MED || Auth::user()->type == CONT || Auth::user()->type == TESORERIA)
                 <li>
@@ -32,7 +32,7 @@
         <div class="tab-content" style="margin-top: .75em;">
             <div class="tab-pane fade active in" id="solicitudes">
                 <div class="panel panel-default">
-                    @include('template/searchmenu') 
+                    @include('template.searchmenu') 
                     <a id="show_leyenda" style="margin-left: 15px" href="#">Ver leyenda</a>
                     <a id="hide_leyenda" style="margin-left: 15px;display: none" href="#">Ocultar leyenda</a>
                 </div>
@@ -73,7 +73,7 @@
                 </div>
             </div>
             @if (Auth::user()->type != TESORERIA)
-                @include('template/tb_estado_cuenta')
+                @include('template.tb_estado_cuenta')
             @endif
             @if (Auth::user()->type == CONT)
                 <!-- Mantenimiento de Documentos -->
@@ -88,7 +88,7 @@
         </div>
     </div>
 </div>
-@include('template/leyenda')
+@include('template.leyenda')
 @if(isset($estado))
     <script type="text/javascript">
         @if($estado['Status'] == 1)
