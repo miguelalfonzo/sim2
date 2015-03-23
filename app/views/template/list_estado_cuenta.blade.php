@@ -16,7 +16,14 @@
             @foreach($solicituds as  $cuenta)
                 <tr>
                     <td class="text-center">{{$cuenta->idsolicitud}}</td>
-                    <td class="text-center">{{$cuenta->titulo}}</td>
+                    <td class="text-left">
+                        @if (!is_null($cuenta->idetiqueta))
+                        <span class="label label-info" style="margin-right:1em;background-color:{{$cuenta->etiqueta->color}}">
+                            {{$cuenta->etiqueta->nombre}}
+                        </span>
+                    @endif
+                        <label>{{$cuenta->titulo}}</label>
+                    </td>
                     @if ($cuenta->user->type == REP_MED)
                         <td class="text-center">{{$cuenta->rm->nombres.' '.$cuenta->rm->apellidos}}</td>
                     @else

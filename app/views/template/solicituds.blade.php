@@ -33,7 +33,7 @@
                         @endif
                     @endif
                 @endif
-                <td style="text-align:center" class="sol_titulo">
+                <td style="text-align:left" class="sol_titulo">
                     @if (!is_null($solicitude->idetiqueta))
                         <span class="label label-info" style="margin-right:1em;background-color:{{$solicitude->etiqueta->color}}">
                             {{$solicitude->etiqueta->nombre}}
