@@ -20,9 +20,6 @@
                         <input id="textinput" type="text" value="{{$solicitude->titulo}}"class="form-control input-md" readonly>
                     </div>
                 </div>
-
-                
-
                 <div class="form-group col-sm-6 col-md-4">
                     <label class="col-sm-8 col-md-8 control-label" for="selectbasic">Fondo</label>
                     <div class="col-sm-12 col-md-12">
@@ -68,7 +65,7 @@
                     </div>
                 </div>
 
-                <div class="form-group col-sm-12 col-md-4">
+                <div class="form-group col-sm-12 col-md-6">
                     <div class="col-md-12">
                         <div class="panel panel-default">
                             <div class="panel-heading">
@@ -100,24 +97,7 @@
                 </div>
                 
                
-                <div class="form-group col-sm-6 col-md-4">
-                    <div class=col-md-12>
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Clientes</h3>
-                            </div>
-                            <div class="panel-body">
-                                @foreach($solicitude->clients as $client)
-                                <div class="form-group" style="padding: 0 10px">
-                                    <div class="">
-                                        <input id="textinput" type="text" value="{{$client->client->clnombre}}" class="form-control input-md" readonly>
-                                    </div>
-                                </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @include('template.list_clients')
                 
                 
                 <div class="col-sm-12 col-md-12" style="margin-top: 10px">
@@ -131,7 +111,7 @@
                 
                 <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
                     <div class="col-sm-12 col-md-12" style="text-align: center">
-                        <a id="button2id" href="{{URL::to('show_user')}}" name="button2id" class="btn btn-primary">Cancelar</a>
+                        <a id="button2id" href="{{URL::to('registrar-fondo')}}" name="button2id" class="btn btn-primary">Cancelar</a>
                     </div>
                 </div>
         

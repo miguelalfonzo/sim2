@@ -314,7 +314,9 @@ class BaseController extends Controller {
             }
             else if ($user->type == REP_MED)
                 $rpta = $this->setRpta(array($user->id));
-            else if (in_array($user->type,array(GER_COM,CONT,TESORERIA,ASIS_GER)))
+            else if ($user->type == ASIS_GER)
+                $rpta = $this->setRpta(array($user->id));    
+            else if (in_array($user->type,array(GER_COM,CONT,TESORERIA)))
                 $rpta = $this->setRpta(array());
             else
                 $rpta = $this->warningException('Se ha solicitado buscar solicitudes por un usuario con rol no autorizado: '.$user->type,__FUNCTION__,'Unauthorized User');

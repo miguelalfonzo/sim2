@@ -146,7 +146,10 @@ $(function(){
         //Cancel the view button to register expense
         $("#cancel-expense").on("click",function(e){
             e.preventDefault();
-            window.location.href = server+"show_user";
+            if (typeUser.value == "AG")
+                window.location.href = server + "registrar-fondo";
+            else
+                window.location.href = server+"show_user";
         });
         //Cancel the view button to generate seat solicitude
         $("#cancel-seat-cont").on("click",function(e){

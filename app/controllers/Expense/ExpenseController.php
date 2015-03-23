@@ -406,8 +406,10 @@ class ExpenseController extends BaseController{
 			$rpta = $this->internalException($e,__FUNCTION__);
 		}
 		Session::put('state',R_REVISADO);
-	    return Redirect::to('show_user');
-
+		if ( Auth::user()->type == ASIS_GER )
+			return Redirect::to('registrar-fondo');
+		else
+	    	return Redirect::to('show_user');
 	}
 
     public function finishExpenseFondo($idfondo){

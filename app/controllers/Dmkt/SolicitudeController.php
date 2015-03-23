@@ -80,7 +80,9 @@ class SolicitudeController extends BaseController
             else if ( Auth::user()->type == REP_MED || Auth::user()->type == SUP || Auth::user()->type == GER_PROD )
                 $state = R_PENDIENTE;
             elseif ( Auth::user()->type == TESORERIA )
-                $state= R_REVISADO;
+                $state = R_REVISADO;
+            elseif ( Auth::user()->type == ASIS_GER )
+                $state = R_TODOS;
         }
         $data = array(
             'state'  => $state,
@@ -1245,9 +1247,22 @@ class SolicitudeController extends BaseController
         if($type == EXPENSE_SOLICITUDE){
             $expense = Expense::where('idsolicitud',$solicitude->idsolicitud)->where('tipo', EXPENSE_SOLICITUDE)->get();
             $clientes   = array();
+            $nom = '';
             foreach($solicitude->clients as $client)
             {
-                array_push($clientes,$client->client->clnombre);
+                if ($client->from_table == TB_DOCTOR)
+                {
+                    $nom = $client->doctors->pefnombres;            
+                }
+                elseif ($client->from_table == TB_INSTITUTE)
+                {
+                    $nom = $client->institutes->pejrazon;
+                }
+                else
+                {
+                    $nom = 'No encontrado';
+                }
+                array_push($clientes,$nom);
             }
             $clientes = implode(',',$clientes);
         }

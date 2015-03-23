@@ -1182,7 +1182,7 @@ function newSolicitude() {
             if (data.Status = 'Ok' )
             {
                 $('.table-solicituds-ager').append(data.Data);
-                $('#table_solicitude_ager').dataTable({
+                $('#table_solicitude').dataTable({
                     "order": [
                         [ 3, "desc" ] //order date
                     ],
