@@ -193,20 +193,7 @@
 
     </div>
 </div>
-<div class="form-group col-sm-6 col-md-4 col-lg-4">
-
-    <label class="col-sm-8 col-md-8 ol-lg-8 control-label" for="textinput">Observacion</label>
-
-    <div class="col-sm-12 col-md-12 col-lg-12">
-        @if($solicitude->estado == DERIVADO)
-        <textarea id="textinput" name="observacion" placeholder=""
-                  class="form-control"></textarea>
-        @else
-        <textarea id="textinput" name="observacion" placeholder=""
-                  class="form-control" disabled>{{$solicitude->observacion}}</textarea>
-        @endif
-    </div>
-</div>
+@include('template.obs')
 
 @if(isset($solicitude) && $solicitude->idtiposolicitud == 2)
 <div class="form-group col-sm-6 col-md-4 col-lg-4">

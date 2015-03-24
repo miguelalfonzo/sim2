@@ -81,16 +81,10 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group col-sm-6 col-md-4">
-                <label class="col-sm-8 col-md-8 control-label" for="textinput">Observacion</label>
-                <div class="col-sm-12 col-md-12">
-                    @if($solicitude->estado == 2)
-                    <textarea id="textinput" name="observacion" placeholder="" class="form-control"></textarea>
-                    @else
-                    <textarea id="textinput" name="observacion" placeholder="" class="form-control" disabled>{{ $solicitude->observacion }}</textarea>
-                    @endif
-                </div>
-            </div>
+            
+            <!-- Observation-->
+            @include('template.obs')
+
             <div class="col-sm-18 col-md-12">
             <div class="form-group col-sm-9 col-md-6">
                 <div class="col-md-12">
@@ -142,7 +136,7 @@
                     <a id="" name="button1id" data-token ="{{$solicitude->token}}"
                        class="btn btn-primary approved_solicitude">Aprobar
                     </a>
-                    <a id="deny_solicitude_gercom" name="button1id" class="btn btn-primary deny_solicitude">Rechazar
+                    <a id="deny_solicitude" name="button1id" class="btn btn-primary deny_solicitude">Rechazar
                     </a>
                     <a id="button2id" href="{{URL::to('cancelar-solicitud-gercom').'/'.$solicitude->token}}" name="button2id"
            class="btn btn-primary">Cancelar</a>

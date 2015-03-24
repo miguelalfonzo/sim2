@@ -26,7 +26,6 @@ class Sup extends Eloquent{
     }
 
     public function Reps(){
-
         return $this->hasMany('Dmkt\Rm','idsup','idsup');
     }
 }

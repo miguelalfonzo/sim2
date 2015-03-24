@@ -12,6 +12,7 @@ const HEIGHT = 600;
 const data = 'Data';
 const ok = 'Ok';
 const warning = 'Warning';
+const danger = 'Danger';
 const error = 'Error';
 const desc_error = 'System Error: Information in log file';
 const status = 'Status';

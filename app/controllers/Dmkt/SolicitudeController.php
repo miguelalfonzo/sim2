@@ -84,11 +84,21 @@ class SolicitudeController extends BaseController
             elseif ( Auth::user()->type == ASIS_GER )
                 $state = R_TODOS;
         }
+        $mWarning = array();
+        if (Session::has('warnings'))
+        {
+            $warnings = Session::pull('warnings');
+            $mWarning[status] = ok ;
+            if (!is_null($warnings))
+                foreach ($warnings as $key => $warning)
+                     $mWarning[data] = $warning[0].' ';
+            $mWarning[data] = substr($mWarning[data],0,-1);
+        }
         $data = array(
             'state'  => $state,
             'states' => StateRange::order(),
-            'estado' => Session::pull('Estado')
-            );
+            'warnings' => $mWarning
+        );
         return View::make('template.show_user',$data);   
     }
 
@@ -121,7 +131,6 @@ class SolicitudeController extends BaseController
         try
         {
             DB::beginTransaction();
-            //$a = $b;
             $inputs = Input::all();
             $image = Input::file('file');
             foreach ($inputs['clients'] as $client)
@@ -217,8 +226,6 @@ class SolicitudeController extends BaseController
                     );
                     $clients = explode(',',$inputs['clients'][0]);
                     $tables = explode(',',$inputs['tables'][0]);
-                    Log::error($clients);
-                    Log::error($tables);
                     for ($i=0;$i< count($clients);$i++) 
                     {
                         $solicitude_clients = new SolicitudeClient;
@@ -338,8 +345,6 @@ class SolicitudeController extends BaseController
             $tables = $inputs['tables'];
             $clients = explode(',',$inputs['clients'][0]);
             $tables = explode(',',$inputs['tables'][0]);
-            Log::error($clients);
-            Log::error($tables);
              
             for ($i=0;$i< count($clients);$i++) 
             {        
@@ -397,7 +402,6 @@ class SolicitudeController extends BaseController
                 $estado = $inputs['idstate'];
             else
                 $estado = R_TODOS;
-            Log::error('ESTADO: '.$estado);
             if (Input::has('date_start'))
                 $start = $inputs['date_start'];
             else
@@ -473,6 +477,7 @@ class SolicitudeController extends BaseController
             $oldOolicitude      = Solicitude::where('idsolicitud', $id)->first();
             $oldStatus          = $oldOolicitude->estado;
             $solicitude->estado = CANCELADO;
+            $solicitude->observacion = $inputs['observacion'];
             $data               = $this->objectToArray($solicitude);
             $solicitude->update($data);
             $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, CANCELADO, Auth::user()->id, $oldOolicitude->iduser, $id);
@@ -525,9 +530,10 @@ class SolicitudeController extends BaseController
             'gerentes' => $gerentes
         );
         $responsables = $this->findResponsables($solicitude,$token);
-        if (isset($responsables['Data']))
+        if (isset($responsables[data]))
         {
-            $data['responsables'] = $responsables['Data'];
+            Log::error('responsables');
+            $data['responsables'] = $responsables[data];
         }
         return View::make('Dmkt.Sup.view_solicitude_sup', $data);
     }
@@ -604,17 +610,59 @@ class SolicitudeController extends BaseController
             DB::beginTransaction();
             $user = Auth::user();
             $inputs = Input::all();
+            $rules = array( 'observacion' => 'required|min:1' );
+            $validator = Validator::make($inputs, $rules);
+            if ($validator->fails()) 
+            {
+                $messages = $validator->errors()->getMessages();
+                return Redirect::to('show_user')->with('warnings',$messages);
+            }
+            else
+            {
+                $id = $inputs['idsolicitude'];
+                $oldOolicitude      = Solicitude::where('idsolicitud', $id)->first();
+                $oldStatus          = $oldOolicitude->estado;
+                $solicitude = Solicitude::where('idsolicitud', $id);
+                $solicitude->idsolicitud = (int)$id;
+                $solicitude->observacion = $inputs['observacion'];
+                $solicitude->estado = RECHAZADO;
+                $solicitude->blocked = 0;
+                $data = $this->objectToArray($solicitude);
+                $solicitude->update($data);
+                $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, RECHAZADO, $user->id,  $oldOolicitude->iduser, $id);
+                if ( $rpta[status] == ok )
+                    DB::commit();
+            }
+        }
+        catch (Exception $e)
+        {
+            DB::rollback();
+            $rpta = $this->internalException($e,__FUNCTION__);
+        }
+        if ($rpta[status] == ok)
+            return Redirect::to('show_user')->with('state',R_NO_AUTORIZADO);
+    }
+
+    // IDKC: CHANGE STATUS => RECHAZADO
+    /*public function denySolicitudeGerCom()
+    {
+        try
+        {
+            DB::beginTransaction();   
+            $inputs = Input::all();
             $id = $inputs['idsolicitude'];
             $oldOolicitude      = Solicitude::where('idsolicitud', $id)->first();
             $oldStatus          = $oldOolicitude->estado;
+            $idSol              = $oldOolicitude->idsolicitud;
             $solicitude = Solicitude::where('idsolicitud', $id);
             $solicitude->idsolicitud = (int)$id;
+            $solicitude->idaproved = Auth::user()->id;
             $solicitude->observacion = $inputs['observacion'];
             $solicitude->estado = RECHAZADO;
             $solicitude->blocked = 0;
             $data = $this->objectToArray($solicitude);
             $solicitude->update($data);
-            $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, RECHAZADO, $user->id,  $oldOolicitude->iduser, $id);
+            $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, RECHAZADO, Auth::user()->id, $oldOolicitude->iduser, $idSol);
             if ( $rpta[status] == ok )
             {
                 DB::commit();
@@ -626,8 +674,10 @@ class SolicitudeController extends BaseController
             $rpta = $this->internalException($e,__FUNCTION__);
         }
         if ($rpta[status] == ok)
-            return Redirect::to('show_user')->with('state',R_NO_AUTORIZADO);    
-    }
+            return Redirect::to('show_user')->with('state', R_NO_AUTORIZADO);
+        else
+            return $rpta;
+    }*/
 
 
     // IDKC: CHANGE STATUS => ACEPTADO
@@ -636,12 +686,14 @@ class SolicitudeController extends BaseController
         try
         {
             DB::beginTransaction();
-            $inputs = Input::all();            
+            $inputs = Input::all(); 
+            Log::error($inputs);          
             $idSol = $inputs['idsolicitude'];
             $oldOolicitude      = Solicitude::where('idsolicitud', $idSol)->first();
             $oldStatus          = $oldOolicitude->estado;
             $solicitude = Solicitude::where('idsolicitud', $idSol);
             $solicitude->estado = ACEPTADO;
+            $solicitude->idresponse = $inputs['responsable'];
             $solicitude->idaproved = Auth::user()->id;
             $solicitude->monto = $inputs['monto'];
             $solicitude->idfondo = $inputs['sub_type_activity'];
@@ -652,7 +704,8 @@ class SolicitudeController extends BaseController
             $amount_assigned = $inputs['amount_assigned'];
             $families = SolicitudeFamily::where('idsolicitud', $idSol)->get();
             $i = 0;
-            foreach ($families as $fam) {
+            foreach ($families as $fam) 
+            {
                 $family = SolicitudeFamily::where('idsolicitud_familia', $fam->idsolicitud_familia);
                 $family->monto_asignado = $amount_assigned[$i];
                 $data = $this->objectToArray($family);
@@ -900,34 +953,99 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.GerCom.view_solicitude_gercom',$info);
     }
 
+    public function massApprovedSolicitudes()
+    {
+        try
+        {
+            $inputs = Input::all();
+            $rules = array(
+                'sols' => 'required'
+            );
+            $validator = Validator::make($inputs, $rules);
+            if ($validator->fails()) 
+                $rpta = $validator->messages();
+            else
+            {
+                $status = array( ok => array() , error => array() );
+                foreach($inputs['sols'] as $solicitude)
+                {
+                    $rpta = $this->approvedTransaction($solicitude);
+                    if ( $rpta[status] != ok )
+                        $status[error][] = $solicitude['token'];
+                    else
+                        $status[ok][] = $solicitude['token'];
+                }
+                if (empty($status[error]))
+                    $rpta = array( status => ok , description => $status);
+                else if (empty($status[ok]))
+                    $rpta = array( status => danger , description => $status);
+                else
+                    $rpta = array( status => warning , description => $status);
+            }
+        }
+        catch (Exception $e)
+        {
+            $rpta = $this->internalException($e,__FUNCTION__);
+        }
+        return $rpta;
+    }
+
     // IDKC: CHANGE STATUS => APROBADA
     public function approvedSolicitude()
     {
         try
         {
-            DB::beginTransaction();
             $inputs = Input::all();
+            $rules = array(
+                'token'             => 'required',
+                'monto'             => 'required|numeric',
+                'amount_assigned'   => 'required'
+            );
+            $validator = Validator::make($inputs, $rules);
+            if ($validator->fails()) 
+                $rpta = $validator->messages();
+            else
+                $rpta = $this->approvedTransaction($inputs);
+        }
+        catch(Exception $e)
+        {
+            $rpta = $this->internalException($e,__FUNCTION__);
+        }  
+        return $rpta;        
+    }
+
+    private function approvedTransaction($inputs)
+    {
+        try
+        {
+            DB::beginTransaction();
             $token = $inputs['token'];
-            $oldOolicitude      = Solicitude::where('token', $inputs['token'])->first();
+            $oldOolicitude      = Solicitude::where('token', $token)->first();
             $oldStatus          = $oldOolicitude->estado;
             $sol = Solicitude::where('token', $token)->first();
             $idSol = $sol->idsolicitud;
             $solicitude = Solicitude::where('token', $token);
             $solicitude->estado = APROBADO;
             $solicitude->blocked = 0;
-            $solicitude->monto = $inputs['monto'];
+            if (isset($inputs['monto']))
+            {
+                $solicitude->monto = $inputs['monto'];
+            }
             $data = $this->objectToArray($solicitude);
             $solicitude->update($data);
-            $amount_assigned = $inputs['amount_assigned'];
-            $families = SolicitudeFamily::where('idsolicitud', $idSol)->get();
-            $i = 0;
-            foreach ($families as $fam) 
+            if (isset($inputs['amount_assigned']))
             {
-                $family = SolicitudeFamily::where('idsolicitud_familia', $fam->idsolicitud_familia);
-                $family->monto_asignado = $amount_assigned[$i];
-                $data = $this->objectToArray($family);
-                $family->update($data);
-                $i++;
+                $amount_assigned = $inputs['amount_assigned'];
+                $families = SolicitudeFamily::where('idsolicitud', $idSol)->get();
+                $i = 0;
+                foreach ($families as $fam) 
+                {
+                    $family = SolicitudeFamily::where('idsolicitud_familia', $fam->idsolicitud_familia);
+                    $family->monto_asignado = $amount_assigned[$i];
+                    $data = $this->objectToArray($family);
+                    $family->update($data);
+                    $i++;
+                }
             }
             $fondo_aux = Fondo::where('idfondo', $sol->idfondo)->first();
             $saldo = $fondo_aux->saldo;
@@ -937,9 +1055,9 @@ class SolicitudeController extends BaseController
             $fondo->update($data);
             $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, APROBADO, Auth::user()->id, USER_CONTABILIDAD, $idSol);
             if ( $rpta[status] == ok )
-            {
                 DB::commit();
-            }
+            else
+                DB::rollback();
         }
         catch (Exception $e)
         {
@@ -949,43 +1067,7 @@ class SolicitudeController extends BaseController
         return $rpta;
     }
 
-    // IDKC: CHANGE STATUS => RECHAZADO
-    public function denySolicitudeGerCom()
-    {
-        try
-        {
-            DB::beginTransaction();   
-            $inputs = Input::all();
-            $id = $inputs['idsolicitude'];
-            $oldOolicitude      = Solicitude::where('idsolicitud', $id)->first();
-            $oldStatus          = $oldOolicitude->estado;
-            $idSol              = $oldOolicitude->idsolicitud;
-            $solicitude = Solicitude::where('idsolicitud', $id);
-            $solicitude->idsolicitud = (int)$id;
-            $solicitude->idaproved = Auth::user()->id;
-            $solicitude->observacion = $inputs['observacion'];
-            $solicitude->estado = RECHAZADO;
-            $solicitude->blocked = 0;
-            $data = $this->objectToArray($solicitude);
-            $solicitude->update($data);
-            $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, RECHAZADO, Auth::user()->id, $oldOolicitude->iduser, $idSol);
-            if ( $rpta[status] == ok )
-            {
-                DB::commit();
-            }
-        }
-        catch (Exception $e)
-        {
-            DB::rollback();
-            $rpta = $this->internalException($e,__FUNCTION__);
-        }
-        if ($rpta[status] == ok)
-            return Redirect::to('show_user')->with('state', R_NO_AUTORIZADO);
-        else
-            return $rpta;
-    }
-
-     public function disBlockSolicitudeGerCom($token)
+    public function disBlockSolicitudeGerCom($token)
     {
         //Desbloquenado La solicitud al presionar el boton Cancelar
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
@@ -1640,28 +1722,29 @@ class SolicitudeController extends BaseController
         try
         {
             $rpta = array();
-            if ($solicitude->estado == DEPOSITO_HABILITADO && is_null($solicitude->idresponse))
+            if ($solicitude->estado == PENDIENTE && is_null($solicitude->idresponse))
             {
                 $responsables = array();
-                $asistentes = User::where('type','AG')->get();
+                $asistentes = User::where('type',ASIS_GER)->get();
                 foreach ($asistentes as $asistente)
                 {
                     array_push($responsables, $asistente->person);
                 }
-                if($solicitude->user->type == 'R')
+                if($solicitude->user->type == REP_MED)
                 {
                     array_push( $responsables, Solicitude::where('token', $token)->select('iduser')->first()->rm );
                 }
-                elseif($solicitude->user->type == 'S')
+                elseif($solicitude->user->type == SUP)
                 {
-                    $rms = Solicitude::where('token', $token)->select('idaproved')->first()->aprovedSup->Reps;
+                    $rms = Solicitude::where('token', $token)->first()->sup->Reps;
+                    Log::error(json_encode($rms));
                     foreach ( $rms as $rm )
                     {
                          array_push( $responsables, $rm );
                     }
                 }
                 $rpta[status] = ok;
-                $rpta['Data'] = $responsables;
+                $rpta[data] = $responsables;
             }
         }
         catch (Exception $e)

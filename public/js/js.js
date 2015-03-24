@@ -1467,23 +1467,23 @@ $(function(){
         $(document).on("click", ".modal_deposit", function(e)
         {
             e.preventDefault();
-            var td = $(this).parent().parent().parent();
-            console.log(td);
-            var id_sol = td.find('.id_solicitud').text();
+            var tr = $(this).parent().parent().parent();
+            console.log(tr);
+            var id_sol = tr.find('.id_solicitud').text();
             console.log(id_sol);
-            var sol_titulo = td.find('.sol_titulo').text();
-            var token = td.find('#sol_token').val();
-            var beneficiario = td.find('.benef').val();
-            var total_deposit = td.find('.total_deposit').text().trim().split(" ");
-            var retencion = td.find('.tes-ret').html().trim();
+            var sol_titulo = tr.find('.sol_titulo').find('label').text();
+            var token = tr.find('#sol_token').val();
+            var beneficiario = tr.find('.benef').val();
+            var total_deposit = tr.find('.total_deposit').text().trim().split(" ");
+            var retencion = tr.find('.tes-ret').html().trim();
             if ( retencion == 0 )
                 $("#tes-mon-ret").parent()[0].style.display = "none";
             else
                 $("#tes-mon-ret").parent()[0].style.display = "";
+            $("#sol-titulo").val(sol_titulo);
             $("#tes-mon-sol").val(total_deposit[0] + " " + total_deposit[1]);
             $("#tes-mon-ret").val(total_deposit[0] + " " + retencion);
             $("#id-solicitude").text(id_sol);
-            $("#sol-titulo").val(sol_titulo);
             $("#token").val(token);
             $("#beneficiario").val(beneficiario);
             $("#total-deposit").val(total_deposit[0] + " " + (total_deposit[1] - retencion));

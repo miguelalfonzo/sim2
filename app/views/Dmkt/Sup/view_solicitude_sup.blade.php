@@ -136,7 +136,7 @@
                     </div>
                 </div>
             </div>
-            @if($solicitude->user->type == 'R')
+            @if($solicitude->user->type == REP_MED)
             <div class="form-group col-sm-6 col-md-4 col-lg-4">
                 <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Solicitante</label>
                 <div class="col-sm-12 col-md-12 col-lg-12">
@@ -159,16 +159,10 @@
                 </div>
             </div>
             @endif
-            <div class="form-group col-sm-6 col-md-4 col-lg-4">
-                <label class="col-sm-8 col-md-8 ol-lg-8 control-label" for="textinput">Observacion</label>
-                <div class="col-sm-12 col-md-12 col-lg-12">
-                    @if($solicitude->estado == PENDIENTE)
-                    <textarea id="textinput" name="observacion" placeholder="" class="form-control"></textarea>
-                    @else
-                    <textarea id="textinput" name="observacion" placeholder="" class="form-control" disabled>{{$solicitude->observacion}}</textarea>
-                    @endif
-                </div>
-            </div>
+
+            <!-- Observation-->
+            @include('template.obs')
+
             @if(isset($solicitude) && $solicitude->idtiposolicitud == 2)
             <div class="form-group col-sm-6 col-md-4 col-lg-4">
                 <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">&nbsp;</label>
@@ -265,23 +259,21 @@
 <!-- Button (Double) -->
             <div class="form-group col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px">
                 <div class="col-sm-12 col-md-12 col-lg-12" style="text-align: center">
-                    @if(isset($responsables))
-                        <a class="btn btn-primary" data-toggle="modal" data-target="#modal_asign_sol_resp">Seleccionar Responsable</a>
-                    @endif
-                    @if($solicitude->estado == PENDIENTE && $solicitude->derived == 0 && $solicitude->user->type == 'R')
-                        <a href="{{URL::to('aceptar_solicitud')}}" id="test" name="button1id"
-                           class="btn btn-primary accepted_solicitude_sup">Aceptar
+                    
+                    @if($solicitude->estado == PENDIENTE && $solicitude->derived == 0 && $solicitude->user->type == REP_MED)
+                        <a class="btn btn-primary" data-toggle="modal" data-target="#modal_asign_sol_resp">
+                            Aceptar
                         </a>
                         <a class="btn btn-primary" data-toggle="modal" data-target="#myModal">
                             Derivar
                         </a>
-                        <a id="deny_solicitude" name="button1id" class="btn btn-primary deny_solicitude">Rechazar
+                        <a id="deny_solicitude" name="button1id" class="btn btn-primary deny_solicitude">
+                            Rechazar
                         </a>
                         <a id="button2id" href="{{URL::to('desbloquear-solicitud-sup').'/'.$solicitude->token}}" name="button2id" class="btn btn-primary">Cancelar</a>
                     @else
                         @if($solicitude->derived == 0 && $solicitude->estado == PENDIENTE )
-                            <a href="{{URL::to('aceptar_solicitud')}}" id="test" name="button1id"
-                               class="btn btn-primary accepted_solicitude_sup">Aceptar
+                            <a class="btn btn-primary" data-toggle="modal" data-target="#modal_asign_sol_resp">Aceptar
                             </a>
                         @endif
                             <a id="button2id" href="{{URL::to('show_user')}}" name="button2id"
@@ -328,8 +320,6 @@
 </div>
 @endif
 @if( isset($responsables) )
-<form id="form_asign-sol-resp" method="post" action="{{url('asignar-solicitud-responsable')}}">
-    {{Form::token()}}
     <div class="modal fade" id="modal_asign_sol_resp" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">         
@@ -339,30 +329,30 @@
                     <h4 class="modal-title" id="myModalLabel">Se asignara como responsable a :</h4>
                 </div>
                 <div class="modal-body">
-                    <form class="form-horizontal">
                         <fieldset>
                             <div class="form-group">
                                 <label class="col-md-4 col-lg-4 control-label" for="selectbasic"></label>
                                 <div class="col-xs-6">
                                     <ul>
                                         @foreach($responsables as $responsable)
-                                        <li  style="display:inline">{{Form::radio('responsable',$responsable->iduser)}} {{ucwords($responsable->nombres.' '.$responsable->apellidos)}}</li><br>
+                                            <li  style="display:inline">
+                                                {{Form::radio('responsable',$responsable->iduser)}} {{ucwords($responsable->nombres.' '.$responsable->apellidos)}}
+                                            </li><br>
                                         @endforeach
                                     </ul>
                                 </div>
                             </div>
                         </fieldset>
-                    </form>
                 </div>
                 <div class="modal-footer">
                     <input type="hidden" value="{{$solicitude->token}}" name="token">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    {{ Form::submit('Asignar',array('class' => 'btn btn-primary')) }}
+                    <button type="button" id="acept-sol" class="btn btn-primary" data-dismiss="modal">Confirmar</button>
                 </div>
             </div>
         </div>
     </div>
-</form>
+<!-- </form> -->
 @endif
         </div>
     </div>

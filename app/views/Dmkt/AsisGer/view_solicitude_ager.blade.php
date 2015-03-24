@@ -54,16 +54,7 @@
                     </div>
                 </div>
 
-                <div class="form-group col-sm-6 col-md-4">
-                    <label class="col-sm-8 col-md-8 control-label" for="textinput">Observacion</label>
-                    <div class="col-sm-12 col-md-12">
-                        @if($solicitude->estado == 2)
-                        <textarea id="textinput" class="form-control"></textarea>
-                        @else
-                        <textarea id="textinput" class="form-control" disabled>{{ $solicitude->observacion }}</textarea>
-                        @endif
-                    </div>
-                </div>
+                @include('template.obs')
 
                 <div class="form-group col-sm-12 col-md-6">
                     <div class="col-md-12">

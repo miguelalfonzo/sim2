@@ -68,7 +68,7 @@
             <a href="{{URL::to('ver-solicitud-tes').'/'.$solicitude->token}}">
                 <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span>
             </a>
-            @if($solicitude->asiento == ENABLE_DEPOSIT && !is_null($solicitude->idresponse) && $solicitude->estado != DEPOSITADO )
+            @if($solicitude->asiento == ENABLE_DEPOSIT && !is_null($solicitude->idresponse) )
                 <a class="modal_deposit">
                     <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span>
                 </a>

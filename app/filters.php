@@ -73,7 +73,7 @@ Route::filter('sup', function () {
         {
             if (in_array($type, array( REP_MED,GER_COM,GER_PROD,CONT,TESORERIA )))
                 return Redirect::to('show_user');
-            else if ($type == AsIS_GER)
+            else if ($type == ASIS_GER)
                 return Redirect::to('registrar-fondo');
             else
                 return Redirect::to('login');      
@@ -181,6 +181,25 @@ Route::filter('rm_cont_ager', function ()
         {
             if( in_array( $type, array( SUP,GER_PROD,GER_COM,TESORERIA )))
                 return Redirect::to('show_user');
+            else
+                return Redirect::to('login');                
+        }
+    }
+    else
+        return Redirect::to('login');
+});
+
+Route::filter('sup_gerprod_gercom', function () 
+{
+    if (Auth::check()) 
+    {
+        $type = Auth::user()->type;
+        if (! ($type == SUP || $type == GER_PROD || $type == GER_COM ))
+        {
+            if( in_array( $type, array( REP_MED,CONT,TESORERIA )))
+                return Redirect::to('show_user');
+            else if ($type == ASIS_GER)
+                return Redirect::to('registrar-fondo');
             else
                 return Redirect::to('login');                
         }

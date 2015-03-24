@@ -143,16 +143,7 @@
 </div>
 
 <!-- Observation-->
-@if(!$solicitude->estado == PENDIENTE)
-<div class="form-group col-sm-6 col-md-4 col-lg-4">
-    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="selectbasic">Observacion</label>
-    <div class="col-sm-12 col-md-12 col-lg-12">
-        <textarea id="textinput" name="observacion" placeholder=""
-        class="form-control" disabled>{{$solicitude->observacion}}</textarea>
-    </div>
-</div>
-@endif
-
+@include('template.obs')
 
 @if(isset($solicitude) && $solicitude->idtiposolicitud == ACEPTADO)
 <div class="form-group col-sm-6 col-md-4 col-lg-4">

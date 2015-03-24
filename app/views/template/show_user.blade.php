@@ -32,9 +32,73 @@
         <div class="tab-content" style="margin-top: .75em;">
             <div class="tab-pane fade active in" id="solicitudes">
                 <div class="panel panel-default">
-                    @include('template.searchmenu') 
-                    <a id="show_leyenda" style="margin-left: 15px" href="#">Ver leyenda</a>
-                    <a id="hide_leyenda" style="margin-left: 15px;display: none" href="#">Ocultar leyenda</a>
+                    @include('template.searchmenu')
+                    @if( Auth::user()->type == TESORERIA )
+                        <div class="modal fade" id="enable_deposit_Modal" tabindex="-1" role="dialog" aria-labelledby="enable_deposit_ModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">
+                                            <span aria-hidden="true">&times;</span>
+                                            <span class="sr-only">Close</span>
+                                        </button>
+                                        <h4 class="modal-title" id="enable_deposit_ModalLabel">Registro del Depósito</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-xs-12 col-sm-6 col-md-6">
+                                                <div class="form-expense">
+                                                    <label>Solicitud</label>
+                                                    <div class="input-group">
+                                                        <div id="id-solicitude" class="input-group-addon" value=""></div>
+                                                        <input id="sol-titulo" class="form-control" type="text" disabled>
+                                                        <input id="token" type="hidden">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-12 col-sm-6 col-md-6">
+                                                <div class="form-expense">
+                                                    <label>Beneficiario</label>
+                                                    <input id="beneficiario" class="form-control" type="text" disabled>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-12 col-sm-6 col-md-6">
+                                                <div class="form-expense">
+                                                    <label>Monto Solicitado</label>
+                                                    <input id="tes-mon-sol" class="form-control" type="text" disabled>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-12 col-sm-6 col-md-6">
+                                                <div class="form-expense">
+                                                    <label>Retencion</label>
+                                                    <input id="tes-mon-ret" class="form-control" type="text" disabled>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-12 col-sm-6 col-md-6">
+                                                <div class="form-expense">
+                                                    <label>Monto a Depositar</label>
+                                                    <input id="total-deposit" class="form-control" type="text" disabled>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                             <div class="col-xs-12 col-sm-12 col-md-12">
+                                                <div class="form-expense">
+                                                    <label for="op-number">Número de Operación, Transacción, Cheque:</label>
+                                                    <input id="op-number" type="text" class="form-control">
+                                                    <p id="message-op-number" style="margin-top:1em;color:#a94442;"></p> 
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <a id="" href="#" class="btn btn-success register-deposit" data-deposit = "solicitude" style="margin-right: 1em;">Confirmar Operación</a>
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
             <div class="tab-pane fade" id="fondos">
@@ -86,16 +150,20 @@
                 </div>
             @endif
         </div>
+        <div>
+            <a id="show_leyenda" style="margin-left: 15px" href="#">Ver leyenda</a>
+            <a id="hide_leyenda" style="margin-left: 15px;display: none" href="#">Ocultar leyenda</a>
+        </div>
     </div>
 </div>
 @include('template.leyenda')
-@if(isset($estado))
-    <script type="text/javascript">
-        @if($estado['Status'] == 1)
+@if(isset($warnings[status]))
+    @if ($warnings[status] == ok )
+        <script type="text/javascript">
             $(document).ready(function() {
-                responseUI("{{$estado['Description']}}","green");
+                bootbox.alert('<h4>' + {{$warnings[data]}} + '</h4>');
             });
-        @endif
-    </script>
+        </script>
+    @endif
 @endif
 @stop

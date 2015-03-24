@@ -83,9 +83,9 @@ Route::group(array('before' => 'gerprod'), function () {
     Route::get('aprobar-solicitud/{token}', 'Dmkt\SolicitudeController@approvedSolicitude');
     Route::post('aceptar-solicitud-gerprod', 'Dmkt\SolicitudeController@acceptedSolicitudeGerProd');
     Route::get('aceptar-solicitud-gerprod', 'Dmkt\SolicitudeController@redirectAcceptedSolicitudeGerProd');
-    Route::post('rechazar-solicitud-gerprod', 'Dmkt\SolicitudeController@denySolicitudeGerProd');
     Route::post('buscar-solicitudes-gerprod', 'Dmkt\SolicitudeController@searchSolicitudsGerProd');
     Route::get('cancelar-solicitud-gerprod/{token}', 'Dmkt\SolicitudeController@disBlockSolicitudeGerProd');
+    //Route::post('rechazar-solicitud-gerprod', 'Dmkt\SolicitudeController@denySolicitudeGerProd');
 });
 /**
  * |-------------------------------------------------------------------------------------------- |
@@ -99,9 +99,10 @@ Route::group(array('before' => 'gercom'), function () {
     Route::post('aprobar-solicitud', 'Dmkt\SolicitudeController@approvedSolicitude');
     Route::get('aprobar-solicitud', 'Dmkt\SolicitudeController@redirectApprovedSolicitude');
     Route::post('buscar-solicitudes-gercom', 'Dmkt\SolicitudeController@searchSolicitudsGerCom');
-    Route::post('rechazar-solicitud-gercom', 'Dmkt\SolicitudeController@denySolicitudeGerCom');
     Route::get('cancelar-solicitud-gercom/{token}', 'Dmkt\SolicitudeController@disBlockSolicitudeGerCom');
     Route::post('gercom-asignar-responsable','Dmkt\SolicitudeController@gercomAsignarResponsable');
+    Route::post('gercom-mass-approv','Dmkt\SolicitudeController@massApprovedSolicitudes');
+    //Route::post('rechazar-solicitud-gercom', 'Dmkt\SolicitudeController@denySolicitudeGerCom');
 });
 
 /**
@@ -184,8 +185,13 @@ Route::group(array('before' => 'rm_cont_ager'), function ()
 Route::group(array('before' => 'sup_gerprod'), function ()
 {
     Route::post('asignar-solicitud-responsable', 'Dmkt\SolicitudeController@asignarResponsableSolicitud');
+});
+
+Route::group(array('before' => 'sup_gerprod_gercom'), function ()
+{
     Route::post('rechazar-solicitud', 'Dmkt\SolicitudeController@denySolicitude');
 });
+
 Route::group(array('before' => 'rm_ager'), function ()
 {
     Route::get('registrar-gasto/{token}', 'Expense\ExpenseController@show');
