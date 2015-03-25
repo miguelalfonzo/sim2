@@ -31,7 +31,9 @@
                     @endif
                 @else
                     @if($fondo->asiento == ASIENTO_FONDO)
-                        <a href="{{url('/')}}/generar-asiento-fondo-gasto/{{$fondo->token}}"><span class="glyphicon glyphicon-book"></span></a>
+                        <a href="{{URL::to('generar-asiento-fondo-gasto/'.$fondo->token)}}">
+                            <span class="glyphicon glyphicon-book"></span>
+                        </a>
                     @else
                         <span><strong>Asiento Generado</strong></span>
                     @endif

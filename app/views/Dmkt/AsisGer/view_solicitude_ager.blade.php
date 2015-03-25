@@ -30,17 +30,10 @@
                 <div class="form-group col-sm-6 col-md-4">
                     <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto Solicitado</label>
                     <div class="col-sm-12 col-md-12">
-                        @if($solicitude->estado == 2)
-                        <div class="input-group">
-                            <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                            <input id="idamount" type="text" value="{{$solicitude->monto}}" class="form-control input-md">
-                        </div>
-                        @else
                         <div class="input-group">
                             <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
                             <input id="idamount" type="text" value="{{$solicitude->monto}}" class="form-control input-md" readonly>
                         </div>
-                        @endif
                     </div>
                 </div>
 

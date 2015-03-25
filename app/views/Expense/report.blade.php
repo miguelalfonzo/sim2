@@ -47,44 +47,14 @@
                                 <td>{{mb_convert_case($value->idProofType->descripcion,MB_CASE_TITLE,'UTF-8')}}</td>
                                 <td>{{$value->num_prefijo.'-'.$value->num_serie}}</td>
                                 <td>{{mb_convert_case($value->descripcion,MB_CASE_TITLE,'UTF-8')}}</td>
-                                <td>
-                                    <?php $string = ""; ?>
-                                    @foreach($solicitude->clients as $client)
-                                       <?php  $string .= $client->idcliente.'-'; ?>
-                                    @endforeach
-                                    {{trim($string,'-')}}
-                                </td>
+                                <td>{{$cmps}}</td>
                                 <td>Dermatología</td>
                                 <td>
-                                    <?php $stringN = ""; ?>
-                                    @foreach($solicitude->clients as $client)
-                                       <?php  $stringN .= $client->client->clnombre.'-'; ?>
-                                    @endforeach
-                                    {{mb_convert_case(trim($stringN,'-'),MB_CASE_TITLE,'UTF-8')}}
+                                    {{$clientes}}
                                 </td>
                                 <td>{{$solicitude->typemoney->simbolo}}{{(real)$value->monto}}</td>
                             </tr>    
                         @endforeach
-                        <!-- <tr>
-                            <td>18/07</td>
-                            <td>Factura</td>
-                            <td>2192</td>
-                            <td>Obsequio de Baby Shower</td>
-                            <td>38040</td>
-                            <td>Dermatología</td>
-                            <td>Sandy Solorzano</td>
-                            <td>70.00</td>
-                        </tr>
-                        <tr>
-                            <td>18/07</td>
-                            <td>Factura</td>
-                            <td>2192</td>
-                            <td>Obsequio de Baby Shower</td>
-                            <td>38040</td>
-                            <td>Dermatología</td>
-                            <td>Sandy Solorzano</td>
-                            <td>30.00</td>
-                        </tr> -->
                         <tfoot>
                             <tr>
                                 <td class="border-white"></td>

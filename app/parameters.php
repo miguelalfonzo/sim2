@@ -97,3 +97,6 @@ const ASIS_GER = 'AG';
 
 const TB_DOCTOR = 'FICPE.PERSONAFIS';
 const TB_INSTITUTE = 'FICPEF.PERSONAJUR';
+
+const SOLIC = 'S';
+const FONDO = 'F';

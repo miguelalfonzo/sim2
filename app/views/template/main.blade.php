@@ -26,12 +26,18 @@
 </head>
 <body>
 <header>
-    {{ HTML::link('/show_rm', '', array('id' => 'logo', 'title' => 'Bagó Perú', 'alt' => 'Bagó Perú')) }}
+    @if (Auth::user()->type == ASIS_GER)
+        {{ HTML::link('/registrar-fondo', '', array('id' => 'logo', 'title' => 'Bagó Perú', 'alt' => 'Bagó Perú')) }}
+    @else
+        {{ HTML::link('/show_user', '', array('id' => 'logo', 'title' => 'Bagó Perú', 'alt' => 'Bagó Perú')) }}
+    @endif
     <a id="logout" href="{{URL::to('logout')}}" title="Cear sesión" alt="Cerrar) sesión">
-       <bdi>{{strtoupper(Auth::user()->username)}}  | <span class="closed-session">Cerrar sesión</span><span class="off"></span></bdi>
-        <img src="{{URL::to('/')}}/img/user.png"></a>
-
-
+        <bdi>{{strtoupper(Auth::user()->username)}}  | 
+            <span class="closed-session">Cerrar sesión</span>
+            <span class="off"></span>
+        </bdi>
+        <img src="{{URL::to('/')}}/img/user.png">
+    </a>
     @if(Auth::user()!= null)
         @if(Auth::user()->type == 'R')
         <input id="typeUser" type="hidden" value="R">

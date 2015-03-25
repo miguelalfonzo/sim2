@@ -72,13 +72,9 @@ $(function(){
         e.preventDefault();
         var token = $(this).attr('data-url');
         if($(this).attr('data-cont'))
-        {
             window.location.href = server+'revisar-gasto/'+token;
-        }
         else
-        {
             window.location.href = server+'registrar-gasto/'+token;
-        }
     });
     $(document).on("click","#token-solicitude",function(e){
         e.preventDefault();
@@ -95,9 +91,7 @@ $(function(){
         //Calculate the IGV loading
         if(parseFloat($(".total-item").val())) calcularIGV();
         if(parseFloat($("#balance").val()) === 0)
-        {
             $(".detail-expense").hide();
-        }
     //Restrictions on data entry forms
         //only numbers integers
         $("#ruc").numeric({negative:false,decimal:false});
@@ -162,17 +156,11 @@ $(function(){
             var button = this;
             e.preventDefault();
             if(!$("#name_account").val())
-            {
                 $("#name_account").attr("placeholder","No ha ingresado la cuenta.").addClass("error-incomplete");
-            }
             if(!$("#number_account").val())
-            {
                 $("#number_account").attr("placeholder","No ha ingresado el Número de la cuenta.").addClass("error-incomplete");
-            }
             if(!$("#total").val())
-            {
                 $("#total").attr("placeholder","No ha ingresado el Importe.").addClass("error-incomplete");
-            }
             if( $("#total").val() && $("#number_account").val() && $("#name_account").val())
             {
                 if($("#add-seat-solicitude").text() === 'Actualizar Detalle')
@@ -235,19 +223,15 @@ $(function(){
                 bootbox.confirm("¿Esta seguro que desea Finalizar el registro del gasto?", function(result) {
                     if(result)
                     {
-                        if(type === 'F'){
+                        if(type === 'F')
                            window.location.href = server + 'end-expense-fondo/' + idfondo;
-                        }else{
+                        else
                             window.location.href = server+'end-expense/'+token;
-                        }
-
                     }
                 });
             }
             else
-            {
                 bootbox.alert("<p style='color: red'>No puede finalizar el registro del gasto, aún tiene saldo pendiente por registrar.</p>");
-            }
         });
         //Generate Seat Solicitude
         $("#seat-solicitude").on("click",function(e){
@@ -273,13 +257,13 @@ $(function(){
             data.total = total;
             data.leyenda = $("#table-seat-solicitude tbody .leyenda:eq(0)").text();
             var url = server+'generate-seat-solicitude';
-            if($(this).data('url')){
+            if($(this).data('url'))
+            {
                 url = server + 'generate-seat-fondo';
                 data.idfondo = parseInt($("#idfondo").val(),10);
             }
-            else{
+            else
                 data.idsolicitude = parseInt($("#idsolicitud").val(),10);
-            }
             bootbox.confirm("¿Esta seguro que desea Generar el Asiento Contable?", function(result) {
                 if(result)
                 {
@@ -293,9 +277,7 @@ $(function(){
                             });
                         }
                         else
-                        {
                             bootbox.alert("<p class='red'>" + data.Description + "</p>");
-                        }
                     });
                 }
             });
@@ -311,12 +293,11 @@ $(function(){
                     'confirm': { label: 'Eliminar', className: 'btn-default' }
                 },
                 callback: function(result) {
-                    if (result) {
+                    if (result) 
+                    {
                         element.parent().parent().remove();
                         if ( !$('#add-seat-solicitude').length == 0 )
-                        {
                             cleanRegistro($('#add-seat-solicitude'));
-                        }
                     }
                 }
             });
@@ -339,9 +320,7 @@ $(function(){
                             });
                         }
                         else
-                        {
                             bootbox.alert("<p class='red'>Error, no se puede generar el asiento contable.</p>");
-                        }
                     });
                 }
             });
@@ -361,22 +340,18 @@ $(function(){
                         data.ret2         = $("#ret2").val();
                         $.post(server+'enable-deposit', data)
                         .done(function (data){
-                            if(data.Status == "Ok")
-                            {
-                                bootbox.alert("<p class='green'>Se habilito el depósito correctamente.</p>", function(){
-                                    window.location.href = server+'show_user';
-                                });
-                            }
-                            else
-                            {
-                                bootbox.alert("<p class='red'>Error, no se puede habilitar el depósito.</p>");
-                            }
+                        if(data.Status == "Ok")
+                        {
+                            bootbox.alert("<p class='green'>Se habilito el depósito correctamente.</p>", function(){
+                                window.location.href = server+'show_user';
+                            });
+                        }
+                        else
+                            bootbox.alert("<p class='red'>Error, no se puede habilitar el depósito.</p>");
                         });
                     }
                     else
-                    {
                         console.log("false");
-                    }
                 }
             });
         });
@@ -409,12 +384,8 @@ $(function(){
             }
             $("#op_number").val('');
             $("#message-op-number").text('');
-
-
             if(!op_number)
-            {
                 $("#message-op-number").text("Ingrese el número de Operación");
-            }
             else
             {
                 $.post(server + url, data)
@@ -452,16 +423,13 @@ $(function(){
                                         }
                                     );
                                 });
-                            }else{
-                                window.location.href = server+'show_user';
                             }
-
+                            else
+                                window.location.href = server+'show_user';
                         });
                     }
                     else
-                    {
                         responseUI("<font color='black'>Ya existe un deposito registrado</font>","yellow");
-                    }
                 });
             }
         });

@@ -4,7 +4,7 @@
             <a href="{{URL::to('ver-solicitud-rm').'/'.$solicitude->token}}">
                 <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span>
             </a>
-            @if($solicitude->estado == DEPOSITADO && $solicitude->asiento == 2 && Auth::user()->id == $solicitude->idresponse)
+            @if($solicitude->estado == GASTO_HABILITADO)
                 <a id="token-reg-expense" data-url="{{$solicitude->token}}">
                     <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span>
                 </a>
@@ -68,7 +68,7 @@
             <a href="{{URL::to('ver-solicitud-tes').'/'.$solicitude->token}}">
                 <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span>
             </a>
-            @if($solicitude->asiento == ENABLE_DEPOSIT && !is_null($solicitude->idresponse) )
+            @if( $solicitude->estado == DEPOSITO_HABILITADO )
                 <a class="modal_deposit">
                     <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span>
                 </a>
@@ -77,7 +77,7 @@
             <a href="{{URL::to('ver-solicitud-ager').'/'.$solicitude->token}}">
                 <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span>
             </a>
-            @if($solicitude->estado == DEPOSITADO && $solicitude->asiento == 2)
+            @if($solicitude->estado == GASTO_HABILITADO)
                 <a id="token-reg-expense" data-url="{{$solicitude->token}}">
                     <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span>
                 </a>

@@ -1,52 +1,58 @@
 @extends('template.main')
 @section('content')
 <div id="loading-fondo" class="hide" style="z-index: 9999 ; position: absolute; top:45% ; left: 45%">
-<img src="{{URL::to('img/loading.gif')}}">
+    <img src="{{URL::to('img/loading.gif')}}">
 </div>
 <div class="content">
-  <ul class="nav nav-tabs" role="tablist">
-              <li class="active">
-                  <a href="#fondos" role="tab" data-toggle="tab">
-                      <icon class="fa fa-home"></icon> Registrar Fondos
-                  </a>
-              </li>
-              <li><a href="#solicitudes" role="tab" data-toggle="tab">
-                  <i class="fa fa-user"></i>Solicitudes
-                  </a>
-              </li>
-  </ul>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="active">
+            <a href="#fondos" role="tab" data-toggle="tab">
+              <icon class="fa fa-home"></icon> Registrar Fondos
+            </a>
+        </li>
+        <li>
+            <a href="#solicitudes" role="tab" data-toggle="tab">
+                <i class="fa fa-user"></i>Solicitudes
+            </a>
+        </li>
+    </ul>
    <div class="tab-content">
    <!-- Registro de Fondos -->
-   <div class="tab-pane fade active in" id="fondos" data-url="fondos">
-
-   <div class="panel panel-default " style="margin-top: 10px">
-   <div class="panel-heading">
-       <h3 class="panel-title" style="height: 15px"></h3>
-       <small style="float: right; margin-top: -15px"><a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" class="icon-collapse"><span class="glyphicon glyphicon-chevron-down"></span></a></small>
-   </div>
-   <div id="collapseOne" class="panel-collapse collapse in">
-   			<div class="panel-body">
-            <div>
-               <input value="" id="idfondo" name="idfondo" type="hidden">
-               <input value="{{csrf_token()}}" name="_token" id="_token" type="hidden">
-               <div class="col-xs-12 col-sm-6 col-md-4">
-                <div class="form-expense">
-                  <label>Mes a Registrar</label>
-                  <div class="input-group">
-                    <span class="input-group-addon" ><i class="glyphicon glyphicon-calendar"></i></span>
-                    <input type="text" readonly class="form-control date_month" data-type="fondos">
-                  </div>
+        <div class="tab-pane fade active in" id="fondos" data-url="fondos">
+            <div class="panel panel-default " style="margin-top: 10px">
+                <div class="panel-heading">
+                    <h3 class="panel-title" style="height: 15px"></h3>
+                    <small style="float: right; margin-top: -15px">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" class="icon-collapse">
+                            <span class="glyphicon glyphicon-chevron-down"></span>
+                        </a>
+                    </small>
                 </div>
-              </div>
+                <div id="collapseOne" class="panel-collapse collapse in">
+           			<div class="panel-body">
+                        <div>
+                            <input value="" id="idfondo" name="idfondo" type="hidden">
+                            <input value="{{csrf_token()}}" name="_token" id="_token" type="hidden">
+                            <div class="col-xs-12 col-sm-6 col-md-4">
+                                <div class="form-expense">
+                                <label>Mes a Registrar</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon" >
+                                            <i class="glyphicon glyphicon-calendar"></i>
+                                        </span>
+                                        <input type="text" readonly class="form-control date_month" data-type="fondos">
+                                    </div>
+                                </div>
+                            </div>
 
-              <div class="col-xs-12 col-sm-6 col-md-4">
-                <div class="form-expense">
-                  <label>Sisol - Hospital</label>
-                  <input id="fondo_institucion" name="institucion" type="text" placeholder=""
-                              value="{{isset($fondo->institucion)? $fondo->institucion : null }}"
-                              class="form-control input-md">
-                </div>
-              </div>
+                            <div class="col-xs-12 col-sm-6 col-md-4">
+                                <div class="form-expense">
+                                    <label>Sisol - Hospital</label>
+                                    <input id="fondo_institucion" name="institucion" type="text"
+                                    value="{{isset($fondo->institucion)? $fondo->institucion : null }}"
+                                    class="form-control input-md">
+                                </div>
+                            </div>
 
               <div class="col-xs-12 col-sm-6 col-md-4">
                 <div class="form-expense">
@@ -103,29 +109,22 @@
    </div>
    </div>
    <div class="panel panel-default">
-   <div class="panel-heading">
-       <h3 class="panel-title">Fondos Institucionales</h3>
-
-
+        <div class="panel-heading">
+        <h3 class="panel-title">Fondos Institucionales</h3>
    </div>
-   <div class="panel-body table-solicituds-fondos" style="position: relative">
-
-
-        <div id="" class="form-group col-xs-6 col-sm-3 col-md-3">
-                        <div class="input-group">
-                    <input type="text" readonly class="form-control date_month" data-type="fondos"><span class="input-group-addon" ><i class="glyphicon glyphicon-calendar"></i></span>
+           <div class="panel-body table-solicituds-fondos" style="position: relative">
+                <div id="" class="form-group col-xs-6 col-sm-3 col-md-3">
+                    <div class="input-group">
+                        <input type="text" readonly class="form-control date_month" data-type="fondos"><span class="input-group-addon" ><i class="glyphicon glyphicon-calendar"></i></span>
+                    </div>
                 </div>
+           </div>
+    </div>
+</div>
+<!-- Solicitudes -->
+        <div class="tab-pane fade table-solicituds" id="solicitudes" >
+
         </div>
-        
-   </div>
-   </div>
-   </div>
-   <!-- Solicitudes -->
-   <div class="tab-pane fade table-solicituds-ager" id="solicitudes" >
-
-   </div>
-   </div>
-
-
+    </div>
 </div>
 @stop

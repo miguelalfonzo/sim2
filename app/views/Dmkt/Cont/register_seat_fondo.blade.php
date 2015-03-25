@@ -48,7 +48,7 @@
 					</div>
 				</section>
 				<hr>
-				<section class="row reg-expense" style="margin:0">
+				<!-- <section class="row reg-expense" style="margin:0">
 					<div class="col-xs-12 col-sm-6 col-md-4">
 						<div class="form-expense">
 							<label for="name_account">Cuenta</label>
@@ -82,7 +82,7 @@
 							<a href="#" id="add-seat-solicitude" class="btn btn-info" style="margin-top:1.75em;">Agregar Detalle</a>
 						</div>
 					</div>					
-				</section>
+				</section> -->
 				<section class="row reg-expense" style="margin:0">
 					<div class="col-xs-12 col-sm-12 col-md-12">
 						<div class="form-expense">

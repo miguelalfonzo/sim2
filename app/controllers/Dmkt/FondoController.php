@@ -48,9 +48,7 @@ class FondoController extends BaseController
         $periodo = $this->period($inputs['mes']);
         $verifyMonth = FondoInstitucional::where('periodo', $periodo)->where('terminado', TERMINADO)->get();
         if(count($verifyMonth) != 0)
-        {
             return 'blocked';
-        }
 
         $fondo              = new FondoInstitucional;
         $fondo->idfondo     = $fondo->searchId() + 1;
@@ -118,9 +116,7 @@ class FondoController extends BaseController
             $estado = 1;
             foreach ($fondos as $fondo) {
                 if($fondo->depositado == PDTE_DEPOSITO)
-                {
                     $estado = PDTE_DEPOSITO;
-                }
             }
             $view   = View::make('Treasury.list_fondos')->with('fondos', $fondos)->with('sum', $fondos->sum('total'))->with('estado', $estado);
             return $view;
@@ -312,10 +308,18 @@ class FondoController extends BaseController
     public function viewGenerateSeatFondo($token)
     {
         $fondo = FondoInstitucional::where('token', $token)->firstOrFail();
-        $getDay = $this->getDay();
+        $date = $this->getDay();
         $cuenta = Fondo::where('cuenta_mkt', CTA_FONDO_INSTITUCIONAL)->get();
         $banco = Account::where('num_cuenta', CTA_BANCOS_SOLES)->get();
-        return View::make('Dmkt.Cont.register_seat_fondo')->with('fondo', $fondo)->with('getDay', $getDay)->with('cuenta', $cuenta)->with('banco',$banco);
+        $data = array(
+            'type'   => FONDO,
+            'fondo'  => $fondo,
+            'date'   => $date,
+            'cuenta' => $cuenta,
+            'banco'  => $banco
+        );
+        return View::make('Dmkt.Cont.register_seat_solicitude')->with($data);
+        //return View::make('Dmkt.Cont.register_seat_fondo')->with($data);
     }
 
     public function generateSeatFondo()

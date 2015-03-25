@@ -93,35 +93,38 @@ class DepositController extends BaseController{
         return 0;
     }
     
-    public function depositFondoTes(){
-        $deposit = Input::all();
-        try {
-            DB::transaction (function() use ($deposit) {
-                $idfondo = $deposit['idfondo'];
-                $row_deposit = Deposit::where('idfondo',$idfondo)->get();
-                if(count($row_deposit)>0)
-                {
-                    return 0;
-                }
-                else
-                {
-                    //Update estado
-                    $fondo = FondoInstitucional::find($idfondo);
-                    $fondo->depositado = 1;
-                    $fondo->save();
-                    //New Deposit
-                    $newDeposit = new Deposit;
-                    $id = $newDeposit->lastId()+1;
-                    $newDeposit->iddeposito        = $id;
-                    $newDeposit->total             = $fondo->total;
-                    $newDeposit->num_transferencia = $deposit['op_number'];
-                    $newDeposit->idfondo       = $idfondo;
-                    $newDeposit->save();
-                }
-            });
+    public function depositFondoTes()
+    {
+        try 
+        {
+            DB::transaction();
+            $deposit = Input::all();
+            $idfondo = $deposit['idfondo'];
+            $row_deposit = Deposit::where('idfondo',$idfondo)->get();
+            if(count($row_deposit)>0)
+                return 0;
+            else
+            {
+                //Update estado
+                $fondo = FondoInstitucional::find($idfondo);
+                $fondo->depositado = 1;
+                $fondo->save();
+                //New Deposit
+                $newDeposit = new Deposit;
+                $id = $newDeposit->lastId()+1;
+                $newDeposit->iddeposito        = $id;
+                $newDeposit->total             = $fondo->total;
+                $newDeposit->num_transferencia = $deposit['op_number'];
+                $newDeposit->idfondo       = $idfondo;
+                $newDeposit->save();
+            }
+            DB::commit();
             return $this->getFondos($deposit['date_fondo']);
-        } catch (Exception $e) {
-            return 'error';
+        } 
+        catch (Exception $e) 
+        {
+            DB::rollback();
+            $this->internalException($e,__FUNCTION__);
         }
     }
     public function getFondos($mes){

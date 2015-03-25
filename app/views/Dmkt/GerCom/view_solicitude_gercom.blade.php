@@ -1,6 +1,5 @@
 @extends('template.main')
 @section('content')
-
 <div class="content">
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -30,7 +29,11 @@
                 <div class="col-sm-12 col-md-12">
                     <div class="input-group">
                         <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                        <input id="idamount" name="monto" type="text" placeholder="" value="{{$solicitude->monto}}" class="form-control input-md" >
+                        @if ($solicitude->estado != ACEPTADO)
+                            <input readonly id="idamount" name="monto" type="text" placeholder="" value="{{$solicitude->monto}}" class="form-control input-md" >
+                        @else
+                            <input id="idamount" name="monto" type="text" placeholder="" value="{{$solicitude->monto}}" class="form-control input-md" >
+                        @endif
                     </div>
                 </div>
             </div>
@@ -103,7 +106,11 @@
                                 <div class="col-sm-4 col-md-4" style="padding: 0">
                                     <div class="input-group">
                                         <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                                        <input id="amount_assigned"  name="amount_assigned[]" type="text" class="form-control input-md amount_families" value="{{isset($family->monto_asignado)? $family->monto_asignado : round($solicitude->monto/count($solicitude->families),2)}}">
+                                        @if ($solicitude->estado != ACEPTADO)
+                                            <input id="amount_assigned"  name="amount_assigned[]" type="text" class="form-control input-md amount_families" value="{{isset($family->monto_asignado)? $family->monto_asignado : round($solicitude->monto/count($solicitude->families),2)}}" readonly>
+                                        @else
+                                            <input id="amount_assigned"  name="amount_assigned[]" type="text" class="form-control input-md amount_families" value="{{isset($family->monto_asignado)? $family->monto_asignado : round($solicitude->monto/count($solicitude->families),2)}}">
+                                        @endif
                                     </div>
                                 </div>
                             </div>

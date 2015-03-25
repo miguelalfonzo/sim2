@@ -9,9 +9,7 @@
                     Solicitudes
                 </a>
             </li>
-            @if (Auth::user()->type != TESORERIA)
-                @include('template.li_estado_cuenta')
-            @endif
+            @include('template.li_estado_cuenta')
             @if ( Auth::user()->type == REP_MED || Auth::user()->type == CONT || Auth::user()->type == TESORERIA)
                 <li>
                     <a href="#fondos" role="tab" data-toggle="tab">
@@ -136,9 +134,7 @@
                     @endif
                 </div>
             </div>
-            @if (Auth::user()->type != TESORERIA)
-                @include('template.tb_estado_cuenta')
-            @endif
+            @include('template.tb_estado_cuenta')
             @if (Auth::user()->type == CONT)
                 <!-- Mantenimiento de Documentos -->
                 <div class="tab-pane fade" id="mantenimiento">

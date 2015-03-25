@@ -24,9 +24,13 @@
             <td>
                 <div class="div-icons-solicituds">
                     @if($fondo->depositado == 0)
-                        <a href="#" class="deposit-fondo" data-idfondo="{{$fondo->idfondo}}" data-toggle="modal" data-target="#myModal" ><span class="glyphicon glyphicon-usd"></span></a>
+                        <a href="#" class="deposit-fondo" data-idfondo="{{$fondo->idfondo}}" data-toggle="modal" data-target="#myModal" >
+                            <span class="glyphicon glyphicon-usd"></span>
+                        </a>
                     @else
-                        <span><strong>Depositado</strong></span>
+                        <span>
+                            <strong>Depositado</strong>
+                        </span>
                     @endif
                 </div>
             </td>
@@ -50,7 +54,7 @@
                     <p id="message-op-number" style="margin-top:1em;color:#a94442;"></p>
                 </div>
                 <div class="modal-footer">
-                    <a id="register-deposit-fondo" href="#" class="btn btn-success " data-deposit="fondo" style="margin-right: 1em;">Confirmar Operación</a>
+                    <a id="register-deposit-fondo" href="#" class="btn btn-success" data-deposit="fondo" style="margin-right: 1em;">Confirmar Operación</a>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
                 </div>
             </div>

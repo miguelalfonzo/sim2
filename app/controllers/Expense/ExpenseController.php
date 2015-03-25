@@ -453,6 +453,29 @@ class ExpenseController extends BaseController{
 
 	public function reportExpense($token){
 		$solicitude = Solicitude::where('token',$token)->firstOrFail();
+		$clientes   = array();
+		$cmps = array();
+		foreach($solicitude->clients as $client)
+        {
+            if ($client->from_table == TB_DOCTOR)
+            {
+                $doctors = $client->doctors;
+                array_push( $clientes, $doctors->pefnombres.' '.$doctors->pefpaterno.' '.$doctors->pefmaterno );
+            	array_push( $cmps , 'CMP: '.$doctors->pefnrodoc1);
+            }
+            elseif ($client->from_table == TB_INSTITUTE)
+            {
+                array_push( $clientes, $client->institutes->pejrazon);
+                array_push( $cmps, 'Ruc: '.$client->institutes->pejnrodoc);       
+            }
+            else
+            {
+                array_push ( $clientes, 'No encontrado' );
+        		array_push ( $cmps, 'No encontrado' );		
+        	}
+        }
+        $clientes = implode(',',$clientes);
+        $cmps = implode(',',$cmps);
 		$created_by = '';
 		if($solicitude->user->type == 'R')
 		{
@@ -474,7 +497,7 @@ class ExpenseController extends BaseController{
 		}
 		else
 		{
-			$dni = $dni['Status'].' : '.$dni['Description'];
+			$dni = ' ________ ';
 		}
 		$expenses = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
 		$aproved_user = User::where('id',$solicitude->idaproved)->firstOrFail();
@@ -496,6 +519,8 @@ class ExpenseController extends BaseController{
 
 		$data = array(
 			'solicitude' => $solicitude,
+			'clientes'	 => $clientes,
+			'cmps'		 => $cmps,
 			'date'       => $this->getDay(),
 			'name'       => $name_aproved,
 			'dni' 		 => $dni,

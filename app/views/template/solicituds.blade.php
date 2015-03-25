@@ -14,7 +14,7 @@
             <th>Estado</th>
             <th>Fecha</th>
             <th>Tipo de Solicitud</th>
-            <th>Edicion</th>
+            <th style="width:auto">Edicion</th>
             @if (Auth::user()->type == GER_COM)
                 <th data-checkbox="true">Marcar</th>
             @endif
@@ -23,9 +23,8 @@
     <tbody>
         @foreach($solicituds as $solicitude)
             <tr>
-                <td style="text-align:center" class="id_solicitud">{{$solicitude->idsolicitud}}</td>
                 @if ( in_array(Auth::user()->type , array( TESORERIA,GER_COM) ))
-                    <input type="hidden" id="sol_token" value="{{$solicitude->token}}">  
+                    <input type="hidden" id="sol_token" class="i-tokens" value="{{$solicitude->token}}">  
                     @if(!is_null($solicitude->response))
                         @if($solicitude->response->type == REP_MED)
                             <input type="hidden" value="{{$solicitude->response->Rm->nombres.' '.$solicitude->response->Rm->apellidos}}" class="benef">
@@ -36,15 +35,16 @@
                         @endif
                     @endif
                 @endif
+                <td style="text-align:center" class="id_solicitud">{{$solicitude->idsolicitud}}</td>
                 <td style="text-align:left" class="sol_titulo">
                     @if (!is_null($solicitude->idetiqueta))
-                        <span class="label label-info" style="margin-right:1em;background-color:{{$solicitude->etiqueta->color}}">
+                        <span class="label" style="margin-right:1em;background-color:{{$solicitude->etiqueta->color}}">
                             {{$solicitude->etiqueta->nombre}}
                         </span>
                     @endif
                     <label>{{$solicitude->titulo}}</label>
                 </td>
-                <td style="text-align:center"> 
+                <td style="text-align:center">
                     @if(count($solicitude->history) != 0)
                         @if (is_object($solicitude->history[0]->user))    
                             @if ($solicitude->history[0]->user->type == REP_MED)
@@ -88,7 +88,7 @@
                 <td style="text-align:center">{{ date_format(date_create($solicitude->created_at), 'd/m/Y' )}}</td>
                 <td style="text-align:center">{{$solicitude->typesolicitude->nombre}}</td>
                 @include('template.icons')
-                @if (Auth::user()->type == GER_COM)
+                @if ( Auth::user()->type == GER_COM )
                     <td style="text-align:center">
                     @if( $solicitude->estado != ACEPTADO)
                         <input type="checkbox" name="mass-aprov" disabled/>

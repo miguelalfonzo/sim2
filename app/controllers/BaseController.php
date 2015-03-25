@@ -246,8 +246,15 @@ class BaseController extends Controller {
             } 
             else if ( Auth::user()->type == TESORERIA ) 
             {
-                $solicituds->where('asiento',ENABLE_DEPOSIT)
-                ->whereNotNull('idresponse');
+                if ($estado != R_FINALIZADO)
+                {
+                    $solicituds->where('asiento',ENABLE_DEPOSIT)
+                    ->whereNotNull('idresponse');
+                }
+                else
+                {
+                    $solicituds->whereNotNull('iddeposito');
+                }
             }
             else if ( Auth::user()->type == ASIS_GER ) 
             {
