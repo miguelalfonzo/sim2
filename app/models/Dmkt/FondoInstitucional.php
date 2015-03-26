@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Developer
- * Date: 13/11/2014
- * Time: 05:52 PM
- */
 
 namespace Dmkt;
 use \Eloquent;

@@ -25,7 +25,7 @@
     <thead>
     <tr>
         <th>#</th>
-        <th>SiSol - Hospitall</th>
+        <th>SISOL - Hospital</th>
         <th>Depositar a</th>
         <th>N° Cuenta Bagó. Bco Credito</th>
         <th>Total a depositar</th>

@@ -177,40 +177,7 @@ function newSolicitude() {
         $(this).parent().removeClass('has-error');
     });
 
-    function listFondos(user, state){
-        var url = server + 'list-'+user +'/'+dateactual + '/' + state;
-        if(user != 'fondos-contabilidad') {
-            url = server + 'list-'+user +'/'+dateactual;
-        }
-        $.ajax({
-            url: url,
-            type: 'GET',
-            dataType: 'html'
-
-        }).done(function (data) {
-            $(".fondo_r").remove();
-            $('.table_solicitude_'+user).append(data);
-            $("#datefondo").val(dateactual);
-            $('#table_solicitude_'+user).dataTable({
-                    "order": [
-                        [ 0, "desc" ] //order date
-                    ],
-                    "bLengthChange": false,
-                    'iDisplayLength': 7,
-                    "oLanguage": {
-                        "sSearch": "Buscar: ",
-                        "sZeroRecords": "No hay fondos",
-                        "sInfoEmpty": "No hay fondos",
-                        "sInfo": 'Mostrando _END_ de _TOTAL_',
-                        "oPaginate": {
-                            "sPrevious": "Anterior",
-                            "sNext" : "Siguiente"
-                        }
-                    }
-                }
-            );
-        });
-    }
+    
 
     function listDocuments(){
         var url = server + 'list-documents';
@@ -254,11 +221,11 @@ function newSolicitude() {
         }
         else
             listSolicitude($('#state_view').val());    
-        if(userType === REP_MED)
-            listFondosRm();
+        /*if(userType === REP_MED)
+            listFondosRm();*/
     }
 
-    function listFondosRm(){
+    /*function listFondosRm(){
         $.get(server + 'list-fondos-rm').done(function(data){
             $('.table_fondos_rm').append(data);
             $('#table_fondos_rm').dataTable({
@@ -280,8 +247,43 @@ function newSolicitude() {
                 }
             );
         });
-    }
+    }*/
 
+    function listFondos(user, state){
+        var url = server + 'list-'+user +'/'+dateactual + '/' + state;
+        if(user != 'fondos-contabilidad') {
+            url = server + 'list-'+user +'/'+dateactual;
+        }
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'html'
+
+        }).done(function (data) {
+            $(".fondo_r").remove();
+            $('.table_solicitude_'+user).append(data);
+            $("#datefondo").val(dateactual);
+            $('#table_solicitude_'+user).dataTable({
+                    "order": [
+                        [ 0, "desc" ] //order date
+                    ],
+                    "bLengthChange": false,
+                    'iDisplayLength': 7,
+                    "oLanguage": {
+                        "sSearch": "Buscar: ",
+                        "sZeroRecords": "No hay fondos",
+                        "sInfoEmpty": "No hay fondos",
+                        "sInfo": 'Mostrando _END_ de _TOTAL_',
+                        "oPaginate": {
+                            "sPrevious": "Anterior",
+                            "sNext" : "Siguiente"
+                        }
+                    }
+                }
+            );
+        });
+    }
+    
     /* Cancel Solicitude */
     var cancel_solicitude = '.cancel-solicitude';
     $(document).on('click', cancel_solicitude, function (e) 
@@ -487,7 +489,7 @@ function newSolicitude() {
     var fondo_cuenta = $('#fondo_cuenta');
     var fondo_supervisor = $('#fondo_supervisor');
     var fondo_institucion = $('#fondo_institucion');
-    var date_reg_fondo = $('#date_reg_fondo');
+    var date_reg_fondo = $('.date_month').first();
 
     fondo_repmed.on('focus', function () {
         $(this).parent().removeClass('has-error');
@@ -505,9 +507,10 @@ function newSolicitude() {
     $('#edit-rep').hide();
     function removeinput(data){
 
-        data.parent().find('input:text').removeClass('success').attr('disabled', false).val('').focus();
-        fondo_cuenta.val('');
-        data.parent().find('input:hidden').val('');
+        data.parent().find('input:text').attr('disabled', false).val('').focus().parent().parent().removeClass('has-success');
+        fondo_cuenta.val('').attr('disabled', false).parent().removeClass("has-success");
+        fondo_supervisor.val('').attr('disabled',false).parent().removeClass("has-success");
+        //data.parent().find('input:hidden').val('');
         data.fadeOut();
     }
     $(document).on("click","#edit-rep", function(e){
@@ -516,7 +519,8 @@ function newSolicitude() {
 
     });
 
-    function findRepresentatives(request, response) {
+    function findRepresentatives(request, response) 
+    {
         function hasMatch(s) {
             return s.toLowerCase().indexOf(request.term.toLowerCase()) !== -1;
         }
@@ -570,48 +574,56 @@ function newSolicitude() {
     fondo_total.numeric();
 
     $(document).on('click','.register_fondo',function(){
-        validate = 0;
+        var validate = 0;
         var aux = this;
+        console.log(date_reg_fondo);
         if(!date_reg_fondo.val()){
-            date_reg_fondo.parent().addClass('has-error');
+            console.log(date_reg_fondo);
+            date_reg_fondo.parent().parent().addClass('has-error');
             date_reg_fondo.attr('placeholder', 'Ingrese Mes');
             date_reg_fondo.addClass('input-placeholder-error');
+            validate = 1;
         }
         if(!fondo_total.val()){
             fondo_total.parent().addClass('has-error');
             fondo_total.attr('placeholder', 'Ingrese Cantidad a depositar');
             fondo_total.addClass('input-placeholder-error');
+            validate = 1;
         }
         if(!fondo_cuenta.val()){
             fondo_cuenta.parent().addClass('has-error');
             fondo_cuenta.attr('placeholder', 'Ingrese Cuenta');
             fondo_cuenta.addClass('input-placeholder-error');
+            validate = 1;
         }
         if(!fondo_repmed.val()){
             fondo_repmed.val('');
             fondo_repmed.parent().addClass('has-error');
             fondo_repmed.attr('placeholder', 'Ingrese Representante');
             fondo_repmed.addClass('input-placeholder-error');
+            validate = 1;
         }
         if(fondo_repmed.attr('data-select') == 'false'){
             fondo_repmed.val('');
             fondo_repmed.parent().addClass('has-error');
             fondo_repmed.attr('placeholder', 'Ingrese Representante');
             fondo_repmed.addClass('input-placeholder-error');
+            validate = 1;
         }
         if(validate == 0){
             var dato = {
                 'institucion' : $('#fondo_institucion').val(),
-                'repmed' :fondo_repmed.val(),
-                'supervisor' : fondo_supervisor.val(),
-                'codrepmed' : fondo_repmed.attr('data-cod'),
+                'repmed'      : fondo_repmed.val(),
+                'codrepmed'   : fondo_repmed.attr('data-cod'),
+                'supervisor'  : fondo_supervisor.val(),
+                'codsup'      : fondo_supervisor.attr('data-cod'), 
                 'total' : fondo_total.val(),
                 'cuenta': fondo_cuenta.val(),
                 '_token' : $('#_token').val(),
-                'start' : date_reg_fondo.val(),
-                'mes' : date_reg_fondo.val()
+                //'start' : date_reg_fondo.val(),
+                'mes' : $(this).parent().parent().parent().find(".date_month").val()
             };
-            $('#datefondo').val(date_reg_fondo.val());
+            date_reg_fondo.last().val(date_reg_fondo.val());
 
             var l = Ladda.create(aux);
             l.start();
@@ -1239,67 +1251,117 @@ function newSolicitude() {
         $("#add-doc").show();
     });
 
-
-    function seeker(element){
-        element.typeahead(
+    function seeker(element,name,url){
+        if (element.length != 0)
         {
-            minLength: 3,
-            hightligth: true,
-            hint: false
-        },
-        {
-            name: 'clients',
-            displayKey: 'label',
-            templates:  
+            console.log(element);
+            element.typeahead(
             {
-                empty: 
-                [
-                    '<p><strong>&nbsp; No se encontro resultados  &nbsp;</strong></p>'
-                ].join('\n'),
-                suggestion: function(data)
-                {
-                    return '<p><strong>' + data.label + '</strong></p>';
-                }
+                minLength: 3,
+                hightligth: true,
+                hint: false
             },
-            source: function (request , response)
             {
-                $.ajax(
+                name: name,
+                displayKey: 'label',
+                templates:  
                 {
-                    type: 'post',
-                    url: server+'search-client',
-                    data:
+                    empty: 
+                    [
+                        '<p><strong>&nbsp; No se encontro resultados  &nbsp;</strong></p>'
+                    ].join('\n'),
+                    suggestion: function(data)
                     {
-                        "_token": $("input[name=_token]").val(),
-                        "sVal": request
-                    },
-                    error: function()
-                    {
-                            responseUI('Error del Sistema','red');
-                    },
-                }).done( function (data)
+                        return '<p><strong>' + data.label + '</strong></p>';
+                    }
+                },
+                source: function (request , response)
                 {
-                    if (!data.Status == 'Ok')
-                        data.Data = '{"rn":"0","value":"0","label":"Error en la busqueda"}';   
-                    response(data.Data);
-                });
-                       
-            }
-        }).on('typeahead:selected', function (evento, suggestion , dataset)
-        {
-            var input = $(this);
-            input.parent().after('<button type="button" class="btn-delete-client" style="z-index: 2"><span class="glyphicon glyphicon-remove"></span></button>');
-            input.parent().addClass('has-success has-feedback');
-            input.attr("name",dataset+'[]');
-            input.attr("table",suggestion.table);
-            input.attr("pk",suggestion.value);
-            input.removeClass('has-error has-feedback');
-            input.parent().children('.span-alert').addClass('glyphicon glyphicon-ok form-control-feedback');
-            input.attr('data-valor','all');
-            input.parent().children('.span-alert').removeClass('glyphicon glyphicon-remove form-control-feedback');
-            input.attr('disabled','disabled');
-        });
+                    $.ajax(
+                    {
+                        type: 'post',
+                        url: server + url ,
+                        data:
+                        {
+                            "_token": $("input[name=_token]").val(),
+                            "sVal": request
+                        },
+                        error: function()
+                        {
+                            var resp = '{"value:0","label":"Error de Conexion"}';
+                            response(resp);
+                        },
+                    }).done( function (data)
+                    {
+                        if (!data.Status == 'Ok')
+                            data.Data = '{"value":"0","label":"Error en la busqueda"}';   
+                        response(data.Data);
+                    });
+                           
+                }
+            }).on('typeahead:selected', function (evento, suggestion , dataset)
+            {
+                console.log(dataset);
+                console.log(dataset == 'clients');
+                console.log(suggestion);
+                if (dataset == 'clients')
+                {
+                    console.log('sclient');
+                    var input = $(this);
+                    input.parent().after('<button type="button" class="btn-delete-client" style="z-index: 2"><span class="glyphicon glyphicon-remove"></span></button>');
+                    input.parent().addClass('has-success has-feedback');
+                    input.attr("name",dataset+'[]');
+                    input.attr("table",suggestion.table);
+                    input.attr("pk",suggestion.value);
+                    input.removeClass('has-error has-feedback');
+                    input.parent().children('.span-alert').addClass('glyphicon glyphicon-ok form-control-feedback');
+                    input.attr('data-valor','all');
+                    input.parent().children('.span-alert').removeClass('glyphicon glyphicon-remove form-control-feedback');
+                    input.attr('disabled','disabled');
+                }
+                else if (dataset == 'reps');
+                {
+                    console.log('srepresentantes');
+                    console.log($(this));
+                    
+                    $(this).attr('data-select','true');
+                    $(this).attr('data-cod',suggestion.value);
+                    $(this).val(suggestion.label );
+                    //$("#id_change_before_rep").val( ui.item.visvisitador );
+                    $(this).attr('disabled',true).parent().parent().addClass('has-success');
+                    $('.edit-repr').fadeIn();
+                    repInfo(suggestion.value).done( function (result)
+                    {
+                        
+                        fondo_cuenta.val(result.Data.cuenta);
+                        fondo_cuenta.attr('disabled',true).parent().addClass('has-success');        
+                        fondo_supervisor.val(result.Data.sup.nombre);
+                        fondo_supervisor.attr('data-cod',result.Data.sup.idsup);
+                        fondo_supervisor.attr('disabled',true).parent().addClass('has-success'); 
+                    });
+                }
+            });
+        }
     }
 
+    function repInfo(rm)
+    {
+        return $.ajax(
+        {
+            type: 'post',
+            url: server+'info-rep',
+            data:
+            {
+                "_token": $("input[name=_token]").val(),
+                "rm": rm
+            },
+            error: function(statusCode,errorThrown)
+            {
+                ajaxError(statusCode,errorThrown);
+
+            }
+        });  
+    }
     /*function load_client(client) {
 
         function lightwell(request, response) {
@@ -1335,7 +1397,7 @@ function newSolicitude() {
                 '<span class="glyphicon glyphicon-remove">' +
                 '</span></button></div></li>').appendTo('#listclient');
         var lastInput = $("#listclient").children().last().find("#idclient0");
-        seeker(lastInput);   
+        seeker(lastInput,'clients','search-client');   
     });
 
     $(document).on("click", ".btn-delete-client", function () {
@@ -1347,8 +1409,11 @@ function newSolicitude() {
 
     $( document ).ready(function() 
     {
-        seeker($('.cliente-seeker'));
+        seeker($('.cliente-seeker'),'clients','search-client');
+        seeker($('.rep-seeker'),'reps','search-rep');
     });
+
+
 
     function ajaxError(statusCode,errorThrown)
     {

@@ -414,6 +414,15 @@ class SolicitudeController extends BaseController
             if ($rpta[status] == ok)
                 $rpta = $this->searchTransaction($estado,$rpta[data],$start,$end);
                 if ($rpta[status] == ok)
+                    Log::error(Auth::user()->rm->idrm);
+                    $fondos = FondoInstitucional::where('idrm', Auth::user()->rm->idrm)
+                    //->where('depositado', 1)->where('asiento', ASIENTO_FONDO)
+                    ->whereRaw("to_date(periodo,'YYYYMM') BETWEEN TRUNC(to_date('$start','DD-MM-YY'),'MM') and TRUNC(to_date('$end','DD-MM-YY'),'MM')")
+                    //->orderBy('periodo')->get();
+                    ->get();
+                    $rpta[data]['fondos'] = $fondos;
+                    Log::error(json_encode($fondos));
+                    //Log::error($rpta[data]['fondos']);
                     $view = View::make('template.solicituds')->with($rpta[data])->render();
                     $rpta = $this->setRpta($view);
         }

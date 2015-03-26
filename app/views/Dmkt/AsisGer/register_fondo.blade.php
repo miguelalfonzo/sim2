@@ -47,7 +47,7 @@
 
                             <div class="col-xs-12 col-sm-6 col-md-4">
                                 <div class="form-expense">
-                                    <label>Sisol - Hospital</label>
+                                    <label>SISOL - Hospital</label>
                                     <input id="fondo_institucion" name="institucion" type="text"
                                     value="{{isset($fondo->institucion)? $fondo->institucion : null }}"
                                     class="form-control input-md">
@@ -57,10 +57,12 @@
               <div class="col-xs-12 col-sm-6 col-md-4">
                 <div class="form-expense">
                   <label>Depositar a</label>
-                  <input id="fondo_repmed"  name="repmed" type="text" placeholder="" style="position: relative"
+                  <input id="fondo_repmed" name="repmed" type="text" style="position: relative"
                               value="{{isset($fondo->repmed)? $fondo->repmed : null }}" data-select="false"
-                              class="form-control input-md change_before_rep" data-cod="">
-                        <a id="edit-rep" class="edit-repr" href="#" style="display: inline;"><span class="glyphicon glyphicon-pencil"></span></a>
+                              class="form-control input-md rep-seeker">
+                        <a id="edit-rep" class="edit-repr" href="#" style="display:inline;">
+                          <span class="glyphicon glyphicon-pencil"></span>
+                        </a>
                 </div>
               </div>
 

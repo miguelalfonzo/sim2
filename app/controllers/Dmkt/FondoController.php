@@ -37,7 +37,6 @@ class FondoController extends BaseController
     
     function getRegister()
     {
-        
         $fondos = FondoInstitucional::all();
         return View::make('Dmkt.AsisGer.register_fondo')->with('fondos', $fondos);
     }
@@ -52,19 +51,23 @@ class FondoController extends BaseController
 
         $fondo              = new FondoInstitucional;
         $fondo->idfondo     = $fondo->searchId() + 1;
+        $fondo->idsup       = $inputs['codsup'];
         $fondo->institucion = $inputs['institucion'];
         $fondo->repmed      = $inputs['repmed'];
         $fondo->supervisor  = $inputs['supervisor'];
         $fondo->total       = $inputs['total'];
         $fondo->cuenta      = $inputs['cuenta'];
         $fondo->idrm        = $inputs['codrepmed'];
+        $fondo->estado      = PENDIENTE;
+        $fondo->tipo_moneda = SOLES;
         $token              = sha1(md5(uniqid($fondo->idfondo, true)));
         $fondo->token       = $token;
         $fondo->periodo     = $periodo;
         $fondo->save();
-        $start  = $inputs['start'];
+        /*$start  = $inputs['start'];
         $fondos = $this->getFondos($start);
-        return $fondos;
+        return $fondos;*/
+        return 'Ok';
         
     }
     

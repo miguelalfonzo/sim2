@@ -35,8 +35,8 @@
                         @endif
                     @endif
                 @endif
-                <td style="text-align:center" class="id_solicitud">{{$solicitude->idsolicitud}}</td>
-                <td style="text-align:left" class="sol_titulo">
+                <td class="text-center" class="id_solicitud">{{$solicitude->idsolicitud}}</td>
+                <td class="text-center" class="sol_titulo">
                     @if (!is_null($solicitude->idetiqueta))
                         <span class="label" style="margin-right:1em;background-color:{{$solicitude->etiqueta->color}}">
                             {{$solicitude->etiqueta->nombre}}
@@ -44,7 +44,7 @@
                     @endif
                     <label>{{$solicitude->titulo}}</label>
                 </td>
-                <td style="text-align:center">
+                <td class="text-center">
                     @if(count($solicitude->history) != 0)
                         @if (is_object($solicitude->history[0]->user))    
                             @if ($solicitude->history[0]->user->type == REP_MED)
@@ -74,7 +74,7 @@
                         {{$solicitude->retencion}}
                     @endif
                     </td>
-                    <td  style="text-align:center">
+                    <td class="text-center">
                         @if (!$solicitude->retencion == null)
                             {{$solicitude->typemoney->simbolo.' '.($solicitude->monto - $solicitude->retencion)}}
                         @else
@@ -82,14 +82,14 @@
                         @endif
                     </td>
                 @else
-                    <td style="text-align:center" class="total_deposit">{{$solicitude->typemoney->simbolo.$solicitude->monto}}</td>
+                    <td class="text-center total_deposit">{{$solicitude->typemoney->simbolo.$solicitude->monto}}</td>
                 @endif
                 @include('template.states')
-                <td style="text-align:center">{{ date_format(date_create($solicitude->created_at), 'd/m/Y' )}}</td>
-                <td style="text-align:center">{{$solicitude->typesolicitude->nombre}}</td>
+                <td class="text-center">{{ date_format(date_create($solicitude->created_at), 'd/m/Y' )}}</td>
+                <td class="text-center">{{$solicitude->typesolicitude->nombre}}</td>
                 @include('template.icons')
                 @if ( Auth::user()->type == GER_COM )
-                    <td style="text-align:center">
+                    <td class="text-center">
                     @if( $solicitude->estado != ACEPTADO)
                         <input type="checkbox" name="mass-aprov" disabled/>
                     @else
@@ -97,6 +97,31 @@
                     @endif
                     </td>
                 @endif
+            </tr>
+        @endforeach
+        @foreach($fondos as  $fondo)
+            <tr>
+                <td>{{$fondo->idfondo}}</td>
+                <td class="text-center">
+                    <label>{{$fondo->institucion}}</label>
+                </td>
+                <td class="text-center"></td>
+                <td class="text-center">S/.{{$fondo->total}}</td>
+                <td></td>
+                <td class="text-center">{{$fondo->monthYear($fondo->periodo)}}</td>
+                <td class="text-center">INSTITUCIONAL</td>
+                <td>
+                    <div class="div-icons-solicituds">
+                        @if($fondo->registrado == 1)
+                            <a target="_blank"  href="{{URL::to('ver-gasto-fondo')}}/{{$fondo->token}}" ><span class="glyphicon glyphicon-eye-open"></span></a>
+                            <a target="_blank"  href="{{URL::to('report-fondo')}}/{{$fondo->token}}"><span class="glyphicon glyphicon-print"></span></a>
+                        @elseif($fondo->asiento == ASIENTO_FONDO)
+                            <a href="{{URL::to('registrar-gasto-fondo')}}/{{$fondo->token}}" class="" data-idfondo="{{$fondo->idfondo}}">
+                                <span class="glyphicon glyphicon-usd"></span>
+                            </a>
+                        @endif
+                    </div>
+                </td>
             </tr>
         @endforeach
     </tbody>

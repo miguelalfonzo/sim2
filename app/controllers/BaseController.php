@@ -265,8 +265,8 @@ class BaseController extends Controller {
                 $solicituds->whereIn('idsolicitud', $idUser);
             }
             if ($start != null && $end != null)
-                $solicituds->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1");
-                $rSolicituds->whereRaw("created_at between to_date('$start' ,'DD-MM-YY') and to_date('$end' ,'DD-MM-YY')+1");
+                $solicituds->whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
+                $rSolicituds->whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
 
             if ($estado != R_TODOS) 
                 $solicituds->whereHas('state', function ($q) use($estado)

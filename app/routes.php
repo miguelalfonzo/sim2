@@ -6,7 +6,6 @@ Route::get('set_status', array('uses' => 'BaseController@setStatus'));
 Route::get('sendmail', array('uses' => 'BaseController@postman'));
 Route::get('prueba', 'Dmkt\FondoController@test');
 
-Route::post('search-client', 'TestController@searchSeeker');
 
 Route::get('clientes-data','TestController@clientsTables');
 Route::get('hola', 'Expense\ExpenseController@test');
@@ -171,10 +170,13 @@ Route::group(array ('before' => 'ager') ,function(){
     Route::post('delete-fondo','Dmkt\FondoController@delFondo');
     Route::post('update-fondo','Dmkt\FondoController@updateFondo');
     Route::get('representatives','Dmkt\FondoController@getRepresentatives');
-    Route::get('getctabanc/{dni}','Dmkt\FondoController@getCtaBanc');
+    //Route::get('getctabanc/{dni}','Dmkt\FondoController@getCtaBanc');
     Route::get('exportfondos/{date}','Dmkt\FondoController@exportExcelFondos');
     Route::get('endfondos/{date}','Dmkt\FondoController@endfondos');
     Route::get('ver-solicitud-ager/{token}','Dmkt\SolicitudeController@viewSolicitudeAGer');
+    Route::post('search-client', 'TestController@repSource');
+    Route::post('search-rep', 'Source\Seeker@repSource');
+    Route::post('info-rep', 'Source\Seeker@repInfo');
     //Route::get('listar-solicitudes-ager','Dmkt\SolicitudeController@listSolicitudeAGer');
 });
 
@@ -212,6 +214,7 @@ Route::group(array('before' => 'rm_sup'), function ()
     Route::post('registrar-solicitud', 'Dmkt\SolicitudeController@registerSolicitude');
     Route::get('editar-solicitud/{id}', 'Dmkt\SolicitudeController@editSolicitude');
     Route::post('editar-solicitud', 'Dmkt\SolicitudeController@formEditSolicitude');
+    Route::post('search-client', 'Source\Seeker@clientSource');
 });
 
 Route::group(array('before' => 'sys_user'), function ()

@@ -87,17 +87,33 @@ class TestController extends BaseController
 		return json_encode($sJson);
 	}
 
-    public function searchSeeker()
+	public function clientSource()
+	{
+		try
+		{
+			$inputs = Input::all();
+			$json = '[{"name":"FICPE.PERSONAFIS","wheres":{"likes":["PEFNRODOC1","(PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)"],"equal":[{"PEFESTADO":1}]},"selects":["PEFCODPERS","(\'DOCTOR: \' || PEFNRODOC1 || \'-\' || PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)"]},{"name":"FICPEF.PERSONAJUR","wheres":{"likes":["PEJNRODOC","PEJRAZON"],"equal":[{"PEJESTADO":1}]},"selects":["PEJCODPERS","(\'CENTRO: \' || PEJNRODOC || \'-\' || PEJRAZON)"]}]';
+	    	$rpta = $this->searchSeeker($inputs['sVal'],$json);
+		}
+		catch (Exception $e)
+		{
+			$rpta = $this->internalException($e,__FUNCTION__);
+		}
+		return Response::Json($rpta);
+
+	}
+
+
+    private function searchSeeker($inputs,$json)
     {
     	try
     	{
-	    	$inputs = Input::all();
+	    	//$inputs = Input::all();
 	    	//$inputs['sVal'] = 'rafael';
-	    	if (!empty($inputs['sVal']))
+	    	if (!empty($inputs))
 	    	{
 		    	//$json = json_decode($this->clientsTables());
 	    		//$json =  '[{"name":"FICPE.PERSONAFIS","wheres":{"likes":["PEFNRODOC1","(PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)"],"equal":[{"PEFESTADO":"1"}]},"selects":["PEFCODPERS","(\'DOCTOR: \' || PEFNRODOC1 || \'-\' || PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)"]}]';
-	    		$json = '[{"name":"FICPE.PERSONAFIS","wheres":{"likes":["PEFNRODOC1","(PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)"],"equal":[{"PEFESTADO":1}]},"selects":["PEFCODPERS","(\'DOCTOR: \' || PEFNRODOC1 || \'-\' || PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)"]},{"name":"FICPEF.PERSONAJUR","wheres":{"likes":["PEJNRODOC","PEJRAZON"],"equal":[{"PEJESTADO":1}]},"selects":["PEJCODPERS","(\'CENTRO: \' || PEJNRODOC || \'-\' || PEJRAZON)"]}]';
 	    		$json = json_decode($json);
 	    		$cAlias = array('value','label');
 		    	if (json_last_error() == JSON_ERROR_NONE)
@@ -108,12 +124,12 @@ class TestController extends BaseController
 			    		$select = '';
 			    		$query = DB::table($table->name);
 			    		foreach ( $table->wheres->likes as $like)
-			    			$query->orWhereRaw(" UPPER(" .$like. ") like '%" .strtoupper($inputs['sVal']). "%' ");
+			    			$query->orWhereRaw(" UPPER(" .$like. ") like '%" .strtoupper($inputs). "%' ");
 			    		for ( $i=0; $i<2; $i++)
 			    			$select = $select. ' ' .$table->selects[$i]. ' as "' .$cAlias[$i]. '",';				
 			    		$select = substr($select,0,-1);
 			    		$query->select(DB::raw($select));
-			    		$query->take(5);
+			    		$query->take(4);
 			    		$tms = $query->get();
 			    		for ($i=0; $i < count($tms); $i++)
 			    			$tms[$i]->table = $table->name;
@@ -136,7 +152,7 @@ class TestController extends BaseController
 	   	{
 	    	$rpta = $this->internalException($e,__FUNCTION__);
     	}
-    	return Response::Json($rpta);
+    	return $rpta;
     }
 
 }
