@@ -169,7 +169,7 @@ Route::group(array ('before' => 'ager') ,function(){
     Route::get('get-fondo/{id}','Dmkt\FondoController@getFondo');
     Route::post('delete-fondo','Dmkt\FondoController@delFondo');
     Route::post('update-fondo','Dmkt\FondoController@updateFondo');
-    Route::get('representatives','Dmkt\FondoController@getRepresentatives');
+    //Route::get('representatives','Dmkt\FondoController@getRepresentatives');
     //Route::get('getctabanc/{dni}','Dmkt\FondoController@getCtaBanc');
     Route::get('exportfondos/{date}','Dmkt\FondoController@exportExcelFondos');
     Route::get('endfondos/{date}','Dmkt\FondoController@endfondos');

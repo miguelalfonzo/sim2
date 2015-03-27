@@ -74,13 +74,12 @@ class DepositController extends BaseController{
                     $data                      = $this->objectToArray($solicitudeUpd);
                     $solicitudeUpd->update($data);
                     
-                    $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, DEPOSITADO, Auth::user()->id, USER_CONTABILIDAD, $idSol);
+                    $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, DEPOSITADO, Auth::user()->id, USER_CONTABILIDAD, $idSol, SOLIC);
                     if ( $rpta[status] == ok )
                     {
                         DB::commit();
                         return 1;
                     }
-                    //$this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, DEPOSITADO, Auth::user()->id, $oldOolicitude->iduser, $idSol);
                 }
             }
             

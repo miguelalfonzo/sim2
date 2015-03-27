@@ -87,7 +87,7 @@
               <div class="col-xs-12 col-sm-6 col-md-4">
                 <div class="form-expense">
                   <label>Supervisor</label>
-                   <input id="fondo_supervisor" name="supervisor" type="text" placeholder=""
+                   <input id="fondo_supervisor" name="supervisor" data-cod="0" type="text"
                               value="{{isset($fondo->supervisor) ? $fondo->supervisor : null }}"
                               class="form-control input-md">
 

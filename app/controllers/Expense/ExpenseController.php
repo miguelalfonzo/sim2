@@ -393,7 +393,7 @@ class ExpenseController extends BaseController{
 			$solicitude  = Solicitude::where('token',$token)->update(array('estado'=>REGISTRADO));
 			if(count($solicitude) == 1)
 			{
-				$rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, REGISTRADO, Auth::user()->id, USER_CONTABILIDAD, $idSol);
+				$rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, REGISTRADO, Auth::user()->id, USER_CONTABILIDAD, $idSol,SOLIC);
 				if ( $rpta[status] == ok )
 				{
 					DB::commit();

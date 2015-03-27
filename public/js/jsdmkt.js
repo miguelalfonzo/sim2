@@ -501,24 +501,17 @@ function newSolicitude() {
         $(this).parent().removeClass('has-error');
     });
     date_reg_fondo.on('focus', function () {
-        $(this).parent().removeClass('has-error');
+        $(this).parent().parent().removeClass('has-error');
+    });
+    fondo_institucion.on('focus', function() {
+        $(this).parent().removeClass('has-error');     
+    });
+    fondo_supervisor.on('focus', function() {
+        $(this).parent().removeClass('has-error');     
     });
 
     $('#edit-rep').hide();
-    function removeinput(data){
-
-        data.parent().find('input:text').attr('disabled', false).val('').focus().parent().parent().removeClass('has-success');
-        fondo_cuenta.val('').attr('disabled', false).parent().removeClass("has-success");
-        fondo_supervisor.val('').attr('disabled',false).parent().removeClass("has-success");
-        //data.parent().find('input:hidden').val('');
-        data.fadeOut();
-    }
-    $(document).on("click","#edit-rep", function(e){
-        e.preventDefault();
-        removeinput($(this))
-
-    });
-
+    
     function findRepresentatives(request, response) 
     {
         function hasMatch(s) {
@@ -540,7 +533,7 @@ function newSolicitude() {
         response(matches);
     }
 
-    var urlFondos = $("#fondos").data('url');
+    /*var urlFondos = $("#fondos").data('url');
     if(urlFondos){
         $.getJSON(server+'representatives', function (data) {
             representatives = data;
@@ -569,16 +562,87 @@ function newSolicitude() {
                 }
             });
         });
-    }
+    }*/
     
     fondo_total.numeric();
+
+    $(document).on('click','.btn_edit_fondo',function(e)
+    {
+        e.preventDefault();
+        var aux = this;
+        var dato = 
+        {
+            'institucion'   : fondo_institucion.val(),
+            'repmed'        : fondo_repmed.val(),
+            'codrepmed'     : fondo_repmed.attr('data-cod'),
+            'supervisor'    : fondo_supervisor.val(),
+            'codsup'        : fondo_supervisor.attr('data-cod'),
+            'total'         : fondo_total.val(),
+            'cuenta'        : fondo_cuenta.val(),
+            '_token'        : $('#_token').val(),
+            'idfondo'       : $('#idfondo').val(),
+            'mes'           : date_reg_fondo.val()
+        };
+        var l = Ladda.create(aux);
+        l.start();
+
+        $.post(server + 'update-fondo',dato).done(function(data)
+            {
+                if (data.Status == 'Ok')
+                {
+                    $("#idfondo").val('');
+                    $('#edit-rep').hide();
+                    $('.btn_cancel_fondo').hide();
+                    $('.btn_edit_fondo').hide();
+                    $('.register_fondo').show();
+                    fondo_institucion.val('');
+                    fondo_repmed.val('');
+                    fondo_supervisor.val('');
+                    fondo_total.val('');
+                    fondo_cuenta.val('');
+
+                    removeinput($('#edit-rep'));
+                    l.stop();
+                    responseUI("Fondo Actualizado","green");
+                    $('.table-solicituds-fondos > .fondo_r').remove();
+                    $('#table_solicitude_fondos_wrapper').remove();
+                    $('.table-solicituds-fondos').append(data.Data);
+                    $('#export-fondo').attr('href', server + 'exportfondos/' + date_reg_fondo.val());
+                    $('#table_solicitude_fondos').dataTable({
+                        "order": 
+                        [
+                            [ 0, "desc" ]
+                        ],
+                        "bLengthChange": false,
+                        'iDisplayLength': 7,
+                        "oLanguage": 
+                        {
+                            "sSearch": "Buscar: ",
+                            "sZeroRecords": "No hay fondos",
+                            "sInfoEmpty": " ",
+                            "sInfo": 'Mostrando _END_ de _TOTAL_',
+                            "oPaginate": 
+                            {
+                                "sPrevious": "Anterior",
+                                "sNext" : "Siguiente"
+                            }
+                        }
+                    });
+                }
+                else
+                {
+                    bootbox.alert("<h4 style='color:red'>No se pudo editar la solicitud - " + data.Description + "</h4>");
+                    l.stop();
+                }
+            }
+        )
+    });
 
     $(document).on('click','.register_fondo',function(){
         var validate = 0;
         var aux = this;
         console.log(date_reg_fondo);
         if(!date_reg_fondo.val()){
-            console.log(date_reg_fondo);
             date_reg_fondo.parent().parent().addClass('has-error');
             date_reg_fondo.attr('placeholder', 'Ingrese Mes');
             date_reg_fondo.addClass('input-placeholder-error');
@@ -597,7 +661,6 @@ function newSolicitude() {
             validate = 1;
         }
         if(!fondo_repmed.val()){
-            fondo_repmed.val('');
             fondo_repmed.parent().addClass('has-error');
             fondo_repmed.attr('placeholder', 'Ingrese Representante');
             fondo_repmed.addClass('input-placeholder-error');
@@ -610,8 +673,21 @@ function newSolicitude() {
             fondo_repmed.addClass('input-placeholder-error');
             validate = 1;
         }
-        if(validate == 0){
-            var dato = {
+        if (!fondo_institucion.val())
+        {
+            fondo_institucion.parent().addClass('has-error');
+            validate = 1;
+        }
+        if (!fondo_supervisor.val())
+        {
+            fondo_supervisor.parent().addClass('has-error');
+            fondo_supervisor.attr('placeholdder','Ingrese Supervisor');
+            validate = 1;
+        }
+        if(validate == 0)
+        {
+            var dato = 
+            {
                 'institucion' : $('#fondo_institucion').val(),
                 'repmed'      : fondo_repmed.val(),
                 'codrepmed'   : fondo_repmed.attr('data-cod'),
@@ -620,7 +696,6 @@ function newSolicitude() {
                 'total' : fondo_total.val(),
                 'cuenta': fondo_cuenta.val(),
                 '_token' : $('#_token').val(),
-                //'start' : date_reg_fondo.val(),
                 'mes' : $(this).parent().parent().parent().find(".date_month").val()
             };
             date_reg_fondo.last().val(date_reg_fondo.val());
@@ -629,17 +704,8 @@ function newSolicitude() {
             l.start();
             $.post(server + 'registrar-fondo',dato)
             .done(function(data){
-                if(data === 'blocked'){
-                    bootbox.alert("<p class='red'>El mes se encuentra cerrado.</p>");
-                    fondo_institucion.val('');
-                    fondo_repmed.val('');
-                    fondo_supervisor.val('');
-                    fondo_total.val('');
-                    fondo_cuenta.val('');
-                    l.stop();
-                    removeinput($('#edit-rep'));
-                }
-                else{
+                if (data.Status == 'Ok')
+                {
                     $('html, body').animate({scrollTop: $('.table-solicituds-fondos').offset().top -10 }, 'slow');
                     fondo_institucion.val('');
                     fondo_repmed.val('');
@@ -648,9 +714,10 @@ function newSolicitude() {
                     fondo_cuenta.val('');
                     l.stop();
                     removeinput($('#edit-rep'));
+                    responseUI("Fondo Registrado","green");
                     $('.table-solicituds-fondos > .fondo_r').remove();
                     $('#table_solicitude_fondos_wrapper').remove();
-                    $('.table-solicituds-fondos').append(data);
+                    $('.table-solicituds-fondos').append(data.Data);
                     $('#export-fondo').attr('href', server + 'exportfondos/' + date_reg_fondo.val());
                     $('#table_solicitude_fondos').dataTable({
                         "order": [
@@ -669,6 +736,12 @@ function newSolicitude() {
                             }
                         }
                     });
+                    fondo_repmed.val('');
+                }
+                else
+                {
+                    l.stop();
+                    bootbox.alert("<h4 style='color:red'>No se pudo registrar el fondo: " + data.Description + "</h4>");
                 }
             });
         }
@@ -759,9 +832,10 @@ function newSolicitude() {
     $(document).on('click','#terminate-fondo',function(e)
     {
         e.preventDefault();
+        var date = date_reg_fondo.val();
         bootbox.confirm(
         {
-            message : '¿Esta seguro que desea terminar los fondos?',
+            message : '¿Esta seguro que desea terminar los fondos del periodo ' + date + '?',
             buttons: 
             {
                 'cancel': {label: 'cancelar', className: 'btn-primary'},
@@ -771,35 +845,40 @@ function newSolicitude() {
             {
                 if (result) 
                 {
-                    var date = $('#datefondo').val()
                     var url = server + 'endfondos/' + date;
                     $.get(url).done(function(data)
                     {
-                        $('.table-solicituds-fondos > .fondo_r').remove();
-                        $('#table_solicitude_fondos_wrapper').remove();
-                        $('.table-solicituds-fondos').append(data);
-                        $('#export-fondo').attr('href', server + 'exportfondos/' + date);
-                        $('#table_solicitude_fondos').dataTable(
+                        if (data.Status == 'Ok')
                         {
-                            "order": 
-                            [
-                                [ 3, "desc" ]
-                            ],
-                            "bLengthChange": false,
-                            'iDisplayLength': 7,
-                            "oLanguage": 
+                            responseUI("Fondos Terminados","green");
+                            $('.table-solicituds-fondos > .fondo_r').remove();
+                            $('#table_solicitude_fondos_wrapper').remove();
+                            $('.table-solicituds-fondos').append(data.Data);
+                            $('#export-fondo').attr('href', server + 'exportfondos/' + date);
+                            $('#table_solicitude_fondos').dataTable(
                             {
-                                "sSearch": "Buscar: ",
-                                "sZeroRecords": "No hay fondos",
-                                "sInfoEmpty": " ",
-                                "sInfo": 'Mostrando _END_ de _TOTAL_',
-                                "oPaginate": 
+                                "order": 
+                                [
+                                    [ 3, "desc" ]
+                                ],
+                                "bLengthChange": false,
+                                'iDisplayLength': 7,
+                                "oLanguage": 
                                 {
-                                    "sPrevious": "Anterior",
-                                    "sNext" : "Siguiente"
+                                    "sSearch": "Buscar: ",
+                                    "sZeroRecords": "No hay fondos",
+                                    "sInfoEmpty": " ",
+                                    "sInfo": 'Mostrando _END_ de _TOTAL_',
+                                    "oPaginate": 
+                                    {
+                                        "sPrevious": "Anterior",
+                                        "sNext" : "Siguiente"
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
+                        else
+                            bootbox.alert("<h4 style='color:red'>No se pudo terminar los fondos - " + data.Description + "</h4>");   
                     });
                 }
             }
@@ -807,23 +886,46 @@ function newSolicitude() {
     });
 
     $(document).on('click','.edit-fondo',function(e){
-        $(this).parent().parent().parent().css('background-color','#59A1F4')
-        fondo_repmed.attr('disabled',true).addClass('success');
-        $('.register_fondo').hide();
-        $('#edit-rep').show();
         e.preventDefault();
-        $.get(server + 'get-fondo/' + $(this).attr('data-idfondo')).done(function(data){
+        $('#table_solicitude_fondos > tbody > tr').css('background-color','');
+        var tr = $(this).parent().parent().parent();
+        
+        $.get(server + 'get-fondo/' + $(this).attr('data-idfondo')).done(function(data)
+        {
+            a = data;
+            tr.css('background-color','#59A1F4');
             $('.btn_cancel_fondo').show();
             $('.btn_edit_fondo').show();
-
+            $('.register_fondo').hide();
+            $('#edit-rep').show();
+        
             fondo_institucion.val(data.institucion);
+            fondo_repmed.attr('disabled',true).attr('data-select',"true").parent().parent().addClass('has-success');
             fondo_repmed.val(data.repmed);
-            fondo_supervisor.val(data.supervisor);
+            fondo_repmed.attr('data-cod',data.idrm)
+            fondo_supervisor.val(data.supervisor).attr('disabled',true);
+            fondo_supervisor.attr('data-cod',data.idsup).parent().addClass('has-success');
             fondo_total.val(data.total);
-            fondo_cuenta.val(data.cuenta);
+            date_reg_fondo.val( data.periodo.substr(4,6) + '-' + data.periodo.substr(0,4) );
+            fondo_cuenta.val(data.cuenta).attr('disabled',true).parent().addClass('has-success');
             $('#idfondo').val(data.idfondo)
         });
-        $('html, body').animate({scrollTop: $('#date_reg_fondo').offset().top -10 }, 'slow');
+        $('html, body').animate({scrollTop: date_reg_fondo.offset().top -10 }, 'slow');
+    });
+
+    function removeinput(data){
+
+        var rep = data.parent().find('input:text');
+        rep.typeahead('val','');
+        rep.attr('disabled', false).attr('data-select',"false").focus().parent().parent().removeClass('has-success');
+        fondo_cuenta.val('').attr('disabled', false).parent().removeClass("has-success");
+        fondo_supervisor.val('').attr('disabled',false).attr('data-cod',0).parent().removeClass("has-success");
+        //data.parent().find('input:hidden').val('');
+        data.fadeOut();
+    }
+    $(document).on("click","#edit-rep", function(e)
+    {
+        removeinput($(this))
     });
 
     $(document).on('click','.btn_cancel_fondo',function(e){
@@ -832,71 +934,10 @@ function newSolicitude() {
         $(this).hide();
         removeinput($('#edit-rep'));
         fondo_institucion.val('');
-        fondo_repmed.val('');
-        fondo_supervisor.val('');
         fondo_total.val('');
-        fondo_cuenta.val('');
-       $('#table_solicitude_fondos > tbody > tr').css('background-color','#fff');
+        $("#idfondo").val('');
+        $('#table_solicitude_fondos > tbody > tr').css('background-color','');
     });
-    $(document).on('click','.btn_edit_fondo',function(e){
-        e.preventDefault();
-        $('#edit-rep').hide();
-        var aux = this;
-        var dato = {
-            'institucion' : fondo_institucion.val(),
-            'repmed' : fondo_repmed.val(),
-            'codrepmed' : fondo_repmed.attr('data-cod'),
-            'supervisor' : fondo_supervisor.val(),
-            'total' : fondo_total.val(),
-            'cuenta': fondo_cuenta.val(),
-            '_token' : $('#_token').val(),
-            'idfondo' : $('#idfondo').val(),
-            'start' : date_reg_fondo.val(),
-            'mes' : date_reg_fondo.val()
-        };
-        var l = Ladda.create(aux);
-        l.start();
-
-        $.post(server + 'update-fondo',dato).done(function(data)
-            {
-                $('.btn_cancel_fondo').hide();
-                $('.btn_edit_fondo').hide();
-                $('.register_fondo').show();
-                fondo_institucion.val('');
-                fondo_repmed.val('');
-                fondo_supervisor.val('');
-                fondo_total.val('');
-                fondo_cuenta.val('');
-
-                removeinput($('#edit-rep'));
-                l.stop();
-                $('.table-solicituds-fondos > .fondo_r').remove();
-                $('#table_solicitude_fondos_wrapper').remove();
-                $('.table-solicituds-fondos').append(data);
-                $('#export-fondo').attr('href', server + 'exportfondos/' + date_reg_fondo.val());
-                $('#table_solicitude_fondos').dataTable({
-                        "order": [
-                            [ 0, "desc" ]
-                        ],
-                        "bLengthChange": false,
-                        'iDisplayLength': 7,
-                        "oLanguage": {
-                            "sSearch": "Buscar: ",
-                            "sZeroRecords": "No hay fondos",
-                            "sInfoEmpty": " ",
-                            "sInfo": 'Mostrando _END_ de _TOTAL_',
-                            "oPaginate": {
-                                "sPrevious": "Anterior",
-                                "sNext" : "Siguiente"
-                            }
-                        }
-                    }
-                );
-            }
-        )
-
-    });
-    
 
     $("#estado_fondo_cont").on("change", function(e){
         var datefondo = $("#datefondo").val();
@@ -1321,23 +1362,24 @@ function newSolicitude() {
                 }
                 else if (dataset == 'reps');
                 {
-                    console.log('srepresentantes');
-                    console.log($(this));
-                    
                     $(this).attr('data-select','true');
                     $(this).attr('data-cod',suggestion.value);
                     $(this).val(suggestion.label );
-                    //$("#id_change_before_rep").val( ui.item.visvisitador );
                     $(this).attr('disabled',true).parent().parent().addClass('has-success');
                     $('.edit-repr').fadeIn();
                     repInfo(suggestion.value).done( function (result)
                     {
-                        
-                        fondo_cuenta.val(result.Data.cuenta);
-                        fondo_cuenta.attr('disabled',true).parent().addClass('has-success');        
-                        fondo_supervisor.val(result.Data.sup.nombre);
-                        fondo_supervisor.attr('data-cod',result.Data.sup.idsup);
-                        fondo_supervisor.attr('disabled',true).parent().addClass('has-success'); 
+                        if (result.Data.cuenta)
+                        {
+                            fondo_cuenta.val(result.Data.cuenta);
+                            fondo_cuenta.attr('disabled',true).parent().addClass('has-success');        
+                        }
+                        if (result.Data.sup)
+                        {
+                            fondo_supervisor.val(result.Data.sup.nombre);
+                            fondo_supervisor.attr('data-cod',result.Data.sup.idsup);
+                            fondo_supervisor.attr('disabled',true).parent().addClass('has-success'); 
+                        }
                     });
                 }
             });
@@ -1476,9 +1518,14 @@ function newSolicitude() {
     $(".date_month").datepicker(date_options2).on('changeDate', function (e) {
         var date = $(this).val();
         var type = $(this).attr('data-type');
+
         if(date!='')
             if(type != "estado-cuenta")
-                searchFondos(date,type);
+            {
+                $('.date_month').val( date );
+                if (!$('#idfondo').val())
+                    searchFondos(date,type);
+            }
             else
                 listAccountState(date);
     });

@@ -98,7 +98,7 @@ class Solicitude extends Eloquent{
         return $this->hasOne('Dmkt\Manager','iduser','idaproved');
     }
 
-    function history(){
+    function histories(){
         return $this->hasMany('System\SolicitudeHistory','idsolicitude');
     }
 

@@ -147,7 +147,7 @@ class BaseController extends Controller {
         return $rpta;
     }
 
-    public function setStatus($description, $status_from, $status_to, $user_from_id, $user_to_id, $idsolicitude){
+    public function setStatus($description, $status_from, $status_to, $user_from_id, $user_to_id, $idsolicitude,$type){
         try
         {
             $fromStatus = State::where('idestado', $status_from)->first();
@@ -162,7 +162,7 @@ class BaseController extends Controller {
             {
                 $idestadoFrom = $fromStatus == null ? null : $fromStatus->idestado;
                 $idestadoTo = $toStatus == null ? null : $toStatus->idestado;
-                $rpta = $this->updateStatusSolicitude($description, $idestadoFrom, $idestadoTo, $fromUser, $toUser, $idsolicitude, 0);
+                $rpta = $this->updateStatusSolicitude($description, $idestadoFrom, $idestadoTo, $fromUser, $toUser, $idsolicitude, 0, $type);
             }
         }
         catch (Exception $e)
@@ -172,13 +172,14 @@ class BaseController extends Controller {
         return $rpta;
     }
 
-    public function updateStatusSolicitude($description, $status_from, $status_to, $user_from, $user_to, $idsolicitude, $notified)
+    public function updateStatusSolicitude($description, $status_from, $status_to, $user_from, $user_to, $idsolicitude, $notified,$type)
     {   
         try
         {
             $fData = array(
                 'status_to'   => $status_to,
-                'idsolicitude'=> $idsolicitude
+                'idsolicitude'=> $idsolicitude,
+                'type'        => $type
                 );
 
             $vData = array(
@@ -200,6 +201,7 @@ class BaseController extends Controller {
                 $statusSolicitude->iduser_from  = $user_from->id;
                 $statusSolicitude->idsolicitude = $idsolicitude;
                 $statusSolicitude->notified     = $notified;
+                $statusSolicitude->type         = $type;
                 $statusSolicitude->save();
             }
             else
@@ -226,14 +228,39 @@ class BaseController extends Controller {
     {
         try
         {
-            $solicituds = Solicitude::with(array('history' => function($q)
+            $solicituds = Solicitude::with(array('histories' => function($q)
             {
                 $q->orderBy('created_at','DESC');  
             }));
-            $rSolicituds = Solicitude::with(array('history' => function($q)
+            $rSolicituds = Solicitude::with(array('histories' => function($q)
             {
                 $q->orderBy('created_at','DESC');  
             }));
+
+
+            // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+            /*$fondos = FondoInstitucional::where('idrm', Auth::user()->rm->idrm)
+                        ->with(array('histories' => function($q)
+                        {
+                            $q->orderBy('created_at','DESC');  
+                        }));
+                        if ($estado != R_TODOS)
+                        {
+                            $fondos->whereHas('state', function ($q) use( $estado )
+                            {
+                                $q->whereHas('rangeState', function ($t) use( $estado )
+                                {
+                                    $t->where('id', $estado );
+                                });
+                            });
+                        }
+                        $fondos = $fondos->whereRaw("to_date(periodo,'YYYYMM') BETWEEN TRUNC(to_date('$start','DD-MM-YY'),'MM') and TRUNC(to_date('$end','DD-MM-YY'),'MM')")
+                        ->orderBy('periodo')->get();
+                        $rpta[data]['fondos'] = $fondos;
+*/
+            // $$$$$$$$$$$$$$$$$$$$$$$$
+
             if (Auth::user()->type == REP_MED)
             {
                 $solicituds->whereIn('iduser', $idUser);

@@ -11,12 +11,12 @@
             </li>
             @include('template.li_estado_cuenta')
             @if ( Auth::user()->type == REP_MED || Auth::user()->type == CONT || Auth::user()->type == TESORERIA)
-                <!-- <li>
+                <li>
                     <a href="#fondos" role="tab" data-toggle="tab">
                         <i class="fa fa-user"></i>
                         Fondos Institucionales
                     </a>
-                </li> -->
+                </li>
                 @if( Auth::user()->type == CONT)
                     <li>
                         <a href="#mantenimiento" role="tab" data-toggle="tab">

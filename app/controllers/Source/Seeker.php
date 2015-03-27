@@ -40,7 +40,7 @@ class Seeker extends BaseController
 		try
 		{
 			$inputs = Input::all();
-			$json = '[{"name":"FICPE.PERSONAFIS","wheres":{"likes":["PEFNRODOC1","(PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)"],"equal":[{"PEFESTADO":1}]},"selects":["PEFCODPERS","(\'DOCTOR: \' || PEFNRODOC1 || \'-\' || PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)"]},{"name":"FICPEF.PERSONAJUR","wheres":{"likes":["PEJNRODOC","PEJRAZON"],"equal":[{"PEJESTADO":1}]},"selects":["PEJCODPERS","(\'CENTRO: \' || PEJNRODOC || \'-\' || PEJRAZON)"]}]';
+			$json = '[{"name":"FICPE.PERSONAFIS","wheres":{"likes":["PEFNRODOC1","(PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)"],"equal":{"PEFESTADO":1}},"selects":["PEFCODPERS","(\'DOCTOR: \' || PEFNRODOC1 || \'-\' || PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)"]},{"name":"FICPEF.PERSONAJUR","wheres":{"likes":["PEJNRODOC","PEJRAZON"],"equal":[{"PEJESTADO":1}]},"selects":["PEJCODPERS","(\'CENTRO: \' || PEJNRODOC || \'-\' || PEJRAZON)"]}]';
 	    	$cAlias = array('value','label');
 	    	$rpta = $this->searchSeeker($inputs['sVal'],$json,$cAlias);
 		}
@@ -66,7 +66,12 @@ class Seeker extends BaseController
 			*/
 			/*$cuenta = new CtaRm;
 			$cuenta = $cuenta->cuenta($rm->vislegajo)*/;
-			$cuenta = $rm->cuenta->cuenta;
+			$cuenta = $rm->cuenta;
+			Log::error($cuenta);
+			if (count($cuenta) == 0)
+				$cuenta = null;
+			else
+				$cuenta = $cuenta->cuenta;
 			$sup = DB::table('FICPE.LINSUPVIS a')->where('LSVVISITADOR',$inputs['rm'])->leftJoin('FICPE.SUPERVISOR b','b.SUPSUPERVISOR','=','a.LSVSUPERVISOR')
 			->SELECT(DB::raw("b.supsupervisor as idsup , (b.supnombre || ' ' || b.suppaterno || ' ' || b.supmaterno) as nombre"))->first();
 			$data = array('cuenta' => $cuenta , 'sup' => $sup);
@@ -86,7 +91,7 @@ class Seeker extends BaseController
 			$inputs = Input::all();
 			//$sVal = 'ACK';
 			//\'DNI: \' || VISLEGAJO || \' - \' || 
-			$json = '[{"name":"FICPE.VISITADOR","wheres":{"likes":["VISLEGAJO","(VISNOMBRE || \' \' || VISPATERNO || \' \' || VISMATERNO)"],"equal":[{"VISACTIVO":"S","LENGTH(VISLEGAJO)":8}]},"selects":["VISVISITADOR","(VISNOMBRE || \' \' || VISPATERNO || \' \' || VISMATERNO)"]}]';
+			$json = '[{"name":"FICPE.VISITADOR","wheres":{"likes":["VISLEGAJO","(VISNOMBRE || \' \' || VISPATERNO || \' \' || VISMATERNO)"],"equal":{"VISACTIVO":"S","LENGTH(VISLEGAJO)":8}},"selects":["VISVISITADOR","(VISNOMBRE || \' \' || VISPATERNO || \' \' || VISMATERNO)"]}]';
 			$cAlias = array('value','label');
 	    	
 			return $this->searchSeeker($inputs['sVal'],$json,$cAlias);
@@ -122,6 +127,8 @@ class Seeker extends BaseController
 			    		$query = DB::table($table->name);
 			    		foreach ( $table->wheres->likes as $like)
 			    			$query->orWhereRaw(" UPPER(" .$like. ") like '%" .strtoupper($inputs). "%' ");
+			    		foreach ($table->wheres->equal as $key=>$value)
+			    			$query->where($key,$value);
 			    		for ( $i=0; $i<2; $i++)
 			    			$select = $select. ' ' .$table->selects[$i]. ' as "' .$cAlias[$i]. '",';				
 			    		$select = substr($select,0,-1);

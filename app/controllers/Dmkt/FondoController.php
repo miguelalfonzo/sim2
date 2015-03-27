@@ -41,34 +41,94 @@ class FondoController extends BaseController
         return View::make('Dmkt.AsisGer.register_fondo')->with('fondos', $fondos);
     }
     
-    function postRegister()
+    public function postRegister()
     {
-        $inputs = Input::all();
-        $periodo = $this->period($inputs['mes']);
-        $verifyMonth = FondoInstitucional::where('periodo', $periodo)->where('terminado', TERMINADO)->get();
-        if(count($verifyMonth) != 0)
-            return 'blocked';
+        try
+        {
+            DB::beginTransaction();
+            $inputs = Input::all();
+            $periodo = $this->period($inputs['mes']);
+            $verifyMonth = FondoInstitucional::where('periodo', $periodo)->where('terminado', TERMINADO)->get();
+            if(count($verifyMonth) != 0)
+                return array(status => warning , description => 'El periodo ingresado ya ha sido terminado');
+            $fondo              = new FondoInstitucional;
+            $idfondo            = $fondo->searchId() + 1;
+            $fondo->idfondo     = $idfondo;
+            $fondo->idsup       = $inputs['codsup'];
+            $fondo->institucion = $inputs['institucion'];
+            $fondo->repmed      = $inputs['repmed'];
+            $fondo->supervisor  = $inputs['supervisor'];
+            $fondo->total       = $inputs['total'];
+            $fondo->cuenta      = $inputs['cuenta'];
+            $fondo->idrm        = $inputs['codrepmed'];
+            $fondo->estado      = PENDIENTE;
+            $fondo->tipo_moneda = SOLES;
+            $token              = sha1(md5(uniqid($fondo->idfondo, true)));
+            $fondo->token       = $token;
+            $fondo->periodo     = $periodo;
+            $fondo->save();
 
-        $fondo              = new FondoInstitucional;
-        $fondo->idfondo     = $fondo->searchId() + 1;
-        $fondo->idsup       = $inputs['codsup'];
-        $fondo->institucion = $inputs['institucion'];
-        $fondo->repmed      = $inputs['repmed'];
-        $fondo->supervisor  = $inputs['supervisor'];
-        $fondo->total       = $inputs['total'];
-        $fondo->cuenta      = $inputs['cuenta'];
-        $fondo->idrm        = $inputs['codrepmed'];
-        $fondo->estado      = PENDIENTE;
-        $fondo->tipo_moneda = SOLES;
-        $token              = sha1(md5(uniqid($fondo->idfondo, true)));
-        $fondo->token       = $token;
-        $fondo->periodo     = $periodo;
-        $fondo->save();
-        /*$start  = $inputs['start'];
-        $fondos = $this->getFondos($start);
-        return $fondos;*/
-        return 'Ok';
-        
+            $userid = Auth::user()->id;
+            $middleRpta = $this->setStatus($inputs['institucion'], '', PENDIENTE, $userid, $userid, $idfondo,FONDO);
+            if ($middleRpta[status] == ok)    
+            {    
+                DB::commit();
+                return $this->setRpta($this->getFondos($inputs['mes']));
+            }
+            else
+            {             
+                DB::rollback();
+                return array( status => warning , description => 'Error del Sistema');
+            }
+        }
+        catch (Exception $e)
+        {
+            DB::rollback();
+            return $this->internalException($e,__FUNCTION__);
+        }
+        return $middleRpta; 
+    }
+
+    public function updateFondo()
+    {
+        try
+        {
+            DB::beginTransaction();
+            $inputs  = Input::all();
+            $periodo = $this->period($inputs['mes']);
+            $verifyMonth = FondoInstitucional::where('periodo', $periodo)->where('terminado', TERMINADO)->get();
+            if(count($verifyMonth) != 0)
+                return 'blocked';
+            else
+            {
+                $fondo              = FondoInstitucional::find($inputs['idfondo']);
+                $fondo->institucion = $inputs['institucion'];
+                $fondo->repmed      = $inputs['repmed'];
+                $fondo->supervisor  = $inputs['supervisor'];
+                $fondo->total       = $inputs['total'];
+                $fondo->cuenta      = $inputs['cuenta'];
+                $fondo->idrm        = $inputs['codrepmed'];
+                $fondo->idsup       = $inputs['codsup'];
+                $fondo->periodo     = $periodo;
+                $fondo->save();
+                $fondos = $this->getFondos($inputs['mes']);
+                $userid = Auth::user()->id;
+                $middleRpta = $this->setStatus($inputs['institucion'], '', PENDIENTE, $userid, $userid, $inputs['idfondo'],FONDO);
+                if ($middleRpta[status] == ok)    
+                {    
+                    DB::commit();
+                    return $this->setRpta($this->getFondos($inputs['mes']));
+                }
+                else
+                    DB::rollback();
+            }
+        }
+        catch (Exception $e)
+        {
+            DB::rollback();
+            $rpta = $this->internalException($e,__FUNCTION__);
+        }
+        return $rpta;
     }
     
     public function getFondos($start, $export = 0)
@@ -97,7 +157,7 @@ class FondoController extends BaseController
                     }
                 }
             }
-            return View::make('Dmkt.AsisGer.list_fondos')->with('fondos', $fondos)->with('sum', $fondos->sum('total'))->with('estado', $estado)->with('export', $export);
+            return View::make('Dmkt.AsisGer.list_fondos')->with('fondos', $fondos)->with('sum', $fondos->sum('total'))->with('estado', $estado)->with('export', $export)->render();
         }
         
     }
@@ -135,7 +195,6 @@ class FondoController extends BaseController
         if($state == '1') {
             $state = FONDO_DEPOSITADO;
             $fondos = FondoInstitucional::where("periodo", $periodo)->where('terminado', TERMINADO)->where('depositado', $state)->where('registrado','<>', FONDO_REGISTRADO)->get();
-            Log::error(json_encode($fondos));
         }
         else {
             $state = FONDO_REGISTRADO;
@@ -146,11 +205,45 @@ class FondoController extends BaseController
     }
     function endFondos($start)
     {
-        $periodo = $this->period($start);
-        FondoInstitucional::where("periodo", $periodo)->update(array('terminado' => TERMINADO));
-        $fondos = $this->getFondos($start);
-        return $fondos;
+        try
+        {
+            DB::beginTransaction();
+            $periodo = $this->period($start);
+            $update = array(
+                'terminado'  => TERMINADO,
+                'estado'     => DEPOSITO_HABILITADO
+            );
+            $fondos = FondoInstitucional::where("periodo", $periodo)->select('institucion','idrm','idfondo')->get();//->update(array('terminado' => TERMINADO));
+            $aux = 0;
+            foreach($fondos as $fondo)
+            {
+                $userTo = $fondo->iduser($fondo->idrm);
+                if (is_null($userTo))
+                    return array(status => warning , description => 'El Representante del fondo '.$fondo->idfondo.' '.$fondo->institucion.' no esta registrado en el sistema');
+                $rpta = $this->setStatus($fondo->institucion, PENDIENTE, DEPOSITO_HABILITADO, Auth::user()->id, $fondo->iduser($fondo->idrm), $fondo->idfondo,FONDO);
+                if ($rpta[status] != ok)
+                    $aux=1;
+            }
+            if ($aux == 0)
+            {
+                FondoInstitucional::where("periodo", $periodo)->update($update);
+                DB::commit();
+                $rpta = $this->setRpta($this->getFondos($start));
+            }
+            else
+            {
+                $rpta = array( status => warning , description => 'No se pudo procesar los fondos');
+                DB::rollback();
+            }
+        }
+        catch (Exception $e)
+        {
+            DB::rollback();
+            $rpta = $this->internalException($e,__FUNCTION__);
+        }
+        return $rpta;
     }
+
     function getFondo($id)
     {
         $fondo = FondoInstitucional::find($id);
@@ -167,32 +260,15 @@ class FondoController extends BaseController
         return $fondos;
     }
     
-    function updateFondo()
-    {
-        $inputs             = Input::all();
-        $fondo              = FondoInstitucional::find($inputs['idfondo']);
-        $fondo->institucion = $inputs['institucion'];
-        $fondo->repmed      = $inputs['repmed'];
-        $fondo->supervisor  = $inputs['supervisor'];
-        $fondo->total       = $inputs['total'];
-        $fondo->cuenta      = $inputs['cuenta'];
-        $fondo->idrm        = $inputs['codrepmed'];
-        $fondo->save();
-        $start = $inputs['start'];
-        
-        $fondos = $this->getFondos($start);
-        return $fondos;
-    }
-    
-    function getRepresentatives()
+    /*function getRepresentatives()
     {
         //$representatives = DB::table('FICPE.VISITADOR')
         //   ->select('visvisitador','vispaterno','vismaterno','visnombre','vislegajo')->where('VISACTIVO','S')->get();
         $representatives = DB::select("select visvisitador,vispaterno,vismaterno,visnombre,vislegajo from FICPE.VISITADOR where VISACTIVO = 'S' and LENGTH(VISLEGAJO) = 8 ");
         return json_encode($representatives);
-    }
+    }*/
     
-    function getCtaBanc($dni)
+    /*function getCtaBanc($dni)
     {
         $cta = CtaRm::where('codbeneficiario', $dni)->where('tipo', 'H')->first();
         if ($cta) {
@@ -203,9 +279,9 @@ class FondoController extends BaseController
                 return $cta->cuenta;
             else
                 return '---';
-        }
-        
-    }
+        } 
+    }*/
+
     function exportExcelFondos($start)
     {
         $data = $this->getFondos($start, 1);

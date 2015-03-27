@@ -36,10 +36,10 @@
     </tr>
     </thead>
     <tbody>
-    <?php $i=1 ; $total = 0?>
+    <?php $total = 0 ?>
     @foreach($fondos as  $fondo)
     <tr>
-        <td>{{$i}}</td>
+        <td>{{$fondo->idfondo}}</td>
         <td style="text-align: center">{{$fondo->institucion}}</td>
         <td>{{$fondo->repmed}}</td>
         <td style="text-align: center">
@@ -51,13 +51,17 @@
          @if($estado != TERMINADO)
         <td>
             <div class="div-icons-solicituds">
-                <a href="#" class="edit-fondo" data-idfondo="{{$fondo->idfondo}}"><span class="glyphicon glyphicon-pencil"></span></a>
-                <a  href="#" class ="delete-fondo" data-idfondo="{{$fondo->idfondo}}" data-token="{{csrf_token()}}"><span class="glyphicon glyphicon-remove"></span></a>
+                <a href="#" class="edit-fondo" data-idfondo="{{$fondo->idfondo}}">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                </a>
+                <a  href="#" class ="delete-fondo" data-idfondo="{{$fondo->idfondo}}" data-token="{{csrf_token()}}">
+                    <span class="glyphicon glyphicon-remove"></span>
+                </a>
             </div>
         </td>
         @endif
     </tr>
-    <?php $total += $fondo->total ; $i++?>
+    <?php $total += $fondo->total ?>
     @endforeach
     </tbody>
 
