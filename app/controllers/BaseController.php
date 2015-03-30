@@ -5,6 +5,7 @@ use \User;
 use \Common\State;
 use \Dmkt\Solicitude;
 use \Swift_TransportException;
+use Dmkt\FondoInstitucional;
 
 class BaseController extends Controller {
 
@@ -224,7 +225,42 @@ class BaseController extends Controller {
         return $rpta;
     }
 
-    protected function searchTransaction($estado,$idUser,$start,$end)
+    protected function searchFondos($estado,$idUser,$start,$end)
+    {
+        try
+        {
+            if ( in_array(Auth::user()->type , array(REP_MED,TESORERIA,CONT)))
+            {
+                $fondos = FondoInstitucional::with(array('histories' => function($q)
+                {
+                    $q->orderBy('created_at','DESC');  
+                }));
+                if ($estado != R_TODOS)
+                {
+                    $fondos->whereHas('state', function ($q) use( $estado )
+                    {
+                        $q->whereHas('rangeState', function ($t) use( $estado )
+                        {
+                            $t->where('id', $estado );
+                        });
+                    });
+                }
+                if ( Auth::user()->type == REP_MED)
+                    $fondos->where('idrm', Auth::user()->rm->idrm);
+                $fondos = $fondos->whereRaw("to_date(periodo,'YYYYMM') BETWEEN TRUNC(to_date('$start','DD-MM-YY'),'MM') and TRUNC(to_date('$end','DD-MM-YY'),'MM')")
+                ->orderBy('periodo')->get();
+                $rpta = $this->setRpta($fondos);
+                return $rpta;
+            }
+        }
+        catch (Exception $e)
+        {
+            $rpta = $this->internalException($e,__FUNCTION__);
+        }
+        
+    }
+
+    protected function searchSolicituds($estado,$idUser,$start,$end)
     {
         try
         {
@@ -237,35 +273,11 @@ class BaseController extends Controller {
                 $q->orderBy('created_at','DESC');  
             }));
 
-
-            // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-
-            /*$fondos = FondoInstitucional::where('idrm', Auth::user()->rm->idrm)
-                        ->with(array('histories' => function($q)
-                        {
-                            $q->orderBy('created_at','DESC');  
-                        }));
-                        if ($estado != R_TODOS)
-                        {
-                            $fondos->whereHas('state', function ($q) use( $estado )
-                            {
-                                $q->whereHas('rangeState', function ($t) use( $estado )
-                                {
-                                    $t->where('id', $estado );
-                                });
-                            });
-                        }
-                        $fondos = $fondos->whereRaw("to_date(periodo,'YYYYMM') BETWEEN TRUNC(to_date('$start','DD-MM-YY'),'MM') and TRUNC(to_date('$end','DD-MM-YY'),'MM')")
-                        ->orderBy('periodo')->get();
-                        $rpta[data]['fondos'] = $fondos;
-*/
-            // $$$$$$$$$$$$$$$$$$$$$$$$
-
             if (Auth::user()->type == REP_MED)
             {
                 $solicituds->whereIn('iduser', $idUser);
                 $rSolicituds->whereNotIn('iduser', $idUser)
-                ->where('idresponse',Auth::user()->id);
+                ->where( 'idresponse' , Auth::user()->id );
             }
             else if (Auth::user()->type == SUP)
             {
@@ -313,8 +325,10 @@ class BaseController extends Controller {
             $solicituds = $solicituds->orderBy('idsolicitud', 'ASC')->get();
             $rSolicituds = $rSolicituds->orderBy('idsolicitud', 'ASC')->get();
             if ( Auth::user()->type == REP_MED )
-                $solicituds->merge($rSolicituds);
-            $rpta = $this->setRpta(array('solicituds' => $solicituds));
+            {
+                $solicituds = $solicituds->merge($rSolicituds);
+            }
+            $rpta = $this->setRpta($solicituds);
         }
         catch (Exception $e)
         {

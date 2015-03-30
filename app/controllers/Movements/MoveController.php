@@ -26,10 +26,10 @@ class MoveController extends BaseController
             $rpta = $this->userType();
             if ($rpta[status] == ok)
             {
-                $rpta = $this->searchTransaction(R_FINALIZADO,$rpta[data],$dates['start'],$dates['end']);
+                $rpta = $this->searchSolicituds(R_FINALIZADO,$rpta[data],$dates['start'],$dates['end']);
                 if ($rpta[status] == ok)
                 {
-                    $view = View::make('template.list_estado_cuenta')->with($rpta[data])->render();
+                    $view = View::make('template.list_estado_cuenta')->with( array( 'solicituds' => $rpta[data] ))->render();
                     $rpta = $this->setRpta($view);                
                 }
             }

@@ -2,7 +2,6 @@
     <div class="col-md-12" style="padding: 0">
         <form method="post" action="" class="">
             {{Form::token()}}
-            <input type="hidden" id="state_view" value="{{$state}}">
             <div class="form-group col-sm-2 col-md-2" style="padding: 0">
                 <div>
                     <select id="idState" name="idstate" class="form-control selectestatesolicitude">

@@ -296,7 +296,7 @@ class SolicitudeController extends BaseController
                 Image::make($image->getRealPath())->resize(800, 600)->save($path);
                 $solicitude->image = $filename;
             }
-            $solicitude->idetiqueta        = $inputs['etiqueta'];
+            $solicitude->idetiqueta     =  $inputs['etiqueta'];
             $solicitude->descripcion    =  $inputs['description'];
             $solicitude->titulo         =  $inputs['titulo'];
             $solicitude->monto          =  $inputs['monto'];
@@ -391,7 +391,7 @@ class SolicitudeController extends BaseController
         return $rpta;
     }
 
-    public function searchSolicituds()
+    public function searchDmkt()
     {
         try
         {
@@ -412,31 +412,20 @@ class SolicitudeController extends BaseController
                 $end = date('t-m-Y', strtotime($m));
             $rpta = $this->userType();
             if ($rpta[status] == ok)
-                $rpta = $this->searchTransaction($estado,$rpta[data],$start,$end);
-                if ($rpta[status] == ok)
-                    if ( Auth::user()->type == REP_MED)
+                $middleRpta1 = $this->searchSolicituds($estado,$rpta[data],$start,$end);
+                if ($middleRpta1[status] == ok)
+                {
+                    if ( in_array(Auth::user()->type , array(REP_MED,TESORERIA,CONT)))
                     {
-                        /*$fondos = FondoInstitucional::where('idrm', Auth::user()->rm->idrm)
-                        ->with(array('histories' => function($q)
-                        {
-                            $q->orderBy('created_at','DESC');  
-                        }));
-                        if ($estado != R_TODOS)
-                        {
-                            $fondos->whereHas('state', function ($q) use( $estado )
-                            {
-                                $q->whereHas('rangeState', function ($t) use( $estado )
-                                {
-                                    $t->where('id', $estado );
-                                });
-                            });
-                        }
-                        $fondos = $fondos->whereRaw("to_date(periodo,'YYYYMM') BETWEEN TRUNC(to_date('$start','DD-MM-YY'),'MM') and TRUNC(to_date('$end','DD-MM-YY'),'MM')")
-                        ->orderBy('periodo')->get();
-                        $rpta[data]['fondos'] = $fondos;*/
+                        $middleRpta2 = $this->searchFondos($estado,$rpta[data],$start,$end);
+                        if ($middleRpta2[status] == ok)
+                            $data = $middleRpta1[data]->merge($middleRpta2[data]);
                     }
-                    $view = View::make('template.solicituds')->with($rpta[data])->render();
+                    else
+                        $data = $middleRpta1[data];
+                    $view = View::make('template.solicituds')->with( array( 'solicituds' => $data ) )->render();
                     $rpta = $this->setRpta($view);
+                }
         }
         catch (Exception $e)
         {

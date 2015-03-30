@@ -9,14 +9,22 @@
                     Solicitudes
                 </a>
             </li>
+            @if ( in_array( Auth::user()->type , array (REP_MED, SUP ) ) )
+            <!-- <li>
+                <a href="#new-solicitud" role="tab" data-toggle="tab">
+                    <i class="fa fa-user"></i>
+                    Nueva Solicitud
+                </a>
+            </li> -->
+            @endif
             @include('template.li_estado_cuenta')
             @if ( Auth::user()->type == REP_MED || Auth::user()->type == CONT || Auth::user()->type == TESORERIA)
-                <li>
+                <!-- <li>
                     <a href="#fondos" role="tab" data-toggle="tab">
                         <i class="fa fa-user"></i>
                         Fondos Institucionales
                     </a>
-                </li>
+                </li> -->
                 @if( Auth::user()->type == CONT)
                     <li>
                         <a href="#mantenimiento" role="tab" data-toggle="tab">
@@ -90,12 +98,32 @@
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <a id="" href="#" class="btn btn-success register-deposit" data-deposit = "solicitude" style="margin-right: 1em;">Confirmar Operación</a>
+                                        <a id="" href="#" class="btn btn-success register-deposit" style="margin-right: 1em;">Confirmar Operación</a>
                                         <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <!-- <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                        <h4 class="modal-title" id="myModalLabel">Registro del Depósito</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <input id="idfondo" type="hidden" value="">
+                                        <label for="op-number">Número de Operación, Transacción, Cheque:</label>
+                                        <input id="op-number2" type="text" class="form-control">
+                                        <p id="message-op-number" style="margin-top:1em;color:#a94442;"></p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <a id="register-deposit-fondo" href="#" class="btn btn-success" data-deposit="fondo" style="margin-right: 1em;">Confirmar Operación</a>
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> -->
                     @endif
                 </div>
             </div>
@@ -145,12 +173,25 @@
                     </div>
                 </div>
             @endif
+            @if ( in_array( Auth::user()->type , array (REP_MED , SUP ) ))
+                <!-- Nueva Solicitud -->
+                <div class="tab-pane fade" id="new-solicitud">
+                        <!-- <div class="panel panel-default">
+                            <div class="panel-body panel-default table_document_contabilidad">
+                                <div id="" class="form-group col-xs-6 col-sm-3 col-md-3"></div>
+                            </div>
+                        </div> -->
+                </div>
+            @endif
         </div>
         <div>
             <a id="show_leyenda" style="margin-left: 15px" href="#">Ver leyenda</a>
             <a id="hide_leyenda" style="margin-left: 15px;display: none" href="#">Ocultar leyenda</a>
         </div>
     </div>
+    @if ( Auth::user()->type == TESORERIA)
+    
+    @endif
 </div>
 @include('template.leyenda')
 @if(isset($warnings[status]))

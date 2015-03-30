@@ -362,77 +362,8 @@ $(function(){
             $('#idfondo').val(idfondo);
         });
 
-        //Register Deposit
-        $(document).off("click", ".register-deposit");
-        $(document).on("click",".register-deposit",function(e)
-        {
-            e.preventDefault();
-            $("#op_number").val('');
-            $("#message-op-number").text('');
-            var op_number  = $("#op-number").val();
-            var type_deposit = $(this).attr('data-deposit');
-            if(type_deposit ==='fondo'){
-                url = 'deposit-fondo'
-                data.idfondo = $('#idfondo').val();
-                data.op_number = op_number;
-                data._token = $("input[name=_token]").val();
-            }else if(type_deposit === 'solicitude'){
-                url = 'deposit-solicitude';
-                data.op_number = op_number;
-                data.token     = $("#token").val();
-                data._token    = $("input[name=_token]").val();
-            }
-            $("#op_number").val('');
-            $("#message-op-number").text('');
-            if(!op_number)
-                $("#message-op-number").text("Ingrese el número de Operación");
-            else
-            {
-                $.post(server + url, data)
-                .done(function (data){
-                    if(parseInt(data,10) === 1)
-                    {
-                        $('#myModal').modal('hide');
-                        $("#enable_deposit_Modal").modal('hide');
-                        bootbox.alert("<p class='green'>Se registro el codigo de deposito correctamente.</p>", function(){
-                            if(type_deposit === 'fondo'){
-                                $.ajax({
-                                    url: server + 'list-fondos-tesoreria/'+ dateactual,
-                                    type: 'GET',
-                                    dataType: 'html'
-
-                                }).done(function (data) {
-                                    $('#table_solicitude_fondos-tesoreria_wrapper').remove();
-                                    $('.table_solicitude_fondos-tesoreria').append(data);
-                                    $('#table_solicitude_fondos-tesoreria').dataTable({
-                                            "order": [
-                                                [ 3, "desc" ] //order date
-                                            ],
-                                            "bLengthChange": false,
-                                            'iDisplayLength': 7,
-                                            "oLanguage": {
-                                                "sSearch": "Buscar: ",
-                                                "sZeroRecords": "No hay fondos",
-                                                "sInfoEmpty": "No hay fondos",
-                                                "sInfo": 'Mostrando _END_ de _TOTAL_',
-                                                "oPaginate": {
-                                                    "sPrevious": "Anterior",
-                                                    "sNext" : "Siguiente"
-                                                }
-                                            }
-                                        }
-                                    );
-                                });
-                            }
-                            else
-                                window.location.href = server+'show_user';
-                        });
-                    }
-                    else
-                        responseUI("<font color='black'>Ya existe un deposito registrado</font>","yellow");
-                });
-            }
-        });
+        
+            
         //Empty message in modal register deposit
         $(document).on("focus","#op-number",function(){
             $("#message-op-number").text('');
@@ -1434,9 +1365,9 @@ $(function(){
         $(document).off("click", ".modal_deposit");
         $(document).on("click", ".modal_deposit", function(e)
         {
-            e.preventDefault();
+            //e.preventDefault();
             var tr = $(this).parent().parent().parent();
-            console.log(tr);
+            console .log(tr);
             var id_sol = tr.find('.id_solicitud').text();
             console.log(id_sol);
             var sol_titulo = tr.find('.sol_titulo').find('label').text();
@@ -1453,6 +1384,7 @@ $(function(){
             $("#tes-mon-ret").val(total_deposit[0] + " " + retencion);
             $("#id-solicitude").text(id_sol);
             $("#token").val(token);
+            $(".register-deposit").attr("data-deposit",tr.attr("sol-type"));
             $("#beneficiario").val(beneficiario);
             $("#total-deposit").val(total_deposit[0] + " " + (total_deposit[1] - retencion));
             $('#enable_deposit_Modal').modal();

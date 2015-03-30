@@ -146,7 +146,8 @@ Route::group(array('before' => 'cont'), function () {
  */
 
 Route::group(array('before' => 'tes'), function(){
-    Route::get('ver-solicitud-tes/{id}', 'Deposit\DepositController@viewSolicitudeTes');
+    Route::get('ver-solicitud-tes/{token}', 'Deposit\DepositController@viewSolicitudeTes');
+    Route::get('ver-fondo-tes/{token}', 'Deposit\DepositController@viewFondoTes');
     Route::post('deposit-solicitude', 'Deposit\DepositController@depositSolicitudeTes');
     Route::post('deposit-fondo','Deposit\DepositController@depositFondoTes');
     Route::get('list-fondos-tesoreria/{date}','Dmkt\FondoController@getFondosTesoreria');
@@ -219,7 +220,7 @@ Route::group(array('before' => 'rm_sup'), function ()
 
 Route::group(array('before' => 'sys_user'), function ()
 {
-    Route::post('buscar-solicitudes', 'Dmkt\SolicitudeController@searchSolicituds');
+    Route::post('buscar-solicitudes', 'Dmkt\SolicitudeController@searchDmkt');
     Route::get('listar-solicitudes/{estado}', 'Dmkt\SolicitudeController@listSolicitude');
     Route::get('getclients', 'Dmkt\SolicitudeController@getClients');
     Route::post('list-account-state', 'Movements\MoveController@searchMove');

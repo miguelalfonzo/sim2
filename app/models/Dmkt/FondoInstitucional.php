@@ -47,4 +47,14 @@ class FondoInstitucional extends Eloquent
     function histories(){
         return $this->hasMany('System\SolicitudeHistory','idsolicitude');
     }
+
+    function subtype(){
+
+        return  $this->hasOne('Common\Fondo','idfondo','idcuenta');
+    }
+
+    function typemoney(){
+
+        return $this->hasOne('Common\TypeMoney','idtipomoneda','tipo_moneda');
+    }
 }

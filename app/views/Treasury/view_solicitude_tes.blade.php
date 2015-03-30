@@ -42,25 +42,26 @@
                         @endif
                     </div>
                 </div>
-                @if (!$solicitude->retencion == null)
-                <div class="form-group col-sm-6 col-md-4">
-                    <label class="col-sm-8 col-md-8 control-label" for="textinput">Retenciones</label>
-                    <div class="col-sm-12 col-md-12">
-                        @if($solicitude->estado == 2)
-                        <div class="input-group">
-                            <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                            <input type="text" value="{{$solicitude->retencion}}" class="form-control input-md">
+                @if (isset($solicitude->retencion))
+                    @if (!$solicitude->retencion == null)
+                        <div class="form-group col-sm-6 col-md-4">
+                            <label class="col-sm-8 col-md-8 control-label" for="textinput">Retenciones</label>
+                            <div class="col-sm-12 col-md-12">
+                                @if($solicitude->estado == 2)
+                                <div class="input-group">
+                                    <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
+                                    <input type="text" value="{{$solicitude->retencion}}" class="form-control input-md">
+                                </div>
+                                @else
+                                <div class="input-group">
+                                    <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
+                                    <input id="idamount" type="text" value="{{$solicitude->retencion}}" class="form-control input-md" disabled>
+                                </div>
+                                @endif
+                            </div>
                         </div>
-                        @else
-                        <div class="input-group">
-                            <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                            <input id="idamount" type="text" value="{{$solicitude->retencion}}" class="form-control input-md" disabled>
-                        </div>
-                        @endif
-                    </div>
-                </div>
+                    @endif
                 @endif
-
                 <div class="form-group col-sm-6 col-md-4">
                     <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto a Depositar</label>
                     <div class="col-sm-12 col-md-12">
@@ -86,77 +87,72 @@
                         </div>
                     </div>
                 </div>
-
-                 <div class="form-group col-sm-6 col-md-4 col-lg-4">
-                    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Solicitante</label>
-                    <div class="col-sm-12 col-md-12 col-lg-12">
-                        <div class="input-group">
-                            @if(!is_null($solicitude->iduser))
+                @if (isset($solicitude->iduser))
+                    <div class="form-group col-sm-6 col-md-4 col-lg-4">
+                        <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Solicitante</label>
+                        <div class="col-sm-12 col-md-12 col-lg-12">
+                            <div class="input-group">
+                                @if(!is_null($solicitude->iduser))
                                     @if($solicitude->user->type == 'R')
-                                    <span class="input-group-addon">Representante Medico</span>
-                                    <input id="textinput" type="text" value="{{$solicitude->user->rm->nombres.' '.$solicitude->user->rm->apellidos}}" class="form-control input-md" readonly>
+                                        <span class="input-group-addon">Representante Medico</span>
+                                        <input id="textinput" type="text" value="{{$solicitude->user->rm->nombres.' '.$solicitude->user->rm->apellidos}}" class="form-control input-md" readonly>
                                     @elseif($solicitude->user->type == 'S')
-                                    <span class="input-group-addon">Supervisor</span>
-                                    <input id="textinput" type="text" value="{{$solicitude->user->sup->nombres.' '.$solicitude->user->sup->apellidos}}" class="form-control input-md" readonly>
+                                        <span class="input-group-addon">Supervisor</span>
+                                        <input id="textinput" type="text" value="{{$solicitude->user->sup->nombres.' '.$solicitude->user->sup->apellidos}}" class="form-control input-md" readonly>
                                     @else
-                                    <span class="input-group-addon">$solicitude->user->type</span>
-                                    <input id="textinput" type="text" value="Usuario no autorizado" class="form-control input-md" readonly>
+                                        <span class="input-group-addon">$solicitude->user->type</span>
+                                        <input id="textinput" type="text" value="Usuario no autorizado" class="form-control input-md" readonly>
                                     @endif
                                 @else
                                     <span class="input-group-addon">Inexistente</span>
                                     <input id="textinput" type="text" value="No existe el usuario solicitante" class="form-control input-md" readonly> 
                                 @endif
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                @include('template.obs')
-
-
-                 
-                <div class="col-sm-18 col-md-12">
-
-                <div class="form-group col-sm-9 col-md-6">
-                    <div class="col-md-12">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Productos</h3>
-                            </div>
-                            <div class="panel-body">
-                                <?php $t=0;?>
-                                @foreach($solicitude->families as $family)
-                                <div class="form-group col-sm-12 col-md-12" style="padding: 0">
-                                    <div class="col-sm-8 col-md-8">
-                                        <input id="textinput" type="text" value="{{$family->marca->descripcion}}" class="form-control input-md" readonly>
-
+                    @include('template.obs')
+                    <div class="col-sm-18 col-md-12">
+                        <div class="form-group col-sm-9 col-md-6">
+                            <div class="col-md-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Productos</h3>
                                     </div>
-                                    <div class="col-sm-4 col-md-4" style="padding: 0">
-                                        <div class="input-group">
-                                            <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                                            <input id="" readonly type="text" class="form-control input-md amount_families" value="{{isset($family->monto_asignado)? $family->monto_asignado : round($solicitude->monto/count($solicitude->families),2)}}">
+                                    <div class="panel-body">
+                                        <?php $t=0;?>
+                                        @foreach($solicitude->families as $family)
+                                            <div class="form-group col-sm-12 col-md-12" style="padding: 0">
+                                                <div class="col-sm-8 col-md-8">
+                                                    <input id="textinput" type="text" value="{{$family->marca->descripcion}}" class="form-control input-md" readonly>
+
+                                                </div>
+                                                <div class="col-sm-4 col-md-4" style="padding: 0">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
+                                                        <input id="" readonly type="text" class="form-control input-md amount_families" value="{{isset($family->monto_asignado)? $family->monto_asignado : round($solicitude->monto/count($solicitude->families),2)}}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <?php $t = $t + round($solicitude->monto/count($solicitude->families),2)?>
+                                        @endforeach
+                                        <div class="form-group col-sm-12 col-md-12">
+                                            <span id="amount_error_families"></span>
                                         </div>
                                     </div>
                                 </div>
-                                <?php $t = $t + round($solicitude->monto/count($solicitude->families),2)?>
-                                @endforeach
-                                <div class="form-group col-sm-12 col-md-12">
-                                    <span id="amount_error_families"></span>
-                                </div>
+                            </div>
+                        </div>
+                        @include('template.list_clients')
+                    </div>
+                    <div class="col-sm-12 col-md-12" style="margin-top: 10px">
+                        <div class="form-group col-sm-12 col-md-12">
+                            <label class="col-sm-8 col-md-8 control-label" for="textarea">Descripcion de la Solicitud</label>
+                            <div class="col-sm-12 col-md-12">
+                                <textarea class="form-control" id="textarea" readonly>{{$solicitude->descripcion}}</textarea>
                             </div>
                         </div>
                     </div>
-                </div>
-                @include('template.list_clients')
-            </div>
-               
-                <div class="col-sm-12 col-md-12" style="margin-top: 10px">
-                    <div class="form-group col-sm-12 col-md-12">
-                        <label class="col-sm-8 col-md-8 control-label" for="textarea">Descripcion de la Solicitud</label>
-                        <div class="col-sm-12 col-md-12">
-                            <textarea class="form-control" id="textarea" readonly>{{$solicitude->descripcion}}</textarea>
-                        </div>
-                    </div>
-                </div>
+                @endif
                 <!-- Button (Double) -->
                 <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
                     <div class="col-sm-12 col-md-12" style="text-align: center">
