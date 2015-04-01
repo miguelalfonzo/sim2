@@ -1375,10 +1375,16 @@ $(function(){
             var beneficiario = tr.find('.benef').val();
             var total_deposit = tr.find('.total_deposit').text().trim().split(" ");
             var retencion = tr.find('.tes-ret').html().trim();
-            if ( retencion == 0 )
-                $("#tes-mon-ret").parent()[0].style.display = "none";
+            if ( retencion != 0 )
+            {
+                $("#tes-mon-ret").parent().css("display",true);
+                $("#tes-mon-sol").parent().css("display",true);
+            }
             else
-                $("#tes-mon-ret").parent()[0].style.display = "";
+            {
+                $("#tes-mon-ret").parent().css("display","none");
+                $("#tes-mon-sol").parent().css("display","none");    
+            }
             $("#sol-titulo").val(sol_titulo);
             $("#tes-mon-sol").val(total_deposit[0] + " " + total_deposit[1]);
             $("#tes-mon-ret").val(total_deposit[0] + " " + retencion);

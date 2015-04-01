@@ -48,28 +48,37 @@ class DepositController extends BaseController{
         {
             DB::beginTransaction();
             $deposit = Input::all();
-            Log::error($deposit);
-            $retencion = 0;
-            $estado = null;
+            $estado = 0;
             $titulo = '';
             if ($deposit['type_deposit'] == SOLIC )
             {
                 $solicitude   = Solicitude::where('token',$deposit['token'])->firstOrFail();
-                $row_deposit  = Deposit::where('idsolicitud',$solicitude->idsolicitud)->get();
-                $estado = $solicitude->estado;       
-                $titulo = $solicitude->titulo.' '.$solicitude->descripcion;
-                $idSol = $solicitude->idsolicitud;
+                $row_deposit  = Deposit::where('iddeposito',$solicitude->iddeposito)->get();
+                $estado       = $solicitude->estado;       
+                $titulo       = $solicitude->titulo.' '.$solicitude->descripcion;
+                $idSol        = $solicitude->idsolicitud;
+                $monto        = $solicitude->monto;
+                $idfondo      = $solicitude->idfondo;
                 if (!$solicitude->retencion == null)
-                    $retencion = $solicitude->retencion;
-                
+                    $total = ($monto - $solicitude->retencion);
+                else
+                    $total = $monto;
             }
             elseif ($deposit['type_deposit'] == FONDO )
             {
-                $fondo = FondoInstitucional::where('token',$deposit['token'])->firstOrFail();
-                $row_deposit = Deposit::where('idfondo',$fondo->idfondo)->get();
-                $estado = $fondo->estado;
-                $titulo = $fondo->institucion;
-                $idSol = $fondo->idfondo;
+                $fondo       = FondoInstitucional::where('token',$deposit['token'])->firstOrFail();
+                $row_deposit = Deposit::where('iddeposito',$fondo->iddeposito)->get();
+                $estado      = $fondo->estado;
+                $titulo      = $fondo->institucion;
+                $idSol       = $fondo->idfondo;
+                $monto       = $fondo->monto;
+                $total       = $monto;
+                $idfondo     = $solicitude->idcuenta;
+            }
+            else
+            {
+                DB::rollback();
+                return array(status => warning , description => 'No se encontro los registros de la solicitud');
             }
             if(count($row_deposit)>0)
             {
@@ -78,20 +87,11 @@ class DepositController extends BaseController{
             }
             else
             {
-                $newDeposit = new Deposit;
-                $id = $newDeposit->lastId()+1;
+                $newDeposit                     = new Deposit;
+                $id                             = $newDeposit->lastId()+1;
                 $newDeposit->iddeposito         = $id;
                 $newDeposit->num_transferencia  = $deposit['op_number'];
-                if ($deposit['type_deposit'] == SOLIC )
-                {
-                    $newDeposit->idsolicitud    = $solicitude->idsolicitud;  
-                    $newDeposit->total              = ($solicitude->monto - $retencion);
-                }
-                elseif ($deposit['type_deposit'] == FONDO )
-                {
-                    $newDeposit->idfondo        = $fondo->idfondo;
-                    $newDeposit->total          = $fondo->total;
-                }
+                $newDeposit->total              = $total
                 if($newDeposit->save())
                 {
                     if ($deposit['type_deposit'] == SOLIC )
@@ -99,16 +99,24 @@ class DepositController extends BaseController{
                         $solicitudeUpd             = Solicitude::where('token',$deposit['token']);
                         $solicitudeUpd->estado     = DEPOSITADO;
                         $solicitudeUpd->iddeposito = $id;
-                        $data                      = $this->objectToArray($solicitudeUpd);
-                        $solicitudeUpd->update($data);
+                        $solicitudeUpd->update($this->objectToArray($solicitudeUpd));
                     }
                     else if ($deposit['type_deposit'] == FONDO )
                     {
-                        $fondo          = FondoInstitucional::where('token',$deposit['token']);
-                        $fondo->estado  = DEPOSITADO;
-                        $data           = $this->objectToArray($fondo);
-                        $fondo->update($data);
+                        $fondoInst                = FondoInstitucional::where('token',$deposit['token']);
+                        $fondoInst->estado        = DEPOSITADO;
+                        $fondoInst->iddeposito    = $id;
+                        $fondoInst->update($this->objectToArray($fondoInst));
                     }
+                    $fondoUpd          = Fondo::where('idfondo', $idfondo);
+                    $fondoUpd->saldo   = $fondoUpd->saldo - $monto; 
+                    if ($fondoUpd->saldo < 0)
+                    {
+                        DB::rollback();
+                        return array( status => warning , description => 'Saldo Insuficiente en el Fondo: '.$fondoUpd->nombre_mkt);
+                    }
+                    else
+                        $fondoUpd->update($this->objectToArray($fondoUpd));        
                     $rpta = $this->setStatus($titulo , $estado, DEPOSITADO, Auth::user()->id, USER_CONTABILIDAD, $idSol, $deposit['type_deposit']);
                     if ( $rpta[status] == ok )
                     {
@@ -128,40 +136,6 @@ class DepositController extends BaseController{
         return $rpta;
     }
     
-    /*public function depositFondoTes()
-    {
-        try 
-        {
-            DB::transaction();
-            $deposit = Input::all();
-            $idfondo = $deposit['idfondo'];
-            $row_deposit = Deposit::where('idfondo',$idfondo)->get();
-            if(count($row_deposit)>0)
-                return 0;
-            else
-            {
-                //Update estado
-                $fondo = FondoInstitucional::find($idfondo);
-                $fondo->depositado = 1;
-                $fondo->save();
-                //New Deposit
-                $newDeposit = new Deposit;
-                $id = $newDeposit->lastId()+1;
-                $newDeposit->iddeposito        = $id;
-                $newDeposit->total             = $fondo->total;
-                $newDeposit->num_transferencia = $deposit['op_number'];
-                $newDeposit->idfondo       = $idfondo;
-                $newDeposit->save();
-            }
-            DB::commit();
-            return $this->getFondos($deposit['date_fondo']);
-        } 
-        catch (Exception $e) 
-        {
-            DB::rollback();
-            $this->internalException($e,__FUNCTION__);
-        }
-    }*/
     
     public function getFondos($mes){
         $mes = explode('-', $mes);

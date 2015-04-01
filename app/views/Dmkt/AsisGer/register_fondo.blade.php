@@ -7,7 +7,8 @@
     <ul class="nav nav-tabs" role="tablist">
         <li class="active">
             <a href="#fondos" role="tab" data-toggle="tab">
-              <icon class="fa fa-home"></icon> Registrar Fondos
+                <icon class="fa fa-home"></icon>
+                Registrar Fondos
             </a>
         </li>
         <li>
@@ -44,57 +45,49 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="col-xs-12 col-sm-6 col-md-4">
                                 <div class="form-expense">
                                     <label>SISOL - Hospital</label>
-                                    <input id="fondo_institucion" name="institucion" type="text"
-                                    value="{{isset($fondo->institucion)? $fondo->institucion : null }}"
-                                    class="form-control input-md">
+                                    <input id="fondo_institucion" name="institucion" type="text" class="form-control input-md">
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-4">
+                                <div class="form-expense">
+                                    <label>Depositar a</label>
+                                    <input id="fondo_repmed" value="" name="repmed" type="text" style="position:relative"
+                                          data-select="false" class="form-control input-md rep-seeker">
+                                    <a id="edit-rep" class="edit-repr" href="#" style="display:inline;">
+                                        <span class="glyphicon glyphicon-pencil"></span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-4">
+                                <div class="form-expense">
+                                    <label>Fondo</label>
+                                    <input type="text" class="form-control" value="{{$cuenta->nombre_mkt.' -> '.$cuenta->saldo}}" disabled>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-4">
+                                <div class="form-expense">
+                                    <label>N° de Cuenta</label>
+                                    <input id="fondo_cuenta" name="cuenta" type="text" class="form-control input-md" maxlength="25">
                                 </div>
                             </div>
 
-              <div class="col-xs-12 col-sm-6 col-md-4">
-                <div class="form-expense">
-                  <label>Depositar a</label>
-                  <input id="fondo_repmed" name="repmed" type="text" style="position: relative"
-                              value="{{isset($fondo->repmed)? $fondo->repmed : null }}" data-select="false"
-                              class="form-control input-md rep-seeker">
-                        <a id="edit-rep" class="edit-repr" href="#" style="display:inline;">
-                          <span class="glyphicon glyphicon-pencil"></span>
-                        </a>
-                </div>
-              </div>
+                            <div class="col-xs-12 col-sm-6 col-md-4">
+                                <div class="form-expense">
+                                    <label>Supervisor</label>
+                                    <input id="fondo_supervisor" name="supervisor" data-cod="0" type="text" class="form-control input-md">
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-4">
+                                <div class="form-expense">
+                                    <label>Total a depositar</label>
+                                    <input id="fondo_total" name="total" type="text" class="form-control input-md">
+                                </div>
+                            </div>
 
-              <div class="col-xs-12 col-sm-6 col-md-4">
-                <div class="form-expense">
-                  <label>N° de Cuenta</label>
-                  <input id="fondo_cuenta" name="cuenta" type="text" placeholder=""
-                              value="{{isset($fondo->cuenta) ? $fondo->cuenta : null }}"
-                              class="form-control input-md" maxlength="25">
-                </div>
-              </div>
-
-              <div class="col-xs-12 col-sm-6 col-md-4">
-                <div class="form-expense">
-                  <label>Total a depositar</label>
-                   <input id="fondo_total" name="total" type="text" placeholder=""
-                              value="{{isset($fondo->total) ? $fondo->total : null }}"
-                              class="form-control input-md">
-                </div>
-              </div>
-
-              <div class="col-xs-12 col-sm-6 col-md-4">
-                <div class="form-expense">
-                  <label>Supervisor</label>
-                   <input id="fondo_supervisor" name="supervisor" data-cod="0" type="text"
-                              value="{{isset($fondo->supervisor) ? $fondo->supervisor : null }}"
-                              class="form-control input-md">
-
-                </div>
-              </div>
-
-
+                          
                <!-- Button (Double) -->
                <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
                    <div class="col-sm-12 col-md-12" style="text-align: center">

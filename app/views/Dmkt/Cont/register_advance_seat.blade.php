@@ -3,26 +3,22 @@
 	<div class="content">
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<h3 class="panel-title"><strong>Generar Asiento de Solicitud</strong></h3><strong class="user">Usuario : {{Auth::user()->username}}</strong>
+				<h3 class="panel-title">
+					<strong>Generar Asiento de Anticipo</strong>
+				</h3>
+				<strong class="user">Usuario: {{Auth::user()->username}}</strong>
 			</div>
 			<div class="panel-body">
 				<aside class="row reg-expense" style="margin-bottom: 0.5em;">
 					<div class="col-xs-12 col-sm-6 col-md-4">
-						<a id="detail_solicitude"><span id="text_solicitude">Ocultar </span>Detalle de Solicitud <span class="glyphicon glyphicon-chevron-up"></span></a>
+						<a id="detail_solicitude">
+							<span id="text_solicitude">Ocultar </span>
+							Detalle de Solicitud
+							<span class="glyphicon glyphicon-chevron-up"></span>
+						</a>
 					</div>
 				</aside>
 				<section id="collapseOne" class="row reg-expense collapse in" style="margin:0">
-					<div class="col-xs-12 col-sm-6 col-md-4">
-						<div class="form-expense">
-							@if ($type == SOLIC)
-								<label>Código de la Solicitud</label>
-								<input id="idsolicitud" type="text" class="form-control" value="{{$solicitude->idsolicitud}}" disabled>
-							@elseif ($type == FONDO)
-								<label>Código del Fondo</label>
-								<input id="idfondo" type="text" class="form-control" value="{{$fondo->idfondo}}" disabled>
-							@endif
-						</div>
-					</div>
 					@if ($type == SOLIC)
 						<div class="col-xs-12 col-sm-6 col-md-4">
 							<div class="form-expense">
@@ -93,77 +89,10 @@
 							</div>
 						</div>
 					@elseif ($type == FONDO)
-						<div class="col-xs-12 col-sm-6 col-md-4">
-							<div class="form-expense">
-								<label>Mes Depositado</label>
-								<div class="input-group">
-	                                <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-	                                <input type="text" value="{{$fondo->monthYear($fondo->periodo)}}" class="form-control" maxlength="10" disabled>
-	                            </div>
-							</div>
-						</div>
-						<div class="col-xs-12 col-sm-6 col-md-4">
-							<div class="form-expense">
-								<label>Sisol - Hospital</label>
-								<input type="text" class="form-control" value="{{$fondo->institucion}}" disabled>
-							</div>
-						</div>
-						<div class="col-xs-12 col-sm-6 col-md-4">
-							<div class="form-expense">
-								<label>Represenante Médico</label>
-								<input type="text" class="form-control" value="{{mb_convert_case($fondo->repmed, MB_CASE_TITLE, 'UTF-8')}}" disabled>
-							</div>
-						</div>
-						<div class="col-xs-12 col-sm-6 col-md-4">
-							<div class="form-expense">
-								<label>Monto Depositado</label>
-								<input type="text" class="form-control" value="{{$fondo->total}}" disabled>
-							</div>
-						</div>
-						<div class="col-xs-12 col-sm-6 col-md-4">
-							<div class="form-expense">
-								<label>Supervisor</label>
-								<input type="text" class="form-control" value="{{$fondo->supervisor}}" disabled>
-							</div>
-						</div>
+						@include('template.fondo_body')
 					@endif
 				</section>
 				<hr>
-				<!-- <section class="row reg-expense" style="margin:0">
-					<div class="col-xs-12 col-sm-6 col-md-4" style="display:none">
-						<div class="form-expense">
-							<label for="name_account">Cuenta</label>
-							<input id="name_account" type="text" class="form-control">
-							{{Form::token()}}
-						</div>
-					</div>
-					<div class="col-xs-12 col-sm-6 col-md-4" style="display:none">
-						<div class="form-expense">
-							<label for="number_account">N° de Cuenta</label>
-							<input id="number_account" type="text" class="form-control">
-						</div>
-					</div>
-					<div class="col-xs-12 col-sm-6 col-md-4" style="display:none">
-						<div class="form-expense">
-							<label for="dc">Tipo de Cuenta</label>
-							<select class="form-control" id="dc">
-								<option value="D">DEBE</option>
-								<option value="C">HABER</option>
-							</select>
-						</div>
-					</div>
-					<div class="col-xs-12 col-sm-6 col-md-4" style="display:none" style="display:none">
-						<div class="form-expense">
-							<label for="total">Importe</label>
-							<input id="total" type="text" class="form-control">
-						</div>
-					</div>
-					<div class="col-xs-12 col-sm-6 col-md-4" style="display:none">
-						<div class="form-expense">
-							<a href="#" id="add-seat-solicitude" class="btn btn-info" style="margin-top:1.75em;">Agregar Detalle</a>
-						</div>
-					</div>					
-				</section> -->
 				<section class="row reg-expense" style="margin:0">
 					<div class="col-xs-12 col-sm-12 col-md-12">
 						<div class="form-expense">
@@ -177,8 +106,6 @@
 											<th>D/C</th>
 											<th>Importe</th>
 											<th>Leyenda Variable</th>
-											<!-- <th style="display:none">Editar</th>
-											<th style="display:none">Eliminar</th> -->
 										</tr>
 									</thead>
 									<tbody>
@@ -196,8 +123,6 @@
 														{{$solicitude->aproved->gerprod->descripcion.' - '.ucwords($solicitude->titulo).' - '.$clientes}}
 													@endif
 												</th>
-											<!-- <th style="display:none"><a class="edit-seat-solicitude" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
-											<th style="display:none"><a class="delete-seat-solicitude" href="#"><span class="glyphicon glyphicon-remove"></span></a></th> -->
 											</tr>
 											<tr>
 												<th class="name_account">{{$bancos->nombre}}</th>
@@ -212,8 +137,6 @@
 														{{$solicitude->aproved->gerprod->descripcion.' '.ucwords($solicitude->titulo).' - '.$clientes}}
 													@endif
 												</th>
-												<!-- <th style="display:none"><a class="edit-seat-solicitude" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
-												<th style="display:none"><a class="delete-seat-solicitude" href="#"><span class="glyphicon glyphicon-remove"></span></a></th> -->
 											</tr>
 											@if(isset($solicitude->retencion))
 												<tr>
@@ -229,8 +152,6 @@
 															{{$solicitude->aproved->gerprod->descripcion.' - '.ucwords($solicitude->titulo).' - '.$clientes}}
 														@endif
 													</th>
-													<!-- <th style="display:none"><a class="edit-seat-solicitude" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
-													<th style="display:none"><a class="delete-seat-solicitude" href="#"><span class="glyphicon glyphicon-remove"></span></a></th> -->
 												</tr>
 											@endif
 										@elseif ($type == FONDO)

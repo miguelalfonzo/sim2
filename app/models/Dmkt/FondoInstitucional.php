@@ -7,7 +7,7 @@ use \Dmkt\Rm;
 class FondoInstitucional extends Eloquent
 {
     protected $table = 'DMKT_RG_FONDOINSTITUCIONAL';
-    protected $primaryKey = 'idfondo';
+    //public $primaryKey = 'idfondo';
 
     function searchId()
     {
@@ -25,11 +25,6 @@ class FondoInstitucional extends Eloquent
         return $month.'/'.$year;
     }
 
-    public function deposit()
-    {
-        return $this->hasOne('Common\Deposit','idfondo','idfondo');
-    }
-
     public function iduser($idrm)
     {
         $response = Rm::where('idrm',$idrm)->first();
@@ -44,17 +39,30 @@ class FondoInstitucional extends Eloquent
         return $this->hasOne('Common\State','idestado','estado');
     }
 
-    function histories(){
+    public function histories()
+    {
         return $this->hasMany('System\SolicitudeHistory','idsolicitude');
     }
 
-    function subtype(){
-
+    protected function deposit()
+    {
+        return $this->hasOne('Common\Deposit','iddeposito', 'iddeposito');
+    }
+    
+    protected function account(){
         return  $this->hasOne('Common\Fondo','idfondo','idcuenta');
     }
 
-    function typemoney(){
-
+    protected function typemoney(){
         return $this->hasOne('Common\TypeMoney','idtipomoneda','tipo_moneda');
+    }
+
+    protected function rep(){
+        return $this->hasOne('Dmkt\Rm','idrm','idrm');
+    }
+
+    protected function ager()
+    {
+        return $this->hasOne('User','id','iduser');
     }
 }

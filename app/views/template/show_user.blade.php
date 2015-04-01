@@ -90,7 +90,7 @@
                                         <div class="row">
                                              <div class="col-xs-12 col-sm-12 col-md-12">
                                                 <div class="form-expense">
-                                                    <label for="op-number">Número de Operación, Transacción, Cheque:</label>
+                                                    <label for="op-number">Número de Operación, Transacción, Cheque</label>
                                                     <input id="op-number" type="text" class="form-control">
                                                     <p id="message-op-number" style="margin-top:1em;color:#a94442;"></p> 
                                                 </div>
@@ -104,26 +104,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                                        <h4 class="modal-title" id="myModalLabel">Registro del Depósito</h4>
-                                    </div>
-                                    <div class="modal-body">
-                                        <input id="idfondo" type="hidden" value="">
-                                        <label for="op-number">Número de Operación, Transacción, Cheque:</label>
-                                        <input id="op-number2" type="text" class="form-control">
-                                        <p id="message-op-number" style="margin-top:1em;color:#a94442;"></p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <a id="register-deposit-fondo" href="#" class="btn btn-success" data-deposit="fondo" style="margin-right: 1em;">Confirmar Operación</a>
-                                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> -->
                     @endif
                 </div>
             </div>

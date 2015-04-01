@@ -28,7 +28,7 @@ class Rm extends Eloquent{
     }
 
     function user(){
-        return $this->belongsTo('User','id','iduser');
+        return $this->hasOne('User','id','iduser');
     }
 
 }

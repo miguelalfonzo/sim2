@@ -159,31 +159,30 @@
                         @if($solicitude->asiento == ENABLE_DEPOSIT && !is_null($solicitude->idresponse) && $solicitude->estado != DEPOSITADO )
                             <button class="btn btn-success" data-toggle="modal" data-target="#myModal" >Registrar Depósito</button>
                         @endif
-                        <a id="button2id" href="{{URL::to('show_user')}}" name="button2id" class="btn btn-primary">Cancelar</a>
+                        <a id="button2id" href="{{URL::to('show_user')}}" name="button2id" class="btn btn-danger">Regresar</a>
                     </div>
                 </div>
                 <!-- Modal -->
-                @if($solicitude->asiento == ENABLE_DEPOSIT && !is_null($solicitude->idresponse) && $solicitude->estado != DEPOSITADO )
-                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                                <h4 class="modal-title" id="myModalLabel">Registro del Depósito</h4>
-                            </div>
-                            <div class="modal-body">
-                                <label for="op-number">Número de Operación, Transacción, Cheque:</label>
-                                <input id="op-number" type="text" class="form-control">
-                                <p id="message-op-number" style="margin-top:1em;color:#a94442;"></p>
-                            </div>
-                            <div class="modal-footer">
-                                <!-- <a id="register-deposit" href="{{URL::to('depositar')}}/{{$solicitude->token}}" class="btn btn-success" style="margin-right: 1em;">Confirmar Operación</a> -->
-                                <a id="" href="#" class="btn btn-success register-deposit" data-deposit = "solicitude" style="margin-right: 1em;">Confirmar Operación</a>
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                @if($solicitude->estado == DEPOSITO_HABILITADO )
+                    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                    <h4 class="modal-title" id="myModalLabel">Registro del Depósito</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <label for="op-number">Número de Operación, Transacción, Cheque:</label>
+                                    <input id="op-number" type="text" class="form-control">
+                                    <p id="message-op-number" style="margin-top:1em;color:#a94442;"></p>
+                                </div>
+                                <div class="modal-footer">
+                                    <a id="" href="#" class="btn btn-success register-deposit" data-deposit="S" style="margin-right: 1em;">Confirmar Operación</a>
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
                 @endif
             </div>
         </div>

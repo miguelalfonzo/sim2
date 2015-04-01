@@ -43,10 +43,10 @@
         <td style="text-align: center">{{$fondo->institucion}}</td>
         <td>{{$fondo->repmed}}</td>
         <td style="text-align: center">
-            {{$fondo->cuenta}}
+            {{$fondo->rep_cuenta}}
         </td>
 
-        <td style="text-align: center">{{$fondo->total}}</td>
+        <td style="text-align: center">{{$fondo->monto}}</td>
         <td style="text-align: center">{{$fondo->supervisor}}</td>
          @if($estado != TERMINADO)
         <td>

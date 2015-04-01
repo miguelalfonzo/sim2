@@ -94,11 +94,11 @@
                             <input type="hidden" value="{{$solicitude->repmed}}" class="benef">
                         @endif
                         <td style="display:none;" class="total_deposit">
-                            S/. {{$solicitude->total}}
+                            S/. {{$solicitude->monto}}
                         </td>
                         <td style="display:none" class="tes-ret">0</td>
                     @endif
-                    <td class="text-center">S/.{{$solicitude->total}}</td>
+                    <td class="text-center">S/. {{$solicitude->monto}}</td>
                     <td class="text-center">
                         <span class="label" style="background-color:{{$solicitude->state->rangeState->color}}">
                             {{$solicitude->state->rangeState->nombre}}

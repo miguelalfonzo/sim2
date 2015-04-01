@@ -41,8 +41,7 @@ Route::group(array('before' => 'rm'), function ()
     Route::get('list-fondos-rm','Dmkt\FondoController@listFondosRep');
     Route::get('registrar-gasto-fondo/{token}', 'Expense\ExpenseController@showRegisterFondo');
     Route::get('end-expense-fondo/{id}','Expense\ExpenseController@finishExpenseFondo');
-    Route::get('ver-gasto-fondo/{token}','Expense\ExpenseController@viewExpenseFondo');
-
+    
     // Ruc
     Route::post('consultarRuc', 'Expense\RucController@show');
     Route::get('ruc', function () {
@@ -181,6 +180,11 @@ Route::group(array ('before' => 'ager') ,function(){
     //Route::get('listar-solicitudes-ager','Dmkt\SolicitudeController@listSolicitudeAGer');
 });
 
+Route::group(array('before' => 'rm_cont_tes_ager'), function ()
+{
+    Route::get('show-fondo/{token}','Expense\ExpenseController@showFondo');
+});
+
 Route::group(array('before' => 'rm_cont_ager'), function ()
 {
     Route::post('register-expense', 'Expense\ExpenseController@registerExpense');
@@ -224,7 +228,7 @@ Route::group(array('before' => 'sys_user'), function ()
     Route::get('listar-solicitudes/{estado}', 'Dmkt\SolicitudeController@listSolicitude');
     Route::get('getclients', 'Dmkt\SolicitudeController@getClients');
     Route::post('list-account-state', 'Movements\MoveController@searchMove');
-    Route::get('show_user', 'Dmkt\SolicitudeController@show_user');
+    Route::get('show_user', 'Dmkt\SolicitudeController@showUser');
 });
 
 App::missing(function ($exception) 

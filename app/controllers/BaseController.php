@@ -229,7 +229,7 @@ class BaseController extends Controller {
     {
         try
         {
-            if ( in_array(Auth::user()->type , array(REP_MED,TESORERIA,CONT)))
+            if ( in_array(Auth::user()->type , array(REP_MED,SUP,CONT,TESORERIA)))
             {
                 $fondos = FondoInstitucional::with(array('histories' => function($q)
                 {
@@ -245,8 +245,11 @@ class BaseController extends Controller {
                         });
                     });
                 }
-                if ( Auth::user()->type == REP_MED)
-                    $fondos->where('idrm', Auth::user()->rm->idrm);
+                Log::error('s--sd');
+                if ( Auth::user()->type == REP_MED )
+                    $fondos->where('idrm', Auth::user()->Rm->idrm);
+                if ( Auth::user()->type == SUP )
+                    $fondos->where('idsup', Auth::user()->Sup->idsup);
                 $fondos = $fondos->whereRaw("to_date(periodo,'YYYYMM') BETWEEN TRUNC(to_date('$start','DD-MM-YY'),'MM') and TRUNC(to_date('$end','DD-MM-YY'),'MM')")
                 ->orderBy('periodo')->get();
                 $rpta = $this->setRpta($fondos);
@@ -287,8 +290,7 @@ class BaseController extends Controller {
             {
                 if ($estado != R_FINALIZADO)
                 {
-                    $solicituds->where('asiento',ENABLE_DEPOSIT)
-                    ->whereNotNull('idresponse');
+                    $solicituds->whereIn('estado',array(DEPOSITO_HABILITADO,DEPOSITADO));
                 }
                 else
                 {

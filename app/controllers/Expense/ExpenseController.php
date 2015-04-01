@@ -437,19 +437,30 @@ class ExpenseController extends BaseController{
 		];
 		return View::make('Expense.view',$data);
 	}
-    public function viewExpenseFondo($token){
-
-        $fondo = FondoInstitucional::where('token',$token)->firstOrFail();
-        if(count($fondo)>0)
-        {
-            $expense = Expense::where('idfondo',$fondo->idfondo)->get();
-        }
-        $data = [
-            'fondo' => $fondo,
-            'expense'    => $expense
-        ];
-        return View::make('Expense.view-fondo',$data);
-    }
+    public function showFondo($token)
+    {
+    	try
+    	{
+    		/*$inputs = Input::all();
+	        $fondo = FondoInstitucional::where('token',$inputs['token'])->firstOrFail();
+	        */
+			$fondo = FondoInstitucional::where('token',$token)->firstOrFail();
+	        if(count($fondo)>0)
+	        {
+	            $expense = Expense::where('idfondo',$fondo->idfondo)->get();
+	        }
+	        $data = array(
+	            'fondo' 	=> $fondo,
+	            'expense'   => $expense
+	        );
+	        return View::make('Expense.view-fondo',$data);
+	    }
+	    catch (Exception $e)
+	    {
+	    	$rpta = $this->internalException($e,__FUNCTION__);
+	    }
+	    return $rpta;
+	}
 
 	public function reportExpense($token){
 		$solicitude = Solicitude::where('token',$token)->firstOrFail();

@@ -37,8 +37,9 @@ class FondoController extends BaseController
     
     function getRegister()
     {
-        $fondos = FondoInstitucional::all();
-        return View::make('Dmkt.AsisGer.register_fondo')->with('fondos', $fondos);
+        $cuenta  = Fondo::where('cuenta_mkt',CTA_FONDO_INSTITUCIONAL)->firstOrFail();
+        Log::error($cuenta);
+        return View::make('Dmkt.AsisGer.register_fondo')->with('cuenta', $cuenta);
     }
     
     public function postRegister()
@@ -51,35 +52,43 @@ class FondoController extends BaseController
             $verifyMonth = FondoInstitucional::where('periodo', $periodo)->where('terminado', TERMINADO)->get();
             if(count($verifyMonth) != 0)
                 return array(status => warning , description => 'El periodo ingresado ya ha sido terminado');
-            $fondo              = new FondoInstitucional;
-            $idfondo            = $fondo->searchId() + 1;
-            $fondo->idfondo     = $idfondo;
-            $fondo->idsup       = $inputs['codsup'];
-            $fondo->institucion = $inputs['institucion'];
-            $fondo->repmed      = $inputs['repmed'];
-            $fondo->supervisor  = $inputs['supervisor'];
-            $fondo->total       = $inputs['total'];
-            $fondo->cuenta      = $inputs['cuenta'];
-            $fondo->idrm        = $inputs['codrepmed'];
-            $fondo->estado      = PENDIENTE;
-            $fondo->tipo_moneda = SOLES;
-            $token              = sha1(md5(uniqid($fondo->idfondo, true)));
-            $fondo->token       = $token;
-            $fondo->periodo     = $periodo;
-            $fondo->save();
+            $cuenta = Fondo::where('cuenta_mkt',CTA_FONDO_INSTITUCIONAL)->get();
+            if (count($cuenta) == 1 )
+            {
+                $fondo              = new FondoInstitucional;
+                $idfondo            = $fondo->searchId() + 1;
+                $fondo->idfondo     = $idfondo;
+                $fondo->institucion = $inputs['institucion'];
+                $fondo->repmed      = $inputs['repmed'];
+                $fondo->idrm        = $inputs['codrepmed'];
+                $fondo->supervisor  = $inputs['supervisor'];
+                $fondo->idsup       = $inputs['codsup'];
+                $fondo->idcuenta    = $cuenta[0]->idfondo;
+                $fondo->monto       = $inputs['total'];
+                $fondo->rep_cuenta  = $inputs['cuenta'];
+                $fondo->iduser      = Auth::user()->id;
+                $fondo->estado      = PENDIENTE;
+                $fondo->tipo_moneda = SOLES;
+                $token              = sha1(md5(uniqid($fondo->idfondo, true)));
+                $fondo->token       = $token;
+                $fondo->periodo     = $periodo;
+                $fondo->save();
 
-            $userid = Auth::user()->id;
-            $middleRpta = $this->setStatus($inputs['institucion'], '', PENDIENTE, $userid, $userid, $idfondo,FONDO);
-            if ($middleRpta[status] == ok)    
-            {    
-                DB::commit();
-                return $this->setRpta($this->getFondos($inputs['mes']));
+                $userid = Auth::user()->id;
+                $middleRpta = $this->setStatus($inputs['institucion'], '', PENDIENTE, $userid, $userid, $idfondo,FONDO);
+                if ($middleRpta[status] == ok)    
+                {    
+                    DB::commit();
+                    return $this->setRpta($this->getFondos($inputs['mes']));
+                }
+                else
+                {             
+                    DB::rollback();
+                    return array( status => warning , description => 'Error del Sistema');
+                }
             }
             else
-            {             
-                DB::rollback();
-                return array( status => warning , description => 'Error del Sistema');
-            }
+                return array ( status => warning, description => 'La cuenta especificada tiene registrada mas de una marca');
         }
         catch (Exception $e)
         {
@@ -101,26 +110,34 @@ class FondoController extends BaseController
                 return 'blocked';
             else
             {
-                $fondo              = FondoInstitucional::find($inputs['idfondo']);
-                $fondo->institucion = $inputs['institucion'];
-                $fondo->repmed      = $inputs['repmed'];
-                $fondo->supervisor  = $inputs['supervisor'];
-                $fondo->total       = $inputs['total'];
-                $fondo->cuenta      = $inputs['cuenta'];
-                $fondo->idrm        = $inputs['codrepmed'];
-                $fondo->idsup       = $inputs['codsup'];
-                $fondo->periodo     = $periodo;
-                $fondo->save();
-                $fondos = $this->getFondos($inputs['mes']);
-                $userid = Auth::user()->id;
-                $middleRpta = $this->setStatus($inputs['institucion'], '', PENDIENTE, $userid, $userid, $inputs['idfondo'],FONDO);
-                if ($middleRpta[status] == ok)    
-                {    
-                    DB::commit();
-                    return $this->setRpta($this->getFondos($inputs['mes']));
+                $cuenta = Fondo::where('cuenta_mkt',CTA_FONDO_INSTITUCIONAL)->get();
+                if (count($cuenta) == 1 )
+                {
+                    $fondo              = FondoInstitucional::find($inputs['idfondo']);
+                    $fondo->institucion = $inputs['institucion'];
+                    $fondo->repmed      = $inputs['repmed'];
+                    $fondo->idrm        = $inputs['codrepmed'];
+                    $fondo->supervisor  = $inputs['supervisor'];
+                    $fondo->idsup       = $inputs['codsup'];
+                    $fondo->idcuenta    = $cuenta[0]->idfondo;
+                    $fondo->monto       = $inputs['total'];
+                    $fondo->rep_cuenta  = $inputs['cuenta'];
+                    $fondo->periodo     = $periodo;
+                    $fondo->iduser      = Auth::user()->id;
+                    $fondo->save();
+                    $fondos = $this->getFondos($inputs['mes']);
+                    $userid = Auth::user()->id;
+                    $middleRpta = $this->setStatus($inputs['institucion'], '', PENDIENTE, $userid, $userid, $inputs['idfondo'],FONDO);
+                    if ($middleRpta[status] == ok)    
+                    {    
+                        DB::commit();
+                        return $this->setRpta($this->getFondos($inputs['mes']));
+                    }
+                    else
+                        DB::rollback();
                 }
                 else
-                    DB::rollback();
+                    return array ( status => warning, description => 'La cuenta especificada tiene registrada mas de una marca');
             }
         }
         catch (Exception $e)
@@ -386,19 +403,36 @@ class FondoController extends BaseController
 
     public function viewGenerateSeatFondo($token)
     {
-        $fondo = FondoInstitucional::where('token', $token)->firstOrFail();
-        $date = $this->getDay();
-        $cuenta = Fondo::where('cuenta_mkt', CTA_FONDO_INSTITUCIONAL)->get();
-        $banco = Account::where('num_cuenta', CTA_BANCOS_SOLES)->get();
-        $data = array(
-            'type'   => FONDO,
-            'fondo'  => $fondo,
-            'date'   => $date,
-            'cuenta' => $cuenta,
-            'banco'  => $banco
-        );
-        return View::make('Dmkt.Cont.register_seat_solicitude')->with($data);
-        //return View::make('Dmkt.Cont.register_seat_fondo')->with($data);
+        try
+        {
+            $fondo = FondoInstitucional::where('token', $token)->firstOrFail();
+            $date = $this->getDay();
+            $cuenta = Fondo::where('cuenta_mkt', CTA_FONDO_INSTITUCIONAL)->get();
+            
+            if ($fondo->tipo_moneda == SOLES)
+                $banco = Account::where('alias',BANCOS)->where('num_cuenta',CUENTA_SOLES)->get();
+            elseif ($fondo->tipo_moneda == DOLARES)
+                $banco = Account::where('alias',BANCOS)->where('num_cuenta',CUENTA_DOLARES)->get();
+            if ( count($banco) == 1)
+            {
+                $data = array(
+                    'type'   => FONDO,
+                    'fondo'  => $fondo,
+                    'date'   => $date,
+                    'cuenta' => $cuenta,
+                    'banco'  => $banco
+                );
+                return View::make('Dmkt.Cont.register_advance_seat')->with($data);
+            //return View::make('Dmkt.Cont.register_seat_fondo')->with($data);
+            }
+            else
+                return array ( status => warning , description => 'Existen varias cuentas de banco en '.$fondo->tipo_moneda);
+        }
+        catch (Exception $e)
+        {
+            $rpta = $this->internalException($e,__FUNCTION__);
+            return $rpta;
+        }
     }
 
     public function generateSeatFondo()

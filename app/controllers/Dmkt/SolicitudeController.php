@@ -69,7 +69,7 @@ class SolicitudeController extends BaseController
         return $result;
     }
     /** ----------------------------------  Representante Medico ---------------------------------- */
-    public function show_user()
+    public function showUser()
     {
         if (Session::has('state'))
             $state = Session::pull('state');
@@ -415,7 +415,8 @@ class SolicitudeController extends BaseController
                 $middleRpta1 = $this->searchSolicituds($estado,$rpta[data],$start,$end);
                 if ($middleRpta1[status] == ok)
                 {
-                    if ( in_array(Auth::user()->type , array(REP_MED,TESORERIA,CONT)))
+                    //Log::error($middleRpta1[data]);
+                    if ( in_array(Auth::user()->type , array(REP_MED,SUP,TESORERIA,CONT)))
                     {
                         $middleRpta2 = $this->searchFondos($estado,$rpta[data],$start,$end);
                         if ($middleRpta2[status] == ok)
@@ -956,10 +957,11 @@ class SolicitudeController extends BaseController
             }
             $fondo_aux = Fondo::where('idfondo', $sol->idfondo)->first();
             $saldo = $fondo_aux->saldo;
-            $fondo = Fondo::where('idfondo', $sol->idfondo);
+            /*$fondo = Fondo::where('idfondo', $sol->idfondo);
             $fondo->saldo = $saldo - $sol->monto;
             $data = $this->objectToArray($fondo);
             $fondo->update($data);
+            */
             $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, APROBADO, Auth::user()->id, USER_CONTABILIDAD, $idSol,SOLIC);
             if ( $rpta[status] == ok )
                 DB::commit();
@@ -1411,41 +1413,54 @@ class SolicitudeController extends BaseController
 
     public function viewGenerateSeatSolicitude($token)
     {
-        $solicitude = Solicitude::where('token', $token)->firstOrFail();
-        $date = $this->getDay();
-        $expense = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
-        $clientes = array();
-        $nom = '';
-        foreach($solicitude->clients as $client)
+        try
         {
-            if ($client->from_table == TB_DOCTOR)
+            $solicitude = Solicitude::where('token', $token)->firstOrFail();
+            $date = $this->getDay();
+            //$expense = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
+            $clientes = array();
+            $nom = '';
+            foreach($solicitude->clients as $client)
             {
-                $doctors = $client->doctors;
-                $nom = $doctors->pefnombres.' '.$doctors->pefpaterno.' '.$doctors->pefmaterno;            
+                if ($client->from_table == TB_DOCTOR)
+                {
+                    $doctors = $client->doctors;
+                    $nom = $doctors->pefnombres.' '.$doctors->pefpaterno.' '.$doctors->pefmaterno;            
+                }
+                elseif ($client->from_table == TB_INSTITUTE)
+                    $nom = $client->institutes->pejrazon;
+                else
+                    $nom = 'No encontrado';
+                array_push($clientes,$nom);
             }
-            elseif ($client->from_table == TB_INSTITUTE)
-                $nom = $client->institutes->pejrazon;
+            $clientes = implode(',',$clientes);
+            if ($solicitude->tipo_moneda == SOLES)
+            {
+                $banco = Account::where('alias',BANCOS)->where('num_cuenta',CUENTA_SOLES)->get();
+            }
+            elseif ($solicitude->tipo_moneda == DOLARES) {
+                $banco = Account::where('alias',BANCOS)->where('num_cuenta',CUENTA_DOLARES)->get();
+            }
+            if (count($banco) == 1)
+            {
+                $data = array(
+                    'type'       => SOLIC,
+                    'solicitude' => $solicitude,
+                    //'expense'    => $expense,
+                    'date'       => $date,
+                    'clientes'   => $clientes,
+                    'bancos'     => $banco
+                );
+                return View::make('Dmkt.Cont.register_advance_seat', $data);
+            }
             else
-                $nom = 'No encontrado';
-            array_push($clientes,$nom);
+                return array ( status => warning , description => 'Existen varias cuentas de banco en '.$solicitude->tipo_moneda);
         }
-        $clientes = implode(',',$clientes);
-        if ($solicitude->tipo_moneda == SOLES)
+        catch (Exception $e)
         {
-            $banco = Account::where('alias',BANCOS)->where('num_cuenta',CUENTA_SOLES)->first();
+            $rpta = $this->internalException($e,__FUNCTION__);
+            return $rpta;
         }
-        elseif ($solicitude->tipo_moneda == DOLARES) {
-            $banco = Account::where('alias',BANCOS)->where('num_cuenta',CUENTA_DOLARES)->first();
-        }
-        $data = array(
-            'type'       => SOLIC,
-            'solicitude' => $solicitude,
-            'expense'    => $expense,
-            'date'       => $date,
-            'clientes'   => $clientes,
-            'bancos'     => $banco
-        );
-        return View::make('Dmkt.Cont.register_seat_solicitude', $data);
     }
 
     public function viewSeatExpense($token)

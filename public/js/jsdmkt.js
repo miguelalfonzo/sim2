@@ -223,9 +223,9 @@ function newSolicitude() {
         var url = 'deposit-solicitude';
         var data = {};
         data.type_deposit   = $(this).attr('data-deposit');
-        data.op_number = $("#op-number").val();
-        data.token     = $("#token").val();
-        data._token    = $("input[name=_token]").val();
+        data.op_number      = $("#op-number").val();
+        data.token          = $("#token").val();
+        data._token         = $("input[name=_token]").val();
 
         if ($("#op-number").val().trim() === "")
             $("#message-op-number").text("Ingrese el número de Operación");
@@ -238,9 +238,14 @@ function newSolicitude() {
                 {
                     $('#myModal').modal('hide');
                     $("#enable_deposit_Modal").modal('hide');
-                    bootbox.alert("<h4 class='green'>Se registro el codigo de deposito correctamente.</h4>");
                     $("#op-number").val('');
-                    listSolicitude();
+                    bootbox.alert("<h4 class='green'>Se registro el codigo de deposito correctamente.</h4>", function()
+                    {
+                        if ($("tbody").length == 0)
+                            window.location.href = server +"show_user";
+                        else
+                            listSolicitude();
+                    });
                 }
                 else
                     bootbox.alert("<h4 class='red'>" + data.Status + ': ' + data.Description + "'.</h4>") ;    
@@ -469,11 +474,10 @@ function newSolicitude() {
 
     /** --------------------------------------------- TESORERIA ------------------------------------------------- **/
 
-    if(userType === 'T')
+    /*if(userType === 'T')
     {
-        /*listSolicitude('tes',APROBADO);*/
         listFondos('fondos-tesoreria');
-    }
+    }*/
 
 
     var search_solicitude_cont = $('#search_solicitude_tes');
@@ -661,10 +665,10 @@ function newSolicitude() {
                 'repmed'      : fondo_repmed.val(),
                 'codrepmed'   : fondo_repmed.attr('data-cod'),
                 'supervisor'  : fondo_supervisor.val(),
-                'codsup'      : fondo_supervisor.attr('data-cod'), 
-                'total' : fondo_total.val(),
-                'cuenta': fondo_cuenta.val(),
-                '_token' : $('#_token').val(),
+                'codsup'      : fondo_supervisor.attr('data-cod'),
+                'total'       : fondo_total.val(),
+                'cuenta'      : fondo_cuenta.val(),
+                '_token'      : $('#_token').val(),
                 'mes' : $(this).parent().parent().parent().find(".date_month").val()
             };
             date_reg_fondo.last().val(date_reg_fondo.val());
@@ -874,9 +878,9 @@ function newSolicitude() {
             fondo_repmed.attr('data-cod',data.idrm)
             fondo_supervisor.val(data.supervisor).attr('disabled',true);
             fondo_supervisor.attr('data-cod',data.idsup).parent().addClass('has-success');
-            fondo_total.val(data.total);
+            fondo_total.val(data.monto);
             date_reg_fondo.val( data.periodo.substr(4,6) + '-' + data.periodo.substr(0,4) );
-            fondo_cuenta.val(data.cuenta).attr('disabled',true).parent().addClass('has-success');
+            fondo_cuenta.val(data.rep_cuenta).attr('disabled',true).parent().addClass('has-success');
             $('#idfondo').val(data.idfondo)
         });
         $('html, body').animate({scrollTop: date_reg_fondo.offset().top -10 }, 'slow');
