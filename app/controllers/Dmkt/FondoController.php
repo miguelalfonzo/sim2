@@ -151,7 +151,8 @@ class FondoController extends BaseController
     public function getFondos($start, $export = 0)
     {
         $periodo = $this->period($start);
-        if ($export) {
+        if ($export) 
+        {
             $fondos = FondoInstitucional::where('periodo', $periodo)->get(array(
                 'institucion',
                 'repmed',
@@ -160,7 +161,9 @@ class FondoController extends BaseController
                 'total'
             ));
             return $fondos;
-        } else {
+        } 
+        else 
+        {
             $fondos = FondoInstitucional::where('periodo', $periodo)->get();
             $estado = 0;
             $export = 0;
@@ -175,9 +178,9 @@ class FondoController extends BaseController
                 }
             }
             return View::make('Dmkt.AsisGer.list_fondos')->with('fondos', $fondos)->with('sum', $fondos->sum('total'))->with('estado', $estado)->with('export', $export)->render();
-        }
-        
+        }    
     }
+
     function getFondosTesoreria($start, $export = 0)
     {
         $periodo = $this->period($start);

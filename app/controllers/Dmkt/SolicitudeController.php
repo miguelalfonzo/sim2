@@ -955,9 +955,9 @@ class SolicitudeController extends BaseController
                     $i++;
                 }
             }
-            $fondo_aux = Fondo::where('idfondo', $sol->idfondo)->first();
+            /*$fondo_aux = Fondo::where('idfondo', $sol->idfondo)->first();
             $saldo = $fondo_aux->saldo;
-            /*$fondo = Fondo::where('idfondo', $sol->idfondo);
+            $fondo = Fondo::where('idfondo', $sol->idfondo);
             $fondo->saldo = $saldo - $sol->monto;
             $data = $this->objectToArray($fondo);
             $fondo->update($data);
@@ -1051,11 +1051,10 @@ class SolicitudeController extends BaseController
         $result   = array();
         $seatList = array();
         Log::error(json_encode($fondo->idfondo  ));
-        if($solicitude){
+        if($solicitude)
             $advanceSeat = json_decode(Entry::where('idsolicitud', $solicitude->idsolicitud)->where('d_c', ASIENTO_GASTO_BASE)->first()->toJson());
-        }else{
+        else
             $advanceSeat = json_decode(Entry::where('idfondo', $fondo->idfondo)->where('d_c', ASIENTO_GASTO_BASE)->first()->toJson());
-        }
 
         $cuentaMkt      = $advanceSeat->num_cuenta;
         $accountResult  = $this->getCuentaCont($cuentaMkt);
@@ -1080,16 +1079,16 @@ class SolicitudeController extends BaseController
         $username= '';
 
         $userType       = $userElement->type;
-        if($userType == 'R'){
+        if($userType == REP_MED){
             $username .= strtoupper(substr($userElement->rm->nombres, 0, 1) .' ');
             $username .= strtoupper(explode(' ', $userElement->rm->apellidos)[0]);
         }
-        elseif($userType == 'S')
+        elseif($userType == SUP)
         {
             $username .= strtoupper(substr($userElement->sup->nombres, 0, 1) .' ');
             $username .= strtoupper(explode(' ', $userElement->sup->apellidos)[0]);
         }
-        elseif($userType == 'P'){
+        elseif($userType == GER_PROD){
             $tempNameArray = explode(' ', $userElement->gerProd->descripcion);
             $username .= strtoupper(substr($tempNameArray[0], 0, 1) .' ');
             $username .= strtoupper($tempNameArray[1]);
