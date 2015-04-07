@@ -3,4 +3,4 @@
 <p>{{ $msg }}</p> 
 <p>{{ $solicitud_titulo }}</p>
 <p>{{ $solicitud_descripcion }}</p>
-<p>Monto: {{ $solicitud_tipo_moneda }} {{ $solicitud_monto }}</p>
+<!-- <p>Monto: { $solicitud_tipo_moneda } { $solicitud_monto }</p> -->

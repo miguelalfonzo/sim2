@@ -7,19 +7,37 @@ use \Eloquent;
 class Solicitude extends Eloquent{
 
 
-    protected $table = 'DMKT_RG_SOLICITUD';
-    protected $primaryKey = 'idsolicitud';
+    protected $table = 'DMKT2_RG_SOLICITUD';
+    protected $primaryKey = 'id';
+    
 
-    function searchId(){
-
-        $lastId = Solicitude::orderBy('idsolicitud', 'DESC')->first();
-        if($lastId == null){
+    public function searchId()
+    {
+        $lastId = Solicitude::orderBy('id', 'DESC')->first();
+        if($lastId == null)
             return 0;
-        }else{
-            return $lastId->idsolicitud;
-        }
-
+        else
+            return $lastId->id;
     }
+
+    protected function detalle()
+    {
+        return $this->hasOne('Dmkt\SolicitudeDetalle','id','iddetalle');
+    }
+
+    protected function typeSolicitude()
+    {
+        return $this->hasOne('Dmkt\SolicitudeType','id','idtiposolicitud');
+    }
+
+    protected function families(){
+        return $this->hasMany('Dmkt\SolicitudeFamily','idsolicitud','id');
+    }
+
+    protected function clients(){
+        return $this->hasMany('Dmkt\SolicitudeClient','idsolicitud','id');
+    }
+
     function subtype(){
 
         return  $this->hasOne('Common\Fondo','idfondo','idfondo');
@@ -27,31 +45,17 @@ class Solicitude extends Eloquent{
 
     function state(){
 
-        return $this->hasOne('Common\State','idestado','estado');
+        return $this->hasOne('Common\State','idestado','idestado');
     }
 
-    function rangeState(){
-        return $this->hasOne('Common\State','idestado','estado')
-        ->hasOne('Common\StateRange','id','idstate');    
-    }
-
-    function typemoney(){
-
-        return $this->hasOne('Common\TypeMoney','idtipomoneda','tipo_moneda');
-    }
-
-    function typesolicitude(){
+    function reasonSolicitude(){
         return $this->hasOne('Dmkt\TypeSolicitude','idtiposolicitud','idtiposolicitud');
     }
 
-    function families(){
-        return $this->hasMany('Dmkt\SolicitudeFamily','idsolicitud','idsolicitud');
-    }
-    function clients(){
-        return $this->hasMany('Dmkt\SolicitudeClient','idsolicitud','idsolicitud');
-    }
+    
+    
     function gastos(){
-        return $this->hasMany('Expense\Expense','idsolicitud','idsolicitud');
+        return $this->hasMany('Expense\Expense','idsolicitud','id');
     }
 
     function user(){
@@ -59,7 +63,7 @@ class Solicitude extends Eloquent{
     }
 
     function response(){
-        return $this->belongsTo('User','idresponse');
+        return $this->belongsTo('User','iduserasigned');
     }
 
     function typePayment(){
@@ -98,8 +102,8 @@ class Solicitude extends Eloquent{
         return $this->hasOne('Dmkt\Manager','iduser','idaproved');
     }
 
-    function histories(){
-        return $this->hasMany('System\SolicitudeHistory','idsolicitude');
+    public function histories(){
+        return $this->hasMany('System\SolicitudeHistory','id');
     }
 
     function etiqueta(){

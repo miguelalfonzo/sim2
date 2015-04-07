@@ -5,7 +5,7 @@ use \Eloquent;
 
 class Fondo extends Eloquent {
 
-    protected $table = 'DMKT_RG_FONDOS';
+    protected $table = 'DMKT_RG_FONDO';
     protected $primaryKey = null;
     public $incrementing = false;
 

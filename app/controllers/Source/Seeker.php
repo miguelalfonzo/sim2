@@ -40,7 +40,7 @@ class Seeker extends BaseController
 		try
 		{
 			$inputs = Input::all();
-			$json = '[{"name":"FICPE.PERSONAFIS","wheres":{"likes":["PEFNRODOC1","(PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)"],"equal":{"PEFESTADO":1}},"selects":["PEFCODPERS","(\'DOCTOR: \' || PEFNRODOC1 || \'-\' || PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)"]},{"name":"FICPEF.PERSONAJUR","wheres":{"likes":["PEJNRODOC","PEJRAZON"],"equal":[{"PEJESTADO":1}]},"selects":["PEJCODPERS","(\'CENTRO: \' || PEJNRODOC || \'-\' || PEJRAZON)"]}]';
+			$json = '[{"name":"FICPE.PERSONAFIS","wheres":{"likes":["PEFNRODOC1","(PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)"],"equal":{"PEFESTADO":1}},"selects":["PEFCODPERS","(\'DOCTOR: \' || PEFNRODOC1 || \'-\' || PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)"]},{"name":"FICPEF.PERSONAJUR","wheres":{"likes":["PEJNRODOC","PEJRAZON"],"equal":{"PEJESTADO":1}},"selects":["PEJCODPERS","(\'CENTRO: \' || PEJNRODOC || \'-\' || PEJRAZON)"]}]';
 	    	$cAlias = array('value','label');
 	    	$rpta = $this->searchSeeker($inputs['sVal'],$json,$cAlias);
 		}
@@ -121,12 +121,14 @@ class Seeker extends BaseController
 	    		if (json_last_error() == JSON_ERROR_NONE)
 		    	{
 			    	$array = array();
+			    	Log::error($json);
 			    	foreach ($json as $table)
 			    	{
 			    		$select = '';
 			    		$query = DB::table($table->name);
 			    		foreach ( $table->wheres->likes as $like)
 			    			$query->orWhereRaw(" UPPER(" .$like. ") like '%" .strtoupper($inputs). "%' ");
+			    		
 			    		foreach ($table->wheres->equal as $key=>$value)
 			    			$query->where($key,$value);
 			    		for ( $i=0; $i<2; $i++)
@@ -134,12 +136,15 @@ class Seeker extends BaseController
 			    		$select = substr($select,0,-1);
 			    		$query->select(DB::raw($select));
 			    		$query->take(4);
+			    		Log::error('SEARCHSEEKER1111111111');
+			    		
 			    		$tms = $query->get();
 			    		for ($i=0; $i < count($tms); $i++)
 			    			$tms[$i]->table = $table->name;
 			    		$array = array_merge($tms,$array);
-			    		
 			    	}
+
+			    		
 			    	$rpta = $this->setRpta($array);
 			    }
 			    else

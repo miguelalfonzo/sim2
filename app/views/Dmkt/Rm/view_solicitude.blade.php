@@ -90,10 +90,9 @@
 
     <div class="col-sm-12 col-md-12 col-lg-12">
         <div class="input-group">
-            <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-            <input id="textinput" name="textinput" type="text" placeholder="" value="{{$solicitude->monto}}"
-                   readonly
-                   class="form-control input-md">
+            <span class="input-group-addon">{{$solicitude->detalle->typeMoney->simbolo}}</span>
+            <input id="textinput" value="{{json_decode($solicitude->detalle->detalle)->monto_solicitado}}"
+            class="form-control input-md" name="textinput" type="text" readonly>
         </div>
     </div>
 </div>

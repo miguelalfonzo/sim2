@@ -107,7 +107,7 @@ class BaseController extends Controller {
     public function postman($idsolicitud, $fromEstado, $toEstado, $toUser){
         try 
         {
-            $solicitud = Solicitude::where('idsolicitud', $idsolicitud)->first();
+            $solicitud = Solicitude::find($idsolicitud);
             $msg        = '';
             $subject    = 'Solicitud N° '.$idsolicitud;
             $user_name  = $toUser != null ? $toUser->getName() : '';
@@ -118,9 +118,9 @@ class BaseController extends Controller {
                     'msg'                   => $msg,
                     'solicitud_estado'      => $toEstado,
                     'solicitud_titulo'      => $solicitud->titulo,
-                    'solicitud_descripcion' => $solicitud->descripcion,
-                    'solicitud_tipo_moneda' => $solicitud->typemoney->simbolo,
-                    'solicitud_monto'       => $solicitud->monto
+                    'solicitud_descripcion' => $solicitud->descripcion//,
+                    /*'solicitud_tipo_moneda' => $solicitud->typemoney->simbolo,
+                    'solicitud_monto'       => $solicitud->monto*/
                 );
 
                 Mail::send('emails.notification', $data, function($message) use ($subject, $user_name, $user_email){
@@ -148,7 +148,7 @@ class BaseController extends Controller {
         return $rpta;
     }
 
-    public function setStatus($description, $status_from, $status_to, $user_from_id, $user_to_id, $idsolicitude,$type){
+    public function setStatus( $status_from, $status_to, $user_from_id, $user_to_id, $idsolicitude){
         try
         {
             $fromStatus = State::where('idestado', $status_from)->first();
@@ -163,7 +163,7 @@ class BaseController extends Controller {
             {
                 $idestadoFrom = $fromStatus == null ? null : $fromStatus->idestado;
                 $idestadoTo = $toStatus == null ? null : $toStatus->idestado;
-                $rpta = $this->updateStatusSolicitude($description, $idestadoFrom, $idestadoTo, $fromUser, $toUser, $idsolicitude, 0, $type);
+                $rpta = $this->updateStatusSolicitude( $idestadoFrom, $idestadoTo, $fromUser, $toUser, $idsolicitude, 0);
             }
         }
         catch (Exception $e)
@@ -173,22 +173,21 @@ class BaseController extends Controller {
         return $rpta;
     }
 
-    public function updateStatusSolicitude($description, $status_from, $status_to, $user_from, $user_to, $idsolicitude, $notified,$type)
+    public function updateStatusSolicitude( $status_from, $status_to, $user_from, $user_to, $idsolicitude, $notified)
     {   
         try
         {
             $fData = array(
                 'status_to'   => $status_to,
                 'idsolicitude'=> $idsolicitude,
-                'type'        => $type
                 );
 
+            Log::error($fData);
+
             $vData = array(
-                'description' => $description,
                 'status_from' => $status_from,
                 'user_from'   => $user_from->type,
                 'user_to'     => $user_to->type,
-                'iduser_from' => $user_from->id,
                 'notified'    => $notified
                 );
             $statusSolicitude = SolicitudeHistory::firstOrNew($fData);
@@ -199,10 +198,9 @@ class BaseController extends Controller {
                 $statusSolicitude->status_to    = $status_to;
                 $statusSolicitude->user_from    = $user_from->type;
                 $statusSolicitude->user_to      = $user_to->type;
-                $statusSolicitude->iduser_from  = $user_from->id;
+                //$statusSolicitude->iduser_from  = $user_from->id;
                 $statusSolicitude->idsolicitude = $idsolicitude;
                 $statusSolicitude->notified     = $notified;
-                $statusSolicitude->type         = $type;
                 $statusSolicitude->save();
             }
             else
@@ -278,9 +276,9 @@ class BaseController extends Controller {
 
             if (Auth::user()->type == REP_MED)
             {
-                $solicituds->whereIn('iduser', $idUser);
-                $rSolicituds->whereNotIn('iduser', $idUser)
-                ->where( 'idresponse' , Auth::user()->id );
+                $solicituds->whereIn('created_by', $idUser);
+                $rSolicituds->whereNotIn('created_by', $idUser)
+                ->whereIn( 'iduserasigned' , $idUser );
             }
             else if (Auth::user()->type == SUP)
             {
@@ -299,17 +297,20 @@ class BaseController extends Controller {
             }
             else if ( Auth::user()->type == ASIS_GER ) 
             {
-                $solicituds->where('idresponse',$idUser);
+                $solicituds->where('iduserasigned',$idUser);
             }
             else if ( !(Auth::user()->type == GER_COM || Auth::user()->type == CONT) )
             {
-                $solicituds->whereIn('idsolicitud', $idUser);
+                $solicituds->whereIn('id', $idUser);
             }
             if ($start != null && $end != null)
+            {
                 $solicituds->whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
                 $rSolicituds->whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
+            }
 
-            if ($estado != R_TODOS) 
+            if ($estado != R_TODOS)
+            { 
                 $solicituds->whereHas('state', function ($q) use($estado)
                 {
                     $q->whereHas('rangeState', function ($t) use($estado)
@@ -324,12 +325,11 @@ class BaseController extends Controller {
                         $t->where('id',$estado);
                     });
                 });
-            $solicituds = $solicituds->orderBy('idsolicitud', 'ASC')->get();
-            $rSolicituds = $rSolicituds->orderBy('idsolicitud', 'ASC')->get();
-            if ( Auth::user()->type == REP_MED )
-            {
-                $solicituds = $solicituds->merge($rSolicituds);
             }
+            $solicituds = $solicituds->orderBy('id', 'ASC')->get();
+            $rSolicituds = $rSolicituds->orderBy('id', 'ASC')->get();
+            if ( Auth::user()->type == REP_MED )
+                $solicituds = $solicituds->merge($rSolicituds);
             $rpta = $this->setRpta($solicituds);
         }
         catch (Exception $e)

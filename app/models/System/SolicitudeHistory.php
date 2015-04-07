@@ -6,16 +6,16 @@ use \Eloquent;
 
 class SolicitudeHistory extends Eloquent{
 	protected $table = 'DMKT_RG_SOLICITUD_HISTORIAL';
-    protected $fillable = array('description','status_to');
+    protected $fillable = array('id','status_to');
 	protected $primaryKey = 'id';
 
-	public function lastId(){
+	public function lastId()
+    {
 		$lastId = SolicitudeHistory::orderBy('id','desc')->first();
-		if($lastId == null){
+		if($lastId == null)
             return 0;
-        }else{
+        else
             return $lastId->id;
-        }
 	}
 
 	public function lastState() {
@@ -23,6 +23,6 @@ class SolicitudeHistory extends Eloquent{
     }
 
     public function user(){
-    	return $this->hasOne('User','id','iduser_from');
+    	return $this->hasOne('User','id','created_by');
     }
 }

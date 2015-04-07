@@ -100,3 +100,10 @@ const TB_INSTITUTE = 'FICPEF.PERSONAJUR';
 
 const SOLIC = 'S';
 const FONDO = 'F';
+
+const SOL_REP  = 1;
+const SOL_INST = 2;
+
+const ACTIVE   = 1;
+const BLOCKED  = 2;
+const INACTIVE = 3;

@@ -23,7 +23,7 @@
             action="{{isset($solicitude) ? 'editar-solicitud' : 'registrar-solicitud' }}" enctype="multipart/form-data">
             {{Form::token()}}
             @if(isset($solicitude))
-                <input value="{{$solicitude->idsolicitud}}" name="idsolicitude" type="hidden">
+                <input value="{{$solicitude->id}}" name="idsolicitude" type="hidden">
             @endif
             <input id="typeUser" type="hidden" value="{{Auth::user()->type}}">
             <div class="form-group col-sm-6 col-md-4">
@@ -41,9 +41,9 @@
                     <select class="form-control selecttypesolicitude" name="type_solicitude">
                         @foreach($typesolicituds as $type)
                             @if(isset($solicitude) && $solicitude->idtiposolicitud == $type->idtiposolicitud)
-                                <option selected value="{{$type->idtiposolicitud}}">{{$type->nombre}}</option>
+                                <option selected value="{{$type->id}}">{{$type->nombre}}</option>
                             @else
-                                <option value="{{$type->idtiposolicitud}}">{{$type->nombre}}</option>
+                                <option value="{{$type->id}}">{{$type->nombre}}</option>
                             @endif
                         @endforeach
                     </select>
@@ -103,7 +103,7 @@
                 <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto Solicitado</label>
                 <div class="col-sm-12 col-md-12">
                     <input id="idestimate" class="form-control input-md" name="monto" type="text" placeholder=""
-                           value="{{isset($solicitude->monto) ? $solicitude->monto : null }}">
+                           value="{{isset($solicitude->detalle->detalle) ? json_decode($solicitude->detalle->detalle)->monto_solicitado : null }}">
                 </div>
             </div>
             <div class="form-group col-sm-6 col-md-4">

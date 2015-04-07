@@ -1,7 +1,7 @@
 <td style="text-align: center">
     <div class="div-icons-solicituds">
         @if(Auth::user()->type == REP_MED)
-            @if (isset($solicitude->idsolicitud))
+            @if ((trim($solicitude->typeSolicitude->code) == SOLIC ) )
                 <a href="{{URL::to('ver-solicitud-rm').'/'.$solicitude->token}}">
                     <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span>
                 </a>
@@ -10,7 +10,7 @@
                         <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span>
                     </a>
                 @endif
-                @if($solicitude->estado == REGISTRADO && Auth::user()->id == $solicitude->idresponse)
+                @if($solicitude->idestado == REGISTRADO && Auth::user()->id == $solicitude->idresponse)
                     <a target="_blank" href="{{URL::to('a'.'/'.$solicitude->token)}}">
                         <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-print"></span>
                     </a>
@@ -18,7 +18,7 @@
                         <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span>
                     </a>
                 @endif
-                @if($solicitude->estado == PENDIENTE && $solicitude->derived == 0 && $solicitude->user->type = REP_MED)
+                @if( $solicitude->idestado == PENDIENTE )
                     @if(!$solicitude->blocked == 1)
                         <a href="{{URL::to('editar-solicitud').'/'.$solicitude->token}}">
                             <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-pencil"></span>
@@ -28,7 +28,7 @@
                         </a>
                     @endif
                 @endif
-            @elseif ( isset($solicitude->idfondo) )
+            @elseif ( $solicitude->typeSolicitude->code == FONDO ) )
                 <a href="{{URL::to('show-fondo/'.$solicitude->token)}}">
                     <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span>
                 </a>    
