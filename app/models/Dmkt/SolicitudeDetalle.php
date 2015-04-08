@@ -18,9 +18,14 @@ class SolicitudeDetalle extends Eloquent
         	return $lastId->id;
     }
 
-    public function typeMoney()
+    protected function typeMoney()
     {
     	return $this->hasOne('Common\TypeMoney','idtipomoneda', 'idmoneda' );
+    }
+
+    protected function typePayment()
+    {
+        return $this->hasOne('Common\TypePayment','idtipopago','idpago');
     }
 
     public function prueba()
@@ -28,5 +33,10 @@ class SolicitudeDetalle extends Eloquent
     		$sol = SolicitudeDetalle::first();
     		return $sol->type;
     		return $sol->id_tipo_moneda;
+    }
+
+    public function fondo(){
+        return $this->hasOne('Common\Fondo','id','idfondo');
+
     }
 }

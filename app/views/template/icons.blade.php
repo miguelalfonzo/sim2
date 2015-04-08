@@ -23,7 +23,7 @@
                         <a href="{{URL::to('editar-solicitud').'/'.$solicitude->token}}">
                             <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-pencil"></span>
                         </a>
-                        <a href="#" class="cancel-solicitude" data-idsolicitude = "{{$solicitude->idsolicitud}}" data-token="{{csrf_token()}}">
+                        <a href="#" class="cancel-solicitude" data-idsolicitude = "{{$solicitude->id}}" data-token="{{csrf_token()}}">
                             <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-remove"></span>
                         </a>
                     @endif
@@ -43,11 +43,11 @@
                 @endif
             @endif
         @elseif (Auth::user()->type == SUP)
-            @if (isset($solicitude->idsolicitud))
+            @if (trim($solicitude->typeSolicitude->code) == SOLIC)
                 <a  href="{{URL::to('ver-solicitud-sup').'/'.$solicitude->token}}">
                     <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span>
                 </a>
-                @if($solicitude->estado == PENDIENTE && $solicitude->derived == 0 && $solicitude->user->type == SUP)
+                @if( $solicitude->idestado == PENDIENTE && $solicitude->created_by == Auth::user()->id )
                     <a  href="{{URL::to('editar-solicitud').'/'.$solicitude->token}}">
                         <span style="padding: 0 5px; font-size: 1.3em"  class="glyphicon glyphicon-pencil"></span>
                     </a>

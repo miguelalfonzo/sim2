@@ -338,7 +338,7 @@ function newSolicitude() {
                             })
                             .done(function (data) 
                             {
-                                if (data.Status = 'Ok')
+                                if (data.Status == 'Ok')
                                 {
                                     bootbox.alert('Solicitud Cancelada' , function()
                                     {    
@@ -346,7 +346,7 @@ function newSolicitude() {
                                     });
                                 }
                                 else
-                                    responseUI(data.Status + ': ' + data.Description,'red');
+                                    bootbox.alert('<h4 style="color:red">' + data.Status + ': ' + data.Description +'</h4>');
                             });
                         }
                     }
@@ -720,51 +720,94 @@ function newSolicitude() {
         }
     });
     
-    $("#acept-sol").on( 'click', function(e) 
+    $("#search_responsable").on('click', function(e)
     {
-        var eResp = $('input[name=responsable]:checked');
-        var label = $(this).parent().parent().find('#myModalLabel');
-        if (eResp.length == 0)
+        $.ajax(
         {
-            label.text('Debe Seleccionar un Responsable');
-            label[0].style.color = "red";
-            return false;
-        }
-        else
-        {   
-            var responsable = eResp.val();
-            $('#modal_asign_sol_resp').modal('hide');
-            label.text('Se asignara como responsable a :');
-            label[0].style.color = "";
-            var formData = new FormData(form_acepted_solicitude[0]);
-            formData.append("responsable",responsable);
-            $.ajax(
+            type: 'POST',
+            url : server + 'buscar-responsable',
+            data: 
             {
-                type: 'POST',
-                url :  server + 'aceptar-solicitud',
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false
-            }).fail(function (statusCode,errorThrown) 
+                idfondo: $("#sub_type_activity").val(),
+                idsolicitude : $("#textinput").val(),
+                _token: $("input[name=_token]").val()
+            }
+        }).fail( function ( statusCode,errorThrown)
+        {
+            ajaxError(statusCode,errorThrown);   
+        }).done(function (data)
+        {
+            console.log(data);
+            if (data.Status == 'Ok' )
             {
-                $('#gerdev').modal('hide');
-                ajaxError(statusCode,errorThrown);
-            }).done(function (data)
-            {
-                if (data.Status == 'Error')
-                    responseUI('Hubo un error al procesar la solicitud','red');
-                else if (data.Status == 'Ok')
+                var list='';
+                data.Data.Responsables.forEach(function(entry)
                 {
-                    responseUI('Solicitud Aceptada','green');
-                    setTimeout(function()
+                    if (data.Data.UserType == 'S')
                     {
-                        window.location.href = server + 'show_user';
-                    },800);
-                }
-            });
-        }
+                        if (data.Data.Type == 'P')
+                            list = list + '<li><input type="radio" name="responsables"  value="' + entry.iduser + '"> ' + entry.descripcion + '</li>';
+                        else if (data.Data.Type == 'S' || data.Data.Type == 'AG') 
+                            list = list + '<li><input type="radio" name="responsables"  value="' + entry.iduser + '"> ' + entry.nombres + ' ' + entry.apellidos + '</li>';
+                    }
+                    else if (data.Data.UserType == 'P')
+                    {
+                        list = list + '<li><input type="radio" name="responsables"  value="' + entry.iduser + '"> ' + entry.nombres + ' ' + entry.apellidos + '</li>';
+                    }    
+                });
+                bootbox.alert("<h4>Responsables habilitados para el Fondo: " + $("#sub_type_activity option:selected").text() + 
+                    "</h4><h5 id='validate'>Seleccione el Responsable</h5><ul>" + list + "</ul>" , function()
+                {
+                    var resp = $("input[name=responsables]:checked");
+                    if (resp.length == 0)
+                    {
+                        $("#validate").css("color","red");
+                        return false; 
+                    }
+                    else
+                    {
+                        console.log(resp);
+                        acceptedSolicitude(resp.val());
+                    }
+                });
+            }
+            else
+            {
+                bootbox.alert("<h4 style='color:red'>" + data.Status + ": " + data.Description + "</h4>");
+            }
+        });
     });
+
+
+    function acceptedSolicitude(idresp)
+    {
+        var formData = new FormData(form_acepted_solicitude[0]);
+        formData.append("idresponsable",idresp);
+        $.ajax(
+        {
+            type: 'POST',
+            url :  server + 'aceptar-solicitud',
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false
+        }).fail(function (statusCode,errorThrown) 
+        {
+            ajaxError(statusCode,errorThrown);
+        }).done(function (data)
+        {
+            if (data.Status == 'Error')
+                responseUI('Hubo un error al procesar la solicitud','red');
+            else if (data.Status == 'Ok')
+            {
+                responseUI('Solicitud Aceptada','green');
+                setTimeout(function()
+                {
+                    window.location.href = server + 'show_user';
+                },800);
+            }
+        });
+    }
 
     $(document).on('click' , '.delete-fondo' , function(e){
         e.preventDefault();

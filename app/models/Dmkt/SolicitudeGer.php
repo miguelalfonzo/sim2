@@ -11,15 +11,15 @@ namespace Dmkt;
 use \Eloquent;
 class SolicitudeGer extends Eloquent{
 
-    protected $table = 'DMKT_RG_SOLICITUD_GERENTES';
-    protected $primaryKey = 'IDSOLICITUD_GERENTE';
+    protected $table = 'DMKT_RG_SOLICITUD_GERENTE';
+    protected $primaryKey = 'ID';
 
     function searchId(){
-        $lastId = SolicitudeGer::orderBy('idsolicitud_gerente', 'DESC')->first();
+        $lastId = SolicitudeGer::orderBy('id', 'DESC')->first();
         if($lastId == null){
             return 0;
         }else{
-            return $lastId->idsolicitud_gerente;
+            return $lastId->id;
         }
 
     }

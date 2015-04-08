@@ -193,6 +193,7 @@ Route::group(array('before' => 'sup_gerprod'), function ()
 {
     Route::post('asignar-solicitud-responsable', 'Dmkt\SolicitudeController@asignarResponsableSolicitud');
     Route::post('aceptar-solicitud', 'Dmkt\SolicitudeController@acceptedSolicitude');
+    Route::post('buscar-responsable' , 'Dmkt\SolicitudeController@getResponsables');
 });
 
 Route::group(array('before' => 'sup_gerprod_gercom'), function ()

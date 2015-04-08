@@ -4,7 +4,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">Ver Solicitud Supervisor</h3>
-            @if($solicitude->blocked == 1 && $solicitude->user->type === 'S')
+            @if($solicitude->blocked == 1 && $solicitude->user->type === SUP)
             <h4 class="" style="color: darkred">LA SOLICITUD ESTA SIENDO EVALUADA</h4>
             @endif
             <small style="float: right; margin-top: -10px"><strong>Usuario : {{Auth::user()->Sup->nombres}}</strong></small>
@@ -12,7 +12,7 @@
         <div class="panel-body">
             <form id="form_make_activity" class="" method="post">
                 {{Form::token()}}
-                <input id="textinput" name="idsolicitude" type="hidden" placeholder="" value="{{$solicitude->idsolicitud}}">
+                <input id="textinput" name="idsolicitude" type="hidden" placeholder="" value="{{$solicitude->id}}">
                 <div class="form-group col-sm-6 col-md-4 col-lg-4">
                     <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Tipo Solicitud</label>
                     <div class="col-sm-12 col-md-12 col-lg-12">
@@ -32,8 +32,8 @@
                     <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo de Pago</label>
                     <div class="col-sm-12 col-md-12">
                         <select id="" name="type_payment" class="form-control selectTypePayment" disabled>
-                            @if(isset($solicitude->idtipopago))
-                                <option selected value="{{$solicitude->typePayment->idtipopago}}">{{$solicitude->typePayment->nombre}}</option>
+                            @if(isset($solicitude->detalle->idpago))
+                                <option selected value="{{$solicitude->detalle->typePayment->idtipopago}}">{{$solicitude->detalle->typePayment->nombre}}</option>
                             @else
                                 <option selected value="0">No Especificado</option>
                             @endif
@@ -58,16 +58,16 @@
                 <div class="form-group col-sm-6 col-md-4 col-lg-4">
                     <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Monto Solicitado</label>
                     <div class="col-sm-12 col-md-12 col-lg-12">
-                        @if($solicitude->estado == PENDIENTE)
+                        @if($solicitude->idestado == PENDIENTE)
                         <div class="input-group">
-                            <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                            <input id="idamount" name="monto" type="text" placeholder="" value="{{$solicitude->monto}}"
+                            <span class="input-group-addon">{{$solicitude->detalle->typemoney->simbolo}}</span>
+                            <input id="idamount" name="monto" type="text" value="{{$detalle->monto_solicitado}}"
                                    class="form-control input-md">
                         </div>
                         @else
                         <div class="input-group">
-                            <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                            <input id="idamount" name="monto" type="text" placeholder="" value="{{$solicitude->monto}}"
+                            <span class="input-group-addon">{{$solicitude->detalle->typeMoney->simbolo}}</span>
+                            <input id="idamount" name="monto" type="text" value="{{$detalle->monto_solicitado}}"
                                    class="form-control input-md" readonly>
                         </div>
                         @endif
@@ -89,27 +89,19 @@
                 <div class="form-group col-sm-6 col-md-4">
                     <label class="col-sm-8 col-md-8 control-label" for="textinput">Fondo</label>
                     <div class="col-sm-12 col-md-12">
-                        @if($solicitude->estado == PENDIENTE)
-                        <select id="sub_type_activity" name="sub_type_activity" class="form-control">
-                            @foreach($fondos as $sub)
-                                @if(isset($solicitude->idfondo) && $sub->idfondo == $solicitude->subtype->idfondo)
-                                    <option selected value="{{$sub->idfondo}}">{{$sub->nombre_mkt}} -> {{$sub->saldo}}</option>
-                                @else
-                                    @if($sub->idfondo == FONDO_SUPERVISOR)
-                                    <option value="{{$sub->idfondo}}">{{$sub->nombre_mkt}} -> {{$sub->saldo}}</option>
-                                    @endif
-                                @endif
-                            @endforeach
-                        </select>
+                        @if($solicitude->idestado == PENDIENTE)
+                            <select id="sub_type_activity" name="idfondo" class="form-control">
                         @else
-                        <select id="sub_type_activity" name="sub_type_activity" class="form-control" disabled>
+                            <select id="sub_type_activity" name="idfondo" class="form-control" disabled>
+                        @endif
                             @foreach($fondos as $sub)
-                                @if($solicitude->idfondo == $sub->idfondo)
-                                    <option selected value="{{$sub->idfondo}}">{{$sub->nombre_mkt}} -> {{$sub->saldo}}</option>
+                                @if($sub->idfondo == FONDO_SUPERVISOR)
+                                    <option value="{{$sub->id}}" selected>{{$sub->nombre}} -> {{$sub->saldo}}</option>
+                                @else
+                                    <option value="{{$sub->id}}">{{$sub->nombre}} -> {{$sub->saldo}}</option>                          
                                 @endif
                             @endforeach
                         </select>
-                        @endif
                     </div>
                 </div>
                 <div class="form-group col-sm-6 col-md-4 col-lg-4">
@@ -133,28 +125,39 @@
                         </div>
                     </div>
                 </div>
-                @if($solicitude->user->type == REP_MED)
-                <div class="form-group col-sm-6 col-md-4 col-lg-4">
-                    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Solicitante</label>
-                    <div class="col-sm-12 col-md-12 col-lg-12">
-                        <div class="input-group date">
-                            <span class="input-group-addon">Representante</span>
-                            <input id="textinput" name="titulo" type="text" value="{{$solicitude->user->rm->nombres.' '.$solicitude->user->rm->apellidos}}" disabled
-                               class="form-control input-md">
+                @if($solicitude->createdBy->type == REP_MED)
+                    <div class="form-group col-sm-6 col-md-4 col-lg-4">
+                        <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Solicitante</label>
+                        <div class="col-sm-12 col-md-12 col-lg-12">
+                            <div class="input-group date">
+                                <span class="input-group-addon">Representante</span>
+                                <input id="textinput" name="titulo" type="text" value="{{$solicitude->createdBy->rm->nombres.' '.$solicitude->createdBy->rm->apellidos}}" disabled
+                                   class="form-control input-md">
+                            </div>
                         </div>
                     </div>
-                </div>
+                @elseif($solicitude->createdBy->type == SUP)
+                    <div class="form-group col-sm-6 col-md-4 col-lg-4">
+                        <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Solicitante</label>
+                        <div class="col-sm-12 col-md-12 col-lg-12">
+                            <div class="input-group date">
+                                <span class="input-group-addon">Supervisor</span>
+                                <input id="textinput" name="titulo" type="text" value="{{$solicitude->createdBy->Sup->nombres.' '.$solicitude->createdBy->Sup->apellidos}}" disabled
+                                   class="form-control input-md">
+                            </div>
+                        </div>
+                    </div>
                 @else
-                <div class="form-group col-sm-6 col-md-4 col-lg-4">
-                    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Solicitante</label>
-                    <div class="col-sm-12 col-md-12 col-lg-12">
-                        <div class="input-group date">
-                            <span class="input-group-addon">Supervisor</span>
-                            <input id="textinput" name="titulo" type="text" value="{{$solicitude->user->Sup->nombres.' '.$solicitude->user->Sup->apellidos}}" disabled
-                               class="form-control input-md">
+                    <div class="form-group col-sm-6 col-md-4 col-lg-4">
+                        <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Solicitante</label>
+                        <div class="col-sm-12 col-md-12 col-lg-12">
+                            <div class="input-group date">
+                                <span class="input-group-addon">Rol No Definido</span>
+                                <input id="textinput" name="titulo" type="text" value="{{$solicitude->createdBy->email}}" disabled
+                                   class="form-control input-md">
+                            </div>
                         </div>
                     </div>
-                </div>
                 @endif
 
                 <!-- Observation-->
@@ -211,22 +214,22 @@
                                     @foreach($solicitude->families as $family)
                                     <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding: 0">
                                         <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-                                            <input id="textinput" name="textinput" type="text" placeholder=""
+                                            <input id="textinput" name="family" type="text"
                                                    value="{{$family->marca->descripcion}}" readonly
                                                    class="form-control input-md">
                                         </div>
-                                        @if($solicitude->idaproved == null || $solicitude->idaproved == Auth::user()->id)
+                                        @if($solicitude->detalle->idaccepted == null )
                                         <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" style="padding: 0">
                                             <div class="input-group">
-                                                <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                                                @if($solicitude->estado == PENDIENTE)
+                                                <span class="input-group-addon">{{$solicitude->detalle->typemoney->simbolo}}</span>
+                                                @if($solicitude->idestado == PENDIENTE)
                                                     <input id="" name="amount_assigned[]" type="text"
                                                            class="form-control input-md amount_families"
-                                                           value="{{isset($family->monto_asignado)? $family->monto_asignado : round($solicitude->monto/count($solicitude->families),2)}}">
+                                                           value="{{isset($family->monto_asignado)? $family->monto_asignado : round($detalle->monto_solicitado/count($solicitude->families),2)}}">
                                                 @else
                                                     <input disabled id="" name="amount_assigned[]" type="text"
                                                            class="form-control input-md amount_families"
-                                                           value="{{isset($family->monto_asignado)? $family->monto_asignado : round($solicitude->monto/count($solicitude->families),2)}}">
+                                                           value="{{isset($family->monto_asignado)? $family->monto_asignado : round($detalle->monto_solicitado/count($solicitude->families),2)}}">
                                                 @endif
                                             </div>
                                         </div>
@@ -242,7 +245,6 @@
                         </div>
                     </div>
                     @include('template.list_clients')
-                    
                 </div>
                 <input type="hidden" id="_token" value="{{csrf_token()}}">
                 <div class="col-sm-12 col-md-12 col-lg-12" style="margin-top: 10px">
@@ -255,104 +257,25 @@
                 </div>
     <!-- Button (Double) -->
                 <div class="form-group col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px">
-                    <div class="col-sm-12 col-md-12 col-lg-12" style="text-align: center">
-                        
-                        @if($solicitude->estado == PENDIENTE && $solicitude->derived == 0 && $solicitude->user->type == REP_MED)
-                            <a class="btn btn-primary" data-toggle="modal" data-target="#modal_asign_sol_resp">
+                    <div class="col-sm-12 col-md-12 col-lg-12" style="text-align: center"> 
+                        @if( $solicitude->idestado == PENDIENTE )
+                            <a class="btn btn-primary" id="search_responsable">
                                 Aceptar
-                            </a>
-                            <a class="btn btn-primary" data-toggle="modal" data-target="#myModal">
-                                Derivar
                             </a>
                             <a id="deny_solicitude" name="button1id" class="btn btn-primary deny_solicitude">
                                 Rechazar
                             </a>
-                            <a id="button2id" href="{{URL::to('desbloquear-solicitud-sup').'/'.$solicitude->token}}" name="button2id" class="btn btn-primary">Cancelar</a>
-                        @else
-                            @if($solicitude->derived == 0 && $solicitude->estado == PENDIENTE )
-                                <a class="btn btn-primary" data-toggle="modal" data-target="#modal_asign_sol_resp">
-                                    Aceptar
-                                </a>
-                            @endif
-                                <a id="button2id" href="{{URL::to('show_user')}}" name="button2id"
-                                   class="btn btn-primary">Cancelar</a>
                         @endif
+                        <a id="button2id" href="{{URL::to('desbloquear-solicitud-sup').'/'.$solicitude->token}}" name="button2id" class="btn btn-primary">
+                            Cancelar
+                        </a>
                     </div>
                 </div>
             </form>
         </div>
     </div>
 </div>
-@if($solicitude->estado == PENDIENTE && $solicitude->derived == 0 && $solicitude->user->type == 'R')
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
-                        class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="myModalLabel">La solicitud será derivado a :</h4>
-            </div>
-            <div class="modal-body">
-                <form class="form-horizontal">
-                    <fieldset>
-                        {{Form::token()}}
-                        <div class="form-group">
-                            <label class="col-md-4 col-lg-4 control-label" for="selectbasic"></label>
-                            <div class="col-md-5 col-lg-5">
-                                <ul>
-                                    @foreach($gerentes as  $gerente)
-                                    <li style="display:inline">{{ $gerente->descripcion }}</li><br>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        </div>
-                    </fieldset>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <a href="{{URL::to('derivar-solicitud').'/'.$solicitude->token}}" type="button" class="btn btn-primary">Derivar</a>
-            </div>
-        </div>
-    </div>
-</div>
-@endif
-@if( isset($responsables) )
-    <div class="modal fade" id="modal_asign_sol_resp" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">         
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span aria-hidden="true">&times;</span>
-                        <span class="sr-only">Close</span>
-                    </button>
-                    <h4 class="modal-title" id="myModalLabel">Se asignara como responsable a :</h4>
-                </div>
-                <div class="modal-body">
-                        <fieldset>
-                            <div class="form-group">
-                                <label class="col-md-4 col-lg-4 control-label" for="selectbasic"></label>
-                                <div class="col-xs-6">
-                                    <ul>
-                                        @foreach($responsables as $responsable)
-                                            <li  style="display:inline">
-                                                {{Form::radio('responsable',$responsable->iduser)}} {{ucwords($responsable->nombres.' '.$responsable->apellidos)}}
-                                            </li><br>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            </div>
-                        </fieldset>
-                </div>
-                <div class="modal-footer">
-                    <input type="hidden" value="{{$solicitude->token}}" name="token">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" id="acept-sol" class="btn btn-primary" data-dismiss="modal">Confirmar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-@endif
+
 @if(isset($Status))
     <script type="text/javascript">
         @if($Status <> ok)

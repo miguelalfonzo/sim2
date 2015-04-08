@@ -5,6 +5,7 @@ use \Dmkt\Solicitude;
 use \Dmkt\SolicitudeDetalle;
 use \Dmkt\SolicitudeClient;
 use \Dmkt\SolicitudeFamily;
+use \Dmkt\SolicitudeGer;
 use \System\SolicitudeHistory;
 
 

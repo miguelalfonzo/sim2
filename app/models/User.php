@@ -33,7 +33,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
         }
 
     }
-    function person(){
+    protected function person(){
         return $this->hasOne('Common\Person','iduser','id');
     }
     public function Rm(){

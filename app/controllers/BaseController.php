@@ -282,13 +282,13 @@ class BaseController extends Controller {
             }
             else if (Auth::user()->type == SUP)
             {
-                $solicituds->whereIn('iduser', $idUser);
+                $solicituds->whereIn('created_by', $idUser);
             } 
             else if ( Auth::user()->type == TESORERIA ) 
             {
                 if ($estado != R_FINALIZADO)
                 {
-                    $solicituds->whereIn('estado',array(DEPOSITO_HABILITADO,DEPOSITADO));
+                    $solicituds->whereIn('idestado',array(DEPOSITO_HABILITADO,DEPOSITADO));
                 }
                 else
                 {
@@ -301,7 +301,9 @@ class BaseController extends Controller {
             }
             else if ( !(Auth::user()->type == GER_COM || Auth::user()->type == CONT) )
             {
-                $solicituds->whereIn('id', $idUser);
+                $solicituds->whereHas('gerente' , function($g) {
+                    $g->where('idgerprod', Auth::user()->id);
+                });
             }
             if ($start != null && $end != null)
             {

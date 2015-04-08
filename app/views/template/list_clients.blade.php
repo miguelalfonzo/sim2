@@ -9,7 +9,7 @@
                     @if (is_null($client->idcliente))
                         <div class="form-group ">
                             <div>
-                                <input id="textinput" name="textinput" type="text" placeholder=""
+                                <input id="textinput" type="text" placeholder=""
                                        value="No hay cliente asignado" readonly
                                        class="form-control input-md ">
                             </div>
@@ -17,7 +17,7 @@
                     @elseif ($client->from_table == TB_DOCTOR)
                         <div class="form-group ">
                             <div>
-                                <input id="textinput" name="textinput" type="text" placeholder=""
+                                <input id="textinput" type="text" placeholder=""
                                        value="DOCTOR: {{$client->doctors->pefnrodoc1.'-'.$client->doctors->pefnombres.' '.$client->doctors->pefpaterno.' '.$client->doctors->pefmaterno}}" readonly
                                        class="form-control input-md ">
                             </div>
@@ -25,7 +25,7 @@
                     @elseif ($client->from_table == TB_INSTITUTE)
                         <div class="form-group ">
                             <div>
-                                <input id="textinput" name="textinput" type="text" placeholder=""
+                                <input id="textinput" type="text" placeholder=""
                                        value="CENTRO: {{$client->institutes->pejnrodoc.'-'.$client->institutes->pejrazon}}" readonly
                                        class="form-control input-md ">
                             </div>
@@ -33,7 +33,7 @@
                     @elseif(!is_null($client->idcliente))
                         <div class="form-group ">
                             <div>
-                                <input id="textinput" name="textinput" type="text" placeholder=""
+                                <input id="textinput" type="text" placeholder=""
                                        value="{{$client->client->clnombre}}" readonly
                                        class="form-control input-md ">
                             </div>

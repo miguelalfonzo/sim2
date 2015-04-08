@@ -65,18 +65,20 @@
                         @endif
                     </td>
                 @else
-                    <td class="text-center total_deposit"><!-- {$solicitude->detalle->typeMoney } --> S/. 500</td>
+                    <td class="text-center total_deposit">
+                        {{ json_decode($solicitude->detalle->detalle)->monto_solicitado }}
+                    </td>
                 @endif
                 
                 
                 @include('template.states')
                 
                 <td class="text-center">{{ date_format(date_create($solicitude->created_at), 'd/m/Y' )}}</td>
-                <td class="text-center"><!-- {$solicitude->typesolicitude->nombre} --> Solicitud</td>
+                <td class="text-center">{{$solicitude->typesolicitude->nombre}}</td>
                 @include('template.icons')
                 @if ( Auth::user()->type == GER_COM )
                     <td class="text-center">
-                    @if( $solicitude->estado != ACEPTADO)
+                    @if( $solicitude->idestado != ACEPTADO)
                         <input type="checkbox" name="mass-aprov" disabled/>
                     @else
                         <input type="checkbox" name="mass-aprov"/>

@@ -4,9 +4,6 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">Ver Solicitud Gerente Producto</h3>
-            @if($block == true)
-                <h4 class="" style="color: darkred">LA SOLICITUD ESTA SIENDO EVALUADA</h4>
-            @endif
             <small style="float: right; margin-top: -10px">
                 <strong>Usuario : {{Auth::user()->Gerprod->descripcion}}</strong>
             </small>
@@ -14,7 +11,7 @@
         <div class="panel-body">
             <form id="form_make_activity" class="" method="post">
                 {{Form::token()}}
-                <input id="textinput" name="idsolicitude" type="hidden" value="{{$solicitude->idsolicitud}}">
+                <input id="textinput" name="idsolicitude" type="hidden" value="{{$solicitude->id}}">
                 <div class="form-group col-sm-6 col-md-4 col-lg-4">
                     <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Tipo Solicitud</label>
                     <div class="col-sm-12 col-md-12 col-lg-12">
@@ -76,17 +73,16 @@
                     <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Monto Solicitado</label>
 
                     <div class="col-sm-12 col-md-12 col-lg-12">
-                        @if($solicitude->estado == DERIVADO)
+                        @if($solicitude->idestado == DERIVADO)
                         <div class="input-group">
-                            <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                            <input id="idamount" name="monto" type="text" placeholder="" value="{{$solicitude->monto}}"
+                            <span class="input-group-addon">{{$solicitude->detalle->typemoney->simbolo}}</span>
+                            <input id="idamount" name="monto" type="text" value="{{json_decode($solicitude->detalle->detalle)->monto_solicitado}}"
                                    class="form-control input-md">
                         </div>
-
                         @else
                         <div class="input-group">
-                            <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                            <input id="idamount" name="monto" type="text" placeholder="" value="{{$solicitude->monto}}"
+                            <span class="input-group-addon">{{$solicitude->detalle->typemoney->simbolo}}</span>
+                            <input id="idamount" name="monto" type="text" placeholder="" value="{{$solicitude->monto_solicitado}}"
                                    class="form-control input-md" readonly>
                         </div>
 
@@ -109,25 +105,24 @@
                     <label class="col-sm-8 col-md-8 control-label" for="textinput">Fondo</label>
                     <div class="col-sm-12 col-md-12">
                         @if(isset($solicitude))
-                            @if($solicitude->estado != DERIVADO)
+                            @if( $solicitude->idestado != DERIVADO )
                                 <input id="textinput" name="amount_fac" type="text"
-                                value="{{ $solicitude->fondo == null ? '' : $solicitude->fondo->nombre_mkt }}"
+                                value="{{ $solicitude->detalle->fondo == null ? '' : $solicitude->fondo->nombre_mkt }}"
                                 class="form-control input-md" readonly>
                             @else
-                              <select id="sub_type_activity" name="sub_type_activity" class="form-control">
-                                    @foreach($fondos as $sub)
-                                        @if($sub->idfondo != 31 && $sub->idfondo !=1)
-                                            @if($sub->idfondo == $solicitude->idfondo)
-                                                <option selected value="{{$sub->idfondo}}">{{$sub->nombre_mkt}} -> {{$sub->saldo}}</option>
-                                            @else
-                                                <option value="{{$sub->idfondo}}">{{$sub->nombre_mkt}} -> {{$sub->saldo}}</option>
-                                            @endif
+                              <select id="sub_type_activity" name="idfondo" class="form-control">
+                                    @foreach($fondos as $fondo)
+                                        @if($fondo->id == $solicitude->detalle->idfondo)
+                                                <option selected value="{{$fondo->id}}">{{$fondo->nombre}} -> {{$fondo->saldo}}</option>
+                                        @else
+                                                <option value="{{$fondo->id}}">{{$fondo->nombre}} -> {{$fondo->saldo}}</option>
                                         @endif
+                                        
                                     @endforeach
                                 </select>
                             @endif
                         @else
-                            <select id="sub_type_activity" name="sub_type_activity" class="form-control">
+                            <select id="sub_type_activity" name="idfondo" class="form-control">
                                 @foreach($fondos as $sub)
                                     @if($sub->idfondo != 31 && $sub->idfondo !=1)
                                         <option value="{{$sub->idfondo}}">{{$sub->nombre_mkt}} -> {{$sub->saldo}}</option>
@@ -222,15 +217,15 @@
                                             </div>
                                             <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" style="padding: 0">
                                                 <div class="input-group">
-                                                    <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                                                    @if($solicitude->estado == DERIVADO)
+                                                    <span class="input-group-addon">{{$solicitude->detalle->typemoney->simbolo}}</span>
+                                                    @if($solicitude->idestado == DERIVADO)
                                                         <input id="" name="amount_assigned[]" type="text"
                                                         class="form-control input-md amount_families"
-                                                        value="{{isset($family->monto_asignado)? $family->monto_asignado : round($solicitude->monto/count($solicitude->families),2)}}">
+                                                        value="{{round(json_decode($solicitude->detalle->detalle)->monto_solicitado/count($solicitude->families),2)}}">
                                                     @else
                                                     <input disabled id="" name="amount_assigned[]" type="text"
                                                            class="form-control input-md amount_families"
-                                                           value="{{isset($family->monto_asignado)? $family->monto_asignado : round($solicitude->monto/count($solicitude->families),2)}}">
+                                                           value="{{$family->monto_asignado}}">
                                                     @endif
                                                 </div>
                                             </div>
@@ -259,9 +254,8 @@
     <!-- Button (Double) -->
                 <div class="form-group col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px">
                     <div class="col-sm-12 col-md-12 col-lg-12" style="text-align: center">
-                        @if($solicitude->estado == DERIVADO)
-                            @if($block == false)
-                                <a class="btn btn-primary" data-toggle="modal" data-target="#modal_asign_sol_resp">
+                        @if($solicitude->idestado == DERIVADO)
+                                <a id="search_responsable" class="btn btn-primary">
                                     Aceptar
                                 </a>
                                 <a id="deny_solicitude" name="button1id" class="btn btn-primary deny_solicitude_gerprod">
@@ -269,10 +263,7 @@
                                 </a>
                                 <a id="button2id" href="{{URL::to('cancelar-solicitud-gerprod').'/'.$solicitude->token}}" name="button2id"
                                 class="btn btn-primary">Cancelar</a>
-                            @else
-                                <a id="button2id" href="{{URL::to('show_user')}}" name="button2id"
-                                class="btn btn-primary">Cancelar</a>
-                            @endif
+                            
                         @else
                         <a id="button2id" href="{{URL::to('cancelar-solicitud-gerprod').'/'.$solicitude->token}}" name="button2id"
                            class="btn btn-primary">Cancelar</a>

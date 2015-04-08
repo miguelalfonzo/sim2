@@ -20,6 +20,10 @@ class Solicitude extends Eloquent{
             return $lastId->id;
     }
 
+    public function histories(){
+        return $this->hasMany('System\SolicitudeHistory','idsolicitude');
+    }
+
     protected function detalle()
     {
         return $this->hasOne('Dmkt\SolicitudeDetalle','id','iddetalle');
@@ -36,6 +40,15 @@ class Solicitude extends Eloquent{
 
     protected function clients(){
         return $this->hasMany('Dmkt\SolicitudeClient','idsolicitud','id');
+    }
+
+    protected function createdBy(){
+        return $this->belongsTo('User','created_by');
+    }
+
+    public function gerente()
+    {
+        return $this->hasOne('Dmkt\SolicitudeGer','idsolicitud','id');
     }
 
     function subtype(){
@@ -58,22 +71,14 @@ class Solicitude extends Eloquent{
         return $this->hasMany('Expense\Expense','idsolicitud','id');
     }
 
-    function user(){
-        return $this->belongsTo('User','iduser');
-    }
+   
 
     function response(){
         return $this->belongsTo('User','iduserasigned');
     }
 
-    function typePayment(){
-        return $this->hasOne('Common\TypePayment','idtipopago','idtipopago');
-
-    }
-    function fondo(){
-        return $this->hasOne('Common\Fondo','idfondo','idfondo');
-
-    }
+    
+    
     function typeRetention(){
         return $this->hasOne('Dmkt\TypeRetention','idtiporetencion','idtiporetencion');
     }
@@ -86,12 +91,12 @@ class Solicitude extends Eloquent{
         return $this->hasOne('Common\Deposit','iddeposito', 'iddeposito');
     }
 
-    function rm(){
-        return $this->hasOne('Dmkt\Rm','iduser','iduser')->select('nombres,apellidos,iduser');
+    protected function rm(){
+        return $this->hasOne('Dmkt\Rm','iduser','created_by')->select('nombres,apellidos,iduser');
     }
 
-    function sup(){
-        return $this->hasOne('Dmkt\Sup','iduser','iduser')->select('nombres,apellidos,iduser,idsup');;
+    protected function sup(){
+        return $this->hasOne('Dmkt\Sup','iduser','created_by')->select('nombres,apellidos,iduser,idsup');;
     }
 
     function aprovedSup(){
@@ -102,9 +107,7 @@ class Solicitude extends Eloquent{
         return $this->hasOne('Dmkt\Manager','iduser','idaproved');
     }
 
-    public function histories(){
-        return $this->hasMany('System\SolicitudeHistory','id');
-    }
+    
 
     function etiqueta(){
         return $this->hasOne('Dmkt\Label','id','idetiqueta');

@@ -9,7 +9,7 @@
             <form id="form_make_activity" class="" method="post" action="">
             {{Form::token()}}
             <input type="hidden" value="{{$solicitude->token}}" name="token">
-            <input id="textinput" name="idsolicitude" type="hidden" placeholder="" value="{{$solicitude->idsolicitud}}">
+            <input id="textinput" name="idsolicitude" type="hidden" placeholder="" value="{{$solicitude->id}}">
             <div class="form-group col-sm-6 col-md-4">
                 <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo Solicitud</label>
                 <div class="col-sm-12 col-md-12">
@@ -28,11 +28,11 @@
                 <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto Solicitado</label>
                 <div class="col-sm-12 col-md-12">
                     <div class="input-group">
-                        <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
-                        @if ($solicitude->estado != ACEPTADO)
-                            <input readonly id="idamount" name="monto" type="text" placeholder="" value="{{$solicitude->monto}}" class="form-control input-md" >
+                        <span class="input-group-addon">{{$solicitude->detalle->typemoney->simbolo}}</span>
+                        @if ($solicitude->idestado != ACEPTADO)
+                            <input readonly id="idamount" name="monto" type="text" placeholder="" value="{{json_decode($solicitude->detalle->detalle)->monto_aceptado}}" class="form-control input-md" >
                         @else
-                            <input id="idamount" name="monto" type="text" placeholder="" value="{{$solicitude->monto}}" class="form-control input-md" >
+                            <input id="idamount" name="monto" type="text" placeholder="" value="{{json_decode($solicitude->detalle->detalle)->monto_aceptado}}" class="form-control input-md" >
                         @endif
                     </div>
                 </div>
@@ -40,7 +40,7 @@
             <div class="form-group col-sm-6 col-md-4">
                 <label class="col-sm-8 col-md-8 control-label" for="selectbasic">Fondo</label>
                 <div class="col-sm-12 col-md-12">
-                    <input id="textinput" name="textinput" type="text" placeholder="" value="{{$solicitude->subtype->nombre_mkt}}" readonly
+                    <input id="textinput" name="textinput" type="text" placeholder="" value="{{$solicitude->detalle->fondo->nombre}}" readonly
                     class="form-control input-md">
                 </div>
             </div>
@@ -58,21 +58,21 @@
                 <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Solicitante</label>
                 <div class="col-sm-12 col-md-12 col-lg-12">
                     <div class="input-group">
-                        @if(isset($solicitude->user->type))
-                            @if($solicitude->user->type == 'R')
+                        @if(isset($solicitude->createdBy->type))
+                            @if($solicitude->createdBy->type == REP_MED)
                             <span class="input-group-addon">Representante Medico</span>
                             <input id="textinput" name="titulo" type="text" placeholder=""
-                                   value="{{ucwords($solicitude->user->rm->nombres.' '.$solicitude->user->rm->apellidos)}}" readonly
+                                   value="{{ucwords($solicitude->createdBy->rm->nombres.' '.$solicitude->createdBy->rm->apellidos)}}" readonly
                                    class="form-control input-md">
-                            @elseif($solicitude->user->type == 'S')
+                            @elseif($solicitude->createdBy->type == SUP)
                             <span class="input-group-addon">Supervisor</span>
                             <input id="textinput" name="titulo" type="text" placeholder=""
-                                   value="{{ucwords($solicitude->user->sup->nombres.' '.$solicitude->user->sup->apellidos)}}" readonly
+                                   value="{{ucwords($solicitude->createdBy->sup->nombres.' '.$solicitude->createdBy->sup->apellidos)}}" readonly
                                    class="form-control input-md">
                             @else
-                            <span class="input-group-addon">{{$solicitude->user->type}}</span>
+                            <span class="input-group-addon">{{$solicitude->createdBy->type}}</span>
                             <input id="textinput" name="titulo" type="text" placeholder=""
-                                   value="{{ucwords($solicitude->user->person->nombres.' '.$solicitude->user->person->apellidos)}}" readonly
+                                   value="{{ucwords($solicitude->createdBy->person->nombres.' '.$solicitude->createdBy->person->apellidos)}}" readonly
                                 class="form-control input-md">
                             @endif
                         @else
@@ -105,7 +105,7 @@
                                 </div>
                                 <div class="col-sm-4 col-md-4" style="padding: 0">
                                     <div class="input-group">
-                                        <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
+                                        <span class="input-group-addon">{{$solicitude->detalle->typemoney->simbolo}}</span>
                                         @if ($solicitude->estado != ACEPTADO)
                                             <input id="amount_assigned"  name="amount_assigned[]" type="text" class="form-control input-md amount_families" value="{{isset($family->monto_asignado)? $family->monto_asignado : round($solicitude->monto/count($solicitude->families),2)}}" readonly>
                                         @else
@@ -139,7 +139,7 @@
             <!-- Button (Double) -->
             <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
                 <div class="col-sm-12 col-md-12" style="text-align: center">
-                    @if($solicitude->estado == ACEPTADO)
+                    @if($solicitude->idestado == ACEPTADO)
                     <a id="" name="button1id" data-token ="{{$solicitude->token}}"
                        class="btn btn-primary approved_solicitude">Aprobar
                     </a>
