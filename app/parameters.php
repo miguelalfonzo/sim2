@@ -107,3 +107,9 @@ const SOL_INST = 2;
 const ACTIVE   = 1;
 const BLOCKED  = 2;
 const INACTIVE = 3;
+
+const PAGO_DEPOSITO = 3;
+const PAGO_CHEQUE   = 2;
+
+
+const REASON_REGALOS = 2;

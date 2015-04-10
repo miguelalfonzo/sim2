@@ -223,7 +223,7 @@ class BaseController extends Controller {
         return $rpta;
     }
 
-    protected function searchFondos($estado,$idUser,$start,$end)
+    /*protected function searchFondos($estado,$idUser,$start,$end)
     {
         try
         {
@@ -259,7 +259,7 @@ class BaseController extends Controller {
             $rpta = $this->internalException($e,__FUNCTION__);
         }
         
-    }
+    }*/
 
     protected function searchSolicituds($estado,$idUser,$start,$end)
     {
@@ -299,11 +299,15 @@ class BaseController extends Controller {
             {
                 $solicituds->where('iduserasigned',$idUser);
             }
-            else if ( !(Auth::user()->type == GER_COM || Auth::user()->type == CONT) )
+            else if ( Auth::user()->type == GER_PROD )
             {
                 $solicituds->whereHas('gerente' , function($g) {
                     $g->where('idgerprod', Auth::user()->id);
                 });
+            }
+            else if ( Auth::user()->type == CONT )
+            {
+                $solicituds->where('idestado' , '<>' , ACEPTADO );  
             }
             if ($start != null && $end != null)
             {

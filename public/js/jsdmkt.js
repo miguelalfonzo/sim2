@@ -17,7 +17,7 @@ function newSolicitude() {
     var solicitude_ruc = $('#div_ruc');
     var solicitude_number_account = $('#div_number_account');
     var number_account = $('#number_account');
-    var idamount = $('#idamount');
+    var idamount = $('#amount');
     var select_type_solicitude = $('.selecttypesolicitude');
     var input_file_factura = $('#input-file-factura');
     var isSetImage = $('#isSetImage');
@@ -62,10 +62,10 @@ function newSolicitude() {
     };
 
     //NEW OR EDIT SOLICITUDE BY RM OR SUP CLIENTES
-    $.getJSON(server + "getclients", function (data) {
+   /* $.getJSON(server + "getclients", function (data) {
         clients = data;
     });
-    
+    */
     //LEYENDA
     $('#show_leyenda').on('click',function(){
         $('#leyenda').show();
@@ -365,7 +365,7 @@ function newSolicitude() {
         {
             sum_total += parseFloat($(this).val());
         });
-
+        console.log(sum_total);
         if(sum_total > parseInt(idamount.val()))
             amount_error_families.text('La suma supera al monto total').css('color', 'red');
         if (parseInt($(this).val()) > parseInt(idamount.val()))
@@ -722,6 +722,10 @@ function newSolicitude() {
     
     $("#search_responsable").on('click', function(e)
     {
+        if ( amount_error_families.text() != '' )
+        {
+            return false;
+        }
         $.ajax(
         {
             type: 'POST',
@@ -737,7 +741,6 @@ function newSolicitude() {
             ajaxError(statusCode,errorThrown);   
         }).done(function (data)
         {
-            console.log(data);
             if (data.Status == 'Ok' )
             {
                 var list='';
@@ -755,19 +758,21 @@ function newSolicitude() {
                         list = list + '<li><input type="radio" name="responsables"  value="' + entry.iduser + '"> ' + entry.nombres + ' ' + entry.apellidos + '</li>';
                     }    
                 });
-                bootbox.alert("<h4>Responsables habilitados para el Fondo: " + $("#sub_type_activity option:selected").text() + 
-                    "</h4><h5 id='validate'>Seleccione el Responsable</h5><ul>" + list + "</ul>" , function()
+                bootbox.confirm("<h4>Responsables habilitados para el Fondo: " + $("#sub_type_activity option:selected").text() + 
+                "</h4><h5 id='validate'>Seleccione el Responsable</h5><ul>" + list + "</ul>", function (result) 
                 {
-                    var resp = $("input[name=responsables]:checked");
-                    if (resp.length == 0)
+                    if (result) 
                     {
-                        $("#validate").css("color","red");
-                        return false; 
-                    }
-                    else
-                    {
-                        console.log(resp);
-                        acceptedSolicitude(resp.val());
+                        var resp = $("input[name=responsables]:checked");
+                        if (resp.length == 0)
+                        {
+                            $("#validate").css("color","red");
+                            return false; 
+                        }
+                        else
+                        {
+                            acceptedSolicitude(resp.val());
+                        }
                     }
                 });
             }
@@ -800,7 +805,7 @@ function newSolicitude() {
                 responseUI('Hubo un error al procesar la solicitud','red');
             else if (data.Status == 'Ok')
             {
-                responseUI('Solicitud Aceptada','green');
+                responseUI('Solicitud Procesada Correctamente','green');
                 setTimeout(function()
                 {
                     window.location.href = server + 'show_user';
@@ -1782,69 +1787,71 @@ function newSolicitude() {
         if (checks == 0)
             bootbox.alert("<h4>No hay solicitudes seleccionadas</h4>")
         else
-        {
-            bootbox.alert("<h4 style='color:blue'>Esta seguro de aprobar todas las solicitudes seleccionadas</h4>" , function(e)
+        {    
+            bootbox.confirm("<h4 style='color:blue'>Esta seguro de aprobar todas las solicitudes seleccionadas</h4>" , function(result)
             {
-                console.log(e);
-                var data = {};
-                var trs = $('#table_solicitude tbody tr');
-                data._token = $('input[name=_token]').val();
-                data.sols = [];
-                trs.each(function( index)
+                if (result)
                 {
-                    var sol = {};
-                    if ( $(this).find('input[name=mass-aprov]:checked').length != 0 )
+                    var data = {};
+                    var trs = $('#table_solicitude tbody tr');
+                    data._token = $('input[name=_token]').val();
+                    data.sols = [];
+                    trs.each(function( index)
                     {
-                        sol.token = $(this).find("#sol_token").val();
-                        data.sols.push(sol);
-                    }
-                });
-                $.ajax(
-                {
-                    url: server + 'gercom-mass-approv',
-                    type: 'POST',
-                    data: data,
-                    beforeSend: function()
+                        var sol = {};
+                        if ( $(this).find('input[name=mass-aprov]:checked').length != 0 )
+                        {
+                            sol.token = $(this).find("#sol_token").val();
+                            data.sols.push(sol);
+                        }
+                    });
+                    $.ajax(
                     {
-                        loadingUI("Procesando");
-                    },
-                    error: function(statusCode,errorThrown)
+                        url: server + 'gercom-mass-approv',
+                        type: 'POST',
+                        data: data,
+                        beforeSend: function()
+                        {
+                            loadingUI("Procesando");
+                        },
+                        error: function(statusCode,errorThrown)
+                        {
+                            if (statusCode.status == 0) 
+                                responseUI('<font color="black">Internet: Problemas de Conexion</font>','yellow');
+                            else
+                                responseUI('Error del Sistema','red');
+                        }
+                    }).done(function (data)
                     {
-                        if (statusCode.status == 0) 
-                            responseUI('<font color="black">Internet: Problemas de Conexion</font>','yellow');
+                        $.unblockUI();
+                        if(data.Status == 'Ok')
+                        {
+                            bootbox.alert("<h4 style='color:green'>Solicitudes Aprobadas</h4>", function()
+                            {
+                                listSolicitude();
+                                colorTr(data.Description);
+                            });
+                        }
+                        else if(data.Status == 'Warning')
+                        {
+                            bootbox.alert("<h4 style='color:yellow'>No se han podido aprobar todas las solicitudes</h4>", function()
+                            {
+                                listSolicitude();
+                                colorTr(data.Description);
+                            });
+                        }
+                        else if(data.Status == 'Danger')
+                        {
+                            bootbox.alert("<h4 style='color:red'>No se han podido aprobar las solicitudes</h4>", function()
+                            {
+                                listSolicitude();
+                                colorTr(data.Description);
+                            });   
+                        }
                         else
-                            responseUI('Error del Sistema','red');
-                    }
-                }).done(function (data)
-                {
-                    $.unblockUI();
-                    if(data.Status == 'Ok')
-                    {
-                        bootbox.alert("<h4 style='color:green'>Solicitudes Aprobadas</h4>", function()
-                        {
-                            listSolicitude();
-                            colorTr(data.Description);
-                        });
-                    }
-                    else if(data.Status == 'Warning')
-                    {
-                        bootbox.alert("<h4 style='color:yellow'>No se han podido aprobar todas las solicitudes</h4>", function()
-                        {
-                            listSolicitude();
-                            colorTr(data.Description);
-                        });
-                    }
-                    else if(data.Status == 'Danger')
-                    {
-                        bootbox.alert("<h4 style='color:red'>No se han podido aprobar las solicitudes</h4>", function()
-                        {
-                            listSolicitude();
-                            colorTr(data.Description);
-                        });   
-                    }
-                    else
-                        responseUI(data.Status + ': ' + data.Description,'red');
-                });
+                            responseUI(data.Status + ': ' + data.Description,'red');
+                    });
+                }
             });
         }
     });

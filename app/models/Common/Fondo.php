@@ -22,12 +22,12 @@ class Fondo extends Eloquent {
         	return $lastId->id;
  	}
 
-    public static function SupFondos()
+    public static function supFondos()
     {
         return Fondo::all();
     }
 
-    public static function GerProdFondos()
+    public static function gerProdFondos()
     {
         return Fondo::where('trim(idusertype)', '<>' ,SUP )->get();
     }

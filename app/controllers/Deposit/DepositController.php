@@ -91,7 +91,7 @@ class DepositController extends BaseController{
                 $id                             = $newDeposit->lastId()+1;
                 $newDeposit->iddeposito         = $id;
                 $newDeposit->num_transferencia  = $deposit['op_number'];
-                $newDeposit->total              = $total
+                $newDeposit->total              = $total;
                 if($newDeposit->save())
                 {
                     if ($deposit['type_deposit'] == SOLIC )

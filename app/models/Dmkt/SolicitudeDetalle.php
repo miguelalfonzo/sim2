@@ -18,6 +18,11 @@ class SolicitudeDetalle extends Eloquent
         	return $lastId->id;
     }
 
+    protected function typeReason()
+    {
+        return $this->hasOne('Dmkt\TypeSolicitude','id','idmotivo');
+    }
+
     protected function typeMoney()
     {
     	return $this->hasOne('Common\TypeMoney','idtipomoneda', 'idmoneda' );
@@ -26,6 +31,11 @@ class SolicitudeDetalle extends Eloquent
     protected function typePayment()
     {
         return $this->hasOne('Common\TypePayment','idtipopago','idpago');
+    }
+
+    protected function typeRetention()
+    {
+        return $this->hasOne('Dmkt\TypeRetention','idtiporetencion','idretencion');
     }
 
     public function prueba()

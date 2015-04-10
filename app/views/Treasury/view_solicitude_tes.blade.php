@@ -23,8 +23,7 @@
                 <div class="form-group col-sm-6 col-md-4">
                     <label class="col-sm-8 col-md-8 control-label" for="selectbasic">Fondo</label>
                     <div class="col-sm-12 col-md-12">
-                        <input id="textinput" type="text" value="{{$solicitude->subtype->nombre_mkt}}" class="form-control input-md" readonly>
-                    </div>
+                        </div>
                 </div>
                 <div class="form-group col-sm-6 col-md-4">
                     <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto Solicitado</label>
@@ -36,7 +35,6 @@
                         </div>
                         @else
                         <div class="input-group">
-                            <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
                             <input id="idamount" type="text" value="{{$solicitude->monto}}" class="form-control input-md" readonly>
                         </div>
                         @endif
@@ -66,7 +64,6 @@
                     <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto a Depositar</label>
                     <div class="col-sm-12 col-md-12">
                         <div class="input-group">
-                            <span class="input-group-addon">{{$solicitude->typemoney->simbolo}}</span>
                             @if($solicitude->estado == 2)
                                 <input type="text" value="{{($solicitude->monto -$solicitude->retencion)}}" class="form-control input-md">
                             @else
@@ -162,28 +159,7 @@
                         <a id="button2id" href="{{URL::to('show_user')}}" name="button2id" class="btn btn-danger">Regresar</a>
                     </div>
                 </div>
-                <!-- Modal -->
-                @if($solicitude->estado == DEPOSITO_HABILITADO )
-                    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                                    <h4 class="modal-title" id="myModalLabel">Registro del Depósito</h4>
-                                </div>
-                                <div class="modal-body">
-                                    <label for="op-number">Número de Operación, Transacción, Cheque:</label>
-                                    <input id="op-number" type="text" class="form-control">
-                                    <p id="message-op-number" style="margin-top:1em;color:#a94442;"></p>
-                                </div>
-                                <div class="modal-footer">
-                                    <a id="" href="#" class="btn btn-success register-deposit" data-deposit="S" style="margin-right: 1em;">Confirmar Operación</a>
-                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endif
+                
             </div>
         </div>
     </div>

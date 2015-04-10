@@ -334,10 +334,9 @@ $(function(){
                     if(validateRet() === true)
                     {
                         data._token       = $("input[name=_token]").val();
-                        data.idsolicitude = $("input[name=idsolicitud]").val();
-                        data.ret0         = $("#ret0").val();
-                        data.ret1         = $("#ret1").val();
-                        data.ret2         = $("#ret2").val();
+                        data.idsolicitude = $("input[name=idsolicitude]").val();
+                        data.idretencion  = $("select[name=retencion]").val();
+                        data.monto_retencion = $("input[name=monto_retencion]").val();
                         $.post(server+'enable-deposit', data)
                         .done(function (data){
                         if(data.Status == "Ok")
@@ -347,7 +346,7 @@ $(function(){
                             });
                         }
                         else
-                            bootbox.alert("<p class='red'>Error, no se puede habilitar el depósito.</p>");
+                            bootbox.alert("<h4 class='red'>" + data.Status + ": " + data.Description +  "</h4>");
                         });
                     }
                     else

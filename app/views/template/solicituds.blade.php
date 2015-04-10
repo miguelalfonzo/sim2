@@ -9,7 +9,7 @@
                 <th style="display:none">Retencion</th>
                 <th>Deposito</th>
             @else
-                <th>Monto Solicitado</th>
+                <th>Monto</th>
             @endif
             <th>Estado</th>
             <th>Fecha</th>
@@ -48,7 +48,7 @@
                 
                 @if(Auth::user()->type == TESORERIA)
                     <td style="display:none;" class="total_deposit">
-                        {{$solicitude->typemoney->simbolo.' '.$solicitude->monto }}
+                        {{$solicitude->detalle->typemoney->simbolo.' '.$solicitude->monto }}
                     </td>
                     <td style="display:none" class="tes-ret">
                     @if ($solicitude->retencion == null)
@@ -58,23 +58,36 @@
                     @endif
                     </td>
                     <td class="text-center">
-                        @if (!$solicitude->retencion == null)
-                            {{$solicitude->typemoney->simbolo.' '.($solicitude->monto - $solicitude->retencion)}}
+                        @if ( is_null( $solicitude->detalle->idretencion) )
+                            {{$solicitude->detalle->typemoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_aprobado }}
                         @else
-                            {{$solicitude->typemoney->simbolo.' '.$solicitude->monto }}
+                            {{$solicitude->detalle->typemoney->simbolo.' '.(json_decode($solicitude->detalle->detalle)->monto_aprobado - json_decode($solicitude->detalle->detalle)->monto_retencion)}}
                         @endif
                     </td>
                 @else
                     <td class="text-center total_deposit">
-                        {{ json_decode($solicitude->detalle->detalle)->monto_solicitado }}
+                        @if ($solicitude->idestado == PENDIENTE || $solicitude->idestado == DERIVADO )
+                            {{ json_decode($solicitude->detalle->detalle)->monto_solicitado }}
+                        @elseif ($solicitude->idestado == ACEPTADO )
+                            {{ json_decode($solicitude->detalle->detalle)->monto_aceptado }}
+                        @elseif ($solicitude->idestado == APROBADO)
+                            {{ json_decode($solicitude->detalle->detalle)->monto_aprobado }}
+                        @else
+                            {{ json_decode($solicitude->detalle->detalle)->monto_solicitado }}
+                        @endif
                     </td>
                 @endif
-                
-                
+
                 @include('template.states')
                 
                 <td class="text-center">{{ date_format(date_create($solicitude->created_at), 'd/m/Y' )}}</td>
-                <td class="text-center">{{$solicitude->typesolicitude->nombre}}</td>
+                <td class="text-center">
+                    @if( $solicitude->typeSolicitude->code == SOLIC )
+                        {{$solicitude->detalle->typeReason->nombre}}
+                    @else
+                        {{$solicitude->typesolicitude->nombre}}
+                    @endif
+                </td>
                 @include('template.icons')
                 @if ( Auth::user()->type == GER_COM )
                     <td class="text-center">

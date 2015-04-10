@@ -5,245 +5,96 @@
         text-align: left;
     }
 </style>
-
 <div class="content">
-
-<div class="panel panel-default">
-<div class="panel-heading"><h3 class="panel-title">Solicitud</h3>
-    @if($solicitude->blocked == 1)
-    <h4 class="" style="color: darkred">LA SOLICITUD ESTA SIENDO EVALUADA</h4>
-    @endif
-    <small style="float: right; margin-top: -10px"><strong>Usuario : {{Auth::user()->Rm->nombres}}</strong></small></div>
-<div class="panel-body">
-
-<!--    Type Solicitude  -->
-<div class="form-group col-sm-6 col-md-4 col-lg-4">
-
-    <label class="col-sm-8 col-md-8 col-lg-4 control-label" for="textinput">Tipo Solicitud</label>
-
-    <div class="col-sm-12 col-md-12">
-        <input id="textinput" name="textinput" type="text" placeholder=""
-               value="{{$solicitude->typesolicitude->nombre}}" readonly
-               class="form-control input-md">
-
-    </div>
-</div>
-
-<!--    Type Payment -->
-
-<div class="form-group col-sm-6 col-md-4" >
-
-    <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo de Pago</label>
-
-    <div class="col-sm-12 col-md-12">
-        <select id="" name="type_payment" class="form-control selectTypePayment" disabled>
-            @foreach($typePayments as $type)
-            @if(isset($solicitude) && $solicitude->idtipopago == $type->idtipopago)
-            <option selected value="{{$type->idtipopago}}">{{$type->nombre}}</option>
-            @else
-            <option value="{{$type->idtipopago}}">{{$type->nombre}}</option>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Solicitud</h3>
+            @if($solicitude->status == BLOCKED )
+                <h4 class="" style="color: darkred">LA SOLICITUD ESTA SIENDO EVALUADA</h4>
             @endif
-            @endforeach
-        </select>
-
-    </div>
-</div>
-<!-- Ruc -->
-<div class="form-group col-sm-6 col-md-4" id="div_ruc">
-    <label class="col-sm-8 col-md-8 control-label" for="textinput">Ruc</label>
-
-    <div class="col-sm-12 col-md-12">
-        <input id="ruc" name="ruc" type="text" placeholder=""
-               value="{{isset($solicitude->numruc) ? $solicitude->numruc : null }}"
-               class="form-control input-md" maxlength="11" readonly>
-
-    </div>
-</div>
-<!-- Account Number -->
-<div class="form-group col-sm-6 col-md-4" id="div_number_account">
-
-    <label class="col-sm-8 col-md-8 control-label" for="textinput">Nº de Cuenta</label>
-    <div class="col-sm-12 col-md-12">
-        <input id="number_account" name="number_account" type="text" placeholder=""
-               value="{{isset($solicitude->numcuenta) ? $solicitude->numcuenta : null }}"
-               class="form-control input-md" readonly>
-
-    </div>
-</div>
-
-
-<!--    Name Solicitude  -->
-<div class="form-group col-sm-6 col-md-4 col-lg-4">
-
-    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Nombre Solicitud</label>
-
-    <div class="col-sm-12 col-md-12 col-lg-12">
-        <input id="textinput" name="textinput" type="text" placeholder=""
-               value="{{$solicitude->titulo}}" readonly
-               class="form-control input-md">
-
-    </div>
-</div>
-<!--  Amount Solicitude -->
-<div class="form-group col-sm-6 col-md-4 col-lg-4">
-    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Monto Solicitado</label>
-
-    <div class="col-sm-12 col-md-12 col-lg-12">
-        <div class="input-group">
-            <span class="input-group-addon">{{$solicitude->detalle->typeMoney->simbolo}}</span>
-            <input id="textinput" value="{{json_decode($solicitude->detalle->detalle)->monto_solicitado}}"
-            class="form-control input-md" name="textinput" type="text" readonly>
-        </div>
-    </div>
-</div>
-
-<!--  Amount Factura -->
-@if(isset($solicitude->monto_factura))
-<div class="form-group col-sm-6 col-md-4 col-lg-4">
-    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Monto Factura</label>
-
-    <div class="col-sm-12 col-md-12 col-lg-12">
-        <input id="textinput" name="textinput" type="text" placeholder="" value="{{$solicitude->monto_factura}}"
-               readonly
-               class="form-control input-md">
-
-    </div>
-</div>
-@endif
-
-<!-- Date Delivery -->
-<div class="form-group col-sm-6 col-md-4 col-lg-4">
-    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Fecha de Entrega</label>
-
-
-    <div class="col-sm-12 col-md-12 col-lg-12">
-
-        <div class="input-group date">
-            <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-            <input id="date" type="text" class="form-control" maxlength="10" placeholder=""
-                   value="{{ date_format(date_create($solicitude->fecha_entrega), 'd/m/Y' )}}" disabled>
-        </div>
-
-    </div>
-</div>
-
-<!-- Date Created -->
-<div class="form-group col-sm-6 col-md-4 col-lg-4">
-    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="selectbasic">Fecha de Creacion</label>
-
-    <div class="col-sm-12 col-md-12 col-lg-12">
-        <div class="input-group date">
-            <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-            <input id="date" type="text" class="form-control" maxlength="10" placeholder=""
-                   value="{{ date_format(date_create($solicitude->created_at), 'd/m/Y' )}}" disabled>
-
-        </div>
-    </div>
-</div>
-
-<!-- Observation-->
-@include('template.obs')
-
-@if(isset($solicitude) && $solicitude->idtiposolicitud == ACEPTADO)
-<div class="form-group col-sm-6 col-md-4 col-lg-4">
-    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="selectbasic">&nbsp;</label>
-    <div class="col-sm-12 col-md-12 col-lg-12">
-        <button class="btn btn-primary btn-md" data-toggle="modal" data-target="#myFac">
-            Ver Comprobante
-        </button>
-    </div>
-</div>
-<div class="modal fade" id="myFac" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="myModalLabel">Comprobante</h4>
-            </div>
-            <div class="modal-body">
-                @if (empty($solicitude->image))
-                    <h3>No se ingreso una imagen</h3>
-                @elseif (!file_exists(public_path().'/'.IMAGE_PATH.$solicitude->image))
-                    <h3>No se encontro la imagen en el sistema</h3>
-                @else
-                    <img class="img-responsive" src="{{asset(IMAGE_PATH.$solicitude->image)}}">
+            <small style="float: right; margin-top: -10px">
+                @if ( Auth::user()->type == REP_MED )
+                    <strong>Usuario : {{Auth::user()->Rm->nombres}}</strong>
+                @elseif ( Auth::user()->type == SUP )
+                    <strong>Usuario : {{Auth::user()->Sup->nombres}}</strong>
+                @elseif ( Auth::user()->type == GER_PROD )
+                     <strong>Usuario : {{Auth::user()->Gerprod->descripcion}}</strong>
                 @endif
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
-            </div>
+            </small>
         </div>
-    </div>
-</div>
+        <div class="panel-body">
+            <form id="form_make_activity" method="post">
+                {{Form::token()}}
+                <input name="idsolicitude" type="hidden" value="{{$solicitude->id}}">
+                <input name="token" type="hidden" value="{{$solicitude->token}}">
+                @include('template.detail_solicitude')
 
-<div id="demoLightbox" class="lightbox hide fade"  tabindex="-1" role="dialog" aria-hidden="true">
-    <div class='lightbox-content'>
-        <img src="{{URL::to('/')}}/img/reembolso/{{$solicitude->image}}">
-        <div class="lightbox-caption"><p>Your caption here</p></div>
-    </div>
-</div>
-@endif
-
-
-<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding: 0">
-    <!-- Products -->
-    <div class="form-group col-sm-12 col-md-6 col-lg-6">
-
-        <div style="padding-left: 15px">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Productos</h3>
-                </div>
-                <div class="panel-body">
-
-                    @foreach($solicitude->families as $family)
-                    <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12"  style="padding: 0">
-
-                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-
-                            <input id="textinput" name="textinput" type="text" placeholder=""
-                                   value="{{$family->marca->descripcion}}" readonly
-                                   class="form-control input-md">
-
-                        </div>
-
+                <!-- RETENCION -->
+                @if( Auth::user()->type == CONT && $solicitude->idestado == APROBADO )
+                <div class="col-sm-12 col-md-12">
+                    <label class="col-sm-12 col-md-12 control-label" for="textinput">Retencion</label>
+                    <div class="col-sm-3 col-md-3">
+                        <select name="retencion" class="form-control">
+                        @foreach($typeRetention as $retention)
+                            <option value="{{$retention->idtiporetencion}}">
+                                {{$retention->descripcion}}
+                            </option>
+                        @endforeach
+                        </select>
                     </div>
-                    @endforeach
+                    <div class="form-group col-sm-3 col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-addon">{{$solicitude->detalle->typemoney->simbolo}}</span>
+                            <input name="monto_retencion" type="text" class="form-control input-md ret">
+                        </div>
+                    </div>
+                </div> 
+                @endif
+                
+                <!-- Button (Double) -->
+                <div class="form-group col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px">
+                    <div class="col-sm-12 col-md-12 col-lg-12" style="text-align: center">
+                        @if ( Auth::user()->type == SUP )
+                            @if( $solicitude->idestado == PENDIENTE )
+                                <a class="btn btn-primary" id="search_responsable">
+                                    Aceptar
+                                </a>
+                                <a id="deny_solicitude" name="button1id" class="btn btn-primary deny_solicitude">
+                                    Rechazar
+                                </a>
+                            @endif
+                        @elseif ( Auth::user()->type == GER_PROD )
+                            @if($solicitude->idestado == DERIVADO)
+                                <a id="search_responsable" class="btn btn-primary">
+                                    Aceptar
+                                </a>
+                                <a id="deny_solicitude" name="button1id" class="btn btn-primary deny_solicitude_gerprod">
+                                    Rechazar
+                                </a>
+                            @endif
+                        @elseif ( Auth::user()->type == GER_COM )
+                            @if($solicitude->idestado == ACEPTADO)
+                                <a name="button1id" data-token ="{{$solicitude->token}}" class="btn btn-primary approved_solicitude">
+                                    Aprobar
+                                </a>
+                                <a id="deny_solicitude" name="button1id" class="btn btn-primary deny_solicitude">
+                                    Rechazar
+                                </a>
+                            @endif
+                        @elseif ( Auth::user()->type == CONT )
+                            @if($solicitude->idestado == APROBADO)
+                                <a id="enable-deposit" class="btn btn-success" style="margin-right: 1em;">Habilitar Depósito</a>
+                            @endif
+                        @elseif ( Auth::user()->type == TESORERIA )
+                            <button class="btn btn-success" data-toggle="modal" data-target="#myModal" >Registrar Depósito</button>
+                        @endif
+                        <a id="button2id" href="{{URL::to('show_user')}}" name="button2id" class="btn btn-primary">
+                            Cancelar
+                        </a>
+                    </div>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
-    <!-- Clients -->
-    @include('template.list_clients')
-</div>
-
-<!-- Description Solicitude -->
-<div class="col-sm-12 col-md-12 col-lg-12" style="margin-top: 10px">
-    <div class="form-group col-sm-12 col-md-12 col-lg-12">
-        <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textarea">Descripcion de la
-            Solicitud</label>
-
-        <div class="col-sm-12 col-md-12 col-lg-12">
-            <textarea class="form-control" id="textarea" name="textarea" readonly>{{$solicitude->descripcion}}</textarea>
-        </div>
-    </div>
-</div>
-<!-- Button (Double) -->
-<div class="form-group col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px">
-
-
-    <div class="col-sm-12 col-md-12 col-lg-12" style="text-align: center">
-        <a id="button2id" href="{{URL::to('show_user')}}" name="button2id"
-           class="btn btn-primary">Cancelar</a>
-    </div>
-</div>
-
-
-</div>
-</div>
 </div>
 @stop
-<script>
-
-
-</script>

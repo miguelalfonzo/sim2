@@ -150,7 +150,7 @@ class SolicitudeController extends BaseController
                     'clients'       => 'required'
                 );
             }
-            else if($inputs['type_solicitude'] == 2)
+            else if( $inputs['type_solicitude'] == 2 )
             {
                 if (filesize($image) == FALSE)
                 {
@@ -198,7 +198,6 @@ class SolicitudeController extends BaseController
                 
                 $solicitud_detalle                   = new SolicitudeDetalle;
                 $solicitud_detalle->id               = $solicitud_detalle->searchId() + 1;
-
                 $solicitud->iddetalle                = $solicitud_detalle->id;
 
                 if ($solicitud->save()) 
@@ -466,7 +465,7 @@ class SolicitudeController extends BaseController
                     Log::error($detalle->prueba());
                 }
                 else
-                    return array ( status => warning , description => $middleRpta[description]);
+                    return array ( status => warning , description => $middleRpta[description] );
         }
         catch (Exception $e)
         {
@@ -478,158 +477,47 @@ class SolicitudeController extends BaseController
     public function viewSolicitude($token)
     {
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
-        $managers = Manager::all();
-        $typePayments = TypePayment::all();
-        $data = [
+        $detalle = json_decode($solicitude->detalle->detalle);
+        $data = array(
             'solicitude' => $solicitude,
-            'managers' => $managers,
-            'typePayments' => $typePayments
-        ];
-
+            'detalle'    => $detalle
+        );
+        Log::error($solicitude->status);
+        Log::error(json_encode($solicitude));
+        if ( Auth::user()->type == SUP && $solicitude->idestado == PENDIENTE )
+        {
+            $solicitude->status = BLOCKED;
+            $solicitude->save();
+            $data['fondos'] = Fondo::supFondos();
+            $data['solicitude']->status = 1;
+        }
+        elseif ( Auth::user()->type == GER_PROD && $solicitude->idestado == DERIVADO )
+        {
+            $data['solicitude']->status = 1;
+            $data['fondos'] = Fondo::gerProdFondos();
+        }
+        elseif ( Auth::user()->type == CONT && $solicitude->idestado == APROBADO )
+            $data['typeRetention'] = TypeRetention::all();
         return View::make('Dmkt.Rm.view_solicitude', $data);
     }
 
-    public function editSolicitude($token)
+    public function viewSolicitudeCont($token)
     {
-        $families = Marca::orderBy('descripcion', 'Asc')->get();
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
-        $id = $solicitude->id;
-        $clients = SolicitudeClient::where('idsolicitud', $id)->lists('idcliente');
-
-        $clients = Client::whereIn('clcodigo', $clients)->get(array('clcodigo', 'clnombre'));
-        $families2 = SolicitudeFamily::where('idsolicitud', $id)->lists('idfamilia');
-        $families2 = Marca::whereIn('id', $families2)->get(array('id', 'descripcion'));
-        $typesolicituds = TypeSolicitude::all();
-        $typePayments = TypePayment::all();
-        $etiqueta = Label::all();
-        $fondos = Fondo::all();
-        $data = array(
-            'etiquetas'        => $etiqueta,
-            'solicitude'       => $solicitude,
-            'clients'          => $clients,
-            'families'         => $families,
-            'families2'        => $families2,
-            'typesolicituds'   => $typesolicituds,
-            'fondos'           => $fondos,
-            'typePayments'     => $typePayments
-        );
-        return View::make('Dmkt.Rm.register_solicitude', $data);
-    }
-
-    // IDKC: CHANGE STATUS => CANCELADO
-    public function cancelSolicitude()
-    {
-        try
-        {
-            DB::beginTransaction();
-            
-            $inputs                   = Input::all();
-            $rules = array(
-                    'idsolicitude'        => 'required|numeric|min:1',
-                    'observacion'         => 'required|string|min:1'
-            );
-            $validator = Validator::make($inputs, $rules);
-            if ($validator->fails()) 
-            {
-                $messages = $validator->messages()->all();
-                Log::error(gettype($messages));
-                Log::error($messages);
-                $desc = '';
-                //Log::error($messages->all());
-                foreach ($messages as $msg)
-                {
-                    //Log::error($key);
-                    Log::error($msg);
-                    $desc .= $msg.'-';
-                }
-                return array ( status => warning , description => substr($desc,0,-1) );
-            }
-
-            $id                       = $inputs['idsolicitude'];
-            Log::error($id);
-            $solicitude               = Solicitude::find($id);
-            $solicitude->idestado     = CANCELADO;
-            $solicitude->observacion  = $inputs['observacion'];
-            $solicitude->save();
-            
-            $status                   = $solicitude->idestado;
-            $user_id                  = Auth::user()->id;
-            $rpta = $this->setStatus($status, CANCELADO, $user_id, $user_id, $id);
-            if ( $rpta[status] == ok)
-                DB::commit();
-            else
-                DB::rollback();
-        }
-        catch (Exception $e)
-        {
-            DB::rollback();
-            $rpta = $this->internalException($e,__FUNCTION__);
-        }
-        Session::put('state',R_NO_AUTORIZADO);
-        return $rpta;
-    }
-
-    public function subtypeactivity($id)
-    {
-        $subtypeactivities = Fondo::where('idtipoactividad', $id)->get();
-        return json_encode($subtypeactivities);
-    }
-
-    public function viewSolicitudeSup($token)
-    {
-        $sol = Solicitude::where('token', $token)->firstOrFail();
-        if ($sol->createdBy->type == REP_MED && $sol->idestado == PENDIENTE)
-            Solicitude::where('token', $token)->update( array( 'status' => BLOCKED ) );
-        $solicitude = Solicitude::where('token', $token)->firstOrFail();
-        $detalle = json_decode($sol->detalle->detalle);
-        $fondos = Fondo::supFondos();
-        $gerentes = array();
-        foreach($solicitude->families as $v)
-        {
-            $manager_temp = $v->marca->manager;
-            if (!in_array($manager_temp,$gerentes))
-                $gerentes[] = $manager_temp;    
-        }
-
-        $data = array(
+        $typeRetention = TypeRetention::all();
+        $data = [
             'solicitude' => $solicitude,
-            'detalle'    => $detalle,
-            'fondos'     => $fondos,
-            'gerentes'   => $gerentes
-        );
-        $responsables = $this->findResponsables($solicitude,$token);
-        if (isset($responsables[data]))
-            $data['responsables'] = $responsables[data];
-        return View::make('Dmkt.Sup.view_solicitude_sup', $data);
+            'typeRetention' => $typeRetention
+        ];
+
+        return View::make('Dmkt.Cont.view_solicitude_cont', $data);
     }
 
-    public function viewSolicitudeGerProd($token)
-    {
-
-        $solicitude = Solicitude::where('token', $token)->firstOrFail();
-        $userid = Auth::user()->id;
-        $block = false;
-        if($solicitude->idestado == DERIVADO)
-        {
-            SolicitudeGer::where('idsolicitud', $solicitude->id) // blockeamos la solicitud para que el otro gerente no lo pueda editar
-            ->update(array('status' => 1));
-        }
-        $fondos = Fondo::GerProdFondos();
-        $data = array(
-            'solicitude' => $solicitude,
-            'fondos' => $fondos
-        );
-        $responsables = $this->findResponsables($solicitude,$token);
-        if (isset($responsables[data]))
-            $data['responsables'] = $responsables[data];
-        return View::make('Dmkt.GerProd.view_solicitude_gerprod', $data);
-    }
-
-    public function viewSolicitudeGerCom($token)
+    /*public function viewSolicitudeGerCom($token)
     {
         $solicitude = Solicitude::where('token', $token)->first();
         $sol = Solicitude::where('token', $token);
-        $sol->status = 2;
+        //$sol->status = 2;
         $data = $this->objectToArray($sol);
         $sol->update($data);
         $info = array();
@@ -668,9 +556,99 @@ class SolicitudeController extends BaseController
             $info = array('solicitude' => $solicitude);
         $info[status] = ok;
         return View::make('Dmkt.GerCom.view_solicitude_gercom',$info);
+    }*/
+
+
+    public function editSolicitude($token)
+    {
+        $families = Marca::orderBy('descripcion', 'Asc')->get();
+        $solicitude = Solicitude::where('token', $token)->firstOrFail();
+        $detalle = json_decode($solicitude->detalle->detalle);
+        $id = $solicitude->id;
+        $clients = SolicitudeClient::where('idsolicitud', $id)->lists('idcliente');
+
+        $clients = Client::whereIn('clcodigo', $clients)->get(array('clcodigo', 'clnombre'));
+        $families2 = SolicitudeFamily::where('idsolicitud', $id)->lists('idfamilia');
+        $families2 = Marca::whereIn('id', $families2)->get(array('id', 'descripcion'));
+        $typesolicituds = TypeSolicitude::all();
+        $typePayments = TypePayment::all();
+        $etiqueta = Label::all();
+        $fondos = Fondo::all();
+        $data = array(
+            'etiquetas'        => $etiqueta,
+            'detalle'          => $detalle,
+            'solicitude'       => $solicitude,
+            'clients'          => $clients,
+            'families'         => $families,
+            'families2'        => $families2,
+            'typesolicituds'   => $typesolicituds,
+            'fondos'           => $fondos,
+            'typePayments'     => $typePayments
+        );
+        return View::make('Dmkt.Rm.register_solicitude', $data);
     }
 
-    public function registerSolicitudeGerProd()
+    // IDKC: CHANGE STATUS => CANCELADO
+    private function msgValidator($validator)
+    {
+        $rpta = '';
+        foreach ($validator->messages()->all() as $msg)
+            $rpta .= $msg.'-';
+        return $rpta;
+    }
+
+    public function cancelSolicitude()
+    {
+        try
+        {
+            DB::beginTransaction();
+            
+            $inputs                   = Input::all();
+            $rules = array(
+                    'idsolicitude'        => 'required|numeric|min:1',
+                    'observacion'         => 'required|string|min:1'
+            );
+            $validator = Validator::make($inputs, $rules);
+            if ($validator->fails()) 
+                return array ( status => warning , description => substr($this->msgValidator($validator),0,-1) );
+
+            $id                       = $inputs['idsolicitude'];
+            Log::error($id);
+            $solicitude               = Solicitude::find($id);
+            $solicitude->idestado     = CANCELADO;
+            $solicitude->observacion  = $inputs['observacion'];
+            $solicitude->save();
+            
+            $status                   = $solicitude->idestado;
+            $user_id                  = Auth::user()->id;
+            $rpta = $this->setStatus($status, CANCELADO, $user_id, $user_id, $id);
+            if ( $rpta[status] == ok)
+                DB::commit();
+            else
+                DB::rollback();
+        }
+        catch (Exception $e)
+        {
+            DB::rollback();
+            $rpta = $this->internalException($e,__FUNCTION__);
+        }
+        Session::put('state',R_NO_AUTORIZADO);
+        return $rpta;
+    }
+
+    public function subtypeactivity($id)
+    {
+        $subtypeactivities = Fondo::where('idtipoactividad', $id)->get();
+        return json_encode($subtypeactivities);
+    }
+
+  
+
+  
+
+    
+
+    /*public function registerSolicitudeGerProd()
     {
         $inputs = Input::all();
         $image = Input::file('file');
@@ -732,7 +710,7 @@ class SolicitudeController extends BaseController
             if ($typeUser == SUP)
                 return SUP;
         }
-    }
+    }*/
 
     // IDKC: CHANGE STATUS => RECHAZADO
     public function denySolicitude()
@@ -758,7 +736,7 @@ class SolicitudeController extends BaseController
                 $solicitude->idsolicitud = (int)$id;
                 $solicitude->observacion = $inputs['observacion'];
                 $solicitude->idestado = RECHAZADO;
-                $solicitude->status = 2;
+                //$solicitude->status = 2;
                 $data = $this->objectToArray($solicitude);
                 $solicitude->update($data);
                 $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, RECHAZADO, $user->id,  $oldOolicitude->iduser, $id,SOLIC);
@@ -775,88 +753,26 @@ class SolicitudeController extends BaseController
             return Redirect::to('show_user')->with('state',R_NO_AUTORIZADO);
     }
 
-   /*public function redirectAcceptedSolicitude()
-   {
-       return Redirect::to('show_user')->with('state', R_APROBADO);
-   }*/
-
-    // IDKC: CHANGE STATUS => PENDIENTE DERIVADO
-    /*public function derivedSolicitude($token,$derive=0)
-    {   
-        try
-        {
-            DB::beginTransaction();
-            $oldOolicitude      = Solicitude::where('token', $token)->first();
-            $oldStatus          = $oldOolicitude->estado;
-            $idSol              = $oldOolicitude->idsolicitud;
-
-            Solicitude::where('token', $token)->update(array('derived' => 1 , 'blocked' => 0 , 'estado' => DERIVADO));
-            $solicitude = Solicitude::where('token', $token)->firstOrFail();
-            $id = $solicitude->idsolicitud;
-            $sol = Solicitude::find($id);
-            $gerentes = array();
-            foreach ($sol->families as $v) 
-            {
-                $manager_temp = $v->marca->manager;
-                if (!in_array($manager_temp,$gerentes))
-                {
-                    $gerentes[] = $manager_temp;
-                    $solGer = new SolicitudeGer;
-                    $solGer->idsolicitud_gerente = $solGer->searchId() + 1;
-                    $solGer->idsolicitud = $id;
-                    $solGer->idgerprod = $v->marca->manager->id;
-                    $solGer->save();
-                }
-                $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, DERIVADO, Auth::user()->id, $v->marca->manager->iduser, $idSol,SOLIC);
-                if ( $rpta[status] == ok )
-                {
-                    DB::commit();
-                }
-            }
-        }
-        catch (Exception $e)
-        {
-            DB::rollback();
-            $rpta = $this->internalException($e,__FUNCTION__);
-        }
-        return Redirect::to('show_user');
-    }*/
-
-    public function disBlockSolicitudeSup($token)
-    {
-        $solicitude = Solicitude::where('token', $token)->firstOrFail();
-        Solicitude::where('idsolicitud', $solicitude->idsolicitud) // desbloqueamos la solicitud para que el rm lo pueda editar
-        ->update(array('blocked' => 0));
-        return Redirect::to('show_user');
-    }
-
-    public function disBlockSolicitudeGerProd($token)
-    {
-        //Desbloquenado La solicitud al presionar el boton Cancelar
-        $solicitude = Solicitude::where('token', $token)->firstOrFail();
-        $solicitude->status = 1 ;
-        $solicitude->save();
-        SolicitudeGer::where('idsolicitud', $solicitude->id) // desblockeamos la solicitud para que el otro gerente no lo pueda editar
-        ->update(array('status' => 1));
-        return Redirect::to('show_user');
-    }
-
+ 
     public function acceptedSolicitude()
     {
         try
         {
             DB::beginTransaction();
-            $inputs = Input::all();   
-            Log::error($inputs);   
-            $rpta = array();
-            $idSol = $inputs['idsolicitude'];
+            $inputs     = Input::all();   
+            $rpta       = array();
+            $idSol      = $inputs['idsolicitude'];
             $solicitude = Solicitude::find($idSol);
+            $oldidestado = $solicitude->idestado;
             $fondo      = Fondo::find($inputs['idfondo']);
 
             if ($fondo->idusertype == SUP)
             {
                 $solicitude->idestado = ACEPTADO;
+                $solicitude->status = ACTIVE;
                 $solicitude->iduserasigned = $inputs['idresponsable'];
+                $solicitude->observacion   = $inputs['observacion'];
+                Log::error($solicitude->iddetalle);
                 if ($solicitude->save())
                 {
                     $sol_detalle = SolicitudeDetalle::find($solicitude->iddetalle);
@@ -880,11 +796,11 @@ class SolicitudeController extends BaseController
                             $fam->update($data);
                             $i++;
                         }
-                        $rpta = $this->setStatus($solicitude->idestado, ACEPTADO, Auth::user()->id, USER_GERENTE_COMERCIAL, $idSol);
+                        $rpta = $this->setStatus($oldidestado, ACEPTADO, Auth::user()->id, USER_GERENTE_COMERCIAL, $idSol);
                         if ( $rpta[status] == ok )
                         {
                             DB::commit();
-                            Session::pull('state', R_APROBADO);
+                            Session::put('state', R_APROBADO);
                             return $rpta;
                         }
                     }
@@ -894,7 +810,8 @@ class SolicitudeController extends BaseController
             {
                 if (Auth::user()->type == SUP )
                 {
-                    $solicitude->idestado = DERIVADO;
+                    $solicitude->idestado      = DERIVADO;
+                    $solicitude->observacion   = $inputs['observacion'];
                     if ($solicitude->save())
                     {
                         $solicitude_gerente = new SolicitudeGer;
@@ -909,11 +826,11 @@ class SolicitudeController extends BaseController
                             $sol_detalle->idfondo   = $inputs['idfondo'];
                             if ($sol_detalle->save())
                             {
-                                $rpta = $this->setStatus($solicitude->idestado, DERIVADO, Auth::user()->id, $inputs['idresponsable'], $idSol);
+                                $rpta = $this->setStatus($$oldidestado, DERIVADO, Auth::user()->id, $inputs['idresponsable'], $idSol);
                                 if ( $rpta[status] == ok )
                                 {
                                     DB::commit();
-                                    Session::pull('state', R_PENDIENTE);
+                                    Session::put('state', R_PENDIENTE);
                                     return $rpta;
                                 }
                             }
@@ -922,9 +839,10 @@ class SolicitudeController extends BaseController
                 }
                 elseif (Auth::user()->type == GER_PROD) 
                 {
-                    Log::error('fggggggggggggggg');
                     $solicitude->idestado = ACEPTADO;
+                    $solicitude->status = ACTIVE;
                     $solicitude->iduserasigned = $inputs['idresponsable'];
+                    $solicitude->observacion   = $inputs['observacion'];
             
                     if ($solicitude->save())
                     {
@@ -949,11 +867,11 @@ class SolicitudeController extends BaseController
                                 $fam->update($data);
                                 $i++;
                             }
-                            $rpta = $this->setStatus($solicitude->idestado, ACEPTADO, Auth::user()->id, USER_GERENTE_COMERCIAL, $idSol);
+                            $rpta = $this->setStatus($oldidestado, ACEPTADO, Auth::user()->id, USER_GERENTE_COMERCIAL, $idSol);
                             if ( $rpta[status] == ok )
                             {
                                 DB::commit();
-                                Session::pull('state', R_APROBADO);
+                                Session::put('state', R_APROBADO);
                                 return $rpta;
                             }
                         }
@@ -963,20 +881,37 @@ class SolicitudeController extends BaseController
             elseif ($fondo->idusertype == ASIS_GER)
             {
                 $solicitude->idestado = ACEPTADO;
+                $solicitude->status   = ACTIVE;
+                $solicitude->observacion   = $inputs['observacion'];
                 $solicitude->iduserasigned = $inputs['idresponsable'];
                 if ($solicitude->save())
                 {
                     $sol_detalle = SolicitudeDetalle::find($solicitude->iddetalle);
                     $sol_detalle->idfondo   = $inputs['idfondo'];
+                    $detalle = json_decode($solicitude->detalle->detalle);
+                    $detalle->monto_aceptado = $inputs['monto'];
+                    $sol_detalle->detalle = json_encode($detalle);
+
                     if ($sol_detalle->save())
                     {
-                       $rpta = $this->setStatus($solicitude->idestado, ACEPTADO, Auth::user()->id, USER_GERENTE_COMERCIAL, $idSol);
-                       if ( $rpta[status] == ok )
-                       {
+                        $amount_assigned = $inputs['amount_assigned'];
+                        $families = SolicitudeFamily::where('idsolicitud', $idSol)->get();
+                        $i = 0;
+                        foreach ($families as $family) 
+                        {
+                            $fam = SolicitudeFamily::where('id', $family->id);
+                            $fam->monto_asignado = $amount_assigned[$i];
+                            $data = $this->objectToArray($fam);
+                            $fam->update($data);
+                            $i++;
+                        }
+                        $rpta = $this->setStatus($oldidestado, ACEPTADO, Auth::user()->id, USER_GERENTE_COMERCIAL, $idSol);
+                        if ( $rpta[status] == ok )
+                        {
                             DB::commit();
-                            Session::pull('state', R_APROBADO);
+                            Session::put('state', R_APROBADO);
                             return $rpta;
-                       }
+                        }
                     }
                 }
             }
@@ -994,7 +929,7 @@ class SolicitudeController extends BaseController
         return Redirect::to('show_user')->with('state', ACEPTADO);
     }*/
 
-    public function gercomAsignarResponsable()
+    /*public function gercomAsignarResponsable()
     {
         try
         {
@@ -1017,7 +952,7 @@ class SolicitudeController extends BaseController
             $middleRpta = $this->internalException($e,__FUNCTION__);
         }
         return $middleRpta;
-    } 
+    } */
 
     public function massApprovedSolicitudes()
     {
@@ -1063,6 +998,7 @@ class SolicitudeController extends BaseController
         try
         {
             $inputs = Input::all();
+            Log::error($inputs);
             $rules = array(
                 'token'             => 'required',
                 'monto'             => 'required|numeric|min:1',
@@ -1070,7 +1006,7 @@ class SolicitudeController extends BaseController
             );
             $validator = Validator::make($inputs, $rules);
             if ($validator->fails()) 
-                $rpta = $validator->messages();
+                return array ( status => warning , description => substr($this->msgValidator($validator),0,-1) );
             else
                 $rpta = $this->approvedTransaction($inputs);
         }
@@ -1089,21 +1025,23 @@ class SolicitudeController extends BaseController
             $rpta = array ( status => warning , description => 'Error Desconocido' );
             $token = $inputs['token'];
             $solicitude = Solicitude::where('token', $token)->firstOrFail();
-            
+            $oldidestado = $solicitude->idestado;
             $idSol = $solicitude->id;        
 
             $solicitude->idestado = APROBADO;
+            if ( isset($inputs['observacion']) )
+                $solicitude->observacion = $inputs['observacion'];
             $solicitude->status = 1;
+
             if ($solicitude->save())
             {
+                $sol_detalle = SolicitudeDetalle::find($solicitude->iddetalle);
+                $detalle = json_decode($sol_detalle->detalle);
+                $detalle->monto_aprobado = $detalle->monto_aceptado;    
                 if (isset($inputs['monto']))
-                {
-                    $sol_detalle = SolicitudeDetalle::find($solicitude->iddetalle);
-                    $detalle = json_decode($sol_detalle->detalle);
                     $detalle->monto_aprobado = $inputs['monto'];
-                    $sol_detalle->detalle = json_encode($detalle);
-                    $sol_detalle->save();
-                }
+                $sol_detalle->detalle = json_encode($detalle);
+                $sol_detalle->save();
                 if (isset($inputs['amount_assigned']))
                 {
                     $amount_assigned = $inputs['amount_assigned'];
@@ -1119,7 +1057,7 @@ class SolicitudeController extends BaseController
                     }
                 }
             }
-            $rpta = $this->setStatus($solicitude->idestado, APROBADO, Auth::user()->id, USER_CONTABILIDAD, $idSol);
+            $rpta = $this->setStatus($oldidestado, APROBADO, Auth::user()->id, USER_CONTABILIDAD, $idSol);
             if ( $rpta[status] == ok )
                 DB::commit();
             else
@@ -1546,17 +1484,7 @@ class SolicitudeController extends BaseController
         return json_encode($result);
     }
 
-    public function viewSolicitudeCont($token)
-    {
-        $solicitude = Solicitude::where('token', $token)->firstOrFail();
-        $typeRetention = TypeRetention::all();
-        $data = [
-            'solicitude' => $solicitude,
-            'typeRetention' => $typeRetention
-        ];
-
-        return View::make('Dmkt.Cont.view_solicitude_cont', $data);
-    }
+  
 
     public function viewSeatSolicitude($token)
     {
@@ -1722,50 +1650,44 @@ class SolicitudeController extends BaseController
         {
             DB::beginTransaction();
             $inputs = Input::all();
-            $val_ret = null;
-            if($inputs['ret0'])
-            {
-                $val_ret = intval($inputs['ret0']);
-                $idtyperetention = 1;
-            }
-            if($inputs['ret1'])
-            {
-                $val_ret = intval($inputs['ret1']);
-                $idtyperetention = 2;
-            }
-            if($inputs['ret2'])
-            {
-                $val_ret = intval($inputs['ret2']);
-                $idtyperetention = 3;
-            }
+            Log::error($inputs);
             $id = $inputs['idsolicitude'];
-            $solicitude = Solicitude::where('idsolicitud', $id);
-            $solicitude->estado = DEPOSITO_HABILITADO;
-            $solicitude->retencion = $val_ret;
-            $oldOolicitude      = Solicitude::where('idsolicitud', $id)->first();
-            $oldStatus          = $oldOolicitude->estado;
-            $idSol              = $oldOolicitude->idsolicitud;
-            $userAproved          = $oldOolicitude->idaproved;
-            if($val_ret != null)
+            $solicitude = Solicitude::find($id);
+            $idAprobado = $solicitude->updated_by;
+            $solicitude->idestado = DEPOSITO_HABILITADO;
+            if ($solicitude->save())
             {
-                $solicitude->idtiporetencion = $idtyperetention;    
-            }
-            $solicitude->asiento = ENABLE_DEPOSIT;
-            $data = $this->objectToArray($solicitude);
-            if($solicitude->update($data))
-            {
-                $user_cod = User::where('id',$userAproved)->select('id')->first();
-                $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, DEPOSITO_HABILITADO, Auth::user()->id, $user_cod->id, $idSol,SOLIC);
+                $val_ret = $inputs['monto_retencion'];
+                if ( !empty( trim( $val_ret ) ) )
+                {
+                    if ( !is_numeric($val_ret) )
+                        return array ( status => warning , description => 'La retencion debe ser un valor Númerico');
+                    elseif ( $val_ret <= 0)    
+                        return array ( status => warning , description => 'La retencion debe ser mayor que 0');
+                    else 
+                    {
+                        $sol_detalle = SolicitudeDetalle::find($solicitude->iddetalle);
+                        $sol_detalle->idretencion = $inputs['idretencion'];
+                        $detalle = json_decode($sol_detalle->detalle);
+                        $detalle->monto_retencion = $val_ret;
+                        $sol_detalle->detalle = json_encode($detalle);
+                        if ( !$sol_detalle->save() )
+                            return array ( status => warning , description => 'Cancelado: No se pudo registrar la retencion');
+                    }
+                }
+                $rpta = $this->setStatus($solicitude->idestado, DEPOSITO_HABILITADO, Auth::user()->id, USER_TESORERIA , $solicitude->id);
                 if ($rpta[status] == ok)
                 {
                     Session::put('state',R_REVISADO);
                     DB::commit();
                 }
+                else
+                    DB::rollback();
             }
             else
             {
                 DB::rollback();
-                $rpta = array(status => warning , description => 'No se pudo registrar la información');
+                $rpta = array(status => warning , description => 'Cancelado: No se pudo registrar la información');
             }
         }
         catch (Exception $e)

@@ -40,7 +40,7 @@
                 <div class="col-sm-12 col-md-12">
                     <select class="form-control selecttypesolicitude" name="type_solicitude">
                         @foreach($typesolicituds as $type)
-                            @if(isset($solicitude) && $solicitude->idtiposolicitud == $type->idtiposolicitud)
+                            @if(isset($solicitude) && $solicitude->detalle->idmotivo == $type->id)
                                 <option selected value="{{$type->id}}">{{$type->nombre}}</option>
                             @else
                                 <option value="{{$type->id}}">{{$type->nombre}}</option>
@@ -118,8 +118,8 @@
             <div class="solicitude_monto form-group col-sm-6 col-md-4">
                 <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto Factura</label>
                 <div class="col-sm-12 col-md-12">
-                    <input id="amountfac" class="form-control input-md" name="amount_fac" type="text" placeholder=""
-                           value="{{isset($solicitude->monto_factura) ? $solicitude->monto_factura : null }}">
+                    <input id="amountfac" class="form-control input-md" name="amount_fac" type="text"
+                    value="{{isset($detalle->monto_factura) ? $detalle->monto_factura : null }}">
                 </div>
             </div>
             @if (!isset($solicitude))
@@ -247,7 +247,7 @@
                     <button type="button" class="btn btn-default" id="btn-add-family">Agregar Otra Familia</button>
                 </div>
             <!-- </div> -->
-            @if(isset($solicitude) && $solicitude->idtiposolicitud == 2)
+            @if( isset($solicitude) && $solicitude->typeSolicitude->code == SOLIC && $solicitude->detalle->idmotivo == REASON_REGALOS )
                 <div class="form-group col-sm-6 col-md-4">
                     <div class="col-sm-12 col-md-12">
                         <label class="col-sm-8 col-md-8 control-label" for="textinput"> </label>
@@ -267,19 +267,19 @@
                                 <h4 class="modal-title" id="myModalLabel">Comprobante</h4>
                             </div>
                             <div class="modal-body">
-                                @if (empty($solicitude->image))
+                                @if (empty($detalle->image))
                                     <h3>No se ingreso una imagen</h3>
-                                @elseif (!file_exists(public_path().'/'.IMAGE_PATH.$solicitude->image))
+                                @elseif (!file_exists(public_path().'/'.IMAGE_PATH.$detalle->image))
                                     <h3>No se encontro la imagen en el sistema</h3>
                                 @else
-                                    <img id="imgSalida" class="img-responsive" src="{{asset(IMAGE_PATH.$solicitude->image)}}">
+                                    <img id="imgSalida" class="img-responsive" src="{{asset(IMAGE_PATH.$detalle->image)}}">
                                 @endif 
                             </div>
                             <div class="modal-footer">
                                 <div class="solicitude_factura form-group col-sm-10 col-md-10" style="padding-right: 30px">
                                     <label class="col-sm-6 col-md-4 control-label" for="textinput">Subir Otra Factura</label>
                                     <div class="col-sm-5 col-md-7">
-                                        <input id="isSetImage" type="hidden" value="{{$solicitude->image}}">
+                                        <input id="isSetImage" type="hidden" value="{{$detalle->image}}">
                                         <input type="file" id="input-file-factura" name="file" class="form-control" style="padding:1px">
                                     </div>
                                 </div>
