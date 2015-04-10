@@ -59,7 +59,7 @@
                                 <a class="btn btn-primary" id="search_responsable">
                                     Aceptar
                                 </a>
-                                <a id="deny_solicitude" name="button1id" class="btn btn-primary deny_solicitude">
+                                <a id="deny_solicitude" name="button1id" class="btn btn-primary">
                                     Rechazar
                                 </a>
                             @endif
@@ -68,7 +68,7 @@
                                 <a id="search_responsable" class="btn btn-primary">
                                     Aceptar
                                 </a>
-                                <a id="deny_solicitude" name="button1id" class="btn btn-primary deny_solicitude_gerprod">
+                                <a id="deny_solicitude" name="button1id" class="btn btn-primary">
                                     Rechazar
                                 </a>
                             @endif
@@ -77,7 +77,7 @@
                                 <a name="button1id" data-token ="{{$solicitude->token}}" class="btn btn-primary approved_solicitude">
                                     Aprobar
                                 </a>
-                                <a id="deny_solicitude" name="button1id" class="btn btn-primary deny_solicitude">
+                                <a id="deny_solicitude" name="button1id" class="btn btn-primary">
                                     Rechazar
                                 </a>
                             @endif
@@ -85,8 +85,8 @@
                             @if($solicitude->idestado == APROBADO)
                                 <a id="enable-deposit" class="btn btn-success" style="margin-right: 1em;">Habilitar Depósito</a>
                             @endif
-                        @elseif ( Auth::user()->type == TESORERIA )
-                            <button class="btn btn-success" data-toggle="modal" data-target="#myModal" >Registrar Depósito</button>
+                        @elseif ( Auth::user()->type == TESORERIA && $solicitude->idestado == DEPOSITO_HABILITADO )
+                            <a class="btn btn-success" data-toggle="modal" data-target="#myModal" >Registrar Depósito</a>
                         @endif
                         <a id="button2id" href="{{URL::to('show_user')}}" name="button2id" class="btn btn-primary">
                             Cancelar

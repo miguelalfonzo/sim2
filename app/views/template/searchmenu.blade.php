@@ -79,6 +79,14 @@
                     </a>
                 </div>
             </div>
+        @elseif (Auth::user()->type == TESORERIA)
+            <div class="form-group col-sm-3 col-md-3" style="text-align: right; padding: 0">
+                <div>
+                    <span class="label" style="background-color:red">
+                        Tasa de Cambio {{$tc->fecha}}: Compra({{$tc->compra}}) - Venta({{$tc->venta}})
+                    </span>
+                </div>
+            </div>
         @endif
     </div>
 </div>

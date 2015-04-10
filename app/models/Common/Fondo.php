@@ -31,4 +31,9 @@ class Fondo extends Eloquent {
     {
         return Fondo::where('trim(idusertype)', '<>' ,SUP )->get();
     }
+
+    protected function typeMoney()
+    {
+        return $this->hasOne('Common\TypeMoney','idtipomoneda','idtipomoneda');
+    }
 }

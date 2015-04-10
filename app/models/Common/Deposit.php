@@ -24,4 +24,9 @@ class Deposit extends Eloquent{
             return $lastId->iddeposito;
         }
 	}
+
+	protected function account()
+	{
+		return $this->hasOne('Dmkt\Account','id','idcuenta');
+	}
 }

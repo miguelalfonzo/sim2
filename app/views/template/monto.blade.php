@@ -1,5 +1,5 @@
 <div class="form-group col-sm-6 col-md-4 col-lg-4">
-    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">
+    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="amount">
         Monto
     </label>
     <div class="col-sm-12 col-md-12 col-lg-12">
@@ -12,7 +12,7 @@
                     <input id="amount" value="{{$detalle->monto_aceptado}}"
                     class="form-control input-md" name="monto" type="text">
                 @else
-                    <input id="textinput" value="{{$detalle->monto_aceptado}}"
+                    <input id="amount" value="{{$detalle->monto_aceptado}}"
                     class="form-control input-md" name="monto" type="text" readonly>
                 @endif
             @elseif ( in_array( $solicitude->idestado , array( PENDIENTE, DERIVADO ) ) )

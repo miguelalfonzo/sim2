@@ -1,23 +1,20 @@
 <!--    Type Solicitude  -->
 <div class="form-group col-sm-6 col-md-4 col-lg-4">
-    <label class="col-sm-8 col-md-8 col-lg-4 control-label" for="textinput">Tipo Solicitud</label>
-
+    <label class="col-sm-8 col-md-8 col-lg-4 control-label" for="reason">Tipo Solicitud</label>
     <div class="col-sm-12 col-md-12">
-        <input id="textinput" name="textinput" type="text" class="form-control input-md"
-               value="{{$solicitude->detalle->typeReason->nombre}}" readonly>
-
+        <input id="reason" type="text" class="form-control input-md"
+        value="{{$solicitude->detalle->typeReason->nombre}}" readonly>
     </div>
 </div>
 
 <!--    Type Payment -->
-
 <div class="form-group col-sm-6 col-md-4" >
-
-    <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo de Pago</label>
-
+    <label class="col-sm-8 col-md-8 control-label">Tipo de Pago</label>
     <div class="col-sm-12 col-md-12">
-        <select name="type_payment" class="form-control selectTypePayment" disabled>
-            <option selected value="{{$solicitude->detalle->typePayment->id}}">{{$solicitude->detalle->typePayment->nombre}}</option>
+        <select class="form-control selectTypePayment" disabled>
+            <option selected value="{{$solicitude->detalle->typePayment->id}}">
+                {{$solicitude->detalle->typePayment->nombre}}
+            </option>
         </select>
     </div>
 </div>
@@ -25,31 +22,31 @@
 <!-- Account Number -->
 @if ( $solicitude->typeSolicitude->code == SOLIC && $solicitude->detalle->idpago == PAGO_DEPOSITO )
     <div class="form-group col-sm-6 col-md-4">
-        <label class="col-sm-8 col-md-8 control-label" for="textinput">Nº de Cuenta</label>
+        <label class="col-sm-8 col-md-8 control-label" for="cuenta">Nº de Cuenta</label>
         <div class="col-sm-12 col-md-12">
-            <input id="number_account" name="number_account" class="form-control input-md" 
+            <input id="cuenta" class="form-control input-md" 
             value="{{$detalle->num_cuenta}}" readonly>
         </div>
     </div>
 @elseif( $solicitude->typeSolicitude->code == SOLIC && $solicitude->detalle->idpago == PAGO_CHEQUE )
     <!-- Ruc -->
     <div class="form-group col-sm-6 col-md-4">
-        <label class="col-sm-8 col-md-8 control-label" for="textinput">Ruc</label>
-
+        <label class="col-sm-8 col-md-8 control-label" for="ruc">Ruc</label>
         <div class="col-sm-12 col-md-12">
-            <input id="ruc" name="ruc" type="text" class="form-control input-md"
+            <input id="ruc" type="text" class="form-control input-md"
             value="{{ $detalle->num_ruc }}" maxlength="11" readonly>
         </div>
     </div>
 @endif
+
 @if( $solicitude->typeSolicitude->code == SOLIC && $solicitude->detalle->idmotivo == REASON_REGALOS )
     <!--  Amount Factura -->
     <div class="form-group col-sm-6 col-md-4 col-lg-4">
-        <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">
+        <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="factura">
             Monto Factura
         </label>
         <div class="col-sm-12 col-md-12 col-lg-12">
-            <input id="textinput" class="form-control input-md" name="textinput" type="text"
+            <input id="factura" class="form-control input-md" type="text"
             value="{{$detalle->monto_factura}}" readonly>
         </div>
     </div>
@@ -57,14 +54,14 @@
 
 <!--    Name Solicitude  -->
 <div class="form-group col-sm-6 col-md-4 col-lg-4">
-
-    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Nombre Solicitud</label>
-
+    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="titulo">
+        Nombre Solicitud
+    </label>
     <div class="col-sm-12 col-md-12 col-lg-12">
         <div class="input-group">
             <span class="input-group-addon">{{$solicitude->etiqueta->nombre}}</span>
-            <input id="textinput" name="textinput" class="form-control input-md" type="text"
-                   value="{{$solicitude->titulo}}" readonly>
+            <input id="titulo" class="form-control input-md" type="text"
+            value="{{$solicitude->titulo}}" readonly>
         </div>
     </div>
 </div>
@@ -76,56 +73,53 @@
     <!--  Retencion      --> 
     @if ( !is_null($solicitude->detalle->idretencion) )
         <div class="form-group col-sm-6 col-md-4 col-lg-4">
-            <label class="col-sm-8 col-md-8 control-label" for="textinput">
+            <label class="col-sm-8 col-md-8 control-label" for="retencion">
                 {{$solicitude->detalle->typeRetention->descripcion}}
             </label>
             <div class="col-sm-12 col-md-12 col-lg-12">
                 <div class="input-group">
                     <span class="input-group-addon">{{$solicitude->detalle->typemoney->simbolo}}</span>
-                    <input type="text" value="{{$detalle->monto_retencion}}" class="form-control input-md" readonly>
+                    <input id="retencion" type="text" value="{{$detalle->monto_retencion}}" class="form-control input-md" readonly>
                 </div>
             </div>
         </div>
         <div class="form-group col-sm-6 col-md-4 col-lg-4">
-            <label class="col-sm-8 col-md-8 control-label" for="textinput">
+            <label class="col-sm-8 col-md-8 control-label" for="depositar">
                 A Depositar
             </label>
             <div class="col-sm-12 col-md-12 col-lg-12">
                 <div class="input-group">
                     <span class="input-group-addon">{{$solicitude->detalle->typemoney->simbolo}}</span>
-                    <input type="text" value="{{($detalle->monto_aprobado - $detalle->monto_retencion)}}" class="form-control input-md" readonly>
+                    <input id="depositar" type="text" value="{{($detalle->monto_aprobado - $detalle->monto_retencion)}}" class="form-control input-md" readonly>
                 </div>
             </div>
         </div>
     @else
         <div class="form-group col-sm-6 col-md-4 col-lg-4">
-            <label class="col-sm-8 col-md-8 control-label" for="textinput">
+            <label class="col-sm-8 col-md-8 control-label" for="depositar">
                 A Depositar
             </label>
             <div class="col-sm-12 col-md-12 col-lg-12">
                 <div class="input-group">
                     <span class="input-group-addon">{{$solicitude->detalle->typemoney->simbolo}}</span>
-                    <input type="text" value="{{$detalle->monto_aprobado}}" class="form-control input-md" readonly>
+                    <input id="depositar" type="text" value="{{$detalle->monto_aprobado}}" class="form-control input-md" readonly>
                 </div>
             </div>
         </div>
     @endif
 @endif
 
-
 <!-- Date Delivery -->
 <div class="form-group col-sm-6 col-md-4 col-lg-4">
-    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textinput">Fecha de Entrega</label>
-
-
+    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="date">Fecha de Entrega</label>
     <div class="col-sm-12 col-md-12 col-lg-12">
-
         <div class="input-group date">
-            <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-            <input id="date" type="text" class="form-control" maxlength="10" placeholder=""
-            value="{{ date_format(date_create($detalle->fecha_entrega), 'd/m/Y' )}}" disabled>
+            <span class="input-group-addon">
+                <i class="glyphicon glyphicon-calendar"></i>
+            </span>
+            <input id="date" type="text" class="form-control" maxlength="10" disabled
+            value="{{ date_format(date_create($detalle->fecha_entrega), 'd/m/Y' )}}">
         </div>
-
     </div>
 </div>
 
@@ -146,43 +140,32 @@
 <!-- Solicitante -->
 @include('template.solicitante')
 
-@if ( isset($fondos) || !is_null($solicitude->detalle->idfondo) )
-    <div class="form-group col-sm-6 col-md-4">
-        <label class="col-sm-8 col-md-8 control-label" for="textinput">Fondo</label>
-        <div class="col-sm-12 col-md-12">
-            @if($solicitude->idestado == PENDIENTE || $solicitude->idestado == DERIVADO)
-                <select id="sub_type_activity" name="idfondo" class="form-control">
-            @else
-                <select id="sub_type_activity" name="idfondo" class="form-control" disabled>
-            @endif
-                @if ( isset($fondos) )
-                    @foreach($fondos as $sub)
-                        @if( $sub->idusertype == SUP )
-                            <option value="{{$sub->id}}" style="background:#A9F5F2" selected>
-                                {{$sub->nombre}} -> {{$sub->saldo}}
-                            </option>
-                        @elseif ( $sub->id == $solicitude->detalle->idfondo )
-                            <option value="{{$sub->id}}" style="background:#A9F5F2" selected>
-                                {{$sub->nombre}} -> {{$sub->saldo}}
-                            </option>
-                        @else
-                            <option value="{{$sub->id}}">
-                                {{$sub->nombre}} -> {{$sub->saldo}}
-                            </option>                          
-                        @endif
-                    @endforeach
-                @else
-                    <option value="{{$solicitude->detalle->idfondo}}" selected>
-                        {{$solicitude->detalle->fondo->nombre}} -> {{$solicitude->detalle->fondo->saldo}}
-                    </option>
-                @endif    
-            </select>
+<!-- Asignado a -->
+@include('template.Details.asignado')
+
+<!-- Fondos -->
+@include('template.Details.fondo')
+
+@if(!is_null($solicitude->detalle->iddeposito) )    
+    <div class="form-group col-sm-6 col-md-4 col-lg-4">
+            <label class="col-sm-8 col-md-8 control-label" for="depositado">
+                Depositado
+            </label>
+            <div class="col-sm-12 col-md-12 col-lg-12">
+                <div class="input-group">
+                    <span class="input-group-addon">{{$solicitude->detalle->deposit->account->typeMoney->simbolo}}</span>
+                    <input id="depositado" type="text" value="{{$solicitude->detalle->deposit->total}}" class="form-control input-md" readonly>
+                </div>
+            </div>
         </div>
-    </div>
+
+
 @endif
 
 <!-- Observation-->
 @include('template.obs')
+
+
 @if( $solicitude->typeSolicitude->code == SOLIC && $solicitude->detalle->idmotivo == REASON_REGALOS )
     <div class="form-group col-sm-6 col-md-4 col-lg-4">
         <label class="col-sm-8 col-md-8 col-lg-8 control-label">&nbsp;</label>

@@ -46,15 +46,15 @@
                 </td>
                 @include('template.last_user')
                 
-                @if(Auth::user()->type == TESORERIA)
+                @if( Auth::user()->type == TESORERIA )
                     <td style="display:none;" class="total_deposit">
-                        {{$solicitude->detalle->typemoney->simbolo.' '.$solicitude->monto }}
+                        {{$solicitude->detalle->typemoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_aprobado }}
                     </td>
                     <td style="display:none" class="tes-ret">
-                    @if ($solicitude->retencion == null)
+                    @if ( is_null( $solicitude->detalle->idretencion ) )
                         0
                     @else
-                        {{$solicitude->retencion}}
+                        {{json_decode($solicitude->detalle->detalle)->monto_retencion}}
                     @endif
                     </td>
                     <td class="text-center">
@@ -70,10 +70,14 @@
                             {{ json_decode($solicitude->detalle->detalle)->monto_solicitado }}
                         @elseif ($solicitude->idestado == ACEPTADO )
                             {{ json_decode($solicitude->detalle->detalle)->monto_aceptado }}
-                        @elseif ($solicitude->idestado == APROBADO)
-                            {{ json_decode($solicitude->detalle->detalle)->monto_aprobado }}
+                        @elseif ( in_array( $solicitude->idestado , array( RECHAZADO , CANCELADO) ) )
+                            @if ( isset($detalle->monto_aceptado))
+                                {{ json_decode($solicitude->detalle->detalle)->monto_aceptado }}
+                            @else
+                                {{ json_decode($solicitude->detalle->detalle)->monto_solicitado }}
+                            @endif
                         @else
-                            {{ json_decode($solicitude->detalle->detalle)->monto_solicitado }}
+                            {{ json_decode($solicitude->detalle->detalle)->monto_aprobado }}
                         @endif
                     </td>
                 @endif

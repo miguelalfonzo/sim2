@@ -20,6 +20,11 @@ class Solicitude extends Eloquent{
             return $lastId->id;
     }
 
+    public function asignedTo()
+    {
+        return $this->hasOne('User','id','iduserasigned');
+    }
+
     public function histories(){
         return $this->hasMany('System\SolicitudeHistory','idsolicitude');
     }

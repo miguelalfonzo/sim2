@@ -17,6 +17,8 @@ use \DB;
 use \Exception;
 use \Common\StateRange;
 use \Log;
+use \Dmkt\Account;
+use \Expense\ChangeRate;
 
 class DepositController extends BaseController{
 
@@ -50,21 +52,63 @@ class DepositController extends BaseController{
             $deposit = Input::all();
             $estado = 0;
             $titulo = '';
-            if ($deposit['type_deposit'] == SOLIC )
+        
+            $solicitude   = Solicitude::where('token',$deposit['token'])->firstOrFail();
+            $row_deposit  = Deposit::find($solicitude->iddeposito);
+            $bank         = Account::find($deposit['idcuenta']);
+            $tc           = ChangeRate::getTc();
+            $detalle      = $solicitude->detalle;
+            $fondo        = $detalle->fondo; 
+            $montos       = json_decode($detalle->detalle);
+            $monto        = $montos->monto_aprobado;
+            if ( !$detalle->idretencion == null )
             {
-                $solicitude   = Solicitude::where('token',$deposit['token'])->firstOrFail();
-                $row_deposit  = Deposit::where('iddeposito',$solicitude->iddeposito)->get();
-                $estado       = $solicitude->estado;       
-                $titulo       = $solicitude->titulo.' '.$solicitude->descripcion;
-                $idSol        = $solicitude->idsolicitud;
-                $monto        = $solicitude->monto;
-                $idfondo      = $solicitude->idfondo;
-                if (!$solicitude->retencion == null)
-                    $total = ($monto - $solicitude->retencion);
-                else
-                    $total = $monto;
+                $total = ($monto - $montos->monto_retencion);
+                $depo = ($monto - $montos->monto_retencion);
             }
-            elseif ($deposit['type_deposit'] == FONDO )
+            else
+            {
+                $total = $monto;
+                $depo = $monto;
+            }
+
+            if ( $detalle->idmoneda == $fondo->idtipomoneda )
+            {
+                if ( $total > $fondo->saldo )
+                {
+                    return array( 
+                    status => warning , 
+                    description => "El Saldo del Fondo: '".$fondo->nombre." ".$fondo->typeMoney->simbolo." ".$fondo->saldo. " es insuficiente para completar la operación" 
+                    );
+                }
+            }
+            elseif ( $detalle->idmoneda != $fondo->idtipomoneda ) 
+            {
+                if ( $detalle->idmoneda == 2 )
+                {
+                    $total = $total*$tc->compra ;
+                    if ( $total > $fondo->saldo )
+                    {
+                        return array( 
+                        status => warning , 
+                        description => "El Saldo del Fondo: '".$fondo->nombre." ".$fondo->typeMoney->simbolo." ".$fondo->saldo. " es insuficiente para completar la operación" 
+                        );
+                    }
+                }
+                else
+                {
+                    $total = $total/$tc->venta;
+                    if ( $total > $fondo->saldo )
+                    {
+                        return array( 
+                        status => warning , 
+                        description => "El Saldo del Fondo: '".$fondo->nombre." ".$fondo->typeMoney->simbolo." ".$fondo->saldo. " es insuficiente para completar la operación"
+                        ); 
+                    }
+                }
+            }
+            
+            /*elseif ($deposit['type_deposit'] == FONDO )
             {
                 $fondo       = FondoInstitucional::where('token',$deposit['token'])->firstOrFail();
                 $row_deposit = Deposit::where('iddeposito',$fondo->iddeposito)->get();
@@ -75,11 +119,13 @@ class DepositController extends BaseController{
                 $total       = $monto;
                 $idfondo     = $solicitude->idcuenta;
             }
-            else
+            */
+
+            /*else
             {
                 DB::rollback();
                 return array(status => warning , description => 'No se encontro los registros de la solicitud');
-            }
+            }*/
             if(count($row_deposit)>0)
             {
                 DB::rollback();
@@ -87,52 +133,47 @@ class DepositController extends BaseController{
             }
             else
             {
+                if ($bank->idtipomoneda == 1 && $detalle->idmoneda == 2 )
+                    $depo = $depo*$tc->compra;
+                elseif ($bank->idtipomoneda == 2 && $detalle->idmoneda == 1 )
+                    $depo = $depo/$tc->venta;
                 $newDeposit                     = new Deposit;
-                $id                             = $newDeposit->lastId()+1;
-                $newDeposit->iddeposito         = $id;
+                $newDeposit->iddeposito         = $newDeposit->lastId()+1;
                 $newDeposit->num_transferencia  = $deposit['op_number'];
-                $newDeposit->total              = $total;
+                $newDeposit->idcuenta           = $deposit['idcuenta'];
+                $newDeposit->total              = $depo;
                 if($newDeposit->save())
-                {
-                    if ($deposit['type_deposit'] == SOLIC )
+                {   
+                    $solicitude->idestado     = DEPOSITADO;
+                    if ($solicitude->save())
                     {
-                        $solicitudeUpd             = Solicitude::where('token',$deposit['token']);
-                        $solicitudeUpd->estado     = DEPOSITADO;
-                        $solicitudeUpd->iddeposito = $id;
-                        $solicitudeUpd->update($this->objectToArray($solicitudeUpd));
+                        $detalle->iddeposito = $newDeposit->iddeposito;
+                        if ($detalle->save())
+                        {
+                            $fondo->saldo = $fondo->saldo - $total;
+                            if ( $fondo->save() )
+                            {
+                                $rpta = $this->setStatus( DEPOSITO_HABILITADO, DEPOSITADO, Auth::user()->id, USER_CONTABILIDAD, $solicitude->id );
+                                if ( $rpta[status] == ok )
+                                {
+                                    DB::commit();
+                                    return $this->setRpta();
+                                }
+                                else
+                                    DB::rollback();
+                            }
+                        }
                     }
-                    else if ($deposit['type_deposit'] == FONDO )
-                    {
-                        $fondoInst                = FondoInstitucional::where('token',$deposit['token']);
-                        $fondoInst->estado        = DEPOSITADO;
-                        $fondoInst->iddeposito    = $id;
-                        $fondoInst->update($this->objectToArray($fondoInst));
-                    }
-                    $fondoUpd          = Fondo::where('idfondo', $idfondo);
-                    $fondoUpd->saldo   = $fondoUpd->saldo - $monto; 
-                    if ($fondoUpd->saldo < 0)
-                    {
-                        DB::rollback();
-                        return array( status => warning , description => 'Saldo Insuficiente en el Fondo: '.$fondoUpd->nombre_mkt);
-                    }
-                    else
-                        $fondoUpd->update($this->objectToArray($fondoUpd));        
-                    $rpta = $this->setStatus($titulo , $estado, DEPOSITADO, Auth::user()->id, USER_CONTABILIDAD, $idSol, $deposit['type_deposit']);
-                    if ( $rpta[status] == ok )
-                    {
-                        DB::commit();
-                        return $this->setRpta();
-                    }
-                    else
-                        DB::rollback();
-                }
+                }      
             }
+            $rpta = array(status => warning , description => 'No se pudo procesar el deposito');
         }
         catch (Exception $e) 
         {
             DB::rollback();
             $rpta = $this->internalException($e,__FUNCTION__);
         }
+        DB::rollback();
         return $rpta;
     }
     

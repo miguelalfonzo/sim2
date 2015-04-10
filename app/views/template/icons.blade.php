@@ -36,8 +36,8 @@
                         <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span>
                     </a>
                 @endif
-                @if( $solicitude->idestado == PENDIENTE )
-                    @if( $solicitude->status != 1 )
+                @if( $solicitude->idestado == PENDIENTE || $solicitude->created_by == Auth::user()->id )
+                    @if( $solicitude->status == 1 )
                         <a href="{{URL::to('editar-solicitud').'/'.$solicitude->token}}">
                             <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-pencil"></span>
                         </a>
@@ -47,9 +47,6 @@
                     @endif
                 @endif
             @elseif ( Auth::user()->type == SUP )
-                <a  href="{{URL::to('ver-solicitud/'.$solicitude->token)}}">
-                    <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span>
-                </a>
                 @if( $solicitude->idestado == PENDIENTE && $solicitude->created_by == Auth::user()->id )
                     <a  href="{{URL::to('editar-solicitud').'/'.$solicitude->token}}">
                         <span style="padding: 0 5px; font-size: 1.3em"  class="glyphicon glyphicon-pencil"></span>

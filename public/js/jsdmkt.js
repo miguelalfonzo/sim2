@@ -103,7 +103,7 @@ function newSolicitude() {
 
     //Validations
     amount.numeric();
-    idamount.numeric();
+    idamount.numeric({negative: false});
     amount_fac.numeric();
     number_account.numeric();
     
@@ -226,6 +226,7 @@ function newSolicitude() {
         data.op_number      = $("#op-number").val();
         data.token          = $("#token").val();
         data._token         = $("input[name=_token]").val();
+        data.idcuenta       = $("#bank_account").val();
 
         if ($("#op-number").val().trim() === "")
             $("#message-op-number").text("Ingrese el número de Operación");
@@ -359,28 +360,79 @@ function newSolicitude() {
 
     var amount_families = $('.amount_families');
     amount_families.numeric({negative: false});
-    amount_families.keyup(function (e) {
+    
+    idamount.keyup( function ()
+    {
+        verifySum( this , 2 );
+    });
+
+    amount_families.keyup( function ()
+    {
+        verifySum( this , 1 );
+    });
+
+    function verifySum( element , type )
+    {
         var sum_total =0;
         amount_families.each(function(i,v)
         {
             sum_total += parseFloat($(this).val());
         });
-        console.log(sum_total);
-        if(sum_total > parseInt(idamount.val()))
-            amount_error_families.text('La suma supera al monto total').css('color', 'red');
-        if (parseInt($(this).val()) > parseInt(idamount.val()))
-            amount_error_families.text('El monto supera al monto total').css('color', 'red');
-        else 
+        if( $("#amount").val().trim() === "" )
         {
-            if (e.keyCode == 8)
-                amount_error_families.text('');
+            amount_error_families.text('Ingresar el monto (Vacío)').css('color', 'red');
+            idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
+        }     
+        else if ( parseFloat( $("#amount").val() ) === 0 )
+        {
+            amount_error_families.text('El monto especificado no debe ser igual a 0').css('color', 'red');
+            idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
         }
-    });
-
-    amount_families.on('focus', function () {
+        else if ( parseFloat( $("#amount").val() ) < 0 )
+        {
+            amount_error_families.text('El monto especificado no debe ser menor a 0').css('color', 'red');
+            idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
+        }
+        else if ( type == 1 && $( element ).val().trim() === "" ) 
+        {
+            amount_error_families.text('Ingresar el monto de la familia').css('color', 'red');
+            idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
+        }
+        else if ( type == 1 && parseFloat( $( element ).val() ) === 0 ) 
+        {
+            amount_error_families.text('El monto de la familia no debe ser igual a 0').css('color', 'red');
+            idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
+        }
+        else if ( type == 1 && parseFloat( $( element ).val() ) < 0 ) 
+        {
+            amount_error_families.text('El monto de la familia no debe ser menora 0').css('color', 'red');
+            idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
+        }
+        else if ( type == 1 && ( parseFloat( $( element ).val() ).toFixed(20) > parseFloat( idamount.val() ).toFixed(20) ) )
+        {
+            amount_error_families.text('El monto de la familia supera al monto especificado').css('color', 'red');
+            idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
+        }
+        else if ( parseFloat( sum_total ).toFixed(20) > parseFloat( idamount.val() ).toFixed(20) )
+        {
+            amount_error_families.text('El monto total de las familias supera al monto especificado').css('color', 'red');
+            idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
+        }
+        else if ( parseFloat( sum_total ).toFixed(20) < parseFloat( idamount.val() ).toFixed(20) )
+        {
+            amount_error_families.text('El monto total de las familias es menor al monto especificado').css('color', 'red');
+            idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
+        }
+        else if ( parseFloat( sum_total ).toFixed(20) == parseFloat( idamount.val() ).toFixed(20) )
+        {
+            amount_error_families.text('Los montos asignados son iguales al monto especificado').css('color', 'green');    
+            idamount.parent().parent().parent().removeClass("has-error").addClass("has-success");
+        }
+    }
+    /*amount_families.on('focus', function () {
         amount_error_families.text('');
     });
-
+*/
     var form_acepted_solicitude = $('#form_make_activity');
 
     var search_solicitude_sup = $('#search_solicitude_sup');
@@ -428,6 +480,11 @@ function newSolicitude() {
         searchSolicitudeToDate('gercom',this)
     });
 
+    if ( $('#deny_solicitude').length != 0 )
+    {
+        verifySum( idamount[0] , 2);
+    }
+
     $('#deny_solicitude').on('click', function (e) {
 
         if ( $(".sol-obs").val() == "" )
@@ -448,9 +505,18 @@ function newSolicitude() {
                 {
                     if ( result ) 
                     {
-                        var url = server + 'rechazar-solicitud';
-                        form_acepted_solicitude.attr('action', url);
-                        form_acepted_solicitude.submit();
+                        $.post(server + 'rechazar-solicitud', form_acepted_solicitude.serialize()).done(function(data)
+                        {
+                            if(data.Status === 'Ok')
+                            {
+                                bootbox.alert('<h4 style="color: green">Solicitud Rechazada</h4>' , function()
+                                {
+                                    window.location.href = server + 'show_user';
+                                });
+                            }
+                            else
+                                bootbox.alert('<h4 style="color: red">' + data.Status + ': '+ data.Description + '</h4>');
+                        });
                     }
                 }
             });
@@ -614,7 +680,6 @@ function newSolicitude() {
     $(document).on('click','.register_fondo',function(){
         var validate = 0;
         var aux = this;
-        console.log(date_reg_fondo);
         if(!date_reg_fondo.val()){
             date_reg_fondo.parent().parent().addClass('has-error');
             date_reg_fondo.attr('placeholder', 'Ingrese Mes');
@@ -722,65 +787,67 @@ function newSolicitude() {
     
     $("#search_responsable").on('click', function(e)
     {
-        if ( amount_error_families.text() != '' )
+        var div_monto = $("label[for=amount]").parent();
+        if ( div_monto.hasClass("has-error") )
+            idamount.focus();
+        else if( div_monto.hasClass("has-success"))
         {
-            return false;
-        }
-        $.ajax(
-        {
-            type: 'POST',
-            url : server + 'buscar-responsable',
-            data: 
+            $.ajax(
             {
-                idfondo: $("#sub_type_activity").val(),
-                idsolicitude : $("#textinput").val(),
-                _token: $("input[name=_token]").val()
-            }
-        }).fail( function ( statusCode,errorThrown)
-        {
-            ajaxError(statusCode,errorThrown);   
-        }).done(function (data)
-        {
-            if (data.Status == 'Ok' )
-            {
-                var list='';
-                data.Data.Responsables.forEach(function(entry)
+                type: 'POST',
+                url : server + 'buscar-responsable',
+                data: 
                 {
-                    if (data.Data.UserType == 'S')
+                    idfondo: $("#sub_type_activity").val(),
+                    idsolicitude : $("input[name=idsolicitude]").val(),
+                    _token: $("input[name=_token]").val()
+                }
+            }).fail( function ( statusCode,errorThrown)
+            {
+                ajaxError(statusCode,errorThrown);   
+            }).done(function (data)
+            {
+                if (data.Status == 'Ok' )
+                {
+                    var list='';
+                    data.Data.Responsables.forEach(function(entry)
                     {
-                        if (data.Data.Type == 'P')
-                            list = list + '<li><input type="radio" name="responsables"  value="' + entry.iduser + '"> ' + entry.descripcion + '</li>';
-                        else if (data.Data.Type == 'S' || data.Data.Type == 'AG') 
+                        if (data.Data.UserType == 'S')
+                        {
+                            if (data.Data.Type == 'P')
+                                list = list + '<li><input type="radio" name="responsables"  value="' + entry.iduser + '"> ' + entry.descripcion + '</li>';
+                            else if (data.Data.Type == 'S' || data.Data.Type == 'AG') 
+                                list = list + '<li><input type="radio" name="responsables"  value="' + entry.iduser + '"> ' + entry.nombres + ' ' + entry.apellidos + '</li>';
+                        }
+                        else if (data.Data.UserType == 'P')
+                        {
                             list = list + '<li><input type="radio" name="responsables"  value="' + entry.iduser + '"> ' + entry.nombres + ' ' + entry.apellidos + '</li>';
-                    }
-                    else if (data.Data.UserType == 'P')
+                        }    
+                    });
+                    bootbox.confirm("<h4>Responsables habilitados para el Fondo: " + $("#sub_type_activity option:selected").text() + 
+                    "</h4><h5 id='validate'>Seleccione el Responsable</h5><ul>" + list + "</ul>", function (result) 
                     {
-                        list = list + '<li><input type="radio" name="responsables"  value="' + entry.iduser + '"> ' + entry.nombres + ' ' + entry.apellidos + '</li>';
-                    }    
-                });
-                bootbox.confirm("<h4>Responsables habilitados para el Fondo: " + $("#sub_type_activity option:selected").text() + 
-                "</h4><h5 id='validate'>Seleccione el Responsable</h5><ul>" + list + "</ul>", function (result) 
+                        if (result) 
+                        {
+                            var resp = $("input[name=responsables]:checked");
+                            if (resp.length == 0)
+                            {
+                                $("#validate").css("color","red");
+                                return false; 
+                            }
+                            else
+                            {
+                                acceptedSolicitude(resp.val());
+                            }
+                        }
+                    });
+                }
+                else
                 {
-                    if (result) 
-                    {
-                        var resp = $("input[name=responsables]:checked");
-                        if (resp.length == 0)
-                        {
-                            $("#validate").css("color","red");
-                            return false; 
-                        }
-                        else
-                        {
-                            acceptedSolicitude(resp.val());
-                        }
-                    }
-                });
-            }
-            else
-            {
-                bootbox.alert("<h4 style='color:red'>" + data.Status + ": " + data.Description + "</h4>");
-            }
-        });
+                    bootbox.alert("<h4 style='color:red'>" + data.Status + ": " + data.Description + "</h4>");
+                }
+            });
+        }
     });
 
 
@@ -803,6 +870,8 @@ function newSolicitude() {
         {
             if (data.Status == 'Error')
                 responseUI('Hubo un error al procesar la solicitud','red');
+            else if (data.Status == 'Warning')
+                bootbox.alert("<h4 class='red'>" + data.Status + ": " + data.Description + "</h4>");
             else if (data.Status == 'Ok')
             {
                 responseUI('Solicitud Procesada Correctamente','green');
@@ -1100,12 +1169,14 @@ function newSolicitude() {
             data.op_number = op_number;
             data._token = $("input[name=_token]").val();
             data.date_fondo = date_fondo;
+            data.idcuenta   = $("#bank_account").val();
         }else if(type_deposit === 'solicitude'){
             url = 'deposit-solicitude';
             data.op_number = op_number;
             data.token     = $("#token").val();
             data._token    = $("input[name=_token]").val();
             data.date_fondo = date_fondo;
+            data.idcuenta   = $("#bank_account").val();
         }
         if(!op_number)
             $("#message-op-number").text("Ingrese el número de Operación");

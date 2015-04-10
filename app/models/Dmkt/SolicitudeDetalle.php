@@ -38,15 +38,13 @@ class SolicitudeDetalle extends Eloquent
         return $this->hasOne('Dmkt\TypeRetention','idtiporetencion','idretencion');
     }
 
-    public function prueba()
+    protected function deposit()
     {
-    		$sol = SolicitudeDetalle::first();
-    		return $sol->type;
-    		return $sol->id_tipo_moneda;
+        return $this->hasOne('Common\Deposit','iddeposito','iddeposito');
     }
-
-    public function fondo(){
+    
+    public function fondo()
+    {
         return $this->hasOne('Common\Fondo','id','idfondo');
-
     }
 }
