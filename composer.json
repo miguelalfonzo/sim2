@@ -8,9 +8,8 @@
         "yajra/laravel-oci8": "*",
         "intervention/image": "2.*",
 		"thujohn/pdf": "dev-master",
-        "maatwebsite/excel": "1.*",
-        "darrylkuhn/dialect": "dev-master"
-	},
+        "maatwebsite/excel": "1.*"
+    },
 	"autoload": {
 		"classmap": [
 			"app/commands",
@@ -37,5 +36,5 @@
 	"config": {
 		"preferred-install": "dist"
 	},
-	"minimum-stability": "dev"
+	"minimum-stability": "stable"
 }
