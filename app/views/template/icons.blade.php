@@ -57,9 +57,9 @@
                 @endif
             @elseif ( Auth::user()->type == CONT )
                 @if($solicitude->idestado == DEPOSITADO)
-                    <a id="token-solicitude" data-url="{{$solicitude->token}}">
+                    <!-- <a id="token-solicitude" data-url="{{$solicitude->token}}">
                         <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-book"></span>
-                    </a>
+                    </a> -->
                 @elseif($solicitude->idestado == REGISTRADO)
                     <a id="token-reg-expense" data-url="{{$solicitude->token}}" data-cont="1">
                         <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span>

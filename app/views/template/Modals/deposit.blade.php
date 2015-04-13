@@ -16,7 +16,7 @@
                             <div class="input-group">
                                 <div id="id-solicitude" class="input-group-addon" value=""></div>
                                 <input id="sol-titulo" class="form-control" type="text" disabled>
-                                <input id="token" type="hidden">
+                                <input name="token" type="hidden">
                             </div>
                         </div>
                     </div>

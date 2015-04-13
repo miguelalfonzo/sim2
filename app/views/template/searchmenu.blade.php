@@ -17,7 +17,7 @@
                                     <option value="{{$estado->id}}">{{$estado->nombre}}</option>
                                 @endif
                             @elseif ( Auth::user()->type == GER_COM || Auth::user()->type == CONT )
-                                @if($estado->id == R_APROBADO || $estado->id == R_REVISADO || $estado->id == R_FINALIZADO)
+                                @if($estado->id == R_APROBADO || $estado->id == R_REVISADO || $estado->id == R_GASTO || $estado->id == R_FINALIZADO)
                                     @if(isset($state))
                                         @if($state == $estado->id)
                                             <option value="{{$estado->id}}" selected >{{$estado->nombre}}</option>

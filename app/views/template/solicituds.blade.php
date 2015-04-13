@@ -4,6 +4,7 @@
             <th>#</th>
             <th>Solicitud</th>
             <th>Visto Ultimo</th>
+            <th>Actualizado el</th>
             @if(Auth::user()->type == TESORERIA)
                 <th style="display:none">Solicitado</th>
                 <th style="display:none">Retencion</th>
@@ -45,7 +46,7 @@
                     <label>{{$solicitude->titulo}}</label>
                 </td>
                 @include('template.last_user')
-                
+                @include('template.List.lastdate')
                 @if( Auth::user()->type == TESORERIA )
                     <td style="display:none;" class="total_deposit">
                         {{$solicitude->detalle->typemoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_aprobado }}
@@ -67,17 +68,17 @@
                 @else
                     <td class="text-center total_deposit">
                         @if ($solicitude->idestado == PENDIENTE || $solicitude->idestado == DERIVADO )
-                            {{ json_decode($solicitude->detalle->detalle)->monto_solicitado }}
+                            {{ $solicitude->detalle->typeMoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_solicitado }}
                         @elseif ($solicitude->idestado == ACEPTADO )
-                            {{ json_decode($solicitude->detalle->detalle)->monto_aceptado }}
+                            {{ $solicitude->detalle->typeMoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_aceptado }}
                         @elseif ( in_array( $solicitude->idestado , array( RECHAZADO , CANCELADO) ) )
                             @if ( isset($detalle->monto_aceptado))
-                                {{ json_decode($solicitude->detalle->detalle)->monto_aceptado }}
+                                {{ $solicitude->detalle->typeMoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_aceptado }}
                             @else
-                                {{ json_decode($solicitude->detalle->detalle)->monto_solicitado }}
+                                {{ $solicitude->detalle->typeMoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_solicitado }}
                             @endif
                         @else
-                            {{ json_decode($solicitude->detalle->detalle)->monto_aprobado }}
+                            {{ $solicitude->detalle->typeMoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_aprobado }}
                         @endif
                     </td>
                 @endif

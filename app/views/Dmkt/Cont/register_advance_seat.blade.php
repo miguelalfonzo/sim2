@@ -11,9 +11,8 @@
 			<div class="panel-body">
 				<aside class="row reg-expense" style="margin-bottom: 0.5em;">
 					<div class="col-xs-12 col-sm-6 col-md-4">
-						<a id="detail_solicitude">
-							<span id="text_solicitude">Ocultar </span>
-							Detalle de Solicitud
+						<a>
+							<span id="text_solicitude">Ocultar Detalle de Solicitud</span>
 							<span class="glyphicon glyphicon-chevron-up"></span>
 						</a>
 					</div>
@@ -30,10 +29,10 @@
 							<div class="form-expense">
 								<label>Nombre del Solicitante</label>
 								<div class="input-group">
-			                        @if($solicitude->user->type == REP_MED)
+			                        @if($solicitude->createdBy->type == REP_MED)
 			                        <span class="input-group-addon">R</span>
 			                        <input id="textinput" name="titulo" type="text" placeholder=""
-			                               value="{{mb_convert_case($solicitude->user->rm->nombres.' '.$solicitude->user->rm->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled
+			                               value="{{mb_convert_case($solicitude->createdBy->rm->nombres.' '.$solicitude->createdBy->rm->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled
 			                               class="form-control">
 			                        @else
 			                        <span class="input-group-addon">S</span>
@@ -47,15 +46,13 @@
 						<div class="col-xs-12 col-sm-6 col-md-4">
 							<div class="form-expense">
 								<label>Fondo</label>
-								<input type="text" class="form-control" value="{{mb_convert_case($solicitude->subtype->nombre_mkt, MB_CASE_TITLE, 'UTF-8')}}" disabled>
-							</div>
+								</div>
 						</div>
 						<div class="col-xs-12 col-sm-6 col-md-4">
 							<div class="form-expense">
 								<label>Monto de la Solicitud</label>
 								<div class="input-group">
-							    	<div id="type-money" class="input-group-addon">{{$solicitude->typemoney->simbolo}}</div>
-							      	<input id="deposit" class="form-control" type="text" value="{{$solicitude->monto}}" disabled>
+							    	<input id="deposit" class="form-control" type="text" value="{{$solicitude->monto}}" disabled>
 							    </div>
 							</div>
 						</div>
@@ -63,17 +60,7 @@
 							<div class="form-expense">
 								<label>Autorizado por</label>
 								<div class="input-group">
-			                        @if($solicitude->aproved->type == SUP)
-			                        <span class="input-group-addon">S</span>
-			                        <input id="textinput" name="titulo" type="text" placeholder=""
-			                               value="{{mb_convert_case($solicitude->aproved->sup->nombres.' '.$solicitude->aproved->sup->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled
-			                               class="form-control">
-			                        @else
-			                        <span class="input-group-addon">G</span>
-			                        <input id="textinput" name="titulo" type="text" placeholder=""
-			                               value="{{mb_convert_case($solicitude->aproved->gerprod->descripcion,MB_CASE_TITLE,'UTF-8')}}" disabled class="form-control">
-			                        @endif
-			                    </div>							
+			                        </div>							
 							</div>
 						</div>
 						<div class="col-xs-12 col-sm-6 col-md-4">
@@ -85,11 +72,8 @@
 						<div class="col-xs-12 col-sm-6 col-md-4">
 							<div class="form-expense">
 								<label>Fecha de Depósito</label>
-								<input type="text" class="form-control" value="{{date_format(date_create($solicitude->deposit->created_at), 'd/m/Y')}}" disabled>
 							</div>
 						</div>
-					@elseif ($type == FONDO)
-						@include('template.fondo_body')
 					@endif
 				</section>
 				<hr>
@@ -109,7 +93,6 @@
 										</tr>
 									</thead>
 									<tbody>
-										@if( $type == SOLIC)	
 											<tr>
 												<th class="name_account">{{$solicitude->subtype->nombre_mkt}}</th>
 												<th class="number_account">{{$solicitude->subtype->cuenta_mkt}}</th>
@@ -138,7 +121,7 @@
 													@endif
 												</th>
 											</tr>
-											@if(isset($solicitude->retencion))
+											@if(!is_null($solicitude->detalle->idretencion))
 												<tr>
 													<th class="name_account">{{mb_convert_case($solicitude->typeRetention->descripcion,MB_CASE_TITLE,'UTF-8')}}</th>
 													<th class="number_account">{{$solicitude->typeRetention->cta_contable}}</th>
@@ -154,28 +137,7 @@
 													</th>
 												</tr>
 											@endif
-										@elseif ($type == FONDO)
-											<tr>
-												@foreach($cuenta as $account)
-													<th class="name_account">{{$account->nombre_cont}}</th>
-													<th class="number_account">{{$account->cuenta_mkt}}</th>
-													<th class="date_ini">{{$date['toDay']}}</th>
-													<th class="dc">D</th>
-													<th class="total">{{$fondo->total}}</th>
-													<th class="leyenda">{{$fondo->institucion}}</th>
-												@endforeach
-											</tr>
-											</tr>
-												@foreach($banco as $bank)
-													<th class="name_account">{{$bank->nombre}}</th>
-													<th class="number_account">{{$bank->num_cuenta}}</th>
-													<th class="date_ini">{{$date['toDay']}}</th>
-													<th class="dc">C</th>
-													<th class="total">{{$fondo->total}}</th>
-													<th class="leyenda">{{$fondo->institucion}}</th>
-												@endforeach
-											</tr>
-										@endif
+										
 									</tbody>
 								</table>
 							</div>

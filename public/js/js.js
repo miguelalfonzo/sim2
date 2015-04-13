@@ -244,10 +244,10 @@ $(function(){
             var total = [];
             var leyenda = [];
             $("#table-seat-solicitude tbody .number_account").each(function(index){
-                number_account[index] = $(this).text();
+                number_account[index] = $(this).text().trim();
             });
             $("#table-seat-solicitude tbody .dc").each(function(index){
-                dc[index] = $(this).text();
+                dc[index] = $(this).text().trim();
             });
             $("#table-seat-solicitude tbody .total").each(function(index){
                 total[index] = parseFloat($(this).text());
@@ -263,21 +263,24 @@ $(function(){
                 data.idfondo = parseInt($("#idfondo").val(),10);
             }
             else
-                data.idsolicitude = parseInt($("#idsolicitud").val(),10);
-            bootbox.confirm("¿Esta seguro que desea Generar el Asiento Contable?", function(result) {
+                data.idsolicitude = parseInt($("input[name=idsolicitude]").val(),10);
+            bootbox.confirm("¿Esta seguro que desea Generar el Asiento Contable?", function(result) 
+            {
                 if(result)
                 {
                     $.post(url, data)
-                    .done( function (data){
-                        data = JSON.parse(data);
-                        if(data.Status == 1)
+                    .done( function (data)
+                    {
+                        console.log(data);
+                        if(data.Status == 'Ok')
                         {
-                            bootbox.alert("<p class='green'>Se generó el asiento contable correctamente.</p>", function(){
+                            bootbox.alert("<h4 class='green'>Se generó el asiento contable correctamente.</h4>", function()
+                            {
                                 window.location.href = server+'show_user';
                             });
                         }
                         else
-                            bootbox.alert("<p class='red'>" + data.Description + "</p>");
+                            bootbox.alert("<h4 class='red'>" + data.Status + ": " + data.Description + "</h4>");
                     });
                 }
             });
@@ -1366,14 +1369,13 @@ $(function(){
         {
             //e.preventDefault();
             var tr = $(this).parent().parent().parent();
-            console .log(tr);
             var id_sol = tr.find('.id_solicitud').text();
-            console.log(id_sol);
             var sol_titulo = tr.find('.sol_titulo').find('label').text();
             var token = tr.find('#sol_token').val();
             var beneficiario = tr.find('.benef').val();
             var total_deposit = tr.find('.total_deposit').text().trim().split(" ");
             var retencion = tr.find('.tes-ret').html().trim();
+            
             if ( retencion != 0 )
             {
                 $("#tes-mon-ret").parent().css("display",true);
@@ -1384,31 +1386,35 @@ $(function(){
                 $("#tes-mon-ret").parent().css("display","none");
                 $("#tes-mon-sol").parent().css("display","none");    
             }
+            
             $("#sol-titulo").val(sol_titulo);
             $("#tes-mon-sol").val(total_deposit[0] + " " + total_deposit[1]);
             $("#tes-mon-ret").val(total_deposit[0] + " " + retencion);
             $("#id-solicitude").text(id_sol);
-            $("#token").val(token);
+            $("input[name=token]").val(token);
             $(".register-deposit").attr("data-deposit",tr.attr("sol-type"));
             $("#beneficiario").val(beneficiario);
             $("#total-deposit").val(total_deposit[0] + " " + (total_deposit[1] - retencion));
             $('#enable_deposit_Modal').modal();
         });
+        
+        //$("#collapseOne").collapse('toggle');
+        
         $(document).off("click", "#detail_solicitude");
         $(document).on("click", "#detail_solicitude", function(e)
         {
             e.preventDefault();
             if($("#collapseOne").hasClass('in'))
             {
-                $("#text_solicitude").text('Mostrar ');
-                $("#detail_solicitude span:last-child").removeClass('glyphicon-chevron-up');
-                $("#detail_solicitude span:last-child").addClass('glyphicon-chevron-down');
+                //$("#detail_solicitude").text('Mostrar');
+                $("#detail_solicitude span:last-child").removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+                $("#detail_solicitude span:first-child").text('Mostrar');
             }
             else
             {
-                $("#text_solicitude").text('Ocultar ');
-                $("#detail_solicitude span:last-child").removeClass('glyphicon-chevron-down');
-                $("#detail_solicitude span:last-child").addClass('glyphicon-chevron-up');
+                //$("#text_solicitude").text('Ocultar');
+                $("#detail_solicitude span:last-child").removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+                $("#detail_solicitude span:first-child").text('Ocultar');
             }
             $("#collapseOne").collapse('toggle');
         });

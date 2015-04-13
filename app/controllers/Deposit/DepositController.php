@@ -43,138 +43,109 @@ class DepositController extends BaseController{
         return View::make('Treasury.view_solicitude_tes')->with('solicitude', $solicitude);        
     }
     
+
+    private function validateBalance( $detalle , $tc )
+    {
+        $fondo = $detalle->fondo;
+        $monto = json_decode($detalle->detalle)->monto_aprobado;
+        if ( $detalle->idmoneda == $fondo->idtipomoneda )
+        {
+            if ( $monto > $fondo->saldo )
+                return array( status => warning , description => "El Saldo del Fondo: '".$fondo->nombre." ".$fondo->typeMoney->simbolo." ".$fondo->saldo. " es insuficiente para completar la operación" );
+            else
+                return $this->setRpta($monto);
+        }
+        elseif ( $detalle->idmoneda != $fondo->idtipomoneda ) 
+        {
+            if ( $detalle->idmoneda == DOLARES )
+                if ( ( $monto*$tc->compra ) > $fondo->saldo )
+                    return array( status => warning , description => "El Saldo del Fondo: '".$fondo->nombre." ".$fondo->typeMoney->simbolo." ".$fondo->saldo. " es insuficiente para completar la operación" );
+                else
+                    return $this->setRpta($monto*$tc->compra);
+            elseif ( $detalle->idmoneda == SOLES)
+                if ( ( $monto/$tc->venta ) > $fondo->saldo )
+                    return array( status => warning , description => "El Saldo del Fondo: '".$fondo->nombre." ".$fondo->typeMoney->simbolo." ".$fondo->saldo. " es insuficiente para completar la operación" ); 
+                else
+                    return $this->setRpta( $monto/$tc->venta);
+            else
+                return array( status => warning , description => "Tipo de Moneda no registrada: ".$detalle->typeMoney->descripcion );
+        }
+        return array( status => warning , description => "No se pudo procesar el fondo de la solicitud");
+    }
+
     // IDKC: CHANGE STATUS => DEPOSITADO
     public function depositSolicitudeTes()
     {
         try
         {
             DB::beginTransaction();
-            $deposit = Input::all();
-            $estado = 0;
-            $titulo = '';
-        
+            
+            $deposit      = Input::all();
+            Log::error($deposit);
             $solicitude   = Solicitude::where('token',$deposit['token'])->firstOrFail();
-            $row_deposit  = Deposit::find($solicitude->iddeposito);
-            $bank         = Account::find($deposit['idcuenta']);
-            $tc           = ChangeRate::getTc();
             $detalle      = $solicitude->detalle;
-            $fondo        = $detalle->fondo; 
-            $montos       = json_decode($detalle->detalle);
-            $monto        = $montos->monto_aprobado;
-            if ( !$detalle->idretencion == null )
+            $tc           = ChangeRate::getTc();
+            
+            $middleRpta = $this->validateBalance( $detalle , $tc );
+            if ( $middleRpta[status] == ok )
             {
-                $total = ($monto - $montos->monto_retencion);
-                $depo = ($monto - $montos->monto_retencion);
-            }
-            else
-            {
-                $total = $monto;
-                $depo = $monto;
-            }
-
-            if ( $detalle->idmoneda == $fondo->idtipomoneda )
-            {
-                if ( $total > $fondo->saldo )
-                {
-                    return array( 
-                    status => warning , 
-                    description => "El Saldo del Fondo: '".$fondo->nombre." ".$fondo->typeMoney->simbolo." ".$fondo->saldo. " es insuficiente para completar la operación" 
-                    );
-                }
-            }
-            elseif ( $detalle->idmoneda != $fondo->idtipomoneda ) 
-            {
-                if ( $detalle->idmoneda == 2 )
-                {
-                    $total = $total*$tc->compra ;
-                    if ( $total > $fondo->saldo )
-                    {
-                        return array( 
-                        status => warning , 
-                        description => "El Saldo del Fondo: '".$fondo->nombre." ".$fondo->typeMoney->simbolo." ".$fondo->saldo. " es insuficiente para completar la operación" 
-                        );
-                    }
-                }
+                $fondo = $detalle->fondo;
+                $fondo->saldo = $fondo->saldo - $middleRpta[data];
+                $fondo->save(); 
+                $row_deposit  = Deposit::find($solicitude->iddeposito);      
+                if( count($row_deposit) > 0 )
+                    return array(status => warning , description => 'El deposito ya ha sido registrado');
                 else
                 {
-                    $total = $total/$tc->venta;
-                    if ( $total > $fondo->saldo )
-                    {
-                        return array( 
-                        status => warning , 
-                        description => "El Saldo del Fondo: '".$fondo->nombre." ".$fondo->typeMoney->simbolo." ".$fondo->saldo. " es insuficiente para completar la operación"
-                        ); 
-                    }
-                }
-            }
-            
-            /*elseif ($deposit['type_deposit'] == FONDO )
-            {
-                $fondo       = FondoInstitucional::where('token',$deposit['token'])->firstOrFail();
-                $row_deposit = Deposit::where('iddeposito',$fondo->iddeposito)->get();
-                $estado      = $fondo->estado;
-                $titulo      = $fondo->institucion;
-                $idSol       = $fondo->idfondo;
-                $monto       = $fondo->monto;
-                $total       = $monto;
-                $idfondo     = $solicitude->idcuenta;
-            }
-            */
+                    $bank = Account::find($deposit['idcuenta']);
+                    $jDetalle = json_decode( $detalle->detalle );
+                    if ( is_null( $detalle->idretencion ) )
+                        $monto_deposito = $jDetalle->monto_aprobado;
+                    else
+                        $monto_deposito = ( $jDetalle->monto_aprobado - $jDetalle->monto_retencion );
 
-            /*else
-            {
-                DB::rollback();
-                return array(status => warning , description => 'No se encontro los registros de la solicitud');
-            }*/
-            if(count($row_deposit)>0)
-            {
-                DB::rollback();
-                return array(status => warning , description => 'El deposito ya ha sido registrado');
-            }
-            else
-            {
-                if ($bank->idtipomoneda == 1 && $detalle->idmoneda == 2 )
-                    $depo = $depo*$tc->compra;
-                elseif ($bank->idtipomoneda == 2 && $detalle->idmoneda == 1 )
-                    $depo = $depo/$tc->venta;
-                $newDeposit                     = new Deposit;
-                $newDeposit->iddeposito         = $newDeposit->lastId()+1;
-                $newDeposit->num_transferencia  = $deposit['op_number'];
-                $newDeposit->idcuenta           = $deposit['idcuenta'];
-                $newDeposit->total              = $depo;
-                if($newDeposit->save())
-                {   
-                    $solicitude->idestado     = DEPOSITADO;
-                    if ($solicitude->save())
+                    if ( $detalle->idmoneda != $bank->idtipomoneda )
                     {
-                        $detalle->iddeposito = $newDeposit->iddeposito;
-                        if ($detalle->save())
+                        if ( $detalle->idmoneda == SOLES)
+                            $monto_deposito = $monto_deposito/$tc->venta;
+                        elseif ( $detalle->idmoneda == DOLARES )
+                            $monto_deposito = $monto_deposito*$tc->compra;
+                        $jDetalle->tcc = $tc->compra;
+                        $jDetalle->tcv = $tc->venta;
+                    }
+
+                    $newDeposit                     = new Deposit;
+                    $newDeposit->iddeposito         = $newDeposit->lastId() + 1;
+                    $newDeposit->num_transferencia  = $deposit['op_number'];
+                    $newDeposit->idcuenta           = $deposit['idcuenta'];
+                    $newDeposit->total              = $monto_deposito;
+                    if($newDeposit->save())
+                    {   
+                        $solicitude->idestado     = DEPOSITADO;
+                        if ($solicitude->save())
                         {
-                            $fondo->saldo = $fondo->saldo - $total;
-                            if ( $fondo->save() )
+                            $detalle->iddeposito = $newDeposit->iddeposito;
+                            $detalle->detalle = json_encode( $jDetalle );
+                            if ($detalle->save())
                             {
                                 $rpta = $this->setStatus( DEPOSITO_HABILITADO, DEPOSITADO, Auth::user()->id, USER_CONTABILIDAD, $solicitude->id );
                                 if ( $rpta[status] == ok )
-                                {
                                     DB::commit();
-                                    return $this->setRpta();
-                                }
                                 else
                                     DB::rollback();
+                                return $this->setRpta();
                             }
                         }
-                    }
-                }      
+                    }      
+                }
             }
-            $rpta = array(status => warning , description => 'No se pudo procesar el deposito');
         }
         catch (Exception $e) 
         {
-            DB::rollback();
-            $rpta = $this->internalException($e,__FUNCTION__);
+            $middleRpta = $this->internalException($e,__FUNCTION__);
         }
         DB::rollback();
-        return $rpta;
+        return $middleRpta;
     }
     
     

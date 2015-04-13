@@ -5,9 +5,11 @@ namespace System;
 use \Eloquent;
 
 class SolicitudeHistory extends Eloquent{
-	protected $table = 'DMKT_RG_SOLICITUD_HISTORIAL';
+	
+    protected $table = 'DMKT_RG_SOLICITUD_HISTORIAL';
     protected $fillable = array('id','status_to');
 	protected $primaryKey = 'id';
+    public $timestamps = true;
 
 	public function lastId()
     {

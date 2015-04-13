@@ -12,4 +12,9 @@ class TypeRetention extends Eloquent {
         return ucwords( mb_strtolower( $value ) );
     }
 
+    protected function account()
+    {
+    	return $this->hasOne('Dmkt\Account','id','idcuenta');
+    }
+
 }

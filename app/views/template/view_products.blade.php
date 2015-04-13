@@ -58,6 +58,7 @@
                                                    value="{{isset($family->monto_asignado)? $family->monto_asignado : round($detalle->monto_solicitado/count($solicitude->families),2)}}">
                                     @endif
                                 </div>
+                                <input type="hidden" name="idfamily[]" value="{{$family->id}}">
                             </div>
                         @endif
                     </div>

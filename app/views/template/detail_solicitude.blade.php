@@ -69,45 +69,42 @@
 <!--  Amount Solicitude -->
 @include('template.monto')
 
-@if ( Auth::user()->type == TESORERIA )
-    <!--  Retencion      --> 
-    @if ( !is_null($solicitude->detalle->idretencion) )
-        <div class="form-group col-sm-6 col-md-4 col-lg-4">
-            <label class="col-sm-8 col-md-8 control-label" for="retencion">
-                {{$solicitude->detalle->typeRetention->descripcion}}
-            </label>
-            <div class="col-sm-12 col-md-12 col-lg-12">
-                <div class="input-group">
-                    <span class="input-group-addon">{{$solicitude->detalle->typemoney->simbolo}}</span>
-                    <input id="retencion" type="text" value="{{$detalle->monto_retencion}}" class="form-control input-md" readonly>
-                </div>
+<!--  Retencion      --> 
+@if ( !is_null( $solicitude->detalle->idretencion ) )
+    <div class="form-group col-sm-6 col-md-4 col-lg-4">
+        <label class="col-sm-8 col-md-8 control-label" for="retencion">
+            {{$solicitude->detalle->typeRetention->descripcion}}
+        </label>
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="input-group">
+                <span class="input-group-addon">{{$solicitude->detalle->typemoney->simbolo}}</span>
+                <input id="retencion" type="text" value="{{$detalle->monto_retencion}}" class="form-control input-md" readonly>
             </div>
         </div>
-        <div class="form-group col-sm-6 col-md-4 col-lg-4">
-            <label class="col-sm-8 col-md-8 control-label" for="depositar">
-                A Depositar
-            </label>
-            <div class="col-sm-12 col-md-12 col-lg-12">
-                <div class="input-group">
-                    <span class="input-group-addon">{{$solicitude->detalle->typemoney->simbolo}}</span>
-                    <input id="depositar" type="text" value="{{($detalle->monto_aprobado - $detalle->monto_retencion)}}" class="form-control input-md" readonly>
-                </div>
-            </div>
-        </div>
-    @else
-        <div class="form-group col-sm-6 col-md-4 col-lg-4">
-            <label class="col-sm-8 col-md-8 control-label" for="depositar">
-                A Depositar
-            </label>
-            <div class="col-sm-12 col-md-12 col-lg-12">
-                <div class="input-group">
-                    <span class="input-group-addon">{{$solicitude->detalle->typemoney->simbolo}}</span>
-                    <input id="depositar" type="text" value="{{$detalle->monto_aprobado}}" class="form-control input-md" readonly>
-                </div>
-            </div>
-        </div>
-    @endif
+    </div>
 @endif
+
+<!-- A Depositar -->
+@if ( Auth::user()->type == TESORERIA && $solicitude->idestado == DEPOSITO_HABILITADO )
+    <div class="form-group col-sm-6 col-md-4 col-lg-4">
+        <label class="col-sm-8 col-md-8 control-label" for="depositar">
+            A Depositar
+        </label>
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="input-group">
+                <span class="input-group-addon">{{$solicitude->detalle->typemoney->simbolo}}</span>
+                @if ( is_null($solicitude->detalle->idretencion) )
+                    <input id="depositar" type="text" value="{{$detalle->monto_aprobado}}" class="form-control input-md" readonly>
+                @else
+                    <input id="depositar" type="text" value="{{($detalle->monto_aprobado - $detalle->monto_retencion)}}" class="form-control input-md" readonly>
+                @endif
+            </div>
+        </div>
+    </div>
+@endif
+
+
+
 
 <!-- Date Delivery -->
 <div class="form-group col-sm-6 col-md-4 col-lg-4">
@@ -143,24 +140,27 @@
 <!-- Asignado a -->
 @include('template.Details.asignado')
 
+<!-- Aceptador Por -->
+@include('template.Details.accepted')
+
 <!-- Fondos -->
 @include('template.Details.fondo')
 
 @if(!is_null($solicitude->detalle->iddeposito) )    
     <div class="form-group col-sm-6 col-md-4 col-lg-4">
-            <label class="col-sm-8 col-md-8 control-label" for="depositado">
-                Depositado
-            </label>
-            <div class="col-sm-12 col-md-12 col-lg-12">
-                <div class="input-group">
-                    <span class="input-group-addon">{{$solicitude->detalle->deposit->account->typeMoney->simbolo}}</span>
-                    <input id="depositado" type="text" value="{{$solicitude->detalle->deposit->total}}" class="form-control input-md" readonly>
-                </div>
+        <label class="col-sm-8 col-md-8 control-label" for="depositado">
+            Depositado
+        </label>
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="input-group">
+                <span class="input-group-addon">{{$solicitude->detalle->deposit->account->typeMoney->simbolo}}</span>
+                <input id="depositado" type="text" value="{{$solicitude->detalle->deposit->total}}" class="form-control input-md" readonly>
             </div>
         </div>
-
-
+    </div>
 @endif
+
+@include('template.Details.tasas')
 
 <!-- Observation-->
 @include('template.obs')
@@ -175,30 +175,6 @@
             </a>
         </div>
     </div>
-
-    <!-- Modal -->
-    @if( Auth::user()->type == TESORERIA && $solicitude->idestado == DEPOSITO_HABILITADO )
-        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                        <h4 class="modal-title" id="myModalLabel">Registro del Depósito</h4>
-                    </div>
-                    <div class="modal-body">
-                        <label for="op-number">Número de Operación, Transacción, Cheque:</label>
-                        <input id="op-number" type="text" class="form-control">
-                        <p id="message-op-number" style="margin-top:1em;color:#a94442;"></p>
-                    </div>
-                    <div class="modal-footer">
-                        <a id="" href="#" class="btn btn-success register-deposit" data-deposit="S" style="margin-right: 1em;">Confirmar Operación</a>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endif
-
     <div class="modal fade" id="myFac" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -234,6 +210,41 @@
     </div>
 @endif
 
+
+<!-- Modal -->
+@if( Auth::user()->type == TESORERIA && $solicitude->idestado == DEPOSITO_HABILITADO )
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">Registro del Depósito</h4>
+                </div>
+                <div class="modal-body">
+                    <label>Bancos</label>
+                    <select id="bank_account" name="bank_account" class="form-control">
+                        @foreach ( $banks as $bank )
+                            <option value="{{$bank->id}}">
+                                {{$bank->typeMoney->simbolo.'-'.$bank->nombre}}
+                            </option>
+                        @endforeach
+                    </select>
+                    <br>
+                    <label for="op-number">Número de Operación, Transacción, Cheque:</label>
+                    <input id="op-number" type="text" class="form-control">
+                    <p id="message-op-number" style="margin-top:1em;color:#a94442;"></p>
+                </div>
+                <div class="modal-footer">
+                    <a id="" href="#" class="btn btn-success register-deposit" data-deposit="S" style="margin-right: 1em;">Confirmar Operación</a>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+@endif
 
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding: 0">
     <!-- Products -->

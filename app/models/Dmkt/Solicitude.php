@@ -25,6 +25,11 @@ class Solicitude extends Eloquent{
         return $this->hasOne('User','id','iduserasigned');
     }
 
+    public function acceptHist()
+    {
+        return $this->hasOne('System\SolicitudeHistory','idsolicitude','id')->where('status_to',ACEPTADO);
+    }
+
     public function histories(){
         return $this->hasMany('System\SolicitudeHistory','idsolicitude');
     }

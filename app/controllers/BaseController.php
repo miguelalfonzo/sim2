@@ -175,15 +175,13 @@ class BaseController extends Controller {
 
     public function updateStatusSolicitude( $status_from, $status_to, $user_from, $user_to, $idsolicitude, $notified)
     {   
-        try
+       try
         {
+            
             $fData = array(
                 'status_to'   => $status_to,
                 'idsolicitude'=> $idsolicitude,
                 );
-
-            Log::error($fData);
-
             $vData = array(
                 'status_from' => $status_from,
                 'user_from'   => $user_from->type,
@@ -193,20 +191,21 @@ class BaseController extends Controller {
             $statusSolicitude = SolicitudeHistory::firstOrNew($fData);
             if (!isset($statusSolicitude->rn))
             {
-                $statusSolicitude->id           = $statusSolicitude->lastId()+1;
-                $statusSolicitude->status_from  = $status_from;
+                $statusSolicitude->id           = $statusSolicitude->lastId() + 1;
                 $statusSolicitude->status_to    = $status_to;
-                $statusSolicitude->user_from    = $user_from->type;
-                $statusSolicitude->user_to      = $user_to->type;
-                //$statusSolicitude->iduser_from  = $user_from->id;
-                $statusSolicitude->idsolicitude = $idsolicitude;
-                $statusSolicitude->notified     = $notified;
-                $statusSolicitude->save();
+                $statusSolicitude->idsolicitude = $idsolicitude;    
             }
             else
             {
-                $statusSolicitude->update($vData);
+                $statusSolicitude = SolicitudeHistory::find($statusSolicitude->id);
             }
+            $statusSolicitude->status_from  = $status_from;
+            $statusSolicitude->user_from    = $user_from->type;
+            $statusSolicitude->user_to      = $user_to->type;
+            $statusSolicitude->notified     = $notified;
+            $statusSolicitude->save();
+                
+            Log::error(json_encode($statusSolicitude));
             $rpta = $this->setRpta();
             /**/
         }
@@ -222,44 +221,6 @@ class BaseController extends Controller {
         $rpta = array(status => ok, 'Data' => $data);
         return $rpta;
     }
-
-    /*protected function searchFondos($estado,$idUser,$start,$end)
-    {
-        try
-        {
-            if ( in_array(Auth::user()->type , array(REP_MED,SUP,CONT,TESORERIA)))
-            {
-                $fondos = FondoInstitucional::with(array('histories' => function($q)
-                {
-                    $q->orderBy('created_at','DESC');  
-                }));
-                if ($estado != R_TODOS)
-                {
-                    $fondos->whereHas('state', function ($q) use( $estado )
-                    {
-                        $q->whereHas('rangeState', function ($t) use( $estado )
-                        {
-                            $t->where('id', $estado );
-                        });
-                    });
-                }
-                Log::error('s--sd');
-                if ( Auth::user()->type == REP_MED )
-                    $fondos->where('idrm', Auth::user()->Rm->idrm);
-                if ( Auth::user()->type == SUP )
-                    $fondos->where('idsup', Auth::user()->Sup->idsup);
-                $fondos = $fondos->whereRaw("to_date(periodo,'YYYYMM') BETWEEN TRUNC(to_date('$start','DD-MM-YY'),'MM') and TRUNC(to_date('$end','DD-MM-YY'),'MM')")
-                ->orderBy('periodo')->get();
-                $rpta = $this->setRpta($fondos);
-                return $rpta;
-            }
-        }
-        catch (Exception $e)
-        {
-            $rpta = $this->internalException($e,__FUNCTION__);
-        }
-        
-    }*/
 
     protected function searchSolicituds($estado,$idUser,$start,$end)
     {

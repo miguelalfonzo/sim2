@@ -222,9 +222,9 @@ function newSolicitude() {
         e.preventDefault();
         var url = 'deposit-solicitude';
         var data = {};
-        data.type_deposit   = $(this).attr('data-deposit');
+        //data.type_deposit   = $(this).attr('data-deposit');
         data.op_number      = $("#op-number").val();
-        data.token          = $("#token").val();
+        data.token          = $("input[name=token]").val();
         data._token         = $("input[name=_token]").val();
         data.idcuenta       = $("#bank_account").val();
 
@@ -373,11 +373,15 @@ function newSolicitude() {
 
     function verifySum( element , type )
     {
-        var sum_total =0;
+        var sum_total = 0;
+        var precision = 11;
         amount_families.each(function(i,v)
         {
-            sum_total += parseFloat($(this).val());
+            console.log(sum_total);
+            sum_total += parseFloat( $(this).val() );
+
         });
+        console.log(sum_total);
         if( $("#amount").val().trim() === "" )
         {
             amount_error_families.text('Ingresar el monto (Vacío)').css('color', 'red');
@@ -408,22 +412,22 @@ function newSolicitude() {
             amount_error_families.text('El monto de la familia no debe ser menora 0').css('color', 'red');
             idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
         }
-        else if ( type == 1 && ( parseFloat( $( element ).val() ).toFixed(20) > parseFloat( idamount.val() ).toFixed(20) ) )
+        else if ( type == 1 && ( parseFloat( $( element ).val() ) > parseFloat( idamount.val() ) ) )
         {
             amount_error_families.text('El monto de la familia supera al monto especificado').css('color', 'red');
             idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
         }
-        else if ( parseFloat( sum_total ).toFixed(20) > parseFloat( idamount.val() ).toFixed(20) )
+        else if ( parseFloat( sum_total ) > parseFloat( idamount.val() ) )
         {
             amount_error_families.text('El monto total de las familias supera al monto especificado').css('color', 'red');
             idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
         }
-        else if ( parseFloat( sum_total ).toFixed(20) < parseFloat( idamount.val() ).toFixed(20) )
+        else if ( parseFloat( sum_total ) < parseFloat( idamount.val() ) )
         {
             amount_error_families.text('El monto total de las familias es menor al monto especificado').css('color', 'red');
             idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
         }
-        else if ( parseFloat( sum_total ).toFixed(20) == parseFloat( idamount.val() ).toFixed(20) )
+        else if ( parseFloat( sum_total ) == parseFloat( idamount.val() ) )
         {
             amount_error_families.text('Los montos asignados son iguales al monto especificado').css('color', 'green');    
             idamount.parent().parent().parent().removeClass("has-error").addClass("has-success");
@@ -1931,14 +1935,11 @@ function newSolicitude() {
     approved_solicitude.on('click',function(e)
     {
         e.preventDefault();
-        var aux = $(this);
-        var total = 0;
         //almacenamos el monto total por cada familia
-        amount_families.each(function (index, value)
-        {
-            total += parseFloat($(this).val());
-        });
-        if (idamount.val() == Math.round(total)) 
+        var div_monto = $("label[for=amount]").parent();
+        if ( div_monto.hasClass("has-error") )
+            idamount.focus();
+        else if( div_monto.hasClass("has-success"))
         {
             bootbox.confirm("¿Esta seguro que desea aprobar esta solicitud?", function (result) 
             {
@@ -1961,10 +1962,6 @@ function newSolicitude() {
                 }
             });
         }
-        else if (idamount.val() < Math.round(total)) 
-            amount_error_families.text('El monto distribuido supera el monto total').css('color', 'red');
-        else
-            amount_error_families.text('El monto distribuido es menor al monto total').css('color', 'red');
     });
     
     function colorTr(tokens)

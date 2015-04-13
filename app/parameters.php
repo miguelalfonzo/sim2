@@ -83,8 +83,10 @@ const SOPORTE_EMAIL         = 'jortiz@esinergy.com';
 const R_PENDIENTE = 1;
 const R_APROBADO = 2;
 const R_REVISADO = 3;
-const R_FINALIZADO = 4;
-const R_NO_AUTORIZADO = 5;
+const R_GASTO = 4;
+const R_FINALIZADO = 5;
+const R_NO_AUTORIZADO = 6;
+
 const R_TODOS = 10;
 
 const REP_MED = 'R';

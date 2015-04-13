@@ -23,10 +23,21 @@
             </small>
         </div>
         <div class="panel-body">
+            <aside class="row reg-expense" style="margin-bottom: 0.5em;">
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <a id="detail_solicitude">
+                        <span>Ocultar</span>
+                        <span class="glyphicon glyphicon-chevron-up"></span>
+                    </a>
+                </div>
+            </aside>
+                
             <form id="form_make_activity" method="post">
                 {{Form::token()}}
                 <input name="idsolicitude" type="hidden" value="{{$solicitude->id}}">
                 <input name="token" type="hidden" value="{{$solicitude->token}}">
+                <section id="collapseOne" class="row reg-expense collapse in">
+            
                 @include('template.detail_solicitude')
 
                 <!-- RETENCION -->
@@ -50,49 +61,15 @@
                     </div>
                 </div> 
                 @endif
-                
+                </section>
+
+                @if ( Auth::user()->type == CONT && $solicitude->idestado == DEPOSITADO )
+                    @include('template.Seat.advance_table')
+                @endif
+
                 <!-- Button (Double) -->
-                <div class="form-group col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px">
-                    <div class="col-sm-12 col-md-12 col-lg-12" style="text-align: center">
-                        @if ( Auth::user()->type == SUP )
-                            @if( $solicitude->idestado == PENDIENTE )
-                                <a class="btn btn-primary" id="search_responsable">
-                                    Aceptar
-                                </a>
-                                <a id="deny_solicitude" name="button1id" class="btn btn-primary">
-                                    Rechazar
-                                </a>
-                            @endif
-                        @elseif ( Auth::user()->type == GER_PROD )
-                            @if($solicitude->idestado == DERIVADO)
-                                <a id="search_responsable" class="btn btn-primary">
-                                    Aceptar
-                                </a>
-                                <a id="deny_solicitude" name="button1id" class="btn btn-primary">
-                                    Rechazar
-                                </a>
-                            @endif
-                        @elseif ( Auth::user()->type == GER_COM )
-                            @if($solicitude->idestado == ACEPTADO)
-                                <a name="button1id" data-token ="{{$solicitude->token}}" class="btn btn-primary approved_solicitude">
-                                    Aprobar
-                                </a>
-                                <a id="deny_solicitude" name="button1id" class="btn btn-primary">
-                                    Rechazar
-                                </a>
-                            @endif
-                        @elseif ( Auth::user()->type == CONT )
-                            @if($solicitude->idestado == APROBADO)
-                                <a id="enable-deposit" class="btn btn-success" style="margin-right: 1em;">Habilitar Depósito</a>
-                            @endif
-                        @elseif ( Auth::user()->type == TESORERIA && $solicitude->idestado == DEPOSITO_HABILITADO )
-                            <a class="btn btn-success" data-toggle="modal" data-target="#myModal" >Registrar Depósito</a>
-                        @endif
-                        <a id="button2id" href="{{URL::to('show_user')}}" name="button2id" class="btn btn-primary">
-                            Cancelar
-                        </a>
-                    </div>
-                </div>
+                @include('template.Details.buttons')
+
             </form>
         </div>
     </div>

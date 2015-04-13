@@ -291,7 +291,6 @@ class SolicitudeController extends BaseController
         try
         {
             DB::beginTransaction();
-
             $inputs = Input::all();
             
             $date = $inputs['delivery_date'];
@@ -357,12 +356,7 @@ class SolicitudeController extends BaseController
             $sol_detalle->detalle = json_encode($detalle);
             
             $solicitude->save();
-            /*Log::error($data);
-            $solicitude->update($data);
-            *//*$data = $this->objectToArray($sol_detalle);
-            Log::error($data);
-            $sol_detalle->update($data);
-            */
+
             $sol_detalle->idmotivo      =  $inputs['type_solicitude'];
             $sol_detalle->idpago        =  $inputs['type_payment'];
             $sol_detalle->idmoneda      = $inputs['money'];
@@ -411,7 +405,6 @@ class SolicitudeController extends BaseController
             {
                 $toUserId = Auth::user()->id;
             }
-
             $rpta = $this->setStatus(0, PENDIENTE, Auth::user()->id, $toUserId, $inputs['idsolicitude']);
             if ($rpta[status] = ok)
             {         
@@ -487,22 +480,54 @@ class SolicitudeController extends BaseController
             $data['solicitude']->status = 1;
             $data['fondos'] = Fondo::gerProdFondos();
         }
+        elseif ( Auth::user()->type == TESORERIA && $solicitude->idestado == DEPOSITO_HABILITADO )
+            $data['banks'] = Account::banks();
         elseif ( Auth::user()->type == CONT && $solicitude->idestado == APROBADO )
             $data['typeRetention'] = TypeRetention::all();
+        elseif ( Auth::user()->type == CONT && $solicitude->idestado == DEPOSITADO )
+        {
+            $data['date'] = $this->getDay();
+            $data['lv'] = $this->textLv($solicitude);
+        }
         return View::make('Dmkt.Rm.view_solicitude', $data);
     }
 
-    /*public function viewSolicitudeCont($token)
-    {
-        $solicitude = Solicitude::where('token', $token)->firstOrFail();
-        $typeRetention = TypeRetention::all();
-        $data = [
-            'solicitude' => $solicitude,
-            'typeRetention' => $typeRetention
-        ];
 
-        return View::make('Dmkt.Cont.view_solicitude_cont', $data);
-    }*/
+    private function textLv( $solicitude )
+    {
+        return $this->textAccepted( $solicitude ).'-'.$solicitude->titulo.'-'.$this->textClients( $solicitude );
+    }
+
+    private function textAccepted( $solicitude )
+    {
+        if ( $solicitude->acceptHist->user->type == SUP )
+            return $solicitude->acceptHist->user->sup->nombres.' '.$solicitude->acceptHist->user->sup->apellidos;
+        elseif ( $solicitude->acceptHist->user->type == GER_PROD )
+            return $solicitude->acceptHist->user->gerProd->descripcion;
+        else
+            return 'No encontrado';
+    }
+
+    private function textClients( $solicitude )
+    {
+        $clientes = array();
+        $nom = '';
+        foreach($solicitude->clients as $client)
+        {
+            if ($client->from_table == TB_DOCTOR)
+            {
+                $doctors = $client->doctors;
+                $nom = $doctors->pefnombres.' '.$doctors->pefpaterno.' '.$doctors->pefmaterno;            
+            }
+            elseif ($client->from_table == TB_INSTITUTE)
+                $nom = $client->institutes->pejrazon;
+            else
+                $nom = 'No encontrado';
+            array_push($clientes,$nom);
+        }
+        return implode(',',$clientes);
+    }
+    
 
     public function editSolicitude($token)
     {
@@ -639,36 +664,41 @@ class SolicitudeController extends BaseController
         elseif ( array_sum( $aSum ) > $total )
             return array( status => warning , description => "El monto total de las familias es mayor al monto asignado" );
         elseif ( array_sum( $aSum ) < $total )
-            return array( status => warning , description => "El monto asignado es mayor al monto total de las familias" );
+            return array( status => warning , description => "El monto total de las familias es mayor al monto asignado" );
         else
             return array( status => ok , description => "Montos Iguales" );
     }
- 
-    public function acceptedSolicitude()
+
+    private function finalStatus($idestado, $estado , $to_user , $id , $state)
     {
         try
         {
-            DB::beginTransaction();
+            $rpta = $this->setStatus($idestado, $estado , Auth::user()->id , $to_user , $id );
+            if ( $rpta[status] == ok )
+                Session::put('state', $state);
+            return $rpta;
+        }
+        catch ( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
+
+    }
+
+    public function acceptedSolicitude()
+    {
+        DB::beginTransaction();
+        try
+        {
             $inputs     = Input::all();   
             $rpta       = array();
-            $idSol      = $inputs['idsolicitude'];
-            $solicitude = Solicitude::find($idSol);
-            $oldidestado = $solicitude->idestado;
-            $fondo      = Fondo::find($inputs['idfondo']);
-
+            $solicitude = Solicitude::find( $inputs['idsolicitude'] );
+            $oldidestado = $solicitude->idestado;    
             $rpta = $this->verifySum( $inputs['amount_assigned'] , $inputs['monto'] );
 
             if ( $rpta[status] != ok )
                 return $rpta;
-
-            if ( array_sum( $inputs['amount_assigned']) > $inputs['monto'] )
-            {
-                return array( status => warning , description => "El monto total de las familias es mayor al monto asignado" );
-            }
-            elseif ( array_sum( $inputs['amount_assigned']) < $inputs['monto'] )
-            {
-                return array( status => warning , description => "El monto asignado es mayor al monto total de las familias" );
-            }
+            $fondo      = Fondo::find($inputs['idfondo']);
 
             if ($fondo->idusertype == SUP)
             {
@@ -676,37 +706,30 @@ class SolicitudeController extends BaseController
                 $solicitude->status = ACTIVE;
                 $solicitude->iduserasigned = $inputs['idresponsable'];
                 $solicitude->observacion   = $inputs['observacion'];
-                Log::error($solicitude->iddetalle);
-                if ($solicitude->save())
+                if ( $solicitude->save() )
                 {
-                    $sol_detalle = SolicitudeDetalle::find($solicitude->iddetalle);
+                    $sol_detalle = $solicitude->detalle;
                     $sol_detalle->idfondo   = $inputs['idfondo'];
-
                     $detalle = json_decode($solicitude->detalle->detalle);
                     $detalle->monto_aceptado = $inputs['monto'];
-
                     $sol_detalle->detalle = json_encode($detalle);
 
                     if ($sol_detalle->save())
                     {
-                        $amount_assigned = $inputs['amount_assigned'];
-                        $families = SolicitudeFamily::where('idsolicitud', $idSol)->get();
-                        $i = 0;
-                        foreach ($families as $family) 
+                        for ($i= 0 ; $i < count($inputs['idfamily']) ; $i++ ) 
                         {
-                            $fam = SolicitudeFamily::where('id', $family->id);
-                            $fam->monto_asignado = $amount_assigned[$i];
-                            $data = $this->objectToArray($fam);
-                            $fam->update($data);
-                            $i++;
+                            $family = SolicitudeFamily::find( $inputs['idfamily'][$i] );
+                            $family->monto_asignado = $inputs['amount_assigned'][$i] ;
+                            $family->save();
+
                         }
-                        $rpta = $this->setStatus($oldidestado, ACEPTADO, Auth::user()->id, USER_GERENTE_COMERCIAL, $idSol);
+                        $rpta = $this->finalStatus( $oldidestado , ACEPTADO , USER_GERENTE_COMERCIAL , $solicitude->id , R_APROBADO );
                         if ( $rpta[status] == ok )
-                        {
                             DB::commit();
-                            Session::put('state', R_APROBADO);
-                            return $rpta;
-                        }
+                        else
+                            DB::rollback();
+                        return $rpta;
+                        
                     }
                 }
             }
@@ -726,17 +749,16 @@ class SolicitudeController extends BaseController
 
                         if ($solicitude_gerente->save())
                         {
-                            $sol_detalle = SolicitudeDetalle::find($solicitude->iddetalle);
+                            $sol_detalle = $solicitude->detalle;
                             $sol_detalle->idfondo   = $inputs['idfondo'];
                             if ($sol_detalle->save())
                             {
-                                $rpta = $this->setStatus($$oldidestado, DERIVADO, Auth::user()->id, $inputs['idresponsable'], $idSol);
-                                if ( $rpta[status] == ok )
-                                {
+                                $rpta = $this->finalStatus( $oldidestado , DERIVADO , $inputs['idresponsable'] , $solicitude->id , R_PENDIENTE );
+                                if ( $rpta[status] == ok)
                                     DB::commit();
-                                    Session::put('state', R_PENDIENTE);
-                                    return $rpta;
-                                }
+                                else
+                                    DB::rollback();
+                                return $rpta;
                             }
                         }
                     }
@@ -750,32 +772,27 @@ class SolicitudeController extends BaseController
             
                     if ($solicitude->save())
                     {
-                        $sol_detalle = SolicitudeDetalle::find($solicitude->iddetalle);
+                        $sol_detalle = $solicitude->detalle;
                         $sol_detalle->idfondo   = $inputs['idfondo'];
-
                         $detalle = json_decode($solicitude->detalle->detalle);
                         $detalle->monto_aceptado = $inputs['monto'];
-
                         $sol_detalle->detalle = json_encode($detalle);
 
                         if ($sol_detalle->save())
                         {
-                            $amount_assigned = $inputs['amount_assigned'];
-                            $families = SolicitudeFamily::where('idsolicitud', $idSol)->get();
-                            $i = 0;
-                            foreach ($families as $family) 
+                            for ($i= 0 ; $i < count($inputs['idfamily']) ; $i++ ) 
                             {
-                                $fam = SolicitudeFamily::where('id', $family->id);
-                                $fam->monto_asignado = $amount_assigned[$i];
-                                $data = $this->objectToArray($fam);
-                                $fam->update($data);
-                                $i++;
+                                $family = SolicitudeFamily::find( $inputs['idfamily'][$i] );
+                                $family->monto_asignado = $inputs['amount_assigned'][$i];
+                                $family->save();
                             }
-                            $rpta = $this->setStatus($oldidestado, ACEPTADO, Auth::user()->id, USER_GERENTE_COMERCIAL, $idSol);
                             if ( $rpta[status] == ok )
                             {
-                                DB::commit();
-                                Session::put('state', R_APROBADO);
+                                $rpta = $this->finalStatus( $oldidestado , ACEPTADO , USER_GERENTE_COMERCIAL , $solicitude->id , R_APROBADO );
+                                if ( $rpta[status] == ok)
+                                    DB::commit();
+                                else
+                                    DB::rollback();
                                 return $rpta;
                             }
                         }
@@ -798,22 +815,19 @@ class SolicitudeController extends BaseController
 
                     if ($sol_detalle->save())
                     {
-                        $amount_assigned = $inputs['amount_assigned'];
-                        $families = SolicitudeFamily::where('idsolicitud', $idSol)->get();
-                        $i = 0;
-                        foreach ($families as $family) 
+                        for ($i= 0 ; $i < count($inputs['idfamily']) ; $i++ ) 
                         {
-                            $fam = SolicitudeFamily::where('id', $family->id);
-                            $fam->monto_asignado = $amount_assigned[$i];
-                            $data = $this->objectToArray($fam);
-                            $fam->update($data);
-                            $i++;
+                            $family = SolicitudeFamily::find( $inputs['idfamily'][$i] );
+                            $family->monto_asignado = $inputs['amount_assigned'][$i];
+                            $family->save();
                         }
-                        $rpta = $this->setStatus($oldidestado, ACEPTADO, Auth::user()->id, USER_GERENTE_COMERCIAL, $idSol);
                         if ( $rpta[status] == ok )
                         {
-                            DB::commit();
-                            Session::put('state', R_APROBADO);
+                            $rpta = $this->finalStatus( $oldidestado , ACEPTADO , USER_GERENTE_COMERCIAL , $solicitude->id , R_APROBADO );
+                            if ( $rpta[status] == ok)
+                                DB::commit();
+                            else
+                                DB::rollback();
                             return $rpta;
                         }
                     }
@@ -823,40 +837,11 @@ class SolicitudeController extends BaseController
         catch (Exception $e)
         {
             DB::rollback();
-            $rpta = $this->internalException($e,__FUNCTION__);
+            return $this->internalException($e,__FUNCTION__);
         }
         DB::rollback();
         return $rpta;
     }
-
-    /*public function redirectAcceptedSolicitudeGerProd(){
-        return Redirect::to('show_user')->with('state', ACEPTADO);
-    }*/
-
-    /*public function gercomAsignarResponsable()
-    {
-        try
-        {
-            $middleRpta = array();
-            $inputs = Input::all();
-            $rules = array('responsable' => 'required|integer|min:1' );   
-            $validator = Validator::make($inputs, $rules);
-            if ($validator->fails()) 
-            {
-                $middleRpta = $validator->messages();
-            }
-            else
-            {
-                Solicitude::where('token',$inputs['token'])->update( array('idresponse' => $inputs['responsable']) );
-                $middleRpta = array( status => ok , description => 'Se asigno la solicitud correctamente');
-            }
-        }
-        catch (Exception $e)
-        {
-            $middleRpta = $this->internalException($e,__FUNCTION__);
-        }
-        return $middleRpta;
-    } */
 
     public function massApprovedSolicitudes()
     {
@@ -902,7 +887,6 @@ class SolicitudeController extends BaseController
         try
         {
             $inputs = Input::all();
-            Log::error($inputs);
             $rules = array(
                 'token'             => 'required',
                 'monto'             => 'required|numeric|min:1',
@@ -1399,57 +1383,6 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.Cont.view_seat_solicitude', $data);
     }
 
-    public function viewGenerateSeatSolicitude($token)
-    {
-        try
-        {
-            $solicitude = Solicitude::where('token', $token)->firstOrFail();
-            $date = $this->getDay();
-            //$expense = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
-            $clientes = array();
-            $nom = '';
-            foreach($solicitude->clients as $client)
-            {
-                if ($client->from_table == TB_DOCTOR)
-                {
-                    $doctors = $client->doctors;
-                    $nom = $doctors->pefnombres.' '.$doctors->pefpaterno.' '.$doctors->pefmaterno;            
-                }
-                elseif ($client->from_table == TB_INSTITUTE)
-                    $nom = $client->institutes->pejrazon;
-                else
-                    $nom = 'No encontrado';
-                array_push($clientes,$nom);
-            }
-            $clientes = implode(',',$clientes);
-            if ($solicitude->tipo_moneda == SOLES)
-            {
-                $banco = Account::where('alias',BANCOS)->where('num_cuenta',CUENTA_SOLES)->get();
-            }
-            elseif ($solicitude->tipo_moneda == DOLARES) {
-                $banco = Account::where('alias',BANCOS)->where('num_cuenta',CUENTA_DOLARES)->get();
-            }
-            if (count($banco) == 1)
-            {
-                $data = array(
-                    'type'       => SOLIC,
-                    'solicitude' => $solicitude,
-                    //'expense'    => $expense,
-                    'date'       => $date,
-                    'clientes'   => $clientes,
-                    'bancos'     => $banco
-                );
-                return View::make('Dmkt.Cont.register_advance_seat', $data);
-            }
-            else
-                return array ( status => warning , description => 'Existen varias cuentas de banco en '.$solicitude->tipo_moneda);
-        }
-        catch (Exception $e)
-        {
-            $rpta = $this->internalException($e,__FUNCTION__);
-            return $rpta;
-        }
-    }
 
     public function viewSeatExpense($token)
     {
@@ -1472,44 +1405,44 @@ class SolicitudeController extends BaseController
             $middleRpta = $this->validateInput($inputs,'number_account,dc,total,leyenda,idsolicitude');
             if ($middleRpta[status] == ok)
             {
-                $fec_origin = Solicitude::where('idsolicitud',$inputs['idsolicitude'])->select('created_at')->get();
-                DB::beginTransaction();
+                DB::beginTransaction();    
+                $solicitude = Solicitude::find($inputs['idsolicitude']);
+                $oldidestado = $solicitude->idestado;
+                $solicitude->idestado = GASTO_HABILITADO;
 
-                $oldOolicitude      = Solicitude::where('idsolicitud', $inputs['idsolicitude'])->first();
-                $oldStatus          = $oldOolicitude->estado;
-                $idSol              = $oldOolicitude->idsolicitud;
-
-                for($i=0;$i<count($inputs['number_account']);$i++)
+                if ( $solicitude->save() )
                 {
-                    $tbEntry = new Entry;
-                    $id = $tbEntry->searchId()+1;
-                    $tbEntry->idasiento = $id;
-                    $tbEntry->num_cuenta = $inputs['number_account'][$i];
-                    $tbEntry->fec_origen = $fec_origin[0]->created_at;
-                    $tbEntry->d_c = $inputs['dc'][$i];
-                    $tbEntry->importe = $inputs['total'][$i];
-                    $tbEntry->leyenda = trim($inputs['leyenda']);
-                    $tbEntry->idsolicitud = $inputs['idsolicitude'];
-                    $tbEntry->tipo_asiento = TIPO_ASIENTO_ANTICIPO;
-                    $tbEntry->updated_at = null;
-                    $tbEntry->save();
+                    for($i=0;$i<count($inputs['number_account']);$i++)
+                    {
+                        $tbEntry = new Entry;
+                        $tbEntry->idasiento = $tbEntry->searchId()+1;
+                        $tbEntry->num_cuenta = $inputs['number_account'][$i];
+                        $tbEntry->fec_origen = $solicitude->created_at;
+                        $tbEntry->d_c = $inputs['dc'][$i];
+                        $tbEntry->importe = $inputs['total'][$i];
+                        $tbEntry->leyenda = trim($inputs['leyenda']);
+                        $tbEntry->idsolicitud = $inputs['idsolicitude'];
+                        $tbEntry->tipo_asiento = TIPO_ASIENTO_ANTICIPO;
+                        $tbEntry->save();
+                    }
+                    $middleRpta = $this->setStatus( $oldidestado, GASTO_HABILITADO, Auth::user()->id, $solicitude->iduserasigned,$solicitude->id );         
+                    if ($middleRpta[status] == ok)
+                    {
+                        Session::put('state',R_REVISADO);
+                        DB::commit();
+                        return $middleRpta;
+                    }
                 }
-                Solicitude::where('idsolicitud', $inputs['idsolicitude'])->update( array('asiento' => SOLICITUD_ASIENTO , 'estado' => GASTO_HABILITADO) );
-                $middleRpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, GASTO_HABILITADO, Auth::user()->id, $oldOolicitude->iduser, $idSol,SOLIC);         
-                if ($middleRpta[status] == ok)
-                {
-                    Session::put('state',R_REVISADO);
-                    $middleRpta[status] = 1;
-                    DB::commit();
-                }
+                else
+                    return array( status => warning , description => 'No se pudo actualizar la solicitud');
             }
         }
         catch (Exception $e)
         {
             DB::rollback();
-            $middleRpta = $this->internalException($e,__FUNCTION__);          
+            return $this->internalException($e,__FUNCTION__);          
         }
-        return json_encode($middleRpta);
+        return $middleRpta;
     }
 
     // IDKC: CHANGE STATUS => GENERADO
@@ -1723,39 +1656,4 @@ class SolicitudeController extends BaseController
         }
     }
 
-    /*public function asignar2ResponsableSolicitud()
-    {
-        try
-        {
-            $middleRpta = array();
-            $inputs = Input::all();
-            $rules = array('responsable' => 'required|integer|min:1' );   
-            $validator = Validator::make($inputs, $rules);
-            if ($validator->fails()) 
-            {
-                $middleRpta = $validator->messages();
-            }
-            else
-            {
-                $oldOolicitude      = Solicitude::where('token', $inputs['token'])->first();
-                $oldStatus          = $oldOolicitude->estado;
-                $idSol              = $oldOolicitude->idsolicitud;
-                Solicitude::where('token',$inputs['token'])->update( array('idresponse' => $inputs['responsable']) );
-                $middleRpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, RESPONSABLE_HABILITADO, Auth::user()->id, USER_TESORERIA, $idSol,SOLIC);
-                if ( $middleRpta[status] == ok )
-                {
-                    Session::put('state',R_REVISADO);
-                    DB::commit();
-                }
-                else
-                    DB::rollback();
-            }
-        }
-        catch (Exception $e)
-        {
-            DB::rollback();
-            $middleRpta = $this->internalException($e,__FUNCTION__);
-        }
-        return $middleRpta;
-    }*/
 }
