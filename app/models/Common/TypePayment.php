@@ -12,7 +12,7 @@ use \Eloquent;
 class TypePayment extends Eloquent{
 
     protected $table = 'DMKT_RG_TIPO_PAGO';
-    protected $primaryKey = 'IDTIPOPAGO';
+    protected $primaryKey = 'id';
 
 
 

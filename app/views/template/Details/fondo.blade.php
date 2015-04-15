@@ -6,7 +6,7 @@
                 <select id="sub_type_activity" name="idfondo" class="form-control">
                     @foreach($fondos as $sub)
                         @if( $sub->idusertype == ASIS_GER )
-                            <option value="{{$sub->id}}">
+                            <option value="{{$sub->id}}" style="background:#F7FE2E">
                                     {{$sub->nombre}} {{$sub->typeMoney->simbolo.' '.$sub->saldo}}
                             </option>
                         @else
@@ -29,7 +29,7 @@
             @else
                 <select id="sub_type_activity" name="idfondo" class="form-control" disabled>            
                     <option value="{{$solicitude->detalle->idfondo}}" selected>
-                        {{$solicitude->detalle->fondo->nombre}} {{$solicitude->detalle->fondo->typeMoney->simbolo.' '.$solicitude->detalle->fondo->saldo}}
+                        {{$solicitude->detalle->fondo->nombre}}
                     </option>
                 </select>
             @endif    

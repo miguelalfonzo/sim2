@@ -33,12 +33,12 @@
                         <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span>
                     </a>
                 @endif
-                @if( $solicitude->idestado == PENDIENTE || $solicitude->created_by == Auth::user()->id )
+                @if( $solicitude->idestado == PENDIENTE && $solicitude->created_by == Auth::user()->id )
                     @if( $solicitude->status == 1 )
                         <a href="{{URL::to('editar-solicitud').'/'.$solicitude->token}}">
                             <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-pencil"></span>
                         </a>
-                        <a href="#" class="cancel-solicitude" data-idsolicitude = "{{$solicitude->id}}" data-token="{{csrf_token()}}">
+                        <a class="cancel-solicitude" data-idsolicitude="{{$solicitude->id}}" data-token="{{csrf_token()}}">
                             <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-remove"></span>
                         </a>
                     @endif
@@ -48,7 +48,7 @@
                     <a  href="{{URL::to('editar-solicitud').'/'.$solicitude->token}}">
                         <span style="padding: 0 5px; font-size: 1.3em"  class="glyphicon glyphicon-pencil"></span>
                     </a>
-                    <a href="#" class="cancel-solicitude" data-idsolicitude = "{{$solicitude->idsolicitud}}"  data-token="{{csrf_token()}}">
+                    <a href="#" class="cancel-solicitude" data-idsolicitude = "{{$solicitude->id}}"  data-token="{{csrf_token()}}">
                         <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-remove"></span>
                     </a>
                 @endif

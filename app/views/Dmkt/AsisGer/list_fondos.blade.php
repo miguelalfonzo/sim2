@@ -1,69 +1,60 @@
-
-@if($export == EXPORTAR)
-<div class="form-group col-xs-3 col-sm-2 col-md-1 pull-right fondo_r" >
-       <a id="export-fondo" class="btn btn-sm btn-primary ladda-button" href=""
-                                    data-style="zoom-in" data-size="l"><i class="glyphicon glyphicon-print"></i> Exportar</a>
-</div>
-@endif
-
-@if($estado != TERMINADO && $export == EXPORTAR)
-<div class="form-group col-xs-3 col-sm-2 col-md-1 pull-right fondo_r" >
-       <a id="terminate-fondo" class="btn btn-sm btn-danger" href=""
-                                    data-style="zoom-in" data-size="l"><i class="glyphicon glyphicon-download"></i> Terminar</a>
-</div>
-@endif
 <div class="form-group col-xs-12 col-sm-3 col-md-3 total-fondo fondo_r" style="">
-
-                          <input id="" name="total" type="text" placeholder=""
-                                 value="Total : {{$sum}}"
-                                 class="form-control input-md" readonly>
-
-
+    <input class="form-control input-md" name="total" type="text" value="Total : {{$total}}" readonly>
 </div>
+@if( $state == ACTIVE )
+    <div class="form-group col-xs-3 col-sm-2 col-md-1 pull-right fondo_r" >
+        <a id="export-fondo" class="btn btn-sm btn-primary ladda-button" data-style="zoom-in" data-size="l">
+            <i class="glyphicon glyphicon-print"></i> 
+            Exportar
+        </a>
+    </div>
+    <div class="form-group col-xs-3 col-sm-2 col-md-1 pull-right fondo_r" >
+        <a id="terminate-fondo" class="btn btn-sm btn-danger" data-style="zoom-in" data-size="l">
+            <i class="glyphicon glyphicon-download"></i> 
+            Terminar
+        </a>
+    </div>
+@endif
 <div class="table-responsive fondo_r">
- <table class="table table-hover table-bordered table-condensed dataTable" id="table_solicitude_fondos" style="width: 100%">
-    <thead>
-    <tr>
-        <th>#</th>
-        <th>SISOL - Hospital</th>
-        <th>Depositar a</th>
-        <th>N° Cuenta Bagó. Bco Credito</th>
-        <th>Total a depositar</th>
-        <th>Supervisor</th>
-        @if($estado != TERMINADO)
-        <th>Edicion</th>
-        @endif
-    </tr>
-    </thead>
-    <tbody>
-    <?php $total = 0 ?>
-    @foreach($fondos as  $fondo)
-    <tr>
-        <td>{{$fondo->idfondo}}</td>
-        <td style="text-align: center">{{$fondo->institucion}}</td>
-        <td>{{$fondo->repmed}}</td>
-        <td style="text-align: center">
-            {{$fondo->rep_cuenta}}
-        </td>
-
-        <td style="text-align: center">{{$fondo->monto}}</td>
-        <td style="text-align: center">{{$fondo->supervisor}}</td>
-         @if($estado != TERMINADO)
-        <td>
-            <div class="div-icons-solicituds">
-                <a href="#" class="edit-fondo" data-idfondo="{{$fondo->idfondo}}">
-                    <span class="glyphicon glyphicon-pencil"></span>
-                </a>
-                <a  href="#" class ="delete-fondo" data-idfondo="{{$fondo->idfondo}}" data-token="{{csrf_token()}}">
-                    <span class="glyphicon glyphicon-remove"></span>
-                </a>
-            </div>
-        </td>
-        @endif
-    </tr>
-    <?php $total += $fondo->total ?>
-    @endforeach
-    </tbody>
-
-</table>
+    <table class="table table-hover table-bordered table-condensed dataTable" id="table_solicitude_fondos" style="width: 100%">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>SISOL - Hospital</th>
+                <th>Depositar a</th>
+                <th>Fondo</th>
+                <th>Total a depositar</th>
+                <th>Supervisor</th>
+                <th>Edicion</th>
+             </tr>
+        </thead>
+        <tbody>
+            @foreach( $solicituds as $solicitud )
+                <tr>
+                    <td>{{$solicitud->id}}</td>
+                    <td style="text-align:center">{{$solicitud->titulo}}</td>
+                    <td style="text-align:center">{{$solicitud->asignedTo->rm->nombres.' '.$solicitud->asignedTo->rm->apellidos}}</td>
+                    <td style="text-align:center">
+                        {{$solicitud->detalle->fondo->nombre}}
+                    </td>
+                    <td style="text-align:center">{{$solicitud->detalle->fondo->typeMoney->simbolo.' '.json_decode($solicitud->detalle->detalle)->monto_aprobado}}</td>
+                    <td style="text-align:center">{{json_decode($solicitud->detalle->detalle)->supervisor}}</td>
+                    <td style="text-align:center">
+                        @if ( $state == ACTIVE )
+                            <div class="div-icons-solicituds">
+                                <a href="#" class="edit-fondo" data-idfondo="{{$solicitud->id}}">
+                                    <span class="glyphicon glyphicon-pencil"></span>
+                                </a>
+                                <a  href="#" class ="delete-fondo" data-idfondo="{{$solicitud->id}}" data-token="{{csrf_token()}}">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                </a>
+                            </div>
+                        @elseif ( $state == BLOCKED )
+                            TERMINADO
+                        @endif
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
 </div>

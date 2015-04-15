@@ -11,6 +11,6 @@ use \Eloquent;
 class TypeUser extends Eloquent{
 
     protected $table = 'TIPO_USUARIO';
-    protected $primaryKey = 'CODIGO';
+    protected $primaryKey = 'codigo';
 
 }

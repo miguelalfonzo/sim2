@@ -6,14 +6,19 @@ use \Eloquent;
 
 class ProofType extends Eloquent{
 	protected $table = 'DMKT_RG_TIPO_COMPROBANTE';
-	protected $primaryKey = 'idcomprobante';
-	public $timestamps = false;
-	public function lastId(){
-		$lastId = ProofType::orderBy('idcomprobante','desc')->first();
-		if($lastId == null){
+	protected $primaryKey = 'id';
+
+	public function lastId()
+	{
+		$lastId = ProofType::orderBy('id','desc')->first();
+		if($lastId == null)
             return 0;
-        }else{
-            return $lastId->idcomprobante;
-        }
+        else
+            return $lastId->id;
+	}
+
+	protected static function order()
+	{
+		return ProofType::orderBy('id','asc')->get();
 	}
 }

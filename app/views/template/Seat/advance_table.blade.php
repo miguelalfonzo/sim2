@@ -46,20 +46,12 @@
 						@if(!is_null($solicitude->detalle->idretencion))
 							<tr>
 								<td class="name_account">{{$solicitude->detalle->typeRetention->descripcion}}</td>
-								<td class="number_account">{{$solicitude->detalle->typeRetention->cta_contable}}</td>
+								<td class="number_account">{{$solicitude->detalle->typeRetention->account->num_cuenta}}</td>
 								<td class="date_ini">{{$date['toDay']}}</td>
 								<td class="dc">C</td>
 								<td> {{ $solicitude->detalle->typeRetention->account->typeMoney->simbolo }}
 								<td class="total">
-									@if ( $solicitude->detalle->idmoneda != $solicitude->detalle->fondo->idtipomoneda )
-										@if ( $solicitude->detalle->idmoneda == SOLES )
-											{{$detalle->monto_retencion/$detalle->tcv}}
-										@elseif	( $solicitude->detalle->idmoneda == DOLARES )
-											{{ $detalle->monto_retencion*$detalle->tcc}}
-										@endif
-									@elseif ( $solicitude->detalle->idmoneda == $solicitude->detalle->fondo->idtipomoneda )
-										{{ $detalle->monto_retencion }}
-									@endif
+									{{$detalle->monto_retencion}}
 								</td>
 								<td class="leyenda">{{$lv}}</td>
 							</tr>

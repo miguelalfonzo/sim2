@@ -13,7 +13,7 @@ use \Common\SubTypeActivity;
 class TypeActivity extends Eloquent{
 
     protected $table = 'DMKT_RG_TIPO_ACTIVIDAD';
-    protected $primaryKey = 'IDTIPOACTIVIDAD';
+    protected $primaryKey = 'id';
 
     public function subtype(){
 

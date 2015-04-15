@@ -39,7 +39,7 @@ class Solicitude extends Eloquent{
         return $this->hasMany('System\SolicitudeHistory','idsolicitude');
     }
 
-    protected function detalle()
+    public function detalle()
     {
         return $this->hasOne('Dmkt\SolicitudeDetalle','id','iddetalle');
     }
@@ -66,18 +66,13 @@ class Solicitude extends Eloquent{
         return $this->hasOne('Dmkt\SolicitudeGer','idsolicitud','id');
     }
 
-    function subtype(){
-
-        return  $this->hasOne('Common\Fondo','idfondo','idfondo');
-    }
-
     function state(){
 
         return $this->hasOne('Common\State','idestado','idestado');
     }
 
     function reasonSolicitude(){
-        return $this->hasOne('Dmkt\TypeSolicitude','idtiposolicitud','idtiposolicitud');
+        return $this->hasOne('Dmkt\TypeSolicitude','id','idtiposolicitud');
     }
 
     
@@ -95,7 +90,7 @@ class Solicitude extends Eloquent{
     
     
     function typeRetention(){
-        return $this->hasOne('Dmkt\TypeRetention','idtiporetencion','idtiporetencion');
+        return $this->hasOne('Dmkt\TypeRetention','id','idtiporetencion');
     }
 
     function aproved(){
@@ -103,7 +98,7 @@ class Solicitude extends Eloquent{
     }
 
     function deposit(){
-        return $this->hasOne('Common\Deposit','iddeposito', 'iddeposito');
+        return $this->hasOne('Common\Deposit','id', 'iddeposito');
     }
 
     protected function rm(){
@@ -122,21 +117,7 @@ class Solicitude extends Eloquent{
         return $this->hasOne('Dmkt\Manager','iduser','idaproved');
     }
 
-    
-
     function etiqueta(){
         return $this->hasOne('Dmkt\Label','id','idetiqueta');
     }
-
-    /*protected function solicitudsRange($user,$estado,$start,$end)
-    {
-        $solicituds = Solicitude::leftJoin('dmkt_rg_sub_estado as se','se.idestado','s.estado')
-        ->leftJoin('dmkt_rg_estado as e','e.id','se.idstate')
-        ->where('s.iduser',$user)
-        ->select('s.idsolicitud','s.typemoney','created_at','s.typesolicitude','s.estado','s.asiento','s.idresponse','s.derive','s.blocked')
-        if ($estado != 10)
-        {
-
-        }
-    }*/
 }

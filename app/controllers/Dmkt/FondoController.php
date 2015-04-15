@@ -25,7 +25,7 @@ use Dmkt\Solicitud\Periodo;
 class FondoController extends BaseController
 {
     
-    function objectToArray($object)
+    public function objectToArray($object)
     {
         $array = array();
         foreach ($object as $member => $data) {
@@ -34,12 +34,55 @@ class FondoController extends BaseController
         return $array;
     }
     
-    function getRegister()
+    public function getRegister()
     {
         $fondos  = Fondo::where('idusertype', ASIS_GER )->get();
         return View::make('Dmkt.AsisGer.register_fondo')->with('fondos', $fondos);
     }
-    
+
+    public function getFondos($start, $export = 0)
+    {
+        $periodo = $this->period($start);
+        $periodos = Periodo::where('periodo', $periodo )->first();
+        if ( count ( $periodos ) == 0 )
+            return $this->setRpta();
+        else
+        {
+            $solicitud = Solicitude::orderBy('id','desc')->whereHas('detalle' , function ($q ) use ( $periodo )
+            {
+                $q->whereHas('periodo' , function ( $t ) use ( $periodo )
+                {
+                    $t->where('periodo',$periodo);
+                });
+            })->get();
+            $total = 0 ;
+            foreach ( $solicitud as $sol )
+            {
+                $jDetalle = json_decode($sol->detalle->detalle);
+                $total += $jDetalle->monto_aprobado;
+            }
+            $data = array( 
+                'solicituds' => $solicitud ,
+                'state'      => $periodos->status , 
+                'total'      => $total
+            );
+            return View::make('Dmkt.AsisGer.list_fondos')->with( $data );
+        }
+            /*$fondos = FondoInstitucional::where('periodo', $periodo)->get();
+            $estado = 0;
+            $export = 0;
+            if(count($fondos) > 0)
+            {
+                $export = EXPORTAR;
+                foreach ($fondos as $fondo) {
+                    if($fondo->terminado == TERMINADO)
+                    {
+                        $estado = TERMINADO;
+                    }
+                }
+            }
+            */
+    }
     public function postRegister()
     {
         try
@@ -47,11 +90,26 @@ class FondoController extends BaseController
             DB::beginTransaction();
             $inputs = Input::all();
             $periodo = $this->period($inputs['mes']);
-            $verifyMonth = Periodo::where( 'periodo' , $periodo )->where( 'status' , TERMINADO )->get();
+            $verifyMonth = Periodo::where( 'periodo' , $periodo )->where( 'status' , BLOCKED )->get();
             if( count( $verifyMonth ) != 0 )
                 return $this->warningException( __FUNCTION__ ,'El periodo ingresado ya ha sido terminado' );
             else
             {
+                Log::error('1');
+                $verifyPeriodo = Periodo::where( 'periodo' , $periodo)->get();
+                if ( count ( $verifyPeriodo ) == 0 )
+                {
+                    $newPeriodo = new Periodo;
+                    $newPeriodo->id = $newPeriodo->searchId() + 1 ;
+                    $newPeriodo->periodo = $periodo ;
+                    $newPeriodo->status  = ACTIVE ;
+                    if ( !$newPeriodo->save() )
+                        return $this->warningException( __FUNCTION__ , 'No se pudo registrar el nuevo periodo' );
+                    $idPeriodo = $newPeriodo->id;
+                }
+                else
+                    $idPeriodo = $verifyPeriodo[0]->id;
+                    
                 $repmed   = Rm::find( $inputs['codrepmed'] );
                 if ( count( $repmed ) == 0 )
                     return $this->warningException( __FUNCTION__ , 'El representante Medico no esta registrado en el sistema' );
@@ -84,11 +142,11 @@ class FondoController extends BaseController
                             $jDetalle = array(
                             'supervisor'     => $inputs['supervisor'] ,
                             'codsup'         => $inputs['codsup'] ,
-                            'periodo'        => $inputs['mes'] ,
                             'num_cuenta'     => $inputs['cuenta'] ,
-                            'monto_aprobado' => $inputs['total'] ,
+                            'monto_aprobado' => $inputs['total'] 
                             );
                             $detalle->idfondo = $inputs['idfondo'] ;
+                            $detalle->idperiodo = $idPeriodo;   
                             $detalle->detalle = json_encode($jDetalle);
                             if ( !$detalle->save() )
                                 return $this->warningException( __FUNCTION__ , 'No se pudo procesar los detalles de la Solicitud' );
@@ -115,6 +173,16 @@ class FondoController extends BaseController
             DB::rollback();
             return $this->internalException($e,__FUNCTION__);
         }
+        return $middleRpta;
+    }
+
+    public function listFondosRep()
+    {
+        /*$fondos = Solicitude::where('idtiposolicitud', SOL_INST )->whereHas('detalle', function ( $q) 
+        {
+            $q->where('')
+        })->get();
+        return View::make('Dmkt.Rm.list_fondos_rm')->with('fondos', $fondos);*/
     }
 
     public function updateFondo()
@@ -167,38 +235,7 @@ class FondoController extends BaseController
         return $rpta;
     }
     
-    public function getFondos($start, $export = 0)
-    {
-        $periodo = $this->period($start);
-        if ($export) 
-        {
-            $fondos = FondoInstitucional::where('periodo', $periodo)->get(array(
-                'institucion',
-                'repmed',
-                'cuenta',
-                'supervisor',
-                'total'
-            ));
-            return $fondos;
-        } 
-        else 
-        {
-            $fondos = FondoInstitucional::where('periodo', $periodo)->get();
-            $estado = 0;
-            $export = 0;
-            if(count($fondos) > 0)
-            {
-                $export = EXPORTAR;
-                foreach ($fondos as $fondo) {
-                    if($fondo->terminado == TERMINADO)
-                    {
-                        $estado = TERMINADO;
-                    }
-                }
-            }
-            return View::make('Dmkt.AsisGer.list_fondos')->with('fondos', $fondos)->with('sum', $fondos->sum('total'))->with('estado', $estado)->with('export', $export)->render();
-        }    
-    }
+    
 
     function getFondosTesoreria($start, $export = 0)
     {
@@ -227,8 +264,6 @@ class FondoController extends BaseController
     }
     function getFondosContabilidad($start, $state)
     {
-        Log::error($start);
-        Log::error($state);
         $periodo = $this->period($start);
         
         if($state == '1') {
@@ -298,28 +333,7 @@ class FondoController extends BaseController
         $fondos = $this->getFondos($start);
         return $fondos;
     }
-    
-    /*function getRepresentatives()
-    {
-        //$representatives = DB::table('FICPE.VISITADOR')
-        //   ->select('visvisitador','vispaterno','vismaterno','visnombre','vislegajo')->where('VISACTIVO','S')->get();
-        $representatives = DB::select("select visvisitador,vispaterno,vismaterno,visnombre,vislegajo from FICPE.VISITADOR where VISACTIVO = 'S' and LENGTH(VISLEGAJO) = 8 ");
-        return json_encode($representatives);
-    }*/
-    
-    /*function getCtaBanc($dni)
-    {
-        $cta = CtaRm::where('codbeneficiario', $dni)->where('tipo', 'H')->first();
-        if ($cta) {
-            return $cta->cuenta;
-        } else {
-            $cta = CtaRm::where('codbeneficiario', $dni)->where('tipo', 'B')->first();
-            if ($cta)
-                return $cta->cuenta;
-            else
-                return '---';
-        } 
-    }*/
+
 
     function exportExcelFondos($start)
     {
@@ -412,11 +426,7 @@ class FondoController extends BaseController
         })->download('xls');
         
     }
-    function listFondosRep()
-    {
-        $fondos = FondoInstitucional::where('idrm', Auth::user()->rm->idrm)->where('depositado', 1)->where('asiento', ASIENTO_FONDO)->orderBy('periodo')->get();
-        return View::make('Dmkt.Rm.list_fondos_rm')->with('fondos', $fondos);
-    }
+
     
     function getLastDayOfMonth($month, $year)
     {
@@ -504,7 +514,7 @@ class FondoController extends BaseController
 
     public function listDocuments()
     {
-        $docs = ProofType::orderBy('idcomprobante')->get();
+        $docs = ProofType::order();
         $view = View::make('Dmkt.Cont.list_documents')->with('docs',$docs);
         return $view;
     }

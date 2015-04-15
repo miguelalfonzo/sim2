@@ -12,6 +12,6 @@ use \Eloquent;
 class TypeMoney extends Eloquent{
 
     protected $table = 'DMKT_RG_TIPO_MONEDA';
-    protected $primaryKey = 'IDTIPOMONEDA';
+    protected $primaryKey = 'id';
 
 }

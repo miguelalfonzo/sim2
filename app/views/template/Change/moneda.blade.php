@@ -4,9 +4,9 @@
         <select id="money" name="money" class="form-control">
         	@foreach( $typesMoney as $money )
             	@if ( isset( $solicitude ) && $solicitude->detalle->idmoneda == $money->idtipomoneda )
-            		<option value="{{$money->idtipomoneda}}" selected>{{$money->descripcion}}</option>
+            		<option value="{{$money->id}}" selected>{{$money->descripcion}}</option>
             	@else
-            		<option value="{{$money->idtipomoneda}}">{{$money->descripcion}}</option>
+            		<option value="{{$money->id}}">{{$money->descripcion}}</option>
             	@endif
             @endforeach	
         </select>

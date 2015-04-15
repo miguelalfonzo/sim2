@@ -3,7 +3,6 @@
 namespace Deposit;
 
 use \BaseController;
-use \Dmkt\FondoInstitucional;
 use \View;
 use \Session;
 use \Auth;
@@ -48,10 +47,11 @@ class DepositController extends BaseController{
     {
         $fondo = $detalle->fondo;
         $monto = json_decode($detalle->detalle)->monto_aprobado;
+        $msg = 'El Saldo del Fondo: '.$fondo->nombre.' '.$fondo->typeMoney->simbolo.' '.$fondo->saldo.' es insuficiente para completar la operación';
         if ( $detalle->idmoneda == $fondo->idtipomoneda )
         {
             if ( $monto > $fondo->saldo )
-                return array( status => warning , description => "El Saldo del Fondo: '".$fondo->nombre." ".$fondo->typeMoney->simbolo." ".$fondo->saldo. " es insuficiente para completar la operación" );
+                return $this->warningException( __FUNCTION__ , $msg );
             else
                 return $this->setRpta($monto);
         }
@@ -59,18 +59,18 @@ class DepositController extends BaseController{
         {
             if ( $detalle->idmoneda == DOLARES )
                 if ( ( $monto*$tc->compra ) > $fondo->saldo )
-                    return array( status => warning , description => "El Saldo del Fondo: '".$fondo->nombre." ".$fondo->typeMoney->simbolo." ".$fondo->saldo. " es insuficiente para completar la operación" );
+                    return $this->warningException( __FUNCTION__ , $msg );
                 else
                     return $this->setRpta($monto*$tc->compra);
             elseif ( $detalle->idmoneda == SOLES)
                 if ( ( $monto/$tc->venta ) > $fondo->saldo )
-                    return array( status => warning , description => "El Saldo del Fondo: '".$fondo->nombre." ".$fondo->typeMoney->simbolo." ".$fondo->saldo. " es insuficiente para completar la operación" ); 
+                    return $this->warningException( __FUNCTION__ , $msg );
                 else
                     return $this->setRpta( $monto/$tc->venta);
             else
-                return array( status => warning , description => "Tipo de Moneda no registrada: ".$detalle->typeMoney->descripcion );
+                return $this->warningException( __FUNCTION__ , 'Tipo de Moneda no registrada: '.$detalle->typeMoney->descripcion );
         }
-        return array( status => warning , description => "No se pudo procesar el fondo de la solicitud");
+        return $this->warningException( __FUNCTION__ , 'No se pudo procesar el fondo de la solicitud');
     }
 
     // IDKC: CHANGE STATUS => DEPOSITADO
@@ -79,10 +79,9 @@ class DepositController extends BaseController{
         try
         {
             DB::beginTransaction();
-            
             $deposit      = Input::all();
-            Log::error($deposit);
             $solicitude   = Solicitude::where('token',$deposit['token'])->firstOrFail();
+            $oldIdestado  = $solicitude->idestado;
             $detalle      = $solicitude->detalle;
             $tc           = ChangeRate::getTc();
             
@@ -91,49 +90,62 @@ class DepositController extends BaseController{
             {
                 $fondo = $detalle->fondo;
                 $fondo->saldo = $fondo->saldo - $middleRpta[data];
-                $fondo->save(); 
-                $row_deposit  = Deposit::find($solicitude->iddeposito);      
-                if( count($row_deposit) > 0 )
-                    return array(status => warning , description => 'El deposito ya ha sido registrado');
+                if ( !$fondo->save() )
+                    return $this->warningException( __FUNCTION__ , 'Cancelado - No se pudo procesar el saldo del fondo' );
                 else
-                {
-                    $bank = Account::find($deposit['idcuenta']);
-                    $jDetalle = json_decode( $detalle->detalle );
-                    if ( is_null( $detalle->idretencion ) )
-                        $monto_deposito = $jDetalle->monto_aprobado;
+                { 
+                    $row_deposit  = Deposit::find($solicitude->iddeposito);      
+                    if( count($row_deposit) > 0 )
+                        return $this->warningException( __FUNCTION__ , 'El deposito ya ha sido registrado');
                     else
-                        $monto_deposito = ( $jDetalle->monto_aprobado - $jDetalle->monto_retencion );
-
-                    if ( $detalle->idmoneda != $bank->idtipomoneda )
                     {
-                        if ( $detalle->idmoneda == SOLES)
-                            $monto_deposito = $monto_deposito/$tc->venta;
-                        elseif ( $detalle->idmoneda == DOLARES )
-                            $monto_deposito = $monto_deposito*$tc->compra;
-                        $jDetalle->tcc = $tc->compra;
-                        $jDetalle->tcv = $tc->venta;
-                    }
-
-                    $newDeposit                     = new Deposit;
-                    $newDeposit->iddeposito         = $newDeposit->lastId() + 1;
-                    $newDeposit->num_transferencia  = $deposit['op_number'];
-                    $newDeposit->idcuenta           = $deposit['idcuenta'];
-                    $newDeposit->total              = $monto_deposito;
-                    if($newDeposit->save())
-                    {   
-                        $solicitude->idestado     = DEPOSITADO;
-                        if ($solicitude->save())
+                        $bank = Account::find($deposit['idcuenta']);
+                        $jDetalle = json_decode( $detalle->detalle );
+                        if ( is_null( $detalle->idretencion ) )
+                            $monto_deposito = $jDetalle->monto_aprobado;
+                        else
+                            if ( $detalle->typeRetention->account->idtipomoneda == $detalle->idmoneda )
+                                $monto_deposito = ( $jDetalle->monto_aprobado - $jDetalle->monto_retencion );
+                            else
+                                if ( $detalle->idmoneda == SOLES )
+                                    $monto_deposito = ( $jDetalle->monto_aprobado / $tc->venta ) - $jDetalle->monto_retencion ;
+                                elseif ( $detalle->idmoneda == DOLARES )
+                                    $monto_deposito = ( $jDetalle->monto_aprobado * $tc->compra ) - $jDetalle->monto_retencion ;
+                        if ( $detalle->idmoneda != $bank->idtipomoneda )
                         {
-                            $detalle->iddeposito = $newDeposit->iddeposito;
-                            $detalle->detalle = json_encode( $jDetalle );
-                            if ($detalle->save())
+                            if ( $detalle->idmoneda == SOLES)
+                                $monto_deposito = $monto_deposito / $tc->venta;
+                            elseif ( $detalle->idmoneda == DOLARES )
+                                $monto_deposito = $monto_deposito * $tc->compra;
+                            $jDetalle->tcc = $tc->compra;
+                            $jDetalle->tcv = $tc->venta;
+                        }
+
+                        $newDeposit                     = new Deposit;
+                        $newDeposit->id                 = $newDeposit->lastId() + 1;
+                        $newDeposit->num_transferencia  = $deposit['op_number'];
+                        $newDeposit->idcuenta           = $deposit['idcuenta'];
+                        $newDeposit->total              = $monto_deposito;
+                        if( !$newDeposit->save() )
+                            return $this->warningException( __FUNCTION__ , 'Cancelado - No se pudo procesar el deposito' );
+                        else
+                        {
+                            $solicitude->idestado     = DEPOSITADO;
+                            if ($solicitude->save())
                             {
-                                $rpta = $this->setStatus( DEPOSITO_HABILITADO, DEPOSITADO, Auth::user()->id, USER_CONTABILIDAD, $solicitude->id );
-                                if ( $rpta[status] == ok )
-                                    DB::commit();
+                                $detalle->iddeposito = $newDeposit->id;
+                                $detalle->detalle = json_encode( $jDetalle );
+                                if ( !$detalle->save() )
+                                    return $this->warningException( __FUNCTION__ , 'Cancelado - No se pudo procesar el detalle de la solicitud');
                                 else
-                                    DB::rollback();
-                                return $this->setRpta();
+                                {
+                                    $rpta = $this->setStatus( $oldIdestado, DEPOSITADO, Auth::user()->id, USER_CONTABILIDAD, $solicitude->id );
+                                    if ( $rpta[status] == ok )
+                                        DB::commit();
+                                    else
+                                        DB::rollback();
+                                    return $this->setRpta();
+                                }
                             }
                         }
                     }      
@@ -165,25 +177,4 @@ class DepositController extends BaseController{
 
     }
 
-    /*public function show_tes()
-    {
-        $state = Session::get('state');
-        $states = StateRange::order();
-        $data = array(
-            'states' => $states,
-            'state' => $state
-        );
-        return View::make('Treasury.show_tes',$data);
-    }*/    
-    /*public function listSolicitudeTes($id)
-    {
-        if ($id == 0) {
-            $solicituds = Solicitude::all();
-        } else {
-
-            $solicituds = Solicitude::whereNotNull('idresponse')->where('estado', '=', APROBADO)->where('asiento','=',ENABLE_DEPOSIT)->get();
-        }
-        $view = View::make('Treasury.view_solicituds_tes')->with('solicituds', $solicituds);
-        return $view;
-    }*/
 }

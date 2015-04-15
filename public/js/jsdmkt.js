@@ -295,7 +295,7 @@ function newSolicitude() {
         var aux = $(this);
         bootbox.dialog(
         {
-            title : '¿Esta seguro que desea cancelar esta solicitud?',
+            title : '<h4>¿Esta seguro que desea cancelar esta solicitud?</h4>',
             message :  '<div class="form-group">' +
                        '<label class="control-label">Observación</label> ' +
                        '<div><textarea class="form-control sol-obs" maxlength="200"></textarea></div>' +
@@ -339,7 +339,7 @@ function newSolicitude() {
                             {
                                 if (data.Status == 'Ok')
                                 {
-                                    bootbox.alert('Solicitud Cancelada' , function()
+                                    bootbox.alert('<h4 class="green">Solicitud Cancelada</h4>' , function()
                                     {    
                                         window.location.href = server+'show_user';
                                     });
@@ -495,31 +495,22 @@ function newSolicitude() {
         }
         else
         {
-            bootbox.confirm(
+            bootbox.confirm('¿Esta seguro que desea rechazar esta solicitud?', function (result) 
             {
-                message : '¿Esta seguro que desea rechazar esta solicitud?',
-                buttons: 
+                if (result) 
                 {
-                    'cancel' :{ label :'cancel' ,className: 'btn-primary'},
-                    'confirm' :{ label :'aceptar' ,className: 'btn-default'}
-                },
-                callback : function (result) 
-                {
-                    if ( result ) 
+                    $.post(server + 'rechazar-solicitud', form_acepted_solicitude.serialize()).done(function(data)
                     {
-                        $.post(server + 'rechazar-solicitud', form_acepted_solicitude.serialize()).done(function(data)
+                        if(data.Status === 'Ok')
                         {
-                            if(data.Status === 'Ok')
+                            bootbox.alert('<h4 style="color: green">Solicitud Rechazada</h4>' , function()
                             {
-                                bootbox.alert('<h4 style="color: green">Solicitud Rechazada</h4>' , function()
-                                {
-                                    window.location.href = server + 'show_user';
-                                });
-                            }
-                            else
-                                bootbox.alert('<h4 style="color: red">' + data.Status + ': '+ data.Description + '</h4>');
-                        });
-                    }
+                                window.location.href = server + 'show_user';
+                            });
+                        }
+                        else
+                            bootbox.alert('<h4 style="color: red">' + data.Status + ': '+ data.Description + '</h4>');
+                    });
                 }
             });
         }
@@ -1952,4 +1943,18 @@ function newSolicitude() {
             });
         },1000);
     }
+
+    /*if ( $("#tcc").length != 0 && $("#tcv").length != 0 )
+    {
+        var tds = $('#table_solicitude tbody tr .deposit');
+        tds.each(function( index)
+        {
+            $(this).split(" ");
+            if ( $(this).find('input[name=mass-aprov]:checked').length != 0 )
+            {
+                sol.token = $(this).find("#sol_token").val();
+                data.sols.push(sol);
+            }
+        });
+    }*/
 }

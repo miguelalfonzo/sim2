@@ -13,7 +13,7 @@
         <tbody>
             @foreach ($docs as $doc)
                 <tr>
-                    <td id="pk" class="col-md-1" style="text-align: center">{{$doc->idcomprobante}}</td>
+                    <td id="pk" class="col-md-1" style="text-align: center">{{$doc->id}}</td>
                     <td id="desc" class="col-md-3" style="text-align: center">{{$doc->descripcion}}</td>
                     <td id="sunat" class="col-md-3" style="text-align: center">{{$doc->cta_sunat}}</td>
                     <td id="marca" class="col-md-2" style="text-align: center">{{$doc->marca}}</td>

@@ -80,7 +80,7 @@
         </label>
         <div class="col-sm-12 col-md-12 col-lg-12">
             <div class="input-group">
-                <span class="input-group-addon">{{$solicitude->detalle->typemoney->simbolo}}</span>
+                <span class="input-group-addon">{{$solicitude->detalle->typeRetention->account->typemoney->simbolo}}</span>
                 <input id="retencion" type="text" value="{{$detalle->monto_retencion}}" class="form-control input-md" readonly>
             </div>
         </div>
@@ -96,11 +96,7 @@
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <div class="input-group">
                 <span class="input-group-addon">{{$solicitude->detalle->typemoney->simbolo}}</span>
-                @if ( is_null($solicitude->detalle->idretencion) )
-                    <input id="depositar" type="text" value="{{$detalle->monto_aprobado}}" class="form-control input-md" readonly>
-                @else
-                    <input id="depositar" type="text" value="{{($detalle->monto_aprobado - $detalle->monto_retencion)}}" class="form-control input-md" readonly>
-                @endif
+                <input id="depositar" type="text" value="{{($deposito)}}" class="form-control input-md" readonly>
             </div>
         </div>
     </div>
@@ -248,10 +244,10 @@
 
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding: 0">
     <!-- Products -->
-    @include('template.view_products')
+    @include('template.Details.products')
 
     <!-- Clients -->
-    @include('template.list_clients')
+    @include('template.Details.clients')
 </div>
 
 <!-- Description Solicitude -->
@@ -265,3 +261,6 @@
         </div>
     </div>
 </div>
+
+<!-- RETENCION -->
+@include('template.Details.retencion')

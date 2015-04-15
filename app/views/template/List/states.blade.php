@@ -4,9 +4,13 @@
     </span>
     @if($solicitude->state->idestado == DERIVADO && Auth::user()->type != GER_PROD )
         <span class="label" style='margin-left:2px ;background-color: {{$solicitude->state->rangeState->color}}'>
-            {{ESTADO_D}}
+            {{ESTADO_DERIVADO}}
         </span>
-    @elseif($solicitude->detalle->idretencion != null && $solicitude->state->rangeState->id == R_REVISADO && ( Auth::user()->type == CONT || Auth::user()->type == TESORERIA ) )
+    @elseif ( $solicitude->idestado == DEPOSITADO && Auth::user()->type == CONT )
+        <span class="label" style='margin-left:2px ;background-color: {{$solicitude->state->rangeState->color}}'>
+            {{ESTADO_DEPOSITADO}}
+        </span>
+    @elseif($solicitude->detalle->idretencion != null && $solicitude->idestado != DEPOSITADO && ( Auth::user()->type == CONT || Auth::user()->type == TESORERIA ) )
         <span class="label" style="margin-left:2px ;background-color:{{$solicitude->state->rangeState->color}}">
         	{{ESTADO_R}}
         </span>        

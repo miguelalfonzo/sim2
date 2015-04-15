@@ -9,8 +9,8 @@ use \Expense\ExpenseItem;
 
 class Expense extends Eloquent {
 
-	protected $table= 'DMKT_RG_GASTOS';
-	protected $primaryKey = 'idgasto';
+	protected $table= 'DMKT_RG_GASTO';
+	protected $primaryKey = 'id';
 
 	public function idSolicitude(){
 		return $this->hasOne('Dmkt\Activity','idsolicitud','idsolicitud');

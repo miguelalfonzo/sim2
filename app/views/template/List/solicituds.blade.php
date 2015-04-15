@@ -3,7 +3,7 @@
         <tr>
             <th>#</th>
             <th>Solicitud</th>
-            <th>Visto Ultimo</th>
+            <th>Visto Ultimo por</th>
             <th>Actualizado el</th>
             @if(Auth::user()->type == TESORERIA)
                 <th style="display:none">Solicitado</th>
@@ -13,7 +13,7 @@
                 <th>Monto</th>
             @endif
             <th>Estado</th>
-            <th>Fecha</th>
+            <th>Fecha de Creación</th>
             <th>Tipo de Solicitud</th>
             <th style="width:auto">Edicion</th>
             @if (Auth::user()->type == GER_COM)
@@ -55,14 +55,22 @@
                     @if ( is_null( $solicitude->detalle->idretencion ) )
                         0
                     @else
-                        {{json_decode($solicitude->detalle->detalle)->monto_retencion}}
+                        {{$solicitude->detalle->typeRetention->account->typeMoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_retencion}}
                     @endif
                     </td>
-                    <td class="text-center">
+                    <td class="text-center deposit">
                         @if ( is_null( $solicitude->detalle->idretencion) )
                             {{$solicitude->detalle->typemoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_aprobado }}
                         @else
-                            {{$solicitude->detalle->typemoney->simbolo.' '.(json_decode($solicitude->detalle->detalle)->monto_aprobado - json_decode($solicitude->detalle->detalle)->monto_retencion)}}
+                            @if ( $solicitude->detalle->typeRetention->account->idtipomoneda == $solicitude->detalle->idmoneda )
+                                {{$solicitude->detalle->typemoney->simbolo.' '.(json_decode($solicitude->detalle->detalle)->monto_aprobado - json_decode($solicitude->detalle->detalle)->monto_retencion)}}
+                            @else
+                                @if ( $solicitude->detalle->idmoneda == SOLES )
+                                    {{$solicitude->detalle->typemoney->simbolo.' '.( json_decode( $solicitude->detalle->detalle )->monto_aprobado - ( json_decode( $solicitude->detalle->detalle )->monto_retencion*$tc->compra ) ) }}    
+                                @elseif ( $solicitude->detalle->idmoneda == DOLARES )
+                                    {{$solicitude->detalle->typemoney->simbolo.' '.( json_decode( $solicitude->detalle->detalle )->monto_aprobado - ( json_decode( $solicitude->detalle->detalle )->monto_retencion/$tc->venta ) ) }}   
+                                @endif
+                            @endif
                         @endif
                     </td>
                 @else

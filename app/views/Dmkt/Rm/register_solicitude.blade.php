@@ -76,10 +76,10 @@
                 <div class="col-sm-12 col-md-12">
                     <select id="" name="type_payment" class="form-control selectTypePayment">
                         @foreach($typePayments as $type)
-                            @if(isset($solicitude) && $solicitude->detalle->idpago == $type->idtipopago)
-                                <option selected value="{{$type->idtipopago}}">{{$type->nombre}}</option>
+                            @if(isset($solicitude) && $solicitude->detalle->idpago == $type->id)
+                                <option selected value="{{$type->id}}">{{$type->nombre}}</option>
                             @else
-                                <option value="{{$type->idtipopago}}">{{$type->nombre}}</option>
+                                <option value="{{$type->id}}">{{$type->nombre}}</option>
                             @endif
                         @endforeach
                     </select>
@@ -96,7 +96,7 @@
                 <label class="col-sm-8 col-md-8 control-label" for="textinput">Nº de Cuenta</label>
                 <div class="col-sm-12 col-md-12">
                     <input id="number_account" class="form-control input-md" name="number_account" type="text"
-                           value="{{isset($detalle->numcuenta) ? $detalle->numcuenta : null }}">
+                           value="{{isset($detalle->num_cuenta) ? $detalle->num_cuenta : null }}">
                 </div>
             </div>
             <div class="form-group col-sm-6 col-md-4">

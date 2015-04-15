@@ -9,6 +9,7 @@ use \Dmkt\SolicitudeGer;
 use \Common\Deposit;
 use \Expense\Entry;
 use \Common\Fondo;
+use \Dmkt\Solicitud\Periodo;
 use \System\SolicitudeHistory;
 
 
@@ -21,3 +22,4 @@ use \System\SolicitudeHistory;
 	Deposit::observe( new Transaction() );
 	Entry::observe( new Transaction() );
 	Fondo::observe( new Transaction() );
+	Periodo::observe( new Transaction() );

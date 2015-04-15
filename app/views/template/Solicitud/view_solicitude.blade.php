@@ -40,27 +40,6 @@
             
                 @include('template.detail_solicitude')
 
-                <!-- RETENCION -->
-                @if( Auth::user()->type == CONT && $solicitude->idestado == APROBADO )
-                <div class="col-sm-12 col-md-12">
-                    <label class="col-sm-12 col-md-12 control-label" for="textinput">Retencion</label>
-                    <div class="col-sm-3 col-md-3">
-                        <select name="retencion" class="form-control">
-                        @foreach($typeRetention as $retention)
-                            <option value="{{$retention->idtiporetencion}}">
-                                {{$retention->descripcion}}
-                            </option>
-                        @endforeach
-                        </select>
-                    </div>
-                    <div class="form-group col-sm-3 col-md-3">
-                        <div class="input-group">
-                            <span class="input-group-addon">{{$solicitude->detalle->typemoney->simbolo}}</span>
-                            <input name="monto_retencion" type="text" class="form-control input-md ret">
-                        </div>
-                    </div>
-                </div> 
-                @endif
                 </section>
 
                 @if ( Auth::user()->type == CONT && $solicitude->idestado == DEPOSITADO )

@@ -13,7 +13,7 @@ class ChangeRate extends Eloquent
         return date_format( date_create( $value ), 'd/m/Y' );
     }
 
-    public static function getTc()
+    protected static function getTc()
     {
         return ChangeRate::where('moneda' , 'DO')->orderBy('fecha','desc')->first();
     }

@@ -6,7 +6,7 @@ use \Eloquent;
 class SolicitudeFamily extends Eloquent
 {
     protected $table = 'DMKT_RG_SOLICITUD_FAMILIA';
-    protected $primaryKey = 'ID';
+    protected $primaryKey = 'id';
 
     public function searchId()
     {

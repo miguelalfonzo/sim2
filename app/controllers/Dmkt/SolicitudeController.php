@@ -160,7 +160,22 @@ class SolicitudeController extends BaseController
             $data['fondos'] = Fondo::gerProdFondos();
         }
         elseif ( Auth::user()->type == TESORERIA && $solicitude->idestado == DEPOSITO_HABILITADO )
+        {
             $data['banks'] = Account::banks();
+            if ( is_null($solicitude->detalle->idretencion) )
+                $data['deposito'] = $detalle->monto_aprobado;
+            else
+                if ( $solicitude->detalle->typeRetention->account->idtipomoneda == $solicitude->detalle->idmoneda )
+                    $data['deposito'] = $detalle->monto_aprobado - $detalle->monto_retencion ;
+                else
+                {
+                    $tc = ChangeRate::getTc();
+                    if ( $solicitude->detalle->idmoneda == SOLES )
+                        $data['deposito'] = $detalle->monto_aprobado - ( $detalle->monto_retencion * $tc->compra );    
+                    elseif ( $solicitude->detalle->idmoneda == DOLARES )
+                        $data['deposito'] = $detalle->monto_aprobado - ( $detalle->monto_retencion / $tc->venta );   
+                }
+        }
         elseif ( Auth::user()->type == CONT && $solicitude->idestado == APROBADO )
             $data['typeRetention'] = TypeRetention::all();
         elseif ( Auth::user()->type == CONT && $solicitude->idestado == DEPOSITADO )
@@ -562,6 +577,8 @@ class SolicitudeController extends BaseController
                 if ($middleRpta[status] == ok)
                 {
                     $data = array( 'solicituds' => $middleRpta[data] );
+                    if ( Auth::user()->type == TESORERIA )
+                        $data['tc'] = ChangeRate::getTc();
                     $view = View::make('template.List.solicituds')->with( $data )->render();
                     $rpta = $this->setRpta($view);
                 }
@@ -627,33 +644,36 @@ class SolicitudeController extends BaseController
         try
         {
             DB::beginTransaction();
-            
-            $inputs                   = Input::all();
+            $inputs = Input::all();
             $rules = array(
                     'idsolicitude'        => 'required|numeric|min:1',
                     'observacion'         => 'required|string|min:1'
             );
             $validator = Validator::make($inputs, $rules);
             if ($validator->fails()) 
-                return array ( status => warning , description => substr($this->msgValidator($validator),0,-1) );
-
-            $id                       = $inputs['idsolicitude'];
-            Log::error($id);
-            $solicitude               = Solicitude::find($id);
-            $solicitude->idestado     = CANCELADO;
-            $solicitude->observacion  = $inputs['observacion'];
-            $solicitude->save();
-            
-            $status                   = $solicitude->idestado;
-            $user_id                  = Auth::user()->id;
-            $rpta = $this->setStatus($status, CANCELADO, $user_id, $user_id, $id);
-            if ( $rpta[status] == ok)
-            {
-                DB::commit();
-                Session::put('state',R_NO_AUTORIZADO);
-            }
+                return $this->warningException( __FUNCTION__ , substr($this->msgValidator($validator),0,-1) );
             else
-                DB::rollback();
+            {
+                $solicitude               = Solicitude::find( $inputs['idsolicitude'] );
+                $oldidestado              = $solicitude->idestado;
+                $solicitude->idestado     = CANCELADO;
+                $solicitude->observacion  = $inputs['observacion'];
+                if ( !$solicitude->save() )
+                    return $this->warningException( __FUNCTION__ , 'No se pudo Cancelar la Solicitud' );
+                else
+                {
+                    $user_id                  = Auth::user()->id;
+                    $rpta = $this->setStatus($oldIdestado, CANCELADO, $user_id, $user_id, $id);
+                    if ( $rpta[status] == ok)
+                    {
+                        DB::commit();
+                        Session::put('state',R_NO_AUTORIZADO);
+                    }
+                    else
+                        DB::rollback();
+                    return $rpta;
+                }
+            }
         }
         catch (Exception $e)
         {
@@ -669,21 +689,20 @@ class SolicitudeController extends BaseController
         try
         {
             DB::beginTransaction();
-            $user = Auth::user();
             $inputs = Input::all();
             $rules = array( 'observacion' => 'required|min:1' );
             $validator = Validator::make($inputs, $rules);
-            if ($validator->fails()) 
+            if ( $validator->fails() ) 
                 return array( status => warning , description => substr( $this->msgValidator($validator) , 0 , -1 ) );
             else
             {    
-                $solicitude = Solicitude::find($inputs['idsolicitude']);
+                $solicitude = Solicitude::find( $inputs['idsolicitude'] );
                 $oldidestado = $solicitude->idestado;
                 $solicitude->observacion = $inputs['observacion'];
                 $solicitude->idestado = RECHAZADO;
                 $solicitude->status = ACTIVE;
                 $solicitude->save();
-                $rpta = $this->setStatus( $oldidestado, RECHAZADO, $user->id,  $solicitude->created_by, $solicitude->id );
+                $rpta = $this->setStatus( $oldidestado, RECHAZADO, Auth::user()->id,  $solicitude->created_by, $solicitude->id );
                 if ( $rpta[status] == ok )
                 {
                     Session::put('state',R_NO_AUTORIZADO);
@@ -737,9 +756,10 @@ class SolicitudeController extends BaseController
 
     public function acceptedSolicitude()
     {
-        DB::beginTransaction();
+        
         try
         {
+            DB::beginTransaction();
             $inputs     = Input::all();   
             $rpta       = array();
             $solicitude = Solicitude::find( $inputs['idsolicitude'] );
@@ -756,22 +776,28 @@ class SolicitudeController extends BaseController
                 $solicitude->status = ACTIVE;
                 $solicitude->iduserasigned = $inputs['idresponsable'];
                 $solicitude->observacion   = $inputs['observacion'];
-                if ( $solicitude->save() )
+                if ( !$solicitude->save() )
+                    return $this->warningException( __FUNCTION__ , 'No se pudo procesar la solicitud' );
+                else
                 {
                     $sol_detalle = $solicitude->detalle;
                     $sol_detalle->idfondo   = $inputs['idfondo'];
                     $detalle = json_decode($solicitude->detalle->detalle);
                     $detalle->monto_aceptado = $inputs['monto'];
                     $sol_detalle->detalle = json_encode($detalle);
-
-                    if ($sol_detalle->save())
+                    Log::error( $inputs);
+                    if ( !$sol_detalle->save() )
+                        return $this->warningException( __FUNCTION , 'No se pudo procesar el detalle de la solicitud' ); 
+                    else
                     {
                         for ($i= 0 ; $i < count($inputs['idfamily']) ; $i++ ) 
                         {
                             $family = SolicitudeFamily::find( $inputs['idfamily'][$i] );
+                            Log::error(json_encode($family));
                             $family->monto_asignado = $inputs['amount_assigned'][$i] ;
-                            $family->save();
-
+                            if ( !$family->save() )
+                                return $this->warningException( __FUNCTION__ , 'No se pudo procesar los montos de las familias' );
+                            Log::error(json_encode($family));
                         }
                         $rpta = $this->finalStatus( $oldidestado , ACEPTADO , USER_GERENTE_COMERCIAL , $solicitude->id , R_APROBADO );
                         if ( $rpta[status] == ok )
@@ -779,7 +805,6 @@ class SolicitudeController extends BaseController
                         else
                             DB::rollback();
                         return $rpta;
-                        
                     }
                 }
             }
@@ -1456,16 +1481,17 @@ class SolicitudeController extends BaseController
             if ($middleRpta[status] == ok)
             {
                 DB::beginTransaction();    
-                $solicitude = Solicitude::find($inputs['idsolicitude']);
+                $solicitude = Solicitude::find( $inputs['idsolicitude'] );
                 $oldidestado = $solicitude->idestado;
                 $solicitude->idestado = GASTO_HABILITADO;
-
-                if ( $solicitude->save() )
+                if ( !$solicitude->save() )
+                    return $this->warningException( __FUNCTION__ , 'No se pudo procesar la solicitud' );
+                else
                 {
-                    for($i=0;$i<count($inputs['number_account']);$i++)
+                    for( $i=0 ; $i < count( $inputs['number_account'] ) ; $i++ )
                     {
                         $tbEntry = new Entry;
-                        $tbEntry->idasiento = $tbEntry->searchId()+1;
+                        $tbEntry->id = $tbEntry->searchId()+1;
                         $tbEntry->num_cuenta = $inputs['number_account'][$i];
                         $tbEntry->fec_origen = $solicitude->created_at;
                         $tbEntry->d_c = $inputs['dc'][$i];
@@ -1473,18 +1499,19 @@ class SolicitudeController extends BaseController
                         $tbEntry->leyenda = trim($inputs['leyenda']);
                         $tbEntry->idsolicitud = $inputs['idsolicitude'];
                         $tbEntry->tipo_asiento = TIPO_ASIENTO_ANTICIPO;
-                        $tbEntry->save();
+                        if ( !$tbEntry->save() )
+                            return $this->warningException( __FUNCTION__ , 'No se pudo procesar el asiento N°: '.( $i+1 ) );
                     }
                     $middleRpta = $this->setStatus( $oldidestado, GASTO_HABILITADO, Auth::user()->id, $solicitude->iduserasigned,$solicitude->id );         
                     if ($middleRpta[status] == ok)
                     {
-                        Session::put('state',R_REVISADO);
+                        Session::put( 'state' , R_GASTO );
                         DB::commit();
-                        return $middleRpta;
                     }
+                    else
+                        DB::rollback();
+                    return $middleRpta;
                 }
-                else
-                    return array( status => warning , description => 'No se pudo actualizar la solicitud');
             }
         }
         catch (Exception $e)
@@ -1537,32 +1564,35 @@ class SolicitudeController extends BaseController
         {
             DB::beginTransaction();
             $inputs = Input::all();
-            Log::error($inputs);
-            $id = $inputs['idsolicitude'];
-            $solicitude = Solicitude::find($id);
-            $idAprobado = $solicitude->updated_by;
+            $solicitude = Solicitude::find( $inputs['idsolicitude'] );
             $solicitude->idestado = DEPOSITO_HABILITADO;
-            if ($solicitude->save())
+            $oldIdestado = $solicitude->idestado ;
+            if ( !$solicitude->save())
+                return $this->warningException( __FUNCTION__ , 'Cancelado - No se pudo procesar la Solicitud' );
+            else
             {
                 $val_ret = $inputs['monto_retencion'];
                 if ( !empty( trim( $val_ret ) ) )
                 {
-                    if ( !is_numeric($val_ret) )
-                        return array ( status => warning , description => 'La retencion debe ser un valor Númerico');
-                    elseif ( $val_ret <= 0)    
-                        return array ( status => warning , description => 'La retencion debe ser mayor que 0');
+                    if ( !is_numeric( $val_ret ) )
+                        return $this->warningException( __FUNCTION__ , 'La retencion debe ser un valor Númerico' );
+                    elseif ( $val_ret <= 0 )    
+                        return $this->warningException( __FUNCTION__ , 'La retencion debe ser mayor que 0' );
+                    elseif ( empty( trim( $inputs['idretencion'] ) ) )
+                        return $this->warningException( __FUNCTION__ , 'No se encontro el tipo de retencion a registrar' );
                     else 
                     {
-                        $sol_detalle = SolicitudeDetalle::find($solicitude->iddetalle);
+                        $sol_detalle = $solicitude->detalle;
+                        Log::error(json_encode($sol_detalle));
                         $sol_detalle->idretencion = $inputs['idretencion'];
-                        $detalle = json_decode($sol_detalle->detalle);
-                        $detalle->monto_retencion = $val_ret;
-                        $sol_detalle->detalle = json_encode($detalle);
+                        $jDetalle = json_decode($sol_detalle->detalle);
+                        $jDetalle->monto_retencion = $val_ret;
+                        $sol_detalle->detalle = json_encode($jDetalle);
                         if ( !$sol_detalle->save() )
-                            return array ( status => warning , description => 'Cancelado: No se pudo registrar la retencion');
+                            return $this->warningException( __FUNCTION__ , 'Cancelado - No se pudo registrar la retencion' );
                     }
                 }
-                $rpta = $this->setStatus($solicitude->idestado, DEPOSITO_HABILITADO, Auth::user()->id, USER_TESORERIA , $solicitude->id);
+                $rpta = $this->setStatus( $oldIdestado, DEPOSITO_HABILITADO, Auth::user()->id, USER_TESORERIA , $solicitude->id);
                 if ($rpta[status] == ok)
                 {
                     Session::put('state',R_REVISADO);
@@ -1570,19 +1600,14 @@ class SolicitudeController extends BaseController
                 }
                 else
                     DB::rollback();
-            }
-            else
-            {
-                DB::rollback();
-                $rpta = array(status => warning , description => 'Cancelado: No se pudo registrar la información');
+                return $rpta;
             }
         }
         catch (Exception $e)
         {
             DB::rollback();
-            $rpta = $this->internalException($e,__FUNCTION__);
+            return $this->internalException($e,__FUNCTION__);
         }
-        return $rpta;
     }
 
     /** ---------------------------  Asistente de  Gerencia  ---------------------------- **/

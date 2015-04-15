@@ -23,7 +23,7 @@ class Account extends Eloquent
 
     protected function typeMoney()
     {
-        return $this->hasOne('Common\TypeMoney','idtipomoneda','idtipomoneda');
+        return $this->hasOne('Common\TypeMoney','id','idtipomoneda');
     }
 
     public static function banks()

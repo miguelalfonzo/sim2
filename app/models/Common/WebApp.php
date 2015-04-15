@@ -12,7 +12,7 @@ use \Eloquent;
 class WebApp extends Eloquent {
 
     protected $table = 'APPS';
-    protected $primaryKey = 'IDAPP';
+    protected $primaryKey = 'idapp';
 
 
 

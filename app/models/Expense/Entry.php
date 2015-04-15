@@ -6,17 +6,17 @@ use \Eloquent;
 
 class Entry extends Eloquent
 {
-    protected $table= 'DMKT_RG_ASIENTOS';
-    protected $primaryKey = 'idasiento';
+    protected $table= 'DMKT_RG_ASIENTO';
+    protected $primaryKey = 'id';
     protected $dates = ['fec_origen'] ;
     
     public function searchId()
     {
-        $lastId = Entry::orderBy('idasiento', 'DESC')->first();
+        $lastId = Entry::orderBy('id', 'DESC')->first();
         if($lastId == null)
             return 0;
         else
-            return $lastId->idasiento;
+            return $lastId->id;
     }
 
 }

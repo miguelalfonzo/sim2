@@ -12,7 +12,7 @@ use \Eloquent;
 class SolicitudeGer extends Eloquent{
 
     protected $table = 'DMKT_RG_SOLICITUD_GERENTE';
-    protected $primaryKey = 'ID';
+    protected $primaryKey = 'id';
 
     function searchId(){
         $lastId = SolicitudeGer::orderBy('id', 'DESC')->first();

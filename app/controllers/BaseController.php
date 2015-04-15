@@ -5,7 +5,6 @@ use \User;
 use \Common\State;
 use \Dmkt\Solicitude;
 use \Swift_TransportException;
-use Dmkt\FondoInstitucional;
 
 class BaseController extends Controller {
 

@@ -1389,12 +1389,12 @@ $(function(){
             
             $("#sol-titulo").val(sol_titulo);
             $("#tes-mon-sol").val(total_deposit[0] + " " + total_deposit[1]);
-            $("#tes-mon-ret").val(total_deposit[0] + " " + retencion);
+            $("#tes-mon-ret").val(retencion);
             $("#id-solicitude").text(id_sol);
             $("input[name=token]").val(token);
             $(".register-deposit").attr("data-deposit",tr.attr("sol-type"));
             $("#beneficiario").val(beneficiario);
-            $("#total-deposit").val(total_deposit[0] + " " + (total_deposit[1] - retencion));
+            $("#total-deposit").val( tr.find('.deposit').text().trim() );
             $('#enable_deposit_Modal').modal();
         });
         

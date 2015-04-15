@@ -4,7 +4,6 @@ namespace Expense;
 
 use \Auth;
 use \BaseController;
-use Dmkt\FondoInstitucional;
 use \View;
 use \Dmkt\Activity;
 use \Dmkt\Solicitude;
@@ -90,7 +89,7 @@ class ExpenseController extends BaseController
         $date        = $this->getDay();
         $typeProof   = ProofType::all();
         $typeExpense = ExpenseType::orderBy('idtipogasto','asc')->get();
-        $fondo       = FondoInstitucional::where('token',$token)->firstOrFail();
+        //$fondo       = FondoInstitucional::where('token',$token)->firstOrFail();
         $expense     = Expense::where('idfondo',$fondo->idfondo)->get();
         
         $balance     = $fondo->total;
@@ -397,7 +396,7 @@ class ExpenseController extends BaseController
 	}
 
     public function finishExpenseFondo($idfondo){
-        $fondo = FondoInstitucional::where('idfondo',$idfondo)->update(array('registrado'=>1));
+        //$fondo = FondoInstitucional::where('idfondo',$idfondo)->update(array('registrado'=>1));
         $states = State::orderBy('idestado', 'ASC')->get();
         return Redirect::to('show_user')->with('states', $states);
     }
@@ -523,7 +522,7 @@ class ExpenseController extends BaseController
 	}
     public function reportExpenseFondo($token){
 
-        $fondo = FondoInstitucional::where('token',$token)->firstOrFail();
+        //$fondo = FondoInstitucional::where('token',$token)->firstOrFail();
         $expense = Expense::where('idfondo',$fondo->idfondo)->get();
         $data = array(
             'fondo'    => $fondo,

@@ -34,7 +34,7 @@ class Fondo extends Eloquent {
 
     protected function typeMoney()
     {
-        return $this->hasOne('Common\TypeMoney','idtipomoneda','idtipomoneda');
+        return $this->hasOne('Common\TypeMoney','id','idtipomoneda');
     }
 
     protected function account()

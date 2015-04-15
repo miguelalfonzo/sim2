@@ -6,7 +6,7 @@ use \Eloquent;
 class Manager extends Eloquent{
 
     protected $table = 'GERENTES';
-    protected $primaryKey = 'ID';
+    protected $primaryKey = 'id';
 
     public function solicituds(){
 

@@ -11,6 +11,6 @@ class UserApp extends Eloquent{
 
 
     protected $table = 'USER_APP';
-    protected $primaryKey = 'ID';
+    protected $primaryKey = 'id';
 
 }

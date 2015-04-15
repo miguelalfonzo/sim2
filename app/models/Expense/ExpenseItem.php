@@ -6,9 +6,9 @@ use \Eloquent;
 
 class ExpenseItem extends Eloquent{
 
-    protected $table= 'DMKT_RG_GASTOS_ITEM';
-    protected $primaryKey = null;
-    public $incrementing = false;
+    protected $table= 'DMKT_RG_GASTO_ITEM';
+    protected $primaryKey = 'id';
+    
 
     function idExpenseType(){
 		return $this->hasOne('ExpenseType','idtipogasto','tipo_gasto');

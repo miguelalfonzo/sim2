@@ -8,7 +8,7 @@ use \Dmkt\Solicitude;
 class Deposit extends Eloquent{
 
 	protected $table = 'DMKT_RG_DEPOSITO';
-	protected $primaryKey = 'iddeposito';
+	protected $primaryKey = 'id';
 	
 
 	public function iddeposit()
@@ -17,11 +17,11 @@ class Deposit extends Eloquent{
 	}
 
 	public function lastId(){
-		$lastId = Deposit::orderBy('iddeposito','desc')->first();
+		$lastId = Deposit::orderBy('id','desc')->first();
 		if($lastId == null){
             return 0;
         }else{
-            return $lastId->iddeposito;
+            return $lastId->id;
         }
 	}
 

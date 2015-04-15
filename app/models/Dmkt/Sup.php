@@ -11,7 +11,7 @@ class Sup extends Eloquent{
 
 
     protected $table = 'DMKT_RG_SUPERVISOR';
-    protected $primaryKey = 'IDSUP';
+    protected $primaryKey = 'idsup';
 
 
     function searchId(){
