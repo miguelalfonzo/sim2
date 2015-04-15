@@ -29,10 +29,8 @@ use \User;
 use \Validator;
 use \View;
 use \Common\StateRange;
-use \Dmkt\Label;
-use \Dmkt\Account;
-use \Dmkt\SolicitudeDetalle;
 use \Expense\ChangeRate;
+use \Common\TypeMoney;
 
 class SolicitudeController extends BaseController
 {
@@ -40,14 +38,6 @@ class SolicitudeController extends BaseController
     {
         parent::__construct();
         $this->beforeFilter('active-user');
-    }
-
-    private function getDay(){
-        $currentDate = getdate();
-        $toDay = $currentDate['mday']."/".str_pad($currentDate['mon'],2,'0',STR_PAD_LEFT)."/".$currentDate['year'];
-        $lastDay = '06/'.str_pad(($currentDate['mon']+1),2,'0',STR_PAD_LEFT).'/'.$currentDate['year'];
-        $date = ['toDay'=>$toDay,'lastDay'=> $lastDay];
-        return $date;
     }
 
     function objectToArray($object)
@@ -113,19 +103,72 @@ class SolicitudeController extends BaseController
 
     public function newSolicitude()
     {
-        $families = Marca::orderBy('descripcion', 'Asc')->get();
-        $typePayments = TypePayment::all();
-        $fondos = Fondo::all();
         $typesolicituds = TypeSolicitude::all();
-        $label = Label::orderBy('id','asc')->get();
+        $etiquetas = Label::orderBy('id','asc')->get();
+        $typePayments = TypePayment::all();
+        $typesMoney = TypeMoney::all();
+        $families = Marca::orderBy('descripcion', 'Asc')->get();
         $data = array(
-            'etiquetas'       => $label,
-            'families'       => $families,
-            'fondos'         => $fondos,
             'typesolicituds' => $typesolicituds,
-            'typePayments'   => $typePayments
+            'etiquetas'      => $etiquetas,
+            'typePayments'   => $typePayments,
+            'typesMoney'     => $typesMoney,
+            'families'       => $families
         );
         return View::make('Dmkt.Rm.register_solicitude', $data);
+    }
+
+    public function editSolicitude($token)
+    {
+        $solicitude = Solicitude::where('token', $token)->firstOrFail();
+        $detalle = json_decode($solicitude->detalle->detalle);
+        $typesolicituds = TypeSolicitude::all();
+        $etiquetas = Label::all();
+        $typePayments = TypePayment::all();
+        $typeMoney = TypeMoney::all();
+        $families = Marca::orderBy('descripcion', 'ASC')->get();
+        $data = array(
+            'solicitude'       => $solicitude,
+            'detalle'          => $detalle,
+            'typesolicituds'   => $typesolicituds,
+            'etiquetas'        => $etiquetas,
+            'typePayments'     => $typePayments,
+            'typesMoney'       => $typeMoney,
+            'families'         => $families
+        );
+        return View::make('Dmkt.Rm.register_solicitude', $data);
+    }
+
+    public function viewSolicitude($token)
+    {
+        $solicitude = Solicitude::where('token', $token)->firstOrFail();
+        $detalle = json_decode($solicitude->detalle->detalle);
+        $data = array(
+            'solicitude' => $solicitude,
+            'detalle'    => $detalle
+        );
+        if ( Auth::user()->type == SUP && $solicitude->idestado == PENDIENTE )
+        {
+            $solicitude->status = BLOCKED;
+            $solicitude->save();
+            $data['fondos'] = Fondo::supFondos();
+            $data['solicitude']->status = 1;
+        }
+        elseif ( Auth::user()->type == GER_PROD && $solicitude->idestado == DERIVADO )
+        {
+            $data['solicitude']->status = 1;
+            $data['fondos'] = Fondo::gerProdFondos();
+        }
+        elseif ( Auth::user()->type == TESORERIA && $solicitude->idestado == DEPOSITO_HABILITADO )
+            $data['banks'] = Account::banks();
+        elseif ( Auth::user()->type == CONT && $solicitude->idestado == APROBADO )
+            $data['typeRetention'] = TypeRetention::all();
+        elseif ( Auth::user()->type == CONT && $solicitude->idestado == DEPOSITADO )
+        {
+            $data['date'] = $this->getDay();
+            $data['lv'] = $this->textLv($solicitude);
+        }
+        return View::make('template.Solicitud.view_solicitude', $data);
     }
 
     // IDKC: CHANGE STATUS => PENDIENTE
@@ -286,140 +329,212 @@ class SolicitudeController extends BaseController
         return $rpta;
     }
 
+    private function unsetPago( $jDetalle , $typePayment , $ruc , $account )
+    {
+        try
+        {
+            if ($typePayment == 1) 
+            {
+                unset($jDetalle->numruc);
+                unset($jDetalle->numcuenta);
+            } 
+            else if ($typePayment == 2) 
+            {
+                $jDetalle->numruc = $ruc;
+                unset($jDetalle->numcuenta);
+            } 
+            else if ($typePayment == 3) 
+            {
+                $jDetalle->numcuenta = $account;
+                unset($jDetalle->numruc);
+            }
+            return $this->setRpta( $jDetalle );
+        }
+        catch ( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__);
+        }
+
+    }
+
+    private function unsetImage( $oldType , $jDetalle , $typeSolicitude , $image , $factura)
+    {
+        try
+        {
+            if ( ( $typeSolicitude == 1 || $typeSolicitude == 3 ) && $oldType == 2 ) 
+            {
+                $path = public_path('img/reembolso/' . $jDetalle->image);
+                @unlink($path);
+                unset($jDetalle->monto_factura);
+                unset($jDetalle->image);
+            }
+            elseif ( $typeSolicitude == 2 )
+            {
+                if ( $oldType == 2 )
+                {
+                    if ( is_object( $image ) )
+                    {
+                        $path = public_path('img/reembolso/' . $jDetalle->image);
+                        @unlink($path);
+                        $filename = uniqid() . '.' . $image->getClientOriginalExtension();
+                        $path = public_path('img/reembolso/' . $filename);
+                        Image::make($image->getRealPath())->resize(800, 600)->save($path);
+                        $jDetalle->image = $filename;
+                    }
+                    $jDetalle->monto_factura = $factura;  
+                }
+                else
+                {
+                    Log::error( $image);
+                    Log::error( gettype( $image) );
+                    if ( !is_object( $image ) )
+                        return $this->warningException(__FUNCTION__,'No ha ingresado la imagen de la Factura');
+                    else
+                    {
+                        $filename = uniqid() . '.' . $image->getClientOriginalExtension();
+                        $path = public_path('img/reembolso/' . $filename);
+                        Image::make($image->getRealPath())->resize(800, 600)->save($path);
+                        $jDetalle->image = $filename;
+                        $jDetalle->monto_factura = $factura;  
+                    }       
+                }
+            }
+            return $this->setRpta($jDetalle);
+        }
+        catch ( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__);
+        }
+    }
+
+    private function setClients( $idSolicitud , $clients , $tables )
+    {
+        try
+        {
+            $clients = explode(',',$clients[0]);
+            $tables = explode(',',$tables[0]);    
+            if ( count($clients) != count($tables) )
+            {
+                return $this->warningException(__FUNCTION__,'El numero de clientes no coincide con el repositorio');
+            }
+            else
+            { 
+                SolicitudeClient::where('idsolicitud' , $idSolicitud )->delete();
+                for ($i=0;$i< count($clients);$i++) 
+                {        
+                    $client = new SolicitudeClient;
+                    $client->id = $client->searchId() + 1;
+                    $client->idsolicitud = $idSolicitud;
+                    $client->idcliente = $clients[$i];
+                    $client->from_table = $tables[$i];
+                    if ( !$client->save() )
+                        return $this->warningException(__FUNCTION__,'No se pudo procesar a los clientes de la solicitud');
+                }
+                return $this->setRpta();
+            }
+        }
+        catch ( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }                    
+    }
+
+    private function setFamilies( $idSolicitud , $families )
+    {
+        try
+        {
+            SolicitudeFamily::where( 'idsolicitud' , $idSolicitud )->delete();
+            foreach ($families as $idFamily) 
+            {
+                $family = new SolicitudeFamily;
+                $family->id = $family->searchId() + 1;
+                $family->idsolicitud = $idSolicitud;
+                $family->idfamilia = $idFamily;
+                if( !$family->save() )
+                    return $this->warningException(__FUNCTION__,'No se pudo procesar los productos de la solicitud');
+                Log::error( json_encode($family));
+            }
+            return $this->setRpta();
+        }
+        catch ( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
+    }
+
     public function formEditSolicitude()
     {
         try
         {
             DB::beginTransaction();
-            $inputs = Input::all();
-            
-            $date = $inputs['delivery_date'];
-            list($d, $m, $y) = explode('/', $date);
+            $inputs = Input::all();  
+            list($d, $m, $y) = explode('/', $inputs['delivery_date'] );
             $d = mktime(11, 14, 54, $m, $d, $y);
             $date = date("Y/m/d", $d);
             
-            $id = $inputs['idsolicitude'];
-            $sol          = Solicitude::find($id);
-            
-            $sol_detalle  = SolicitudeDetalle::find($sol->iddetalle);
-            
-            $solicitude   = Solicitude::find($id);
-            $image        = Input::file('file');
-            $detalle      = json_decode($sol_detalle->detalle);
-            
-            $solicitude->titulo         =  $inputs['titulo'];
-            $solicitude->descripcion    =  $inputs['description'];
-            $solicitude->idetiqueta     =  $inputs['etiqueta'];
-            
-            $detalle->monto_solicitado  =  $inputs['monto'];
-            $detalle->fecha_entrega     =  $date;
-            
-            
-            $typePayment    = $inputs['type_payment'];
-            $typeSolicitude = $inputs['type_solicitude'];
-
-            if ( $sol->detalle->idmotivo == 2 && ( $typeSolicitude == 1 || $typeSolicitude == 3 ) ) 
-            {
-                $path = public_path('img/reembolso/' . $sol->image);
-                @unlink($path);
-                unset($detalle->monto_factura);
-                unset($detalle->image);
-            }
-            elseif ( $typeSolicitude == 2 )
-            {
-                if (isset($image))
-                {
-                    $path = public_path('img/reembolso/' . $sol->image);
-                    @unlink($path);
-                    $filename = uniqid() . '.' . $image->getClientOriginalExtension();
-                    $path = public_path('img/reembolso/' . $filename);
-                    Image::make($image->getRealPath())->resize(800, 600)->save($path);
-                    $detalle->image = $filename;
-                }
-                $detalle->monto_factura = $inputs['amount_fac'];
-            }
-            if ($typePayment == 1) 
-            {
-                unset($detalle->numruc);
-                unset($detalle->numcuenta);
-            } 
-            else if ($typePayment == 2) 
-            {
-                $detalle->numruc = $inputs['ruc'];
-                unset($detalle->numcuenta);
-            } 
-            else if ($typePayment == 3) 
-            {
-                $detalle->numcuenta = $inputs['number_account'];
-                unset($detalle->numruc);
-            }
-            $sol_detalle->detalle = json_encode($detalle);
-            
-            $solicitude->save();
-
-            $sol_detalle->idmotivo      =  $inputs['type_solicitude'];
-            $sol_detalle->idpago        =  $inputs['type_payment'];
-            $sol_detalle->idmoneda      = $inputs['money'];
-            
-            $detail    = SolicitudeDetalle::find($sol->iddetalle);
-            $detail->idmoneda = $inputs['money'];
-            $detail->idpago  = $inputs['type_payment'];
-            $detail->idmotivo = $inputs['type_solicitude'];
-            $detail->detalle = json_encode($detalle);
-            $detail->save();
-            
-
-            SolicitudeClient::where('idsolicitud', '=', $id)->delete();
-            SolicitudeFamily::where('idsolicitud', '=', $id)->delete();
-            $clients = $inputs['clients'];
-            $tables = $inputs['tables'];
-            $clients = explode(',',$inputs['clients'][0]);
-            $tables = explode(',',$inputs['tables'][0]);
-             
-            for ($i=0;$i< count($clients);$i++) 
-            {        
-                $solicitude_clients = new SolicitudeClient;
-                $solicitude_clients->id = $solicitude_clients->searchId() + 1;
-                $solicitude_clients->idsolicitud = $id;
-                $solicitude_clients->idcliente = $clients[$i];
-                $solicitude_clients->from_table = $tables[$i];
-                $solicitude_clients->save();
-            }
-            $families = $inputs['families'];
-            foreach ($families as $family) 
-            {
-                $solicitude_families = new SolicitudeFamily;
-                $solicitude_families->id = $solicitude_families->searchId() + 1;
-                $solicitude_families->idsolicitud = $id;
-                $solicitude_families->idfamilia = $family;
-                $solicitude_families->save();
-            }
-            $typeUser = Auth::user()->type;
-            $iduser_to = 0;
-            if ($typeUser == REP_MED)
-            {
-                $toUserId = Rm::where('iduser',Auth::user()->id)->first();
-                $toUserId = $toUserId->rmSup->iduser;
-            }
-            elseif ($typeUser == SUP)
-            {
-                $toUserId = Auth::user()->id;
-            }
-            $rpta = $this->setStatus(0, PENDIENTE, Auth::user()->id, $toUserId, $inputs['idsolicitude']);
-            if ($rpta[status] = ok)
-            {         
-                $rpta = $this->setRpta($typeUser);
-                DB::commit();
-            }
+            $solicitud   = Solicitude::find( $inputs['idsolicitude'] );
+            $solicitud->titulo         =  $inputs['titulo'];
+            $solicitud->descripcion    =  $inputs['description'];
+            $solicitud->idetiqueta     =  $inputs['etiqueta'];
+            if ( !$solicitud->save() )
+                return array( status => warning , description => 'No se pudo procesar la solicitud');
             else
-                DB::rollback();
+            {
+                $typeSol = $inputs['type_solicitude'];
+
+                $detalle  = $solicitud->detalle;
+                $jDetalle = json_decode( $detalle->detalle );
+                $jDetalle->monto_solicitado  =  $inputs['monto'];
+                $jDetalle->fecha_entrega     =  $date;  
+            
+                $middleRpta = $this->unsetImage( $detalle->idmotivo , $jDetalle , $typeSol , Input::file('file') , $inputs['amount_fac'] );    
+                if ( $middleRpta[status] == ok )
+                {
+                    $middleRpta = $this->unsetPago( $middleRpta[data] , $inputs['type_payment'] , $inputs['ruc'] , $inputs['number_account'] );
+                    if ( $middleRpta[status] == ok )
+                    {
+                        $detalle->detalle = json_encode( $middleRpta[data] );
+                        $detalle->idmotivo      =  $typeSol;
+                        $detalle->idpago        =  $inputs['type_payment'];
+                        $detalle->idmoneda      =  $inputs['money'];
+                        if (!$detalle->save() )
+                            return array( status => warning , description => 'No se pudo procesar los detalles de la solicitud' );
+                        else
+                        {
+                            $middleRpta = $this->setClients( $solicitud->id , $inputs['clients'] , $inputs['tables'] );
+                            if ( $middleRpta[status] == ok )
+                            {
+                                $middleRpta = $this->setFamilies( $solicitud->id , $inputs['families'] );
+                                if ( $middleRpta[status] == ok )
+                                {
+                                    Log::error('ertyu');
+                                    $typeUser = Auth::user()->type;
+                                    if ($typeUser == REP_MED)
+                                    {
+                                        $toUserId = Rm::where('iduser',Auth::user()->id)->first();
+                                        $toUserId = $toUserId->rmSup->iduser;
+                                    }
+                                    elseif ($typeUser == SUP)
+                                        $toUserId = Auth::user()->id;
+                                    $middleRpta = $this->setStatus(0, PENDIENTE, Auth::user()->id, $toUserId, $inputs['idsolicitude']);
+                                    if ( $middleRpta[status] == ok)     
+                                        DB::commit();
+                                    else
+                                        DB::rollback();
+                                    return $middleRpta;
+                                }
+                            }   
+                        }
+                    }
+                }
+            }
         }
         catch(Exception $e)
         {
             DB::rollback();
-            $rpta = $this->internalException($e,__FUNCTION__);
+            return $this->internalException($e,__FUNCTION__);
         }
-        return $rpta;
+        return $middleRpta;
     }
 
     public function searchDmkt()
@@ -447,7 +562,7 @@ class SolicitudeController extends BaseController
                 if ($middleRpta[status] == ok)
                 {
                     $data = array( 'solicituds' => $middleRpta[data] );
-                    $view = View::make('template.solicituds')->with( $data )->render();
+                    $view = View::make('template.List.solicituds')->with( $data )->render();
                     $rpta = $this->setRpta($view);
                 }
                 else
@@ -460,37 +575,7 @@ class SolicitudeController extends BaseController
         return $rpta;
     }
 
-    public function viewSolicitude($token)
-    {
-        $solicitude = Solicitude::where('token', $token)->firstOrFail();
-        $detalle = json_decode($solicitude->detalle->detalle);
-        $data = array(
-            'solicitude' => $solicitude,
-            'detalle'    => $detalle
-        );
-        if ( Auth::user()->type == SUP && $solicitude->idestado == PENDIENTE )
-        {
-            $solicitude->status = BLOCKED;
-            $solicitude->save();
-            $data['fondos'] = Fondo::supFondos();
-            $data['solicitude']->status = 1;
-        }
-        elseif ( Auth::user()->type == GER_PROD && $solicitude->idestado == DERIVADO )
-        {
-            $data['solicitude']->status = 1;
-            $data['fondos'] = Fondo::gerProdFondos();
-        }
-        elseif ( Auth::user()->type == TESORERIA && $solicitude->idestado == DEPOSITO_HABILITADO )
-            $data['banks'] = Account::banks();
-        elseif ( Auth::user()->type == CONT && $solicitude->idestado == APROBADO )
-            $data['typeRetention'] = TypeRetention::all();
-        elseif ( Auth::user()->type == CONT && $solicitude->idestado == DEPOSITADO )
-        {
-            $data['date'] = $this->getDay();
-            $data['lv'] = $this->textLv($solicitude);
-        }
-        return View::make('Dmkt.Rm.view_solicitude', $data);
-    }
+    
 
 
     private function textLv( $solicitude )
@@ -526,36 +611,6 @@ class SolicitudeController extends BaseController
             array_push($clientes,$nom);
         }
         return implode(',',$clientes);
-    }
-    
-
-    public function editSolicitude($token)
-    {
-        $families = Marca::orderBy('descripcion', 'Asc')->get();
-        $solicitude = Solicitude::where('token', $token)->firstOrFail();
-        $detalle = json_decode($solicitude->detalle->detalle);
-        $id = $solicitude->id;
-        $clients = SolicitudeClient::where('idsolicitud', $id)->lists('idcliente');
-
-        $clients = Client::whereIn('clcodigo', $clients)->get(array('clcodigo', 'clnombre'));
-        $families2 = SolicitudeFamily::where('idsolicitud', $id)->lists('idfamilia');
-        $families2 = Marca::whereIn('id', $families2)->get(array('id', 'descripcion'));
-        $typesolicituds = TypeSolicitude::all();
-        $typePayments = TypePayment::all();
-        $etiqueta = Label::all();
-        $fondos = Fondo::all();
-        $data = array(
-            'etiquetas'        => $etiqueta,
-            'detalle'          => $detalle,
-            'solicitude'       => $solicitude,
-            'clients'          => $clients,
-            'families'         => $families,
-            'families2'        => $families2,
-            'typesolicituds'   => $typesolicituds,
-            'fondos'           => $fondos,
-            'typePayments'     => $typePayments
-        );
-        return View::make('Dmkt.Rm.register_solicitude', $data);
     }
 
     // IDKC: CHANGE STATUS => CANCELADO
@@ -593,7 +648,10 @@ class SolicitudeController extends BaseController
             $user_id                  = Auth::user()->id;
             $rpta = $this->setStatus($status, CANCELADO, $user_id, $user_id, $id);
             if ( $rpta[status] == ok)
+            {
                 DB::commit();
+                Session::put('state',R_NO_AUTORIZADO);
+            }
             else
                 DB::rollback();
         }
@@ -602,16 +660,8 @@ class SolicitudeController extends BaseController
             DB::rollback();
             $rpta = $this->internalException($e,__FUNCTION__);
         }
-        Session::put('state',R_NO_AUTORIZADO);
         return $rpta;
     }
-
-    /*public function subtypeactivity($id)
-    {
-        $subtypeactivities = Fondo::where('idtipoactividad', $id)->get();
-        return json_encode($subtypeactivities);
-    }*/
-
 
     // IDKC: CHANGE STATUS => RECHAZADO
     public function denySolicitude()

@@ -10,21 +10,10 @@
                 </a>
             </li>
             @if ( in_array( Auth::user()->type , array (REP_MED, SUP ) ) )
-            <!-- <li>
-                <a href="#new-solicitud" role="tab" data-toggle="tab">
-                    <i class="fa fa-user"></i>
-                    Nueva Solicitud
-                </a>
-            </li> -->
+            
             @endif
             @include('template.li_estado_cuenta')
             @if ( Auth::user()->type == REP_MED || Auth::user()->type == CONT || Auth::user()->type == TESORERIA)
-                <!-- <li>
-                    <a href="#fondos" role="tab" data-toggle="tab">
-                        <i class="fa fa-user"></i>
-                        Fondos Institucionales
-                    </a>
-                </li> -->
                 @if( Auth::user()->type == CONT)
                     <li>
                         <a href="#mantenimiento" role="tab" data-toggle="tab">

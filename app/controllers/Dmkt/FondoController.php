@@ -16,12 +16,11 @@ use \Auth;
 use \Validator;
 use \Excel;
 use \Common\Fondo;
-use \Dmkt\Account;
 use \Expense\Entry;
-use \Dmkt\FondoInstitucional;
 use \Log;
 use \Expense\ProofType;
 use \Exception;
+use Dmkt\Solicitud\Periodo;
 
 class FondoController extends BaseController
 {
@@ -37,9 +36,8 @@ class FondoController extends BaseController
     
     function getRegister()
     {
-        $cuenta  = Fondo::where('cuenta_mkt',CTA_FONDO_INSTITUCIONAL)->firstOrFail();
-        Log::error($cuenta);
-        return View::make('Dmkt.AsisGer.register_fondo')->with('cuenta', $cuenta);
+        $fondos  = Fondo::where('idusertype', ASIS_GER )->get();
+        return View::make('Dmkt.AsisGer.register_fondo')->with('fondos', $fondos);
     }
     
     public function postRegister()
@@ -49,53 +47,74 @@ class FondoController extends BaseController
             DB::beginTransaction();
             $inputs = Input::all();
             $periodo = $this->period($inputs['mes']);
-            $verifyMonth = FondoInstitucional::where('periodo', $periodo)->where('terminado', TERMINADO)->get();
-            if(count($verifyMonth) != 0)
-                return array(status => warning , description => 'El periodo ingresado ya ha sido terminado');
-            $cuenta = Fondo::where('cuenta_mkt',CTA_FONDO_INSTITUCIONAL)->get();
-            if (count($cuenta) == 1 )
+            $verifyMonth = Periodo::where( 'periodo' , $periodo )->where( 'status' , TERMINADO )->get();
+            if( count( $verifyMonth ) != 0 )
+                return $this->warningException( __FUNCTION__ ,'El periodo ingresado ya ha sido terminado' );
+            else
             {
-                $fondo              = new FondoInstitucional;
-                $idfondo            = $fondo->searchId() + 1;
-                $fondo->idfondo     = $idfondo;
-                $fondo->institucion = $inputs['institucion'];
-                $fondo->repmed      = $inputs['repmed'];
-                $fondo->idrm        = $inputs['codrepmed'];
-                $fondo->supervisor  = $inputs['supervisor'];
-                $fondo->idsup       = $inputs['codsup'];
-                $fondo->idcuenta    = $cuenta[0]->idfondo;
-                $fondo->monto       = $inputs['total'];
-                $fondo->rep_cuenta  = $inputs['cuenta'];
-                $fondo->iduser      = Auth::user()->id;
-                $fondo->estado      = PENDIENTE;
-                $fondo->tipo_moneda = SOLES;
-                $token              = sha1(md5(uniqid($fondo->idfondo, true)));
-                $fondo->token       = $token;
-                $fondo->periodo     = $periodo;
-                $fondo->save();
-
-                $userid = Auth::user()->id;
-                $middleRpta = $this->setStatus($inputs['institucion'], '', PENDIENTE, $userid, $userid, $idfondo,FONDO);
-                if ($middleRpta[status] == ok)    
-                {    
-                    DB::commit();
-                    return $this->setRpta($this->getFondos($inputs['mes']));
-                }
+                $repmed   = Rm::find( $inputs['codrepmed'] );
+                if ( count( $repmed ) == 0 )
+                    return $this->warningException( __FUNCTION__ , 'El representante Medico no esta registrado en el sistema' );
                 else
-                {             
-                    DB::rollback();
-                    return array( status => warning , description => 'Error del Sistema');
+                {
+                    $sup    =  Sup::find( $inputs['codsup'] );
+                    if( count( $sup ) == 0 )
+                        return $this->warningException( __FUNCTION__ , 'El supervisor del Representante Medico no esta registrado en el sistema' );
+                    else
+                    {
+                        $solicitud                  = new Solicitude;
+                        $solicitud->id              = $solicitud->searchId() + 1;
+                        $solicitud->titulo          = $inputs['institucion'];
+                        $solicitud->idestado        = PENDIENTE;
+                        $solicitud->idtiposolicitud = SOL_INST;
+                        $solicitud->iduserasigned   = $repmed->iduser;
+                        $solicitud->token           = sha1(md5(uniqid($solicitud->id, true)));
+                        
+                        //$solicitud->idetiqueta    = $inputs['idetiqueta'];
+
+                        $detalle                    = new SolicitudeDetalle;
+                        $detalle->id                = $detalle->searchId() + 1;
+
+                        $solicitud->iddetalle       = $detalle->id;
+
+                        if ( !$solicitud->save() )
+                            return $this->warningException( __FUNCTION__ , 'No se pudo procesar la solicitud' );
+                        else
+                        {
+                            $jDetalle = array(
+                            'supervisor'     => $inputs['supervisor'] ,
+                            'codsup'         => $inputs['codsup'] ,
+                            'periodo'        => $inputs['mes'] ,
+                            'num_cuenta'     => $inputs['cuenta'] ,
+                            'monto_aprobado' => $inputs['total'] ,
+                            );
+                            $detalle->idfondo = $inputs['idfondo'] ;
+                            $detalle->detalle = json_encode($jDetalle);
+                            if ( !$detalle->save() )
+                                return $this->warningException( __FUNCTION__ , 'No se pudo procesar los detalles de la Solicitud' );
+                            else
+                            {
+                                $userid = Auth::user()->id;
+                                $middleRpta = $this->setStatus( 0 , PENDIENTE, $userid , $userid, $solicitud->id );
+                                if ($middleRpta[status] == ok)
+                                {     
+                                    DB::commit();
+                                    $middleRpta[data] = $this->getFondos( $inputs['mes'] );
+                                }
+                                else
+                                    DB::rollback();
+                                return $middleRpta;
+                            }
+                        }
+                    }
                 }
             }
-            else
-                return array ( status => warning, description => 'La cuenta especificada tiene registrada mas de una marca');
         }
         catch (Exception $e)
         {
             DB::rollback();
             return $this->internalException($e,__FUNCTION__);
         }
-        return $middleRpta; 
     }
 
     public function updateFondo()
@@ -483,14 +502,6 @@ class FondoController extends BaseController
         return $period[1].str_pad($period[0], 2, '0', STR_PAD_LEFT);
     }
 
-    private function getDay(){
-        $currentDate = getdate();
-        $toDay = $currentDate['mday']."/".str_pad($currentDate['mon'],2,'0',STR_PAD_LEFT)."/".$currentDate['year'];
-        $lastDay = '06/'.str_pad(($currentDate['mon']+1),2,'0',STR_PAD_LEFT).'/'.$currentDate['year'];
-        $date = ['toDay'=>$toDay,'lastDay'=> $lastDay];
-        return $date;
-    }
-
     public function listDocuments()
     {
         $docs = ProofType::orderBy('idcomprobante')->get();
@@ -498,35 +509,3 @@ class FondoController extends BaseController
         return $view;
     }
 }
-
-/*public function test()
-    {
-        //$data = DB::table('FONDOINSTITUCIONAL')->select('repmed','institucion','cuenta','supervisor','total')->toJson();
-        $dato = FondoInstitucional::all();
-              
-        Excel::create('Filename4', function($excel) use($dato) {
-        
-        $excel->sheet('Sheetname', function($sheet) use($dato) {
-        
-        $sheet->fromArray($dato);
-        $sheet->row(1, array(
-        'test1', 'test2', 'test4' , 'test5','test3'
-        ));    
-        });
-        
-        })->export('xls');
-        Excel::load('testfondo.xlsx', function($reader)
-        {
-            
-            // Getting all results
-            //$reader->skip(1);
-            //$results = $reader->get();
-            
-            // ->all() is a wrapper for ->get() and will work the same
-            $results = $reader->all();
-            echo json_encode($results);
-        });
-        
-        // Demo::display();
-        
-    }*/

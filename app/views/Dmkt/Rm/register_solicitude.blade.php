@@ -76,7 +76,7 @@
                 <div class="col-sm-12 col-md-12">
                     <select id="" name="type_payment" class="form-control selectTypePayment">
                         @foreach($typePayments as $type)
-                            @if(isset($solicitude) && $solicitude->idtipopago == $type->idtipopago)
+                            @if(isset($solicitude) && $solicitude->detalle->idpago == $type->idtipopago)
                                 <option selected value="{{$type->idtipopago}}">{{$type->nombre}}</option>
                             @else
                                 <option value="{{$type->idtipopago}}">{{$type->nombre}}</option>
@@ -88,15 +88,15 @@
             <div class="form-group col-sm-6 col-md-4" id="div_ruc">
                 <label class="col-sm-8 col-md-8 control-label" for="textinput">Ruc</label>
                 <div class="col-sm-12 col-md-12">
-                    <input id="ruc" class="form-control input-md" maxlength="11" name="ruc" type="text" placeholder=""
-                           value="{{isset($solicitude->numruc) ? $solicitude->numruc : null }}">
+                    <input id="ruc" class="form-control input-md" maxlength="11" name="ruc" type="text"
+                           value="{{isset($detalle->numruc) ? $detalle->numruc : null }}">
                 </div>
             </div>
             <div id="div_number_account" class="form-group col-sm-6 col-md-4">
                 <label class="col-sm-8 col-md-8 control-label" for="textinput">Nº de Cuenta</label>
                 <div class="col-sm-12 col-md-12">
-                    <input id="number_account" class="form-control input-md" name="number_account" type="text" placeholder=""
-                           value="{{isset($solicitude->numcuenta) ? $solicitude->numcuenta : null }}">
+                    <input id="number_account" class="form-control input-md" name="number_account" type="text"
+                           value="{{isset($detalle->numcuenta) ? $detalle->numcuenta : null }}">
                 </div>
             </div>
             <div class="form-group col-sm-6 col-md-4">
@@ -106,15 +106,10 @@
                            value="{{isset($solicitude->detalle->detalle) ? json_decode($solicitude->detalle->detalle)->monto_solicitado : null }}">
                 </div>
             </div>
-            <div class="form-group col-sm-6 col-md-4">
-                <label class="col-sm-8 col-md-8 control-label" for="textinput">Moneda</label>
-                <div class="col-sm-12 col-md-12">
-                    <select id="money" name="money" class="form-control">
-                        <option value="1">Soles</option>
-                        <option value="2">Dolares</option>
-                    </select>
-                </div>
-            </div>
+
+            <!-- Moneda -->
+            @include('template.Change.moneda')
+            
             <div class="solicitude_monto form-group col-sm-6 col-md-4">
                 <label class="col-sm-8 col-md-8 control-label" for="textinput">Monto Factura</label>
                 <div class="col-sm-12 col-md-12">
@@ -122,24 +117,10 @@
                     value="{{isset($detalle->monto_factura) ? $detalle->monto_factura : null }}">
                 </div>
             </div>
-            @if (!isset($solicitude))
-                <div class="solicitude_factura form-group col-sm-6 col-md-4">
-                    <label class="col-sm-12 col-md-12 control-label" for="textinput">Factura
-                        <small>(solo imagenes)</small>
-                    </label>
-                    <div class="col-sm-12 col-md-12" style="">
-                        <div class="input-group">
-                            <span class="input-group-btn">
-                                 <span class="btn btn-primary btn-file">
-                                     <i class="glyphicon glyphicon-folder-open"></i>
-                                     <input type="file" multiple="" name="file">
-                                 </span>
-                            </span>
-                            <input type="text" id="input-file-factura"  class="form-control" readonly="" required="">
-                        </div>
-                    </div>
-                </div>
-            @endif
+            
+            <!-- Factura Imagen -->
+            @include('template.Change.image')
+        
             <div class="form-group col-sm-6 col-md-4">
                 <label class="col-sm-8 col-md-8 control-label" for="textinput">Fecha de Entrega</label>
                 <div class="col-sm-12 col-md-12">
@@ -147,150 +128,65 @@
                         <span class="input-group-addon">
                             <i class="glyphicon glyphicon-calendar"></i>
                         </span>
-                        <input id="delivery_date" type="text" name="delivery_date" class="form-control" maxlength="10" placeholder="" readonly
-                               value="{{isset($solicitude)? date_format(date_create($solicitude->fecha_entrega), 'd/m/Y' ) : null }}">
+                        <input id="delivery_date" type="text" name="delivery_date" class="form-control" maxlength="10" readonly
+                        value="{{isset($solicitude)? date_format(date_create($detalle->fecha_entrega), 'd/m/Y' ) : null }}">
                     </div>
                 </div>
             </div>
-            <!-- <div class="form-group col-sm-12 col-md-8" style="padding: 0"> -->
-
-            <!-- <div class="form-group col-sm-6 col-md-4">
-                <label class="col-sm-8 col-md-8 control-label" for="textinput">Pruebas</label>
-                <div class="col-sm-12 col-md-12">
-                    <input id="idtitle" class="form-control input-md cliente-seeker" name="titulo" type="text" placeholder=""
-                    value="">
-                </div>
-            </div> -->
-                <div class="form-group col-sm-6 col-md-4 ">
-                    <label class="col-sm-8 col-md-8 control-label" for="textinput">Cliente</label>
-                    <ul id="listclient" class="col-sm-12 col-md-12">
-                        @if(isset($solicitude))
-                            @foreach($solicitude->clients as $client)
-                                <li>
-                                    <div style="position: relative" class="has-success has-feedback">
-                                            @if($client->from_table == TB_DOCTOR)
-                                                <input type='text' id="idclient0" name="clients[]" type="text" style="margin-bottom: 10px"
-                                                   class="form-control input-md project input-client cliente-seeker" pk="{{$client->idcliente}}"
-                                                   value="DOCTOR: {{$client->doctors->pefnrodoc1.'-'.$client->doctors->pefnombres.' '.$client->doctors->pefpaterno.' '.$client->doctors->pefmaterno}}"
-                                                   data-valor="all" table="{{$client->from_table}}" disabled>
-                                            @elseif($client->from_table == TB_INSTITUTE)
-                                                <input type='text' id="idclient0" name="clients[]" type="text" style="margin-bottom: 10px"
-                                                   class="form-control input-md project input-client cliente-seeker" pk="{{$client->idcliente}}"
-                                                   value="CENTRO: {{$client->institutes->pejnrodoc.'-'.$client->instituteS->pejrazon}}"
-                                                   data-valor="all" table="{{$client->from_table}}" disabled>
-                                            @else
-                                                <input id="idclient0" name="clients[]" type="text" style="margin-bottom: 10px"
-                                                   class="form-control input-md project input-client cliente-seeker" pk="{{$client->client->clcodigo}}"
-                                                   value='{{isset($client->client->clnombre) ? $client->client->clcodigo.' - '.$client->client->clnombre : null }}'
-                                                   data-valor="all" table="VTA.CLIENTES" disabled>
-                                            @endif
-                                        <button type='button' class='btn-delete-client' style="z-index: 2">
-                                            <span class='glyphicon glyphicon-remove'></span>
-                                        </button>
-                                    </div>
-                                </li>
-                            @endforeach
-                        @else
+            
+            <div class="form-group col-sm-6 col-md-4 ">
+                <label class="col-sm-8 col-md-8 control-label" for="textinput">Cliente</label>
+                <ul id="listclient" class="col-sm-12 col-md-12">
+                    @if(isset($solicitude))
+                        @foreach($solicitude->clients as $client)
                             <li>
-                                <div style="position: relative" class="">
-                                        <input id="idclient0" name="clients[]" type="text" placeholder="" style="margin-bottom: 10px"
-                                               class="form-control input-md input-client cliente-seeker" data-valor=""
-                                               value="{{isset($client->clnombre) ? $client->clcodigo.' - '.$client->clnombre : null }}">
-                                    <button type='button' class='btn-delete-client' style="display: none; z-index: 2">
+                                <div style="position: relative" class="has-success has-feedback">
+                                        @if($client->from_table == TB_DOCTOR)
+                                            <input type='text' id="idclient0" name="clients[]" type="text" style="margin-bottom: 10px"
+                                               class="form-control input-md project input-client cliente-seeker" pk="{{$client->idcliente}}"
+                                               value="DOCTOR: {{$client->doctors->pefnrodoc1.'-'.$client->doctors->pefnombres.' '.$client->doctors->pefpaterno.' '.$client->doctors->pefmaterno}}"
+                                               data-valor="all" table="{{$client->from_table}}" disabled>
+                                        @elseif($client->from_table == TB_INSTITUTE)
+                                            <input type='text' id="idclient0" name="clients[]" type="text" style="margin-bottom: 10px"
+                                               class="form-control input-md project input-client cliente-seeker" pk="{{$client->idcliente}}"
+                                               value="CENTRO: {{$client->institutes->pejnrodoc.'-'.$client->instituteS->pejrazon}}"
+                                               data-valor="all" table="{{$client->from_table}}" disabled>
+                                        @else
+                                            <input id="idclient0" name="clients[]" type="text" style="margin-bottom: 10px"
+                                               class="form-control input-md project input-client cliente-seeker" pk="{{$client->client->clcodigo}}"
+                                               value='{{isset($client->client->clnombre) ? $client->client->clcodigo.' - '.$client->client->clnombre : null }}'
+                                               data-valor="all" table="VTA.CLIENTES" disabled>
+                                        @endif
+                                    <button type='button' class='btn-delete-client' style="z-index: 2">
                                         <span class='glyphicon glyphicon-remove'></span>
                                     </button>
                                 </div>
                             </li>
-                        @endif
-                    </ul>
-                    <span class="col-sm-10 col-md-10 clients_repeat" style=""></span>
-                    <button type="button" class="btn btn-default" id="btn-add-client">Agregar Otro Cliente</button>
-                </div>
-                <div class="form-group col-sm-6 col-md-4">
-                    <label class="col-sm-8 col-md-8 control-label" for="selectfamily">Familia</label>
-                    <ul id="listfamily" class="col-sm-12 col-md-12" style="">
-                        @if(isset($families2))
-                            @foreach($families2 as $family2)
-                                <li>
-                                    <div class="" style="position: relative">
-                                        <select id="selectfamily" name="families[]" class="form-control selectfamily" style="margin-bottom:10px ">
-                                            @foreach($families as $family)
-                                                @if($family->id == $family2->id)
-                                                    <option value="{{$family->id}}" selected>{{$family->descripcion}}</option>
-                                                @else
-                                                    <option value="{{$family->id}}">{{$family->descripcion}}</option>
-                                                @endif
-                                            @endforeach
-                                        </select>
-                                        <button type='button' class='btn-delete-family' style="">
-                                            <span class='glyphicon glyphicon-remove'></span>
-                                        </button>
-                                    </div>
-                                </li>
-                            @endforeach
-                        @else
-                            <li>
-                                <div class="" style="position: relative">
-                                    <select id="selectfamily" name="families[]" class="form-control selectfamily" style="margin-bottom:10px">
-                                        @foreach($families as $family)
-                                            <option value="{{$family->id}}">{{$family->descripcion}}</option>
-                                        @endforeach
-                                    </select>
-                                    <button type='button' class='btn-delete-family' style="display: none">
-                                        <span class='glyphicon glyphicon-remove'></span>
-                                    </button>
-                                </div>
-                            </li>
-                        @endif
-                    </ul>
-                    <span class="col-sm-10 col-md-10 families_repeat" style="margin-bottom: 10px ; margin-top: -10px"></span>
-                    <button type="button" class="btn btn-default" id="btn-add-family">Agregar Otra Familia</button>
-                </div>
-            <!-- </div> -->
-            @if( isset($solicitude) && $solicitude->typeSolicitude->code == SOLIC && $solicitude->detalle->idmotivo == REASON_REGALOS )
-                <div class="form-group col-sm-6 col-md-4">
-                    <div class="col-sm-12 col-md-12">
-                        <label class="col-sm-8 col-md-8 control-label" for="textinput"> </label>
-                        <a class="btn btn-primary btn-md" data-toggle="modal" data-target="#myFac">
-                            Ver Comprobante
-                        </a>
-                    </div>
-                </div>
-                <div class="modal fade" id="myFac" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal">
-                                    <span aria-hidden="true">&times;</span>
-                                    <span class="sr-only">Close</span>
+                        @endforeach
+                    @else
+                        <li>
+                            <div style="position: relative" class="">
+                                    <input id="idclient0" name="clients[]" type="text" placeholder="" style="margin-bottom: 10px"
+                                           class="form-control input-md input-client cliente-seeker" data-valor=""
+                                           value="{{isset($client->clnombre) ? $client->clcodigo.' - '.$client->clnombre : null }}">
+                                <button type='button' class='btn-delete-client' style="display: none; z-index: 2">
+                                    <span class='glyphicon glyphicon-remove'></span>
                                 </button>
-                                <h4 class="modal-title" id="myModalLabel">Comprobante</h4>
                             </div>
-                            <div class="modal-body">
-                                @if (empty($detalle->image))
-                                    <h3>No se ingreso una imagen</h3>
-                                @elseif (!file_exists(public_path().'/'.IMAGE_PATH.$detalle->image))
-                                    <h3>No se encontro la imagen en el sistema</h3>
-                                @else
-                                    <img id="imgSalida" class="img-responsive" src="{{asset(IMAGE_PATH.$detalle->image)}}">
-                                @endif 
-                            </div>
-                            <div class="modal-footer">
-                                <div class="solicitude_factura form-group col-sm-10 col-md-10" style="padding-right: 30px">
-                                    <label class="col-sm-6 col-md-4 control-label" for="textinput">Subir Otra Factura</label>
-                                    <div class="col-sm-5 col-md-7">
-                                        <input id="isSetImage" type="hidden" value="{{$detalle->image}}">
-                                        <input type="file" id="input-file-factura" name="file" class="form-control" style="padding:1px">
-                                    </div>
-                                </div>
-                                <div class="form-group col-sm-1 col-md-1">
-                                    <button type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endif
+                        </li>
+                    @endif
+                </ul>
+                <span class="col-sm-10 col-md-10 clients_repeat" style=""></span>
+                <button type="button" class="btn btn-default" id="btn-add-client">Agregar Otro Cliente</button>
+            </div>
+
+            <!-- Productos -->
+            @include('template.Change.productos')
+                
+            
+            <!-- Ver Comprobante -->
+            @include('template.Change.comprobante')
+           
             <div class="col-sm-12 col-md-12" style="margin-top: 10px">
                 <div class="form-group ">
                     <label class="col-sm-8 col-md-8 control-label" for="textarea">Descripcion de la Solicitud</label>

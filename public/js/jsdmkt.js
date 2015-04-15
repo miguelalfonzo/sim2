@@ -11,7 +11,6 @@ function newSolicitude() {
     var data_start = $('#date_start');
     var data_end = $('#date_end');
     var amount_fac = $('#amountfac');
-    var solicitude_factura = $('.solicitude_factura');
     var solicitude_monto =  $('.solicitude_monto');
     var select_type_payment = $('.selectTypePayment');
     var solicitude_ruc = $('#div_ruc');
@@ -20,6 +19,7 @@ function newSolicitude() {
     var idamount = $('#amount');
     var select_type_solicitude = $('.selecttypesolicitude');
     var input_file_factura = $('#input-file-factura');
+    var comprobante = $('#comprobante');
     var isSetImage = $('#isSetImage');
     var amount_error_families = $('#amount_error_families');
     var userType = $('#typeUser').val();//tipo de usuario se encuentra en main
@@ -109,27 +109,25 @@ function newSolicitude() {
     
     if (select_type_solicitude.val() != 2) 
     {
-        solicitude_factura.hide();
         solicitude_monto.hide();
+        comprobante.hide();
     }
 
     select_type_solicitude.on('change', function () 
     {
         if ( $(this).val() == 1 || $(this).val() == 3) 
         {
-            solicitude_factura.hide();
             solicitude_monto.hide();
+            comprobante.hide();
         }
         else if ( $(this).val() == 2 )
         {
-            solicitude_factura.show();
             solicitude_monto.show();
+            comprobante.show();
         } 
     });
 
     //select type payment
-    solicitude_number_account.hide();
-    solicitude_ruc.hide();
     if(select_type_payment.val()!=2)  solicitude_ruc.hide();
     if(select_type_payment.val()!=3)  solicitude_number_account.hide();
     select_type_payment.on('change', function()
@@ -718,19 +716,20 @@ function newSolicitude() {
         if (!fondo_institucion.val())
         {
             fondo_institucion.parent().addClass('has-error');
+            fondo_institucion.attr('placeholder','Ingrese Institución');
             validate = 1;
         }
         if (!fondo_supervisor.val())
         {
             fondo_supervisor.parent().addClass('has-error');
-            fondo_supervisor.attr('placeholdder','Ingrese Supervisor');
+            fondo_supervisor.attr('placeholder','Ingrese Supervisor');
             validate = 1;
         }
         if(validate == 0)
         {
             var dato = 
             {
-                'institucion' : $('#fondo_institucion').val(),
+                'institucion' : fondo_institucion.val(),
                 'repmed'      : fondo_repmed.val(),
                 'codrepmed'   : fondo_repmed.attr('data-cod'),
                 'supervisor'  : fondo_supervisor.val(),
@@ -738,7 +737,8 @@ function newSolicitude() {
                 'total'       : fondo_total.val(),
                 'cuenta'      : fondo_cuenta.val(),
                 '_token'      : $('#_token').val(),
-                'mes' : $(this).parent().parent().parent().find(".date_month").val()
+                'idfondo'       : $("#sub_type_activity option:selected").val(),
+                'mes'         : $(this).parent().parent().parent().find(".date_month").val()
             };
             date_reg_fondo.last().val(date_reg_fondo.val());
 
@@ -806,7 +806,7 @@ function newSolicitude() {
                     idsolicitude : $("input[name=idsolicitude]").val(),
                     _token: $("input[name=_token]").val()
                 }
-            }).fail( function ( statusCode,errorThrown)
+            }).fail( function ( statusCode, errorThrown)
             {
                 ajaxError(statusCode,errorThrown);   
             }).done(function (data)
@@ -1443,7 +1443,6 @@ function newSolicitude() {
                 console.log(suggestion);
                 if (dataset == 'clients')
                 {
-                    console.log('sclient');
                     var input = $(this);
                     input.parent().after('<button type="button" class="btn-delete-client" style="z-index: 2"><span class="glyphicon glyphicon-remove"></span></button>');
                     input.parent().addClass('has-success has-feedback');
@@ -1468,13 +1467,13 @@ function newSolicitude() {
                         if (result.Data.cuenta)
                         {
                             fondo_cuenta.val(result.Data.cuenta);
-                            fondo_cuenta.attr('disabled',true).parent().addClass('has-success');        
+                            fondo_cuenta.attr('disabled',true).parent().removeClass('has-error').addClass('has-success');        
                         }
                         if (result.Data.sup)
                         {
                             fondo_supervisor.val(result.Data.sup.nombre);
                             fondo_supervisor.attr('data-cod',result.Data.sup.idsup);
-                            fondo_supervisor.attr('disabled',true).parent().addClass('has-success'); 
+                            fondo_supervisor.attr('disabled',true).parent().removeClass('has-error').addClass('has-success'); 
                         }
                     });
                 }
@@ -1500,29 +1499,6 @@ function newSolicitude() {
             }
         });  
     }
-    /*function load_client(client) {
-
-        function lightwell(request, response) {
-            function hasMatch(s) {
-                return s.toLowerCase().indexOf(request.term.toLowerCase()) !== -1;
-            }
-            var i, l, obj, matches = [];
-            if (request.term === "") 
-            {
-                response([]);
-                return;
-            }
-            for (i = 0, l = clients.length; i < l; i++) 
-            {
-                obj = clients[i];
-                if (hasMatch(obj.clnombre))
-                    matches.push(obj);
-            }
-            response(matches);
-        }
-        var idclient = '#idclient';
-    }*/
-
    
     $(document).off('click', '#btn-add-client');
     $(document).on('click', '#btn-add-client', function () 
@@ -1555,8 +1531,6 @@ function newSolicitude() {
 
     function ajaxError(statusCode,errorThrown)
     {
-        console.log(errorThrown);
-        console.log(statusCode);
         if (statusCode.status == 0) 
             responseUI('<font color="black">Internet: Problemas de Conexion</font>','yellow');    
         else
@@ -1810,7 +1784,6 @@ function newSolicitude() {
                     message1 = 'Actualizando';
                     message2 = '<strong style="color: green">Solicitud Actualizada</strong>'
                 }
-                console.log(formData);
                 $.ajax(
                 {
                     url: server + rute,
@@ -1828,22 +1801,17 @@ function newSolicitude() {
                     $.unblockUI();
                     if(data.Status == 'Ok')
                     {
-                        if (data.Data == REP_MED || data.Data == SUP ) 
+                        responseUI('Solicitud Registrada', 'green');
+                        setTimeout(function()
                         {
-                            responseUI('Solicitud Registrada', 'green');
-                            setTimeout(function()
-                            {
-                                window.location.href = server + 'show_user';
-                            },500);
-                        }
-                        else
-                            responseUI('Rol Sin Definir: ' + data.Data , 'red');
+                            window.location.href = server + 'show_user';
+                        },500);
                     }
                     else
                         responseUI(data.Status + ': ' + data.Description,'red');
-                }).fail(function (e) {
+                }).fail(function ( statusCode , errorThrown ) {
                     $.unblockUI();
-                    alert('error');
+                    ajaxError( statusCode, errorThrown );
                 });
             }
         }, 300);

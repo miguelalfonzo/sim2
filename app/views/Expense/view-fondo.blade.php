@@ -10,7 +10,7 @@
 			</div>
 			<div class="panel-body">
 				<section class="row reg-expense" style="margin:0">
-					@include('fondo_body')
+					@include('template.fondo_body')
 				</section>
 				<section class="row reg-expense align-center" style="margin-top:20px">
 					<div class="col-xs-12 col-sm-12 col-md-12">

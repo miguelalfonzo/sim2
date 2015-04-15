@@ -1,20 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Developer
- * Date: 13/08/14
- * Time: 10:43 AM
- */
 
 namespace Dmkt;
 use \Eloquent;
 
 class SolicitudeFamily extends Eloquent
 {
-
-
     protected $table = 'DMKT_RG_SOLICITUD_FAMILIA';
-    protected $primaryKey = 'id';
+    protected $primaryKey = 'ID';
 
     public function searchId()
     {

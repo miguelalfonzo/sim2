@@ -13,7 +13,7 @@
         </li>
         <li>
             <a href="#solicitudes" role="tab" data-toggle="tab">
-                <i class="fa fa-user"></i>Solicitudes
+                <i class="fa fa-user">Solicitudes</i>
             </a>
         </li>
     </ul>
@@ -34,9 +34,11 @@
                         <div>
                             <input value="" id="idfondo" name="idfondo" type="hidden">
                             <input value="{{csrf_token()}}" name="_token" id="_token" type="hidden">
-                            <div class="col-xs-12 col-sm-6 col-md-4">
-                                <div class="form-expense">
-                                <label>Mes a Registrar</label>
+                            
+                            <!-- PERIODO -->
+                            <div class="form-group col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12">Mes a Registrar</label>
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                                     <div class="input-group">
                                         <span class="input-group-addon" >
                                             <i class="glyphicon glyphicon-calendar"></i>
@@ -45,81 +47,84 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-xs-12 col-sm-6 col-md-4">
-                                <div class="form-expense">
-                                    <label>SISOL - Hospital</label>
+
+                            <!-- SISOL -->
+                            <div class="form-group col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12">SISOL - Hospital</label>
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">  
                                     <input id="fondo_institucion" name="institucion" type="text" class="form-control input-md">
                                 </div>
                             </div>
-                            <div class="col-xs-12 col-sm-6 col-md-4">
-                                <div class="form-expense">
-                                    <label>Depositar a</label>
-                                    <input id="fondo_repmed" value="" name="repmed" type="text" style="position:relative"
-                                          data-select="false" class="form-control input-md rep-seeker">
-                                    <a id="edit-rep" class="edit-repr" href="#" style="display:inline;">
-                                        <span class="glyphicon glyphicon-pencil"></span>
+
+                            <!-- REPRESENTANTE -->
+                            <div class="form-group col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12">Depositar a</label>
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                    <input id="fondo_repmed" name="repmed" type="text" style="display:inline"
+                                    data-select="false" class="form-control input-md rep-seeker">
+                                    <a id="edit-rep" class="edit-repr glyphicon glyphicon-pencil" href="#" style="display:inline">
+                                        <!-- <span class=""></span> -->
                                     </a>
                                 </div>
                             </div>
-                            <div class="col-xs-12 col-sm-6 col-md-4">
-                                <div class="form-expense">
-                                    <label>Fondo</label>
-                                    <input type="text" class="form-control" value="{{$cuenta->nombre_mkt.' -> '.$cuenta->saldo}}" disabled>
-                                </div>
-                            </div>
-                            <div class="col-xs-12 col-sm-6 col-md-4">
-                                <div class="form-expense">
-                                    <label>N° de Cuenta</label>
+
+                            
+                            <!-- Fondos -->
+                            @include('template.Details.fondo')
+                            
+                            <!-- Cuenta -->
+                            <div class="form-group col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12">N° de Cuenta</label>
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                                     <input id="fondo_cuenta" name="cuenta" type="text" class="form-control input-md" maxlength="25">
                                 </div>
                             </div>
 
-                            <div class="col-xs-12 col-sm-6 col-md-4">
-                                <div class="form-expense">
-                                    <label>Supervisor</label>
+                            <!-- SUPERVISOR -->
+                            <div class="form-group col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12">Supervisor</label>
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                                     <input id="fondo_supervisor" name="supervisor" data-cod="0" type="text" class="form-control input-md">
                                 </div>
                             </div>
-                            <div class="col-xs-12 col-sm-6 col-md-4">
-                                <div class="form-expense">
-                                    <label>Total a depositar</label>
+
+                            <!-- MONTO -->
+                            <div class="form-group col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12">Total a depositar</label>
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">    
                                     <input id="fondo_total" name="total" type="text" class="form-control input-md">
                                 </div>
                             </div>
 
                           
-               <!-- Button (Double) -->
-               <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
-                   <div class="col-sm-12 col-md-12" style="text-align: center">
-                           <button id="" name="button1id" class="btn btn-primary register_fondo ladda-button" data-style="zoom-in" data-size="l">Registrar
-                           </button>
-                           <button id="" name="button1id" class="btn btn-primary btn_edit_fondo ladda-button" data-style="zoom-in" data-size="l">Actualizar
-                           </button>
-                           <button id="" name="button1id" class="btn btn-primary btn_cancel_fondo ladda-button" data-style="zoom-in" data-size="l">Cancelar
-                           </button>
-                   </div>
-               </div>
-            </div>
-        </div>
-   </div>
-   </div>
-   <div class="panel panel-default">
-        <div class="panel-heading">
-        <h3 class="panel-title">Fondos Institucionales</h3>
-   </div>
-           <div class="panel-body table-solicituds-fondos" style="position: relative">
-                <div id="" class="form-group col-xs-6 col-sm-3 col-md-3">
-                    <div class="input-group">
-                        <input type="text" readonly class="form-control date_month" data-type="fondos"><span class="input-group-addon" ><i class="glyphicon glyphicon-calendar"></i></span>
+                           <!-- Button (Double) -->
+                            <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
+                               <div class="col-sm-12 col-md-12">
+                                   <button class="btn btn-primary register_fondo ladda-button" data-style="zoom-in" data-size="l">
+                                        Registrar
+                                   </button>
+                                   <button class="btn btn-primary btn_edit_fondo ladda-button" data-style="zoom-in" data-size="l">
+                                        Actualizar
+                                   </button>
+                                   <button class="btn btn-primary btn_cancel_fondo ladda-button" data-style="zoom-in" data-size="l">
+                                        Cancelar
+                                   </button>
+                               </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-           </div>
-    </div>
-</div>
-<!-- Solicitudes -->
-        <div class="tab-pane fade table-solicituds" id="solicitudes" >
-
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Fondos Institucionales</h3>
+                </div>
+                <div class="panel-body table-solicituds-fondos" style="position: relative"></div>
+            </div>
         </div>
+
+    <!-- Solicitudes -->
+        <div class="tab-pane fade table-solicituds" id="solicitudes" ></div>
     </div>
 </div>
 @stop

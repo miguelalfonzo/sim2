@@ -9,7 +9,7 @@ class Solicitude extends Eloquent{
 
     protected $table = 'DMKT2_RG_SOLICITUD';
     protected $primaryKey = 'id';
-    
+    //protected $touches = array('pendHist');
 
     public function searchId()
     {
@@ -20,6 +20,11 @@ class Solicitude extends Eloquent{
             return $lastId->id;
     }
 
+    /*protected function pendHist()
+    {
+        return $this->hasOne('System\SolicitudeHistory','idsolicitude','id')->where( 'status_to' , PENDIENTE );
+    }*/
+
     public function asignedTo()
     {
         return $this->hasOne('User','id','iduserasigned');
@@ -27,7 +32,7 @@ class Solicitude extends Eloquent{
 
     public function acceptHist()
     {
-        return $this->hasOne('System\SolicitudeHistory','idsolicitude','id')->where('status_to',ACEPTADO);
+        return $this->hasOne('System\SolicitudeHistory','idsolicitude','id')->where( 'status_to' , ACEPTADO );
     }
 
     public function histories(){

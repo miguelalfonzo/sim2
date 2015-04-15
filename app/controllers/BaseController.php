@@ -21,6 +21,22 @@ class BaseController extends Controller {
         $this->beforeFilter('csrf', array('on' => array('post', 'put', 'patch', 'delete')));
     }
 
+    protected function getDay( $type=1 )
+    {
+        $currentDate = getdate();
+        $toDay = $currentDate['mday']."/".str_pad( $currentDate['mon'] , 2 , '0' , STR_PAD_LEFT )."/".$currentDate['year'];
+        $lastDay = '06/'.str_pad( ( $currentDate['mon'] + 1 ) , 2 , '0' , STR_PAD_LEFT ).'/'.$currentDate['year'];
+        
+        if ( $type == 2 )
+        {
+            $toDay = $currentDate['year']."/".str_pad( $currentDate['mon'] , 2 , '0' , STR_PAD_LEFT )."/".$currentDate['mday'].' '.$currentDate['hours'].':'.$currentDate['minutes'].':'.$currentDate['seconds'];
+            $lastDay = $currentDate['year']."/".str_pad( $currentDate['mon'] , 2 , '0' , STR_PAD_LEFT )."/".'06'.' '.$currentDate['hours'].':'.$currentDate['minutes'].':'.$currentDate['seconds'];   
+        }
+
+        $date = array( 'toDay' => $toDay , 'lastDay' => $lastDay );
+        return $date;
+    }
+
 	protected function setupLayout()
 	{
 		if ( ! is_null($this->layout))
@@ -57,19 +73,16 @@ class BaseController extends Controller {
         return $rpta;
     }
 
-    protected function warningException($exception,$function,$description)
+    protected function warningException($function,$description)
     {
         $rpta = array();
         $rpta[status] = warning;
         $rpta[description] = $description;
-        Log::error($exception);
-        Mail::send('soporte', array( 'msg' => $exception ), 
-            function($message) use($function)
-            {
-                $message->to(SOPORTE_EMAIL);
-                $message->subject(warning.'-Function: '.$function);      
-            }
-        );
+        Mail::send('soporte', array( 'description' => $description ), function($message) use($function)
+        {
+            $message->to(SOPORTE_EMAIL);
+            $message->subject(warning.'-Function: '.$function);      
+        });
         return $rpta;
     }
 
@@ -79,12 +92,11 @@ class BaseController extends Controller {
         $rpta[status] = error;
         $rpta[description] = desc_error;
         Log::error($exception);
-        Mail::send('soporte', array( 'msg' => $exception ), 
-            function($message) use($function)
-            {
-                $message->to(SOPORTE_EMAIL);
-                $message->subject(error.'-Function: '.$function);      
-            }
+        Mail::send('soporte', array( 'msg' => $exception ), function($message) use($function)
+        {
+            $message->to(SOPORTE_EMAIL);
+            $message->subject(error.'-Function: '.$function);      
+        }
         );
         return $rpta;
     }
@@ -193,21 +205,17 @@ class BaseController extends Controller {
             {
                 $statusSolicitude->id           = $statusSolicitude->lastId() + 1;
                 $statusSolicitude->status_to    = $status_to;
-                $statusSolicitude->idsolicitude = $idsolicitude;    
+                $statusSolicitude->idsolicitude = $idsolicitude;
             }
             else
-            {
                 $statusSolicitude = SolicitudeHistory::find($statusSolicitude->id);
-            }
             $statusSolicitude->status_from  = $status_from;
             $statusSolicitude->user_from    = $user_from->type;
             $statusSolicitude->user_to      = $user_to->type;
             $statusSolicitude->notified     = $notified;
+            $statusSolicitude->updated_at   = Carbon\Carbon::now();
             $statusSolicitude->save();
-                
-            Log::error(json_encode($statusSolicitude));
             $rpta = $this->setRpta();
-            /**/
         }
         catch (Exception $e)
         {
@@ -258,7 +266,7 @@ class BaseController extends Controller {
             }
             else if ( Auth::user()->type == ASIS_GER ) 
             {
-                $solicituds->where('iduserasigned',$idUser);
+                $solicituds->where( 'iduserasigned' , $idUser );
             }
             else if ( Auth::user()->type == GER_PROD )
             {

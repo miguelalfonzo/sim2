@@ -46,8 +46,11 @@
             Monto Factura
         </label>
         <div class="col-sm-12 col-md-12 col-lg-12">
-            <input id="factura" class="form-control input-md" type="text"
-            value="{{$detalle->monto_factura}}" readonly>
+            <div class="input-group">
+                <span class="input-group-addon">{{$solicitude->detalle->typeMoney->simbolo}}</span>
+                <input id="factura" class="form-control input-md" type="text"
+                value="{{$detalle->monto_factura}}" readonly>
+            </div>
         </div>
     </div>
 @endif
@@ -86,11 +89,11 @@
 
 <!-- A Depositar -->
 @if ( Auth::user()->type == TESORERIA && $solicitude->idestado == DEPOSITO_HABILITADO )
-    <div class="form-group col-sm-6 col-md-4 col-lg-4">
-        <label class="col-sm-8 col-md-8 control-label" for="depositar">
+    <div class="form-group col-xs-4 col-sm-4 col-md-4 col-lg-4">
+        <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label" for="depositar">
             A Depositar
         </label>
-        <div class="col-sm-12 col-md-12 col-lg-12">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <div class="input-group">
                 <span class="input-group-addon">{{$solicitude->detalle->typemoney->simbolo}}</span>
                 @if ( is_null($solicitude->detalle->idretencion) )
@@ -102,9 +105,6 @@
         </div>
     </div>
 @endif
-
-
-
 
 <!-- Date Delivery -->
 <div class="form-group col-sm-6 col-md-4 col-lg-4">

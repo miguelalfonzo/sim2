@@ -1,9 +1,6 @@
 <td style="text-align: center">
     <div class="div-icons-solicituds">
         @if ( Auth::user()->type == ASIS_GER)
-            <a href="{{URL::to('ver-solicitud-ager').'/'.$solicitude->token}}">
-                <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span>
-            </a>
             @if($solicitude->idestado == GASTO_HABILITADO)
                 <a id="token-reg-expense" data-url="{{$solicitude->token}}">
                     <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span>
@@ -16,9 +13,9 @@
                 <a  href="{{URL::to('ver-gasto'.'/'.$solicitude->token)}}">
                     <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span>
                 </a>
-            @endiF
+            @endif
         @endif
-        @if ( $solicitude->typeSolicitude->code == SOLIC )
+        @if ( $solicitude->idtiposolicitud == SOL_REP )
             <a href="{{URL::to('ver-solicitud/'.$solicitude->token)}}">
                     <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span>
             </a>       
@@ -75,7 +72,7 @@
                     </a>
                 @endif
             @endif
-        @elseif ( $solicitude->typeSolicitude->code == FONDO ) )
+        @elseif ( $solicitude->idtiposolicitud == SOL_INST )
                 <a href="{{URL::to('show-fondo/'.$solicitude->token)}}">
                     <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span>
                 </a>    

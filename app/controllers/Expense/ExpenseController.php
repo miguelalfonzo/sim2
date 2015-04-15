@@ -26,30 +26,14 @@ use \BagoUser;
 use \Exception;
 use \Session;
 
-class ExpenseController extends BaseController{
-
-	private function getDay(){
-		$lastDay = date('j/m/Y');
-		$now=date('Y/m/j');
-		$nuevafecha = strtotime('-7 day', strtotime($now));
-		$toDay = date ('j/m/Y' , $nuevafecha);
-		
-		// $currentDate = getdate();
-		// $toDay = $currentDate['mday']."/".str_pad($currentDate['mon'],2,'0',STR_PAD_LEFT)."/".$currentDate['year'];
-		// $lastDay = '06/'.str_pad(($currentDate['mon']+1),2,'0',STR_PAD_LEFT).'/'.$currentDate['year'];
-		$date = array(
-			'toDay'		=> $toDay,
-			'lastDay'	=> $lastDay
-		);
-		return $date;
-	}
+class ExpenseController extends BaseController
+{
 
 	private function getDayAll(){
 		$lastDay = date('j/m/Y');
 		$now=date('Y/m/j');
 		$nuevafecha = strtotime('-2 month', strtotime($now));
 		$toDay = date ('j/m/Y' , $nuevafecha);
-
 		$date = array(
 			'toDay'		=> $toDay,
 			'lastDay'	=> $lastDay
@@ -444,22 +428,16 @@ class ExpenseController extends BaseController{
     		/*$inputs = Input::all();
 	        $fondo = FondoInstitucional::where('token',$inputs['token'])->firstOrFail();
 	        */
-			$fondo = FondoInstitucional::where('token',$token)->firstOrFail();
-	        if(count($fondo)>0)
-	        {
-	            $expense = Expense::where('idfondo',$fondo->idfondo)->get();
-	        }
-	        $data = array(
-	            'fondo' 	=> $fondo,
-	            'expense'   => $expense
-	        );
+			$solicitud = Solicitude::where('token',$token)->firstOrFail();
+	        if( count( $solicitud ) == 0 )
+	            return $this->warninException( __FUNCTION__ , 'No se encontro los datos de la Solicitud Institucional' );
+	        $data['fondo']	= $solicitud;
 	        return View::make('Expense.view-fondo',$data);
 	    }
 	    catch (Exception $e)
 	    {
-	    	$rpta = $this->internalException($e,__FUNCTION__);
+	    	return $this->internalException($e,__FUNCTION__);
 	    }
-	    return $rpta;
 	}
 
 	public function reportExpense($token){
