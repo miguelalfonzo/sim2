@@ -424,13 +424,11 @@ class ExpenseController extends BaseController
     {
     	try
     	{
-    		/*$inputs = Input::all();
-	        $fondo = FondoInstitucional::where('token',$inputs['token'])->firstOrFail();
-	        */
-			$solicitud = Solicitude::where('token',$token)->firstOrFail();
+    		$solicitud = Solicitude::where( 'token' , $token )->firstOrFail();
 	        if( count( $solicitud ) == 0 )
 	            return $this->warninException( __FUNCTION__ , 'No se encontro los datos de la Solicitud Institucional' );
 	        $data['fondo']	= $solicitud;
+	        $data['detalle'] = json_decode( $solicitud->detalle->detalle );
 	        return View::make('Expense.view-fondo',$data);
 	    }
 	    catch (Exception $e)

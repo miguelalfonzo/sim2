@@ -6,7 +6,7 @@ use Eloquent;
 
 class SolicitudeDetalle extends Eloquent
 {
-	protected $table = 'DMKT2_RG_SOLICITUD_DETALLE';
+	protected $table = 'DMKT_RG_SOLICITUD_DETALLE';
     protected $primaryKey = 'id';    
  
     public function searchId()

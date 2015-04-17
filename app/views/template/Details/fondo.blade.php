@@ -1,5 +1,5 @@
 @if ( isset($fondos) || !is_null($solicitude->detalle->idfondo) )
-    <div class="form-group col-xs-4 col-sm-4 col-md-4 col-lg-4">
+    <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
         <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label" for="textinput">Fondo</label>
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             @if ( isset($fondos) )

@@ -7,7 +7,7 @@ use \Eloquent;
 class Solicitude extends Eloquent{
 
 
-    protected $table = 'DMKT2_RG_SOLICITUD';
+    protected $table = 'DMKT_RG_SOLICITUD';
     protected $primaryKey = 'id';
     //protected $touches = array('pendHist');
 
@@ -20,6 +20,16 @@ class Solicitude extends Eloquent{
             return $lastId->id;
     }
 
+    protected static function solInst( $periodo )
+    {
+        return Solicitude::orderBy('id','desc')->whereHas('detalle' , function ($q ) use ( $periodo )
+        {
+            $q->whereHas('periodo' , function ( $t ) use ( $periodo )
+            {
+                $t->where('periodo',$periodo);
+            });
+        })->where( 'idestado' , '<>' , CANCELADO )->get();
+    }
     /*protected function pendHist()
     {
         return $this->hasOne('System\SolicitudeHistory','idsolicitude','id')->where( 'status_to' , PENDIENTE );

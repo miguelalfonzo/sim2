@@ -60,10 +60,10 @@ class LoginController extends BaseController{
                 if($aplication)
                 {
                     $typeUser = Auth::user()->type;
-                    if( in_array( $typeUser, array( REP_MED,SUP,GER_PROD,GER_COM,CONT,TESORERIA )))
+                    if( in_array( $typeUser, array( REP_MED , SUP , GER_PROD , GER_COM , CONT , TESORERIA , ASIS_GER ) ) )
                         return Redirect::to('show_user');
-                    else if($typeUser == ASIS_GER)
-                        return Redirect::to('registrar-fondo');
+                   /* else if($typeUser == ASIS_GER)
+                        return Redirect::to('registrar-fondo');*/
                     else
                         return View::make('Dmkt.login')->with( array('message' => 'Usuario no autorizado') );
                 }

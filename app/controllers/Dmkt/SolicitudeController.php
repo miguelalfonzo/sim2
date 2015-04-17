@@ -31,6 +31,7 @@ use \View;
 use \Common\StateRange;
 use \Expense\ChangeRate;
 use \Common\TypeMoney;
+use \Dmkt\Solicitud\Periodo;
 
 class SolicitudeController extends BaseController
 {
@@ -69,13 +70,13 @@ class SolicitudeController extends BaseController
         else
         {
             if (Auth::user()->type == GER_COM || Auth::user()->type == CONT)
-                $state = R_APROBADO;
+                $state = R_APROBADO ;
             else if ( Auth::user()->type == REP_MED || Auth::user()->type == SUP || Auth::user()->type == GER_PROD )
                 $state = R_PENDIENTE;
             elseif ( Auth::user()->type == TESORERIA )
-                $state = R_REVISADO;
+                $state = R_REVISADO ;
             elseif ( Auth::user()->type == ASIS_GER )
-                $state = R_TODOS;
+                $state = R_APROBADO ;
         }
         $mWarning = array();
         if (Session::has('warnings'))
@@ -96,9 +97,13 @@ class SolicitudeController extends BaseController
         {
             $data['tc'] = ChangeRate::getTc();    
             $data['banks'] = Account::banks();
-        }                    
-
-        return View::make('template.show_user',$data);   
+        }
+        if ( Auth::user()->type == ASIS_GER )
+        {
+            $data['fondos']  = Fondo::where('idusertype', ASIS_GER )->get();                
+            $data['etiquetas'] = Label::orderBy('id','asc')->get();
+        }
+        return View::make('template.User.show',$data);   
     }
 
     public function newSolicitude()
@@ -115,7 +120,7 @@ class SolicitudeController extends BaseController
             'typesMoney'     => $typesMoney,
             'families'       => $families
         );
-        return View::make('Dmkt.Rm.register_solicitude', $data);
+        return View::make('Dmkt.Register.solicitude', $data);
     }
 
     public function editSolicitude($token)
@@ -136,7 +141,7 @@ class SolicitudeController extends BaseController
             'typesMoney'       => $typeMoney,
             'families'         => $families
         );
-        return View::make('Dmkt.Rm.register_solicitude', $data);
+        return View::make('Dmkt.Rm.Register.solicitude', $data);
     }
 
     public function viewSolicitude($token)
@@ -259,10 +264,6 @@ class SolicitudeController extends BaseController
                 {
                     $detalle['monto_solicitado']     = $inputs['monto'];
                     $detalle['fecha_entrega']        = $date;
-                    //$detalle['id_motivo_solicitud']  = $inputs['type_solicitude'];
-                    //$detalle['id_tipo_moneda']       = $inputs['money'];
-                    //$detalle['id_tipo_pago']         = $inputs['type_payment'];
-                    
                     if ($inputs['type_solicitude']   == 2)
                     {
                         if (isset($image)) 
@@ -324,7 +325,7 @@ class SolicitudeController extends BaseController
                         {
                             $toUserId    = Auth::user()->id;
                         }
-                        $rpta = $this->setStatus(0, PENDIENTE, Auth::user()->id, $toUserId, $id_sol);
+                        $rpta = $this->setStatus( 0 , PENDIENTE, Auth::user()->id, $toUserId, $id_sol);
                         if ($rpta[status] == ok)
                         {
                             $rpta = $this->setRpta($typeUser);
@@ -369,7 +370,6 @@ class SolicitudeController extends BaseController
         {
             return $this->internalException( $e , __FUNCTION__);
         }
-
     }
 
     private function unsetImage( $oldType , $jDetalle , $typeSolicitude , $image , $factura)
@@ -400,8 +400,6 @@ class SolicitudeController extends BaseController
                 }
                 else
                 {
-                    Log::error( $image);
-                    Log::error( gettype( $image) );
                     if ( !is_object( $image ) )
                         return $this->warningException(__FUNCTION__,'No ha ingresado la imagen de la Factura');
                     else
@@ -429,9 +427,7 @@ class SolicitudeController extends BaseController
             $clients = explode(',',$clients[0]);
             $tables = explode(',',$tables[0]);    
             if ( count($clients) != count($tables) )
-            {
                 return $this->warningException(__FUNCTION__,'El numero de clientes no coincide con el repositorio');
-            }
             else
             { 
                 SolicitudeClient::where('idsolicitud' , $idSolicitud )->delete();
@@ -631,14 +627,6 @@ class SolicitudeController extends BaseController
     }
 
     // IDKC: CHANGE STATUS => CANCELADO
-    private function msgValidator($validator)
-    {
-        $rpta = '';
-        foreach ($validator->messages()->all() as $msg)
-            $rpta .= $msg.'-';
-        return $rpta;
-    }
-
     public function cancelSolicitude()
     {
         try
@@ -646,7 +634,7 @@ class SolicitudeController extends BaseController
             DB::beginTransaction();
             $inputs = Input::all();
             $rules = array(
-                    'idsolicitude'        => 'required|numeric|min:1',
+                    'idsolicitud'        => 'required|numeric|min:1',
                     'observacion'         => 'required|string|min:1'
             );
             $validator = Validator::make($inputs, $rules);
@@ -654,24 +642,44 @@ class SolicitudeController extends BaseController
                 return $this->warningException( __FUNCTION__ , substr($this->msgValidator($validator),0,-1) );
             else
             {
-                $solicitude               = Solicitude::find( $inputs['idsolicitude'] );
-                $oldidestado              = $solicitude->idestado;
-                $solicitude->idestado     = CANCELADO;
-                $solicitude->observacion  = $inputs['observacion'];
-                if ( !$solicitude->save() )
-                    return $this->warningException( __FUNCTION__ , 'No se pudo Cancelar la Solicitud' );
+                $solicitud               = Solicitude::find( $inputs['idsolicitud'] );
+                if ( count( $solicitud ) == 0 )
+                    return $this->warningException( __FUNCTION__ , 'No se encontro la solicitud: '.$inputs['idsolicitud'] );
                 else
                 {
-                    $user_id                  = Auth::user()->id;
-                    $rpta = $this->setStatus($oldIdestado, CANCELADO, $user_id, $user_id, $id);
-                    if ( $rpta[status] == ok)
+                    $periodo = $solicitud->detalle->periodo;
+                    if ( $solicitud->idtiposolicitud == SOL_INST )
                     {
-                        DB::commit();
-                        Session::put('state',R_NO_AUTORIZADO);
+                        if ( $periodo->status == BLOCKED )
+                            return $this->warningException( __FUNCTION__ , 'No se puede eliminar las solicitudes del periodo: '.$periodo->periodo );
+                        if ( count ( Solicitude::solInst( $periodo->periodo ) ) == 1 )
+                            Periodo::inhabilitar( $periodo->periodo ); 
                     }
+                    elseif ( $solicitud->idtiposolicitud == SOL_REP )
+                    {
+                        if ( $solicitud->idestado != PENDIENTE )
+                            return $this->warningException( __FUNCTION__ , 'No se puede cancelar las solicitudes aceptadas');        
+                    } 
+                    $oldIdestado             = $solicitud->idestado;
+                    $solicitud->idestado     = CANCELADO;
+                    $solicitud->observacion  = $inputs['observacion'];
+                    if ( !$solicitud->save() )
+                        return $this->warningException( __FUNCTION__ , 'No se pudo Cancelar la Solicitud' );
                     else
-                        DB::rollback();
-                    return $rpta;
+                    {
+                        $user_id                  = Auth::user()->id;
+                        $rpta = $this->setStatus($oldIdestado, CANCELADO, $user_id, $user_id, $solicitud->id);
+                        if ( $rpta[status] == ok)
+                        {
+                            DB::commit();
+                            $rpta['Type'] = $solicitud->idtiposolicitud;
+                            if ( $rpta['Type'] == SOL_REP )
+                                Session::put('state',R_NO_AUTORIZADO);
+                        }
+                        else
+                            DB::rollback();
+                        return $rpta;
+                    }
                 }
             }
         }
@@ -697,12 +705,12 @@ class SolicitudeController extends BaseController
             else
             {    
                 $solicitude = Solicitude::find( $inputs['idsolicitude'] );
-                $oldidestado = $solicitude->idestado;
+                $oldIdestado = $solicitude->idestado;
                 $solicitude->observacion = $inputs['observacion'];
                 $solicitude->idestado = RECHAZADO;
                 $solicitude->status = ACTIVE;
                 $solicitude->save();
-                $rpta = $this->setStatus( $oldidestado, RECHAZADO, Auth::user()->id,  $solicitude->created_by, $solicitude->id );
+                $rpta = $this->setStatus( $oldIdestado, RECHAZADO, Auth::user()->id,  $solicitude->created_by, $solicitude->id );
                 if ( $rpta[status] == ok )
                 {
                     Session::put('state',R_NO_AUTORIZADO);
