@@ -351,4 +351,30 @@ class BaseController extends Controller {
         }
         return $rpta;
     }
+    public function viewTestUploadImg(){
+        return View::make('test.testUploadImg');
+    }
+    public function viewTestUploadImgSave() {
+        $file = Input::file('image');
+        $input = array('image' => $file);
+        $rules = array(
+            'image' => 'image'
+        );
+        $validator = Validator::make($input, $rules);
+        if ( $validator->fails() )
+        {
+            return Response::json(['success' => false, 'errors' => $validator->getMessageBag()->toArray()]);
+ 
+        }
+        else {
+            $destinationPath = 'uploads/';
+            //$filename = $file->getClientOriginalName();
+            $filename_ori = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $ext = pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
+            $filename = md5(uniqid(rand(), true)).$ext;
+            Input::file('image')->move($destinationPath, $filename);
+            return Response::json(['success' => true, 'file' => asset($destinationPath.$filename)]);
+        }
+ 
+    }
 }

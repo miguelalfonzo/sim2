@@ -5,6 +5,9 @@ Route::get('test', array('uses' => 'Dmkt\LoginController@test'));
 Route::get('set_status', array('uses' => 'BaseController@setStatus'));
 Route::get('sendmail', array('uses' => 'BaseController@postman'));
 Route::get('prueba', 'Dmkt\FondoController@test');
+Route::get('testUploadImg', 'BaseController@viewTestUploadImg');
+Route::post('testUploadImgSave', 'BaseController@viewTestUploadImgSave');
+
 
 
 Route::get('clientes-data','TestController@clientsTables');
