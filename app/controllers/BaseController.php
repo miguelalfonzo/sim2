@@ -36,6 +36,14 @@ class BaseController extends Controller {
         return $date;
     }
 
+    protected function msgValidator($validator)
+    {
+        $rpta = '';
+        foreach ($validator->messages()->all() as $msg)
+            $rpta .= $msg.'-';
+        return $rpta;
+    }
+
 	protected function setupLayout()
 	{
 		if ( ! is_null($this->layout))
@@ -171,24 +179,19 @@ class BaseController extends Controller {
             // POSTMAN: send email
             $rpta = $this->postman($idsolicitude, $statusNameFrom, $statusNameTo, $toUser);
             if ($rpta[status] == ok || $rpta[status] == warning)
-            {
-                $idestadoFrom = $fromStatus == null ? null : $fromStatus->idestado;
-                $idestadoTo = $toStatus == null ? null : $toStatus->idestado;
-                $rpta = $this->updateStatusSolicitude( $idestadoFrom, $idestadoTo, $fromUser, $toUser, $idsolicitude, 0);
-            }
+                $rpta = $this->updateStatusSolicitude( $status_from, $status_to , $fromUser, $toUser, $idsolicitude, 0);
+            return $rpta;
         }
         catch (Exception $e)
         {
-            $rpta = $this->internalException($e,__FUNCTION__);
+            return $this->internalException( $e , __FUNCTION__ );
         }
-        return $rpta;
     }
 
     public function updateStatusSolicitude( $status_from, $status_to, $user_from, $user_to, $idsolicitude, $notified)
     {   
-       try
-        {
-            
+        try
+        {         
             $fData = array(
                 'status_to'   => $status_to,
                 'idsolicitude'=> $idsolicitude,
@@ -214,13 +217,12 @@ class BaseController extends Controller {
             $statusSolicitude->notified     = $notified;
             $statusSolicitude->updated_at   = Carbon\Carbon::now();
             $statusSolicitude->save();
-            $rpta = $this->setRpta();
+            return $this->setRpta();
         }
         catch (Exception $e)
         {
-            $rpta = $this->internalException($e,__FUNCTION__);
+            return $this->internalException($e,__FUNCTION__);
         }
-        return $rpta;
     }
 
     protected function setRpta( $data='' )

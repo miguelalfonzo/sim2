@@ -54,11 +54,9 @@ Route::filter('rm', function ()
         $type = Auth::user()->type;
         if ($type != REP_MED)
         {
-            if (in_array($type, array( SUP,GER_COM,GER_PROD,CONT,TESORERIA )))
+            if (in_array( $type, array( SUP , GER_COM , GER_PROD , CONT , TESORERIA , ASIS_GER ) ) )
                 return Redirect::to('show_user');
-            else if ($type == ASIS_GER)
-                return Redirect::to('registrar-fondo');
-             else
+            else
                 return Redirect::to('login');
         }
     } 
@@ -71,10 +69,8 @@ Route::filter('sup', function () {
         $type = Auth::user()->type;
         if ($type != SUP)
         {
-            if (in_array($type, array( REP_MED,GER_COM,GER_PROD,CONT,TESORERIA )))
+            if ( in_array( $type, array( REP_MED , GER_COM , GER_PROD , CONT , TESORERIA , ASIS_GER ) ) )
                 return Redirect::to('show_user');
-            else if ($type == ASIS_GER)
-                return Redirect::to('registrar-fondo');
             else
                 return Redirect::to('login');      
         }
@@ -89,10 +85,8 @@ Route::filter('gerprod', function () {
         $type = Auth::user()->type;
         if ($type != GER_PROD)
         {
-            if (in_array($type, array( REP_MED,SUP,GER_COM,CONT,TESORERIA )))
+            if (in_array($type, array( REP_MED,SUP,GER_COM,CONT,TESORERIA , ASIS_GER ) ) )
                 return Redirect::to('show_user');
-            else if ($type == ASIS_GER)
-                return Redirect::to('registrar-fondo');
             else
                 return Redirect::to('login');
         }
@@ -107,10 +101,8 @@ Route::filter('cont', function () {
         $type = Auth::user()->type;
         if ($type != CONT)
         {
-            if (in_array($type, array( REP_MED,SUP,GER_COM,GER_PROD,TESOREIA )))
+            if (in_array($type, array( REP_MED,SUP,GER_COM,GER_PROD,TESOREIA , ASIS_GER ) ) )
                 return Redirect::to('show_user');
-            else if ($type == ASIS_GER)
-                return Redirect::to('registrar-fondo');
             else
                 return Redirect::to('login');
         }
@@ -125,10 +117,8 @@ Route::filter('tes', function () {
         $type = Auth::user()->type;
         if ($type != TESORERIA)
         {
-            if (in_array($type, array( REP_MED,SUP,GER_COM,GER_PROD,CONT )))
+            if (in_array($type, array( REP_MED,SUP,GER_COM,GER_PROD,CONT , ASIS_GER ) ) )
                 return Redirect::to('show_user');
-            else if ($type == ASIS_GER)
-                return Redirect::to('registrar-fondo');
             else
                 return Redirect::to('login');
         }
@@ -143,10 +133,8 @@ Route::filter('gercom', function () {
         $type = Auth::user()->type;
         if ($type != GER_COM)
         {
-            if (in_array($type, array( REP_MED,SUP,GER_PROD,CONT,TESORERIA )))
+            if (in_array($type, array( REP_MED,SUP,GER_PROD,CONT,TESORERIA , ASIS_GER ) ) )
                 return Redirect::to('show_user');
-            else if ($type == ASIS_GER)
-                return Redirect::to('registrar-fondo');
             else
                 return Redirect::to('login');
         }
@@ -196,10 +184,8 @@ Route::filter('sup_gerprod_gercom', function ()
         $type = Auth::user()->type;
         if (! ($type == SUP || $type == GER_PROD || $type == GER_COM ))
         {
-            if( in_array( $type, array( REP_MED,CONT,TESORERIA )))
+            if( in_array( $type, array( REP_MED,CONT,TESORERIA , ASIS_GER ) ) )
                 return Redirect::to('show_user');
-            else if ($type == ASIS_GER)
-                return Redirect::to('registrar-fondo');
             else
                 return Redirect::to('login');                
         }
@@ -215,10 +201,8 @@ Route::filter('sup_gerprod', function ()
         $type = Auth::user()->type;
         if (! ($type == SUP || $type == GER_PROD ))
         {
-            if( in_array( $type, array( REP_MED,GER_COM,CONT,TESORERIA )))
+            if( in_array( $type, array( REP_MED,GER_COM,CONT,TESORERIA , ASIS_GER ) ) )
                 return Redirect::to('show_user');
-            else if ($type == ASIS_GER)
-                return Redirect::to('registrar-fondo');
             else
                 return Redirect::to('login');                
         }
@@ -263,10 +247,25 @@ Route::filter('rm_sup', function ()
         $type = Auth::user()->type;
         if (! ($type == REP_MED || $type == SUP ))
         {
-            if( in_array( $type, array( GER_PROD,GER_COM,CONT,TESORERIA )))
+            if( in_array( $type, array( GER_PROD,GER_COM,CONT,TESORERIA , ASIS_GER ) ) )
                 return Redirect::to('show_user');
-            else if ($type == ASIS_GER)
-                return Redirect::to('registrar-fondo');
+            else
+                return Redirect::to('login');                
+        }
+    }
+    else
+        return Redirect::to('login');
+});
+
+Route::filter( 'rm_sup_ager' , function () 
+{
+    if (Auth::check()) 
+    {
+        $type = Auth::user()->type;
+        if (! ($type == REP_MED || $type == SUP || $type == ASIS_GER ) )
+        {
+            if( in_array( $type, array( GER_PROD,GER_COM,CONT,TESORERIA ) ) )
+                return Redirect::to('show_user');
             else
                 return Redirect::to('login');                
         }

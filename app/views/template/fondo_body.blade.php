@@ -47,7 +47,7 @@
 			<span class="input-group-addon">
                 <i class="glyphicon glyphicon-calendar"></i>
             </span>
-			<input id="periodo" class="form-control date_month" type="text" value="{{json_decode($fondo->detalle->detalle)->periodo}}" disabled>
+			<input id="periodo" class="form-control date_month" type="text" value="{{$fondo->detalle->periodo->periodo}}" disabled>
 		</div>
 	</div>
 </div>
@@ -65,4 +65,12 @@
 		<input type="text" class="form-control" value="{{json_decode($fondo->detalle->detalle)->num_cuenta}}" disabled>
 	</div>
 </div>
+@if (!is_null( $fondo->observacion) )
+	<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+		<div class="form-expense">
+			<label>Observación</label>
+			<textarea class="form-control" disabled>{{$fondo->observacion}}</textarea>
+		</div>
+	</div>
+@endif
 <div class="col-xs-12 col-sm-6 col-md-4"></div>

@@ -21,6 +21,7 @@ use \Log;
 use \Expense\ProofType;
 use \Exception;
 use Dmkt\Solicitud\Periodo;
+use Common\TypeMoney;
 
 class FondoController extends BaseController
 {
@@ -28,10 +29,15 @@ class FondoController extends BaseController
     public function objectToArray($object)
     {
         $array = array();
-        foreach ($object as $member => $data) {
+        foreach ($object as $member => $data)
             $array[$member] = $data;
-        }
         return $array;
+    }
+
+    private function period($date)
+    {
+        $period = explode('-', $date);
+        return $period[1].str_pad($period[0], 2, '0', STR_PAD_LEFT);
     }
     
     public function getRegister()
@@ -40,63 +46,307 @@ class FondoController extends BaseController
         return View::make('Dmkt.AsisGer.register_fondo')->with('fondos', $fondos);
     }
 
-    public function getFondos($start, $export = 0)
+    public function getSolInst()
     {
-        $periodo = $this->period($start);
-        $periodos = Periodo::where('periodo', $periodo )->first();
-        if ( count ( $periodos ) == 0 )
-            return $this->setRpta();
-        else
+        try
         {
-            $solicitud = Solicitude::orderBy('id','desc')->whereHas('detalle' , function ($q ) use ( $periodo )
+            $inputs = Input::all();
+            $rules = array( 'idsolicitud' => 'required|min:1' );
+            $validator = Validator::make( $inputs , $rules );
+            if ( $validator->fails() )
+                return $this->warningException( __FUNCTION__ , substr( $this->msgValidator($validator) , 0 , -1 ) );
+            else
             {
-                $q->whereHas('periodo' , function ( $t ) use ( $periodo )
-                {
-                    $t->where('periodo',$periodo);
-                });
-            })->get();
-            $total = 0 ;
+                $solInst = Solicitude::find( $inputs['idsolicitud']);
+                $detalle = $solInst->detalle;
+                $jDetalle = json_decode($detalle->detalle);
+                $rm = $solInst->asignedTo->rm;
+                $data = array(
+                    'titulo'    => $solInst->titulo,
+                    'idetiqueta'  => $solInst->idetiqueta,
+                    'rm'            => $rm->nombres.' '.$rm->apellidos ,
+                    'idrm'          => $rm->idrm ,
+                    'supervisor'    => $jDetalle->supervisor ,
+                    'codsup'        => $jDetalle->codsup ,
+                    'monto'         => $jDetalle->monto_aprobado ,
+                    'periodo'       => $detalle->periodo->periodo ,
+                    'rep_cuenta'    => $jDetalle->num_cuenta ,
+                    'idfondo'       => $detalle->idfondo
+                );
+                return $this->setRpta( $data );
+            }
+        }
+        catch ( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
+    }
+
+    private function sumSolicitudInst( $solicitud )
+    {
+        try
+        {
+            $monedas = TypeMoney::all();
+            $totales = array();
+            foreach ( $monedas as $moneda )
+                $totales[$moneda->simbolo] = 0 ;
             foreach ( $solicitud as $sol )
             {
-                $jDetalle = json_decode($sol->detalle->detalle);
-                $total += $jDetalle->monto_aprobado;
+                $jDetalle = json_decode( $sol->detalle->detalle );
+                $typeMoney = $sol->detalle->fondo->typeMoney;
+                $totales[$typeMoney->simbolo] += $jDetalle->monto_aprobado ;
             }
-            $data = array( 
-                'solicituds' => $solicitud ,
-                'state'      => $periodos->status , 
-                'total'      => $total
-            );
-            return View::make('Dmkt.AsisGer.list_fondos')->with( $data );
+            return $this->setRpta( $totales );
         }
-            /*$fondos = FondoInstitucional::where('periodo', $periodo)->get();
-            $estado = 0;
-            $export = 0;
-            if(count($fondos) > 0)
+        catch ( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        } 
+    }
+
+    private function getStringTotal( $totales )
+    {
+        $rpta = 'Total: ' ;
+        foreach ( $totales as $key => $total )
+            if ( $total != 0 )
+                $rpta .= $key.' '.$total.' , ';
+        return substr( $rpta , 0 , -2 );
+    }
+
+    public function getFondos($start, $export = 0)
+    {
+        try
+        {
+            $periodo = $this->period($start);
+            $periodos = Periodo::where('periodo', $periodo )->first();
+            if ( count ( $periodos ) == 0 )
+                return $this->setRpta( View::make('Dmkt.AsisGer.list_fondos')->with( 'total' , '' )->render() );
+            else
             {
-                $export = EXPORTAR;
-                foreach ($fondos as $fondo) {
-                    if($fondo->terminado == TERMINADO)
+                $solicitud = Solicitude::solInst( $periodo );
+                $middleRpta = $this->sumSolicitudInst( $solicitud );
+                if ( $middleRpta[status] == ok )
+                {   
+                    $data = array( 
+                        'solicituds' => $solicitud ,
+                        'state'      => $periodos->status , 
+                        'total'      => $this->getStringTotal( $middleRpta[data] )
+                    );
+                   return $this->setRpta( View::make('Dmkt.AsisGer.list_fondos')->with( $data )->render() );
+                }
+            }
+            return $middleRpta;
+        }
+        catch ( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
+    }
+
+    private function endSolicituds( $solicituds )
+    {
+        try
+        {
+            foreach( $solicituds as $solicitud )
+            {
+                $oldIdestado = $solicitud->idestado;
+                $solicitud->idestado = DEPOSITO_HABILITADO;
+                if ( !$solicitud->save() )
+                    return $this->warningException( __FUNCTION , 'No se pudo actualizar la solicitud: '.$solicitud->id );
+                else
+                {
+                    $middleRpta = $this->setStatus( $oldIdestado , DEPOSITO_HABILITADO , Auth::user()->id , USER_TESORERIA , $solicitud->id );
+                    if ( $middleRpta[status] != ok )
+                        return $middleRpta;
+                }
+            }
+            return $this->setRpta();
+        }
+        catch( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
+    }
+
+
+    public function endFondos( $start )
+    {
+        try
+        {
+            DB::beginTransaction();
+            $periodo = $this->period($start);
+            $periodos = Periodo::where( 'periodo' , $periodo )->first();
+            if ( count( $periodos ) == 0 )
+                return $this->warningException( __FUNCTION__ , 'El periodo seleccionado no ha sido activado: '.$periodo );
+            elseif ( $periodos->status == BLOCKED )
+                return $this->warningException( __FUNCTION__ , 'El periodo ya se encuentra Terminado' );
+            else
+            {
+                $solicituds = Solicitude::solInst( $periodo );
+                if ( count( $solicituds ) == 0 )
+                    return $this->warningException( __FUNCTION__ , 'No se encontro solicitudes para el periodo especificado: ' .$periodo);
+                else
+                {
+                    $middleRpta = $this->endSolicituds( $solicituds );
+                    if ( $middleRpta[status] == ok )
                     {
-                        $estado = TERMINADO;
+                        $periodos->status = BLOCKED ;
+                        if ( !$periodos->save() )
+                        {
+                            DB::rollback();
+                            return $this->warningException( __FUNCTION , 'No se pudo terminar el periodo');
+                        }
+                        else
+                            DB::commit();
                     }
                 }
             }
-            */
+            return $middleRpta;   
+        }
+        catch (Exception $e)
+        {
+            DB::rollback();
+            return $this->internalException( $e , __FUNCTION__ );
+        }
     }
+
+    private function solicitudToArray( $solicituds )
+    {
+        $rpta = array();
+        foreach ( $solicituds as $solicitud )
+        {
+            $data     = array();
+            $detalle  = $solicitud->detalle;
+            $jDetalle = json_decode( $detalle->detalle );
+            $data[]   = $solicitud->titulo;
+            $data[]   = $solicitud->asignedTo->rm->nombres.' '.$solicitud->asignedTo->rm->apellidos;
+            $data[]   = $jDetalle->num_cuenta;
+            $data[]   = $jDetalle->supervisor;
+            $data[]   = $detalle->fondo->typeMoney->simbolo;
+            $data[]   = $jDetalle->monto_aprobado;
+            $rpta[]   = $data ;
+        }
+        return $rpta;
+    }
+
+    public function exportExcelFondos( $start )
+    {
+        $solicituds = Solicitude::solInst( $this->period( $start ) );
+        $data = $this->solicitudToArray( $solicituds );
+        //$dato = $data->toArray();
+        $sum  = $this->sumSolicitudInst( $solicituds );
+        $mes  = array(
+            '01' => 'enero',
+            '02' => 'febrero',
+            '03' => 'marzo',
+            '04' => 'abril',
+            '05' => 'mayo',
+            '06' => 'junio',
+            '07' => 'julio',
+            '08' => 'agosto',
+            '09' => 'setiembre',
+            '10' => 'octubre',
+            '11' => 'noviembre',
+            '12' => 'diciembre'
+        );
+        $st   = explode('-', $start);
+        $mes  = $mes[str_pad($st[0], 2, '0', STR_PAD_LEFT)];
+        $anio = $st[1];
+        
+        Excel::create('Fondo - '.str_pad($st[0], 2, '0', STR_PAD_LEFT).$anio , function($excel) use ( $data , $sum , $mes , $anio )
+        {  
+            $excel->sheet($mes, function($sheet) use ( $data , $sum , $mes , $anio )
+            {
+                $sheet->mergeCells('A1:F1');
+                $sheet->row( 1 , array( 'FONDO INSTITUCIONAL ' . strtoupper($mes) . ' - ' . $anio ));
+                $sheet->row( 1 , function( $row )
+                {
+                    $row->setAlignment('center');
+                    $row->setFont( array(
+                        'family' => 'Calibri',
+                        'size' => '20',
+                        'bold' => true
+                    ) );
+                    $row->setBackground('#339246'); 
+                });
+                $sheet->setHeight(1, 30);
+                $count = count( $data ) + 2;
+                $sheet->setBorder( 'A1:F' . $count, 'thin' );
+                $sheet->setHeight( 2 , 20 );
+                $sheet->row( 2 , array(
+                    'SISOL  - Hospital',
+                    'Depositar a:',
+                    'Nº Cuenta Bagó Bco. Crédito',
+                    'SUPERVISOR',
+                    'Moneda',
+                    'Monto Real'
+                ) );
+                $sheet->row(2, function($row)
+                {
+                    $row->setFont( array(
+                        'family' => 'Calibri',
+                        'size' => '15',
+                        'bold' => true
+                    ) );
+                    
+                    $row->setBackground('#D2E718');
+                    $row->setAlignment('center');
+                });      
+                $sheet->fromArray( $data , null , 'A3' , false , false );
+                $i= 0 ;
+                foreach( $sum[data] as $moneda => $total )
+                {
+                    if ( $total != 0)
+                    {
+                        $i++;
+                        $sheet->row( $count + $i , array( '' , '' , '' , '' , 'Total: '.$moneda , $total ) );
+                    }   
+                } 
+            });  
+        })->download('xls');
+        
+    }
+
+    private function validateRm( $codrepmed , $codsup )
+    {
+        try
+        {
+            $repmed  = Rm::find( $codrepmed );
+            if ( count( $repmed ) == 0 )
+                return $this->warningException( __FUNCTION__ , 'El representante Medico no esta registrado en el sistema: '.$codrepmed );
+            else
+            {
+                if ( $repmed->idsup != $codsup )
+                    return $this->warningException( __FUNCTION__ , 'El codigo del supervisor no coincide con el registro del Sistema: '.$repmed->idsup.'!='.$codsup )
+                else
+                {
+                    $sup    =  Sup::find( $codsup );
+                    if( count( $sup ) == 0 )
+                        return $this->warningException( __FUNCTION__ , 'El supervisor del Representante Medico no esta registrado en el sistema' );
+                    else
+                        return $this->setRpta( $repmed );
+                }
+            }
+        }
+        catch ( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }                   
+    }
+
     public function postRegister()
     {
         try
         {
             DB::beginTransaction();
             $inputs = Input::all();
-            $periodo = $this->period($inputs['mes']);
-            $verifyMonth = Periodo::where( 'periodo' , $periodo )->where( 'status' , BLOCKED )->get();
+            $periodo = $this->period( $inputs['mes'] );
+            $verifyMonth = Periodo::where( 'periodo' , $periodo )->where( 'status' , BLOCKED )->first();
             if( count( $verifyMonth ) != 0 )
                 return $this->warningException( __FUNCTION__ ,'El periodo ingresado ya ha sido terminado' );
             else
             {
-                Log::error('1');
-                $verifyPeriodo = Periodo::where( 'periodo' , $periodo)->get();
+                $verifyPeriodo = Periodo::where( 'periodo' , $periodo)->first();
                 if ( count ( $verifyPeriodo ) == 0 )
                 {
                     $newPeriodo = new Periodo;
@@ -107,29 +357,28 @@ class FondoController extends BaseController
                         return $this->warningException( __FUNCTION__ , 'No se pudo registrar el nuevo periodo' );
                     $idPeriodo = $newPeriodo->id;
                 }
-                else
-                    $idPeriodo = $verifyPeriodo[0]->id;
-                    
-                $repmed   = Rm::find( $inputs['codrepmed'] );
-                if ( count( $repmed ) == 0 )
-                    return $this->warningException( __FUNCTION__ , 'El representante Medico no esta registrado en el sistema' );
+                elseif ( $verifyPeriodo->status = 3 )
+                {
+                    $verifyPeriodo->status = ACTIVE ;
+                    if ( !$verifyPeriodo->save() )
+                        return $this->warningException( __FUNCTION__ , 'No se pudo reactivar el periodo');
+                    $idPeriodo = $verifyPeriodo->id;
+                }
                 else
                 {
-                    $sup    =  Sup::find( $inputs['codsup'] );
-                    if( count( $sup ) == 0 )
-                        return $this->warningException( __FUNCTION__ , 'El supervisor del Representante Medico no esta registrado en el sistema' );
-                    else
+                    $idPeriodo = $verifyPeriodo->id;
+                    $middleRpta = $this->validateRm( $inputs['codrep'] , $inputs['codsup'] )
+                    if ( $middleRpta[status] == ok )
                     {
                         $solicitud                  = new Solicitude;
                         $solicitud->id              = $solicitud->searchId() + 1;
                         $solicitud->titulo          = $inputs['institucion'];
                         $solicitud->idestado        = PENDIENTE;
+                        $solicitud->idetiqueta      = $inputs['idetiqueta'];
                         $solicitud->idtiposolicitud = SOL_INST;
-                        $solicitud->iduserasigned   = $repmed->iduser;
+                        $solicitud->iduserasigned   = $middleRpta[data]->iduser;
                         $solicitud->token           = sha1(md5(uniqid($solicitud->id, true)));
                         
-                        //$solicitud->idetiqueta    = $inputs['idetiqueta'];
-
                         $detalle                    = new SolicitudeDetalle;
                         $detalle->id                = $detalle->searchId() + 1;
 
@@ -145,7 +394,7 @@ class FondoController extends BaseController
                             'num_cuenta'     => $inputs['cuenta'] ,
                             'monto_aprobado' => $inputs['total'] 
                             );
-                            $detalle->idfondo = $inputs['idfondo'] ;
+                            $detalle->idfondo   = $inputs['idfondo'] ;
                             $detalle->idperiodo = $idPeriodo;   
                             $detalle->detalle = json_encode($jDetalle);
                             if ( !$detalle->save() )
@@ -176,55 +425,69 @@ class FondoController extends BaseController
         return $middleRpta;
     }
 
-    public function listFondosRep()
-    {
-        /*$fondos = Solicitude::where('idtiposolicitud', SOL_INST )->whereHas('detalle', function ( $q) 
-        {
-            $q->where('')
-        })->get();
-        return View::make('Dmkt.Rm.list_fondos_rm')->with('fondos', $fondos);*/
-    }
-
-    public function updateFondo()
+    public function updateSolInst()
     {
         try
         {
             DB::beginTransaction();
             $inputs  = Input::all();
             $periodo = $this->period($inputs['mes']);
-            $verifyMonth = FondoInstitucional::where('periodo', $periodo)->where('terminado', TERMINADO)->get();
-            if(count($verifyMonth) != 0)
-                return 'blocked';
+            $verifyMonth = Periodo::where( 'periodo' , $periodo )->where( 'status' , BLOCKED )->get();
+            if( count( $verifyMonth ) != 0 )
+                return $this->warningException( __FUNCTION__ ,'El periodo ingresado ya ha sido terminado' );
             else
             {
-                $cuenta = Fondo::where('cuenta_mkt',CTA_FONDO_INSTITUCIONAL)->get();
-                if (count($cuenta) == 1 )
-                {
-                    $fondo              = FondoInstitucional::find($inputs['idfondo']);
-                    $fondo->institucion = $inputs['institucion'];
-                    $fondo->repmed      = $inputs['repmed'];
-                    $fondo->idrm        = $inputs['codrepmed'];
-                    $fondo->supervisor  = $inputs['supervisor'];
-                    $fondo->idsup       = $inputs['codsup'];
-                    $fondo->idcuenta    = $cuenta[0]->idfondo;
-                    $fondo->monto       = $inputs['total'];
-                    $fondo->rep_cuenta  = $inputs['cuenta'];
-                    $fondo->periodo     = $periodo;
-                    $fondo->iduser      = Auth::user()->id;
-                    $fondo->save();
-                    $fondos = $this->getFondos($inputs['mes']);
-                    $userid = Auth::user()->id;
-                    $middleRpta = $this->setStatus($inputs['institucion'], '', PENDIENTE, $userid, $userid, $inputs['idfondo'],FONDO);
-                    if ($middleRpta[status] == ok)    
-                    {    
-                        DB::commit();
-                        return $this->setRpta($this->getFondos($inputs['mes']));
-                    }
-                    else
-                        DB::rollback();
-                }
+                $solInst = Solicitude::find( $inputs['idsolicitud'] );
+                if ( count( $solInst ) == 0 )
+                    return $this->warningException( __FUNCTION__ , 'No se encontro la solicitud: #'.$inputs['idsolicitud'] );
                 else
-                    return array ( status => warning, description => 'La cuenta especificada tiene registrada mas de una marca');
+                    if ( $solInst->idtiposolicitud != SOL_INST )
+                        if ( is_null( $solInst->idtiposolicitud ) )
+                            return $this->warningException( __FUNCTION__ , 'La solicitud no tiene Id de Tipo: #'.$inputs['idsolicitud']);
+                        else
+                            return $this->warningException( __FUNCTION__ , 'La solicitud no es Institucional: #'.$inputs['idsolicitud'].'-'.$solInst->typeSolicitude->nombre);
+                    elseif ( $solInst->idestado != PENDIENTE )
+                        return $this->warningException( __FUNCTION__ , 'Esta solicitud ya ha sido procesada: #'.$inputs['idsolicitud'].'-'.$solInst->state->nombre);
+                    else
+                    {
+                        $middleRpta = $this->validateRm( $inputs['codrepmed'] , $inputs['codsup'] );
+                        if ( $middleRpta[status] == ok )
+                        {
+                            $solInst->titulo    = $inputs['institucion'];
+                            $solInst->iduserasigned = $middleRpta[data]->iduser;
+                            if ( !$solInst->save() )
+                                return $this->warningException( __FUNCTION__ , 'No se pudo actualizar la solicitud: '.$inputs['idsolicitud'] );
+                            else
+                            {
+                                $periodos = Periodo::where( 'periodo' , $periodo)->first();
+                                $detalle      = $solInst->detalle;
+                                $jDetalle     = json_decode( $detalle->detalle );
+                                $jDetalle->supervisor = $inputs['supervisor'];
+                                $jDetalle->codsup     = $inputs['codsup'];
+                                $jDetalle->num_cuenta = $inputs['cuenta'];
+                                $jDetalle->monto_aprobado = $inputs['monto'];
+                                $jDetalle->idfondo        = $inputs['idfondo'];
+                                $detalle->periodo     = $periodos->id;
+                                $detalle->detalle     = json_encode($jDetalle);
+                                if ( !$detalle->save() )
+                                    return $this->warningException( __FUNCTION__ , 'No se pudo procesar los detalles de la Solicitud' );
+                                else
+                                {
+                                    $userid = Auth::user()->id;
+                                    $middleRpta = $this->setStatus( PENDIENTE , PENDIENTE , $userid , $userid, $solicitud->id );
+                                    if ($middleRpta[status] == ok)
+                                    {     
+                                        DB::commit();
+                                        $middleRpta[data] = $this->getFondos( $inputs['mes'] );
+                                    }
+                                    else
+                                        DB::rollback();
+                                    return $middleRpta;
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
         catch (Exception $e)
@@ -277,47 +540,8 @@ class FondoController extends BaseController
         $view   = View::make('Dmkt.Cont.list_fondos')->with('fondos', $fondos)->with('sum', $fondos->sum('total'));
         return $view;
     }
-    function endFondos($start)
-    {
-        try
-        {
-            DB::beginTransaction();
-            $periodo = $this->period($start);
-            $update = array(
-                'terminado'  => TERMINADO,
-                'estado'     => DEPOSITO_HABILITADO
-            );
-            $fondos = FondoInstitucional::where("periodo", $periodo)->select('institucion','idrm','idfondo')->get();//->update(array('terminado' => TERMINADO));
-            $aux = 0;
-            foreach($fondos as $fondo)
-            {
-                $userTo = $fondo->iduser($fondo->idrm);
-                if (is_null($userTo))
-                    return array(status => warning , description => 'El Representante del fondo '.$fondo->idfondo.' '.$fondo->institucion.' no esta registrado en el sistema');
-                $rpta = $this->setStatus($fondo->institucion, PENDIENTE, DEPOSITO_HABILITADO, Auth::user()->id, $fondo->iduser($fondo->idrm), $fondo->idfondo,FONDO);
-                if ($rpta[status] != ok)
-                    $aux=1;
-            }
-            if ($aux == 0)
-            {
-                FondoInstitucional::where("periodo", $periodo)->update($update);
-                DB::commit();
-                $rpta = $this->setRpta($this->getFondos($start));
-            }
-            else
-            {
-                $rpta = array( status => warning , description => 'No se pudo procesar los fondos');
-                DB::rollback();
-            }
-        }
-        catch (Exception $e)
-        {
-            DB::rollback();
-            $rpta = $this->internalException($e,__FUNCTION__);
-        }
-        return $rpta;
-    }
-
+    
+/*
     function getFondo($id)
     {
         $fondo = FondoInstitucional::find($id);
@@ -333,99 +557,9 @@ class FondoController extends BaseController
         $fondos = $this->getFondos($start);
         return $fondos;
     }
+*/
 
-
-    function exportExcelFondos($start)
-    {
-        $data = $this->getFondos($start, 1);
-        $dato = $data->toArray();
-        $sum  = $data->sum('total');
-        $mes  = array(
-            '01' => 'enero',
-            '02' => 'febrero',
-            '03' => 'marzo',
-            '04' => 'abril',
-            '05' => 'mayo',
-            '06' => 'junio',
-            '07' => 'julio',
-            '08' => 'agosto',
-            '09' => 'setiembre',
-            '10' => 'octubre',
-            '11' => 'noviembre',
-            '12' => 'diciembre'
-        );
-        $st   = explode('-', $start);
-        $mes  = $mes[str_pad($st[0], 2, '0', STR_PAD_LEFT)];
-        $anio = $st[1];
-        
-        Excel::create('Fondo - '.str_pad($st[0], 2, '0', STR_PAD_LEFT).$anio , function($excel) use ($dato, $sum, $mes, $anio)
-        {
-            
-            $excel->sheet($mes, function($sheet) use ($dato, $sum, $mes, $anio)
-            {
-                $sheet->mergeCells('A1:E1');
-                $sheet->row(1, array(
-                    'FONDO INSTITUCIONAL ' . strtoupper($mes) . ' - ' . $anio
-                ));
-                $sheet->row(1, function($row)
-                {
-                    $row->setAlignment('center');
-                    $row->setFont(array(
-                        'family' => 'Calibri',
-                        'size' => '20',
-                        'bold' => true
-                    ));
-                    $row->setBackground('#339246');
-                    
-                });
-                $sheet->setHeight(1, 30);
-                $count = count($dato) + 2;
-                $sheet->setBorder('A1:E' . $count, 'thin');
-                $sheet->setHeight(2, 20);
-                $sheet->row(2, array(
-                    'SISOL  - Hospital',
-                    'Depositar a:',
-                    'Nº Cuenta Bagó Bco. Crédito',
-                    ' SUPERVISOR',
-                    'Monto Real'
-                ));
-                $sheet->row(2, function($row)
-                {
-                    $row->setFont(array(
-                        'family' => 'Calibri',
-                        'size' => '15',
-                        'bold' => true
-                    ));
-                    
-                    $row->setBackground('#D2E718');
-                    $row->setAlignment('center');
-                });
-                
-                
-                $sheet->fromArray($dato, null, 'A3', false, false);
-                $sheet->row($count + 1, array(
-                    '',
-                    '',
-                    '',
-                    'Total:',
-                    $sum
-                ));
-                $sheet->row($count + 1, function($row)
-                {
-                    $row->setAlignment('center');
-                    $row->setFont(array(
-                        'family' => 'Calibri',
-                        'size' => '16',
-                        'bold' => true
-                    ));
-                    
-                });
-                
-            });
-            
-        })->download('xls');
-        
-    }
+    
 
     
     function getLastDayOfMonth($month, $year)
@@ -433,7 +567,7 @@ class FondoController extends BaseController
         return date('d', mktime(0, 0, 0, $month + 1, 1, $year) - 1);
     }
 
-    public function viewGenerateSeatFondo($token)
+  /*  public function viewGenerateSeatFondo($token)
     {
         try
         {
@@ -465,9 +599,9 @@ class FondoController extends BaseController
             $rpta = $this->internalException($e,__FUNCTION__);
             return $rpta;
         }
-    }
+    }*/
 
-    public function generateSeatFondo()
+ /*   public function generateSeatFondo()
     {   
         $middleRpta = array();
         $inputs  = Input::all();
@@ -506,16 +640,12 @@ class FondoController extends BaseController
         return json_encode($middleRpta);
     }
 
-    private function period($date)
-    {
-        $period = explode('-', $date);
-        return $period[1].str_pad($period[0], 2, '0', STR_PAD_LEFT);
-    }
+    
 
     public function listDocuments()
     {
         $docs = ProofType::order();
         $view = View::make('Dmkt.Cont.list_documents')->with('docs',$docs);
         return $view;
-    }
+    }*/
 }

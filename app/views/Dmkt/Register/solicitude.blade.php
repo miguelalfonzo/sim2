@@ -50,27 +50,10 @@
                 </div>
             </div>
 
-            <div class="form-group col-sm-6 col-md-4">
-                <label class="col-sm-8 col-md-8 control-label" for="textinput">Etiqueta</label>
-                <div class="col-sm-12 col-md-12">
-                    <select class="form-control selectetiqueta" name="etiqueta">
-                        @foreach($etiquetas as $etiqueta)
-                            @if (isset($solicitude))
-                                @if ($solicitude->idetiqueta == $etiqueta->id)
-                                    <option selected value="{{$etiqueta->id}}">{{$etiqueta->nombre}}</option>
-                                @else
-                                    <option value="{{$etiqueta->id}}">{{$etiqueta->nombre}}</option>
-                                @endif
-                            @else
-                                <option value="{{$etiqueta->id}}">{{$etiqueta->nombre}}</option>
-                            @endif
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-            <!--  -->
-            <!--  -->
-            <!-- -->
+            <!-- LABEL -->
+            @include('Dmkt.Register.label')
+            
+            <!-- TIPO DE PAGO -->
             <div class="form-group col-sm-6 col-md-4">
                 <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo de Pago</label>
                 <div class="col-sm-12 col-md-12">

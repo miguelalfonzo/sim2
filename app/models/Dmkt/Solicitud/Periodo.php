@@ -5,7 +5,7 @@ use \Eloquent;
 
 class Periodo extends Eloquent
 {
-    protected $table = 'DMKT2_RG_PERIODO';
+    protected $table = 'DMKT_RG_PERIODO';
     protected $primaryKey = 'id';
 
     public function searchId()
@@ -16,5 +16,11 @@ class Periodo extends Eloquent
         else
             return $lastId->id;
     }
+
+    protected static function inhabilitar( $periodo )
+    {
+        Periodo::where('periodo' , $periodo )->where('status',ACTIVE)->update( array( 'status' => 3) );
+    }
+
 }
     

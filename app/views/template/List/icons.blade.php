@@ -76,11 +76,11 @@
                 <a href="{{URL::to('show-fondo/'.$solicitude->token)}}">
                     <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span>
                 </a>    
-                @if($solicitude->registrado == 1)   
+                @if($solicitude->idestado == REGISTRADO )   
                     <a href="{{URL::to('report-fondo')}}/{{$solicitude->token}}">
                         <span class="glyphicon glyphicon-print" style="padding: 0 5px; font-size: 1.3em"></span>
                     </a>
-                @elseif($solicitude->asiento == ASIENTO_FONDO )
+                @elseif($solicitude->idestado == GASTO_HABILITADO )
                     <a href="{{URL::to('registrar-gasto-fondo')}}/{{$solicitude->token}}" data-idfondo="{{$solicitude->idfondo}}">
                         <span class="glyphicon glyphicon-usd" style="padding: 0 5px; font-size: 1.3em"></span>
                     </a>

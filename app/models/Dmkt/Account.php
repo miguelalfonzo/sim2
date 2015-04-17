@@ -4,7 +4,7 @@ namespace Dmkt;
 use \Eloquent;
 class Account extends Eloquent
 {
-    protected $table = 'DMKT2_RG_CUENTA';
+    protected $table = 'DMKT_RG_CUENTA';
     protected $primaryKey = 'id';
     
     protected function searchId()

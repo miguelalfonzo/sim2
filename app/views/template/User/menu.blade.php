@@ -16,7 +16,19 @@
                                 @else    
                                     <option value="{{$estado->id}}">{{$estado->nombre}}</option>
                                 @endif
-                            @elseif ( Auth::user()->type == GER_COM || Auth::user()->type == CONT )
+                            @elseif ( Auth::user()->type == GER_COM )
+                                @if( in_array( $estado->id , array( R_APROBADO , R_REVISADO , R_GASTO , R_FINALIZADO , R_NO_AUTORIZADO ) ) )
+                                    @if(isset($state))
+                                        @if($state == $estado->id)
+                                            <option value="{{$estado->id}}" selected >{{$estado->nombre}}</option>
+                                        @else
+                                            <option value="{{$estado->id}}">{{$estado->nombre}}</option>
+                                        @endif
+                                    @else    
+                                        <option value="{{$estado->id}}">{{$estado->nombre}}</option>
+                                    @endif
+                                @endif
+                            @elseif ( in_array ( Auth::user()->type , array( CONT , ASIS_GER ) ) )
                                 @if($estado->id == R_APROBADO || $estado->id == R_REVISADO || $estado->id == R_GASTO || $estado->id == R_FINALIZADO)
                                     @if(isset($state))
                                         @if($state == $estado->id)
