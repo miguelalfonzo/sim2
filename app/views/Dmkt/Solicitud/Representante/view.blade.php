@@ -9,7 +9,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">Solicitud</h3>
-            @if($solicitude->status == BLOCKED )
+            @if($solicitud->status == BLOCKED )
                 <h4 class="" style="color: darkred">LA SOLICITUD ESTA SIENDO EVALUADA</h4>
             @endif
             <small style="float: right; margin-top: -10px">
@@ -30,25 +30,19 @@
                         <span class="glyphicon glyphicon-chevron-up"></span>
                     </a>
                 </div>
-            </aside>
-                
+            </aside>       
             <form id="form_make_activity" method="post">
                 {{Form::token()}}
-                <input name="idsolicitude" type="hidden" value="{{$solicitude->id}}">
-                <input name="token" type="hidden" value="{{$solicitude->token}}">
+                <input name="idsolicitude" type="hidden" value="{{$solicitud->id}}">
+                <input name="token" type="hidden" value="{{$solicitud->token}}">
                 <section id="collapseOne" class="row reg-expense collapse in">
-            
-                @include('template.detail_solicitude')
-
+                    @include('Dmkt.Solicitud.Representante.detail')
                 </section>
-
-                @if ( Auth::user()->type == CONT && $solicitude->idestado == DEPOSITADO )
+                @if ( Auth::user()->type == CONT && $solicitud->idestado == DEPOSITADO )
                     @include('template.Seat.advance_table')
                 @endif
-
                 <!-- Button (Double) -->
-                @include('template.Details.buttons')
-
+                @include('Dmkt.Solicitud.Detail.buttons')
             </form>
         </div>
     </div>

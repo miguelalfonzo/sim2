@@ -53,11 +53,7 @@
                     </a>
                 @endif
             @elseif ( Auth::user()->type == CONT )
-                @if($solicitude->idestado == DEPOSITADO)
-                    <!-- <a id="token-solicitude" data-url="{{$solicitude->token}}">
-                        <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-book"></span>
-                    </a> -->
-                @elseif($solicitude->idestado == REGISTRADO)
+                @if($solicitude->idestado == REGISTRADO)
                     <a id="token-reg-expense" data-url="{{$solicitude->token}}" data-cont="1">
                         <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span>
                     </a>
@@ -73,37 +69,32 @@
                 @endif
             @endif
         @elseif ( $solicitude->idtiposolicitud == SOL_INST )
-                <a href="{{URL::to('show-fondo/'.$solicitude->token)}}">
-                    <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span>
-                </a>    
-                @if($solicitude->idestado == REGISTRADO )   
-                    <a href="{{URL::to('report-fondo')}}/{{$solicitude->token}}">
-                        <span class="glyphicon glyphicon-print" style="padding: 0 5px; font-size: 1.3em"></span>
-                    </a>
-                @elseif($solicitude->idestado == GASTO_HABILITADO )
+            <a href="{{URL::to('show-fondo/'.$solicitude->token)}}">
+                <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span>
+            </a>    
+            @if($solicitude->idestado == REGISTRADO )   
+                <a href="{{URL::to('report-fondo')}}/{{$solicitude->token}}">
+                    <span class="glyphicon glyphicon-print" style="padding: 0 5px; font-size: 1.3em"></span>
+                </a>
+            @endif
+            @if ( Auth::user()->type == REP_MED )
+                @if($solicitude->idestado == GASTO_HABILITADO )
                     <a href="{{URL::to('registrar-gasto-fondo')}}/{{$solicitude->token}}" data-idfondo="{{$solicitude->idfondo}}">
                         <span class="glyphicon glyphicon-usd" style="padding: 0 5px; font-size: 1.3em"></span>
                     </a>
                 @endif
-            @if (Auth::user()->type == SUP)
-                <a href="{{URL::to('show-fondo/'.$solicitude->token)}}">
-                    <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span>
-                </a>    
-            @elseif (Auth::user()->type == CONT)
-                    <a href="{{URL::to('show-fondo/'.$solicitude->token)}}">
-                        <span class="glyphicon glyphicon-eye-open" style="padding: 0 5px; font-size: 1.3em"></span>
-                    </a>
-                    @if ($solicitude->estado == DEPOSITADO)
+            @elseif ( Auth::user()->type == CONT )
+                @if ( $solicitude->idestado == DEPOSITADO || $solicitude->idestado == REGISTRADO )
                     <a href="{{URL::to('generar-asiento-fondo/'.$solicitude->token)}}">
                         <span class="glyphicon glyphicon-book" style="padding: 0 5px; font-size: 1.3em"></span>
                     </a>
-                    @endif
-              
-            @elseif ( Auth::user()->type == TESORERIA)
-                <a href="{{URL::to('show-fondo/'.$solicitude->token)}}">
-                    <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span>
-                </a>
-          
+                @endif
+            @elseif ( Auth::user()->type == TESORERIA )
+                @if ( $solicitude->idestado == DEPOSITO_HABILITADO )
+                    <a class="modal_deposit">
+                        <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span>
+                    </a>
+                @endif
             @endif
         @endif
     </div>

@@ -9,15 +9,13 @@ const ok = 'Ok';
 const warning = 'Warning';
 const danger = 'Danger';
 const error = 'Error';
-const desc_error = 'System Error: Information in log file';
+const desc_error = 'System Error';
 const status = 'Status';
 const description = 'Description';
 const DOCUMENTO_NO_SUSTENTABLE_ID = 7;
 
 const SOLES = 1 ;
 const DOLARES = 2;
-const BANCOS = 'BANCOS';
-
 
 // ASIENTOS DE GASTOS
 const ASIENTO_GASTO_IVA_BASE 					= 'N6';
@@ -102,3 +100,9 @@ const INACTIVE = 3;
 const PAGO_DEPOSITO = 3;
 const PAGO_CHEQUE   = 2;
 const REASON_REGALOS = 2;
+
+//CUENTAS
+const FONDO = 1;
+const BANCO = 2;
+const RETENCION = 3;
+const GASTO = 4;

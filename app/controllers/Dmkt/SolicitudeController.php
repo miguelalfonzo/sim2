@@ -128,7 +128,7 @@ class SolicitudeController extends BaseController
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $detalle = json_decode($solicitude->detalle->detalle);
         $typesolicituds = TypeSolicitude::all();
-        $etiquetas = Label::all();
+        $etiquetas = Label::order();
         $typePayments = TypePayment::all();
         $typeMoney = TypeMoney::all();
         $families = Marca::orderBy('descripcion', 'ASC')->get();
@@ -141,54 +141,75 @@ class SolicitudeController extends BaseController
             'typesMoney'       => $typeMoney,
             'families'         => $families
         );
-        return View::make('Dmkt.Rm.Register.solicitude', $data);
+        return View::make('Dmkt.Register.solicitude', $data);
     }
 
     public function viewSolicitude($token)
     {
-        $solicitude = Solicitude::where('token', $token)->firstOrFail();
-        $detalle = json_decode($solicitude->detalle->detalle);
-        $data = array(
-            'solicitude' => $solicitude,
-            'detalle'    => $detalle
-        );
-        if ( Auth::user()->type == SUP && $solicitude->idestado == PENDIENTE )
+        try
         {
-            $solicitude->status = BLOCKED;
-            $solicitude->save();
-            $data['fondos'] = Fondo::supFondos();
-            $data['solicitude']->status = 1;
-        }
-        elseif ( Auth::user()->type == GER_PROD && $solicitude->idestado == DERIVADO )
-        {
-            $data['solicitude']->status = 1;
-            $data['fondos'] = Fondo::gerProdFondos();
-        }
-        elseif ( Auth::user()->type == TESORERIA && $solicitude->idestado == DEPOSITO_HABILITADO )
-        {
-            $data['banks'] = Account::banks();
-            if ( is_null($solicitude->detalle->idretencion) )
-                $data['deposito'] = $detalle->monto_aprobado;
+            $solicitud = Solicitude::where('token', $token)->first();
+            if ( count( $solicitud) == 0 )
+                return $this->warningException( __FUNCTION__ ,'No se encontro la Solicitud con Codigo: '.$token );
             else
-                if ( $solicitude->detalle->typeRetention->account->idtipomoneda == $solicitude->detalle->idmoneda )
-                    $data['deposito'] = $detalle->monto_aprobado - $detalle->monto_retencion ;
+            {
+                if ( $solicitud->idtiposolicitud != SOL_REP )
+                    return $this->warningException( __FUNCTION__ , 'La solicitud con Id: '.$solicitud->id.' no es de Representantes');
                 else
                 {
-                    $tc = ChangeRate::getTc();
-                    if ( $solicitude->detalle->idmoneda == SOLES )
-                        $data['deposito'] = $detalle->monto_aprobado - ( $detalle->monto_retencion * $tc->compra );    
-                    elseif ( $solicitude->detalle->idmoneda == DOLARES )
-                        $data['deposito'] = $detalle->monto_aprobado - ( $detalle->monto_retencion / $tc->venta );   
+                    $detalle = json_decode($solicitud->detalle->detalle);
+                    $data = array(
+                        'solicitud' => $solicitud,
+                        'detalle'   => $detalle
+                    );
+                    if ( Auth::user()->type == SUP && $solicitud->idestado == PENDIENTE )
+                    {
+                        $solicitud->status = BLOCKED;
+                        if ( !$solicitud->save() )
+                            return $this->warningException( __FUNCTION__ , 'No se puede procesar la solicitud para el supervisor');
+                        else
+                        {
+                            $data['fondos'] = Fondo::supFondos();
+                            $data['solicitud']->status = 1;
+                        }
+                    }
+                    elseif ( Auth::user()->type == GER_PROD && $solicitud->idestado == DERIVADO )
+                    {
+                        $data['solicitud']->status = 1;
+                        $data['fondos'] = Fondo::gerProdFondos();
+                    }
+                    elseif ( Auth::user()->type == TESORERIA && $solicitud->idestado == DEPOSITO_HABILITADO )
+                    {
+                        $data['banks'] = Account::banks();
+                        if ( is_null($solicitud->detalle->idretencion) )
+                            $data['deposito'] = $detalle->monto_aprobado;
+                        else
+                            if ( $solicitud->detalle->typeRetention->account->idtipomoneda == $solicitud->detalle->idmoneda )
+                                $data['deposito'] = $detalle->monto_aprobado - $detalle->monto_retencion ;
+                            else
+                            {
+                                $tc = ChangeRate::getTc();
+                                if ( $solicitud->detalle->idmoneda == SOLES )
+                                    $data['deposito'] = $detalle->monto_aprobado - ( $detalle->monto_retencion * $tc->compra );    
+                                elseif ( $solicitud->detalle->idmoneda == DOLARES )
+                                    $data['deposito'] = $detalle->monto_aprobado - ( $detalle->monto_retencion / $tc->venta );   
+                            }
+                    }
+                    elseif ( Auth::user()->type == CONT && $solicitud->idestado == APROBADO )
+                        $data['typeRetention'] = TypeRetention::all();
+                    elseif ( Auth::user()->type == CONT && $solicitud->idestado == DEPOSITADO )
+                    {
+                        $data['date'] = $this->getDay();
+                        $data['lv'] = $this->textLv( $solicitud );
+                    }
+                    return View::make('Dmkt.Solicitud.Representante.view', $data);
                 }
+            }
         }
-        elseif ( Auth::user()->type == CONT && $solicitude->idestado == APROBADO )
-            $data['typeRetention'] = TypeRetention::all();
-        elseif ( Auth::user()->type == CONT && $solicitude->idestado == DEPOSITADO )
+        catch ( Exception $e )
         {
-            $data['date'] = $this->getDay();
-            $data['lv'] = $this->textLv($solicitude);
+            return $this->internalException( $e , __FUNCTION__ );
         }
-        return View::make('template.Solicitud.view_solicitude', $data);
     }
 
     // IDKC: CHANGE STATUS => PENDIENTE
@@ -233,7 +254,7 @@ class SolicitudeController extends BaseController
                 return array( status => warning , description => "Tipo de Solicitud no Existente");
             $validator = Validator::make($inputs, $rules);
             if ($validator->fails()) 
-                return array( status => warning , description => substr($this->msgValidator($validator), 0 , -1 ) );
+                return $this->warningException( __FUNCTION__ , substr($this->msgValidator($validator), 0 , -1 ) );
             else
             {
                 $date       = $inputs['delivery_date'];

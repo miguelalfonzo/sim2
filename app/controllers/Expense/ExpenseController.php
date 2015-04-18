@@ -424,12 +424,23 @@ class ExpenseController extends BaseController
     {
     	try
     	{
-    		$solicitud = Solicitude::where( 'token' , $token )->firstOrFail();
+    		$solicitud = Solicitude::where( 'token' , $token )->first();
 	        if( count( $solicitud ) == 0 )
 	            return $this->warninException( __FUNCTION__ , 'No se encontro los datos de la Solicitud Institucional' );
-	        $data['fondo']	= $solicitud;
-	        $data['detalle'] = json_decode( $solicitud->detalle->detalle );
-	        return View::make('Expense.view-fondo',$data);
+	        else
+	        	if ( $solicitud->idtiposolicitud == SOL_REP )
+	        		return $this->warninException( __FUNCTION__ , 'La solicitud con Id: '.$solicitud->id.' no es Insitucional' );
+	        	else
+	        	{
+			        $data['solicitud']	 = $solicitud;
+			        $data['detalle'] = json_decode( $solicitud->detalle->detalle );
+			        if ( Auth::user()->type == CONT && $solicitud->idestado == DEPOSITADO )
+                    {
+                        $data['date'] = $this->getDay();
+                        $data['lv'] = $solicitud->titulo;
+                    }
+			        return View::make('Dmkt.Solicitud.Institucional.view',$data);
+			    }
 	    }
 	    catch (Exception $e)
 	    {

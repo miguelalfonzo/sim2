@@ -313,18 +313,18 @@ class FondoController extends BaseController
         {
             $repmed  = Rm::find( $codrepmed );
             if ( count( $repmed ) == 0 )
-                return $this->warningException( __FUNCTION__ , 'El representante Medico no esta registrado en el sistema: '.$codrepmed );
+                return $this->warningException( __FUNCTION__ , 'El representante Medico no esta registrado en el sistema Codigo de Representante: '.$codrepmed );
             else
             {
                 if ( $repmed->idsup != $codsup )
-                    return $this->warningException( __FUNCTION__ , 'El codigo del supervisor no coincide con el registro del Sistema: '.$repmed->idsup.'!='.$codsup )
+                    return $this->warningException( __FUNCTION__ , 'El codigo del supervisor no coincide con el registro del Sistema: '.$repmed->idsup.'!='.$codsup );
                 else
                 {
                     $sup    =  Sup::find( $codsup );
                     if( count( $sup ) == 0 )
                         return $this->warningException( __FUNCTION__ , 'El supervisor del Representante Medico no esta registrado en el sistema' );
                     else
-                        return $this->setRpta( $repmed );
+                        return $this->setRpta( $repmed->iduser );
                 }
             }
         }
@@ -334,40 +334,113 @@ class FondoController extends BaseController
         }                   
     }
 
+    private function verifyPeriodo( $periodo )
+    {
+        try
+        {
+            $periodos = Periodo::periodoInst( $periodo );
+            if( count( $periodos ) == 0 )
+            {
+                $newPeriodo = new Periodo;
+                $newPeriodo->id = $newPeriodo->searchId() + 1 ;
+                $newPeriodo->periodo = $periodo ;
+                $newPeriodo->status  = ACTIVE ;
+                $newPeriodo->idtiposolicitud = SOL_INST ;
+                if ( !$newPeriodo->save() )
+                    return $this->warningException( __FUNCTION__ , 'No se pudo registrar el nuevo periodo: '.$periodo );
+                else
+                    return $this->setRpta( $newPeriodo->id );
+            }
+            else
+                if ( $periodos->status == BLOCKED )
+                    return $this->warningException( __FUNCTION__ ,'El periodo ingresado ya ha sido terminado: '.$periodo );
+                elseif( $periodos->status == INACTIVE )
+                {
+                    $periodos->status = ACTIVE ;
+                    if ( !$periodos->save() )
+                        return $this->warningException( __FUNCTION__ , 'No se pudo reactivar el periodo: '.$periodo);
+                    else
+                        return $this->setRpta( $periodos->id );           
+                }
+                elseif ( $periodos->status == ACTIVE )
+                    return $this->setRpta( $periodos->id );
+                else
+                    return $this->warningException( __FUNCTION__ , 'Estado: '.$periodos->status.' no registrado' );
+        }
+        catch ( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
+    }
+
+
+    private function validateInputSolInst( $inputs )
+    {
+        try
+        {
+            $rules = array(
+                'institucion' => 'required|min:3',
+                'idetiqueta'  => 'required|numeric|min:1',
+                'codrepmed'   => 'required|numeric|min:1',
+                'supervisor'  => 'required|min:4',
+                'codsup'      => 'required|numeric|min:0',
+                'total'       => 'required|numeric|min:1',
+                'cuenta'      => 'required|min:1',
+                'idfondo'     => 'required|min:1',
+                'mes'         => 'required|string|date_format:m-Y'         
+            );
+            $validator = Validator::make($inputs, $rules);
+            if ($validator->fails()) 
+                return $this->warningException( __FUNCTION__ , substr($this->msgValidator($validator), 0 , -1 ) );
+            else
+                return $this->setRpta();
+        }
+        catch ( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
+    }
+
+    private function setDetalleInst( $detalle , $inputs , $idPeriodo )
+    {
+        try
+        {
+            $jDetalle = array(
+            'supervisor'     => $inputs['supervisor'] ,
+            'codsup'         => $inputs['codsup'] ,
+            'num_cuenta'     => $inputs['cuenta'] ,
+            'monto_aprobado' => $inputs['total'] 
+            );
+            $detalle->idfondo   = $inputs['idfondo'] ;
+            $detalle->idperiodo = $idPeriodo;   
+            $detalle->detalle = json_encode($jDetalle);
+            if ( !$detalle->save() )
+                return $this->warningException( __FUNCTION__ , 'No se pudo procesar los detalles de la Solicitud' );
+            else
+                return $this->setRpta();
+        }
+        catch ( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
+                            
+    }
+
     public function postRegister()
     {
         try
         {
             DB::beginTransaction();
             $inputs = Input::all();
-            $periodo = $this->period( $inputs['mes'] );
-            $verifyMonth = Periodo::where( 'periodo' , $periodo )->where( 'status' , BLOCKED )->first();
-            if( count( $verifyMonth ) != 0 )
-                return $this->warningException( __FUNCTION__ ,'El periodo ingresado ya ha sido terminado' );
-            else
+            $middleRpta = $this->ValidateInputSolInst( $inputs );
+            if ( $middleRpta[status] == ok )
             {
-                $verifyPeriodo = Periodo::where( 'periodo' , $periodo)->first();
-                if ( count ( $verifyPeriodo ) == 0 )
+                $periodo = $this->period( $inputs['mes'] );
+                $middleRpta = $this->verifyPeriodo( $periodo );
+                if( $middleRpta[status] == ok )
                 {
-                    $newPeriodo = new Periodo;
-                    $newPeriodo->id = $newPeriodo->searchId() + 1 ;
-                    $newPeriodo->periodo = $periodo ;
-                    $newPeriodo->status  = ACTIVE ;
-                    if ( !$newPeriodo->save() )
-                        return $this->warningException( __FUNCTION__ , 'No se pudo registrar el nuevo periodo' );
-                    $idPeriodo = $newPeriodo->id;
-                }
-                elseif ( $verifyPeriodo->status = 3 )
-                {
-                    $verifyPeriodo->status = ACTIVE ;
-                    if ( !$verifyPeriodo->save() )
-                        return $this->warningException( __FUNCTION__ , 'No se pudo reactivar el periodo');
-                    $idPeriodo = $verifyPeriodo->id;
-                }
-                else
-                {
-                    $idPeriodo = $verifyPeriodo->id;
-                    $middleRpta = $this->validateRm( $inputs['codrep'] , $inputs['codsup'] )
+                    $idPeriodo = $middleRpta[data];
+                    $middleRpta = $this->validateRm( $inputs['codrepmed'] , $inputs['codsup'] );
                     if ( $middleRpta[status] == ok )
                     {
                         $solicitud                  = new Solicitude;
@@ -376,7 +449,8 @@ class FondoController extends BaseController
                         $solicitud->idestado        = PENDIENTE;
                         $solicitud->idetiqueta      = $inputs['idetiqueta'];
                         $solicitud->idtiposolicitud = SOL_INST;
-                        $solicitud->iduserasigned   = $middleRpta[data]->iduser;
+                        $solicitud->idmoneda        = 1;
+                        $solicitud->iduserasigned   = $middleRpta[data];
                         $solicitud->token           = sha1(md5(uniqid($solicitud->id, true)));
                         
                         $detalle                    = new SolicitudeDetalle;
@@ -388,41 +462,29 @@ class FondoController extends BaseController
                             return $this->warningException( __FUNCTION__ , 'No se pudo procesar la solicitud' );
                         else
                         {
-                            $jDetalle = array(
-                            'supervisor'     => $inputs['supervisor'] ,
-                            'codsup'         => $inputs['codsup'] ,
-                            'num_cuenta'     => $inputs['cuenta'] ,
-                            'monto_aprobado' => $inputs['total'] 
-                            );
-                            $detalle->idfondo   = $inputs['idfondo'] ;
-                            $detalle->idperiodo = $idPeriodo;   
-                            $detalle->detalle = json_encode($jDetalle);
-                            if ( !$detalle->save() )
-                                return $this->warningException( __FUNCTION__ , 'No se pudo procesar los detalles de la Solicitud' );
-                            else
+                            $middleRpta = $this->setDetalleInst( $detalle , $inputs , $idPeriodo );
+                            if ( $middleRpta[status] == ok )
                             {
                                 $userid = Auth::user()->id;
                                 $middleRpta = $this->setStatus( 0 , PENDIENTE, $userid , $userid, $solicitud->id );
                                 if ($middleRpta[status] == ok)
-                                {     
+                                {  
                                     DB::commit();
-                                    $middleRpta[data] = $this->getFondos( $inputs['mes'] );
+                                    return $middleRpta;
                                 }
-                                else
-                                    DB::rollback();
-                                return $middleRpta;
                             }
                         }
                     }
                 }
             }
+            DB::rollback();
+            return $middleRpta;
         }
         catch (Exception $e)
         {
             DB::rollback();
             return $this->internalException($e,__FUNCTION__);
         }
-        return $middleRpta;
     }
 
     public function updateSolInst()
@@ -431,74 +493,63 @@ class FondoController extends BaseController
         {
             DB::beginTransaction();
             $inputs  = Input::all();
-            $periodo = $this->period($inputs['mes']);
-            $verifyMonth = Periodo::where( 'periodo' , $periodo )->where( 'status' , BLOCKED )->get();
-            if( count( $verifyMonth ) != 0 )
-                return $this->warningException( __FUNCTION__ ,'El periodo ingresado ya ha sido terminado' );
-            else
-            {
-                $solInst = Solicitude::find( $inputs['idsolicitud'] );
-                if ( count( $solInst ) == 0 )
-                    return $this->warningException( __FUNCTION__ , 'No se encontro la solicitud: #'.$inputs['idsolicitud'] );
-                else
-                    if ( $solInst->idtiposolicitud != SOL_INST )
-                        if ( is_null( $solInst->idtiposolicitud ) )
-                            return $this->warningException( __FUNCTION__ , 'La solicitud no tiene Id de Tipo: #'.$inputs['idsolicitud']);
-                        else
-                            return $this->warningException( __FUNCTION__ , 'La solicitud no es Institucional: #'.$inputs['idsolicitud'].'-'.$solInst->typeSolicitude->nombre);
-                    elseif ( $solInst->idestado != PENDIENTE )
-                        return $this->warningException( __FUNCTION__ , 'Esta solicitud ya ha sido procesada: #'.$inputs['idsolicitud'].'-'.$solInst->state->nombre);
+            $middleRpta = $this->validateInputSolInst( $inputs );
+            if ( $middleRpta[status] == ok )
+            {   
+                $periodo = $this->period($inputs['mes']);
+                $middleRpta = $this->verifyPeriodo( $periodo );
+                if( $middleRpta[status] == ok )
+                {
+                    $idPeriodo = $middleRpta[data];
+                    $solInst = Solicitude::find( $inputs['idsolicitud'] );
+                    if ( count( $solInst ) == 0 )
+                        return $this->warningException( __FUNCTION__ , 'No se encontro la solicitud: #'.$inputs['idsolicitud'] );
                     else
-                    {
-                        $middleRpta = $this->validateRm( $inputs['codrepmed'] , $inputs['codsup'] );
-                        if ( $middleRpta[status] == ok )
-                        {
-                            $solInst->titulo    = $inputs['institucion'];
-                            $solInst->iduserasigned = $middleRpta[data]->iduser;
-                            if ( !$solInst->save() )
-                                return $this->warningException( __FUNCTION__ , 'No se pudo actualizar la solicitud: '.$inputs['idsolicitud'] );
+                        if ( $solInst->idtiposolicitud != SOL_INST )
+                            if ( is_null( $solInst->idtiposolicitud ) )
+                                return $this->warningException( __FUNCTION__ , 'La solicitud no tiene Id de Tipo: #'.$inputs['idsolicitud']);
                             else
+                                return $this->warningException( __FUNCTION__ , 'La solicitud no es Institucional: #'.$inputs['idsolicitud'].'-'.$solInst->typeSolicitude->nombre);
+                        elseif ( $solInst->idestado != PENDIENTE )
+                            return $this->warningException( __FUNCTION__ , 'Esta solicitud ya ha sido procesada: #'.$inputs['idsolicitud'].'-'.$solInst->state->nombre);
+                        else
+                        {
+                            $middleRpta = $this->validateRm( $inputs['codrepmed'] , $inputs['codsup'] );
+                            if ( $middleRpta[status] == ok )
                             {
-                                $periodos = Periodo::where( 'periodo' , $periodo)->first();
-                                $detalle      = $solInst->detalle;
-                                $jDetalle     = json_decode( $detalle->detalle );
-                                $jDetalle->supervisor = $inputs['supervisor'];
-                                $jDetalle->codsup     = $inputs['codsup'];
-                                $jDetalle->num_cuenta = $inputs['cuenta'];
-                                $jDetalle->monto_aprobado = $inputs['monto'];
-                                $jDetalle->idfondo        = $inputs['idfondo'];
-                                $detalle->periodo     = $periodos->id;
-                                $detalle->detalle     = json_encode($jDetalle);
-                                if ( !$detalle->save() )
-                                    return $this->warningException( __FUNCTION__ , 'No se pudo procesar los detalles de la Solicitud' );
+                                $solInst->titulo     = $inputs['institucion'];
+                                $solInst->idetiqueta = $inputs['idetiqueta'];
+                                $solInst->iduserasigned = $middleRpta[data];
+                                if ( !$solInst->save() )
+                                    return $this->warningException( __FUNCTION__ , 'No se pudo actualizar la solicitud: '.$inputs['idsolicitud'] );
                                 else
                                 {
-                                    $userid = Auth::user()->id;
-                                    $middleRpta = $this->setStatus( PENDIENTE , PENDIENTE , $userid , $userid, $solicitud->id );
-                                    if ($middleRpta[status] == ok)
-                                    {     
-                                        DB::commit();
-                                        $middleRpta[data] = $this->getFondos( $inputs['mes'] );
+                                    $detalle      = $solInst->detalle;
+                                    $middleRpta   = $this->setDetalleInst( $detalle , $inputs , $idPeriodo );
+                                    if ( $middleRpta[status] == ok )
+                                    {
+                                        $userid = Auth::user()->id;
+                                        $middleRpta = $this->setStatus( PENDIENTE , PENDIENTE , $userid , $userid, $solInst->id );
+                                        if ($middleRpta[status] == ok)
+                                        {
+                                            DB::commit();
+                                            return $middleRpta;
+                                        }
                                     }
-                                    else
-                                        DB::rollback();
-                                    return $middleRpta;
                                 }
                             }
                         }
-                    }
                 }
             }
+            DB::rollback();
+            return $middleRpta;
         }
         catch (Exception $e)
         {
             DB::rollback();
-            $rpta = $this->internalException($e,__FUNCTION__);
+            return $this->internalException($e,__FUNCTION__);
         }
-        return $rpta;
-    }
-    
-    
+    }   
 
     function getFondosTesoreria($start, $export = 0)
     {

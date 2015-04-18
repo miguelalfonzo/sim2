@@ -1,4 +1,4 @@
-@if ( isset($fondos) || !is_null($solicitude->detalle->idfondo) )
+@if ( isset($fondos) || !is_null($solicitud->detalle->idfondo) )
     <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
         <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label" for="textinput">Fondo</label>
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -14,7 +14,7 @@
                                 <option value="{{$sub->id}}" style="background:#A9F5F2" selected>
                                     {{$sub->nombre}} {{$sub->typeMoney->simbolo.' '.$sub->saldo}}
                                 </option>
-                            @elseif ( $sub->id == $solicitude->detalle->idfondo )
+                            @elseif ( $sub->id == $solicitud->detalle->idfondo )
                                 <option value="{{$sub->id}}" style="background:#A9F5F2" selected>
                                     {{$sub->nombre}} {{$sub->typeMoney->simbolo.' '.$sub->saldo}}
                                 </option>
@@ -27,11 +27,7 @@
                     @endforeach
                 </select>
             @else
-                <select id="sub_type_activity" name="idfondo" class="form-control" disabled>            
-                    <option value="{{$solicitude->detalle->idfondo}}" selected>
-                        {{$solicitude->detalle->fondo->nombre}}
-                    </option>
-                </select>
+                <input id="sub_type_activity" name="idfondo" class="form-control" value="{{$solicitud->detalle->fondo->nombre}}" disabled>
             @endif    
         </div>
     </div>

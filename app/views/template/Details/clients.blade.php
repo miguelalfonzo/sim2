@@ -5,7 +5,7 @@
                 <h3 class="panel-title">Clientes</h3>
             </div>
             <div class="panel-body">
-                @foreach($solicitude->clients as $client)
+                @foreach($solicitud->clients as $client)
                     @if (is_null($client->idcliente))
                         <div class="form-group ">
                             <div>

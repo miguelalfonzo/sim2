@@ -11,6 +11,8 @@ class SolicitudeHistory extends Eloquent{
 	protected $primaryKey = 'id';
     public $timestamps = true;
 
+    //protected function getUpdated_atAttribute( )
+
 	public function lastId()
     {
 		$lastId = SolicitudeHistory::orderBy('id','desc')->first();

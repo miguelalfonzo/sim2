@@ -1,9 +1,12 @@
+<!--    Name Solicitude  -->
+@include('Dmkt.Solicitud.Detail.titulo')
+
 <!--    Type Solicitude  -->
 <div class="form-group col-sm-6 col-md-4 col-lg-4">
     <label class="col-sm-8 col-md-8 col-lg-4 control-label" for="reason">Tipo Solicitud</label>
     <div class="col-sm-12 col-md-12">
         <input id="reason" type="text" class="form-control input-md"
-        value="{{$solicitude->detalle->typeReason->nombre}}" readonly>
+        value="{{$solicitud->detalle->typeReason->nombre}}" readonly>
     </div>
 </div>
 
@@ -12,15 +15,15 @@
     <label class="col-sm-8 col-md-8 control-label">Tipo de Pago</label>
     <div class="col-sm-12 col-md-12">
         <select class="form-control selectTypePayment" disabled>
-            <option selected value="{{$solicitude->detalle->typePayment->id}}">
-                {{$solicitude->detalle->typePayment->nombre}}
+            <option selected value="{{$solicitud->detalle->typePayment->id}}">
+                {{$solicitud->detalle->typePayment->nombre}}
             </option>
         </select>
     </div>
 </div>
 
 <!-- Account Number -->
-@if ( $solicitude->typeSolicitude->code == SOLIC && $solicitude->detalle->idpago == PAGO_DEPOSITO )
+@if ( $solicitud->typeSolicitude->code == SOLIC && $solicitud->detalle->idpago == PAGO_DEPOSITO )
     <div class="form-group col-sm-6 col-md-4">
         <label class="col-sm-8 col-md-8 control-label" for="cuenta">Nº de Cuenta</label>
         <div class="col-sm-12 col-md-12">
@@ -28,7 +31,7 @@
             value="{{$detalle->num_cuenta}}" readonly>
         </div>
     </div>
-@elseif( $solicitude->typeSolicitude->code == SOLIC && $solicitude->detalle->idpago == PAGO_CHEQUE )
+@elseif( $solicitud->typeSolicitude->code == SOLIC && $solicitud->detalle->idpago == PAGO_CHEQUE )
     <!-- Ruc -->
     <div class="form-group col-sm-6 col-md-4">
         <label class="col-sm-8 col-md-8 control-label" for="ruc">Ruc</label>
@@ -39,7 +42,7 @@
     </div>
 @endif
 
-@if( $solicitude->typeSolicitude->code == SOLIC && $solicitude->detalle->idmotivo == REASON_REGALOS )
+@if( $solicitud->typeSolicitude->code == SOLIC && $solicitud->detalle->idmotivo == REASON_REGALOS )
     <!--  Amount Factura -->
     <div class="form-group col-sm-6 col-md-4 col-lg-4">
         <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="factura">
@@ -47,7 +50,7 @@
         </label>
         <div class="col-sm-12 col-md-12 col-lg-12">
             <div class="input-group">
-                <span class="input-group-addon">{{$solicitude->detalle->typeMoney->simbolo}}</span>
+                <span class="input-group-addon">{{$solicitud->detalle->typeMoney->simbolo}}</span>
                 <input id="factura" class="form-control input-md" type="text"
                 value="{{$detalle->monto_factura}}" readonly>
             </div>
@@ -55,32 +58,18 @@
     </div>
 @endif
 
-<!--    Name Solicitude  -->
-<div class="form-group col-sm-6 col-md-4 col-lg-4">
-    <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="titulo">
-        Nombre Solicitud
-    </label>
-    <div class="col-sm-12 col-md-12 col-lg-12">
-        <div class="input-group">
-            <span class="input-group-addon">{{$solicitude->etiqueta->nombre}}</span>
-            <input id="titulo" class="form-control input-md" type="text"
-            value="{{$solicitude->titulo}}" readonly>
-        </div>
-    </div>
-</div>
-
 <!--  Amount Solicitude -->
-@include('template.monto')
+@include('Dmkt.Solicitud.Detail.monto')
 
 <!--  Retencion      --> 
-@if ( !is_null( $solicitude->detalle->idretencion ) )
+@if ( !is_null( $solicitud->detalle->idretencion ) )
     <div class="form-group col-sm-6 col-md-4 col-lg-4">
         <label class="col-sm-8 col-md-8 control-label" for="retencion">
-            {{$solicitude->detalle->typeRetention->descripcion}}
+            {{$solicitud->detalle->typeRetention->descripcion}}
         </label>
         <div class="col-sm-12 col-md-12 col-lg-12">
             <div class="input-group">
-                <span class="input-group-addon">{{$solicitude->detalle->typeRetention->account->typemoney->simbolo}}</span>
+                <span class="input-group-addon">{{$solicitud->detalle->typeRetention->account->typemoney->simbolo}}</span>
                 <input id="retencion" type="text" value="{{$detalle->monto_retencion}}" class="form-control input-md" readonly>
             </div>
         </div>
@@ -88,14 +77,14 @@
 @endif
 
 <!-- A Depositar -->
-@if ( Auth::user()->type == TESORERIA && $solicitude->idestado == DEPOSITO_HABILITADO )
+@if ( Auth::user()->type == TESORERIA && $solicitud->idestado == DEPOSITO_HABILITADO )
     <div class="form-group col-xs-4 col-sm-4 col-md-4 col-lg-4">
         <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label" for="depositar">
             A Depositar
         </label>
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <div class="input-group">
-                <span class="input-group-addon">{{$solicitude->detalle->typemoney->simbolo}}</span>
+                <span class="input-group-addon">{{$solicitud->detalle->typemoney->simbolo}}</span>
                 <input id="depositar" type="text" value="{{($deposito)}}" class="form-control input-md" readonly>
             </div>
         </div>
@@ -124,45 +113,45 @@
         <div class="input-group date">
             <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
             <input id="date" type="text" class="form-control" maxlength="10" placeholder=""
-                   value="{{ date_format(date_create($solicitude->created_at), 'd/m/Y' )}}" disabled>
+                   value="{{ date_format(date_create($solicitud->created_at), 'd/m/Y' )}}" disabled>
 
         </div>
     </div>
 </div>
 
 <!-- Solicitante -->
-@include('template.solicitante')
+@include('Dmkt.Solicitud.Detail.solicitante')
 
 <!-- Asignado a -->
-@include('template.Details.asignado')
+@include('Dmkt.Solicitud.Detail.asignado')
 
 <!-- Aceptador Por -->
 @include('template.Details.accepted')
 
 <!-- Fondos -->
-@include('template.Details.fondo')
+@include('Dmkt.Solicitud.Detail.fondo')
 
-@if(!is_null($solicitude->detalle->iddeposito) )    
+@if(!is_null($solicitud->detalle->iddeposito) )    
     <div class="form-group col-sm-6 col-md-4 col-lg-4">
         <label class="col-sm-8 col-md-8 control-label" for="depositado">
             Depositado
         </label>
         <div class="col-sm-12 col-md-12 col-lg-12">
             <div class="input-group">
-                <span class="input-group-addon">{{$solicitude->detalle->deposit->account->typeMoney->simbolo}}</span>
-                <input id="depositado" type="text" value="{{$solicitude->detalle->deposit->total}}" class="form-control input-md" readonly>
+                <span class="input-group-addon">{{$solicitud->detalle->deposit->account->typeMoney->simbolo}}</span>
+                <input id="depositado" type="text" value="{{$solicitud->detalle->deposit->total}}" class="form-control input-md" readonly>
             </div>
         </div>
     </div>
 @endif
 
-@include('template.Details.tasas')
+@include('Dmkt.Solicitud.Detail.tasa')
 
 <!-- Observation-->
 @include('template.obs')
 
 
-@if( $solicitude->typeSolicitude->code == SOLIC && $solicitude->detalle->idmotivo == REASON_REGALOS )
+@if( $solicitud->typeSolicitude->code == SOLIC && $solicitud->detalle->idmotivo == REASON_REGALOS )
     <div class="form-group col-sm-6 col-md-4 col-lg-4">
         <label class="col-sm-8 col-md-8 col-lg-8 control-label">&nbsp;</label>
         <div class="col-sm-12 col-md-12 col-lg-12">
@@ -208,7 +197,7 @@
 
 
 <!-- Modal -->
-@if( Auth::user()->type == TESORERIA && $solicitude->idestado == DEPOSITO_HABILITADO )
+@if( Auth::user()->type == TESORERIA && $solicitud->idestado == DEPOSITO_HABILITADO )
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -257,7 +246,7 @@
             Descripcion de la Solicitud
         </label>
         <div class="col-sm-12 col-md-12 col-lg-12">
-            <textarea class="form-control" id="textarea" name="textarea" readonly>{{$solicitude->descripcion}}</textarea>
+            <textarea class="form-control" id="textarea" name="textarea" readonly>{{$solicitud->descripcion}}</textarea>
         </div>
     </div>
 </div>

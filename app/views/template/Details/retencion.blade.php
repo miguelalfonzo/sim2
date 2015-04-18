@@ -1,5 +1,5 @@
 <!-- RETENCION -->
-@if( Auth::user()->type == CONT && $solicitude->idestado == APROBADO )
+@if( Auth::user()->type == CONT && $solicitud->idestado == APROBADO )
 <div class="col-sm-12 col-md-12">
     <label class="col-sm-12 col-md-12 control-label" for="textinput">Retenciones</label>
     <div class="col-sm-3 col-md-3">

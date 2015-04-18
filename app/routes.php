@@ -33,7 +33,6 @@ Route::get('recharge', function(){
  */
 Route::group(array('before' => 'rm'), function () 
 {    
-    
     // Fondo
     Route::get('list-fondos-rm','Dmkt\FondoController@listFondosRep');
     Route::get('registrar-gasto-fondo/{token}', 'Expense\ExpenseController@showRegisterFondo');
@@ -138,7 +137,7 @@ Route::group( array('before' => 'ager') , function()
     //Route::get('registrar-fondo','Dmkt\FondoController@getRegister');
     Route::post('registrar-fondo','Dmkt\FondoController@postRegister');
     //Route::get('get-fondo/{id}','Dmkt\FondoController@getFondo');
-    Route::post('update-fondo','Dmkt\FondoController@updateFondo');
+    Route::post('update-fondo','Dmkt\FondoController@updateSolInst');
     Route::get('exportfondos/{date}','Dmkt\FondoController@exportExcelFondos');
     Route::get('endfondos/{date}','Dmkt\FondoController@endfondos');
     //Route::get('ver-solicitud-ager/{token}','Dmkt\SolicitudeController@viewSolicitudeAGer');
@@ -164,8 +163,6 @@ Route::group(array('before' => 'sup_gerprod'), function ()
     Route::post('asignar-solicitud-responsable', 'Dmkt\SolicitudeController@asignarResponsableSolicitud');
     Route::post('aceptar-solicitud', 'Dmkt\SolicitudeController@acceptedSolicitude');
     Route::post('buscar-responsable' , 'Dmkt\SolicitudeController@getResponsables');
-
-    
 });
 
 Route::group(array('before' => 'sup_gerprod_gercom'), function ()
