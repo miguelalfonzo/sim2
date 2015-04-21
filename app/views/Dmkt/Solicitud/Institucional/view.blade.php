@@ -24,7 +24,6 @@
 						@if (Auth::user()->type == TESORERIA && $solicitud->estado == DEPOSITO_HABILITADO)
 							<button class="btn btn-success" data-toggle="modal" data-target="#myModal">Registrar Depósito</button>
 						@endif
-						<a href="{{URL::to('show_user')}}" class="btn btn-danger">Regresar</a>
 					</div>
 				</section>
 				@if( Auth::user()->type == TESORERIA && $solicitud->estado == DEPOSITO_HABILITADO )

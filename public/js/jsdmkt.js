@@ -209,6 +209,70 @@ function newSolicitude() {
         });
     }
 
+    $('#derived').click( function()
+    {
+        var pdata = 
+        {
+            _token : $('input[name=_token]').val() ,
+            idsolicitud : $('input[name=idsolicitude]').val()
+        };
+        $.ajax({
+            url  : server + 'buscar-gerprod',
+            type : 'POST',
+            data : pdata
+        }).fail( function ( statusCode , errorThrown )
+        {
+            ajaxError( statusCode , errorThrown );
+        }).done( function ( data ) 
+        {
+            if ( data.Status != 'Ok' )
+                bootbox.alert('<h4 class="red">' + data.Status + ' ' + data.Description + '</h4>');
+            else
+            {
+                var list='';
+                data.Data.forEach(function(entry)
+                {
+                    list = list + '<li><input type="radio" name="responsables"  value="' + entry.iduser + '"> ' + entry.descripcion + '</li>';    
+                });
+                bootbox.confirm("<h4 id='validate'>Seleccione al Responsable</h4><ul>" + list + "</ul>", function (result) 
+                {
+                    if (result) 
+                    {
+                        var resp = $("input[name=responsables]:checked");
+                        if (resp.length == 0 )
+                        {
+                            $("#validate").css("color","red");
+                            return false; 
+                        }
+                        
+                        pdata.gerente = resp.val();
+                        
+                        $.ajax({
+                        url: server + 'derivar-solicitud',
+                        type: 'POST',
+                        data : pdata
+                        }).fail( function ( statusCode , errorThrown )
+                        {
+                            ajaxError( statusCode , errorThrown );
+                        }).done( function ( data ) 
+                        {
+                            if ( data.Status != 'Ok' )
+                                bootbox.alert('<h4 class="red">' + data.Status + ' ' + data.Description + '</h4>');
+                            else
+                            {
+                                bootbox.alert('<h4 class="green">Solicitud Derivada</h4>' , function() 
+                                {
+                                    window.location.href = server +"show_user";
+                                });  
+                            }
+                        });
+                    }
+                });
+            }
+        });      
+    });
+
+
     // -------------------------------------  REPRESENTANTE MEDICO -----------------------------
     
     if ( $("#idState").length === 1 )
@@ -402,11 +466,9 @@ function newSolicitude() {
         var precision = 11;
         amount_families.each(function(i,v)
         {
-            console.log(sum_total);
             sum_total += parseFloat( $(this).val() );
-
         });
-        console.log(sum_total);
+        
         if( $("#amount").val().trim() === "" )
         {
             amount_error_families.text('Ingresar el monto (Vacío)').css('color', 'red');
@@ -546,7 +608,6 @@ function newSolicitude() {
     /** --------------------------------------------- CONTABILIDAD ------------------------------------------------- **/
 
     if(userType === 'C'){
-        /*listSolicitude('cont',APROBADO);*/
         listFondos('fondos-contabilidad', $('#estado_fondo_cont').val());
         listDocuments();
         $("#datefondo").val(dateactual);
@@ -557,13 +618,6 @@ function newSolicitude() {
     search_solicitude_cont.on('click', function () {
         searchSolicitudeToDate('cont',this)
     });
-
-    /** --------------------------------------------- TESORERIA ------------------------------------------------- **/
-
-    /*if(userType === 'T')
-    {
-        listFondos('fondos-tesoreria');
-    }*/
 
 
     var search_solicitude_cont = $('#search_solicitude_tes');
@@ -599,33 +653,8 @@ function newSolicitude() {
         $(this).parent().removeClass('has-error');     
     });
 
-    $('#edit-rep').hide();
-    
-    /*function findRepresentatives(request, response) 
-    {
-        function hasMatch(s) {
-            return s.toLowerCase().indexOf(request.term.toLowerCase()) !== -1;
-        }
-
-        var i, l, obj, matches = [];
-
-        if (request.term === "") {
-            response([]);
-            return;
-        }
-        for (i = 0, l = representatives.length; i < l; i++) {
-            obj = representatives[i];
-            if (hasMatch(obj.vispaterno)) {
-                matches.push(obj);
-            }
-        }
-        response(matches);
-    }*/
-
-    
+    $('#edit-rep').hide();    
     fondo_total.numeric();
-
-    
 
     $(document).on( 'click' , '.register_fondo' , function()
     {
@@ -747,42 +776,27 @@ function newSolicitude() {
                 if (data.Status == 'Ok' )
                 {
                     var list='';
-                    data.Data.Responsables.forEach(function(entry)
+                    data.Data.forEach(function(entry)
                     {
-                        if (data.Data.UserType == 'S')
-                        {
-                            if (data.Data.Type == 'P')
-                                list = list + '<li><input type="radio" name="responsables"  value="' + entry.iduser + '"> ' + entry.descripcion + '</li>';
-                            else if (data.Data.Type == 'S' || data.Data.Type == 'AG') 
-                                list = list + '<li><input type="radio" name="responsables"  value="' + entry.iduser + '"> ' + entry.nombres + ' ' + entry.apellidos + '</li>';
-                        }
-                        else if (data.Data.UserType == 'P')
-                        {
-                            list = list + '<li><input type="radio" name="responsables"  value="' + entry.iduser + '"> ' + entry.nombres + ' ' + entry.apellidos + '</li>';
-                        }    
+                        list = list + '<li><input type="radio" name="responsables"  value="' + entry.iduser + '"> ' + entry.nombres + ' ' + entry.apellidos + '</li>';    
                     });
-                    bootbox.confirm("<h4>Responsables habilitados para el Fondo: " + $("#sub_type_activity option:selected").text() + 
-                    "</h4><h5 id='validate'>Seleccione el Responsable</h5><ul>" + list + "</ul>", function (result) 
+                    bootbox.confirm("<h5 id='validate'>Seleccione el Responsable</h5><ul>" + list + "</ul>", function (result) 
                     {
                         if (result) 
                         {
                             var resp = $("input[name=responsables]:checked");
-                            if (resp.length == 0)
+                            if (resp.length == 0 )
                             {
                                 $("#validate").css("color","red");
                                 return false; 
                             }
                             else
-                            {
                                 acceptedSolicitude(resp.val());
-                            }
                         }
                     });
                 }
                 else
-                {
                     bootbox.alert("<h4 style='color:red'>" + data.Status + ": " + data.Description + "</h4>");
-                }
             });
         }
     });
@@ -844,33 +858,12 @@ function newSolicitude() {
                     var url = server + 'endfondos/' + date;
                     $.get(url).done(function(data)
                     {
+                        $('input[name=idsolicitud]').val('');
                         if (data.Status == 'Ok')
                         {
-                            responseUI("Fondos Terminados","green");
-                            $('.table-solicituds-fondos > .fondo_r').remove();
-                            $('#table_solicitude_fondos_wrapper').remove();
-                            $('.table-solicituds-fondos').append(data.Data);
-                            $('#export-fondo').attr('href', server + 'exportfondos/' + date);
-                            $('#table_solicitude_fondos').dataTable(
+                            bootbox.alert('<h4 class="green">Fondos Terminados</h4>' , function()
                             {
-                                "order": 
-                                [
-                                    [ 3, "desc" ]
-                                ],
-                                "bLengthChange": false,
-                                'iDisplayLength': 7,
-                                "oLanguage": 
-                                {
-                                    "sSearch": "Buscar: ",
-                                    "sZeroRecords": "No hay fondos",
-                                    "sInfoEmpty": " ",
-                                    "sInfo": 'Mostrando _END_ de _TOTAL_',
-                                    "oPaginate": 
-                                    {
-                                        "sPrevious": "Anterior",
-                                        "sNext" : "Siguiente"
-                                    }
-                                }
+                                searchFondos( date );
                             });
                         }
                         else
@@ -968,6 +961,7 @@ function newSolicitude() {
                 fondo_cuenta.val('');
 
                 removeinput($('#edit-rep'));
+                $('input[name=idsolicitud]').val('');
                 bootbox.alert('<h4 class="green">Fondo Actualizado</h4>' , function()
                 {
                     searchFondos( date_reg_fondo.val() );
@@ -1053,46 +1047,6 @@ function newSolicitude() {
                 bootbox.alert('<h4 class="red">' + data.Status + ': ' + data.Description + '</h4>');
         });
     }
-
-   /* if(userType === ASIS_GER){
-        $.ajax(
-        {
-            url: server + 'buscar-solicitudes',
-            type: 'POST',
-            data:
-            {
-                _token: $("input[name=_token]").val()
-            }
-        }).done(function (data) 
-        {
-            if (data.Status = 'Ok' )
-            {
-                $('.table-solicituds').append(data.Data);
-                $('#table_solicitude').dataTable({
-                    "order": [
-                        [ 3, "desc" ] //order date
-                    ],
-                    "bLengthChange": false,
-                    'iDisplayLength': 7,
-                    "oLanguage": 
-                    {
-                        "sSearch": "Buscar: ",
-                        "sZeroRecords": "No hay solicitudes",
-                        "sInfoEmpty": "No hay solicitudes",
-                        "sInfo": 'Mostrando _END_ de _TOTAL_',
-                        "oPaginate": 
-                        {
-                            "sPrevious": "Anterior",
-                            "sNext" : "Siguiente"
-                        }
-                    }
-                });
-            }
-            else
-                alert(data.Status + ': ' + data.Description);
-        });
-    }*/
-    /** ------------------------------------------------------------------------------------------------------------ **/
 
     function addImage(e) {
         var file = e.target.files[0],
@@ -1480,7 +1434,7 @@ function newSolicitude() {
     {
         $('<li>' +
             '<div style="position: relative">' +
-                '<input id="idclient0" "name="clients[]" type="text" placeholder="" style="margin-bottom: 10px"' + 
+                '<input id="idclient0" "name="clientes[]" type="text" placeholder="" style="margin-bottom: 10px"' + 
                 'class="form-control input-md input-client cliente-seeker">' +
                 '<button type="button" class="btn-delete-client" style="z-index: 2">' +
                 '<span class="glyphicon glyphicon-remove">' +
@@ -1636,163 +1590,176 @@ function newSolicitude() {
         });
     }
 
-/* Validate send register solicitude */
-    $('#button1id').off('click');
-    $('#button1id').on('click', (function (e) {
-        e.preventDefault();
+    function validateNewSol()
+    {
         var aux = 0;
-        //var obj = [];
-        var clients_input = [];
-        var clients_table = [];
-        var families_input = [];
-        /*for (var i = 0, l = clients.length; i < l; i++) {
-            obj[i] = clients[i].clcodigo + ' - ' + clients[i].clnombre;
-        }*/
-        if (!title.val()) {
+        if (!title.val()) 
+        {
             title.parent().addClass('has-error');
             title.attr('placeholder', 'Ingrese nombre de la solicitud');
             title.addClass('input-placeholder-error');
+            aux = 1;
         }
-        if (!amount.val()) {
+        if (!amount.val()) 
+        {
             amount.parent().addClass('has-error');
             amount.attr('placeholder', 'Ingrese monto');
             amount.addClass('input-placeholder-error');
+            aux = 1;
         }
-        if (!delivery_date.val()) {
+        if (!delivery_date.val()) 
+        {
             delivery_date.parent().addClass('has-error');
             delivery_date.attr('placeholder', 'Ingrese Fecha');
             delivery_date.addClass('input-placeholder-error');
+            aux = 1;
         }
-        if (!input_client.val()) {
+        if (!input_client.val()) 
+        {
             input_client.parent().addClass('has-error');
             input_client.attr('placeholder', 'Ingrese Cliente');
             input_client.addClass('input-placeholder-error');
+            aux = 1;
         }
-        if(select_type_solicitude.val() == 2){
-            if (!amount_fac.val()) {
+        if( select_type_solicitude.val() == 2 )
+        {
+            if ( !amount_fac.val() ) 
+            {
                 amount_fac.parent().addClass('has-error');
                 amount_fac.attr('placeholder', 'Ingrese Monto de la Factura');
                 amount_fac.addClass('input-placeholder-error');
+                aux = 1;
             }
-            if(!input_file_factura.val() && isSetImage.val()==null){
+            if( !input_file_factura.val() && isSetImage.val()==null )
+            {
                 input_file_factura.parent().addClass('has-error');
                 input_file_factura.attr('placeholder', 'Ingrese Imagen');
                 input_file_factura.addClass('input-placeholder-error');
+                aux = 1;
             }
         }
+        return aux;
+    }
 
-        setTimeout(function () {
-
-            //validate fields client are correct
-            $('.input-client').each(function (index) 
+    //Validate send register solicitude
+    $('#button1id').off('click');
+    $('#button1id').on( 'click' , function ( e ) 
+    {
+        e.preventDefault();
+        var aux = 0;
+        var clients_input = [];
+        var clients_table = [];
+        var families_input = [];
+        
+        aux = validateNewSol();
+     
+        //validate fields client are correct
+        $( '.input-client' ).each( function ( index ) 
+        {
+            elem = $(this);
+            if ( !$(this).attr('data-valor') ) 
             {
-                elem = $(this);
-                var input = elem.val();
+                aux = 1;
+                $(this).parent().addClass('has-error has-feedback');
+                $(this).parent().children('.span-alert').addClass('span-alert glyphicon glyphicon-remove form-control-feedback');
+                $(this).val('');
+                $(this).attr('placeholder','Especifique Cliente');
+                $(this).addClass('input-placeholder-error');
+            }
+            else
+            {
                 clients_input[index] = elem.attr("pk");
                 clients_table[index] = elem.attr("table");
-            });
-        }, 100);
-        setTimeout(function ()
+            }
+        });
+
+        //Validate of fields duplicate in clients
+        for ( var i = 0 ; i < clients_input.length ; i++ ) 
         {
-            $('.input-client').each(function (index) {
-                var input = $(this).val();
-                if (!$(this).attr('data-valor')) 
+            $( '.input-client' ).each( function ( index ) 
+            {
+                if (index != i && clients_input[i] === $( this ).val() ) 
                 {
-                    aux = 1;
+                    var ind = clients_input.indexOf( $( this ).val() );
+                    clients_input[ index ] = '';
+                    $(this).parent().removeClass('has-success has-feedback');
                     $(this).parent().addClass('has-error has-feedback');
                     $(this).parent().children('.span-alert').addClass('span-alert glyphicon glyphicon-remove form-control-feedback');
-                    $(this).val('');
-                    $(this).attr('placeholder','Seleccione cliente');
-                    $(this).addClass('input-placeholder-error');
+                    $(".clients_repeat").text('Datos Repetidos').css('color', 'red');
+                    aux=1;
                 }
             });
-        }, 100);
-        setTimeout(function () {
-            //Validate of fields duplicate in clients
-            for (var i = 0; i < clients_input.length; i++) {
-                $('.input-client').each(function (index) {
-                    if (index != i && clients_input[i] === $(this).val()) 
-                    {
-                        var ind = clients_input.indexOf($(this).val());
-                        clients_input[index] = '';
-                        $(this).parent().removeClass('has-success has-feedback');
-                        $(this).parent().addClass('has-error has-feedback');
-                        $(this).parent().children('.span-alert').addClass('span-alert glyphicon glyphicon-remove form-control-feedback');
-                        $(".clients_repeat").text('Datos Repetidos').css('color', 'red');
-                        aux=1;
-                    }
-
-                });
-            }
-        }, 200);
-        setTimeout(function () 
+        }
+        
+        var families = $('.selectfamily');
+        families.each(function (index) 
         {
-            var families = $('.selectfamily');
-            families.each(function (index) 
+            families_input[index] = $(this).val();
+        });
+
+        for (var i = 0 ; i < families_input.length; i++) 
+        {
+            families.each( function ( index ) 
             {
-                families_input[index] = $(this).val();
-            });
-            for (var i = 0; i < families_input.length; i++) 
-            {
-                families.each(function (index) 
+                if ( index != i && families_input[i] === $( this ).val() ) 
                 {
-                    if (index != i && families_input[i] === $(this).val()) 
-                    {
-                        var ind = families_input.indexOf($(this).val());
-                        families_input[index] = '';
-                        $(this).css('border-color', 'red');
-                        $(".families_repeat").text('Datos Repetidos').css('color', 'red');
-                        aux=1;
-                    }
-                });
-            }
-            if (aux == 0) 
-            {
-                var form = $('#form-register-solicitude');
-                var formData = new FormData(form[0]);
-                formData.append("clients[]",clients_input);
-                formData.append("tables[]",clients_table);
-                var rute = form.attr('action');
-                var message1 = 'Registrando';
-                var message2 = '<strong style="color: green">Solicitud Registrada</strong>';
-                if (rute == 'editar-solicitud') 
-                {
-                    message1 = 'Actualizando';
-                    message2 = '<strong style="color: green">Solicitud Actualizada</strong>'
+                    var ind = families_input.indexOf( $( this ).val() );
+                    families_input[index] = '';
+                    $(this).css('border-color', 'red');
+                    $(".families_repeat").text('Datos Repetidos').css('color', 'red');
+                    aux=1;
                 }
-                $.ajax(
-                {
-                    url: server + rute,
-                    type: 'POST',
-                    data: formData,
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    beforeSend: function()
-                    {
-                        loadingUI(message1);
-                    }
-                }).done(function (data)
-                {
-                    $.unblockUI();
-                    if(data.Status == 'Ok')
-                    {
-                        responseUI('Solicitud Registrada', 'green');
-                        setTimeout(function()
-                        {
-                            window.location.href = server + 'show_user';
-                        },500);
-                    }
-                    else
-                        responseUI(data.Status + ': ' + data.Description,'red');
-                }).fail(function ( statusCode , errorThrown ) {
-                    $.unblockUI();
-                    ajaxError( statusCode, errorThrown );
-                });
+            });
+        }
+    
+        if ( aux == 0 ) 
+        {
+            var form = $('#form-register-solicitude');
+            var formData = new FormData(form[0]);
+            formData.append("clientes[]",clients_input);
+            formData.append("tables[]",clients_table);
+            var rute = form.attr('action');
+            var message1 = 'Registrando';
+            var message2 = '<strong style="color: green">Solicitud Registrada</strong>';
+            if (rute == 'editar-solicitud') 
+            {
+                message1 = 'Actualizando';
+                message2 = '<strong style="color: green">Solicitud Actualizada</strong>';
             }
-        }, 300);
-        e.preventDefault();
-    }));
+            $.ajax(
+            {
+                url: server + rute,
+                type: 'POST',
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                beforeSend: function()
+                {
+                    loadingUI(message1);
+                }
+            }).done(function ( data )
+            {
+                $.unblockUI();
+                if(data.Status == 'Ok')
+                {
+                    responseUI('Solicitud Registrada', 'green');
+                    setTimeout( function()
+                    {
+                        window.location.href = server + 'show_user';
+                    },500);
+                }
+                else
+                    bootbox.alert('<h4 class="red">' + data.Status + ': ' + data.Description + '</h4>');
+            }).fail( function ( statusCode , errorThrown ) 
+            {
+                $.unblockUI();
+                ajaxError( statusCode, errorThrown );
+            });
+        }
+        else
+            responseUI( 'Complete los campos' , 'red' );
+    });
 
     $(document).off("click",".sol-obs");
     $(document).on("click",".sol-obs", function()
@@ -1929,17 +1896,4 @@ function newSolicitude() {
         },1000);
     }
 
-    /*if ( $("#tcc").length != 0 && $("#tcv").length != 0 )
-    {
-        var tds = $('#table_solicitude tbody tr .deposit');
-        tds.each(function( index)
-        {
-            $(this).split(" ");
-            if ( $(this).find('input[name=mass-aprov]:checked').length != 0 )
-            {
-                sol.token = $(this).find("#sol_token").val();
-                data.sols.push(sol);
-            }
-        });
-    }*/
 }

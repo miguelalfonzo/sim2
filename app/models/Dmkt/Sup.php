@@ -13,15 +13,18 @@ class Sup extends Eloquent{
     protected $table = 'DMKT_RG_SUPERVISOR';
     protected $primaryKey = 'idsup';
 
+    protected function getFullNameAttribute()
+    {
+        return substr( $this->attributes['nombres'] , 0 , 1 ).'. '.$this->attributes['apellidos'];
+    }
 
-    function searchId(){
-
+    function searchId()
+    {
         $lastId = Sup::orderBy('idsup', 'DESC')->first();
-        if($lastId == null){
+        if($lastId == null)
             return 0;
-        }else{
+        else
             return $lastId->idsup;
-        }
 
     }
 

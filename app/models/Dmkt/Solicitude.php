@@ -9,7 +9,16 @@ class Solicitude extends Eloquent{
 
     protected $table = 'DMKT_RG_SOLICITUD';
     protected $primaryKey = 'id';
-    //protected $touches = array('pendHist');
+
+    protected function getFecOriginAttribute()
+    {
+        return $this->attributes['created_at'];
+    }
+
+    protected function getCreatedAtAttribute( $attr )
+    {
+        return \Carbon\Carbon::parse( $attr )->format('Y-m-d h:i');
+    }
 
     public function searchId()
     {
@@ -82,7 +91,7 @@ class Solicitude extends Eloquent{
     }
 
     function reasonSolicitude(){
-        return $this->hasOne('Dmkt\TypeSolicitude','id','idtiposolicitud');
+        return $this->hasOne('Dmkt\SolicitudReason','id','idtiposolicitud');
     }
 
     

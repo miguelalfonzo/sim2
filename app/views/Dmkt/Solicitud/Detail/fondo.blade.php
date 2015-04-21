@@ -5,25 +5,9 @@
             @if ( isset($fondos) )
                 <select id="sub_type_activity" name="idfondo" class="form-control">
                     @foreach($fondos as $sub)
-                        @if( $sub->idusertype == ASIS_GER )
-                            <option value="{{$sub->id}}" style="background:#F7FE2E">
-                                    {{$sub->nombre}} {{$sub->typeMoney->simbolo.' '.$sub->saldo}}
-                            </option>
-                        @else
-                            @if( $sub->idusertype == SUP )
-                                <option value="{{$sub->id}}" style="background:#A9F5F2" selected>
-                                    {{$sub->nombre}} {{$sub->typeMoney->simbolo.' '.$sub->saldo}}
-                                </option>
-                            @elseif ( $sub->id == $solicitud->detalle->idfondo )
-                                <option value="{{$sub->id}}" style="background:#A9F5F2" selected>
-                                    {{$sub->nombre}} {{$sub->typeMoney->simbolo.' '.$sub->saldo}}
-                                </option>
-                            @else
-                                <option value="{{$sub->id}}">
-                                    {{$sub->nombre}} {{$sub->typeMoney->simbolo.' '.$sub->saldo}}
-                                </option>                          
-                            @endif
-                        @endif
+                        <option value="{{$sub->id}}">
+                            {{$sub->nombre}} {{$sub->typeMoney->simbolo.' '.$sub->saldo}}
+                        </option>                          
                     @endforeach
                 </select>
             @else

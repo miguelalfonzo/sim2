@@ -19,6 +19,8 @@
                     <strong>Usuario : {{Auth::user()->Sup->nombres}}</strong>
                 @elseif ( Auth::user()->type == GER_PROD )
                      <strong>Usuario : {{Auth::user()->Gerprod->descripcion}}</strong>
+                @else
+                    <strong>Usuario : {{Auth::user()->person->nombres.' '.Auth::user()->person->apellidos}}</strong>
                 @endif
             </small>
         </div>

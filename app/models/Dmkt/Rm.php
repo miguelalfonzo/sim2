@@ -22,6 +22,11 @@ class Rm extends Eloquent{
             return $lastId->idrm;
     }
 
+    protected function getFullNameAttribute()
+    {
+        return substr( $this->attributes['nombres'] , 0 , 1 ).'. '.$this->attributes['apellidos'];
+    }
+
     function rmSup()
     {
         return $this->belongsTo('Dmkt\Sup','idsup','idsup');

@@ -42,7 +42,7 @@
     </div>
 @endif
 
-@if( $solicitud->typeSolicitude->code == SOLIC && $solicitud->detalle->idmotivo == REASON_REGALOS )
+@if( $solicitud->typeSolicitude->code == SOLIC && $solicitud->detalle->idmotivo == REASON_REGALO )
     <!--  Amount Factura -->
     <div class="form-group col-sm-6 col-md-4 col-lg-4">
         <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="factura">
@@ -100,7 +100,7 @@
                 <i class="glyphicon glyphicon-calendar"></i>
             </span>
             <input id="date" type="text" class="form-control" maxlength="10" disabled
-            value="{{ date_format(date_create($detalle->fecha_entrega), 'd/m/Y' )}}">
+            value="{{$detalle->fecha_entrega}}">
         </div>
     </div>
 </div>
@@ -110,7 +110,7 @@
     <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="selectbasic">Fecha de Creacion</label>
 
     <div class="col-sm-12 col-md-12 col-lg-12">
-        <div class="input-group date">
+        <div class="input-group">
             <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
             <input id="date" type="text" class="form-control" maxlength="10" placeholder=""
                    value="{{ date_format(date_create($solicitud->created_at), 'd/m/Y' )}}" disabled>
@@ -126,7 +126,7 @@
 @include('Dmkt.Solicitud.Detail.asignado')
 
 <!-- Aceptador Por -->
-@include('template.Details.accepted')
+@include('Dmkt.Solicitud.Detail.accepted')
 
 <!-- Fondos -->
 @include('Dmkt.Solicitud.Detail.fondo')
@@ -148,10 +148,10 @@
 @include('Dmkt.Solicitud.Detail.tasa')
 
 <!-- Observation-->
-@include('template.obs')
+@include('Dmkt.Solicitud.Detail.observacion')
 
 
-@if( $solicitud->typeSolicitude->code == SOLIC && $solicitud->detalle->idmotivo == REASON_REGALOS )
+@if( $solicitud->typeSolicitude->code == SOLIC && $solicitud->detalle->idmotivo == REASON_REGALO )
     <div class="form-group col-sm-6 col-md-4 col-lg-4">
         <label class="col-sm-8 col-md-8 col-lg-8 control-label">&nbsp;</label>
         <div class="col-sm-12 col-md-12 col-lg-12">
@@ -233,10 +233,10 @@
 
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding: 0">
     <!-- Products -->
-    @include('template.Details.products')
+    @include('Dmkt.Solicitud.Detail.products')
 
     <!-- Clients -->
-    @include('template.Details.clients')
+    @include('Dmkt.Solicitud.Detail.clients')
 </div>
 
 <!-- Description Solicitude -->
@@ -252,4 +252,4 @@
 </div>
 
 <!-- RETENCION -->
-@include('template.Details.retencion')
+@include('Dmkt.Solicitud.Detail.retencion')

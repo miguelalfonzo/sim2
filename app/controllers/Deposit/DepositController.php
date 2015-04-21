@@ -182,7 +182,7 @@ class DepositController extends BaseController{
                             if ( $middleRpta[status] == ok )
                             {
                                 $fondo = $detalle->fondo;
-                                $fondo->saldo = $fondo->saldo - $middleRpta[data];
+                                $fondo->saldo = $fondo->saldo - round( $middleRpta[data] , 2 , PHP_ROUND_HALF_DOWN );
                                 if ( !$fondo->save() )
                                     return $this->warningException( __FUNCTION__ , 'Cancelado - No se pudo procesar el saldo del fondo' );
                                 else
@@ -202,7 +202,7 @@ class DepositController extends BaseController{
                                                 $newDeposit->id                 = $newDeposit->lastId() + 1;
                                                 $newDeposit->num_transferencia  = $inputs['op_number'];
                                                 $newDeposit->idcuenta           = $inputs['idcuenta'];
-                                                $newDeposit->total              = $middleRpta[data]['monto'];
+                                                $newDeposit->total              = round( $middleRpta[data]['monto'] , 2 , PHP_ROUND_HALF_DOWN );
                                                 if( !$newDeposit->save() )
                                                     return $this->warningException( __FUNCTION__ , 'Cancelado - No se pudo procesar el deposito' );
                                                 else

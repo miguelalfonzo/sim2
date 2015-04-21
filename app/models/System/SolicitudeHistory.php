@@ -11,7 +11,11 @@ class SolicitudeHistory extends Eloquent{
 	protected $primaryKey = 'id';
     public $timestamps = true;
 
-    //protected function getUpdated_atAttribute( )
+    protected function getUpdatedAtAttribute( $attr )
+    {
+        return \Carbon\Carbon::parse( $attr )->format('Y-m-d h:i');
+    }
+
 
 	public function lastId()
     {

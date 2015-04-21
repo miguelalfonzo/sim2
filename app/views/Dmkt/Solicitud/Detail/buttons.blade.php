@@ -5,7 +5,10 @@
                 <a class="btn btn-primary" id="search_responsable">
                     Aceptar
                 </a>
-                <a id="deny_solicitude" name="button1id" class="btn btn-primary">
+                <a class="btn btn-primary" id="derived">
+                    Derivar
+                </a>
+                <a class="btn btn-danger" id="deny_solicitude">
                     Rechazar
                 </a>
             @endif
@@ -39,8 +42,8 @@
         @elseif ( Auth::user()->type == TESORERIA && $solicitud->idestado == DEPOSITO_HABILITADO )
             <a class="btn btn-success" data-toggle="modal" data-target="#myModal" >Registrar Depósito</a>
         @endif
-        <a id="button2id" href="{{URL::to('show_user')}}" name="button2id" class="btn btn-primary">
-            Cancelar
+        <a id="button2id" href="{{URL::to('show_user')}}" class="btn btn-primary">
+            Regresar
         </a>
     </div>
 </div>

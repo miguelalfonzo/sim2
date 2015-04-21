@@ -409,7 +409,8 @@ class FondoController extends BaseController
             'supervisor'     => $inputs['supervisor'] ,
             'codsup'         => $inputs['codsup'] ,
             'num_cuenta'     => $inputs['cuenta'] ,
-            'monto_aprobado' => $inputs['total'] 
+            'monto_aprobado' => $inputs['total'] ,
+            'idmoneda'       => 1
             );
             $detalle->idfondo   = $inputs['idfondo'] ;
             $detalle->idperiodo = $idPeriodo;   
@@ -449,7 +450,6 @@ class FondoController extends BaseController
                         $solicitud->idestado        = PENDIENTE;
                         $solicitud->idetiqueta      = $inputs['idetiqueta'];
                         $solicitud->idtiposolicitud = SOL_INST;
-                        $solicitud->idmoneda        = 1;
                         $solicitud->iduserasigned   = $middleRpta[data];
                         $solicitud->token           = sha1(md5(uniqid($solicitud->id, true)));
                         

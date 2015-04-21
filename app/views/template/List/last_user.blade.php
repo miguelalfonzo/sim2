@@ -2,13 +2,13 @@
     @if(count($solicitude->histories) != 0)
         @if (is_object($solicitude->histories[0]->user))    
             @if ($solicitude->histories[0]->user->type == REP_MED)
-                {{ucwords(strtolower($solicitude->histories[0]->user->Rm->nombres.' '.$solicitude->histories[0]->user->Rm->apellidos))}}
+                {{ $solicitude->histories[0]->user->rm->full_name }}
             @elseif ($solicitude->histories[0]->user->type == SUP)
-                {{ucwords(strtolower($solicitude->histories[0]->user->Sup->nombres.' '.$solicitude->histories[0]->user->Sup->apellidos))}}
+                {{ $solicitude->histories[0]->user->sup->full_name }}
             @elseif ($solicitude->histories[0]->user->type == GER_PROD)
-                {{ucwords(strtolower($solicitude->histories[0]->user->GerProd->descripcion))}}
+                {{ ucwords(strtolower($solicitude->histories[0]->user->gerProd->descripcion))}}
             @elseif ( in_array($solicitude->histories[0]->user->type, array(GER_COM,CONT,TESORERIA,ASIS_GER) ))
-                {{ucwords(strtolower($solicitude->histories[0]->user->person->nombres.' '.$solicitude->histories[0]->user->person->apellidos))}}
+                {{ $solicitude->histories[0]->user->person->full_name }}
             @else
                 Usuario no autorizado
             @endif

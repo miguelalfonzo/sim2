@@ -28,9 +28,9 @@
                     <input type="hidden" id="sol_token" class="i-tokens" value="{{$solicitude->token}}">  
                     @if(!is_null($solicitude->response))
                         @if($solicitude->response->type == REP_MED)
-                            <input type="hidden" value="{{$solicitude->response->Rm->nombres.' '.$solicitude->response->Rm->apellidos}}" class="benef">
+                            <input type="hidden" value="{{$solicitude->response->rm->full_name}}" class="benef">
                         @elseif($solicitude->response->type == ASIS_GER)
-                            <input type="hidden" value="{{$solicitude->response->person->nombres.' '.$solicitude->response->person->apellidos}}" class="benef">
+                            <input type="hidden" value="{{$solicitude->response->person->full_name}}" class="benef">
                         @else
                             <input type="hidden" value="Usuario no autorizado" class="benef">
                         @endif

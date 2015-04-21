@@ -32,7 +32,7 @@ function responseUI(message,color){
     }, message: '<h2>' + message + '</h2>'});
     setTimeout(function(){
         $.unblockUI();
-    },750);
+    },2000);
 }
 
 $(function(){

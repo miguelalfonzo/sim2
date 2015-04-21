@@ -54,7 +54,8 @@ Route::group(array('before' => 'sup'), function ()
 {
     Route::get('ver-solicitud-sup/{id}', 'Dmkt\SolicitudeController@viewSolicitudeSup');
     Route::get('aceptar-solicitud', 'Dmkt\SolicitudeController@redirectAcceptedSolicitude');
-    Route::get('derivar-solicitud/{token}', 'Dmkt\SolicitudeController@derivedSolicitude');
+    Route::post('buscar-gerprod', 'Dmkt\SolicitudeController@findGerProd');
+    Route::post('derivar-solicitud', 'Dmkt\SolicitudeController@deriveSolRep');
 });
 
 /**
@@ -162,7 +163,7 @@ Route::group(array('before' => 'sup_gerprod'), function ()
 {
     Route::post('asignar-solicitud-responsable', 'Dmkt\SolicitudeController@asignarResponsableSolicitud');
     Route::post('aceptar-solicitud', 'Dmkt\SolicitudeController@acceptedSolicitude');
-    Route::post('buscar-responsable' , 'Dmkt\SolicitudeController@getResponsables');
+    Route::post('buscar-responsable' , 'Dmkt\SolicitudeController@findResponsables');
 });
 
 Route::group(array('before' => 'sup_gerprod_gercom'), function ()

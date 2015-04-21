@@ -97,9 +97,11 @@ const BLOCKED  = 2;
 const INACTIVE = 3;
 
 //TIPO DE PAGOS
-const PAGO_DEPOSITO = 3;
 const PAGO_CHEQUE   = 2;
-const REASON_REGALOS = 2;
+const PAGO_DEPOSITO = 3;
+
+//MOTIVO
+const REASON_REGALO = 2;
 
 //CUENTAS
 const FONDO = 1;
