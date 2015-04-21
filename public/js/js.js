@@ -428,7 +428,8 @@ $(function(){
             }
         });
         //Delete a document already registered
-        $(document).on("click","#table-expense .delete-expense",function(e){
+        $(document).on("click","#table-expense .delete-expense", function(e)
+        {
             e.preventDefault();
             var elementTr = $(this).parent().parent();
             var elementTrId = elementTr.attr("data-id");
@@ -441,26 +442,33 @@ $(function(){
             // ruc            = $(this).parent().parent().find('.ruc').html();
             // voucher_number = $(this).parent().parent().find('.voucher_number').html();
             
-            bootbox.confirm("¿Esta seguro que desea eliminar el gasto?", function(result) {
-                if(result)
+            bootbox.confirm("¿Esta seguro que desea eliminar el gasto?", function(result) 
+            {
+                if( result )
                 {
                     // data = {"ruc":ruc,"voucher_number":voucher_number, "_token":$("input[name=_token]").val()};
                     data = {"gastoId": elementTrId, "_token":$("input[name=_token]").val()};
                     $.post(server + 'delete-expense', data)
-                    .done(function (data) {
-                        elementTr.remove();
-                        tot_expenses = calculateTot($(".total").parent(),'.total_expense');
-                        console.log(deposit);
-                        console.log(tot_expenses);
-                        balance = parseFloat(deposit - tot_expenses);
-                        balance = balance.toFixed(2);
-                        deleteItems();
-                        deleteExpense();
-                        $("#balance").val(balance);
-                        $("#save-expense").html("Registrar");
-                        $(".detail-expense").show();
-                        $(".search-ruc").show();
-                        $("#ruc-hide").siblings().parent().addClass('input-group');
+                    .done(function (data) 
+                    {
+                        if ( data.Status == 'Ok' )
+                        {
+                            elementTr.remove();
+                            tot_expenses = calculateTot($(".total").parent(),'.total_expense');
+                            console.log(deposit);
+                            console.log(tot_expenses);
+                            balance = parseFloat(deposit - tot_expenses);
+                            balance = balance.toFixed(2);
+                            deleteItems();
+                            deleteExpense();
+                            $("#balance").val(balance);
+                            $("#save-expense").html("Registrar");
+                            $(".detail-expense").show();
+                            $(".search-ruc").show();
+                            $("#ruc-hide").siblings().parent().addClass('input-group');
+                        }
+                        else
+                            bootbox.alert('<h4>' + data.Status + ': ' + data.Description + '</h4>');
                     });
                 }
             });
@@ -477,7 +485,8 @@ $(function(){
             row_edit.addClass('select-row');
         });
         //Edit a document already registered
-        $(document).on("click","#table-expense .edit-expense",function(e){
+        $(document).on("click","#table-expense .edit-expense", function( e )
+        {
             e.preventDefault();
             $("#ruc-hide").siblings().parent().removeClass('input-group');
             $(".search-ruc").hide();
@@ -493,22 +502,15 @@ $(function(){
             $(".message-expense").text('').hide();
             $("#table-items tbody tr").remove();
             $("#save-expense ").html("Actualizar");
-            data = {"ruc":ruc,"voucher_number":voucher_number};
-            if($(this).attr('data-sol'))
-            {
-                var ruta = 'edit-expense';
-            }
-            else
-            {
-                var ruta = 'edit-expense-cont';
-            }
+            //data = {"ruc":ruc,"voucher_number":voucher_number};
+            var ruta = 'edit-expense';
             $.ajax({
                 type: 'get',
                 url: server+ruta,
                 dataType: 'json',
-                data: {
+               /* data: {
                     data : JSON.stringify(data)
-                },
+                }*/
                 beforeSend:function(){
                     loadingUI('Cargando Datos');
                 },
@@ -517,8 +519,10 @@ $(function(){
                     $.blockUI();
                     $(".message-expense").text('No se pueden recuperar los datos del servidor.').show();
                 }
-            }).done(function (response){
-                setTimeout(function(){
+            }).done( function ( response )
+            {
+                setTimeout(function()
+                {
                     responseUI('Editar Gasto','green');
                     $("html, body").animate({scrollTop:200},'500','swing');
                     data_response = JSON.parse(JSON.stringify(response));
@@ -531,16 +535,10 @@ $(function(){
                     $("#number-serie").val(data_response.expense.num_serie).attr("disabled",true);
 
 					if ( !$('#dreparo').find('input[name=reparo]').length == 0)
-					{
-						if ( data_response.expense.reparo == true )
-						{                   
+						if ( data_response.expense.reparo == true )          
 							$('#dreparo').find('input[name=reparo]')[0].checked = true;
-						}
 						else
-						{
 							$('#dreparo').find('input[name=reparo]')[1].checked = true;
-						}
-					}
                     date = data_response.date.split('-');
                     date = date[2].substring(0,2)+'/'+date[1]+'/'+date[0];
                     $("#date").val(date);
@@ -551,13 +549,6 @@ $(function(){
                         row_add.find('.description input').val(value.descripcion);
                         row_add.find('.type-expense').val(value.tipo_gasto);
                         row_add.find('.total-item input').val(value.importe);
-                        /*if($(".reparo"))
-                        {
-                            if(value.reparo == 1)
-                            {
-                                row_add.find('.reparo').attr('checked', true);
-                            }
-                        }*/
                         $("#table-items tbody").append(row_add);
                         $(".total-item input").numeric({negative:false});
                         $(".quantity input").numeric({negative:false});
@@ -588,41 +579,34 @@ $(function(){
         $("#save-expense").on("click",function(e){
             e.preventDefault();
 
-            if($(this).attr('data-sol'))
-            {
-                route_update = 'update-expense';
-            }
-            else
-            {
-                route_update = 'update-expense-cont';
-            }
-
+            route_update = 'update-expense';
+            
             $(".message-expense").text('').hide();
             
             var btn_save = $(this).html();
-            var row = "<tr>";
-                row+= "<th class='proof-type'></th>";
-                row+= "<th class='ruc'></th>";
-                row+= "<th class='razon'></th>";
-                row+= "<th class='voucher_number'></th>";
-                row+= "<th class='date_movement'></th>";
-                row+= "<th class='total'><span class='type_money'></span>&nbsp;<span class='total_expense'></span></th>";
-                row+= "<th><a class='edit-expense' href='#'><span class='glyphicon glyphicon-pencil'></span></a></th>";
-                row+= "<th><a class='delete-expense' href='#'><span class='glyphicon glyphicon-remove'></span></a></th>";
-                row+= "</tr>";
+            var row  = "<tr>";
+                row += "<th class='proof-type'></th>";
+                row += "<th class='ruc'></th>";
+                row += "<th class='razon'></th>";
+                row += "<th class='voucher_number'></th>";
+                row += "<th class='date_movement'></th>";
+                row += "<th class='total'><span class='type_money'></span>&nbsp;<span class='total_expense'></span></th>";
+                row += "<th><a class='edit-expense' href='#'><span class='glyphicon glyphicon-pencil'></span></a></th>";
+                row += "<th><a class='delete-expense' href='#'><span class='glyphicon glyphicon-remove'></span></a></th>";
+                row += "</tr>";
 
-            proof_type       = $("#proof-type").val();
-            proof_type_sel   = $("#proof-type option:selected").text();
-            ruc              = $("#ruc").val();
-            ruc_hide         = $("#ruc-hide").val();
-            razon            = $("#razon").text();
-            razon_hide       = $("#razon").val();
-            razon_edit       = $("#razon").attr("data-edit");
-            number_prefix    = $("#number-prefix").val();
-            number_serie     = $("#number-serie").val();
-            voucher_number   = number_prefix+"-"+number_serie;
-            date             = $("#date").val();
-            desc_expense     = $("#desc-expense").val();
+            var proof_type       = $("#proof-type").val();
+            var proof_type_sel   = $("#proof-type option:selected").text();
+            var ruc              = $("#ruc").val();
+            var ruc_hide         = $("#ruc-hide").val();
+            var razon            = $("#razon").text();
+            var razon_hide       = $("#razon").val();
+            var razon_edit       = $("#razon").attr("data-edit");
+            var number_prefix    = $("#number-prefix").val();
+            var number_serie     = $("#number-serie").val();
+            var voucher_number   = number_prefix+"-"+number_serie;
+            var date             = $("#date").val();
+            var desc_expense     = $("#desc-expense").val();
             var balance      = parseFloat($("#balance").val());
             
             //Validación de errores de cabeceras
@@ -697,26 +681,20 @@ $(function(){
                 data.number_serie  = number_serie;
                 data.date_movement = date;
                 data.desc_expense  = desc_expense;
-                data.type = $(this).attr('data-type');
-                if(data.type == 'F') // si es que el registro viene de un fondo
-                    data.idfondo = $('#idfondo').val();
-
+                
                 var error_json = 0;
                 //Datos del detalle gastos por items
                 quantity = $(".quantity input");
                 total_item = $(".total-item input");
+                
                 var data_quantity    = validateEmpty(quantity);
                 var data_total_item  = validateEmpty(total_item);
-                // var arr_type_expense = [];
                 var arr_description = [];
-                // $.each($(".type-expense"),function(index){
-                //     arr_type_expense[index] = $(this).val();
-                // });
-                $.each($(".description input"),function(index){
-                    if($(this).val().length>0)
-                    {
+                
+                $.each($(".description input"),function(index)
+                {
+                    if( $(this).val().length > 0 )
                         arr_description[index] = $(this).val();
-                    }
                     else
                     {
                         $(this).val('').attr('placeholder','Debe ingresar la descripción');
@@ -728,13 +706,9 @@ $(function(){
                 if ( !$('#dreparo').find('input[name=reparo]').length == 0)
                 {
                     if( $('#dreparo').find('input[name=reparo]')[0].checked == true )
-                    {
                         rep = 1 ;
-                    }
                     else
-                    {
                         rep = 0 ;
-                    }
                 }
                 (data_quantity.length>0) ? data.quantity = data_quantity : error_json = 1;
                 data.description = arr_description;
@@ -760,8 +734,7 @@ $(function(){
                     tot_expense = parseFloat($("#total-expense").val());
                     data.total_expense = tot_expense;
                     var tot_expenses = calculateTot($(".total").parent(),'.total_expense');
-                    if(tot_expenses >0)
-                    {
+                    if( tot_expenses > 0 )
                         if(validateRuc(ruc) === true || proof_type == '7')
                         {
                             ajaxExpense(data)
@@ -792,7 +765,6 @@ $(function(){
                             });
                         }
                         else
-                        {
                             if(validateVoucher(ruc,voucher_number) === true)
                             {
                                 ajaxExpense(data)
@@ -823,7 +795,6 @@ $(function(){
                                 });
                             }
                             else
-                            {
                                 if(btn_save === 'Registrar')
                                 {
                                     $(".message-expense").text("El documento ya se encuentra registrado.").show();
@@ -832,13 +803,13 @@ $(function(){
                                 else
                                 {
                                     var rows = $(".total").parent();
-
-                                    $.each(rows,function(index){
+                                    $.each(rows,function(index)
+                                    {
                                         if($(this).find(".voucher_number").html()===voucher_number && $(this).find(".ruc").html()===ruc)
                                         {
                                             $.ajax({
                                                 type: 'post',
-                                                url: server+route_update,
+                                                url: server + route_update,
                                                 data: data,
                                                 beforeSend: function(){
                                                     loadingUI('Actualizando ...');
@@ -846,7 +817,8 @@ $(function(){
                                                 error: function(){
                                                     console.log("error al Actualizar el gasto");
                                                 }
-                                            }).done( function (result) {
+                                            }).done( function (result) 
+                                            {
                                                 if(result > 0)
                                                 {
                                                     deleteItems();
@@ -870,13 +842,10 @@ $(function(){
                                         }
                                     });
                                 }
-                            }
-                        }
-                    }
                     else
                     {
-                        ajaxExpense(data)
-                        .done(function(result){
+                        ajaxExpense(data).done(function(result)
+                        {
                             if(result.code == -1)
                             {
                                 responseUI("Documento ya registrado","red");
@@ -896,22 +865,17 @@ $(function(){
                                 responseUI("No se ha registrado el gasto","red");
                                 $(".message-expense").text("No se ha podido registrar el detalle de gastos");
                             }
-                        })
-                        .fail(function(){
+                        }).fail(function(){
                             responseUI("Error del servidor","red");
                             $(".message-expense").text("Ocurrió un error al momento de registrar los gastos");
                         });
                     }
                 }
                 else
-                {
                     $("html, body").animate({scrollTop:200},'500','swing');
-                }
             }
             if(balance === 0)
-            {
                 $(".detail-expense").hide();
-            }
             $(".search-ruc").show();
             $("#ruc-hide").siblings().parent().addClass('input-group');
         });
@@ -1413,16 +1377,21 @@ $(function(){
             e.preventDefault();
             if($("#collapseOne").hasClass('in'))
             {
-                //$("#detail_solicitude").text('Mostrar');
                 $("#detail_solicitude span:last-child").removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
                 $("#detail_solicitude span:first-child").text('Mostrar');
             }
             else
             {
-                //$("#text_solicitude").text('Ocultar');
                 $("#detail_solicitude span:last-child").removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
                 $("#detail_solicitude span:first-child").text('Ocultar');
             }
             $("#collapseOne").collapse('toggle');
         });
+
+        if ( $(".search-ruc").length == 1 )
+        {
+            $("#detail_solicitude span:last-child").removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+            $("#detail_solicitude span:first-child").text('Mostrar');
+            $("#collapseOne").collapse('toggle');
+        } 
 });

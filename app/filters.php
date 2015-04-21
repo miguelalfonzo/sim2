@@ -101,7 +101,7 @@ Route::filter('cont', function () {
         $type = Auth::user()->type;
         if ($type != CONT)
         {
-            if (in_array($type, array( REP_MED,SUP,GER_COM,GER_PROD,TESOREIA , ASIS_GER ) ) )
+            if (in_array($type, array( REP_MED , SUP , GER_COM , GER_PROD , TESORERIA , ASIS_GER ) ) )
                 return Redirect::to('show_user');
             else
                 return Redirect::to('login');

@@ -69,7 +69,11 @@
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label">	
 			<div class="input-group">
 		    	<div class="input-group-addon">{{$solicitud->detalle->typemoney->simbolo}}</div>
-		      	<input id="balance" class="form-control" type="text" value="{{$detalle->monto_aprobado}}" disabled>
+		    	@if ( isset( $balance) )
+		    		<input id="balance" class="form-control" type="text" value="{{$balance}}" disabled>
+		    	@else
+		      		<input id="balance" class="form-control" type="text" value="{{$detalle->monto_aprobado}}" disabled>
+		    	@endif
 		    </div>
 		</div>
 	</div>
@@ -156,7 +160,7 @@
 <section class="row reg-expense detail-expense" style="margin:0">
 	<div class="col-xs-12 col-sm-12 col-md-12">
 		<div class="form-expense">
-			<button id="save-expense" data-sol="1" data-type="S" type="button" class="btn btn-primary">Registrar</button>
+			<button id="save-expense" type="button" class="btn btn-primary">Registrar</button>
 			<div class="inline"><p class="inline message-expense"></p></div>
 		</div>
 	</div>
@@ -192,12 +196,12 @@
 										<span class="total_expense">{{(real)$val->monto}}</span>
 									</th>
 									<th>
-										<a class="edit-expense" data-sol="1" >
+										<a href="#" class="edit-expense">
 											<span class="glyphicon glyphicon-pencil"></span>
 										</a>
 									</th>
 									<th>
-										<a class="delete-expense">
+										<a href="#" class="delete-expense">
 											<span class="glyphicon glyphicon-remove"></span>
 										</a>
 									</th>

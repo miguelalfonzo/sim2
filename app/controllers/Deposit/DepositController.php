@@ -31,19 +31,6 @@ class DepositController extends BaseController{
         return $array;
     }
 
-    public function viewSolicitudeTes($token)
-    {
-        $solicitude = Solicitude::where('token', $token)->firstOrFail();
-        return View::make('Treasury.view_solicitude_tes')->with('solicitude', $solicitude);
-    }
-
-    public function viewFondoTes($token)
-    {
-        $solicitude = FondoInstitucional::where('token', $token)->firstOrFail();
-        return View::make('Treasury.view_solicitude_tes')->with('solicitude', $solicitude);        
-    }
-    
-
     private function validateBalance( $detalle , $tc )
     {
         $fondo = $detalle->fondo;
@@ -241,22 +228,5 @@ class DepositController extends BaseController{
             DB::rollback();
             return $this->internalException($e,__FUNCTION__);
         }
-    }    
-
-    public function getFondos($mes){
-        $mes = explode('-', $mes);
-        $periodo = $mes[1].str_pad($mes[0], 2, '0', STR_PAD_LEFT);
-        $fondos = FondoInstitucional::where('terminado', TERMINADO)->where('periodo', $periodo)->get();
-        $estado = 1;
-        foreach ($fondos as $fondo) {
-            if($fondo->depositado == PDTE_DEPOSITO)
-            {
-                $estado = PDTE_DEPOSITO;
-            }
-        }
-        $view = View::make('Treasury.list_fondos')->with('fondos',$fondos)->with('estado', $estado);
-        return $view;
-
     }
-
 }

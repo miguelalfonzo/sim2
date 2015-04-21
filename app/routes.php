@@ -1,19 +1,5 @@
 <?php
 
-/* TEST */
-Route::get('test', array('uses' => 'Dmkt\LoginController@test'));
-Route::get('set_status', array('uses' => 'BaseController@setStatus'));
-Route::get('sendmail', array('uses' => 'BaseController@postman'));
-Route::get('prueba', 'Dmkt\FondoController@test');
-
-Route::get('clientes-data','TestController@clientsTables');
-Route::get('hola', 'Expense\ExpenseController@test');
-Route::get('a/{token}', 'Expense\ExpenseController@reportExpense');
-Route::get('report-fondo/{token}','Expense\ExpenseController@reportExpenseFondo');
-Route::get('report', 'ExpenseController@reportExpense');
-Route::get('tmp','TestController@tm');
-Route::get('history','TestController@withHistory');
-
 /* Login */
 Route::get('/', array('uses' => 'Dmkt\LoginController@showLogin'));
 Route::get('login', array('uses' => 'Dmkt\LoginController@showLogin'));
@@ -27,44 +13,13 @@ Route::get('recharge', function(){
 
 /**
  * |-------------------------------------------------------------------------------------------- |
- * | Representante Medico |
- * |-------------------------------------------------------------------------------------------- |
- */
-Route::group(array('before' => 'rm'), function () 
-{    
-    // Fondo
-    Route::get('list-fondos-rm','Dmkt\FondoController@listFondosRep');
-    Route::get('registrar-gasto-fondo/{token}', 'Expense\ExpenseController@showRegisterFondo');
-    Route::get('end-expense-fondo/{id}','Expense\ExpenseController@finishExpenseFondo');
-    
-    // Ruc
-    Route::post('consultarRuc', 'Expense\RucController@show');
-    Route::get('ruc', function () {
-        return View::make('Expense\ruc');
-    });
-});
-
-/**
- * |-------------------------------------------------------------------------------------------- |
  * | SUPERVISOR |
  * |-------------------------------------------------------------------------------------------- |
  */
 Route::group(array('before' => 'sup'), function () 
 {
-    Route::get('ver-solicitud-sup/{id}', 'Dmkt\SolicitudeController@viewSolicitudeSup');
-    Route::get('aceptar-solicitud', 'Dmkt\SolicitudeController@redirectAcceptedSolicitude');
     Route::post('buscar-gerprod', 'Dmkt\SolicitudeController@findGerProd');
     Route::post('derivar-solicitud', 'Dmkt\SolicitudeController@deriveSolRep');
-});
-
-/**
- * |-------------------------------------------------------------------------------------------- |
- * | Gerente de Producto |
- * |-------------------------------------------------------------------------------------------- |
- */
-Route::group(array('before' => 'gerprod'), function () 
-{
-    Route::get('ver-solicitud-gerprod/{id}', 'Dmkt\SolicitudeController@viewSolicitudeGerProd');
 });
 /**
  * |-------------------------------------------------------------------------------------------- |
@@ -73,19 +28,16 @@ Route::group(array('before' => 'gerprod'), function ()
  */
 Route::group(array('before' => 'gercom'), function () 
 {
-    Route::get('ver-solicitud-gercom/{id}', 'Dmkt\SolicitudeController@viewSolicitudeGerCom');
     Route::post('aprobar-solicitud', 'Dmkt\SolicitudeController@approvedSolicitude');
     Route::post('gercom-mass-approv','Dmkt\SolicitudeController@massApprovedSolicitudes');
 });
-
 /**
  * |-------------------------------------------------------------------------------------------- |
  * | Contabilidad |
  * |-------------------------------------------------------  ------------------------------------- |
  */
-
-Route::group(array('before' => 'cont'), function () {
-    Route::get('ver-solicitud-cont/{id}', 'Dmkt\SolicitudeController@viewSolicitudeCont');
+Route::group(array('before' => 'cont'), function () 
+{
     Route::post('enable-deposit', 'Dmkt\SolicitudeController@enableDeposit');
     Route::get('revisar-asiento-solicitud/{token}', 'Dmkt\SolicitudeController@viewSeatSolicitude');
     Route::get('generar-asiento-solicitud/{token}', 'Dmkt\SolicitudeController@viewGenerateSeatSolicitude');
@@ -110,28 +62,20 @@ Route::group(array('before' => 'cont'), function () {
     Route::get('list-documents', 'Dmkt\FondoController@listDocuments');
     Route::post('cont-document-manage' , 'Expense\ExpenseController@manageDocument');
 });
-
 /**
  * |-------------------------------------------------------------------------------------------- |
  * | Tesorería |
  * |-------------------------------------------------------------------------------------------- |
  */
-
 Route::group(array('before' => 'tes'), function()
 {
-    Route::get('ver-solicitud-tes/{token}', 'Deposit\DepositController@viewSolicitudeTes');
-    Route::get('ver-fondo-tes/{token}', 'Deposit\DepositController@viewFondoTes');
     Route::post('deposit-solicitude', 'Deposit\DepositController@depositSolicitudeTes');
-    Route::post('deposit-fondo','Deposit\DepositController@depositFondoTes');
-    Route::get('list-fondos-tesoreria/{date}','Dmkt\FondoController@getFondosTesoreria');
 });
-
 /**
  * |-------------------------------------------------------------------------------------------- |
- * | Fondo Institucional |
+ * | Asistente Gerencia |
  * |-------------------------------------------------------------------------------------------- |
  */
-
 Route::group( array('before' => 'ager') , function()
 {
     Route::post('registrar-fondo','Dmkt\FondoController@postRegister');
@@ -144,12 +88,10 @@ Route::group( array('before' => 'ager') , function()
     Route::post('get-sol-inst' , 'Dmkt\FondoController@getSolInst');
 });
 
-
 Route::group( array( 'before' => 'rm_sup_ager' ), function ()
 {
     Route::post('cancelar-solicitud', 'Dmkt\SolicitudeController@cancelSolicitude');
 });
-
 
 Route::group(array('before' => 'sup_gerprod'), function ()
 {
@@ -161,7 +103,6 @@ Route::group(array('before' => 'sup_gerprod'), function ()
 Route::group(array('before' => 'sup_gerprod_gercom'), function ()
 {
     Route::post('rechazar-solicitud', 'Dmkt\SolicitudeController@denySolicitude');
-    Route::get('desbloquear-solicitud/{token}', 'Dmkt\SolicitudeController@disBlockSolicitude');
 });
 
 Route::group(array('before' => 'rm_ager'), function ()
@@ -199,5 +140,4 @@ Route::group(array('before' => 'sys_user'), function ()
 
 App::missing(function ($exception) 
 {
-
 });

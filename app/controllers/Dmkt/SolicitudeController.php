@@ -206,9 +206,15 @@ class SolicitudeController extends BaseController
                     {
                         $data['typeProof'] = ProofType::orderBy('id','asc')->get();
                         $data['date']      = $this->getDay();
-                        $gasto = $solicitud->expense;
-                        if ( count( $gasto ) > 0 )
-                            $data['expense'] = $gasto;
+                        $gastos = $solicitud->expense;
+                        if ( count( $gastos ) > 0 )
+                        {
+                            $data['expense'] = $gastos;
+                            $balance = 0.00;
+                            foreach ( $gastos as $gasto )
+                                $balance += $gasto->monto;
+                            $data['balance'] = $detalle->monto_aprobado - $balance;
+                        }
                     }
                     return View::make('Dmkt.Solicitud.Representante.view', $data);
                 }
