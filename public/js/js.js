@@ -38,7 +38,6 @@ function responseUI(message,color){
 $(function(){
     //Vars
     var token          = $("#token").val();
-    var deposit        = parseFloat($("#deposit").val());
     var type_money     = $("#type-money").html();
     var proof_type;
     var proof_type_sel;
@@ -64,6 +63,8 @@ $(function(){
     var description;
     var total_item;
     var row_item_first = $("#table-items tbody tr:eq(0)").clone();
+    var depositado     = $('#amount');
+    var deposit        = parseFloat(depositado.val());
     var row_expense_first;
     var data          = {};
     var data_response = {};
@@ -449,6 +450,8 @@ $(function(){
                     .done(function (data) {
                         elementTr.remove();
                         tot_expenses = calculateTot($(".total").parent(),'.total_expense');
+                        console.log(deposit);
+                        console.log(tot_expenses);
                         balance = parseFloat(deposit - tot_expenses);
                         balance = balance.toFixed(2);
                         deleteItems();
@@ -681,14 +684,12 @@ $(function(){
                 error = 1;
             }
             //Mostrando errores de cabeceras si es que existen
-            if(error !== 0){
-                $("html, body").animate({scrollTop:200},'500','swing');
+            if(error !== 0)
                 return false;
-            }
             else
             {
-                data._token        = $("input[name=_token]").val();
-                data.token         = $("#token").val();
+                data._token        = $('input[name=_token]').val();
+                data.token         = $('input[name=token]').val();
                 data.proof_type    = proof_type;
                 data.ruc           = ruc;
                 data.razon         = razon;
@@ -1058,13 +1059,18 @@ $(function(){
         function calcularBalance()
         {
             var balance;
-            var deposit = parseFloat($("#deposit").val());
+            var deposit = parseFloat(depositado.val());
             var tot_expenses = calculateTot($(".total").parent(),'.total_expense');
             var btn_save = $("#save-expense").html();
             var tot_expense = parseFloat($("#total-expense").val());
             var imp_serv = parseFloat($("#imp-ser").val());
             if(!$.isNumeric(imp_serv)) imp_serv = 0;
             if(!$.isNumeric(tot_expense)) tot_expense = 0;
+            
+            console.log(deposit);
+            console.log(tot_expenses);
+            console.log(tot_expense);
+
             if(btn_save === "Registrar")
             {
                 balance = deposit - tot_expenses - tot_expense;
@@ -1072,6 +1078,7 @@ $(function(){
             }
             else
             {
+
                 balance = deposit - tot_expense - tot_expenses + parseFloat($("#tot-edit-hidden").val());
                 $("#balance").val(balance.toFixed(2));
             }

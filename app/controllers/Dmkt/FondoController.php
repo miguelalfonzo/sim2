@@ -39,12 +39,6 @@ class FondoController extends BaseController
         $period = explode('-', $date);
         return $period[1].str_pad($period[0], 2, '0', STR_PAD_LEFT);
     }
-    
-    public function getRegister()
-    {
-        $fondos  = Fondo::where('idusertype', ASIS_GER )->get();
-        return View::make('Dmkt.AsisGer.register_fondo')->with('fondos', $fondos);
-    }
 
     public function getSolInst()
     {
@@ -592,111 +586,9 @@ class FondoController extends BaseController
         return $view;
     }
     
-/*
-    function getFondo($id)
-    {
-        $fondo = FondoInstitucional::find($id);
-        return $fondo;
-    }
-    
-    function delFondo()
-    {
-        $id    = Input::get('idfondo');
-        $start = Input::get('start');
-        $fondo = FondoInstitucional::find($id);
-        $fondo->delete();
-        $fondos = $this->getFondos($start);
-        return $fondos;
-    }
-*/
-
-    
-
-    
     function getLastDayOfMonth($month, $year)
     {
         return date('d', mktime(0, 0, 0, $month + 1, 1, $year) - 1);
     }
 
-  /*  public function viewGenerateSeatFondo($token)
-    {
-        try
-        {
-            $fondo = FondoInstitucional::where('token', $token)->firstOrFail();
-            $date = $this->getDay();
-            $cuenta = Fondo::where('cuenta_mkt', CTA_FONDO_INSTITUCIONAL)->get();
-            
-            if ($fondo->tipo_moneda == SOLES)
-                $banco = Account::where('alias',BANCOS)->where('num_cuenta',CUENTA_SOLES)->get();
-            elseif ($fondo->tipo_moneda == DOLARES)
-                $banco = Account::where('alias',BANCOS)->where('num_cuenta',CUENTA_DOLARES)->get();
-            if ( count($banco) == 1)
-            {
-                $data = array(
-                    'type'   => FONDO,
-                    'fondo'  => $fondo,
-                    'date'   => $date,
-                    'cuenta' => $cuenta,
-                    'banco'  => $banco
-                );
-                return View::make('Dmkt.Cont.register_advance_seat')->with($data);
-            //return View::make('Dmkt.Cont.register_seat_fondo')->with($data);
-            }
-            else
-                return array ( status => warning , description => 'Existen varias cuentas de banco en '.$fondo->tipo_moneda);
-        }
-        catch (Exception $e)
-        {
-            $rpta = $this->internalException($e,__FUNCTION__);
-            return $rpta;
-        }
-    }*/
-
- /*   public function generateSeatFondo()
-    {   
-        $middleRpta = array();
-        $inputs  = Input::all();
-        $middleRpta[status] = 1;
-        foreach ($inputs['number_account'] as $account) {
-            $fondo = Fondo::where('cuenta_mkt', $account)->get();
-            if(count($fondo) == 0){
-                $cuentaContable = Account::where('num_cuenta', $account)->get();
-                if(count($cuentaContable) == 0){
-                    $middleRpta[status] = error;
-                    $middleRpta[description] = "La cuenta $account no se encuentra registrada en la Base de datos.";
-                }
-            }
-        }
-        try {
-            DB::transaction (function() use ($inputs){
-                for($i=0;$i<count($inputs['number_account']);$i++)
-                {
-                    $entry = new Entry;
-                    $idasiento = $entry->searchId()+1;
-                    $entry->idasiento = $idasiento;
-                    $entry->num_cuenta = $inputs['number_account'][$i];
-                    $entry->fec_origen = $this->getDay()['toDay'];
-                    $entry->d_c = $inputs['dc'][$i];
-                    $entry->importe = $inputs['total'][$i];
-                    $entry->leyenda = $inputs['leyenda'];
-                    $entry->idfondo = $inputs['idfondo'];
-                    $entry->tipo_asiento = TIPO_ASIENTO_ANTICIPO;
-                    $entry->save();
-                }
-                FondoInstitucional::where('idfondo', $inputs['idfondo'])->update(array('asiento' => ASIENTO_FONDO));
-            });
-        } catch (Exception $e) {
-            $middleRpta = $this->internalException($e,__FUNCTION__);
-        }
-        return json_encode($middleRpta);
-    }
-
-    
-
-    public function listDocuments()
-    {
-        $docs = ProofType::order();
-        $view = View::make('Dmkt.Cont.list_documents')->with('docs',$docs);
-        return $view;
-    }*/
 }

@@ -20,11 +20,6 @@
                     <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span>
             </a>       
             @if( Auth::user()->type == REP_MED)
-                @if($solicitude->estado == GASTO_HABILITADO)
-                    <a id="token-reg-expense" data-url="{{$solicitude->token}}">
-                        <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span>
-                    </a>
-                @endif
                 @if($solicitude->idestado == REGISTRADO && Auth::user()->id == $solicitude->idresponse)
                     <a target="_blank" href="{{URL::to('a'.'/'.$solicitude->token)}}">
                         <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-print"></span>
@@ -57,9 +52,6 @@
                     <a id="token-reg-expense" data-url="{{$solicitude->token}}" data-cont="1">
                         <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span>
                     </a>
-                    <!-- <a id="token-expense" data-url="{{$solicitude->token}}" href="#">
-                        <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-book"></span>
-                    </a> -->
                 @endif
             @elseif ( Auth::user()->type == TESORERIA )
                 @if( $solicitude->idestado == DEPOSITO_HABILITADO )

@@ -126,13 +126,6 @@
 										<tr>
 											<th class="quantity"><input type="text" class="form-control" maxlength="4"></th>
 											<th class="description"><input type="text" class="form-control"></th>
-											<!-- <th>
-												<select class="form-control type-expense">
-													@foreach($typeExpense as $val)
-														<option value="{{$val->idtipogasto}}">{{mb_convert_case($val->descripcion,MB_CASE_TITLE, 'UTF-8')}}</option>
-													@endforeach
-												</select>
-											</th> -->
 											<th class="total-item">
 												<div class="input-group">
 											    	<div class="input-group-addon">S/.</div>

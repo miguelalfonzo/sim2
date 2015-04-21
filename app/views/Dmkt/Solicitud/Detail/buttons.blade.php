@@ -1,6 +1,10 @@
 <div class="form-group col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px">
     <div class="col-sm-12 col-md-12 col-lg-12" style="text-align: center">
-        @if ( Auth::user()->type == SUP )
+        @if( Auth::user()->type == REP_MED )
+            <a id="finish-expense" class="btn btn-success">
+                Terminar
+            </a>
+        @elseif ( Auth::user()->type == SUP )
             @if( $solicitud->idestado == PENDIENTE )
                 <a class="btn btn-primary" id="search_responsable">
                     Aceptar

@@ -42,8 +42,8 @@
     </div>
 @endif
 
+<!--  Amount Factura -->
 @if( $solicitud->typeSolicitude->code == SOLIC && $solicitud->detalle->idmotivo == REASON_REGALO )
-    <!--  Amount Factura -->
     <div class="form-group col-sm-6 col-md-4 col-lg-4">
         <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="factura">
             Monto Factura
@@ -196,40 +196,8 @@
 @endif
 
 
-<!-- Modal -->
-@if( Auth::user()->type == TESORERIA && $solicitud->idestado == DEPOSITO_HABILITADO )
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span aria-hidden="true">&times;</span>
-                        <span class="sr-only">Close</span>
-                    </button>
-                    <h4 class="modal-title" id="myModalLabel">Registro del Depósito</h4>
-                </div>
-                <div class="modal-body">
-                    <label>Bancos</label>
-                    <select id="bank_account" name="bank_account" class="form-control">
-                        @foreach ( $banks as $bank )
-                            <option value="{{$bank->id}}">
-                                {{$bank->typeMoney->simbolo.'-'.$bank->nombre}}
-                            </option>
-                        @endforeach
-                    </select>
-                    <br>
-                    <label for="op-number">Número de Operación, Transacción, Cheque:</label>
-                    <input id="op-number" type="text" class="form-control">
-                    <p id="message-op-number" style="margin-top:1em;color:#a94442;"></p>
-                </div>
-                <div class="modal-footer">
-                    <a id="" href="#" class="btn btn-success register-deposit" data-deposit="S" style="margin-right: 1em;">Confirmar Operación</a>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-@endif
+<!-- Modal Deposito -->
+@include('template.Modals.deposit-min')
 
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding: 0">
     <!-- Products -->

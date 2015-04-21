@@ -14,7 +14,7 @@
             @endif
             <th>Estado</th>
             <th>Fecha de Creación</th>
-            <th>Tipo de Solicitud</th>
+            <th>Tipo</th>
             <th style="width:auto">Edicion</th>
             @if (Auth::user()->type == GER_COM)
                 <th data-checkbox="true">Marcar</th>
@@ -37,7 +37,7 @@
                     @endif
                 @endif
                 <td class="text-center id_solicitud">{{$solicitude->id}}</td>
-                <td class="text-center sol_titulo">
+                <td class="text-left sol_titulo">
                     @if (!is_null($solicitude->idetiqueta))
                         <span class="label" style="margin-right:1em;background-color:{{$solicitude->etiqueta->color}}">
                             {{$solicitude->etiqueta->nombre}}
@@ -64,18 +64,22 @@
                     </td>
                     <td class="text-center deposit">
                         @if ( $solicitude->idtiposolicitud == SOL_REP )
-                            @if ( is_null( $solicitude->detalle->idretencion) )
-                                {{$solicitude->detalle->typemoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_aprobado }}
-                            @else
-                                @if ( $solicitude->detalle->typeRetention->account->idtipomoneda == $solicitude->detalle->idmoneda )
-                                    {{$solicitude->detalle->typemoney->simbolo.' '.(json_decode($solicitude->detalle->detalle)->monto_aprobado - json_decode($solicitude->detalle->detalle)->monto_retencion)}}
+                            @if ( is_null( $solicitude->detalle->iddeposito ) )
+                                @if ( is_null( $solicitude->detalle->idretencion) )
+                                    {{$solicitude->detalle->typemoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_aprobado }}
                                 @else
-                                    @if ( $solicitude->detalle->idmoneda == SOLES )
-                                        {{$solicitude->detalle->typemoney->simbolo.' '.( json_decode( $solicitude->detalle->detalle )->monto_aprobado - ( json_decode( $solicitude->detalle->detalle )->monto_retencion*$tc->compra ) ) }}    
-                                    @elseif ( $solicitude->detalle->idmoneda == DOLARES )
-                                        {{$solicitude->detalle->typemoney->simbolo.' '.( json_decode( $solicitude->detalle->detalle )->monto_aprobado - ( json_decode( $solicitude->detalle->detalle )->monto_retencion/$tc->venta ) ) }}   
+                                    @if ( $solicitude->detalle->typeRetention->account->idtipomoneda == $solicitude->detalle->idmoneda )
+                                        {{$solicitude->detalle->typemoney->simbolo.' '.(json_decode($solicitude->detalle->detalle)->monto_aprobado - json_decode($solicitude->detalle->detalle)->monto_retencion)}}
+                                    @else
+                                        @if ( $solicitude->detalle->idmoneda == SOLES )
+                                            {{$solicitude->detalle->typemoney->simbolo.' '.( json_decode( $solicitude->detalle->detalle )->monto_aprobado - ( json_decode( $solicitude->detalle->detalle )->monto_retencion*$tc->compra ) ) }}    
+                                        @elseif ( $solicitude->detalle->idmoneda == DOLARES )
+                                            {{$solicitude->detalle->typemoney->simbolo.' '.( json_decode( $solicitude->detalle->detalle )->monto_aprobado - ( json_decode( $solicitude->detalle->detalle )->monto_retencion/$tc->venta ) ) }}   
+                                        @endif
                                     @endif
                                 @endif
+                            @else
+                                {{$solicitude->detalle->deposit->account->typeMoney->simbolo.' '.$solicitude->detalle->deposit->total}}
                             @endif
                         @elseif ( $solicitude->idtiposolicitud == SOL_INST )
                             {{$solicitude->detalle->fondo->typemoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_aprobado }}

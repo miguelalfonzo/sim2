@@ -39,10 +39,15 @@ class Solicitude extends Eloquent{
             });
         })->where( 'idestado' , '<>' , CANCELADO )->get();
     }
-    /*protected function pendHist()
+
+    /* PUBLIC RELATIONSHIPS */
+
+    public function state()
     {
-        return $this->hasOne('System\SolicitudeHistory','idsolicitude','id')->where( 'status_to' , PENDIENTE );
-    }*/
+        return $this->hasOne('Common\State','idestado','idestado');
+    }
+
+    /* ------------------ */
 
     public function asignedTo()
     {
@@ -76,7 +81,8 @@ class Solicitude extends Eloquent{
         return $this->hasMany('Dmkt\SolicitudeClient','idsolicitud','id');
     }
 
-    protected function createdBy(){
+    protected function createdBy()
+    {
         return $this->belongsTo('User','created_by');
     }
 
@@ -85,58 +91,35 @@ class Solicitude extends Eloquent{
         return $this->hasOne('Dmkt\SolicitudeGer','idsolicitud','id');
     }
 
-    function state(){
+    
 
-        return $this->hasOne('Common\State','idestado','idestado');
-    }
-
-    function reasonSolicitude(){
+    protected function reasonSolicitude()
+    {
         return $this->hasOne('Dmkt\SolicitudReason','id','idtiposolicitud');
     }
 
-    
-    
-    function gastos(){
-        return $this->hasMany('Expense\Expense','idsolicitud','id');
-    }
-
-   
-
-    function response(){
+    protected function response()
+    {
         return $this->belongsTo('User','iduserasigned');
     }
 
-    
-    
-    function typeRetention(){
-        return $this->hasOne('Dmkt\TypeRetention','id','idtiporetencion');
-    }
-
-    function aproved(){
-        return $this->hasOne('User','id', 'idaproved');
-    }
-
-    function deposit(){
-        return $this->hasOne('Common\Deposit','id', 'iddeposito');
-    }
-
-    protected function rm(){
+    protected function rm()
+    {
         return $this->hasOne('Dmkt\Rm','iduser','created_by')->select('nombres,apellidos,iduser');
     }
 
-    protected function sup(){
+    protected function sup()
+    {
         return $this->hasOne('Dmkt\Sup','iduser','created_by')->select('nombres,apellidos,iduser,idsup');;
     }
 
-    function aprovedSup(){
-        return $this->hasOne('Dmkt\Sup','iduser','idaproved');
-    }
-
-    function aprovedGerProd(){
-        return $this->hasOne('Dmkt\Manager','iduser','idaproved');
-    }
-
-    function etiqueta(){
+    protected function etiqueta()
+    {
         return $this->hasOne('Dmkt\Label','id','idetiqueta');
+    }
+
+    protected function expense()
+    {
+        return $this->hasMany( '\Expense\Expense' , 'idsolicitud' , 'id' );
     }
 }

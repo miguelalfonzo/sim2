@@ -40,9 +40,17 @@
                 <section id="collapseOne" class="row reg-expense collapse in">
                     @include('Dmkt.Solicitud.Representante.detail')
                 </section>
+                
+                <!-- Asiento de Anticipo -->
                 @if ( Auth::user()->type == CONT && $solicitud->idestado == DEPOSITADO )
                     @include('template.Seat.advance_table')
                 @endif
+
+                <!-- Registro de Gasto -->
+                @if ( ( Auth::user()->type == ASIS_GER || Auth::user()->type == REP_MED ) && $solicitud->idestado == GASTO_HABILITADO )
+                    @include('Dmkt.Solicitud.Section.gasto')
+                @endif
+
                 <!-- Button (Double) -->
                 @include('Dmkt.Solicitud.Detail.buttons')
             </form>

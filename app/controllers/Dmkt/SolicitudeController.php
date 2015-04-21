@@ -202,6 +202,14 @@ class SolicitudeController extends BaseController
                         $data['date'] = $this->getDay();
                         $data['lv'] = $this->textLv( $solicitud );
                     }
+                    elseif ( in_array( Auth::user()->type , array( REP_MED , ASIS_GER ) ) && $solicitud->idestado == GASTO_HABILITADO )
+                    {
+                        $data['typeProof'] = ProofType::orderBy('id','asc')->get();
+                        $data['date']      = $this->getDay();
+                        $gasto = $solicitud->expense;
+                        if ( count( $gasto ) > 0 )
+                            $data['expense'] = $gasto;
+                    }
                     return View::make('Dmkt.Solicitud.Representante.view', $data);
                 }
             }
@@ -1475,43 +1483,52 @@ class SolicitudeController extends BaseController
             DB::beginTransaction();
             $inputs = Input::all();
             $solicitude = Solicitude::find( $inputs['idsolicitude'] );
-            $solicitude->idestado = DEPOSITO_HABILITADO;
-            $oldIdestado = $solicitude->idestado ;
-            if ( !$solicitude->save())
-                return $this->warningException( __FUNCTION__ , 'Cancelado - No se pudo procesar la Solicitud' );
+            if ( count( $solicitude ) == 0 )
+                return $this->warningException( __FUNCTION__ , 'No se encontro la solicitud con Id: '.$inputs['idsolicitude']);
             else
             {
-                $val_ret = $inputs['monto_retencion'];
-                if ( !empty( trim( $val_ret ) ) )
+                if ( $solicitude->idestado != APROBADO )
+                    return $this->warningException( __FUNCTION__ , 'No se puede procesar una solicitud que no ha sido Aprobada');
+                else
                 {
-                    if ( !is_numeric( $val_ret ) )
-                        return $this->warningException( __FUNCTION__ , 'La retencion debe ser un valor Númerico' );
-                    elseif ( $val_ret <= 0 )    
-                        return $this->warningException( __FUNCTION__ , 'La retencion debe ser mayor que 0' );
-                    elseif ( empty( trim( $inputs['idretencion'] ) ) )
-                        return $this->warningException( __FUNCTION__ , 'No se encontro el tipo de retencion a registrar' );
-                    else 
+                    $oldIdestado = $solicitude->idestado;
+                    $solicitude->idestado = DEPOSITO_HABILITADO;
+                    if ( !$solicitude->save())
+                        return $this->warningException( __FUNCTION__ , 'Cancelado - No se pudo procesar la Solicitud' );
+                    else
                     {
-                        $sol_detalle = $solicitude->detalle;
-                        Log::error(json_encode($sol_detalle));
-                        $sol_detalle->idretencion = $inputs['idretencion'];
-                        $jDetalle = json_decode($sol_detalle->detalle);
-                        $jDetalle->monto_retencion = $val_ret;
-                        $sol_detalle->detalle = json_encode($jDetalle);
-                        if ( !$sol_detalle->save() )
-                            return $this->warningException( __FUNCTION__ , 'Cancelado - No se pudo registrar la retencion' );
+                        $val_ret = $inputs['monto_retencion'];
+                        if ( !empty( trim( $val_ret ) ) )
+                        {
+                            if ( !is_numeric( $val_ret ) )
+                                return $this->warningException( __FUNCTION__ , 'La retencion debe ser un valor Númerico' );
+                            elseif ( $val_ret <= 0 )    
+                                return $this->warningException( __FUNCTION__ , 'La retencion debe ser mayor que 0' );
+                            elseif ( empty( trim( $inputs['idretencion'] ) ) )
+                                return $this->warningException( __FUNCTION__ , 'No se encontro el tipo de retencion a registrar' );
+                            else 
+                            {
+                                $sol_detalle = $solicitude->detalle;
+                                $sol_detalle->idretencion = $inputs['idretencion'];
+                                $jDetalle = json_decode($sol_detalle->detalle);
+                                $jDetalle->monto_retencion = round( $val_ret , 2 ,PHP_ROUND_HALF_DOWN );
+                                $sol_detalle->detalle = json_encode($jDetalle);
+                                if ( !$sol_detalle->save() )
+                                    return $this->warningException( __FUNCTION__ , 'Cancelado - No se pudo registrar la retencion' );
+                            }
+                        }
+                        $middleRpta = $this->setStatus( $oldIdestado, DEPOSITO_HABILITADO, Auth::user()->id, USER_TESORERIA , $solicitude->id);
+                        if ($middleRpta[status] == ok)
+                        {
+                            Session::put('state',R_REVISADO);
+                            DB::commit();
+                            return $middleRpta;
+                        }
                     }
                 }
-                $rpta = $this->setStatus( $oldIdestado, DEPOSITO_HABILITADO, Auth::user()->id, USER_TESORERIA , $solicitude->id);
-                if ($rpta[status] == ok)
-                {
-                    Session::put('state',R_REVISADO);
-                    DB::commit();
-                }
-                else
-                    DB::rollback();
-                return $rpta;
             }
+            DB::rollback();
+            return $middleRpta;
         }
         catch (Exception $e)
         {

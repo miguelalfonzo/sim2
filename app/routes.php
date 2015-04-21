@@ -6,7 +6,6 @@ Route::get('set_status', array('uses' => 'BaseController@setStatus'));
 Route::get('sendmail', array('uses' => 'BaseController@postman'));
 Route::get('prueba', 'Dmkt\FondoController@test');
 
-
 Route::get('clientes-data','TestController@clientsTables');
 Route::get('hola', 'Expense\ExpenseController@test');
 Route::get('a/{token}', 'Expense\ExpenseController@reportExpense');
@@ -15,7 +14,7 @@ Route::get('report', 'ExpenseController@reportExpense');
 Route::get('tmp','TestController@tm');
 Route::get('history','TestController@withHistory');
 
-/** Login */
+/* Login */
 Route::get('/', array('uses' => 'Dmkt\LoginController@showLogin'));
 Route::get('login', array('uses' => 'Dmkt\LoginController@showLogin'));
 Route::post('login', array('uses' => 'Dmkt\LoginController@doLogin'));
@@ -135,14 +134,10 @@ Route::group(array('before' => 'tes'), function()
 
 Route::group( array('before' => 'ager') , function()
 {
-    //Route::get('registrar-fondo','Dmkt\FondoController@getRegister');
     Route::post('registrar-fondo','Dmkt\FondoController@postRegister');
-    //Route::get('get-fondo/{id}','Dmkt\FondoController@getFondo');
     Route::post('update-fondo','Dmkt\FondoController@updateSolInst');
     Route::get('exportfondos/{date}','Dmkt\FondoController@exportExcelFondos');
     Route::get('endfondos/{date}','Dmkt\FondoController@endfondos');
-    //Route::get('ver-solicitud-ager/{token}','Dmkt\SolicitudeController@viewSolicitudeAGer');
-    //Route::post('search-client', 'TestController@repSource');
     Route::post('search-rep', 'Source\Seeker@repSource');
     Route::post('info-rep', 'Source\Seeker@repInfo');
     Route::get('list-fondos/{date}','Dmkt\FondoController@getFondos');
@@ -155,10 +150,7 @@ Route::group( array( 'before' => 'rm_sup_ager' ), function ()
     Route::post('cancelar-solicitud', 'Dmkt\SolicitudeController@cancelSolicitude');
 });
 
-Route::group(array('before' => 'rm_cont_ager'), function ()
-{
-    Route::post('register-expense', 'Expense\ExpenseController@registerExpense');
-});
+
 Route::group(array('before' => 'sup_gerprod'), function ()
 {
     Route::post('asignar-solicitud-responsable', 'Dmkt\SolicitudeController@asignarResponsableSolicitud');
@@ -181,6 +173,7 @@ Route::group(array('before' => 'rm_ager'), function ()
     // Expense
     Route::get('edit-expense', 'Expense\ExpenseController@editExpense');
     Route::post('delete-expense', 'Expense\ExpenseController@deleteExpense');
+    Route::post('register-expense', 'Expense\ExpenseController@registerExpense');
     Route::post('update-expense', 'Expense\ExpenseController@updateExpense');
 });
 Route::group(array('before' => 'rm_sup'), function ()

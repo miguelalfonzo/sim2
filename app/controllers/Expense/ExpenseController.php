@@ -24,6 +24,7 @@ use \Common\Deposit;
 use \BagoUser;
 use \Exception;
 use \Session;
+use \Dmkt\Account;
 
 class ExpenseController extends BaseController
 {
@@ -52,15 +53,15 @@ class ExpenseController extends BaseController
 	public function show($token){
 		$date         = $this->getDay();
 		$typeProof    = ProofType::all();
-		$typeExpense  = ExpenseType::orderBy('idtipogasto','asc')->get();
-		$solicitude   = Solicitude::where('token',$token)->firstOrFail();
+		$typeExpense  = ExpenseType::orderBy('id','asc')->get();
+		$solicitude   = Solicitude::where('token',$token)->first();
 		$expense      = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
-		$aproved_user = User::where('id',$solicitude->idaproved)->firstOrFail();
-		if($aproved_user->type === 'S')
+		$aproved_user = User::where('id',$solicitude->acceptHist->updated_by)->first();
+		if($aproved_user->type === SUP )
 		{
 			$name_aproved = $aproved_user->sup->nombres;
 		}
-		if($aproved_user->type === 'P')
+		if($aproved_user->type === GER_PROD )
 		{
 			$name_aproved = $aproved_user->gerprod->descripcion;
 		}
@@ -74,7 +75,7 @@ class ExpenseController extends BaseController
 			$balance= $solicitude->monto - $balance;
  		}
  		$data = [
-			'solicitude'   => $solicitude,
+			'solicitud'   => $solicitude,
 			'typeProof'    => $typeProof,
 			'typeExpense'  => $typeExpense,
 			'date'         => $date,
@@ -149,111 +150,106 @@ class ExpenseController extends BaseController
  		return View::make('Expense.register_cont',$data);
 	}
 
-	public function registerExpense(){
-
-		$result = array(); 
-		$inputs = Input::all();
-
-        if($inputs['type']=='S')
-			$row_solicitude = Solicitude::where('token',$inputs['token'])->firstOrFail();
-        if($inputs['type']=='F')
-        	$row_fondo = $inputs['idfondo'];
-
-    	$resultCode = null;
-
-    	if($inputs['ruc'] != null && $inputs['number_prefix'] != null && $inputs['number_serie'] != null && $inputs['proof_type'] == DOCUMENTO_NO_SUSTENTABLE_ID){
-    		$row_expense    = Expense::where('ruc',$inputs['ruc'])->where('num_prefijo',$inputs['number_prefix'])
-						  ->where('num_serie',$inputs['number_serie'])->get();
-		
-			if(count($row_expense)>0)
-			{
-				$resultCode = -1;
-			}
-		}
-		if($resultCode == -1)
-			return array(
-				'code' 	=> $resultCode,
-				'error' => '',
-				'msg'	=> ''
-			);
-		else
+	public function registerExpense()
+	{
+		try
 		{
-			$expense = new Expense;
-			
-			$expense->num_prefijo = $inputs['number_prefix'];
-			$expense->num_serie = $inputs['number_serie'];
-			$expense->ruc = $inputs['ruc'];
-			$expense->razon = $inputs['razon'];
-			$expense->monto = $inputs['total_expense'];
-            if($inputs['type']=='S')
-                $expense->tipo = 'S';
-            if($inputs['type']=='F')
-                $expense->tipo = 'F';
+			DB::beginTransaction();
+			$result = array(); 
+			$inputs = Input::all();
+	        $solicitude = Solicitude::where( 'token' , $inputs['token'] )->first();
+ 
+	    	$resultCode = null;
 
-			if($inputs['proof_type'] == '1' || $inputs['proof_type'] == '4' || $inputs['proof_type'] == '6')
-			{
-				$expense->igv = $inputs['igv'];
-				$expense->imp_serv = $inputs['imp_service'];
-				$expense->sub_tot = $inputs['sub_total_expense'];
-				$expense->idigv = $expense->lastIdIgv()+1;
+	    	if($inputs['ruc'] != null && $inputs['number_prefix'] != null && $inputs['number_serie'] != null && $inputs['proof_type'] == DOCUMENTO_NO_SUSTENTABLE_ID)
+	    	{
+	    		$row_expense    = Expense::where('ruc',$inputs['ruc'])->where('num_prefijo',$inputs['number_prefix'])
+							  ->where('num_serie',$inputs['number_serie'])->get();
+			
+				if(count($row_expense)>0)
+				{
+					$resultCode = -1;
+				}
 			}
+			if($resultCode == -1)
+				return array(
+					'code' 	=> $resultCode,
+					'error' => '',
+					'msg'	=> ''
+				);
 			else
 			{
-				$expense->igv = null;
-				$expense->imp_serv = null;
-				$expense->sub_tot = null;	
-				$expense->idigv = null;
-			}
-			$date = $inputs['date_movement'];
-	        list($d, $m, $y) = explode('/', $date);
-	        $d = mktime(11, 14, 54, $m, $d, $y);
-	        $date = date("Y/m/d", $d);
-	        $expense->descripcion = $inputs['desc_expense'];
-	        $expense->fecha_movimiento = $date;
-	        $expense->idcomprobante = $inputs['proof_type'];
-			$idgasto = $expense->lastId()+1;
-			$expense->idgasto = $idgasto;
-            if($inputs['type']=='S')
-			$expense->idsolicitud = $row_solicitude->idsolicitud;
-            if($inputs['type']=='F')
-            $expense->idfondo = $row_fondo;
-			//Detail Expense
-			$quantity = $inputs['quantity'];
-			$description = $inputs['description'];
-			// $type_expense = $expenseJson->type_expense;
-			$total_item = $inputs['total_item'];
-			$result_save = $expense->save();
-			
-			if($result_save)
-			{
-				try {
-					DB::transaction (function() use ($idgasto,$quantity,$description,$total_item){
-						for($i=0;$i<count($quantity);$i++)
+				$expense = new Expense;
+				
+				$expense->num_prefijo = $inputs['number_prefix'];
+				$expense->num_serie = $inputs['number_serie'];
+				$expense->ruc = $inputs['ruc'];
+				$expense->razon = $inputs['razon'];
+				$expense->monto = $inputs['total_expense'];
+	            
+				if($inputs['proof_type'] == '1' || $inputs['proof_type'] == '4' || $inputs['proof_type'] == '6')
+				{
+					$expense->igv = $inputs['igv'];
+					$expense->imp_serv = $inputs['imp_service'];
+					$expense->sub_tot = $inputs['sub_total_expense'];
+					$expense->idigv = $expense->lastIdIgv() + 1;
+				}
+				else
+				{
+					$expense->igv = null;
+					$expense->imp_serv = null;
+					$expense->sub_tot = null;	
+					$expense->idigv = null;
+				}
+				$date = $inputs['date_movement'];
+		        list($d, $m, $y) = explode('/', $date);
+		        $d = mktime(11, 14, 54, $m, $d, $y);
+		        $date = date("Y/m/d", $d);
+		        $expense->descripcion = $inputs['desc_expense'];
+		        $expense->fecha_movimiento = $date;
+		        $expense->idcomprobante = $inputs['proof_type'];
+		 		$expense->idsolicitud = $solicitude->id;
+				$expense->id = $expense->lastId() + 1;
+				//Detail Expense
+				$quantity = $inputs['quantity'];
+				$description = $inputs['description'];
+				// $type_expense = $expenseJson->type_expense;
+				$total_item = $inputs['total_item'];
+				$result_save = $expense->save();
+				
+				if($result_save)
+				{
+					for($i=0;$i<count($quantity);$i++)
+					{
+						$expense_detail = new ExpenseItem;
+						$expense_detail->id = $expense_detail->lastId() + 1 ;
+						$expense_detail->idgasto = $expense->id;
+						$expense_detail->cantidad = $quantity[$i];
+						$expense_detail->descripcion = $description[$i];
+						// $expense_detail->tipo_gasto = $type_expense[$i];
+						$expense_detail->importe = $total_item[$i];
+						if ( !$expense_detail->save() )
 						{
-							$expense_detail = new ExpenseItem;
-							$expense_detail->idgasto = $idgasto;
-							$expense_detail->cantidad = $quantity[$i];
-							$expense_detail->descripcion = $description[$i];
-							// $expense_detail->tipo_gasto = $type_expense[$i];
-							$expense_detail->importe = $total_item[$i];
-							$expense_detail->save();	
-						}
-					});
-				} catch (Exception $e) {
+							DB::rollback();
+							return array(
+								'code'	=> 0,
+								'error'	=> '',
+								'msg' 	=> '',
+							);
+						}				
+					}
+					DB::commit();
 					return array(
-						'code'	=> 0,
-						'error'	=> '',
-						'msg' 	=> '',
+						'code'		=> 1,
+						'gastoId'	=> $expense->idgasto
 					);
 				}
-				return array(
-					'code'		=> 1,
-					'gastoId'	=> $expense->idgasto
-				);
 			}
-			
 		}
-		
+		catch ( Exception $e )
+		{
+			return $this->internalException( $e , __FUNCTION__ );
+		}
 	}
 
 	public function deleteExpense(){
@@ -280,87 +276,84 @@ class ExpenseController extends BaseController
 		return $response;
 	}
 
-	public function updateExpense(){
-		$inputs = Input::all();
-		$voucher_number = explode("-",$inputs['voucher_number']);
-		$expenseUpdate  = Expense::where('ruc',$inputs['ruc'])->where('num_prefijo',$voucher_number[0])
-						  ->where('num_serie',$voucher_number[1])->get();
-		if(count($expenseUpdate)>0)
+	public function updateExpense()
+	{
+		try
 		{
-			foreach ($expenseUpdate as $key => $value) {
-				$idgasto = $value->idgasto;
-			}
-			$expenseEdit = Expense::where('idgasto',$idgasto);
-			$expenseEdit->num_prefijo = $inputs['number_prefix'];
-			$expenseEdit->num_serie = $inputs['number_serie'];
-			$expenseEdit->ruc = $inputs['ruc'];
-			$expenseEdit->razon = $inputs['razon'];
-			$expenseEdit->monto = $inputs['total_expense'];
-            if($inputs['proof_type'] == '1' || $inputs['proof_type'] == '4' || $inputs['proof_type'] == '6')
-            {
-                if(isset($inputs['igv']) || isset($inputs['imp_service']))
-                {
-                    $expenseEdit->igv = $inputs['igv'];
-                    $expenseEdit->imp_serv = $inputs['imp_service'];
-                    $expenseEdit->sub_tot = $inputs['sub_total_expense'];
-                }
-                else
-                {
-                    $expenseEdit->sub_tot = $inputs['total_expense'];
-                }
-            }
-            else
-            {
-                $expenseEdit->igv      = null;
-                $expenseEdit->imp_serv = null;
-                $expenseEdit->sub_tot  = null;
-            }
-
-			$expenseEdit->idcomprobante = $inputs['proof_type'];
-			$date = $inputs['date_movement'];
-	        list($d, $m, $y) = explode('/', $date);
-	        $d = mktime(11, 14, 54, $m, $d, $y);
-	        $date = date("Y/m/d", $d);
-	        $expenseEdit->fecha_movimiento = $date;
-	        $expenseEdit->descripcion = $inputs['desc_expense'];
-	        if(isset($inputs['rep']))
+			DB::beginTransaction();
+			$inputs = Input::all();
+			$voucher_number = explode("-",$inputs['voucher_number']);
+			$expenseUpdate  = Expense::where('ruc',$inputs['ruc'])->where('num_prefijo',$voucher_number[0])
+							  ->where('num_serie',$voucher_number[1])->get();
+			if(count($expenseUpdate)>0)
 			{
-				if (is_numeric($inputs['rep']))
+				foreach ($expenseUpdate as $key => $value)
+					$idgasto = $value->idgasto;
+
+				$expenseEdit = Expense::where('idgasto',$idgasto);
+				$expenseEdit->num_prefijo = $inputs['number_prefix'];
+				$expenseEdit->num_serie = $inputs['number_serie'];
+				$expenseEdit->ruc = $inputs['ruc'];
+				$expenseEdit->razon = $inputs['razon'];
+				$expenseEdit->monto = $inputs['total_expense'];
+
+	            if($inputs['proof_type'] == '1' || $inputs['proof_type'] == '4' || $inputs['proof_type'] == '6')
+	                if(isset($inputs['igv']) || isset($inputs['imp_service']))
+	                {
+	                    $expenseEdit->igv = $inputs['igv'];
+	                    $expenseEdit->imp_serv = $inputs['imp_service'];
+	                    $expenseEdit->sub_tot = $inputs['sub_total_expense'];
+	                }
+	                else
+	                    $expenseEdit->sub_tot = $inputs['total_expense'];
+	            else
+	            {
+	                $expenseEdit->igv      = null;
+	                $expenseEdit->imp_serv = null;
+	                $expenseEdit->sub_tot  = null;
+	            }
+
+				$expenseEdit->idcomprobante = $inputs['proof_type'];
+				$date = $inputs['date_movement'];
+		        list($d, $m, $y) = explode('/', $date);
+		        $d = mktime(11, 14, 54, $m, $d, $y);
+		        $date = date("Y/m/d", $d);
+		        $expenseEdit->fecha_movimiento = $date;
+		        $expenseEdit->descripcion = $inputs['desc_expense'];
+		        if(isset($inputs['rep']))
+					if (is_numeric($inputs['rep']))
+						$expenseEdit->reparo = $inputs['rep'];
+				
+				$data = $this->objectToArray($expenseEdit);
+		        //Detail Expense
+				$quantity = $inputs['quantity'];
+				$description = $inputs['description'];
+				
+				// $type_expense = $expenseJson->type_expense;
+				
+				$total_item = $inputs['total_item'];
+
+				if($expenseEdit->update($data))
 				{
-					$expenseEdit->reparo = $inputs['rep'];
+					$expense_detail_edit = ExpenseItem::where('idgasto',$idgasto)->delete();
+					for($i=0;$i<count($quantity);$i++)
+					{
+						$expense_detail = new ExpenseItem;
+						$expense_detail->idgasto = $idgasto;
+						$expense_detail->cantidad = $quantity[$i];
+						$expense_detail->descripcion = $description[$i];
+						// $expense_detail->tipo_gasto = $type_expense[$i];
+						$expense_detail->importe = $total_item[$i];
+						if ( !$expense_detail->save() )
+							return 0;	
+					}
+					return 1;
 				}
 			}
-	        $data = $this->objectToArray($expenseEdit);
-	        //Detail Expense
-			$quantity = $inputs['quantity'];
-			$description = $inputs['description'];
-			
-			// $type_expense = $expenseJson->type_expense;
-			
-			$total_item = $inputs['total_item'];
-
-			if($expenseEdit->update($data))
-			{
-				$expense_detail_edit = ExpenseItem::where('idgasto',$idgasto)->delete();
-				try {
-					DB::transaction (function() use ($idgasto,$quantity,$description,$total_item){
-						for($i=0;$i<count($quantity);$i++)
-						{
-							$expense_detail = new ExpenseItem;
-							$expense_detail->idgasto = $idgasto;
-							$expense_detail->cantidad = $quantity[$i];
-							$expense_detail->descripcion = $description[$i];
-							// $expense_detail->tipo_gasto = $type_expense[$i];
-							$expense_detail->importe = $total_item[$i];
-							$expense_detail->save();	
-						}
-					});
-				} catch (Exception $e) {
-					Log::error($e);
-					return 0;
-				}
-				return 1;
-			}
+		}
+		catch ( Exception $e )
+		{
+			return $this->internalException( $e , __FUNCTION__ );
 		}
 	}
 
@@ -439,6 +432,8 @@ class ExpenseController extends BaseController
                         $data['date'] = $this->getDay();
                         $data['lv'] = $solicitud->titulo;
                     }
+                    elseif ( Auth::user()->type == TESORERIA && $solicitud->idestado == DEPOSITO_HABILITADO )
+                    	$data['banks'] = Account::banks();
 			        return View::make('Dmkt.Solicitud.Institucional.view',$data);
 			    }
 	    }

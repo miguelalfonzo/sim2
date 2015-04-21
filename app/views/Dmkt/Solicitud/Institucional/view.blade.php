@@ -11,7 +11,7 @@
 			<div class="panel-body">
 				<input type="hidden" id="idsolicitude" name="idsolicitude" value="{{$solicitud->id}}">
 				{{Form::token()}}
-				<input type="hidden" id="token" value="{{$solicitud->token}}">
+				<input type="hidden" name="token" value="{{$solicitud->token}}">
 				<section class="row reg-expense" style="margin:0">
 					@include('Dmkt.Solicitud.Institucional.detail')
 				</section>
@@ -25,31 +25,7 @@
 							<button class="btn btn-success" data-toggle="modal" data-target="#myModal">Registrar Depósito</button>
 						@endif
 					</div>
-				</section>
-				@if( Auth::user()->type == TESORERIA && $solicitud->estado == DEPOSITO_HABILITADO )
-	            	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-	                    <div class="modal-dialog">
-	                        <div class="modal-content">
-	                            <div class="modal-header">
-	                                <button type="button" class="close" data-dismiss="modal">
-	                                	<span aria-hidden="true">&times;</span>
-	                                	<span class="sr-only">Close</span>
-	                                </button>
-	                                <h4 class="modal-title" id="myModalLabel">Registro del Depósito</h4>
-	                            </div>
-	                            <div class="modal-body">
-	                                <label for="op-number">Número de Operación, Transacción, Cheque:</label>
-	                                <input id="op-number" type="text" class="form-control">
-	                                <p id="message-op-number" style="margin-top:1em;color:#a94442;"></p>
-	                            </div>
-	                            <div class="modal-footer">
-	                                <a id="" href="#" class="btn btn-success register-deposit" data-deposit="F" style="margin-right: 1em;">Confirmar Operación</a>
-	                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-	                            </div>
-	                        </div>
-	                    </div>
-	                </div>
-	            @endif 
+				</section> 
 			</div>
 		</div>
 	</div>
