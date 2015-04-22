@@ -105,17 +105,24 @@ Route::group(array('before' => 'sup_gerprod_gercom'), function ()
     Route::post('rechazar-solicitud', 'Dmkt\SolicitudeController@denySolicitude');
 });
 
-Route::group(array('before' => 'rm_ager'), function ()
+Route::group(array('before' => 'rm_cont_ager'), function () 
 {
-    Route::get('registrar-gasto/{token}', 'Expense\ExpenseController@show');
-    Route::get('end-expense/{token}', 'Expense\ExpenseController@finishExpense');
-    Route::get('ver-gasto/{token}', 'Expense\ExpenseController@viewExpense');
-    
-    // Expense
-    Route::get('edit-expense', 'Expense\ExpenseController@editExpense');
+    Route::post('edit-expense', 'Expense\ExpenseController@editExpense');
     Route::post('delete-expense', 'Expense\ExpenseController@deleteExpense');
     Route::post('register-expense', 'Expense\ExpenseController@registerExpense');
     Route::post('update-expense', 'Expense\ExpenseController@updateExpense');
+    Route::get('a/{token}', 'Expense\ExpenseController@reportExpense');
+    Route::get('report-fondo/{token}','Expense\ExpenseController@reportExpenseFondo');
+});
+
+Route::group(array('before' => 'rm_ager'), function ()
+{
+    //Route::get('registrar-gasto/{token}', 'Expense\ExpenseController@show');
+    Route::post('end-expense', 'Expense\ExpenseController@finishExpense');
+    Route::get('ver-gasto/{token}', 'Expense\ExpenseController@viewExpense');
+    
+    // Expense
+    
 });
 Route::group(array('before' => 'rm_sup'), function ()
 {    

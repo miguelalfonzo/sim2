@@ -8,10 +8,11 @@ class Manager extends Eloquent{
     protected $table = 'GERENTES';
     protected $primaryKey = 'id';
 
-    public function solicituds(){
-
+    public function solicituds()
+    {
         return $this->hasMany('Dmkt\SolicitudeGer','idgerprod','id');
     }
+    
     function searchId(){
 
         $lastId = Manager::orderBy('id', 'DESC')->first();

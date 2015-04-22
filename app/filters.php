@@ -47,22 +47,7 @@ Route::filter('active-user',function()
         return Redirect::to('login');
 });
 
-Route::filter('rm', function () 
-{
-    if (Auth::check()) 
-    {
-        $type = Auth::user()->type;
-        if ($type != REP_MED)
-        {
-            if (in_array( $type, array( SUP , GER_COM , GER_PROD , CONT , TESORERIA , ASIS_GER ) ) )
-                return Redirect::to('show_user');
-            else
-                return Redirect::to('login');
-        }
-    } 
-    else
-        return Redirect::to('login');
-});
+
 Route::filter('sup', function () {
     if (Auth::check()) 
     {
@@ -79,21 +64,6 @@ Route::filter('sup', function () {
         return Redirect::to('login');
 });
 
-Route::filter('gerprod', function () {
-    if (Auth::check()) 
-    {
-        $type = Auth::user()->type;
-        if ($type != GER_PROD)
-        {
-            if (in_array($type, array( REP_MED,SUP,GER_COM,CONT,TESORERIA , ASIS_GER ) ) )
-                return Redirect::to('show_user');
-            else
-                return Redirect::to('login');
-        }
-    } 
-    else
-        return Redirect::to('login');
-});
 
 Route::filter('cont', function () {
     if (Auth::check()) 

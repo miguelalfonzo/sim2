@@ -18,7 +18,7 @@
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Fondo</label>
-						<input type="text" class="form-control" value="{{mb_convert_case($solicitude->subtype->nombre_mkt, MB_CASE_TITLE, 'UTF-8')}}" disabled>
+						<input type="text" class="form-control" value="{{mb_convert_case($solicitude->detalle->fondo->nombre, MB_CASE_TITLE, 'UTF-8')}}" disabled>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
@@ -37,7 +37,7 @@
 					<div class="form-expense">
 						<label>Monto Depositado</label>
 						<div class="input-group">
-					    	<div id="type-money" class="input-group-addon">{{$solicitude->typemoney->simbolo}}</div>
+					    	<div id="type-money" class="input-group-addon">{{$solicitude->detalle->typeMoney->simbolo}}</div>
 					      	<input id="deposit" class="form-control" type="text" value="{{$solicitude->monto}}" disabled>
 					    </div>
 					</div>
@@ -46,7 +46,7 @@
 					<div class="form-expense">
 						<label>Monto Restante</label>
 						<div class="input-group">
-					    	<div class="input-group-addon">{{$solicitude->typemoney->simbolo}}</div>
+					    	<div class="input-group-addon">{{$solicitude->detalle->typeMoney->simbolo}}</div>
 					      	<input id="balance" class="form-control" type="text" value="{{$balance}}" disabled>
 					    </div>
 					</div>
@@ -117,9 +117,8 @@
 										<tr>
 											<th class="w-quantity">Cantidad</th>
 											<th class="w-desc-item">Descripción</th>
-											<!-- <th class="w-type-expense">Tipo de Gasto</th> -->
+											<th class="w-type-expense">Tipo de Gasto</th>
 											<th class="w-total-item">Valor de Venta</th>
-											<!-- <th class="w-reparo">Reparo</th> -->
 											<th>Eliminar</th>
 										</tr>
 									</thead>
@@ -127,16 +126,16 @@
 										<tr>
 											<th class="quantity"><input type="text" class="form-control" maxlength="4"></th>
 											<th class="description"><input type="text" class="form-control"></th>
-											<!-- <th>
+											<th>
 												<select class="form-control type-expense">
 													@foreach($typeExpense as $val)
 														<option value="{{$val->idtipogasto}}">{{mb_convert_case($val->descripcion,MB_CASE_TITLE, 'UTF-8')}}</option>
 													@endforeach
 												</select>
-											</th> -->
+											</th>
 											<th class="total-item">
 												<div class="input-group">
-											    	<div class="input-group-addon">{{$solicitude->typemoney->simbolo}}</div>
+											    	<div class="input-group-addon">{{$solicitude->detalle->typeMoney->simbolo}}</div>
 											      	<input class="form-control" type="text" maxlength="8">
 											    </div>
 											</th>
@@ -161,7 +160,7 @@
 					<div class="form-expense">
 						<label>Sub Total</label>
 						<div class="input-group">
-					    	<div class="input-group-addon">{{$solicitude->typemoney->simbolo}}</div>
+					    	<div class="input-group-addon">{{$solicitude->detalle->typeMoney->simbolo}}</div>
 					      	<input id="sub-tot" class="form-control" type="text" value=0>
 					    </div>
 					</div>
@@ -170,7 +169,7 @@
 					<div class="form-expense">
 						<label>Impuesto por Servicio</label>
 						<div class="input-group">
-					    	<div class="input-group-addon">{{$solicitude->typemoney->simbolo}}</div>
+					    	<div class="input-group-addon">{{$solicitude->detalle->typeMoney->simbolo}}</div>
 					      	<input id="imp-ser" class="form-control" type="text" value=0>
 					    </div>
 					</div>
@@ -179,7 +178,7 @@
 					<div class="form-expense">
 						<label>IGV</label>
 						<div class="input-group">
-					    	<div class="input-group-addon">{{$solicitude->typemoney->simbolo}}</div>
+					    	<div class="input-group-addon">{{$solicitude->detalle->typeMoney->simbolo}}</div>
 					      	<input id="igv" class="form-control" type="text" value=0>
 					    </div>
 					</div>
@@ -188,7 +187,7 @@
 					<div class="form-expense">
 						<label>Monto Total</label>
 						<div class="input-group">
-					    	<div class="input-group-addon">{{$solicitude->typemoney->simbolo}}</div>
+					    	<div class="input-group-addon">{{$solicitude->detalle->typeMoney->simbolo}}</div>
 					      	<input id="total-expense" class="form-control" type="text" disabled>
 					    </div>
 					</div>
@@ -246,7 +245,7 @@
 												<th class="razon">{{$val->razon}}</th>
 												<th class="voucher_number">{{$val->num_prefijo.'-'.$val->num_serie}}</th>
 												<th class="date_movement">{{date('d/m/Y',strtotime($val->fecha_movimiento))}}</th>
-												<th class="total"><span class="type_moeny">{{$solicitude->typemoney->simbolo}}&nbsp;<span class="total_expense">{{(real)$val->monto}}</span></th>
+												<th class="total"><span class="type_moeny">{{$solicitude->detalle->typeMoney->simbolo}}&nbsp;<span class="total_expense">{{(real)$val->monto}}</span></th>
 												<th><a class="edit-expense" href="#"><span class="glyphicon glyphicon-pencil"></span></a></th>
 											</tr>	
 										@endforeach

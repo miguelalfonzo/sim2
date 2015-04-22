@@ -8,15 +8,11 @@ use \Common\Fondo;
 use \Common\State;
 use \Common\TypePayment;
 use \DB;
-use \Demo;
-use \Excel;
 use \Exception;
 use \Expense\Entry;
 use \Expense\Expense;
 use \Expense\ExpenseItem;
 use \Expense\ProofType;
-use \Hash;
-use \Illuminate\Database\Query\Builder;
 use \Image;
 use \Input;
 use \Log;
@@ -32,6 +28,7 @@ use \Common\StateRange;
 use \Expense\ChangeRate;
 use \Common\TypeMoney;
 use \Dmkt\Solicitud\Periodo;
+use \Expense\ExpenseType;
 
 class SolicitudeController extends BaseController
 {
@@ -195,28 +192,24 @@ class SolicitudeController extends BaseController
                                     $data['deposito'] = $detalle->monto_aprobado - ( $detalle->monto_retencion / $tc->venta );   
                             }
                     }
-                    elseif ( Auth::user()->type == CONT && $solicitud->idestado == APROBADO )
-                        $data['typeRetention'] = TypeRetention::all();
-                    elseif ( Auth::user()->type == CONT && $solicitud->idestado == DEPOSITADO )
+                    elseif ( Auth::user()->type == CONT )
                     {
-                        $data['date'] = $this->getDay();
-                        $data['lv'] = $this->textLv( $solicitud );
-                    }
-                    elseif ( in_array( Auth::user()->type , array( REP_MED , ASIS_GER ) ) && $solicitud->idestado == GASTO_HABILITADO )
-                    {
-                        $data['typeProof'] = ProofType::orderBy('id','asc')->get();
-                        $data['date']      = $this->getDay();
-                        $gastos = $solicitud->expense;
-                        if ( count( $gastos ) > 0 )
+                        if ( $solicitud->idestado == APROBADO )
+                            $data['typeRetention'] = TypeRetention::all();
+                        elseif ( count( $solicitud->registerHist ) == 1 )
+                            $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
+                        elseif ( $solicitud->idestado == DEPOSITADO )
                         {
-                            $data['expense'] = $gastos;
-                            $balance = 0.00;
-                            foreach ( $gastos as $gasto )
-                                $balance += $gasto->monto;
-                            $data['balance'] = $detalle->monto_aprobado - $balance;
+                            $data['date'] = $this->getDay();
+                            $data['lv'] = $this->textLv( $solicitud );
                         }
+                        elseif ( count( $solicitud->registerHist ) == 1 )
+                            $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
                     }
+                    elseif ( in_array( Auth::user()->type , array( REP_MED , ASIS_GER ) ) )
+                        $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
                     return View::make('Dmkt.Solicitud.Representante.view', $data);
+                    //Log::error(json_encode($data));
                 }
             }
         }
@@ -224,6 +217,23 @@ class SolicitudeController extends BaseController
         {
             return $this->internalException( $e , __FUNCTION__ );
         }
+    }
+
+    private function expenseData( $solicitud , $monto_aprobado )
+    {
+        $data = array(
+            'typeProof'  => ProofType::orderBy('id','asc')->get(),
+            'typeExpense' => ExpenseType::order(),
+            'date'         => $this->getDay()
+        );
+        $gastos = $solicitud->expense;
+        if ( count( $gastos ) > 0 )
+        {
+            $data['expense'] = $gastos;
+            $balance = $gastos->sum('monto');
+            $data['balance'] = $monto_aprobado - $balance;
+        }
+        return $data;
     }
 
     private function validateInputSolRep( $inputs , $type )

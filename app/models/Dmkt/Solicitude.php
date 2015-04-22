@@ -47,13 +47,12 @@ class Solicitude extends Eloquent{
         return $this->hasOne('Common\State','idestado','idestado');
     }
 
-    /* ------------------ */
-
     public function asignedTo()
     {
         return $this->hasOne('User','id','iduserasigned');
     }
 
+    
     public function acceptHist()
     {
         return $this->hasOne('System\SolicitudeHistory','idsolicitude','id')->where( 'status_to' , ACEPTADO );
@@ -66,6 +65,14 @@ class Solicitude extends Eloquent{
     public function detalle()
     {
         return $this->hasOne('Dmkt\SolicitudeDetalle','id','iddetalle');
+    }
+
+
+    /* PROTECTED RELATIOSNSHIPS */
+
+    protected function registerHist()
+    {
+        return $this->hasOne('System\SolicitudeHistory','idsolicitude','id')->where('status_to' , REGISTRADO );
     }
 
     protected function typeSolicitude()

@@ -4,12 +4,17 @@ namespace Common;
 
 use \Eloquent;
 use \Dmkt\Solicitude;
+use \Carbon\Carbon;
 
 class Deposit extends Eloquent{
 
 	protected $table = 'DMKT_RG_DEPOSITO';
 	protected $primaryKey = 'id';
 	
+	protected function getUpdatedAtAttribute( $attr )
+	{
+		return Carbon::parse( $attr )->format('d/m/Y');
+	}
 
 	public function iddeposit()
 	{

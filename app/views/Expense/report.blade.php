@@ -8,22 +8,41 @@
 <body style="background: url('img/logo-marcadeagua.png') center fixed no-repeat; filter: blur(20px);">
     <div class="background">
         <header style="margin-top:-2em;">
-            <img src="img/logo-report.png" alt="" style="width:170px;margin-left:-5em;">
+            <img src="img/logo-report.png" style="width:170px;margin-left:-5em;">
             <h1><p><strong>REPORTE DE GASTOS PUBLICIDAD Y PROMOCIÓN SEGÚN PRESUPUESTO</strong></p><h1>
         </header>
         <main>
             <section style="text-align:center;margin-top:2.5em;">
                 <strong><p style="display:inline">Fecha:</strong>&nbsp;{{$date['toDay']}}</p>
-                <strong><p style="display:inline">Autorizado por:</strong>&nbsp;{{mb_convert_case($name,MB_CASE_TITLE,'UTF-8')}}</p>
-                <strong><p style="display:inline">Fondo:</strong>&nbsp;{{mb_convert_case($solicitude->subtype->nombre_mkt,MB_CASE_TITLE,'UTF-8')}}</p>
-                <strong><p style="display:inline">Código Comercial:</strong>&nbsp;{{$solicitude->idsolicitud}}</p>
-                <strong><p style="display:inline">N° de Depósito:</strong>&nbsp;101</p>
+                @if ( $solicitude->acceptHist->updatedBy->type == SUP )
+                    <strong><p style="display:inline">Autorizado por:</strong>&nbsp;{{$solicitude->acceptHist->updatedBy->sup->full_name}}</p>
+                    <strong><p style="display:inline">Cargo:</strong>&nbsp;Supervisor</p>
+                @elseif ( $solicitude->acceptHist->updatedBy->type == GER_PROD )
+                    <strong><p style="display:inline">Autorizado por:</strong>&nbsp;{{$solicitude->acceptHist->updatedBy->gerProd->full_name}}</p>
+                    <strong><p style="display:inline">Cargo:</strong>&nbsp;G. Producto</p>
+                @endif    
+                <strong><p style="display:inline">Fondo:</strong>&nbsp;{{mb_convert_case($solicitude->detalle->fondo->nombre,MB_CASE_TITLE,'UTF-8')}}</p>
+                <strong><p style="display:inline">Código Comercial:</strong>&nbsp;{{$solicitude->id}}</p>
             </section>
             <section style="text-align:center;margin-top:2em;">
-                <strong><p style="display:inline">Colaborador Bagó:</strong>&nbsp;{{mb_convert_case($created_by,MB_CASE_TITLE,'UTF-8')}}</p>
+                @if ( $solicitude->createdBy->type == REP_MED )
+                    <strong>
+                        <p style="display:inline">Colaborador Bagó:</strong>&nbsp;{{$solicitude->createdBy->rm->full_name}}</p>
+                    <strong><p style="display:inline">Cargo:</strong>&nbsp;Representante Medico</p>
+                @else ( $solicitude->createdBy->type == SUP )
+                    <strong>
+                        <p style="display:inline">Colaborador Bagó:</strong>&nbsp;{{$solicitude->cratedBy->sup->full_name}}</p>    
+                    <strong>
+                        <p style="display:inline">Cargo:</strong>&nbsp;Supervisor</p>
+                @endif
                 <strong><p style="display:inline">Ciudad:</strong>&nbsp;Lima</p>
-                <strong><p style="display:inline">Cargo:</strong>&nbsp;{{mb_convert_case($charge,MB_CASE_TITLE,'UTF-8')}}</p>
-                <strong><p style="display:inline">Fecha de Depósito:</strong>&nbsp;{{$date['toDay']}}</p>
+            </section>
+            <section style="text-align:center;margin-top:2em;">
+                <strong><p style="display:inline">Fecha de Depósito:</strong>&nbsp;{{$solicitude->detalle->deposit->updated_at}}</p>
+                <strong><p style="display:inline">N° de Depósito:</strong>&nbsp;{{$solicitude->detalle->deposit->num_transferencia}}</p>
+                @if ( isset($detalle->tcc) && isset($detalle->tcv) )
+                    <strong><p style="display:inline">T. Cambio:</strong>&nbsp;C: {{$detalle->tcc}} V: {{$detalle->tcv}}</p>
+                @endif
             </section>
             <section style="margin-top:2em;">
                 <table class="table">
@@ -52,7 +71,7 @@
                                 <td>
                                     {{$clientes}}
                                 </td>
-                                <td>{{$solicitude->typemoney->simbolo}}{{(real)$value->monto}}</td>
+                                <td>{{$solicitude->detalle->typeMoney->simbolo}}{{(real)$value->monto}}</td>
                             </tr>    
                         @endforeach
                         <tfoot>
@@ -64,7 +83,7 @@
                                 <td class="border-white"></td>
                                 <td class="border-white other"></td>
                                 <td class="border align-left"><strong>Total Reportado</strong></td>
-                                <td class="border"><strong><span class="symbol">{{$solicitude->typemoney->simbolo}}</span><span class="total-expense">&nbsp;{{$total}}</span></strong></td>
+                                <td class="border"><strong><span class="symbol">{{$solicitude->detalle->typemoney->simbolo}}</span><span class="total-expense">&nbsp;{{$total}}</span></strong></td>
                             </tr>
                             <tr>
                                 <td></td>
@@ -74,7 +93,12 @@
                                 <td></td>
                                 <td class="other"></td>
                                 <td class="border align-left">Total Depositado</td>
-                                <td class="border"><strong><span class="symbol">{{$solicitude->typemoney->simbolo}}</span><span class="total-expense">&nbsp;{{$solicitude->deposit->total}}</span></strong></td>
+                                <td class="border">
+                                    <strong>
+                                        <span class="symbol">{{$solicitude->detalle->deposit->account->typeMoney->simbolo}}</span>
+                                        <span class="total-expense">&nbsp;{{$solicitude->detalle->deposit->total}}</span>
+                                    </strong>
+                                </td>
                             </tr>
                             <tr>
                                 <td></td>
@@ -94,11 +118,7 @@
                                 <td></td>
                                 <td class="other"></td>
                                 <td class="border bottom align-left">Saldo a favor Compañía</td>
-                                @if ($solicitude->deposit->total - $total > 0)
-                                    <td class="border bottom">{{$solicitude->deposit->total - $total}}</td>
-                                @else
-                                    <td class="border bottom">-</td>
-                                @endif
+                                <td class="border bottom">{{$solicitude->detalle->typeMoney->simbolo.' '.$balance['bussiness']}}</td>
                             </tr>
                             <tr>
                                 <td></td>
@@ -108,11 +128,7 @@
                                 <td></td>
                                 <td class="other"></td>
                                 <td class="border bottom align-left">Saldo a favor del Empleado</td>
-                                @if ($solicitude->deposit->total - $total < 0)
-                                    <td class="border bottom">{{$solicitude->deposit->total - $total}}</td>
-                                @else
-                                    <td class="border bottom">-</td>
-                                @endif
+                                <td class="border bottom">{{$solicitude->detalle->typeMoney->simbolo.' '.$balance['employed']}}</td>
                             </tr>
                         </tfoot>
                     </tbody>

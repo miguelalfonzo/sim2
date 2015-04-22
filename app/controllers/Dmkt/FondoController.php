@@ -204,6 +204,13 @@ class FondoController extends BaseController
         }
     }
 
+    public function listDocuments()
+    {
+        $docs = ProofType::order();
+        $view = View::make('Dmkt.Cont.list_documents')->with('docs',$docs);
+        return $view;
+    }
+
     private function solicitudToArray( $solicituds )
     {
         $rpta = array();
@@ -570,7 +577,13 @@ class FondoController extends BaseController
         }
         
     }
-    function getFondosContabilidad($start, $state)
+
+    function getLastDayOfMonth($month, $year)
+    {
+        return date('d', mktime(0, 0, 0, $month + 1, 1, $year) - 1);
+    }
+
+    /*function getFondosContabilidad($start, $state)
     {
         $periodo = $this->period($start);
         
@@ -584,11 +597,8 @@ class FondoController extends BaseController
         }
         $view   = View::make('Dmkt.Cont.list_fondos')->with('fondos', $fondos)->with('sum', $fondos->sum('total'));
         return $view;
-    }
+    }*/
     
-    function getLastDayOfMonth($month, $year)
-    {
-        return date('d', mktime(0, 0, 0, $month + 1, 1, $year) - 1);
-    }
+    
 
 }

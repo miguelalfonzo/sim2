@@ -7,10 +7,6 @@ use \BaseController;
 use \View;
 use \Dmkt\Activity;
 use \Dmkt\Solicitude;
-use \Expense\Expense;
-use \Expense\ProofType;
-use \Expense\ExpenseType;
-use \Expense\ExpenseItem;
 use \User;
 use \Common\State;
 use \Input;
@@ -62,16 +58,25 @@ class ExpenseController extends BaseController
 	        		return $this->warninException( __FUNCTION__ , 'La solicitud con Id: '.$solicitud->id.' no es Insitucional' );
 	        	else
 	        	{
+
 			        $data['solicitud']	 = $solicitud;
-			        $data['detalle'] = json_decode( $solicitud->detalle->detalle );
-			        if ( Auth::user()->type == CONT && $solicitud->idestado == DEPOSITADO )
+			        $detalle = json_decode( $solicitud->detalle->detalle );
+			        $data['detalle'] = $detalle;
+			        if ( Auth::user()->type == CONT )
                     {
-                        $data['date'] = $this->getDay();
-                        $data['lv'] = $solicitud->titulo;
+                    	if( $solicitud->idestado == DEPOSITADO )
+                        {
+	                        $data['date'] = $this->getDay();
+	                        $data['lv'] = $solicitud->titulo;
+	                    }
+	                    elseif ( $solicitud->idestado == REGISTRADO )
+                			$data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );    	
                     }
                     elseif ( Auth::user()->type == TESORERIA && $solicitud->idestado == DEPOSITO_HABILITADO )
                     	$data['banks'] = Account::banks();
-			        return View::make('Dmkt.Solicitud.Institucional.view',$data);
+                    elseif ( Auth::user()->type == REP_MED && count( $solicitud->advanceSeatHist ) != 0  )
+                    	$data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
+			        return View::make( 'Dmkt.Solicitud.Institucional.view' , $data );
 			    }
 	    }
 	    catch (Exception $e)
@@ -80,50 +85,31 @@ class ExpenseController extends BaseController
 	    }
 	}
 
-	public function show($token){
-		$date         = $this->getDay();
-		$typeProof    = ProofType::all();
-		$typeExpense  = ExpenseType::orderBy('id','asc')->get();
-		$solicitude   = Solicitude::where('token',$token)->first();
-		$expense      = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
-		$aproved_user = User::where('id',$solicitude->acceptHist->updated_by)->first();
-		if($aproved_user->type === SUP )
-		{
-			$name_aproved = $aproved_user->sup->nombres;
-		}
-		if($aproved_user->type === GER_PROD )
-		{
-			$name_aproved = $aproved_user->gerprod->descripcion;
-		}
-		$balance     = $solicitude->monto;
-		if(count($expense)>0)
-		{
-			$balance         = 0;
-			foreach ($expense as $key => $value) {
-				$balance += $value->monto;
-			}
-			$balance= $solicitude->monto - $balance;
- 		}
- 		$data = [
-			'solicitud'   => $solicitude,
-			'typeProof'    => $typeProof,
-			'typeExpense'  => $typeExpense,
-			'date'         => $date,
-			'balance'      => $balance,
-			'expense'      => $expense,
-			'name_aproved' => $name_aproved
-		];
- 		return View::make('Expense.register',$data);
-	}
+	private function expenseData( $solicitud , $monto_aprobado )
+    {
+        $data = array(
+            'typeProof'  => ProofType::orderBy('id','asc')->get(),
+            'typeExpense' => ExpenseType::order(),
+            'date'         => $this->getDay()
+        );
+        $gastos = $solicitud->expense;
+        if ( count( $gastos ) > 0 )
+        {
+            $data['expense'] = $gastos;
+            $balance = $gastos->sum('monto');
+            $data['balance'] = $monto_aprobado - $balance;
+        }
+        return $data;
+    }
 
 	public function showCont($token)
 	{
 		$date         = $this->getDayAll();
 		$typeProof    = ProofType::all();
-		$typeExpense  = ExpenseType::orderBy('idtipogasto','asc')->get();
+		$typeExpense  = ExpenseType::order();
 		$solicitude   = Solicitude::where('token',$token)->firstOrFail();
 		$expense      = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
-		$aproved_user = User::where('id',$solicitude->idaproved)->firstOrFail();
+		$aproved_user = $solicitude->acceptHist->updatedBy;
 		if($aproved_user->type === 'S')
 		{
 			$name_aproved = $aproved_user->sup->nombres;
@@ -189,8 +175,7 @@ class ExpenseController extends BaseController
 				$expense->ruc = $inputs['ruc'];
 				$expense->razon = $inputs['razon'];
 				$expense->monto = $inputs['total_expense'];
-	            
-				if($inputs['proof_type'] == '1' || $inputs['proof_type'] == '4' || $inputs['proof_type'] == '6')
+	            if($inputs['proof_type'] == '1' || $inputs['proof_type'] == '4' || $inputs['proof_type'] == '6')
 				{
 					$expense->igv = $inputs['igv'];
 					$expense->imp_serv = $inputs['imp_service'];
@@ -216,8 +201,10 @@ class ExpenseController extends BaseController
 				//Detail Expense
 				$quantity = $inputs['quantity'];
 				$description = $inputs['description'];
-				// $type_expense = $expenseJson->type_expense;
 				$total_item = $inputs['total_item'];
+				if( isset( $inputs['rep'] ) )
+					$expense->reparo = $inputs['rep'];
+				
 				$result_save = $expense->save();
 				
 				if($result_save)
@@ -229,7 +216,7 @@ class ExpenseController extends BaseController
 						$expense_detail->idgasto = $expense->id;
 						$expense_detail->cantidad = $quantity[$i];
 						$expense_detail->descripcion = $description[$i];
-						// $expense_detail->tipo_gasto = $type_expense[$i];
+						$expense_detail->tipo_gasto = $inputs['tipo_gasto'][$i];
 						$expense_detail->importe = $total_item[$i];
 						if ( !$expense_detail->save() )
 						{
@@ -287,12 +274,9 @@ class ExpenseController extends BaseController
 	{
 		try
 		{
-			$expense        = Input::get('data');
-			$expenseJson    = json_decode($expense);
-			$voucher_number = explode("-",$expenseJson->voucher_number);
-			$idExpense      = Expense::where('ruc',$expenseJson->ruc)->where('num_prefijo',$voucher_number[0])
-							  ->where('num_serie',$voucher_number[1])->firstOrFail();
-			$data           = ExpenseItem::where('idgasto','=',intval($idExpense->idgasto))->get();
+			$inputs = Input::all();
+			$idExpense      = Expense::find( $inputs['idgasto']);
+			$data           = $idExpense->items;
 			$response = ['data'=>$data, 'expense'=>$idExpense, 'date'=>$idExpense->fecha_movimiento];
 			return $response;
 		}
@@ -308,20 +292,14 @@ class ExpenseController extends BaseController
 		{
 			DB::beginTransaction();
 			$inputs = Input::all();
-			$voucher_number = explode("-",$inputs['voucher_number']);
-			$expenseUpdate  = Expense::where('ruc',$inputs['ruc'])->where('num_prefijo',$voucher_number[0])
-							  ->where('num_serie',$voucher_number[1])->get();
-			if(count($expenseUpdate)>0)
+			$expenseEdit  = Expense::find($inputs['idgasto']);
+			if( count( $expenseEdit ) > 0 )
 			{
-				foreach ($expenseUpdate as $key => $value)
-					$idgasto = $value->idgasto;
-
-				$expenseEdit = Expense::where('idgasto',$idgasto);
-				$expenseEdit->num_prefijo = $inputs['number_prefix'];
-				$expenseEdit->num_serie = $inputs['number_serie'];
-				$expenseEdit->ruc = $inputs['ruc'];
-				$expenseEdit->razon = $inputs['razon'];
-				$expenseEdit->monto = $inputs['total_expense'];
+				$expenseEdit->num_prefijo   = $inputs['number_prefix'];
+				$expenseEdit->num_serie 	= $inputs['number_serie'];
+				$expenseEdit->ruc			= $inputs['ruc'];
+				$expenseEdit->razon 		= $inputs['razon'];
+				$expenseEdit->monto 		= $inputs['total_expense'];
 
 	            if($inputs['proof_type'] == '1' || $inputs['proof_type'] == '4' || $inputs['proof_type'] == '6')
 	                if(isset($inputs['igv']) || isset($inputs['imp_service']))
@@ -346,72 +324,79 @@ class ExpenseController extends BaseController
 		        $date = date("Y/m/d", $d);
 		        $expenseEdit->fecha_movimiento = $date;
 		        $expenseEdit->descripcion = $inputs['desc_expense'];
-		        if(isset($inputs['rep']))
-					if (is_numeric($inputs['rep']))
-						$expenseEdit->reparo = $inputs['rep'];
+		        if( isset( $inputs['rep'] ) )
+					$expenseEdit->reparo = $inputs['rep'];
 				
-				$data = $this->objectToArray($expenseEdit);
-		        //Detail Expense
-				$quantity = $inputs['quantity'];
+		        $quantity = $inputs['quantity'];
 				$description = $inputs['description'];
-				
-				// $type_expense = $expenseJson->type_expense;
 				
 				$total_item = $inputs['total_item'];
 
-				if($expenseEdit->update($data))
+				if( $expenseEdit->save() )
 				{
-					$expense_detail_edit = ExpenseItem::where('idgasto',$idgasto)->delete();
+					ExpenseItem::where( 'idgasto' , $expenseEdit->id )->delete();
 					for($i=0;$i<count($quantity);$i++)
 					{
 						$expense_detail = new ExpenseItem;
-						$expense_detail->idgasto = $idgasto;
+						$expense_detail->id = $expense_detail->lastId() + 1;
+						$expense_detail->idgasto = $expenseEdit->id;
 						$expense_detail->cantidad = $quantity[$i];
 						$expense_detail->descripcion = $description[$i];
-						// $expense_detail->tipo_gasto = $type_expense[$i];
 						$expense_detail->importe = $total_item[$i];
 						if ( !$expense_detail->save() )
+						{
+							DB::rollback();	
 							return 0;	
+						}
 					}
+					DB::commit();
 					return 1;
 				}
 			}
 		}
 		catch ( Exception $e )
 		{
+			DB::rollback();
 			return $this->internalException( $e , __FUNCTION__ );
 		}
 	}
 
 	// IDKC: CHANGE STATUS => REGISTRADO
-	public function finishExpense($token)
+	public function finishExpense()
 	{
 		try
 		{
 			DB::beginTransaction();
-			$oldOolicitude      = Solicitude::where('token',$token)->first();
-	        $oldStatus          = $oldOolicitude->estado;
-	        $idSol              = $oldOolicitude->idsolicitud;
-			$solicitude  = Solicitude::where('token',$token)->update(array('estado'=>REGISTRADO));
-			if(count($solicitude) == 1)
+			$inputs = Input::all();
+			$token = $inputs['token'];
+			$solicitud  = Solicitude::where('token',$token)->first();
+			if( count($solicitud) == 0 )
+				return $this->warninException( __FUNCTION__ , 'No se encontro la solicitud');
+			else
 			{
-				$rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, REGISTRADO, Auth::user()->id, USER_CONTABILIDAD, $idSol,SOLIC);
-				if ( $rpta[status] == ok )
+				$oldIdEstado = $solicitud->idestado;
+				$solicitud->idestado = REGISTRADO;
+				if ( !$solicitud->save() )
+					return $this->warninException( __FUNCTION__ , 'No se pudo procesar la solicitud');
+				else
 				{
-					DB::commit();
-				}		
+					$rpta = $this->setStatus( $oldIdEstado, REGISTRADO, Auth::user()->id, USER_CONTABILIDAD, $solicitud->id );
+					if ( $rpta[status] == ok )
+					{
+						Session::put('state',R_GASTO);
+						DB::commit();
+						return $rpta;
+					}
+				}	
 			}
+			DB::rollback();
+			return $rpta;
 		}
 		catch (Exception $e)
 		{
 			DB::rollback();
-			$rpta = $this->internalException($e,__FUNCTION__);
+			return $this->internalException($e,__FUNCTION__);
 		}
-		Session::put('state',R_REVISADO);
-		if ( Auth::user()->type == ASIS_GER )
-			return Redirect::to('registrar-fondo');
-		else
-	    	return Redirect::to('show_user');
 	}
 
 	public function viewExpense($token){
@@ -474,8 +459,10 @@ class ExpenseController extends BaseController
 		return $data;
 	}
 
-}/*public function reportExpense($token){
+	public function reportExpense($token){
 		$solicitude = Solicitude::where('token',$token)->firstOrFail();
+		$detalle = $solicitude->detalle;
+		$jDetalle = json_decode( $solicitude->detalle->detalle );
 		$clientes   = array();
 		$cmps = array();
 		foreach($solicitude->clients as $client)
@@ -499,49 +486,34 @@ class ExpenseController extends BaseController
         }
         $clientes = implode(',',$clientes);
         $cmps = implode(',',$cmps);
-		$created_by = '';
-		if($solicitude->user->type == 'R')
-		{
+		if($solicitude->createdBy->type == REP_MED )
 			$created_by = $solicitude->rm->nombres.' '.$solicitude->rm->apellidos;
-		}
-		else if ($solicitude->user->type == 'S')
-		{
+		else if ($solicitude->createdBy->type == SUP )
 			$created_by = $solicitude->sup->nombres.' '.$solicitude->sup->apellidos;
-		}
 		else
-		{
 			$created_by = 'Usuario no Autorizado';
-		}
 		$dni = new BagoUser;
-		$dni = $dni->dni($solicitude->user->username);
-		if ($dni['Status'] == 'Ok')
-		{
-			$dni = $dni['Data'];
-		}
+		$dni = $dni->dni($solicitude->createdBy->username);
+		if ($dni[status] == ok )
+			$dni = $dni[data];
 		else
-		{
-			$dni = ' ________ ';
-		}
-		$expenses = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
-		$aproved_user = User::where('id',$solicitude->idaproved)->firstOrFail();
-		if($aproved_user->type === 'P')
+			$dni = '';
+		$expenses = $solicitude->expense;
+		$aproved_user = User::where('id',$solicitude->acceptHist->updated_by)->firstOrFail();
+		if($aproved_user->type == GER_PROD )
 		{
 			$name_aproved = $aproved_user->gerprod->descripcion;
 			$charge = "Gerente de Producto";
 		}
-		if($aproved_user->type === 'S')
+		if($aproved_user->type == SUP )
 		{
 			$name_aproved = $aproved_user->sup->nombres;
 			$charge = "Supervisor";
 		}
-		$total = 0;
-		foreach($expenses as $expense)
-		{
-			$total += $expense->monto;
-		}
-
+		$total = $expenses->sum('monto');
 		$data = array(
 			'solicitude' => $solicitude,
+			'detalle'	 => $jDetalle,
 			'clientes'	 => $clientes,
 			'cmps'		 => $cmps,
 			'date'       => $this->getDay(),
@@ -552,23 +524,58 @@ class ExpenseController extends BaseController
 			'expenses'   => $expenses,
 			'total'      => $total
 		);
+		$data['balance'] = $this->reportBalance( $solicitude , $detalle , $jDetalle , $total );
 		$html = View::make('Expense.report',$data)->render();
 		return PDF::load($html, 'A4', 'landscape')->show();
-	}*/
+	}
 
-		/*
-    public function reportExpenseFondo($token){
-
-        //$fondo = FondoInstitucional::where('token',$token)->firstOrFail();
-        $expense = Expense::where('idfondo',$fondo->idfondo)->get();
+	public function reportExpenseFondo($token)
+	{
+        $fondo = Solicitude::where('token',$token)->first();
+        $detalle = $fondo->detalle;
+        $jDetalle = json_decode( $detalle->detalle );
+        $expense = $fondo->expense;
         $data = array(
             'fondo'    => $fondo,
+            'detalle'  => $jDetalle,
             'date'     => $this->getDay(),
-            'expense'  => $expense
+            'expense'  => $expense,
         );
-        $html = View::make('Expense.report-fondo',$data);
+        $data['balance'] = $this->reportBalance( $fondo , $detalle , $jDetalle , $expense->sum('monto') );
+        $html = View::make('Expense.report-fondo',$data)->render();
         return PDF::load($html, 'A4', 'landscape')->show();
-    }*/
+    }
+
+    private function reportBalance( $solicitud , $detalle , $jDetalle , $mGasto )
+	{
+		$mDeposit = $detalle->deposit->total;
+	    if ( isset( $jDetalle->tcc ) && isset( $jDetalle->tcv ) )
+	    {
+	    	if ( $detalle->idmoneda == SOLES )
+	    		$mDeposit = $mDeposit * $jDetalle->tcv;
+	    	elseif ( $detalle->idmoneda == DOLARES )
+				$mDeposit = $mDeposit / $jDetalle->tcc ;
+	    }
+	    $mBalance = $mDeposit - $mGasto;
+	    if ( $mBalance > 0)
+	    	$data = array( 'bussiness' => round( $mBalance , 2 , PHP_ROUND_HALF_DOWN ) , 'employed' => 0 );
+	    elseif ( $mBalance < 0 )
+	    	$data = array( 'bussiness' => 0 , 'employed' => round( $mBalance*-1 , 2 , PHP_ROUND_HALF_DOWN ) );
+	    elseif ( $mBalance = 0 )
+			$data = array( 'bussiness' => 0 , 'employed' => 0 );
+		return $data;
+	}
+
+}
+
+
+
+
+
+/**/
+
+		
+    
 
     /*public function showRegisterFondo($token){
 
@@ -603,3 +610,34 @@ class ExpenseController extends BaseController
         $states = State::orderBy('idestado', 'ASC')->get();
         return Redirect::to('show_user')->with('states', $states);
     }*/
+/*public function show($token)
+	{
+		$date         = $this->getDay();
+		$typeProof    = ProofType::all();
+		$typeExpense  = ExpenseType::orderBy('id','asc')->get();
+		$solicitude   = Solicitude::where('token',$token)->first();
+		$expense      = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
+		$aproved_user = User::where('id',$solicitude->acceptHist->updated_by)->first();
+		if($aproved_user->type === SUP )
+			$name_aproved = $aproved_user->sup->nombres;
+		if($aproved_user->type === GER_PROD )
+			$name_aproved = $aproved_user->gerprod->descripcion;
+		$balance     = $solicitude->monto;
+		if( count( $expense ) > 0 )
+		{
+			$balance         = 0;
+			foreach ($expense as $key => $value)
+				$balance += $value->monto;
+			$balance= $solicitude->monto - $balance;
+ 		}
+ 		$data = [
+			'solicitud'   => $solicitude,
+			'typeProof'    => $typeProof,
+			'typeExpense'  => $typeExpense,
+			'date'         => $date,
+			'balance'      => $balance,
+			'expense'      => $expense,
+			'name_aproved' => $name_aproved
+		];
+ 		return View::make('Expense.register',$data);
+	}*/

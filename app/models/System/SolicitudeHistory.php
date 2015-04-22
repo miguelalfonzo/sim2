@@ -33,4 +33,9 @@ class SolicitudeHistory extends Eloquent{
     public function user(){
     	return $this->hasOne('User','id','created_by');
     }
+
+    protected function updatedBy()
+    {
+        return $this->hasOne('User','id','updated_by');
+    }
 }

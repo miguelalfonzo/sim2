@@ -40,7 +40,7 @@
                     class="form-control input-md" name="monto" type="text" readonly>
                 @endif
             @elseif( $solicitud->idtiposolicitud == SOL_INST )
-                <input value="{{$detalle->monto_aprobado}}"
+                <input id="amount" value="{{$detalle->monto_aprobado}}"
                 class="form-control input-md" type="text" readonly>
             @endif   
         </div>

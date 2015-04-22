@@ -25,15 +25,15 @@
 							<div class="form-expense">
 							<label>Nombre del Solicitante</label>
 							<div class="input-group">
-		                        @if($solicitude->user->type == 'R')
+		                        @if($solicitude->createdBy->type == 'R')
 		                        <span class="input-group-addon">R</span>
 		                        <input id="textinput" name="titulo" type="text" placeholder=""
-		                               value="{{mb_convert_case($solicitude->user->rm->nombres.' '.$solicitude->user->rm->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled
+		                               value="{{mb_convert_case($solicitude->createdBy->rm->nombres.' '.$solicitude->createdBy->rm->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled
 		                               class="form-control">
 		                        @else
 		                        <span class="input-group-addon">S</span>
 		                        <input id="textinput" name="titulo" type="text" placeholder=""
-		                               value="{{mb_convert_case($solicitude->user->sup->nombres.' '.$solicitude->user->sup->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled
+		                               value="{{mb_convert_case($solicitude->createdBy->sup->nombres.' '.$solicitude->createdBy->sup->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled
 		                               class="form-control">
 		                        @endif
 		                    </div>							
@@ -43,14 +43,14 @@
 					<div class="col-xs-12 col-sm-6 col-md-4">
 						<div class="form-expense">
 							<label>Fondo</label>
-							<input type="text" class="form-control" value="{{mb_convert_case($solicitude->subtype->nombre_mkt, MB_CASE_TITLE, 'UTF-8')}}" disabled>
+							<input type="text" class="form-control" value="{{mb_convert_case($solicitude->detalle->fondo->nombre, MB_CASE_TITLE, 'UTF-8')}}" disabled>
 						</div>
 					</div>
 					<div class="col-xs-12 col-sm-6 col-md-4">
 						<div class="form-expense">
 							<label>Monto de la Solicitud</label>
 							<div class="input-group">
-						    	<div id="type-money" class="input-group-addon">{{$solicitude->typemoney->simbolo}}</div>
+						    	<div id="type-money" class="input-group-addon">{{$solicitude->detalle->typeMoney->simbolo}}</div>
 						      	<input id="deposit" class="form-control" type="text" value="{{$solicitude->monto}}" disabled>
 						    </div>
 						</div>
@@ -59,10 +59,10 @@
 						<div class="form-expense">
 							<label>Autorizado por</label>
 							<div class="input-group">
-		                        @if($solicitude->user->type == 'S')
+		                        @if($solicitude->acceptHist->updatedBy->type == 'S')
 		                        <span class="input-group-addon">S</span>
 		                        <input id="textinput" name="titulo" type="text" placeholder=""
-		                               value="{{mb_convert_case($solicitude->user->sup->nombres.' '.$solicitude->user->sup->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled
+		                               value="{{mb_convert_case($solicitude->acceptHist->updatedBy->sup->nombres,MB_CASE_TITLE,'UTF-8')}}" disabled
 		                               class="form-control">
 		                        @else
 		                        <span class="input-group-addon">G</span>
@@ -76,13 +76,13 @@
 					<div class="col-xs-12 col-sm-6 col-md-4">
 						<div class="form-expense">
 							<label>Número de Depósito</label>
-							<input type="text" class="form-control" value="{{$solicitude->iddeposito}}" disabled>
+							<input type="text" class="form-control" value="{{$solicitude->detalle->iddeposito}}" disabled>
 						</div>
 					</div>
 					<div class="col-xs-12 col-sm-6 col-md-4">
 						<div class="form-expense">
 							<label>Fecha de Depósito</label>
-							<input type="text" class="form-control" value="{{date_format(date_create($solicitude->deposit->created_at), 'd/m/Y')}}" disabled>
+							<input type="text" class="form-control" value="{{date_format(date_create($solicitude->detalle->deposit->created_at), 'd/m/Y')}}" disabled>
 						</div>
 					</div>
 			</div>
@@ -110,7 +110,7 @@
 												<th class="razon">{{$val->razon}}</th>
 												<th class="voucher_number">{{$val->num_prefijo.'-'.$val->num_serie}}</th>
 												<th class="date_movement">{{date('d/m/Y',strtotime($val->fecha_movimiento))}}</th>
-												<th class="total"><span class="type_moeny">{{$solicitude->typemoney->simbolo}}&nbsp;<span class="total_expense">{{(real)$val->monto}}</span></th>
+												<th class="total"><span class="type_moeny">{{$solicitude->detalle->typeMoney->simbolo}}&nbsp;<span class="total_expense">{{(real)$val->monto}}</span></th>
 											</tr>	
 										@endforeach
 									@endif

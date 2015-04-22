@@ -37,7 +37,7 @@ function responseUI(message,color){
 
 $(function(){
     //Vars
-    var token          = $("#token").val();
+    var token          = $('input[name=token]').val();
     var type_money     = $("#type-money").html();
     var proof_type;
     var proof_type_sel;
@@ -124,8 +124,8 @@ $(function(){
         // FIX COLOR IN INPUTS READONLY
         $('.date>input[readonly]').css('background-color', "#fff");
         if(!($('.date>input:not([disabled])').length == 0)){
-            var toDate = $(".date>input").val();
-
+            //var toDate = $(".date>input").val();
+            var toDate = "";
             $(".date").datepicker({
                 language: 'es',
                 startDate: toDate == "" ? "{{$data['date']['toDay']}}" : toDate,
@@ -221,18 +221,39 @@ $(function(){
             var balance = parseFloat($("#balance").val());
             if(balance >= 0)
             {
-                bootbox.confirm("¿Esta seguro que desea Finalizar el registro del gasto?", function(result) {
+                bootbox.confirm('¿Esta seguro que desea Finalizar el registro del gasto?', function(result) 
+                {
                     if(result)
                     {
-                        if(type === 'F')
-                           window.location.href = server + 'end-expense-fondo/' + idfondo;
-                        else
-                            window.location.href = server+'end-expense/'+token;
+                        $.ajax(
+                        {
+                            type: 'post',
+                            url: server + 'end-expense',
+                            data: 
+                            {
+                                _token : $('input[name=_token]').val(),
+                                token  : token
+                            }
+                        }).fail( function( statusCode , errorThrow )
+                        {
+                            bootbox.alert(statusCode + ': ' + errorThrow );
+                        }).done( function ( data ) 
+                        {
+                            if ( data.Status == 'Ok' )
+                            {
+                                bootbox.alert('<h4 class="green">Gasto Registrado</h4>' , function()
+                                {
+                                    window.location.href = server + 'show_user';
+                                });
+                            }
+                            else
+                                bootbox.alert('<h4 class="red">' + data.Status + ': ' + data.Description + '</h4>');
+                        });
                     }
                 });
             }
             else
-                bootbox.alert("<p style='color: red'>No puede finalizar el registro del gasto, aún tiene saldo pendiente por registrar.</p>");
+                bootbox.alert("<p style='color: red'>No puede finalizar el registro del gasto, el monto registrado supera al depositado.</p>");
         });
         //Generate Seat Solicitude
         $("#seat-solicitude").on("click",function(e){
@@ -505,12 +526,13 @@ $(function(){
             //data = {"ruc":ruc,"voucher_number":voucher_number};
             var ruta = 'edit-expense';
             $.ajax({
-                type: 'get',
-                url: server+ruta,
-                dataType: 'json',
-               /* data: {
-                    data : JSON.stringify(data)
-                }*/
+                type : 'post' ,
+                url  : server + ruta ,
+                data : 
+                {
+                    _token  : $('input[name=_token]').val(),
+                    idgasto : row_expense.attr('data-id')
+                },
                 beforeSend:function(){
                     loadingUI('Cargando Datos');
                 },
@@ -526,6 +548,7 @@ $(function(){
                     responseUI('Editar Gasto','green');
                     $("html, body").animate({scrollTop:200},'500','swing');
                     data_response = JSON.parse(JSON.stringify(response));
+                    $('input[name=idgasto]').val(data_response.expense.id)
                     $("#proof-type").val(data_response.expense.idcomprobante).attr("disabled",true);
                     $("#ruc").val(data_response.expense.ruc).attr("disabled",true);
                     $("#ruc-hide").val(data_response.expense.ruc);
@@ -539,7 +562,9 @@ $(function(){
 							$('#dreparo').find('input[name=reparo]')[0].checked = true;
 						else
 							$('#dreparo').find('input[name=reparo]')[1].checked = true;
-                    date = data_response.date.split('-');
+                    date = data_response.expense.fecha_movimiento.split('-');
+                    //date = data_response.date.split('-');
+                    console.log(date);
                     date = date[2].substring(0,2)+'/'+date[1]+'/'+date[0];
                     $("#date").val(date);
                     $("#desc-expense").val(data_response.expense.descripcion);
@@ -553,7 +578,7 @@ $(function(){
                         $(".total-item input").numeric({negative:false});
                         $(".quantity input").numeric({negative:false});
                     });
-                    if(data_response.expense.idcomprobante == 1 || data_response.expense.idcomprobante == 4 || data_response.expense.idcomprobante == 6)
+                    if(data_response.expense.id == 1 || data_response.expense.id == 4 || data_response.expense.id == 6)
                     {
                         $(".tot-document").show();
                         $("#sub-tot").val(data_response.expense.sub_tot);
@@ -578,12 +603,10 @@ $(function(){
         //Validation spending record button
         $("#save-expense").on("click",function(e){
             e.preventDefault();
-
             route_update = 'update-expense';
-            
             $(".message-expense").text('').hide();
             
-            var btn_save = $(this).html();
+            var btn_save = $(this).html().trim();
             var row  = "<tr>";
                 row += "<th class='proof-type'></th>";
                 row += "<th class='ruc'></th>";
@@ -681,7 +704,12 @@ $(function(){
                 data.number_serie  = number_serie;
                 data.date_movement = date;
                 data.desc_expense  = desc_expense;
-                
+            
+                data.tipo_gasto = [];
+                $('.type-expense').each(function() {
+                    data.tipo_gasto.push( $(this).val() );
+                });
+
                 var error_json = 0;
                 //Datos del detalle gastos por items
                 quantity = $(".quantity input");
@@ -714,8 +742,7 @@ $(function(){
                 data.description = arr_description;
                 (data_total_item.length>0) ? data.total_item = data_total_item : error_json = 1;
                 data.rep = rep;
-                // data.type_expense = arr_type_expense;
-                //Validando el Objeto JSON
+                
                 if(error_json === 0)
                 {
                     if(proof_type == '1' || proof_type == '4' || proof_type == '6')
@@ -735,7 +762,7 @@ $(function(){
                     data.total_expense = tot_expense;
                     var tot_expenses = calculateTot($(".total").parent(),'.total_expense');
                     if( tot_expenses > 0 )
-                        if(validateRuc(ruc) === true || proof_type == '7')
+                        if(validateRuc(ruc) === true )
                         {
                             ajaxExpense(data)
                             .done(function(result){
@@ -765,10 +792,10 @@ $(function(){
                             });
                         }
                         else
-                            if(validateVoucher(ruc,voucher_number) === true)
+                            if (validateVoucher(ruc,voucher_number) === true)
                             {
-                                ajaxExpense(data)
-                                .done(function(result){
+                                ajaxExpense(data).done(function(result)
+                                {
                                     if(result.code == -1)
                                     {
                                         responseUI("Documento ya registrado","red");
@@ -788,14 +815,14 @@ $(function(){
                                         responseUI("No se ha registrado el gasto","red");
                                         $(".message-expense").text("No se ha podido registrar el detalle de gastos");
                                     }
-                                })
-                                .fail(function(){
+                                }).fail(function()
+                                {
                                     responseUI("Error del servidor","red");
                                     $(".message-expense").text("Ocurrió un error al momento de registrar los gastos");
                                 });
                             }
                             else
-                                if(btn_save === 'Registrar')
+                                if( btn_save === 'Registrar')
                                 {
                                     $(".message-expense").text("El documento ya se encuentra registrado.").show();
                                     return false;
@@ -807,6 +834,7 @@ $(function(){
                                     {
                                         if($(this).find(".voucher_number").html()===voucher_number && $(this).find(".ruc").html()===ruc)
                                         {
+                                            data.idgasto = $('input[name=idgasto]').val();
                                             $.ajax({
                                                 type: 'post',
                                                 url: server + route_update,
@@ -1299,7 +1327,7 @@ $(function(){
                     var data = {};
                     data.cuentaMkt = editElement.attr("data-cuenta_mkt");
                     data._token   = $("input[name=_token]").val();
-                     $.ajax({
+                    $.ajax({
                         type: 'post',
                         url: server+"get-account",
                         data: data,

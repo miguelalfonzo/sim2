@@ -21,7 +21,7 @@ class Expense extends Eloquent {
 	}
 
     public function items(){
-        return $this->hasMany('Expense\ExpenseItem','idgasto','idgasto');
+        return $this->hasMany('Expense\ExpenseItem','idgasto','id');
     }
 
     public function lastId()

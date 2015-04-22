@@ -25,14 +25,7 @@
             </small>
         </div>
         <div class="panel-body">
-            <aside class="row reg-expense" style="margin-bottom: 0.5em;">
-                <div class="col-xs-12 col-sm-6 col-md-4">
-                    <a id="detail_solicitude">
-                        <span>Ocultar</span>
-                        <span class="glyphicon glyphicon-chevron-up"></span>
-                    </a>
-                </div>
-            </aside>       
+            @include('Dmkt.Solicitud.Section.aside')   
             <form id="form_make_activity" method="post">
                 {{Form::token()}}
                 <input name="idsolicitude" type="hidden" value="{{$solicitud->id}}">
@@ -47,10 +40,8 @@
                 @endif
 
                 <!-- Registro de Gasto -->
-                @if ( ( Auth::user()->type == ASIS_GER || Auth::user()->type == REP_MED ) && $solicitud->idestado == GASTO_HABILITADO )
-                    @include('Dmkt.Solicitud.Section.gasto')
-                @endif
-
+                @include('Dmkt.Solicitud.Section.gasto')
+                
                 <!-- Button (Double) -->
                 @include('Dmkt.Solicitud.Detail.buttons')
             </form>

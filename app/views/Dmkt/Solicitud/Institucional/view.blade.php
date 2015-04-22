@@ -9,15 +9,17 @@
 				</h3>
 			</div>
 			<div class="panel-body">
-				<input type="hidden" id="idsolicitude" name="idsolicitude" value="{{$solicitud->id}}">
+				@include('Dmkt.Solicitud.Section.aside')
 				{{Form::token()}}
+				<input type="hidden" id="idsolicitude" name="idsolicitude" value="{{$solicitud->id}}">
 				<input type="hidden" name="token" value="{{$solicitud->token}}">
-				<section class="row reg-expense" style="margin:0">
+				<section id="collapseOne" class="row reg-expense collapse in">
 					@include('Dmkt.Solicitud.Institucional.detail')
 				</section>
 				@if ( Auth::user()->type == CONT && $solicitud->idestado == DEPOSITADO )
                     @include('template.Seat.advance_table')
                 @endif
+                @include('Dmkt.Solicitud.Section.gasto')
                 @include('Dmkt.Solicitud.Detail.buttons')
 				<section class="row reg-expense align-center" style="margin-top:20px">
 					<div class="col-xs-12 col-sm-12 col-md-12">

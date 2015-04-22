@@ -25,13 +25,13 @@
                 {{$solicitude->state->nombre}}
             </span>
         @endif
-    @elseif ( ( Auth::user()->type == REP_MED  || Auth::user()->type == ASIS_GER ) && $solicitude->idestado == GASTO_HABILITADO )
+    @elseif ( $solicitude->idestado == GASTO_HABILITADO )
         <span class="label" style="margin-left:2px ;background-color:{{$solicitude->state->rangeState->color}}">
-            GASTO
+            POR REGISTRAR
         </span>
     @else
         <span class="label" style="margin-left:2px ;background-color:{{$solicitude->state->rangeState->color}}">
-            {{$solicitude->state->rangeState->nombre}}
+            {{$solicitude->state->nombre}}
         </span>
     @endif
 </td> 

@@ -13,18 +13,23 @@
         </header>
         <main>
             <section style="text-align:center;margin-top:2.5em;">
-                <strong><p style="display:inline">Fecha:</strong>&nbsp;{{$date['lastDay']}}</p>
+                <strong><p style="display:inline">Fecha:</strong>&nbsp;{{$date['toDay']}}</p>
                 <strong><p style="display:inline">Ciudad:</strong>&nbsp;Lima</p>
-                <strong><p style="display:inline">Institucion:</strong>&nbsp;{{$fondo->institucion}}</p>
-                <strong><p style="display:inline">Código Comercial:</strong>&nbsp;{{$fondo->idfondo}}</p>
-                <strong><p style="display:inline">N° de Depósito:</strong>&nbsp;{{$fondo->deposit->num_transferencia}}</p>
+                <strong><p style="display:inline">Institucion:</strong>&nbsp;{{$fondo->titulo}}</p>
+                <strong><p style="display:inline">Código Comercial:</strong>&nbsp;{{$fondo->id}}</p>
+                <strong><p style="display:inline">N° de Depósito:</strong>&nbsp;{{$fondo->detalle->deposit->num_transferencia}}</p>
             </section>
             <section style="text-align:center;margin-top:2em;">
-                <strong><p style="display:inline">Colaborador Bagó:</strong>&nbsp;{{$fondo->repmed}}</p>
-
+                <strong><p style="display:inline">Colaborador Bagó:</strong>&nbsp;{{$fondo->asignedTo->rm->full_name}}</p>
                 <strong><p style="display:inline">Cargo:</strong>&nbsp;Representante Med.</p>
-                <strong><p style="display:inline">Fecha de Depósito:</strong>&nbsp;{{date_format(date_create($fondo->deposit->created_at), 'd/m/Y' )}}</p>
+                <strong><p style="display:inline">Fecha de Depósito:</strong>&nbsp;{{date_format(date_create($fondo->detalle->deposit->created_at), 'd/m/Y' )}}</p>
             </section>
+            <section style="text-align:center;margin-top:2em;">
+                <strong><p style="display:inline">Fecha de Deposito:</strong>&nbsp;{{$fondo->detalle->deposit->updated_at}}</p>
+                @if ( isset($detalle->tcc) && isset($detalle->tcv) )
+                    <strong><p style="display:inline">T. Cambio:</strong>&nbsp;C: {{$detalle->tcc}} V: {{$detalle->tcv}}</p>
+                @endif
+            </section>    
             <section style="margin-top:2em;">
                 <table class="table">
                     <thead>
@@ -57,26 +62,6 @@
                                 <td>{{$value->monto}}</td>
                             </tr>
                         @endforeach
-                        <!-- <tr>
-                            <td>18/07</td>
-                            <td>Factura</td>
-                            <td>2192</td>
-                            <td>Obsequio de Baby Shower</td>
-                            <td>38040</td>
-                            <td>Dermatología</td>
-                            <td>Sandy Solorzano</td>
-                            <td>70.00</td>
-                        </tr>
-                        <tr>
-                            <td>18/07</td>
-                            <td>Factura</td>
-                            <td>2192</td>
-                            <td>Obsequio de Baby Shower</td>
-                            <td>38040</td>
-                            <td>Dermatología</td>
-                            <td>Sandy Solorzano</td>
-                            <td>30.00</td>
-                        </tr> -->
                         <tfoot>
                             <tr>
                                 <td class="border-white"></td>
@@ -86,7 +71,12 @@
                                 <td class="border-white"></td>
                                 <td class="border-white other"></td>
                                 <td class="border align-left"><strong>Total Reportado</strong></td>
-                                <td class="border"><strong><span class="symbol">S/.</span><span class="total-expense">&nbsp;{{$fondo->total}}</span></strong></td>
+                                <td class="border">
+                                    <strong>
+                                        <span class="symbol">{{$fondo->detalle->typeMoney->simbolo}}</span>
+                                        <span class="total-expense">&nbsp;{{$fondo->expense->sum('monto')}}</span>
+                                    </strong>
+                                </td>
                             </tr>
                             <tr>
                                 <td></td>
@@ -96,7 +86,12 @@
                                 <td></td>
                                 <td class="other"></td>
                                 <td class="border align-left">Total Depositado</td>
-                                <td class="border"><strong><span class="symbol">S/.</span><span class="total-expense">&nbsp;{{$fondo->total}}</span></strong></td>
+                                <td class="border">
+                                    <strong>
+                                        <span class="symbol">{{$fondo->detalle->deposit->account->typeMoney->simbolo}}</span>
+                                        <span class="total-expense">&nbsp;{{$fondo->detalle->deposit->total}}</span>
+                                    </strong>
+                                </td>
                             </tr>
                             <tr>
                                 <td></td>
@@ -116,7 +111,7 @@
                                 <td></td>
                                 <td class="other"></td>
                                 <td class="border bottom align-left">Saldo a favor Compañía</td>
-                                <td class="border bottom">-</td>
+                                <td class="border bottom">{{$fondo->detalle->typeMoney->simbolo.' '.$balance['bussiness']}}</td>
                             </tr>
                             <tr>
                                 <td></td>
@@ -126,7 +121,7 @@
                                 <td></td>
                                 <td class="other"></td>
                                 <td class="border bottom align-left">Saldo a favor del Empleado</td>
-                                <td class="border bottom">-</td>
+                                <td class="border bottom">{{$fondo->detalle->typeMoney->simbolo.' '.$balance['employed']}}</td>
                             </tr>
                         </tfoot>
                     </tbody>
@@ -138,7 +133,7 @@
             <p class="firma">V°B° SUPERVISOR</p>
             <p class="firma">V°B° GERENTE COMERCIAL</p>
             <div>DNI:&nbsp;<span class="dni">44595954</span></div>
-            <div>NOMBRE:&nbsp;<span class="dni">{{$fondo->repmed}}</span></div>
+            <div>NOMBRE:&nbsp;<span class="dni">{{$fondo->asignedTo->rm->full_name}}</span></div>
         </footer>
     </div>
 </body>

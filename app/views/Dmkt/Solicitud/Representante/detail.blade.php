@@ -99,7 +99,7 @@
             <span class="input-group-addon">
                 <i class="glyphicon glyphicon-calendar"></i>
             </span>
-            <input id="date" type="text" class="form-control" maxlength="10" disabled
+            <input type="text" class="form-control" maxlength="10" disabled
             value="{{$detalle->fecha_entrega}}">
         </div>
     </div>
@@ -112,7 +112,7 @@
     <div class="col-sm-12 col-md-12 col-lg-12">
         <div class="input-group">
             <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-            <input id="date" type="text" class="form-control" maxlength="10" placeholder=""
+            <input type="text" class="form-control" maxlength="10" placeholder=""
                    value="{{ date_format(date_create($solicitud->created_at), 'd/m/Y' )}}" disabled>
 
         </div>
