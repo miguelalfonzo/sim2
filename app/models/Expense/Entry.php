@@ -19,4 +19,9 @@ class Entry extends Eloquent
             return $lastId->id;
     }
 
+    protected function account()
+    {
+        return $this->hasOne( 'Dmkt\Account' , 'num_cuenta' , 'num_cuenta');
+    }
+
 }

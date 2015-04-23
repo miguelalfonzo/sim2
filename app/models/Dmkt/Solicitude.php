@@ -52,7 +52,11 @@ class Solicitude extends Eloquent{
         return $this->hasOne('User','id','iduserasigned');
     }
 
-    
+    protected function advanceSeatHist()
+    {
+        return $this->hasMany( 'System\SolicitudeHistory' , 'idsolicitude' , 'id' )->where( 'status_to' , GASTO_HABILITADO );
+    }
+
     public function acceptHist()
     {
         return $this->hasOne('System\SolicitudeHistory','idsolicitude','id')->where( 'status_to' , ACEPTADO );
@@ -125,8 +129,13 @@ class Solicitude extends Eloquent{
         return $this->hasOne('Dmkt\Label','id','idetiqueta');
     }
 
-    protected function expense()
+    protected function expenses()
     {
-        return $this->hasMany( '\Expense\Expense' , 'idsolicitud' , 'id' );
+        return $this->hasMany( '\Expense\Expense' , 'idsolicitud' , 'id' )->orderBy( 'updated_at' , 'desc');
+    }
+
+    protected function baseEntrys()
+    {
+        return $this->hasMany( 'Expense\Entry' , 'idsolicitud' )->where( 'd_c' , ASIENTO_GASTO_BASE);
     }
 }

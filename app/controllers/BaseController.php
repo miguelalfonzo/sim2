@@ -267,7 +267,10 @@ class BaseController extends Controller {
             }
             else if ( Auth::user()->type == ASIS_GER ) 
             {
-                $solicituds->where( 'iduserasigned' , $idUser );
+                $solicituds->where( function ( $q ) use ( $idUser )
+                {
+                    $q->where('iduserasigned' , $idUser )->orWhereIn('created_by' , $idUser );
+                });
             }
             else if ( Auth::user()->type == GER_PROD )
             {

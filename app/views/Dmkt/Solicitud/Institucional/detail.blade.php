@@ -47,6 +47,10 @@
 	</div>
 </div>
 
+<!-- DEPOSITADO -->
+@include('Dmkt.Solicitud.Detail.depositado')
+
+<!-- Tasa del Día del Deposito -->
 @include('Dmkt.Solicitud.Detail.tasa')
 
 @if (!is_null( $solicitud->observacion) )
@@ -57,6 +61,8 @@
 		</div>
 	</div>
 @endif
+
+
 
 <!-- Modal Deposito -->
 @include('template.Modals.deposit-min')

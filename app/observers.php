@@ -13,6 +13,7 @@ use \Dmkt\Solicitud\Periodo;
 use \System\SolicitudeHistory;
 use \Expense\Expense;
 use \Expense\ExpenseItem;
+use \Expense\ProofType;
 
 
 	Solicitude::observe( new Transaction() );
@@ -27,3 +28,4 @@ use \Expense\ExpenseItem;
 	Periodo::observe( new Transaction() );
 	Expense::observe( new Transaction() );
 	ExpenseItem::observe( new Transaction() );
+	ProofType::observe( new Transaction() );

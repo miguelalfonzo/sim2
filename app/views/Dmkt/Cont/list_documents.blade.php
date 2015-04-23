@@ -17,9 +17,9 @@
                     <td id="desc" class="col-md-3" style="text-align: center">{{$doc->descripcion}}</td>
                     <td id="sunat" class="col-md-3" style="text-align: center">{{$doc->cta_sunat}}</td>
                     <td id="marca" class="col-md-2" style="text-align: center">{{$doc->marca}}</td>
-                    @if ( $doc->idcomprobante == 1 )
+                    @if ( $doc->igv == 1 )
                         <td id="igv" class="col-md-1" style="text-align: center">Si</td>
-                    @else
+                    @elseif ( $doc->igv == 0) 
                         <td id="igv" class="col-md-1" style="text-align: center">No</td>
                     @endif
                     <td id="icons" class="col-md-1" style="text-align: center">

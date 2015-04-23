@@ -583,7 +583,7 @@ class FondoController extends BaseController
         return date('d', mktime(0, 0, 0, $month + 1, 1, $year) - 1);
     }
 
-    /*function getFondosContabilidad($start, $state)
+   /* public function getFondosContabilidad($start, $state)
     {
         $periodo = $this->period($start);
         

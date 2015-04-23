@@ -1,4 +1,4 @@
-@if ( ( in_array( Auth::user()->type , array ( REP_MED , ASIS_GER ) ) && $solicitud->idestado == GASTO_HABILITADO ) || ( Auth::user()->type == CONT && $solicitud->idestado == REGISTRADO ) )
+@if ( ( $solicitud->iduserasigned == Auth::user()->id  && $solicitud->idestado == GASTO_HABILITADO ) || ( Auth::user()->type == CONT && $solicitud->idestado == REGISTRADO )  )
 	<section class="row reg-expense">
 		<input type="hidden" name="idgasto">
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -188,7 +188,6 @@
 				</div>
 			</div>
 		@endif
-
 	</section>
 	<section class="row reg-expense detail-expense" style="margin:0">
 		<div class="col-xs-12 col-sm-12 col-md-12">
@@ -198,58 +197,21 @@
 			</div>
 		</div>
 	</section>
-@endif
+
 <section class="row reg-expense" style="margin:0">
-	<div class="col-xs-12 col-sm-12 col-md-12">
-		<div class="form-expense">
-			<div class="table-responsive">
-				<table id="table-expense" class="table table-bordered">
-					<thead>
-						<tr>
-							<th>Comprobante</th>
-							<th>RUC</th>
-							<th>Razón Social</th>
-							<th>Nro. Comprobante</th>
-							<th>Fecha</th>
-							<th>Monto Total</th>
-							@if ( $solicitud->idestado == GASTO_HABILITADO || Auth::user()->type == CONT )
-								<th>Editar</th>
-								<th>Eliminar</th>
-							@endif
-						</tr>
-					</thead>
-					<tbody>
-						@if(isset($expense))
-							@foreach($expense as $val)
-								<tr data-id="{{$val->id}}">
-									<th class="proof-type">{{mb_convert_case($val->idProofType->descripcion,MB_CASE_TITLE,'UTF-8')}}</th>
-									<th class="ruc">{{$val->ruc}}</th>
-									<th class="razon">{{$val->razon}}</th>
-									<th class="voucher_number">{{$val->num_prefijo.'-'.$val->num_serie}}</th>
-									<th class="date_movement">{{date('d/m/Y',strtotime($val->fecha_movimiento))}}</th>
-									<th class="total">
-										<span class="type_money">{{$solicitud->detalle->typemoney->simbolo}}</span>
-										<span class="total_expense">{{(real)$val->monto}}</span>
-									</th>
-									@if ( $solicitud->idestado == GASTO_HABILITADO || Auth::user()->type == CONT )
-										<th>
-											<a href="#" class="edit-expense">
-												<span class="glyphicon glyphicon-pencil"></span>
-											</a>
-										</th>
-										<th>
-											<a href="#" class="delete-expense">
-												<span class="glyphicon glyphicon-remove"></span>
-											</a>
-										</th>
-									@endif
-								</tr>	
-							@endforeach
+		<div class="col-xs-12 col-sm-12 col-md-12">
+			<div class="form-expense">
+				<div class="table-responsive">
+					<table id="table-expense" class="table table-bordered">
+						@if ( isset($expense) )
+							@include('Dmkt.Solicitud.Section.gasto-table')
 						@endif
-					</tbody>
-				</table>
-			</div>
+					</table>
+				</div>
 			<input id="tot-edit-hidden" type="hidden">
 		</div>
 	</div>
 </section>
+
+@endif
+

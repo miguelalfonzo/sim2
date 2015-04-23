@@ -1,10 +1,5 @@
 @extends('template.main')
 @section('content')
-<style>
-    .form-horizontal .control-label {
-        text-align: left;
-    }
-</style>
 <div class="content">
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -14,9 +9,9 @@
             @endif
             <small style="float: right; margin-top: -10px">
                 @if ( Auth::user()->type == REP_MED )
-                    <strong>Usuario : {{Auth::user()->Rm->nombres}}</strong>
+                    <strong>Usuario : {{Auth::user()->rm->full_name}}</strong>
                 @elseif ( Auth::user()->type == SUP )
-                    <strong>Usuario : {{Auth::user()->Sup->nombres}}</strong>
+                    <strong>Usuario : {{Auth::user()->sup->full_name}}</strong>
                 @elseif ( Auth::user()->type == GER_PROD )
                      <strong>Usuario : {{Auth::user()->Gerprod->descripcion}}</strong>
                 @else
@@ -31,7 +26,11 @@
                 <input name="idsolicitude" type="hidden" value="{{$solicitud->id}}">
                 <input name="token" type="hidden" value="{{$solicitud->token}}">
                 <section id="collapseOne" class="row reg-expense collapse in">
-                    @include('Dmkt.Solicitud.Representante.detail')
+                    @if ( $solicitud->idtiposolicitud == SOL_REP )
+                        @include('Dmkt.Solicitud.Representante.detail')
+                    @elseif ( $solicitud->idtiposolicitud == SOL_INST )
+                        @include('Dmkt.Solicitud.Institucional.detail')
+                    @endif
                 </section>
                 
                 <!-- Asiento de Anticipo -->

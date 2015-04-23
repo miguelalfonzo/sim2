@@ -107,6 +107,7 @@ Route::group(array('before' => 'sup_gerprod_gercom'), function ()
 
 Route::group(array('before' => 'rm_cont_ager'), function () 
 {
+    Route::post('get-expenses' , 'Expense\ExpenseController@getExpenses');
     Route::post('edit-expense', 'Expense\ExpenseController@editExpense');
     Route::post('delete-expense', 'Expense\ExpenseController@deleteExpense');
     Route::post('register-expense', 'Expense\ExpenseController@registerExpense');

@@ -1,13 +1,13 @@
 <div class="form-group col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px">
     <div class="col-sm-12 col-md-12 col-lg-12" style="text-align: center">
         @if( Auth::user()->type == REP_MED )
-            @if ( $solicitud->idestado == GASTO_HABILITADO )
+            @if ( $solicitud->idestado == GASTO_HABILITADO && $solicitud->iduserasigned == Auth::user()->id )
                 <a id="finish-expense" class="btn btn-success">
                     Terminar
                 </a>
             @endif
         @elseif ( Auth::user()->type == ASIS_GER )
-            @if ( $solicitud->idestado == GASTO_HABILITADO )
+            @if ( $solicitud->idestado == GASTO_HABILITADO && $solicitud->iduserasigned == Auth::user()->id )
                 <a id="finish-expense" class="btn btn-success">
                     Terminar
                 </a>

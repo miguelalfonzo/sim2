@@ -35,4 +35,10 @@ class Account extends Eloquent
         return $banks;
     }
 
+    protected static function getExpenseAccount( $cuenta_mkt )
+    {
+        return Account::leftJoin('DMKT_RG_CUENTA_GASTO_MARCA b' , 'b.idcuentafondo' , '=' , 'dmkt_rg_cuenta.id' )
+        ->leftJoin('DMKT_RG_CUENTA c' , 'c.id' , '=' , 'b.idcuentagasto' )->select('c.*')->where('dmkt_rg_cuenta.num_cuenta' , $cuenta_mkt )->get();
+    }
+
 }

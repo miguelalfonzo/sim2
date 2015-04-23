@@ -46,11 +46,18 @@
 		                        <input id="textinput" name="titulo" type="text" placeholder=""
 		                               value="{{mb_convert_case($solicitude->createdBy->rm->nombres.' '.$solicitude->createdBy->rm->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled
 		                               class="form-control">
-		                        @else
+		                        @elseif ( $solicitude->createdBy->type == SUP )
 		                        <span class="input-group-addon">S</span>
 		                        <input id="textinput" name="titulo" type="text" placeholder=""
-		                               value="{{mb_convert_case($solicitude->createdBy->sup->nombres.' '.$solicitude->createdBy->sup->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled
+		                               value="{{$solicitude->createdBy->sup->full_name}}" disabled
 		                               class="form-control">
+		                        @else
+		                        	<span class="input-group-addon">AG</span>
+		                        <input id="textinput" name="titulo" type="text" placeholder=""
+		                               value="{{$solicitude->createdBy->person->full_name}}" disabled
+		                               class="form-control">
+		                        
+
 		                        @endif
 		                    </div>							
 						</div>
@@ -59,12 +66,17 @@
 						<div class="form-expense">
 							<label>Autorizado por</label>
 							<div class="input-group">
-		                        @if($solicitude->acceptHist->updatedBy->type == 'S')
+								@if ( $solicitude->createdBy->type == ASIS_GER )
+		                        <span class="input-group-addon">AG</span>
+		                        <input id="textinput" name="titulo" type="text" placeholder=""
+		                               value="{{$solicitude->createdBy->person->full_name}}" disabled class="form-control">
+		                        
+		                        @elseif($solicitude->acceptHist->updatedBy->type == SUP )
 		                        <span class="input-group-addon">S</span>
 		                        <input id="textinput" name="titulo" type="text" placeholder=""
 		                               value="{{mb_convert_case($solicitude->acceptHist->updatedBy->sup->nombres.' '.$solicitude->acceptHist->updatedBy->sup->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled
 		                               class="form-control">
-		                        @else
+		                        @elseif ( $solicitude->acceptHist->updatedBy->type == GER_PROD )
 		                        <span class="input-group-addon">G</span>
 		                        <input id="textinput" name="titulo" type="text" placeholder=""
 		                               value="{{mb_convert_case($solicitude->acceptHist->updatedBy->gerprod->descripcion,MB_CASE_TITLE,'UTF-8')}}" disabled class="form-control">
@@ -180,9 +192,9 @@
 											<tbody>
 											@if ( isset($expenseItem) )
 											@foreach($expenseItem as $expenseValue)
-												<tr data-id="{{ $expenseValue->idgasto }}">
+												<tr data-id="{{ $expenseValue->id }}">
 												    @foreach($typeProof as $val)
-												    	@if($expenseValue->idcomprobante == $val->idcomprobante)
+												    	 @if($expenseValue->idcomprobante == $val->id)
 												    <td rowspan="{{ $expenseValue->count }}" data-id="{{ $val->idcomprobante }}">{{ $val->descripcion }}</td>
 												    	@endif
 													@endforeach
@@ -216,7 +228,7 @@
 				
 				<section class="row reg-expense align-center" style="margin:1.5em 0">
 					<div class="col-xs-12 col-sm-12 col-md-12">
-						<a id="saveSeatExpense" class="btn btn-success" style="margin:-2em 2em .5em 0">Generar Asiento Solicitud</a>
+						<a id="saveSeatExpense" class="btn btn-success" style="margin:-2em 2em .5em 0">Generar Asiento Gasto</a>
 						<a id="cancel-seat-cont" href="#" class="btn btn-danger" style="margin:-2em 2em .5em 0">Atras</a>
 					</div>
 				</section>

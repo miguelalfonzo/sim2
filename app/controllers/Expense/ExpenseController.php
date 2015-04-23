@@ -76,7 +76,7 @@ class ExpenseController extends BaseController
                     	$data['banks'] = Account::banks();
                     elseif ( Auth::user()->type == REP_MED && count( $solicitud->advanceSeatHist ) != 0  )
                     	$data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
-			        return View::make( 'Dmkt.Solicitud.Institucional.view' , $data );
+                    return View::make( 'Dmkt.Solicitud.view' , $data );
 			    }
 	    }
 	    catch (Exception $e)
@@ -92,7 +92,7 @@ class ExpenseController extends BaseController
             'typeExpense' => ExpenseType::order(),
             'date'         => $this->getDay()
         );
-        $gastos = $solicitud->expense;
+        $gastos = $solicitud->expenses;
         if ( count( $gastos ) > 0 )
         {
             $data['expense'] = $gastos;
@@ -339,6 +339,7 @@ class ExpenseController extends BaseController
 					{
 						$expense_detail = new ExpenseItem;
 						$expense_detail->id = $expense_detail->lastId() + 1;
+						$expense_detail->tipo_gasto = $inputs['tipo_gasto'][$i];
 						$expense_detail->idgasto = $expenseEdit->id;
 						$expense_detail->cantidad = $quantity[$i];
 						$expense_detail->descripcion = $description[$i];
@@ -431,7 +432,7 @@ class ExpenseController extends BaseController
 			
 			if ($input['type'] == 'Update')
 			{
-				$document = ProofType::where('idcomprobante',$input['pk'])->first();
+				$document = ProofType::where('id',$input['pk'])->first();
 				$document->descripcion = strtoupper($input['desc']);
 				$document->marca = strtoupper($input['marca']);
 				$document->igv = $input['igv'];
@@ -440,23 +441,22 @@ class ExpenseController extends BaseController
 			else
 			{
 				$document = new ProofType;
-				$document->idcomprobante = $document->lastId()+1;
+				$document->id = $document->lastId() + 1;
 				$document->descripcion = strtoupper($input['desc']);
 				$document->cta_sunat = $input['sunat'];
 				$document->marca = strtoupper($input['marca']);
 				$document->igv = $input['igv'];
 				$document->save();
 			}
-			$data["Status"] = "Ok";				
+			$rpta = $this->setRpta();			
 			DB::commit();
+			return $setRpta;
 		}
 		catch (Exception $e)
 		{
-			Log::error($e);
-			$data["Status"] = "Error";	
 			DB::rollback();
+			return $this->internalException( $e , __FUNCTION__ );
 		}
-		return $data;
 	}
 
 	public function reportExpense($token){
@@ -564,6 +564,24 @@ class ExpenseController extends BaseController
 	    elseif ( $mBalance = 0 )
 			$data = array( 'bussiness' => 0 , 'employed' => 0 );
 		return $data;
+	}
+
+	public function getExpenses()
+	{
+		try
+		{
+			$inputs = Input::all();
+			$solicitud = Solicitude::find( $inputs['idsolicitud']);
+			$data = array(
+				'solicitud' => $solicitud,
+				'expense'   => $solicitud->expenses
+			);
+			return $this->setRpta( View::make('Dmkt.Solicitud.Section.gasto-table')->with( $data )->render() );
+		}
+		catch ( Exception $e )
+		{
+			return $this->internalException( $e , __FUNCTION__ );
+		}
 	}
 
 }

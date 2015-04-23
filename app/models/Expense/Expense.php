@@ -16,11 +16,13 @@ class Expense extends Eloquent {
 		return $this->hasOne('Dmkt\Activity','idsolicitud','idsolicitud');
 	}
 
-	public function idProofType(){
+	protected function proof()
+	{
 		return $this->hasOne('Expense\ProofType','id','idcomprobante');
 	}
 
-    public function items(){
+    protected function items()
+    {
         return $this->hasMany('Expense\ExpenseItem','idgasto','id');
     }
 

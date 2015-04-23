@@ -178,7 +178,8 @@ function newSolicitude() {
 
     
 
-    function listDocuments(){
+    function listDocuments()
+    {
         var url = server + 'list-documents';
         $.ajax({
             url: url,
@@ -608,7 +609,7 @@ function newSolicitude() {
     /** --------------------------------------------- CONTABILIDAD ------------------------------------------------- **/
 
     if(userType === 'C'){
-        listFondos('fondos-contabilidad', $('#estado_fondo_cont').val());
+        //listFondos('fondos-contabilidad', $('#estado_fondo_cont').val());
         listDocuments();
         $("#datefondo").val(dateactual);
     }

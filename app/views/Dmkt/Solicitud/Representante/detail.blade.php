@@ -23,7 +23,7 @@
 </div>
 
 <!-- Account Number -->
-@if ( $solicitud->typeSolicitude->code == SOLIC && $solicitud->detalle->idpago == PAGO_DEPOSITO )
+@if ( $solicitud->detalle->idpago == PAGO_DEPOSITO )
     <div class="form-group col-sm-6 col-md-4">
         <label class="col-sm-8 col-md-8 control-label" for="cuenta">Nº de Cuenta</label>
         <div class="col-sm-12 col-md-12">
@@ -31,7 +31,7 @@
             value="{{$detalle->num_cuenta}}" readonly>
         </div>
     </div>
-@elseif( $solicitud->typeSolicitude->code == SOLIC && $solicitud->detalle->idpago == PAGO_CHEQUE )
+@elseif( $solicitud->detalle->idpago == PAGO_CHEQUE )
     <!-- Ruc -->
     <div class="form-group col-sm-6 col-md-4">
         <label class="col-sm-8 col-md-8 control-label" for="ruc">Ruc</label>
@@ -43,7 +43,7 @@
 @endif
 
 <!--  Amount Factura -->
-@if( $solicitud->typeSolicitude->code == SOLIC && $solicitud->detalle->idmotivo == REASON_REGALO )
+@if( $solicitud->detalle->idmotivo == REASON_REGALO )
     <div class="form-group col-sm-6 col-md-4 col-lg-4">
         <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="factura">
             Monto Factura
@@ -131,20 +131,10 @@
 <!-- Fondos -->
 @include('Dmkt.Solicitud.Detail.fondo')
 
-@if(!is_null($solicitud->detalle->iddeposito) )    
-    <div class="form-group col-sm-6 col-md-4 col-lg-4">
-        <label class="col-sm-8 col-md-8 control-label" for="depositado">
-            Depositado
-        </label>
-        <div class="col-sm-12 col-md-12 col-lg-12">
-            <div class="input-group">
-                <span class="input-group-addon">{{$solicitud->detalle->deposit->account->typeMoney->simbolo}}</span>
-                <input id="depositado" type="text" value="{{$solicitud->detalle->deposit->total}}" class="form-control input-md" readonly>
-            </div>
-        </div>
-    </div>
-@endif
+<!-- Depositado -->
+@include('Dmkt.Solicitud.Detail.depositado')
 
+<!-- Tasa de Cambio del Dia del Deposito -->
 @include('Dmkt.Solicitud.Detail.tasa')
 
 <!-- Observation-->
