@@ -49,7 +49,7 @@
                             <tr>
 
                                 <td>{{date('d/m/Y',strtotime($value->fecha_movimiento))}}</td>
-                                <td>{{mb_convert_case($value->idProofType->descripcion,MB_CASE_TITLE,'UTF-8')}}</td>
+                                <td>{{mb_convert_case($value->proof->descripcion,MB_CASE_TITLE,'UTF-8')}}</td>
                                 <td>{{$value->num_prefijo.'-'.$value->num_serie}}</td>
                                 <td>{{mb_convert_case($value->descripcion,MB_CASE_TITLE,'UTF-8')}}</td>
                                 <td>
@@ -59,7 +59,7 @@
                                 <td>
                                     --
                                 </td>
-                                <td>{{$value->monto}}</td>
+                                <td>S/.{{$value->monto}}</td>
                             </tr>
                         @endforeach
                         <tfoot>
@@ -74,7 +74,7 @@
                                 <td class="border">
                                     <strong>
                                         <span class="symbol">{{$fondo->detalle->typeMoney->simbolo}}</span>
-                                        <span class="total-expense">&nbsp;{{$fondo->expense->sum('monto')}}</span>
+                                        <span class="total-expense">&nbsp;{{$fondo->expenses->sum('monto')}}</span>
                                     </strong>
                                 </td>
                             </tr>
@@ -88,8 +88,14 @@
                                 <td class="border align-left">Total Depositado</td>
                                 <td class="border">
                                     <strong>
-                                        <span class="symbol">{{$fondo->detalle->deposit->account->typeMoney->simbolo}}</span>
-                                        <span class="total-expense">&nbsp;{{$fondo->detalle->deposit->total}}</span>
+                                        <span class="symbol">S/.</span>
+                                        <span class="total-expense">
+                                            @if ( $fondo->detalle->deposit->account->idtipomoneda == DOLARES )
+                                                {{ round( $fondo->detalle->deposit->total * $detalle->tcv , 2 , PHP_ROUND_HALF_DOWN ) }}
+                                            @elseif ( $fondo->detalle->deposit->account->idtipomoneda == SOLES )
+                                                {{ $fondo->detalle->deposit->total }}
+                                            @endif 
+                                            </span>
                                     </strong>
                                 </td>
                             </tr>

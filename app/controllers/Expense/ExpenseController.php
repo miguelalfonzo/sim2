@@ -548,7 +548,7 @@ class ExpenseController extends BaseController
         $fondo = Solicitude::where('token',$token)->first();
         $detalle = $fondo->detalle;
         $jDetalle = json_decode( $detalle->detalle );
-        $expense = $fondo->expense;
+        $expense = $fondo->expenses;
         $data = array(
             'fondo'    => $fondo,
             'detalle'  => $jDetalle,
