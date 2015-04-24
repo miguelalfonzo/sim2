@@ -136,6 +136,9 @@ class Solicitude extends Eloquent{
 
     protected function baseEntrys()
     {
-        return $this->hasMany( 'Expense\Entry' , 'idsolicitud' )->where( 'd_c' , ASIENTO_GASTO_BASE);
+        return $this->hasMany( 'Expense\Entry' , 'idsolicitud' )->where( function( $q )
+        {
+            $q->where( 'd_c' , ASIENTO_GASTO_BASE )->orWhere( 'substr(num_cuenta , 0 , 1 )' , 4);
+        });
     }
 }
