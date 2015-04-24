@@ -32,7 +32,7 @@
             @elseif ( Auth::user()->type == CONT )
                 @if( $solicitude->idestado == REGISTRADO )
                     <a href="{{URL::to('generar-asiento-gasto/'.$solicitude->token)}}">
-                        <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span>
+                        <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-book"></span>
                     </a>
                 @endif   
             @elseif ( Auth::user()->type == TESORERIA )
@@ -62,7 +62,7 @@
             @elseif ( Auth::user()->type == CONT )
                  @if( $solicitude->idestado == REGISTRADO )
                     <a href="{{URL::to('generar-asiento-gasto/'.$solicitude->token)}}">
-                        <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span>
+                        <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-book"></span>
                     </a>
                 @endif  
             @elseif ( Auth::user()->type == TESORERIA )

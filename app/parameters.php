@@ -12,7 +12,7 @@ const error = 'Error';
 const desc_error = 'System Error';
 const status = 'Status';
 const description = 'Description';
-const DOCUMENTO_NO_SUSTENTABLE_ID = 7;
+//const DOCUMENTO_NO_SUSTENTABLE_ID = 7;
 
 const SOLES = 1 ;
 const DOLARES = 2;
@@ -31,15 +31,11 @@ const ERROR_NOT_FOUND_MATCH_ACCOUNT_MKT_CNT   	= 'No se encontro cuenta relacion
 const MESSAGE_NOT_FOUND_MATCH_ACCOUNT_MKT_CNT 	= 'Verificar relación entre las cuentas de Marketing y Contabilidad';
 const ERROR_NOT_FOUND_MARCA					  	= 'No se encontro Marca';
 const MESSAGE_NOT_FOUND_MARCA				  	= 'Verificar relación entre las Cuentas de Contabilidad y las Marcas';
-const CUENTA_REPARO_COMPRAS						= '6411000';
-const CUENTA_REPARO_GOBIERNO					= '4011100';
+const CUENTA_REPARO_COMPRAS						= '6411000';//debe
+const CUENTA_REPARO_GOBIERNO					= '4011100';//haber
 const CUENTA_CONTRA_PARTE						= '1413360';
 const ERROR_INVALID_ACCOUNT_MKT					= 'Error de Cuenta';
 const MSG_INVALID_ACCOUNT_MKT					= 'Verificar campo de cuenta';
-
-
-//ESTADOS
-const ESTADO_GENERADO	= 7;
 
 //ESTADOS ADICIONALES
 const ESTADO_DERIVADO = 'DERIVADO';
@@ -78,10 +74,6 @@ const ASIS_GER = 'AG';
 //TABLAS EXTERNAS
 const TB_DOCTOR = 'FICPE.PERSONAFIS';
 const TB_INSTITUTE = 'FICPEF.PERSONAJUR';
-
-//CODIGO DE SOLICITUDES
-const SOLIC = 'S';
-const INSTITUCIONAL = 'F';
 
 //ID DE TIPO DE SOLICITUDES
 const SOL_REP  = 1;

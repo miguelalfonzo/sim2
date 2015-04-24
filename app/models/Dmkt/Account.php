@@ -35,6 +35,11 @@ class Account extends Eloquent
         return $banks;
     }
 
+    protected function fondoRelations()
+    {
+        return $this->hasMany( 'Expense\MarkProofAccounts' , 'idcuentafondo' , 'id');
+    }
+
     protected static function getExpenseAccount( $cuenta_mkt )
     {
         return Account::leftJoin('DMKT_RG_CUENTA_GASTO_MARCA b' , 'b.idcuentafondo' , '=' , 'dmkt_rg_cuenta.id' )

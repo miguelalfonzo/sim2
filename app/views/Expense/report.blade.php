@@ -63,7 +63,7 @@
                             <tr>
                                 
                                 <td>{{date('d/m/Y',strtotime($value->fecha_movimiento))}}</td>
-                                <td>{{mb_convert_case($value->idProofType->descripcion,MB_CASE_TITLE,'UTF-8')}}</td>
+                                <td>{{mb_convert_case($value->proof->descripcion,MB_CASE_TITLE,'UTF-8')}}</td>
                                 <td>{{$value->num_prefijo.'-'.$value->num_serie}}</td>
                                 <td>{{mb_convert_case($value->descripcion,MB_CASE_TITLE,'UTF-8')}}</td>
                                 <td>{{$cmps}}</td>
@@ -71,7 +71,7 @@
                                 <td>
                                     {{$clientes}}
                                 </td>
-                                <td>{{$solicitude->detalle->typeMoney->simbolo}}{{(real)$value->monto}}</td>
+                                <td>S/.{{ $value->monto }}</td>
                             </tr>    
                         @endforeach
                         <tfoot>
@@ -82,8 +82,15 @@
                                 <td class="border-white"></td>
                                 <td class="border-white"></td>
                                 <td class="border-white other"></td>
-                                <td class="border align-left"><strong>Total Reportado</strong></td>
-                                <td class="border"><strong><span class="symbol">{{$solicitude->detalle->typemoney->simbolo}}</span><span class="total-expense">&nbsp;{{$total}}</span></strong></td>
+                                <td class="border align-left">
+                                    <strong>Total Reportado</strong>
+                                </td>
+                                <td class="border">
+                                    <strong>
+                                        <span class="symbol">S/.</span>
+                                        <span class="total-expense">{{$total}}</span>
+                                    </strong>
+                                </td>
                             </tr>
                             <tr>
                                 <td></td>
@@ -95,8 +102,14 @@
                                 <td class="border align-left">Total Depositado</td>
                                 <td class="border">
                                     <strong>
-                                        <span class="symbol">{{$solicitude->detalle->deposit->account->typeMoney->simbolo}}</span>
-                                        <span class="total-expense">&nbsp;{{$solicitude->detalle->deposit->total}}</span>
+                                        <span class="symbol">S/.</span>
+                                        <span class="total-expense">
+                                            @if ( $solicitude->detalle->deposit->account->idtipomoneda == DOLARES )
+                                                {{ round ( $solicitude->detalle->deposit->total * $detalle->tcv , 2 , PHP_ROUND_HALF_DOWN ) }}
+                                            @else
+                                                {{ $solicitude->detalle->deposit->total }}    
+                                            @endif
+                                        </span>
                                     </strong>
                                 </td>
                             </tr>
@@ -118,7 +131,7 @@
                                 <td></td>
                                 <td class="other"></td>
                                 <td class="border bottom align-left">Saldo a favor Compañía</td>
-                                <td class="border bottom">{{$solicitude->detalle->typeMoney->simbolo.' '.$balance['bussiness']}}</td>
+                                <td class="border bottom">S/.{{$balance['bussiness']}}</td>
                             </tr>
                             <tr>
                                 <td></td>
@@ -128,7 +141,7 @@
                                 <td></td>
                                 <td class="other"></td>
                                 <td class="border bottom align-left">Saldo a favor del Empleado</td>
-                                <td class="border bottom">{{$solicitude->detalle->typeMoney->simbolo.' '.$balance['employed']}}</td>
+                                <td class="border bottom">S/.{{$balance['employed']}}</td>
                             </tr>
                         </tfoot>
                     </tbody>

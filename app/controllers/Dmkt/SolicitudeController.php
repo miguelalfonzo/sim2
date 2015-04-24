@@ -622,7 +622,7 @@ class SolicitudeController extends BaseController
 
     private function textLv( $solicitude )
     {
-        return $this->textAccepted( $solicitude ).'-'.$solicitude->titulo.'-'.$this->textClients( $solicitude );
+        return $this->textAccepted( $solicitude ).' - '.$solicitude->titulo.' - '.$this->textClients( $solicitude );
     }
 
     private function textAccepted( $solicitude )
@@ -1011,6 +1011,23 @@ class SolicitudeController extends BaseController
 
     public function getCuentaContHandler(){
         $dataInputs  = Input::all();
+        
+        $accountFondo = Account::where( 'num_cuenta' , $dataInputs['cuentaMkt'] )->first();
+        
+        $rpta = MarkProofAccounts::listExpenses( $accountFondo->id );
+        
+        //$rpta = $mDCs->with('expenseAccount' , 'expenseMark' , 'expenseDocument' , 'expenseFondo' );
+        
+        //Log::error( $rpta );
+        return $rpta;
+
+        foreach ( $mDCs as $mDC )
+        {
+            $accountExpense[] = $mDC->getExpenseAccount;
+        } 
+        $accountFondo->tExpense = $accountExpense;
+        $accountFondo->accountGasto = $accountExpense;
+
         return $this->getCuentaCont($dataInputs['cuentaMkt']);
     }
 
@@ -1044,17 +1061,18 @@ class SolicitudeController extends BaseController
     {    
         $result   = array();
         $seatList = array();
-        $AadvanceSeat = $solicitud->baseEntrys;
+        $AadvanceSeat = $solicitud->depositEntrys;
         //Log::error( json_encode( $advanceSeat ) );
-        if ( count( $AadvanceSeat ) == 0 )
+        if ( is_null( $AadvanceSeat ) )
             return $this->warningException( __FUNCTION__ , 'No se encontro registros del asiento de anticipo D/C: "D" para la solicitud');
-        elseif ( count ( $AadvanceSeat ) >= 3 )
+        /*elseif ( count ( $AadvanceSeat ) >= 3 )
             return $this->warningException( __FUNCTION__ , 'Se encontro mas de un asiento de anticipo D/C: "D" para la solicitud');
-        else
+        */else
         {
-        $advanceSeat = $AadvanceSeat[0];
-        $cuentaMkt      = $advanceSeat->num_cuenta;
-        $idcuentaMkt = $advanceSeat->account->id;
+            Log::error('ASIENTO GASTO');
+        //$advanceSeat = $AadvanceSeat[0];
+        $cuentaMkt      = $solicitud->baseEntry->num_cuenta;
+        $idcuentaMkt = $solicitud->baseEntry->account->id;
 
         $accountResult  = $this->getCuentaCont($cuentaMkt);
         $account_number = '';
@@ -1171,13 +1189,13 @@ class SolicitudeController extends BaseController
             {
                 if ( $aS->d_c == 'C' )
                 {
-                    $seat = $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', CUENTA_CONTRA_PARTE, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_BASE, $aS->importe, '', $description_seat_back, '', 'CAN');        
+                    $seat = $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', CUENTA_CONTRA_PARTE, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO , $aS->importe, '', $description_seat_back, '', 'CAN');        
                     array_push($seatList, $seat);
             
                 }
                 else
                 {
-                    $seat = $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', CUENTA_CONTRA_PARTE, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO, $aS->importe, '', $description_seat_back, '', 'CAN');
+                    $seat = $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', CUENTA_CONTRA_PARTE, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_BASE , $aS->importe, '', $description_seat_back, '', 'CAN');
                     array_push($seatList, $seat);
             
                 }
@@ -1221,6 +1239,9 @@ class SolicitudeController extends BaseController
         }
         $solicitud->documentList = $expenses;
         $resultSeats             = $this->generateSeatExpenseData($solicitud, null, null);
+
+        Log::error(json_encode($resultSeats));
+
         $seatList                = $resultSeats['seatList'];
 
         $solicitude = Solicitude::where('token', $token)->first();
@@ -1368,7 +1389,7 @@ class SolicitudeController extends BaseController
                         $tbEntry = new Entry;
                         $tbEntry->id = $tbEntry->searchId()+1;
                         $tbEntry->num_cuenta = $inputs['number_account'][$i];
-                        $tbEntry->fec_origen = $solicitude->fec_origin;
+                        $tbEntry->fec_origen = $solicitude->detalle->deposit->updated_at ;
                         $tbEntry->d_c = $inputs['dc'][$i];
                         $tbEntry->importe = $inputs['total'][$i];
                         $tbEntry->leyenda = trim($inputs['leyenda']);

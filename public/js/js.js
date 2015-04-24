@@ -611,12 +611,13 @@ $(function(){
                         $(".total-item input").numeric({negative:false});
                         $(".quantity input").numeric({negative:false});
                     });
-                    if(data_response.expense.idcomprobante == 1 || data_response.expense.idcomprobante == 4 || data_response.expense.idcomprobante == 6)
+                    if(data_response.expense.idcomprobante == 1 || data_response.expense.idcomprobante == 4 )
                     {
                         $(".tot-document").show();
                         $("#sub-tot").val(data_response.expense.sub_tot);
                         $("#imp-ser").val(data_response.expense.imp_serv);
                         $("#igv").val(data_response.expense.igv);
+                        $('#dreparo').show();
                     }
                     else
                     {
@@ -624,6 +625,7 @@ $(function(){
                         $("#sub-tot").val(0);
                         $("#imp-ser").val(0);
                         $("#igv").val(0);
+                        $('#dreparo').hide();
                     }
                     var row_expenses = $(".total").parent();
                     tot_expenses = calculateTot(row_expenses,'.total_expense');
@@ -1208,26 +1210,20 @@ $(function(){
             });
             if(total_expense>0)
             {
-                if($("#proof-type").val()==='1' || $("#proof-type").val()==='4' || $("#proof-type").val()==='6')
+                if($("#proof-type").val()==='1' || $("#proof-type").val()==='4' )
                 {
                     if(!imp_service) imp_service = 0;
-                    if(typeUser === 'R'){
-                        igv = total_expense*IGV;
-                        sub_total_expense = total_expense - igv;
-                    }else{
-                        sub_total_expense = total_expense;
-                        igv = sub_total_expense * IGV;
-                    }
                     
-                    total_expense = sub_total_expense + igv + imp_service;
+                    igv = total_expense*IGV;
+                    sub_total_expense = total_expense;
                     $("#sub-tot").val(sub_total_expense.toFixed(2));
+                    total_expense = sub_total_expense + igv + imp_service;
+                    
                     $("#igv").val(igv.toFixed(2));
                     $("#total-expense").val(total_expense.toFixed(2));
                 }
                 else
-                {
                     $("#total-expense").val(total_expense.toFixed(2));
-                }
             }
             else
             {
@@ -1441,6 +1437,7 @@ $(function(){
                         if(!result.hasOwnProperty("error"))
                         {
                             var select_temp = $('<select></select>');
+                            console.log(result);
                             $(result.account).each(function(i,option){
                                 var tempOption = $('<option value="'+ option.cuenta_cont +'">'+ option.cuenta_mkt +' | '+ option.cuenta_cont +' | '+ option.nombre_cont +'</option>');
                                 tempOption.attr('data-marca', option.marca)

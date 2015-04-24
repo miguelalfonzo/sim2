@@ -134,11 +134,13 @@ class Solicitude extends Eloquent{
         return $this->hasMany( '\Expense\Expense' , 'idsolicitud' , 'id' )->orderBy( 'updated_at' , 'desc');
     }
 
-    protected function baseEntrys()
+    protected function baseEntry()
     {
-        return $this->hasMany( 'Expense\Entry' , 'idsolicitud' )->where( function( $q )
-        {
-            $q->where( 'd_c' , ASIENTO_GASTO_BASE )->orWhere( 'substr(num_cuenta , 0 , 1 )' , 4);
-        });
+        return $this->hasOne( 'Expense\Entry' , 'idsolicitud' )->where( 'd_c' , ASIENTO_GASTO_BASE );
+    }
+
+    protected function depositEntrys()
+    {
+        return $this->hasMany( 'Expense\Entry' , 'idsolicitud' )->where( 'd_c' , ASIENTO_GASTO_DEPOSITO );
     }
 }

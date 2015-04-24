@@ -67,7 +67,7 @@ class ExpenseController extends BaseController
                     	if( $solicitud->idestado == DEPOSITADO )
                         {
 	                        $data['date'] = $this->getDay();
-	                        $data['lv'] = $solicitud->titulo;
+	                        $data['lv'] = $solicitud->createdBy->person->full_name.' - '.$solicitud->titulo;
 	                    }
 	                    elseif ( $solicitud->idestado == REGISTRADO )
                 			$data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );    	
@@ -384,7 +384,7 @@ class ExpenseController extends BaseController
 					$rpta = $this->setStatus( $oldIdEstado, REGISTRADO, Auth::user()->id, USER_CONTABILIDAD, $solicitud->id );
 					if ( $rpta[status] == ok )
 					{
-						Session::put('state',R_GASTO);
+						Session::put( 'state' , R_GASTO );
 						DB::commit();
 						return $rpta;
 					}
@@ -498,7 +498,7 @@ class ExpenseController extends BaseController
 			$dni = $dni[data];
 		else
 			$dni = '';
-		$expenses = $solicitude->expense;
+		$expenses = $solicitude->expenses;
 		$aproved_user = User::where('id',$solicitude->acceptHist->updated_by)->firstOrFail();
 		if($aproved_user->type == GER_PROD )
 		{
@@ -510,6 +510,20 @@ class ExpenseController extends BaseController
 			$name_aproved = $aproved_user->sup->nombres;
 			$charge = "Supervisor";
 		}
+		if ( $solicitude->detalle->idmoneda == DOLARES )
+		{
+			foreach( $expenses as $expense )
+			{
+				$eTc = ChangeRate::where('fecha' , $expense->fecha_movimiento )->first();
+				if ( is_null( $eTc ) )
+					$expense->tc = ChangeRate::getTc();
+				else	
+					$expense->tc = $eTc;
+				Log::error( json_encode( $expense->tc ));
+				$expense->monto = round ( $expense->monto * $expense->tc->compra , 2 , PHP_ROUND_HALF_DOWN );
+			}
+		}
+
 		$total = $expenses->sum('monto');
 		$data = array(
 			'solicitude' => $solicitude,
@@ -549,14 +563,15 @@ class ExpenseController extends BaseController
     private function reportBalance( $solicitud , $detalle , $jDetalle , $mGasto )
 	{
 		$mDeposit = $detalle->deposit->total;
-	    if ( isset( $jDetalle->tcc ) && isset( $jDetalle->tcv ) )
-	    {
-	    	if ( $detalle->idmoneda == SOLES )
-	    		$mDeposit = $mDeposit * $jDetalle->tcv;
-	    	elseif ( $detalle->idmoneda == DOLARES )
-				$mDeposit = $mDeposit / $jDetalle->tcc ;
-	    }
-	    $mBalance = $mDeposit - $mGasto;
+	    
+    	if ( $detalle->deposit->account->idtipomoneda == DOLARES )
+    		$mDeposit = $mDeposit * $jDetalle->tcv;
+
+	    if ( isset( $jDetalle->monto_retencion ))
+	    	$monto_retencion = $jDetalle->monto_retencion ;
+	    else
+	    	$monto_retencion = 0;
+	    $mBalance = $mDeposit - ( $mGasto - $monto_retencion );  // - $monto_retencion );
 	    if ( $mBalance > 0)
 	    	$data = array( 'bussiness' => round( $mBalance , 2 , PHP_ROUND_HALF_DOWN ) , 'employed' => 0 );
 	    elseif ( $mBalance < 0 )

@@ -152,7 +152,7 @@
                                             @foreach($expenseItem as $expenseValue)
                                                 <tr data-id="{{ $expenseValue->idgasto }}">
                                                     @foreach($typeProof as $val)
-                                                        @if($expenseValue->idcomprobante == $val->idcomprobante)
+                                                        @if($expenseValue->idcomprobante == $val->id)
                                                     <td rowspan="{{ $expenseValue->count }}" data-id="{{ $val->idcomprobante }}">{{ $val->descripcion }}</td>
                                                         @endif
                                                     @endforeach
