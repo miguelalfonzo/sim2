@@ -14,7 +14,7 @@ use \System\SolicitudeHistory;
 use \Expense\Expense;
 use \Expense\ExpenseItem;
 use \Expense\ProofType;
-
+use \Common\FileStorage;
 
 	Solicitude::observe(		new Transaction());
 	SolicitudeDetalle::observe(	new Transaction());
