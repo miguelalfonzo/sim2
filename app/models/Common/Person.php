@@ -13,14 +13,17 @@ class Person extends Eloquent{
     protected $table = 'PERSONAS';
     protected $primaryKey = 'idpersona';
 
-    function searchId(){
+    protected function getFullNameAttribute()
+    {
+        return substr( $this->attributes['nombres'] , 0 , 1 ).'. '.$this->attributes['apellidos'];
+    }
 
+    function searchId()
+    {
         $lastId = Person::orderBy('idpersona', 'DESC')->first();
-        if($lastId == null){
+        if ($lastId == null)
             return 0;
-        }else{
+        else
             return $lastId->idpersona;
-        }
-
     }
 }

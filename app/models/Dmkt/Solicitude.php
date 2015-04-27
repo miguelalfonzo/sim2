@@ -9,7 +9,16 @@ class Solicitude extends Eloquent{
 
     protected $table = 'DMKT_RG_SOLICITUD';
     protected $primaryKey = 'id';
-    //protected $touches = array('pendHist');
+
+    protected function getFecOriginAttribute()
+    {
+        return $this->attributes['created_at'];
+    }
+
+    protected function getCreatedAtAttribute( $attr )
+    {
+        return \Carbon\Carbon::parse( $attr )->format('Y-m-d h:i');
+    }
 
     public function searchId()
     {
@@ -30,14 +39,22 @@ class Solicitude extends Eloquent{
             });
         })->where( 'idestado' , '<>' , CANCELADO )->get();
     }
-    /*protected function pendHist()
+
+    /* PUBLIC RELATIONSHIPS */
+
+    public function state()
     {
-        return $this->hasOne('System\SolicitudeHistory','idsolicitude','id')->where( 'status_to' , PENDIENTE );
-    }*/
+        return $this->hasOne('Common\State','idestado','idestado');
+    }
 
     public function asignedTo()
     {
         return $this->hasOne('User','id','iduserasigned');
+    }
+
+    protected function advanceSeatHist()
+    {
+        return $this->hasMany( 'System\SolicitudeHistory' , 'idsolicitude' , 'id' )->where( 'status_to' , GASTO_HABILITADO );
     }
 
     public function acceptHist()
@@ -54,6 +71,14 @@ class Solicitude extends Eloquent{
         return $this->hasOne('Dmkt\SolicitudeDetalle','id','iddetalle');
     }
 
+
+    /* PROTECTED RELATIOSNSHIPS */
+
+    protected function registerHist()
+    {
+        return $this->hasOne('System\SolicitudeHistory','idsolicitude','id')->where('status_to' , REGISTRADO );
+    }
+
     protected function typeSolicitude()
     {
         return $this->hasOne('Dmkt\SolicitudeType','id','idtiposolicitud');
@@ -67,7 +92,8 @@ class Solicitude extends Eloquent{
         return $this->hasMany('Dmkt\SolicitudeClient','idsolicitud','id');
     }
 
-    protected function createdBy(){
+    protected function createdBy()
+    {
         return $this->belongsTo('User','created_by');
     }
 
@@ -76,58 +102,45 @@ class Solicitude extends Eloquent{
         return $this->hasOne('Dmkt\SolicitudeGer','idsolicitud','id');
     }
 
-    function state(){
-
-        return $this->hasOne('Common\State','idestado','idestado');
-    }
-
-    function reasonSolicitude(){
-        return $this->hasOne('Dmkt\TypeSolicitude','id','idtiposolicitud');
-    }
-
     
-    
-    function gastos(){
-        return $this->hasMany('Expense\Expense','idsolicitud','id');
+
+    protected function reasonSolicitude()
+    {
+        return $this->hasOne('Dmkt\SolicitudReason','id','idtiposolicitud');
     }
 
-   
-
-    function response(){
+    protected function response()
+    {
         return $this->belongsTo('User','iduserasigned');
     }
 
-    
-    
-    function typeRetention(){
-        return $this->hasOne('Dmkt\TypeRetention','id','idtiporetencion');
-    }
-
-    function aproved(){
-        return $this->hasOne('User','id', 'idaproved');
-    }
-
-    function deposit(){
-        return $this->hasOne('Common\Deposit','id', 'iddeposito');
-    }
-
-    protected function rm(){
+    protected function rm()
+    {
         return $this->hasOne('Dmkt\Rm','iduser','created_by')->select('nombres,apellidos,iduser');
     }
 
-    protected function sup(){
+    protected function sup()
+    {
         return $this->hasOne('Dmkt\Sup','iduser','created_by')->select('nombres,apellidos,iduser,idsup');;
     }
 
-    function aprovedSup(){
-        return $this->hasOne('Dmkt\Sup','iduser','idaproved');
-    }
-
-    function aprovedGerProd(){
-        return $this->hasOne('Dmkt\Manager','iduser','idaproved');
-    }
-
-    function etiqueta(){
+    protected function etiqueta()
+    {
         return $this->hasOne('Dmkt\Label','id','idetiqueta');
+    }
+
+    protected function expenses()
+    {
+        return $this->hasMany( '\Expense\Expense' , 'idsolicitud' , 'id' )->orderBy( 'updated_at' , 'desc');
+    }
+
+    protected function baseEntry()
+    {
+        return $this->hasOne( 'Expense\Entry' , 'idsolicitud' )->where( 'd_c' , ASIENTO_GASTO_BASE );
+    }
+
+    protected function depositEntrys()
+    {
+        return $this->hasMany( 'Expense\Entry' , 'idsolicitud' )->where( 'd_c' , ASIENTO_GASTO_DEPOSITO );
     }
 }

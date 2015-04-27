@@ -9,15 +9,13 @@ const ok = 'Ok';
 const warning = 'Warning';
 const danger = 'Danger';
 const error = 'Error';
-const desc_error = 'System Error: Information in log file';
+const desc_error = 'System Error';
 const status = 'Status';
 const description = 'Description';
-const DOCUMENTO_NO_SUSTENTABLE_ID = 7;
+//const DOCUMENTO_NO_SUSTENTABLE_ID = 7;
 
 const SOLES = 1 ;
 const DOLARES = 2;
-const BANCOS = 'BANCOS';
-
 
 // ASIENTOS DE GASTOS
 const ASIENTO_GASTO_IVA_BASE 					= 'N6';
@@ -33,25 +31,17 @@ const ERROR_NOT_FOUND_MATCH_ACCOUNT_MKT_CNT   	= 'No se encontro cuenta relacion
 const MESSAGE_NOT_FOUND_MATCH_ACCOUNT_MKT_CNT 	= 'Verificar relación entre las cuentas de Marketing y Contabilidad';
 const ERROR_NOT_FOUND_MARCA					  	= 'No se encontro Marca';
 const MESSAGE_NOT_FOUND_MARCA				  	= 'Verificar relación entre las Cuentas de Contabilidad y las Marcas';
-const CUENTA_REPARO_COMPRAS						= '6411000';
-const CUENTA_REPARO_GOBIERNO					= '4011100';
+const CUENTA_REPARO_COMPRAS						= '6411000';//debe
+const CUENTA_REPARO_GOBIERNO					= '4011100';//haber
 const CUENTA_CONTRA_PARTE						= '1413360';
 const ERROR_INVALID_ACCOUNT_MKT					= 'Error de Cuenta';
 const MSG_INVALID_ACCOUNT_MKT					= 'Verificar campo de cuenta';
 
-
-//ESTADOS
-const ESTADO_GENERADO	= 7;
-
-//TIPO GASTOS
-const EXPENSE_SOLICITUDE = 'S';
-const EXPENSE_FONDO = 'F';
-
 //ESTADOS ADICIONALES
 const ESTADO_DERIVADO = 'DERIVADO';
-const ESTADO_R = 'RETENCION';
+const ESTADO_RETENCION = 'RETENCION';
 const ESTADO_DEPOSITADO = 'DEPOSITADO'; 
-const ESTADO_AA = 'AD ANTICIPO';
+const ESTADO_ACEPTADO = 'POR APROBAR';
 
 //ID USUARIOS
 const USER_CONTABILIDAD = 43;
@@ -85,10 +75,6 @@ const ASIS_GER = 'AG';
 const TB_DOCTOR = 'FICPE.PERSONAFIS';
 const TB_INSTITUTE = 'FICPEF.PERSONAJUR';
 
-//CODIGO DE SOLICITUDES
-const SOLIC = 'S';
-const INSTITUCIONAL = 'F';
-
 //ID DE TIPO DE SOLICITUDES
 const SOL_REP  = 1;
 const SOL_INST = 2;
@@ -99,6 +85,14 @@ const BLOCKED  = 2;
 const INACTIVE = 3;
 
 //TIPO DE PAGOS
-const PAGO_DEPOSITO = 3;
 const PAGO_CHEQUE   = 2;
-const REASON_REGALOS = 2;
+const PAGO_DEPOSITO = 3;
+
+//MOTIVO
+const REASON_REGALO = 2;
+
+//CUENTAS
+const FONDO = 1;
+const BANCO = 2;
+const RETENCION = 3;
+const GASTO = 4;

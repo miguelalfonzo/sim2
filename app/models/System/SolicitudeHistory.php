@@ -11,6 +11,12 @@ class SolicitudeHistory extends Eloquent{
 	protected $primaryKey = 'id';
     public $timestamps = true;
 
+    protected function getUpdatedAtAttribute( $attr )
+    {
+        return \Carbon\Carbon::parse( $attr )->format('Y-m-d h:i');
+    }
+
+
 	public function lastId()
     {
 		$lastId = SolicitudeHistory::orderBy('id','desc')->first();
@@ -26,5 +32,10 @@ class SolicitudeHistory extends Eloquent{
 
     public function user(){
     	return $this->hasOne('User','id','created_by');
+    }
+
+    protected function updatedBy()
+    {
+        return $this->hasOne('User','id','updated_by');
     }
 }

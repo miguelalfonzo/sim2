@@ -8,9 +8,12 @@
 			<li>Description: {{$msg->getTraceAsString()}}</li>
 		</ol>
 	@elseif( isset( $description) )
-		<h1>{{$description}}</h1>
+		<ol>
+			<li>User: {{Auth::user()->id.' '.Auth::user()->username}}</li>
+			<li>Description: {{$description}}</li>
+		</ol>
 	@elseif( isset( $subject ) )
-		<h1> 
+		<h1>
 			{{$subject}}
 		</h1>
 	@endif

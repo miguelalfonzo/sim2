@@ -16,30 +16,32 @@ class Expense extends Eloquent {
 		return $this->hasOne('Dmkt\Activity','idsolicitud','idsolicitud');
 	}
 
-	public function idProofType(){
-		return $this->hasOne('Expense\ProofType','idcomprobante','idcomprobante');
+	protected function proof()
+	{
+		return $this->hasOne('Expense\ProofType','id','idcomprobante');
 	}
 
-    public function items(){
-        return $this->hasMany('Expense\ExpenseItem','idgasto','idgasto');
+    protected function items()
+    {
+        return $this->hasMany('Expense\ExpenseItem','idgasto','id');
     }
 
-    public function lastId(){
-		$lastId = Expense::orderBy('idgasto','desc')->first();
-		if($lastId == null){
+    public function lastId()
+    {
+		$lastId = Expense::orderBy('id','desc')->first();
+		if($lastId == null)
             return 0;
-        }else{
-            return $lastId->idgasto;
-        }
+        else
+            return $lastId->id;
 	}
 
-	public function lastIdIgv(){
+	public function lastIdIgv()
+	{
 		$lastIdIgv = Expense::orderBy('idigv','desc')->first();
-		if($lastIdIgv == null){
+		if($lastIdIgv == null)
             return 0;
-        }else{
-            return $lastIdIgv->idigv;
-        }	
+        else
+            return $lastIdIgv->idigv;	
 	}
 
 }

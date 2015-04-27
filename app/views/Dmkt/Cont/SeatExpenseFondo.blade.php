@@ -19,7 +19,7 @@
                     <div class="col-xs-12 col-sm-6 col-md-4">
                         <div class="form-expense">
                             <label>Código del Fondo</label>
-                            <input id="idfondo" type="text" class="form-control" value="{{$fondo->idfondo}}" disabled>
+                            <input id="idfondo" type="text" class="form-control" value="{{$solicitude->id}}" disabled>
                         </div>
                     </div>
                     <div class="col-xs-12 col-sm-6 col-md-4">
@@ -27,20 +27,20 @@
                             <label>Mes Depositado</label>
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-                                <input type="text" value="{{$fondo->monthYear($fondo->periodo)}}" class="form-control" maxlength="10" disabled>
+                                <input type="text" value="{{$solicitude->created_at}}" class="form-control" maxlength="10" disabled>
                             </div>
                         </div>
                     </div>
                     <div class="col-xs-12 col-sm-6 col-md-4">
                         <div class="form-expense">
                             <label>Sisol - Hospital</label>
-                            <input type="text" class="form-control" value="{{$fondo->institucion}}" disabled>
+                            <input type="text" class="form-control" value="{{$solicitude->institucion}}" disabled>
                         </div>
                     </div>
                     <div class="col-xs-12 col-sm-6 col-md-4">
                         <div class="form-expense">
                             <label>Represenante Médico</label>
-                            <input type="text" class="form-control" value="{{mb_convert_case($fondo->repmed, MB_CASE_TITLE, 'UTF-8')}}" disabled>
+                            <input type="text" class="form-control" value="{{mb_convert_case($solicitude->created_by, MB_CASE_TITLE, 'UTF-8')}}" disabled>
                         </div>
                     </div>
                     <div class="col-xs-12 col-sm-6 col-md-4">
@@ -48,14 +48,14 @@
                             <label>Monto Depositado</label>
                             <div class="input-group">
                                 <span class="input-group-addon">S/.</span>
-                                <input type="text" class="form-control" value="{{$fondo->total}}" disabled>
+                                <input type="text" class="form-control" value="{{json_decode($solicitude->detalle->detalle)->monto_aprobado}}" disabled>
                             </div>
                         </div>
                     </div>
                     <div class="col-xs-12 col-sm-6 col-md-4">
                         <div class="form-expense">
                             <label>Supervisor</label>
-                            <input type="text" class="form-control" value="{{$fondo->supervisor}}" disabled>
+                            <input type="text" class="form-control" value="{{$solicitude->asignedTo->id}}" disabled>
                         </div>
                     </div>
                 </section>
@@ -152,7 +152,7 @@
                                             @foreach($expenseItem as $expenseValue)
                                                 <tr data-id="{{ $expenseValue->idgasto }}">
                                                     @foreach($typeProof as $val)
-                                                        @if($expenseValue->idcomprobante == $val->idcomprobante)
+                                                        @if($expenseValue->idcomprobante == $val->id)
                                                     <td rowspan="{{ $expenseValue->count }}" data-id="{{ $val->idcomprobante }}">{{ $val->descripcion }}</td>
                                                         @endif
                                                     @endforeach

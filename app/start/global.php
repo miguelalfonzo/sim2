@@ -6,7 +6,6 @@
  *
  */
 
-define('TODOS', 10);
 define('PENDIENTE', 1);
 define('ACEPTADO', 2);
 define('APROBADO', 3);
@@ -16,11 +15,11 @@ define('ENTREGADO', 6);
 define('GENERADO', 7);
 define('CANCELADO', 8);
 define('RECHAZADO', 9);
-//define('BLOQUEADO', 10); //NO EXISTE ESTE ESTADO
+define('TODOS', 10);
 define('DERIVADO', 11);
 define('GASTO_HABILITADO', 12);
 define('DEPOSITO_HABILITADO', 13);
-define('RESPONSABLE_HABILITADO', 14);
+
 /*
 |--------------------------------------------------------------------------
 | Register The Laravel Class Loader

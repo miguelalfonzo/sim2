@@ -25,14 +25,14 @@
 					<div class="col-xs-12 col-sm-6 col-md-4">
 						<div class="form-expense">
 							<label>Fondo</label>
-							<input type="text" class="form-control" value="{{mb_convert_case($solicitude->subtype->nombre_mkt, MB_CASE_TITLE, 'UTF-8')}}" disabled>
+							<input type="text" class="form-control" value="{{mb_convert_case($solicitude->detalle->fondo->nombre, MB_CASE_TITLE, 'UTF-8')}}" disabled>
 						</div>
 					</div>
 					<div class="col-xs-12 col-sm-6 col-md-4">
 						<div class="form-expense">
 							<label>Monto de la Solicitud</label>
 							<div class="input-group">
-						    	<div id="type-money" class="input-group-addon">{{$solicitude->typemoney->simbolo}}</div>
+						    	<div id="type-money" class="input-group-addon">{{$solicitude->detalle->typeMoney->simbolo}}</div>
 						      	<input id="deposit" class="form-control" type="text" value="{{$solicitude->monto}}" disabled>
 						    </div>
 						</div>
@@ -41,16 +41,23 @@
 						<div class="form-expense">
 							<label>Nombre del Solicitante</label>
 							<div class="input-group">
-		                        @if($solicitude->user->type == 'R')
+		                        @if($solicitude->createdBy->type == 'R')
 		                        <span class="input-group-addon">R</span>
 		                        <input id="textinput" name="titulo" type="text" placeholder=""
-		                               value="{{mb_convert_case($solicitude->user->rm->nombres.' '.$solicitude->user->rm->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled
+		                               value="{{mb_convert_case($solicitude->createdBy->rm->nombres.' '.$solicitude->createdBy->rm->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled
 		                               class="form-control">
-		                        @else
+		                        @elseif ( $solicitude->createdBy->type == SUP )
 		                        <span class="input-group-addon">S</span>
 		                        <input id="textinput" name="titulo" type="text" placeholder=""
-		                               value="{{mb_convert_case($solicitude->user->sup->nombres.' '.$solicitude->user->sup->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled
+		                               value="{{$solicitude->createdBy->sup->full_name}}" disabled
 		                               class="form-control">
+		                        @else
+		                        	<span class="input-group-addon">AG</span>
+		                        <input id="textinput" name="titulo" type="text" placeholder=""
+		                               value="{{$solicitude->createdBy->person->full_name}}" disabled
+		                               class="form-control">
+		                        
+
 		                        @endif
 		                    </div>							
 						</div>
@@ -59,15 +66,20 @@
 						<div class="form-expense">
 							<label>Autorizado por</label>
 							<div class="input-group">
-		                        @if($solicitude->aproved->type == 'S')
+								@if ( $solicitude->createdBy->type == ASIS_GER )
+		                        <span class="input-group-addon">AG</span>
+		                        <input id="textinput" name="titulo" type="text" placeholder=""
+		                               value="{{$solicitude->createdBy->person->full_name}}" disabled class="form-control">
+		                        
+		                        @elseif($solicitude->acceptHist->updatedBy->type == SUP )
 		                        <span class="input-group-addon">S</span>
 		                        <input id="textinput" name="titulo" type="text" placeholder=""
-		                               value="{{mb_convert_case($solicitude->aproved->sup->nombres.' '.$solicitude->aproved->sup->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled
+		                               value="{{mb_convert_case($solicitude->acceptHist->updatedBy->sup->nombres.' '.$solicitude->acceptHist->updatedBy->sup->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled
 		                               class="form-control">
-		                        @else
+		                        @elseif ( $solicitude->acceptHist->updatedBy->type == GER_PROD )
 		                        <span class="input-group-addon">G</span>
 		                        <input id="textinput" name="titulo" type="text" placeholder=""
-		                               value="{{mb_convert_case($solicitude->aproved->gerprod->descripcion,MB_CASE_TITLE,'UTF-8')}}" disabled class="form-control">
+		                               value="{{mb_convert_case($solicitude->acceptHist->updatedBy->gerprod->descripcion,MB_CASE_TITLE,'UTF-8')}}" disabled class="form-control">
 		                        @endif
 		                    </div>							
 						</div>
@@ -81,7 +93,7 @@
 					<div class="col-xs-12 col-sm-6 col-md-4">
 						<div class="form-expense">
 							<label>Fecha de Depósito</label>
-							<input type="text" class="form-control" value="{{date_format(date_create($solicitude->deposit->created_at), 'd/m/Y')}}" disabled>
+							<input type="text" class="form-control" value="{{date_format(date_create($solicitude->detalle->deposit->created_at), 'd/m/Y')}}" disabled>
 						</div>
 					</div>
 				</section>
@@ -123,6 +135,7 @@
 												</tr>
 											</thead>
 											<tbody>
+												@if ( isset( $seats ) )
 												@foreach($seats as $seatItem)
 												<tr data-id="{{ $seatItem->tempId }}" class="{{ $seatItem->type == 'IGV' ? 'info' : ($seatItem->type == 'SER' ? 'warning' : ($seatItem->type == 'REP' ? 'danger' : ($seatItem->type == 'CAN' ? 'success' : ''))) }}">
 													<td class="cuenta editable" data-cuenta_mkt="{{ $seatItem->cuentaMkt }}">{{ $seatItem->numero_cuenta }}</td>
@@ -145,6 +158,7 @@
 													<td><a class="edit-seat" href="#" {{ $seatItem->type != '' ? 'style="display:none;"' : ''  }}><span class="glyphicon glyphicon-pencil"></span></a></td>
 												</tr>
 												@endforeach
+												@endif
 											</tbody>
 										</table>
 									</div>
@@ -176,10 +190,11 @@
 												</tr>
 											</thead>
 											<tbody>
+											@if ( isset($expenseItem) )
 											@foreach($expenseItem as $expenseValue)
-												<tr data-id="{{ $expenseValue->idgasto }}">
+												<tr data-id="{{ $expenseValue->id }}">
 												    @foreach($typeProof as $val)
-												    	@if($expenseValue->idcomprobante == $val->idcomprobante)
+												    	 @if($expenseValue->idcomprobante == $val->id)
 												    <td rowspan="{{ $expenseValue->count }}" data-id="{{ $val->idcomprobante }}">{{ $val->descripcion }}</td>
 												    	@endif
 													@endforeach
@@ -200,7 +215,7 @@
 												    @endforeach
 												</tr>
 											@endforeach
-
+											@endif
 											</tbody>
 										</table>
 									</div>
@@ -213,7 +228,7 @@
 				
 				<section class="row reg-expense align-center" style="margin:1.5em 0">
 					<div class="col-xs-12 col-sm-12 col-md-12">
-						<a id="saveSeatExpense" class="btn btn-success" style="margin:-2em 2em .5em 0">Generar Asiento Solicitud</a>
+						<a id="saveSeatExpense" class="btn btn-success" style="margin:-2em 2em .5em 0">Generar Asiento Gasto</a>
 						<a id="cancel-seat-cont" href="#" class="btn btn-danger" style="margin:-2em 2em .5em 0">Atras</a>
 					</div>
 				</section>
@@ -222,6 +237,7 @@
 	</div>
 
 	<script>
+	@if ( isset($seats) )
 		$(document).ready(function(){
 			GBDMKT = typeof(GBDMKT) === 'undefined' ? {} : GBDMKT;
 			GBDMKT.seatsList = {{ json_encode($seats) }};
@@ -235,6 +251,6 @@
 			  $(this).tab('show')
 			})
 		});
-		
+	@endif
 	</script>
 @stop

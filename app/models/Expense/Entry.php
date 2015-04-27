@@ -3,6 +3,7 @@
 namespace Expense;
 
 use \Eloquent;
+use \Log;
 
 class Entry extends Eloquent
 {
@@ -17,6 +18,17 @@ class Entry extends Eloquent
             return 0;
         else
             return $lastId->id;
+    }
+
+    protected function account()
+    {
+        return $this->hasOne( 'Dmkt\Account' , 'num_cuenta' , 'num_cuenta');
+    }
+
+    public function setFecOrigenAttribute($value)
+    {
+        Log::error(  $value  );
+        $this->attributes['fec_origen'] = \Carbon\Carbon::createFromFormat( 'd/m/Y', $value );
     }
 
 }

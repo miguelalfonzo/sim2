@@ -10,10 +10,10 @@
             @endif
             <small style="float: right; margin-top: -10px">
                 <strong>Usuario : 
-                @if(Auth::user()->type == 'R') 
-                    {{Auth::user()->rm->nombres.' '.Auth::user()->rm->apellidos}}
+                @if( Auth::user()->type == REP_MED ) 
+                    {{Auth::user()->rm->full_name}}
                 @else
-                    {{Auth::user()->Sup->nombres.' '.Auth::user()->Sup->apellidos}} 
+                    {{Auth::user()->sup->full_name}} 
                 @endif
                 </strong>
             </small>
@@ -54,10 +54,10 @@
             @include('Dmkt.Register.label')
             
             <!-- TIPO DE PAGO -->
-            <div class="form-group col-sm-6 col-md-4">
-                <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo de Pago</label>
-                <div class="col-sm-12 col-md-12">
-                    <select id="" name="type_payment" class="form-control selectTypePayment">
+            <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+                <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label" for="textinput">Tipo de Pago</label>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <select name="pago" class="form-control selectTypePayment">
                         @foreach($typePayments as $type)
                             @if(isset($solicitude) && $solicitude->detalle->idpago == $type->id)
                                 <option selected value="{{$type->id}}">{{$type->nombre}}</option>
@@ -68,16 +68,16 @@
                     </select>
                 </div>
             </div>
-            <div class="form-group col-sm-6 col-md-4" id="div_ruc">
-                <label class="col-sm-8 col-md-8 control-label" for="textinput">Ruc</label>
-                <div class="col-sm-12 col-md-12">
+            <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4" id="div_ruc">
+                <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label" for="textinput">Ruc</label>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                     <input id="ruc" class="form-control input-md" maxlength="11" name="ruc" type="text"
                            value="{{isset($detalle->numruc) ? $detalle->numruc : null }}">
                 </div>
             </div>
-            <div id="div_number_account" class="form-group col-sm-6 col-md-4">
-                <label class="col-sm-8 col-md-8 control-label" for="textinput">Nº de Cuenta</label>
-                <div class="col-sm-12 col-md-12">
+            <div id="div_number_account" class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+                <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label" for="textinput">Nº de Cuenta</label>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                     <input id="number_account" class="form-control input-md" name="number_account" type="text"
                            value="{{isset($detalle->num_cuenta) ? $detalle->num_cuenta : null }}">
                 </div>
@@ -104,38 +104,38 @@
             <!-- Factura Imagen -->
             @include('template.Change.image')
         
-            <div class="form-group col-sm-6 col-md-4">
-                <label class="col-sm-8 col-md-8 control-label" for="textinput">Fecha de Entrega</label>
-                <div class="col-sm-12 col-md-12">
+            <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+                <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label" for="textinput">Fecha de Entrega</label>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                     <div class="input-group date">
                         <span class="input-group-addon">
                             <i class="glyphicon glyphicon-calendar"></i>
                         </span>
-                        <input id="delivery_date" type="text" name="delivery_date" class="form-control" maxlength="10" readonly
-                        value="{{isset($solicitude)? date_format(date_create($detalle->fecha_entrega), 'd/m/Y' ) : null }}">
+                        <input id="delivery_date" type="text" name="fecha" class="form-control" maxlength="10" readonly
+                        value="{{ isset( $solicitude ) ? $detalle->fecha_entrega : null }}">
                     </div>
                 </div>
             </div>
             
-            <div class="form-group col-sm-6 col-md-4 ">
-                <label class="col-sm-8 col-md-8 control-label" for="textinput">Cliente</label>
-                <ul id="listclient" class="col-sm-12 col-md-12">
+            <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+                <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label" for="textinput">Cliente</label>
+                <ul id="listclient" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                     @if(isset($solicitude))
                         @foreach($solicitude->clients as $client)
                             <li>
                                 <div style="position: relative" class="has-success has-feedback">
                                         @if($client->from_table == TB_DOCTOR)
-                                            <input type='text' id="idclient0" name="clients[]" type="text" style="margin-bottom: 10px"
+                                            <input type='text' id="idclient0" name="clientes[]" type="text" style="margin-bottom: 10px"
                                                class="form-control input-md project input-client cliente-seeker" pk="{{$client->idcliente}}"
                                                value="DOCTOR: {{$client->doctors->pefnrodoc1.'-'.$client->doctors->pefnombres.' '.$client->doctors->pefpaterno.' '.$client->doctors->pefmaterno}}"
                                                data-valor="all" table="{{$client->from_table}}" disabled>
                                         @elseif($client->from_table == TB_INSTITUTE)
-                                            <input type='text' id="idclient0" name="clients[]" type="text" style="margin-bottom: 10px"
+                                            <input type='text' id="idclient0" name="clientes[]" type="text" style="margin-bottom: 10px"
                                                class="form-control input-md project input-client cliente-seeker" pk="{{$client->idcliente}}"
                                                value="CENTRO: {{$client->institutes->pejnrodoc.'-'.$client->instituteS->pejrazon}}"
                                                data-valor="all" table="{{$client->from_table}}" disabled>
                                         @else
-                                            <input id="idclient0" name="clients[]" type="text" style="margin-bottom: 10px"
+                                            <input id="idclient0" name="clientes[]" type="text" style="margin-bottom: 10px"
                                                class="form-control input-md project input-client cliente-seeker" pk="{{$client->client->clcodigo}}"
                                                value='{{isset($client->client->clnombre) ? $client->client->clcodigo.' - '.$client->client->clnombre : null }}'
                                                data-valor="all" table="VTA.CLIENTES" disabled>
@@ -149,7 +149,7 @@
                     @else
                         <li>
                             <div style="position: relative" class="">
-                                    <input id="idclient0" name="clients[]" type="text" placeholder="" style="margin-bottom: 10px"
+                                    <input id="idclient0" name="clientes[]" type="text" placeholder="" style="margin-bottom: 10px"
                                            class="form-control input-md input-client cliente-seeker" data-valor=""
                                            value="{{isset($client->clnombre) ? $client->clcodigo.' - '.$client->clnombre : null }}">
                                 <button type='button' class='btn-delete-client' style="display: none; z-index: 2">
@@ -166,7 +166,6 @@
             <!-- Productos -->
             @include('template.Change.productos')
                 
-            
             <!-- Ver Comprobante -->
             @include('template.Change.comprobante')
            
@@ -174,10 +173,11 @@
                 <div class="form-group ">
                     <label class="col-sm-8 col-md-8 control-label" for="textarea">Descripcion de la Solicitud</label>
                     <div class="col-sm-12 col-md-12">
-                        <textarea class="form-control" id="iddescriptionsolicitude" name="description">{{isset($solicitude->descripcion) ? $solicitude->descripcion : null}}</textarea>
+                        <textarea class="form-control" id="iddescriptionsolicitude" name="descripcion">{{isset($solicitude->descripcion) ? $solicitude->descripcion : null}}</textarea>
                     </div>
                 </div>
             </div>
+
             <!-- Button (Double) -->
             <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
                 <div class="col-sm-12 col-md-12" style="text-align: center">

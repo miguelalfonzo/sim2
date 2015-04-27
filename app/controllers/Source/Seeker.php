@@ -55,19 +55,8 @@ class Seeker extends BaseController
 	{
 		try
 		{
-			$this->setRpta();
-			
-			Log::error('repinfo');
 			$inputs = Input::all();
 			$rm = Visitador::find($inputs['rm']);
-			//Log::error(json_encode($rm));
-			/*$sup = $rm->sup;
-			Log::error($sup);
-			*/
-			/*$cuenta = new CtaRm;
-			$cuenta = $cuenta->cuenta($rm->vislegajo)*/;
-			$cuenta = $rm->cuenta;
-			Log::error($cuenta);
 			if (count($cuenta) == 0)
 				$cuenta = null;
 			else
@@ -100,7 +89,6 @@ class Seeker extends BaseController
 			//$json = '[{"name":"FICPE.VISITADOR","wheres":{"likes":["PEFNRODOC1","(PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)"],"equal":[{"PEFESTADO":1}]},"selects":["PEFCODPERS","(\'DOCTOR: \' || PEFNRODOC1 || \'-\' || PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)"]},{"name":"FICPEF.PERSONAJUR","wheres":{"likes":["PEJNRODOC","PEJRAZON"],"equal":[{"PEJESTADO":1}]},"selects":["PEJCODPERS","(\'CENTRO: \' || PEJNRODOC || \'-\' || PEJRAZON)"]}]';
 	    	$like = "VISNOMBRE || ' ' || VISMATERNO || ' ' || VISPATERNO";
 	    	$reps = DB::TABLE('FICPE.VISITADOR')->SELECT('VISVISITADOR')->WHERE("UPPER(".$like.")","like","%".strtoupper($sVal)."%")->get();
-	    	Log::error($reps);
 	    	return $reps;
 	    	$rpta = $this->searchSeeker($inputs['sVal'],$json);
 		}
@@ -121,7 +109,6 @@ class Seeker extends BaseController
 	    		if (json_last_error() == JSON_ERROR_NONE)
 		    	{
 			    	$array = array();
-			    	Log::error($json);
 			    	foreach ($json as $table)
 			    	{
 			    		$select = '';
@@ -136,8 +123,6 @@ class Seeker extends BaseController
 			    		$select = substr($select,0,-1);
 			    		$query->select(DB::raw($select));
 			    		$query->take(4);
-			    		Log::error('SEARCHSEEKER1111111111');
-			    		
 			    		$tms = $query->get();
 			    		for ($i=0; $i < count($tms); $i++)
 			    			$tms[$i]->table = $table->name;

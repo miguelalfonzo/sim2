@@ -19,7 +19,12 @@ class Periodo extends Eloquent
 
     protected static function inhabilitar( $periodo )
     {
-        Periodo::where('periodo' , $periodo )->where('status',ACTIVE)->update( array( 'status' => 3) );
+        Periodo::where('periodo' , $periodo )->where('status',ACTIVE)->where( 'idtiposolicitud' , SOL_INST )->update( array( 'status' => 3) );
+    }
+
+    protected static function periodoInst( $periodo )
+    {
+        return Periodo::where( 'periodo' , $periodo )->where( 'idtiposolicitud' , SOL_INST )->first();    
     }
 
 }

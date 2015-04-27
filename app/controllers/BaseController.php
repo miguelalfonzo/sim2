@@ -80,7 +80,7 @@ class BaseController extends Controller {
         return $rpta;
     }
 
-    protected function warningException($function,$description)
+    protected function warningException( $function , $description )
     {
         $rpta = array();
         $rpta[status] = warning;
@@ -88,12 +88,12 @@ class BaseController extends Controller {
         Mail::send('soporte', array( 'description' => $description ), function($message) use($function)
         {
             $message->to(SOPORTE_EMAIL);
-            $message->subject(warning.'-Function: '.$function);      
+            $message->subject(warning.' - Function: '.$function);      
         });
         return $rpta;
     }
 
-    protected function internalException($exception,$function)
+    protected function internalException( $exception , $function )
     {
         $rpta = array();
         $rpta[status] = error;
@@ -102,7 +102,7 @@ class BaseController extends Controller {
         Mail::send('soporte', array( 'msg' => $exception ), function($message) use($function)
         {
             $message->to(SOPORTE_EMAIL);
-            $message->subject(error.'-Function: '.$function);      
+            $message->subject(error.' - Function: '.$function);      
         }
         );
         return $rpta;
@@ -267,7 +267,10 @@ class BaseController extends Controller {
             }
             else if ( Auth::user()->type == ASIS_GER ) 
             {
-                $solicituds->where( 'iduserasigned' , $idUser );
+                $solicituds->where( function ( $q ) use ( $idUser )
+                {
+                    $q->where('iduserasigned' , $idUser )->orWhereIn('created_by' , $idUser );
+                });
             }
             else if ( Auth::user()->type == GER_PROD )
             {

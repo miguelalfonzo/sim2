@@ -24,12 +24,12 @@ class Fondo extends Eloquent {
 
     public static function supFondos()
     {
-        return Fondo::all();
+        return Fondo::where( 'trim(idusertype)' , SUP )->get();
     }
 
     public static function gerProdFondos()
     {
-        return Fondo::where('trim(idusertype)', '<>' ,SUP )->get();
+        return Fondo::where('trim(idusertype)', GER_PROD )->get();
     }
 
     protected function typeMoney()

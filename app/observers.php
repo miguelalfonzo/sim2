@@ -11,6 +11,9 @@ use \Expense\Entry;
 use \Common\Fondo;
 use \Dmkt\Solicitud\Periodo;
 use \System\SolicitudeHistory;
+use \Expense\Expense;
+use \Expense\ExpenseItem;
+use \Expense\ProofType;
 
 
 	Solicitude::observe( new Transaction() );
@@ -23,3 +26,6 @@ use \System\SolicitudeHistory;
 	Entry::observe( new Transaction() );
 	Fondo::observe( new Transaction() );
 	Periodo::observe( new Transaction() );
+	Expense::observe( new Transaction() );
+	ExpenseItem::observe( new Transaction() );
+	ProofType::observe( new Transaction() );

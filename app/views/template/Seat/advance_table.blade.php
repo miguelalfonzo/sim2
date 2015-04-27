@@ -16,42 +16,48 @@
 					</thead>
 					<tbody>
 						<tr>
-							<td class="name_account">{{$solicitude->detalle->fondo->account->nombre}}</td>
-							<td class="number_account">{{$solicitude->detalle->fondo->account->num_cuenta}}</td>
-							<td class="date_ini">{{$date['toDay']}}</td>
+							<td class="name_account">{{$solicitud->detalle->fondo->account->nombre}}</td>
+							<td class="number_account">{{$solicitud->detalle->fondo->account->num_cuenta}}</td>
+							<td class="date_ini">{{ $solicitud->detalle->deposit->updated_at }}</td>
 							<td class="dc">D</td>
-							<td>{{$solicitude->detalle->fondo->typeMoney->simbolo}}</td>
+							<td>S/.</td>
 							<td class="total">
-								@if ( $solicitude->detalle->idmoneda != $solicitude->detalle->fondo->idtipomoneda )
-									@if ( $solicitude->detalle->idmoneda == SOLES )
-										{{$detalle->monto_aprobado/$detalle->tcv}}
-									@elseif	( $solicitude->detalle->idmoneda == DOLARES )
-										{{ $detalle->monto_aprobado*$detalle->tcc}}
-									@endif
-								@elseif ( $solicitude->detalle->idmoneda == $solicitude->detalle->fondo->idtipomoneda )
+								@if ( $solicitud->detalle->idmoneda == DOLARES )
+									{{ round( $detalle->monto_aprobado * $detalle->tcc , 2 , PHP_ROUND_HALF_DOWN ) }}
+								@elseif ( $solicitud->detalle->idmoneda == SOLES )
 									{{ $detalle->monto_aprobado }}
-								@endif  
+								@endif
 							</td>
 							<td class="leyenda">{{$lv}}</td>
 						</tr>
 						<tr>
-							<td class="name_account">{{$solicitude->detalle->deposit->account->nombre}}</td>
-							<td class="number_account">{{$solicitude->detalle->deposit->account->num_cuenta}}</td>
-							<td class="date_ini">{{$date['toDay']}}</td>
+							<td class="name_account">{{ $solicitud->detalle->deposit->account->nombre }}</td>
+							<td class="number_account">{{$solicitud->detalle->deposit->account->num_cuenta}}</td>
+							<td class="date_ini">{{ $solicitud->detalle->deposit->updated_at }}</td>
 							<td class="dc">C</td>
-							<td>{{ $solicitude->detalle->deposit->account->typeMoney->simbolo }}</td>
-							<td class="total">{{ $solicitude->detalle->deposit->total }}</td>
+							<td>S/.</td>
+							<td class="total">
+								@if ( $solicitud->detalle->deposit->account->idtipomoneda == DOLARES )
+									{{ round( $solicitud->detalle->deposit->total * $detalle->tcv , 2 , PHP_ROUND_HALF_DOWN ) }}
+								@elseif ( $solicitud->detalle->deposit->account->idtipomoneda == SOLES )
+									{{ $solicitud->detalle->deposit->total }}
+								@endif
+							</td>
 							<td class="leyenda">{{$lv}}</td>
 						</tr>
-						@if(!is_null($solicitude->detalle->idretencion))
+						@if(!is_null($solicitud->detalle->idretencion))
 							<tr>
-								<td class="name_account">{{$solicitude->detalle->typeRetention->descripcion}}</td>
-								<td class="number_account">{{$solicitude->detalle->typeRetention->account->num_cuenta}}</td>
-								<td class="date_ini">{{$date['toDay']}}</td>
+								<td class="name_account">{{$solicitud->detalle->typeRetention->descripcion}}</td>
+								<td class="number_account">{{$solicitud->detalle->typeRetention->account->num_cuenta}}</td>
+								<td class="date_ini">{{ $solicitud->detalle->deposit->updated_at }}</td>
 								<td class="dc">C</td>
-								<td> {{ $solicitude->detalle->typeRetention->account->typeMoney->simbolo }}
+								<td>S/.</td> 
 								<td class="total">
-									{{$detalle->monto_retencion}}
+									@if ( $solicitud->detalle->typeRetention->account->idtipomoneda == DOLARES )
+										{{ round( $detalle->monto_retencion * $detalle->tcv , 2 , PHP_ROUND_HALF_DOWN ) }}
+									@elseif ( $solicitud->detalle->typeRetention->account->idtipomoneda == SOLES )
+										{{ $detalle->monto_retencion }}
+									@endif 
 								</td>
 								<td class="leyenda">{{$lv}}</td>
 							</tr>
