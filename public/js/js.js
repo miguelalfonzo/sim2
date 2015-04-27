@@ -136,7 +136,7 @@ $(function(){
             $(".date").on("change",function(){
                 $(this).datepicker('hide');
             });
-            $(".date").datepicker( "setDate" , typeof($("#last-date").val()) != 'undefined' ? $("#last-date").val() : toDate);
+            //$(".date").datepicker( "setDate" , typeof($("#last-date").val()) != 'undefined' ? $("#last-date").val() : toDate);
         }
         //Cancel the view button to register expense
         $("#cancel-expense").on("click",function(e){
@@ -1429,18 +1429,23 @@ $(function(){
                         url: server+"get-account",
                         data: data,
                         async: false,
-                        error: function(){
+                        error: function()
+                        {
                             console.log("ERROR: No se pudo obtener cuentas.");
                         }
-                    }).done( function (result) {
-                    e=result;
+                    }).done( function (result) 
+                    {
+                        console.log(result);
+                        e=result;
                         if(!result.hasOwnProperty("error"))
                         {
                             var select_temp = $('<select></select>');
-                            console.log(result);
-                            $(result.account).each(function(i,option){
-                                var tempOption = $('<option value="'+ option.cuenta_cont +'">'+ option.cuenta_mkt +' | '+ option.cuenta_cont +' | '+ option.nombre_cont +'</option>');
-                                tempOption.attr('data-marca', option.marca)
+                            a = result;
+                            $(result).each(function(i,option)
+                            {
+                                var tempOption = $('<option value="'+ option.account_expense.num_cuenta +'">'+ option.account_fondo.nombre +' | '+ option.account_expense.num_cuenta +' | '+ option.account_expense.nombre +'</option>');
+                                tempOption.attr('data-marca', option.mark.codigo + option.document.codigo);
+                                console.log( tempOption);
                                 select_temp.append(tempOption);
                             });
                             editElement.attr('data-html', editElement.html());
@@ -1448,9 +1453,7 @@ $(function(){
                             editElement.append(select_temp);
                         }
                         else
-                        {
                             bootbox.alert(result.error + ": " + result.msg);
-                        }
                     });
                 }
             });

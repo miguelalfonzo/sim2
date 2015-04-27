@@ -27,7 +27,7 @@ class MarkProofAccounts extends Eloquent
 
 	public function mark()
 	{
-		return $this->hasOne( 'Dmkt\Marca' , 'id' , 'idmarca' );
+		return $this->hasOne( 'Expense\Mark' , 'id' , 'idmarca' );
 	}
 
 	public function document()

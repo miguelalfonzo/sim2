@@ -1061,7 +1061,7 @@ class SolicitudeController extends BaseController
     {    
         $result   = array();
         $seatList = array();
-        $AadvanceSeat = $solicitud->depositEntrys;
+        $AadvanceSeat = $solicitud->baseEntry;
         //Log::error( json_encode( $advanceSeat ) );
         if ( is_null( $AadvanceSeat ) )
             return $this->warningException( __FUNCTION__ , 'No se encontro registros del asiento de anticipo D/C: "D" para la solicitud');
@@ -1185,22 +1185,18 @@ class SolicitudeController extends BaseController
 
             $description_seat_back = strtoupper($username .' '. $solicitud->titulo);
             //Log::error('ASIENTO DE GASTO DEL ANTICIPO');
-            foreach ( $AadvanceSeat as $aS )
-            {
-                if ( $aS->d_c == 'C' )
-                {
-                    $seat = $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', CUENTA_CONTRA_PARTE, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO , $aS->importe, '', $description_seat_back, '', 'CAN');        
-                    array_push($seatList, $seat);
-            
+            $seat = $this->createSeatElement($tempId++, $cuentaMkt , $solicitud->id, '', $cuentaMkt , '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO , $AadvanceSeat->importe, '', $description_seat_back, '', 'CAN');        
+            array_push($seatList, $seat);
+            /*
                 }
                 else
                 {
-                    $seat = $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', CUENTA_CONTRA_PARTE, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_BASE , $aS->importe, '', $description_seat_back, '', 'CAN');
+                    $seat = $this->createSeatElement($tempId++, $aS->num_cuenta, $solicitud->id, '', $aS->num_cuenta, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_BASE , $aS->importe, '', $description_seat_back, '', 'CAN');
                     array_push($seatList, $seat);
             
-                }
+                }*/
                 //Log::error(json_encode($seat));        
-            }
+            //}
             $result['seatList'] = $seatList;
             return $result;
         }
@@ -1261,12 +1257,16 @@ class SolicitudeController extends BaseController
             $tempArray['error'] = $resultSeats['error'];
             $data = array_merge($data, $tempArray);
         }
+        
+        return View::make('Dmkt.Cont.SeatExpense', $data);
+        
+
         //print_r($data);
-        if( $solicitud->idtiposolicitud == SOL_REP ){
+        /*if( $solicitud->idtiposolicitud == SOL_REP ){
             return View::make('Dmkt.Cont.SeatExpense', $data);
         }else{
             return View::make('Dmkt.Cont.SeatExpenseFondo', $data);
-        }
+        }*/
     }
 
     // IDKC: CHANGE STATUS => GENERADO
