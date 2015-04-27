@@ -374,6 +374,7 @@ class BaseController extends Controller {
             $filename_ori = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
             $ext = pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
             $filename = md5(uniqid(rand(), true)).$ext;
+            dd($filename);
             Input::file('image')->move($destinationPath, $filename);
             return Response::json(['success' => true, 'file' => asset($destinationPath.$filename)]);
         }
