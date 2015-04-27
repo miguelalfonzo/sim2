@@ -88,5 +88,6 @@
 {{ HTML::script('js/jsdmkt.js') }}
 {{ HTML::script('js/bootstrap-lightbox.js') }}
 {{ HTML::script('js/typeahead.js') }}
+{{ HTML::script('js/jquery.form.js') }}
 </body>
 </html>

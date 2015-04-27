@@ -1,41 +1,78 @@
 <?php
 
-/* Login */
+/*
+|--------------------------------------------------------------------------
+| TESTING
+|--------------------------------------------------------------------------
+*/
+Route::get('test', array('uses' => 'Dmkt\LoginController@test'));
+Route::get('set_status', array('uses' => 'BaseController@setStatus'));
+Route::get('sendmail', array('uses' => 'BaseController@postman'));
+Route::get('prueba', 'Dmkt\FondoController@test');
+Route::get('testUploadImg', 'BaseController@viewTestUploadImg');
+Route::post('testUploadImgSave', 'BaseController@viewTestUploadImgSave');
+
+
+
+Route::get('clientes-data','TestController@clientsTables');
+Route::get('hola', 'Expense\ExpenseController@test');
+Route::get('a/{token}', 'Expense\ExpenseController@reportExpense');
+Route::get('report-fondo/{token}','Expense\ExpenseController@reportExpenseFondo');
+Route::get('report', 'ExpenseController@reportExpense');
+Route::get('tmp','TestController@tm');
+Route::get('history','TestController@withHistory');
+
+/*
+|--------------------------------------------------------------------------
+| LOGIN
+|--------------------------------------------------------------------------
+*/
+
 Route::get('/', array('uses' => 'Dmkt\LoginController@showLogin'));
 Route::get('login', array('uses' => 'Dmkt\LoginController@showLogin'));
 Route::post('login', array('uses' => 'Dmkt\LoginController@doLogin'));
 Route::get('logout', array('uses' => 'Dmkt\LoginController@doLogout'));
 
-/** Descargos  */
+/*
+|--------------------------------------------------------------------------
+| DESCARGOS
+|--------------------------------------------------------------------------
+*/
+
 Route::get('recharge', function(){
     return View::make('recharge');
 });
 
-/**
- * |-------------------------------------------------------------------------------------------- |
- * | SUPERVISOR |
- * |-------------------------------------------------------------------------------------------- |
- */
+/*
+|--------------------------------------------------------------------------
+| SUPERVISOR
+|--------------------------------------------------------------------------
+*/
+
 Route::group(array('before' => 'sup'), function () 
 {
     Route::post('buscar-gerprod', 'Dmkt\SolicitudeController@findGerProd');
     Route::post('derivar-solicitud', 'Dmkt\SolicitudeController@deriveSolRep');
 });
-/**
- * |-------------------------------------------------------------------------------------------- |
- * | Gerente Comercial |
- * |-------------------------------------------------------------------------------------------- |
- */
+
+/*
+|--------------------------------------------------------------------------
+| GERENTE COMERCIAL
+|--------------------------------------------------------------------------
+*/
+
 Route::group(array('before' => 'gercom'), function () 
 {
     Route::post('aprobar-solicitud', 'Dmkt\SolicitudeController@approvedSolicitude');
     Route::post('gercom-mass-approv','Dmkt\SolicitudeController@massApprovedSolicitudes');
 });
-/**
- * |-------------------------------------------------------------------------------------------- |
- * | Contabilidad |
- * |-------------------------------------------------------  ------------------------------------- |
- */
+
+/*
+|--------------------------------------------------------------------------
+| CONTABILIDAD
+|--------------------------------------------------------------------------
+*/
+
 Route::group(array('before' => 'cont'), function () 
 {
     Route::post('enable-deposit', 'Dmkt\SolicitudeController@enableDeposit');
@@ -62,20 +99,22 @@ Route::group(array('before' => 'cont'), function ()
     Route::get('list-documents', 'Dmkt\FondoController@listDocuments');
     Route::post('cont-document-manage' , 'Expense\ExpenseController@manageDocument');
 });
-/**
- * |-------------------------------------------------------------------------------------------- |
- * | Tesorería |
- * |-------------------------------------------------------------------------------------------- |
- */
+/*
+|--------------------------------------------------------------------------
+| TESORERIA
+|--------------------------------------------------------------------------
+*/
+
 Route::group(array('before' => 'tes'), function()
 {
     Route::post('deposit-solicitude', 'Deposit\DepositController@depositSolicitudeTes');
 });
-/**
- * |-------------------------------------------------------------------------------------------- |
- * | Asistente Gerencia |
- * |-------------------------------------------------------------------------------------------- |
- */
+/*
+|--------------------------------------------------------------------------
+| ASISTENTE GERENCIA
+|--------------------------------------------------------------------------
+*/
+
 Route::group( array('before' => 'ager') , function()
 {
     Route::post('registrar-fondo','Dmkt\FondoController@postRegister');
