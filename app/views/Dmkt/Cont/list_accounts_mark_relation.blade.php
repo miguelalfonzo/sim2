@@ -18,7 +18,13 @@
         @foreach ( $iAccounts as $iAccount )
             <tr row-id="{{$iAccount->id}}" type="cuentas-marca">
                 <td style="text-align: center">{{$iAccount->id}}</td>
-                <td class="idfondo" style="text-align:center">{{$iAccount->accountFondo->nombre}}</td>
+                <td class="idfondo" style="text-align:center">
+                    @if ( is_null( $iAccount->accountFondo ) )
+                        -
+                    @else
+                        {{$iAccount->accountFondo->nombre}}
+                    @endif
+                </td>
                 <td class="idcuentafondo" editable=3 style="text-align:center">{{$iAccount->num_cuenta_fondo}}</td>
                 <td class="fondo-cuenta-nombre" style="text-align:center">{{$iAccount->bagoAccountFondo->ctanombrecta}}</td>
                 <td class="fondo-cuenta-type" style="text-align:center">{{$iAccount->bagoAccountFondo->ctatipocta}}</td>

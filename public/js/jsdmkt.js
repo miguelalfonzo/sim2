@@ -1391,7 +1391,7 @@ function newSolicitude() {
         {
             if ( response.Status == 'Ok')
             {
-                if ( aData.type == 'fondos' )
+                if ( aData.type == 'fondo' )
                 {
                     bootbox.alert('<h4 class="green">Fondos Actualizado</h4>');
                     listFondos();

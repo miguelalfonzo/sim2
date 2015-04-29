@@ -3,7 +3,6 @@
 namespace Expense;
 
 use \Eloquent;
-use \Log;
 
 class Entry extends Eloquent
 {

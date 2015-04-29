@@ -148,21 +148,19 @@ class TableController extends BaseController
 			DB::beginTransaction();
 			$middleRpta = $this->processAccount( $val[data]['num_cuenta_fondo'] , 1 );
 			if ( $middleRpta[status] == ok )
+			{
 				$middleRpta = $this->processAccount( $val[data]['num_cuenta_gasto'] , 4 );
 				if ( $middleRpta[status] == ok )
 				{
-					$val[data]['idcuentagasto'] = $middleRpta[data];
-					$middleRpta = $this->processMark( $val[data]['idmarca'] );
+					$middleRpta = $this->processMark( $val[data]['marca_codigo'] );
 					if ( $middleRpta[status] == ok )
 					{
-						$val[data]['idmarca'] = $middleRpta[data];
 						$accountsMark = MarkProofAccounts::orderBy('id');
 						foreach ( $val[data] as $key => $data)
 							$accountsMark->where( $key , $data );
 						$accountsMark->get();
-						Log::error( json_encode($accountsMark));
 						if ( $accountsMark->count() == 1 )
-							return $this->warningException( __FUNCTION__ , 'La Relacion ya existes');
+							return $this->warningException( __FUNCTION__ , 'La Relacion ya existe');
 						elseif ( $accountsMark->count() == 0 )
 						{
 							$accountsMark = new MarkProofAccounts;
@@ -180,7 +178,6 @@ class TableController extends BaseController
 					}
 				}
 			}
-			}
 			DB::rollback();
 			return $middleRpta;
 		}
@@ -197,9 +194,10 @@ class TableController extends BaseController
 		{
 			$mark = Mark::where( 'codigo' , $val )->get();
 			if ( $mark->count() == 1 )
-				return $this->setRpta( $mark[0]->id );
+				return $this->setRpta();
 			elseif ( $mark->count() == 0 )
 			{
+
 				$mark = new Mark;
 				$mark->id = $mark->lastId() + 1;
 				$mark->codigo = $val;
@@ -210,7 +208,7 @@ class TableController extends BaseController
 				if ( !$mark->save() )
 					return $this->warningException( __FUNCTION__ , 'No se pudo procesar la marca');
 				else
-					return $this->setRpta( $mark->id );
+					return $this->setRpta();
 			}
 		}
 		catch ( Exception $e )
@@ -253,7 +251,7 @@ class TableController extends BaseController
 		{
 			$account = Account::where('num_cuenta' , $val )->get();
 			if ( $account->count() == 1 )
-				return $this->setRpta( $account[0]->id );
+				return $this->setRpta();
 			elseif ( $account->count() == 0 )
 			{
 				$bagoAccount = PlanCta::find( $val );
@@ -269,10 +267,7 @@ class TableController extends BaseController
 					if ( !$account->save() )
 						return $this->warningException( __FUNCTION__ , 'No se pudo procesar la cuenta N°: '.$val );
 					else
-					{
-						$val = $account->id;
-						return $this->setRpta( $account->id );
-					}
+						return $this->setRpta();
 				}
 			}	
 		}
