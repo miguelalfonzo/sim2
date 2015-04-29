@@ -5,6 +5,9 @@
         </a>    
         @if ( $solicitude->idtiposolicitud == SOL_REP )
             @if( Auth::user()->type == REP_MED)
+                <a data-toggle="modal" data-target=".timeLineModal">
+                    <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-flag"></span>
+                </a>
                 @if($solicitude->idestado == REGISTRADO && Auth::user()->id == $solicitude->iduserasigned )
                     <a target="_blank" href="{{URL::to('a'.'/'.$solicitude->token)}}">
                         <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-print"></span>
@@ -20,6 +23,9 @@
                         </a>
                     @endif
                 @endif
+                <a href="{{URL::to('a'.'/'.$solicitude->token)}}">
+                    <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-print"></span>
+                </a>
             @elseif ( Auth::user()->type == SUP )
                 @if( $solicitude->idestado == PENDIENTE && $solicitude->created_by == Auth::user()->id )
                     <a href="{{URL::to('editar-solicitud').'/'.$solicitude->token}}">
@@ -51,6 +57,9 @@
         
         @elseif ( $solicitude->idtiposolicitud == SOL_INST )
             @if ( Auth::user()->type == REP_MED )
+                <a data-toggle="modal" data-target=".timeLineModal">
+                    <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-flag"></span>
+                </a>
                 @if($solicitude->idestado == REGISTRADO && Auth::user()->id == $solicitude->iduserasigned )   
                     <a href="{{URL::to('report-fondo')}}/{{$solicitude->token}}">
                         <span class="glyphicon glyphicon-print" style="padding: 0 5px; font-size: 1.3em"></span>
