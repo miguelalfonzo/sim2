@@ -67,12 +67,10 @@ class SolicitudeController extends BaseController
             $state = Session::pull('state');
         else
         {
-            if (Auth::user()->type == GER_COM || Auth::user()->type == CONT)
+            if ( in_array( Auth::user()->type , array( GER_COM , TESORERIA , CONT ) ) )
                 $state = R_APROBADO ;
             else if ( Auth::user()->type == REP_MED || Auth::user()->type == SUP || Auth::user()->type == GER_PROD )
                 $state = R_PENDIENTE;
-            elseif ( Auth::user()->type == TESORERIA )
-                $state = R_REVISADO ;
             elseif ( Auth::user()->type == ASIS_GER )
                 $state = R_APROBADO ;
         }
@@ -98,7 +96,7 @@ class SolicitudeController extends BaseController
         }
         if ( Auth::user()->type == ASIS_GER )
         {
-            $data['fondos']  = Fondo::where('idusertype', ASIS_GER )->get();                
+            $data['fondos']  = Fondo::asisGerFondos();                
             $data['etiquetas'] = Label::orderBy('id','asc')->get();
         }
         return View::make('template.User.show',$data);   
@@ -151,67 +149,64 @@ class SolicitudeController extends BaseController
                 return $this->warningException( __FUNCTION__ ,'No se encontro la Solicitud con Codigo: '.$token );
             else
             {
-                if ( $solicitud->idtiposolicitud != SOL_REP )
-                    return $this->warningException( __FUNCTION__ , 'La solicitud con Id: '.$solicitud->id.' no es de Representantes');
-                else
+                $detalle = json_decode($solicitud->detalle->detalle);
+                $data = array(
+                    'solicitud' => $solicitud,
+                    'detalle'   => $detalle
+                );
+                if ( Auth::user()->type == SUP && $solicitud->idestado == PENDIENTE )
                 {
-                    $detalle = json_decode($solicitud->detalle->detalle);
-                    $data = array(
-                        'solicitud' => $solicitud,
-                        'detalle'   => $detalle
-                    );
-                    if ( Auth::user()->type == SUP && $solicitud->idestado == PENDIENTE )
+                    $solicitud->status = BLOCKED;
+                    if ( !$solicitud->save() )
+                        return $this->warningException( __FUNCTION__ , 'No se puede procesar la solicitud para el supervisor');
+                    else
                     {
-                        $solicitud->status = BLOCKED;
-                        if ( !$solicitud->save() )
-                            return $this->warningException( __FUNCTION__ , 'No se puede procesar la solicitud para el supervisor');
-                        else
-                        {
-                            $data['fondos'] = Fondo::supFondos();
-                            $data['solicitud']->status = 1;
-                        }
-                    }
-                    elseif ( Auth::user()->type == GER_PROD && $solicitud->idestado == DERIVADO )
-                    {
+                        $data['fondos'] = Fondo::supFondos();
                         $data['solicitud']->status = 1;
-                        $data['fondos'] = Fondo::gerProdFondos();
                     }
-                    elseif ( Auth::user()->type == TESORERIA && $solicitud->idestado == DEPOSITO_HABILITADO )
-                    {
-                        $data['banks'] = Account::banks();
-                        if ( is_null($solicitud->detalle->idretencion) )
-                            $data['deposito'] = $detalle->monto_aprobado;
-                        else
-                            if ( $solicitud->detalle->typeRetention->account->idtipomoneda == $solicitud->detalle->idmoneda )
-                                $data['deposito'] = $detalle->monto_aprobado - $detalle->monto_retencion ;
-                            else
-                            {
-                                $tc = ChangeRate::getTc();
-                                if ( $solicitud->detalle->idmoneda == SOLES )
-                                    $data['deposito'] = $detalle->monto_aprobado - ( $detalle->monto_retencion * $tc->compra );    
-                                elseif ( $solicitud->detalle->idmoneda == DOLARES )
-                                    $data['deposito'] = $detalle->monto_aprobado - ( $detalle->monto_retencion / $tc->venta );   
-                            }
-                    }
-                    elseif ( Auth::user()->type == CONT )
-                    {
-                        if ( $solicitud->idestado == APROBADO )
-                            $data['typeRetention'] = TypeRetention::all();
-                        elseif ( count( $solicitud->registerHist ) == 1 )
-                            $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
-                        elseif ( $solicitud->idestado == DEPOSITADO )
-                        {
-                            $data['date'] = $this->getDay();
-                            $data['lv'] = $this->textLv( $solicitud );
-                        }
-                        elseif ( count( $solicitud->registerHist ) == 1 )
-                            $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
-                    }
-                    elseif ( in_array( Auth::user()->type , array( REP_MED , ASIS_GER ) ) && count( $solicitud->advanceSeatHist ) == 1 )
-                        $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
-                    Log::error( count($solicitud->advanceSeat ) );
-                    return View::make('Dmkt.Solicitud.view', $data);
                 }
+                elseif ( Auth::user()->type == GER_PROD && $solicitud->idestado == DERIVADO )
+                {
+                    $data['solicitud']->status = 1;
+                    $data['fondos'] = Fondo::gerProdFondos();
+                }
+                elseif ( Auth::user()->type == TESORERIA && $solicitud->idestado == APROBADO )
+                {
+                    $data['banks'] = Account::banks();
+                    if ( is_null($solicitud->detalle->idretencion) )
+                        $data['deposito'] = $detalle->monto_aprobado;
+                    else
+                        if ( $solicitud->detalle->typeRetention->account->idtipomoneda == $solicitud->detalle->idmoneda )
+                            $data['deposito'] = $detalle->monto_aprobado - $detalle->monto_retencion ;
+                        else
+                        {
+                            $tc = ChangeRate::getTc();
+                            if ( $solicitud->detalle->idmoneda == SOLES )
+                                $data['deposito'] = $detalle->monto_aprobado - ( $detalle->monto_retencion * $tc->compra );    
+                            elseif ( $solicitud->detalle->idmoneda == DOLARES )
+                                $data['deposito'] = $detalle->monto_aprobado - ( $detalle->monto_retencion / $tc->venta );   
+                        }
+                }
+                elseif ( Auth::user()->type == CONT )
+                {
+                    if ( $solicitud->idestado == APROBADO )
+                        $data['typeRetention'] = TypeRetention::all();
+                    elseif ( count( $solicitud->registerHist ) == 1 )
+                        $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
+                    elseif ( $solicitud->idestado == DEPOSITADO )
+                    {
+                        $data['date'] = $this->getDay();
+                        $data['lv'] = $this->textLv( $solicitud );
+                    }
+                    elseif ( count( $solicitud->registerHist ) == 1 )
+                        $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
+                }
+                elseif ( in_array( Auth::user()->type , array( REP_MED , ASIS_GER ) ) && ( $solicitud->advanceSeatHist->count() == 1 ) )
+                {
+                    $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
+                    $data['igv'] = Parameter::getIGV();
+                }
+                return View::make('Dmkt.Solicitud.view', $data);
             }
         }
         catch ( Exception $e )
@@ -955,7 +950,7 @@ class SolicitudeController extends BaseController
                     }
                 }
             }
-            $rpta = $this->setStatus($oldidestado, APROBADO, Auth::user()->id, USER_CONTABILIDAD, $idSol);
+            $rpta = $this->setStatus( $oldidestado , APROBADO , Auth::user()->id , USER_TESORERIA , $idSol );
             if ( $rpta[status] == ok )
                 DB::commit();
             else
@@ -1009,36 +1004,27 @@ class SolicitudeController extends BaseController
         return $seat;
     }
 
-    public function getCuentaContHandler(){
-        $dataInputs  = Input::all();
-        
+    public function getCuentaContHandler()
+    {
+        $dataInputs  = Input::all();    
         $accountFondo = Account::where( 'num_cuenta' , $dataInputs['cuentaMkt'] )->first();
-        
         $rpta = MarkProofAccounts::listExpenses( $accountFondo->id );
-        
-        //$rpta = $mDCs->with('expenseAccount' , 'expenseMark' , 'expenseDocument' , 'expenseFondo' );
-        
-        //Log::error( $rpta );
         return $rpta;
 
-        foreach ( $mDCs as $mDC )
-        {
+        /*foreach ( $mDCs as $mDC )
             $accountExpense[] = $mDC->getExpenseAccount;
-        } 
         $accountFondo->tExpense = $accountExpense;
         $accountFondo->accountGasto = $accountExpense;
 
-        return $this->getCuentaCont($dataInputs['cuentaMkt']);
+        return $this->getCuentaCont($dataInputs['cuentaMkt']);*/
     }
 
     public function getCuentaCont($cuentaMkt){
         $result = array();
         if(!empty($cuentaMkt))
         {
-            //$accountElement = Account::where('num_cuenta', $cuentaMkt)->get();
             $accountElement = Account::getExpenseAccount( $cuentaMkt );
             $account        = count($accountElement) == 0 ? array() : json_decode($accountElement->toJson());
-//$marcaNumber == '' ? '' : $marcaNumber.$comprobante->marcaArray[1];
             if(count($account) > 0)
                 $result['account'] =  $account;
             else{
@@ -1061,16 +1047,12 @@ class SolicitudeController extends BaseController
     {    
         $result   = array();
         $seatList = array();
-        $AadvanceSeat = $solicitud->depositEntrys;
-        //Log::error( json_encode( $advanceSeat ) );
+        $AadvanceSeat = $solicitud->baseEntry;
         if ( is_null( $AadvanceSeat ) )
             return $this->warningException( __FUNCTION__ , 'No se encontro registros del asiento de anticipo D/C: "D" para la solicitud');
-        /*elseif ( count ( $AadvanceSeat ) >= 3 )
-            return $this->warningException( __FUNCTION__ , 'Se encontro mas de un asiento de anticipo D/C: "D" para la solicitud');
-        */else
+        else
         {
             Log::error('ASIENTO GASTO');
-        //$advanceSeat = $AadvanceSeat[0];
         $cuentaMkt      = $solicitud->baseEntry->num_cuenta;
         $idcuentaMkt = $solicitud->baseEntry->account->id;
 
@@ -1082,7 +1064,6 @@ class SolicitudeController extends BaseController
             $account_number = $accountResult['account'][0]->num_cuenta;
             $idaccount_number = $accountResult['account'][0]->id;
             $marcaNumber = MarkProofAccounts::getMarks( $idcuentaMkt , $idaccount_number );
-            //Log::error( json_encode($marcaNumber));
             $marcaNumber = $marcaNumber[0]->codigo; 
         }
         else
@@ -1094,19 +1075,18 @@ class SolicitudeController extends BaseController
         $username= '';
 
         $userType       = $userElement->type;
-        if($userType == REP_MED)
-            $username == $userElement->rm->full_name;
+        if($userType == REP_MED )
+            $username = $userElement->rm->full_name;
+        elseif ( $userType == SUP )
+            $username = $userElement->sup->full_name;
         elseif ( $userType == ASIS_GER )
-            $username == $userElement->person->full_name;
+            $username = $userElement->person->full_name;
         
         $tempId=1;
-        Log::error('AGG '.json_encode($solicitud->documentList));
         foreach($solicitud->documentList as $expense)
         {
-            Log::error('FOREACH GASTOS ');
             $comprobante             = $this->getTypeDoc($expense->idcomprobante);
             $comprobante->marcaArray =  explode(",", $comprobante->marca);
-
             $marca = '';
             if($marcaNumber == ''){
                 $errorTemp = array(
@@ -1174,35 +1154,25 @@ class SolicitudeController extends BaseController
             {
                 // ASIENTO DOCUMENT - NO ITEM
                     $description_seat_other_doc = strtoupper($username.' '. $expense->descripcion);
-                    $seat = $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', $account_number, $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_BASE, ASIENTO_GASTO_COD_PROV, $expense->razon, ASIENTO_GASTO_COD, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, $expense->monto, $marca, $description_seat_other_doc, $tipo_responsable, '');
+
+                    /*if ( $solicitud->detalle->idmoneda == DOLARES )
+                    {
+                        $nTc = ChangeRate::getDateTc( $expense->fecha_movimiento );
+                        $expense->monto = $expense->monto * $nTc->venta;
+                    }
+                    */$seat = $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', $account_number, $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_BASE, ASIENTO_GASTO_COD_PROV, $expense->razon, ASIENTO_GASTO_COD, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, $expense->monto, $marca, $description_seat_other_doc, $tipo_responsable, '');
                     array_push($seatListTemp, $seat);
             }
             $seatList = array_merge($seatList, $seatListTemp);
-            //Log::error( json_encode( $seatList ) );
         }
-        
         // CONTRAPARTE ASIENTO DE ANTICIPO
 
-            $description_seat_back = strtoupper($username .' '. $solicitud->titulo);
-            //Log::error('ASIENTO DE GASTO DEL ANTICIPO');
-            foreach ( $AadvanceSeat as $aS )
-            {
-                if ( $aS->d_c == 'C' )
-                {
-                    $seat = $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', CUENTA_CONTRA_PARTE, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO , $aS->importe, '', $description_seat_back, '', 'CAN');        
-                    array_push($seatList, $seat);
-            
-                }
-                else
-                {
-                    $seat = $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', CUENTA_CONTRA_PARTE, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_BASE , $aS->importe, '', $description_seat_back, '', 'CAN');
-                    array_push($seatList, $seat);
-            
-                }
-                //Log::error(json_encode($seat));        
-            }
-            $result['seatList'] = $seatList;
-            return $result;
+        $description_seat_back = strtoupper($username .' '. $solicitud->titulo);
+        //Log::error('ASIENTO DE GASTO DEL ANTICIPO');
+        $seat = $this->createSeatElement($tempId++, $cuentaMkt , $solicitud->id, '', $cuentaMkt , '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO , $AadvanceSeat->importe, '', $description_seat_back, '', 'CAN');        
+        array_push($seatList, $seat);
+        $result['seatList'] = $seatList;
+        return $result;
         }
     }
 
@@ -1261,16 +1231,21 @@ class SolicitudeController extends BaseController
             $tempArray['error'] = $resultSeats['error'];
             $data = array_merge($data, $tempArray);
         }
+        
+        return View::make('Dmkt.Cont.SeatExpense', $data);
+        
+
         //print_r($data);
-        if( $solicitud->idtiposolicitud == SOL_REP ){
+        /*if( $solicitud->idtiposolicitud == SOL_REP ){
             return View::make('Dmkt.Cont.SeatExpense', $data);
         }else{
             return View::make('Dmkt.Cont.SeatExpenseFondo', $data);
-        }
+        }*/
     }
 
     // IDKC: CHANGE STATUS => GENERADO
-    public function saveSeatExpense(){
+    public function saveSeatExpense()
+    {
         try
         {
             DB::beginTransaction();
@@ -1279,14 +1254,15 @@ class SolicitudeController extends BaseController
             
             foreach ($dataInputs['seatList'] as $key => $seatItem) 
             {
-                list($day, $month, $year) = explode('/', $seatItem['fec_origen']);
+                /*list($day, $month, $year) = explode('/', $seatItem['fec_origen']);
                 $dateTemp = mktime(11, 14, 54, $month, $day, $year);
                 $fec_origen = date("Y/m/d", $dateTemp);
+                */
                 $seat = new Entry;
-                $seat->idasiento    = $seat->searchId()+1;
+                $seat->id           = $seat->searchId() + 1;
                 $seat->num_cuenta   = $seatItem['numero_cuenta'];
                 $seat->cc           = $seatItem['codigo_sunat'];
-                $seat->fec_origen   = $fec_origen;
+                $seat->fec_origen   = $seatItem['fec_origen']; // $fec_origen;
                 $seat->iva          = $seatItem['iva'];
                 $seat->cod_pro      = $seatItem['cod_prov'];
                 $seat->nom_prov     = $seatItem['nombre_proveedor'];
@@ -1304,43 +1280,30 @@ class SolicitudeController extends BaseController
                 if ( !$seat->save() )
                     return $this->warningException( __FUNCTION__ , 'No se pudo registrar el asiento N°: '.$key);
             }        
-            if($solicitudeId != null)
-            {
-                $oldOolicitude      = Solicitude::where('idsolicitud', $solicitudeId)->first();
-                $oldStatus          = $oldOolicitude->estado;
-                $idSol              = $oldOolicitude->idsolicitud;
+            $solicitud = Solicitude::find( $dataInputs['idsolicitud'] );
+            $oldIdEstado = $solicitud->idestado;
+            $solicitud->idestado = GENERADO;
+            $userId = Auth::user()->id;
 
-                Solicitude::where('idsolicitud', $solicitudeId )->update(array('estado' => ESTADO_GENERADO));
-
-                $rpta = $this->setStatus($oldOolicitude->titulo .' - '. $oldOolicitude->descripcion, $oldStatus, ESTADO_GENERADO, Auth::user()->id, $oldOolicitude->iduser, $idSol,SOLIC);
-                if ( $rpta[status] == ok )
-                {
-                    DB::commit();
-                    $result['msg'] = 'Asientos Registrados';
-                }
-            }
-            else if($fondoId != null)
-            {
-                FondoInstitucional::where('idfondo', $fondoId)->update(array('asiento' => ASIENTO_FONDO_GASTO));
-                DB::commit();
-                $result['msg'] = 'Asientos Registrados';
-            }
+            if ( !$solicitud->save() )
+                return $this->warningException( $e , __FUNCTION__ );
             else
             {
-                DB::rollback();
-                $result['error'] = 'ERROR';
-                $result['msg']   = 'No se pudo registrar asientos';
+                $middleRpta = $this->setStatus( $oldIdEstado, GENERADO , $userId, $userId , $solicitud->id );
+                if ( $middleRpta[status] == ok )
+                {
+                    DB::commit();
+                    Session::put('state' , R_FINALIZADO );
+                }
             }
-        }
+            DB::rollback();
+            return $middleRpta;
+        }   
         catch (Exception $e)
         {
             DB::rollback();
-            $result['error'] = 'ERROR';
-            $result['msg']   = 'No se pudo registrar asientos';
-            $temp = $this->internalException($e,__FUNCTION__);        
+            return $this->internalException( $e , __FUNCTION__ );        
         }
-             return json_encode($result);
-       
     }
 
   
@@ -1416,70 +1379,6 @@ class SolicitudeController extends BaseController
             return $this->internalException($e,__FUNCTION__);          
         }
         return $middleRpta;
-    }
-
-    
-
-    // IDKC: CHANGE STATUS => DEPOSITO HABILITADO
-    public function enableDeposit()
-    {
-        try
-        {
-            DB::beginTransaction();
-            $inputs = Input::all();
-            $solicitude = Solicitude::find( $inputs['idsolicitude'] );
-            if ( count( $solicitude ) == 0 )
-                return $this->warningException( __FUNCTION__ , 'No se encontro la solicitud con Id: '.$inputs['idsolicitude']);
-            else
-            {
-                if ( $solicitude->idestado != APROBADO )
-                    return $this->warningException( __FUNCTION__ , 'No se puede procesar una solicitud que no ha sido Aprobada');
-                else
-                {
-                    $oldIdestado = $solicitude->idestado;
-                    $solicitude->idestado = DEPOSITO_HABILITADO;
-                    if ( !$solicitude->save())
-                        return $this->warningException( __FUNCTION__ , 'Cancelado - No se pudo procesar la Solicitud' );
-                    else
-                    {
-                        $val_ret = $inputs['monto_retencion'];
-                        if ( !empty( trim( $val_ret ) ) )
-                        {
-                            if ( !is_numeric( $val_ret ) )
-                                return $this->warningException( __FUNCTION__ , 'La retencion debe ser un valor Númerico' );
-                            elseif ( $val_ret <= 0 )    
-                                return $this->warningException( __FUNCTION__ , 'La retencion debe ser mayor que 0' );
-                            elseif ( empty( trim( $inputs['idretencion'] ) ) )
-                                return $this->warningException( __FUNCTION__ , 'No se encontro el tipo de retencion a registrar' );
-                            else 
-                            {
-                                $sol_detalle = $solicitude->detalle;
-                                $sol_detalle->idretencion = $inputs['idretencion'];
-                                $jDetalle = json_decode($sol_detalle->detalle);
-                                $jDetalle->monto_retencion = round( $val_ret , 2 ,PHP_ROUND_HALF_DOWN );
-                                $sol_detalle->detalle = json_encode($jDetalle);
-                                if ( !$sol_detalle->save() )
-                                    return $this->warningException( __FUNCTION__ , 'Cancelado - No se pudo registrar la retencion' );
-                            }
-                        }
-                        $middleRpta = $this->setStatus( $oldIdestado, DEPOSITO_HABILITADO, Auth::user()->id, USER_TESORERIA , $solicitude->id);
-                        if ($middleRpta[status] == ok)
-                        {
-                            Session::put('state',R_REVISADO);
-                            DB::commit();
-                            return $middleRpta;
-                        }
-                    }
-                }
-            }
-            DB::rollback();
-            return $middleRpta;
-        }
-        catch (Exception $e)
-        {
-            DB::rollback();
-            return $this->internalException($e,__FUNCTION__);
-        }
     }
 
     public function findResponsables()

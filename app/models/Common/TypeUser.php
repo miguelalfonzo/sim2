@@ -13,4 +13,10 @@ class TypeUser extends Eloquent{
     protected $table = 'TIPO_USUARIO';
     protected $primaryKey = 'codigo';
 
+    protected static function dmkt()
+    {
+    	return TypeUser::whereIn('codigo' , array( SUP , GER_PROD , ASIS_GER ) )->get();
+    }
+
+
 }

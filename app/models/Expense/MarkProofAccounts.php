@@ -9,6 +9,14 @@ class MarkProofAccounts extends Eloquent
     protected $table= 'DMKT_RG_CUENTA_GASTO_MARCA';
     protected $primaryKey = 'id';
  
+    public function lastId()
+    {
+    	$lastId = MarkProofAccounts::orderBy('id','desc')->first();
+		if( $lastId == null )
+            return 0;
+        else
+            return $lastId->id;
+    }
 
 	protected static function getMarks( $id_cuenta_mkt , $id_cuenta_cont )
 	{
@@ -27,7 +35,7 @@ class MarkProofAccounts extends Eloquent
 
 	public function mark()
 	{
-		return $this->hasOne( 'Dmkt\Marca' , 'id' , 'idmarca' );
+		return $this->hasOne( 'Expense\Mark' , 'id' , 'idmarca' );
 	}
 
 	public function document()

@@ -32,6 +32,11 @@ class Deposit extends Eloquent{
 
 	protected function account()
 	{
-		return $this->hasOne('Dmkt\Account','id','idcuenta');
+		return $this->hasOne('Dmkt\Account','num_cuenta','num_cuenta');
+	}
+
+	protected function bagoAccount()
+	{
+		return $this->hasOne('Expense\PlanCta' , 'ctactaextern' , 'num_cuenta' );
 	}
 }

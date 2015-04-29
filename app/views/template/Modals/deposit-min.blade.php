@@ -1,4 +1,4 @@
-@if( Auth::user()->type == TESORERIA && $solicitud->idestado == DEPOSITO_HABILITADO )
+@if( Auth::user()->type == TESORERIA && $solicitud->idestado == APROBADO )
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -13,8 +13,8 @@
                     <label>Bancos</label>
                     <select id="bank_account" name="bank_account" class="form-control">
                         @foreach ( $banks as $bank )
-                            <option value="{{$bank->id}}">
-                                {{$bank->typeMoney->simbolo.'-'.$bank->nombre}}
+                            <option value="{{$bank->num_cuenta}}">
+                                {{$bank->typeMoney->simbolo.'-'.$bank->bagoAccount->ctanombrecta}}
                             </option>
                         @endforeach
                     </select>

@@ -1,7 +1,7 @@
 @extends('template.main')
 @section('solicitude')
 <div class="content">
-    <div class="col-md-12">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
         <ul class="nav nav-tabs" role="tablist">
             <li class="active">
                 <a href="#solicitudes" role="tab" data-toggle="tab">
@@ -18,16 +18,28 @@
                 </li>
             @endif
             @include('template.User.li_estado_cuenta')
-            @if ( Auth::user()->type == REP_MED || Auth::user()->type == CONT || Auth::user()->type == TESORERIA)
-                @if( Auth::user()->type == CONT)
-                    <li>
-                        <a href="#mantenimiento" role="tab" data-toggle="tab">
-                            <i class="fa fa-user"></i>
-                            Mantenimiento de Documentos
-                        </a>
-                    </li>
-                @endif
+            @if( Auth::user()->type == CONT)
+                <li>
+                    <a href="#mantenimiento" role="tab" data-toggle="tab">
+                        <i class="fa fa-user"></i>
+                        Mantenimiento de Documentos
+                    </a>
+                </li>
+                <li>
+                    <a href="#account-mark-rel" role="tab" data-toggle="tab">
+                        <i class="fa fa-user"></i>
+                        Mantenimiento de Cuentas-Marcas
+                    </a>
+                </li>
             @endif
+            @if ( Auth::user()->type == TESORERIA )
+                <li>
+                    <a href="#sol-fondo" role="tab" data-toggle="tab">
+                        <i class="fa fa-user"></i>
+                        Mantenimiento de Fondos
+                    </a>
+                </li>
+            @endif  
         </ul>
         <div class="tab-content" style="margin-top: .75em;">
             <div class="tab-pane fade active in" id="solicitudes">
@@ -40,17 +52,40 @@
             </div>
             @include('template.tb_estado_cuenta')
             
-            <!-- Mantenimiento de Documentos -->
             @if (Auth::user()->type == CONT)
+                <!-- Mantenimiento de Documentos -->
                 <div class="tab-pane fade" id="mantenimiento">
                     <div class="panel panel-default">
-                        <div class="panel-body panel-default table_document_contabilidad">
-                            <div id="" class="form-group col-xs-6 col-sm-3 col-md-3"></div>
-                        </div>
+                        <div class="panel-body panel-default table_document_contabilidad"></div>
+                    </div>
+                    <div>
+                       <input class="btn btn-primary" id="add-doc" type="button" value="Agregar">
+                    </div>
+                </div>
+
+                <!-- Mantenimeinto de Cuentas y Marcas -->
+                <div class="tab-pane fade" id="account-mark-rel">
+                    <div class="panel panel-default">
+                        <div class="panel-body panel-default table_accounts_mark_rel"></div>
+                    </div>
+                    <div>
+                       <input class="btn btn-primary maintenance-add" type="button" case="cuentas-marca" value="Agregar">
                     </div>
                 </div>
             @endif
 
+            @if ( Auth::user()->type == TESORERIA )
+                <!-- Mantenimiento de los Fondos de las Solicitudes -->
+                <div class="tab-pane fade" id="sol-fondo">
+                    <div class="panel panel-default">
+                        <div class="panel-body panel-default table_sol_fondo"></div>
+                    </div>
+                    <div>
+                       <input class="btn btn-primary maintenance-add" type="button" case="fondo" value="Agregar">
+                    </div>
+                </div>
+            @endif
+            
             <!-- Solicitud Institucional -->
             @include('template.User.institucion')
 

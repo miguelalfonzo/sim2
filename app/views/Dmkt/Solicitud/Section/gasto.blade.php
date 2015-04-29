@@ -9,7 +9,7 @@
 			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 				<select id="proof-type" class="form-control">
 					@foreach($typeProof as $val)
-						<option value="{{$val->id}}">{{$val->descripcion}}</option>
+						<option value="{{$val->id}}" igv={{$val->igv}} marca="{{$val->marca}}">{{$val->descripcion}}</option>
 					@endforeach
 				</select>
 			</div>
@@ -152,7 +152,7 @@
 			    </div>
 			</div>
 		</div>
-		<div class="col-xs-12 col-sm-6 col-md-4 tot-document">
+		<!-- <div class="col-xs-12 col-sm-6 col-md-4 tot-document">
 			<div class="form-expense">
 				<label>IGV</label>
 				<div class="input-group">
@@ -160,7 +160,23 @@
 			      	<input id="igv" class="form-control" type="text" value=0>
 			    </div>
 			</div>
+		</div> -->
+		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4 tot-document">
+			<div class="form-expense">
+				<label>IGV</label>
+				<div class="input-group">
+					<div class="btn-group">
+						<label class="btn btn-default">
+					 		<input value={{$igv}} type="radio" name="igv" style="margin-top:.5em;" checked>Si
+						</label>
+						<label class="btn btn-default">
+							<input value=0 type="radio" name="igv" style="margin-top:.5em;">No
+						</label> 
+					</div>
+			    </div>
+			 </div>
 		</div>
+
 		<div class="col-xs-12 col-sm-6 col-md-4">
 			<div class="form-expense">
 				<label>Monto Total</label>
@@ -176,7 +192,7 @@
 				<div class="form-expense">
 					<label>Reparo</label>
 					<div class="input-group">
-						<div class="btn-group" role="group" aria-label="...">
+						<div class="btn-group" role="group">
 							<label class="btn btn-default">
 						 		<input value="1" type="radio" name="reparo" style="margin-top:.5em;">Si
 							</label>

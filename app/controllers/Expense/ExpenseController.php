@@ -46,7 +46,7 @@ class ExpenseController extends BaseController
         return $array;
     }
 
-    public function showFondo($token)
+  /*  public function showFondo($token)
     {
     	try
     	{
@@ -72,7 +72,7 @@ class ExpenseController extends BaseController
 	                    elseif ( $solicitud->idestado == REGISTRADO )
                 			$data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );    	
                     }
-                    elseif ( Auth::user()->type == TESORERIA && $solicitud->idestado == DEPOSITO_HABILITADO )
+                    elseif ( Auth::user()->type == TESORERIA && $solicitud->idestado == APROBADO )
                     	$data['banks'] = Account::banks();
                     elseif ( Auth::user()->type == REP_MED && count( $solicitud->advanceSeatHist ) != 0  )
                     	$data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
@@ -83,9 +83,9 @@ class ExpenseController extends BaseController
 	    {
 	    	return $this->internalException($e,__FUNCTION__);
 	    }
-	}
+	}*/
 
-	private function expenseData( $solicitud , $monto_aprobado )
+	/*private function expenseData( $solicitud , $monto_aprobado )
     {
         $data = array(
             'typeProof'  => ProofType::orderBy('id','asc')->get(),
@@ -100,9 +100,9 @@ class ExpenseController extends BaseController
             $data['balance'] = $monto_aprobado - $balance;
         }
         return $data;
-    }
+    }*/
 
-	public function showCont($token)
+	/*public function showCont($token)
 	{
 		$date         = $this->getDayAll();
 		$typeProof    = ProofType::all();
@@ -137,7 +137,7 @@ class ExpenseController extends BaseController
 			'name_aproved' => $name_aproved
 		];
  		return View::make('Expense.register_cont',$data);
-	}
+	}*/
 
 	public function registerExpense()
 	{
@@ -149,17 +149,15 @@ class ExpenseController extends BaseController
 	        $solicitude = Solicitude::where( 'token' , $inputs['token'] )->first();
  
 	    	$resultCode = null;
+	    	$proof = ProofType::find( $inputs['proof_type']);
 
-	    	if($inputs['ruc'] != null && $inputs['number_prefix'] != null && $inputs['number_serie'] != null && $inputs['proof_type'] == DOCUMENTO_NO_SUSTENTABLE_ID)
-	    	{
-	    		$row_expense    = Expense::where('ruc',$inputs['ruc'])->where('num_prefijo',$inputs['number_prefix'])
-							  ->where('num_serie',$inputs['number_serie'])->get();
-			
-				if(count($row_expense)>0)
-				{
-					$resultCode = -1;
+	    	if ( $proof->code != 'N' )
+		    	if($inputs['ruc'] != null && $inputs['number_prefix'] != null && $inputs['number_serie'] != null )
+		    	{
+		    		$row_expense    = Expense::where('ruc',$inputs['ruc'])->where('num_prefijo',$inputs['number_prefix'])->where('num_serie',$inputs['number_serie'])->get();	
+					if(count($row_expense)>0)
+						$resultCode = -1;
 				}
-			}
 			if($resultCode == -1)
 				return array(
 					'code' 	=> $resultCode,
@@ -175,7 +173,7 @@ class ExpenseController extends BaseController
 				$expense->ruc = $inputs['ruc'];
 				$expense->razon = $inputs['razon'];
 				$expense->monto = $inputs['total_expense'];
-	            if($inputs['proof_type'] == '1' || $inputs['proof_type'] == '4' || $inputs['proof_type'] == '6')
+	            if( $proof->igv == 1 )
 				{
 					$expense->igv = $inputs['igv'];
 					$expense->imp_serv = $inputs['imp_service'];
@@ -436,7 +434,6 @@ class ExpenseController extends BaseController
 				$document->descripcion = strtoupper($input['desc']);
 				$document->marca = strtoupper($input['marca']);
 				$document->igv = $input['igv'];
-				$document->save();
 			}
 			else
 			{
@@ -446,11 +443,14 @@ class ExpenseController extends BaseController
 				$document->cta_sunat = $input['sunat'];
 				$document->marca = strtoupper($input['marca']);
 				$document->igv = $input['igv'];
-				$document->save();
 			}
-			$rpta = $this->setRpta();			
-			DB::commit();
-			return $setRpta;
+			if ( !$document->save() )
+				return $this->warninException( __FUNCTION__ , 'No se pudo procesar el documento');
+			else
+			{
+				DB::commit();
+				return $this->setRpta();
+			}
 		}
 		catch (Exception $e)
 		{
@@ -458,6 +458,8 @@ class ExpenseController extends BaseController
 			return $this->internalException( $e , __FUNCTION__ );
 		}
 	}
+
+
 
 	public function reportExpense($token){
 		$solicitude = Solicitude::where('token',$token)->firstOrFail();
@@ -563,20 +565,21 @@ class ExpenseController extends BaseController
     private function reportBalance( $solicitud , $detalle , $jDetalle , $mGasto )
 	{
 		$mDeposit = $detalle->deposit->total;
-	    
+	    Log::error( $mDeposit );
     	if ( $detalle->deposit->account->idtipomoneda == DOLARES )
     		$mDeposit = $mDeposit * $jDetalle->tcv;
 
-	    if ( isset( $jDetalle->monto_retencion ))
+	    if ( isset( $jDetalle->monto_retencion ) )
 	    	$monto_retencion = $jDetalle->monto_retencion ;
 	    else
 	    	$monto_retencion = 0;
 	    $mBalance = $mDeposit - ( $mGasto - $monto_retencion );  // - $monto_retencion );
+	    Log::error( $mBalance );
 	    if ( $mBalance > 0)
 	    	$data = array( 'bussiness' => round( $mBalance , 2 , PHP_ROUND_HALF_DOWN ) , 'employed' => 0 );
 	    elseif ( $mBalance < 0 )
 	    	$data = array( 'bussiness' => 0 , 'employed' => round( $mBalance*-1 , 2 , PHP_ROUND_HALF_DOWN ) );
-	    elseif ( $mBalance = 0 )
+	    elseif ( $mBalance == 0 )
 			$data = array( 'bussiness' => 0 , 'employed' => 0 );
 		return $data;
 	}
@@ -597,5 +600,11 @@ class ExpenseController extends BaseController
 		{
 			return $this->internalException( $e , __FUNCTION__ );
 		}
+	}
+
+	public function getDailySeatRelation()
+	{
+		$iAccounts = MarkProofAccounts::all();
+		return View::make( 'Dmkt.Cont.list_accounts_mark_relation' )->with( 'iAccounts' , $iAccounts )->render();
 	}
 }

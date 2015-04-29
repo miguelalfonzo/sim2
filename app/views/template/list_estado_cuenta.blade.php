@@ -15,7 +15,7 @@
             @if(!empty($solicituds))
                 @foreach($solicituds as  $cuenta)
                     <tr>
-                        <td class="text-center">{{$cuenta->idsolicitud}}</td>
+                        <td class="text-center">{{$cuenta->id}}</td>
                         <td class="text-left">
                             @if (!is_null($cuenta->idetiqueta))
                             <span class="label label-info" style="margin-right:1em;background-color:{{$cuenta->etiqueta->color}}">
@@ -24,17 +24,26 @@
                         @endif
                             <label>{{$cuenta->titulo}}</label>
                         </td>
-                        @if ($cuenta->user->type == REP_MED)
-                            <td class="text-center">{{$cuenta->rm->nombres.' '.$cuenta->rm->apellidos}}</td>
-                        @else
-                            <td class="text-center">{{$cuenta->sup->nombres.' '.$cuenta->sup->apellidos}}</td>
+                        <td class="text-center">
+                            @if ( $cuenta->createdBy->type == REP_MED)
+                                {{$cuenta->createdBy->rm->full_name}}
+                            @elseif ( $cuenta->createdBy->type == SUP )
+                                {{$cuenta->createdBy->sup->full_name}}
+                            @elseif ( $cuenta->createdBy->type == ASIS_GER )
+                                {{$cuenta->createdBy->person->full_name}}
+                            @endif
+                        </td>
+                        <td class="text-center">
+                        @if ( $cuenta->idtiposolicitud == SOL_INST )
+                            {{$cuenta->createdBy->person->full_name}}
+                        @elseif ( $cuenta->idtiposolicitud == SOL_REP )
+                            @if ($cuenta->acceptHist->user->type == SUP)
+                                {{$cuenta->acceptHist->user->sup->full_name}}
+                            @else ($cuenta->acceptHist->user->type == GER_PROD)
+                                {{$cuenta->acceptHist->user->gerProd->full_name}}
+                            @endif
                         @endif
-                        @if ($cuenta->aproved->type == SUP)
-                            <td class="text-center">{{$cuenta->aprovedSup->nombres.' '.$cuenta->aprovedSup->apellidos}}</td>
-                        @else ($cuenta->aproved->type == GER_PROD)
-                            <td class="text-center">{{$cuenta->aprovedGerProd->descripcion}}</td>
-                        @endif
-                        <td class="text-center">{{$cuenta->deposit->total}}</td>
+                        <td class="text-center">{{$cuenta->detalle->deposit->account->typeMoney->simbolo.' '.$cuenta->detalle->deposit->total}}</td>
                         <td class="text-center">{{$cuenta->created_at}}</td>
                         <td class="text-center">{{$cuenta->updated_at}}</td>
                     </tr>

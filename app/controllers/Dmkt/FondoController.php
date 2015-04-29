@@ -107,7 +107,7 @@ class FondoController extends BaseController
         return substr( $rpta , 0 , -2 );
     }
 
-    public function getFondos($start, $export = 0)
+    public function listSolInst($start, $export = 0)
     {
         try
         {
@@ -144,12 +144,12 @@ class FondoController extends BaseController
             foreach( $solicituds as $solicitud )
             {
                 $oldIdestado = $solicitud->idestado;
-                $solicitud->idestado = DEPOSITO_HABILITADO;
+                $solicitud->idestado = APROBADO;
                 if ( !$solicitud->save() )
-                    return $this->warningException( __FUNCTION , 'No se pudo actualizar la solicitud: '.$solicitud->id );
+                    return $this->warningException( __FUNCTION__ , 'No se pudo actualizar la solicitud: '.$solicitud->id );
                 else
                 {
-                    $middleRpta = $this->setStatus( $oldIdestado , DEPOSITO_HABILITADO , Auth::user()->id , USER_TESORERIA , $solicitud->id );
+                    $middleRpta = $this->setStatus( $oldIdestado , APROBADO , Auth::user()->id , USER_TESORERIA , $solicitud->id );
                     if ( $middleRpta[status] != ok )
                         return $middleRpta;
                 }
@@ -188,7 +188,7 @@ class FondoController extends BaseController
                         if ( !$periodos->save() )
                         {
                             DB::rollback();
-                            return $this->warningException( __FUNCTION , 'No se pudo terminar el periodo');
+                            return $this->warningException( __FUNCTION__ , 'No se pudo terminar el periodo');
                         }
                         else
                             DB::commit();
@@ -552,7 +552,7 @@ class FondoController extends BaseController
         }
     }   
 
-    function getFondosTesoreria($start, $export = 0)
+   /* function getFondosTesoreria($start, $export = 0)
     {
         $periodo = $this->period($start);
         
@@ -576,12 +576,19 @@ class FondoController extends BaseController
             return $view;
         }
         
-    }
+    }*/
 
     function getLastDayOfMonth($month, $year)
     {
         return date('d', mktime(0, 0, 0, $month + 1, 1, $year) - 1);
     }
+
+    public function getFondos()
+    {
+        $fondos = Fondo::all();
+        return View::make('Dmkt.Treasury.fondo')->with('fondos' , $fondos);
+    }
+
 
    /* public function getFondosContabilidad($start, $state)
     {

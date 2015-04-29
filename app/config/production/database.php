@@ -29,8 +29,7 @@ return array(
 			'password' => 'outdvp',
 			'charset' => 'utf8',
 			'prefix' => '',
-            //'schema' => 'public'
-		)
+        )
 
 	),
 

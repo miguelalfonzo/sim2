@@ -27,7 +27,6 @@ class Entry extends Eloquent
 
     public function setFecOrigenAttribute($value)
     {
-        Log::error(  $value  );
         $this->attributes['fec_origen'] = \Carbon\Carbon::createFromFormat( 'd/m/Y', $value );
     }
 

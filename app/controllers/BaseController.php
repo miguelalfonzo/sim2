@@ -254,11 +254,11 @@ class BaseController extends Controller {
             {
                 if ($estado != R_FINALIZADO)
                 {
-                    $solicituds->whereIn('idestado',array(DEPOSITO_HABILITADO,DEPOSITADO));
+                    $solicituds->whereIn( 'idestado' , array( APROBADO , DEPOSITADO ) );
                 }
                 else
                 {
-                    $solicituds->whereNotNull('iddeposito');
+                    $solicituds->detalle->whereNotNull('iddeposito');
                 }
             }
             else if ( Auth::user()->type == ASIS_GER ) 
@@ -270,13 +270,14 @@ class BaseController extends Controller {
             }
             else if ( Auth::user()->type == GER_PROD )
             {
-                $solicituds->whereHas('gerente' , function($g) {
+                $solicituds->whereHas('gerente' , function( $g ) 
+                {
                     $g->where('idgerprod', Auth::user()->id);
                 });
             }
             else if ( Auth::user()->type == CONT )
             {
-                $solicituds->where('idestado' , '<>' , ACEPTADO );  
+                $solicituds->whereIn( 'idestado' , array( DEPOSITADO , GASTO_HABILITADO , REGISTRADO , GENERADO ) );  
             }
             if ($start != null && $end != null)
             {

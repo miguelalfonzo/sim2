@@ -18,6 +18,7 @@ use \Common\StateRange;
 use \Log;
 use \Dmkt\Account;
 use \Expense\ChangeRate;
+use \Expense\PlanCta;
 use \Validator;
 
 class DepositController extends BaseController{
@@ -67,7 +68,7 @@ class DepositController extends BaseController{
         {
             $rules = array(
                 'token'       => 'required',
-                'idcuenta'    => 'required|numeric|min:1',
+                'num_cuenta'  => 'required|numeric|digits_between:6,8',
                 'op_number'   => 'required|min:3'
             );
             $validator = Validator::make($inputs, $rules);
@@ -86,6 +87,8 @@ class DepositController extends BaseController{
     {
         try
         {
+            $jDetalle->tcc = $tc->compra;
+            $jDetalle->tcv = $tc->venta;    
             if ( $solIdMoneda != $bankIdMoneda )
             {
                 if ( $solIdMoneda == SOLES)
@@ -94,8 +97,6 @@ class DepositController extends BaseController{
                     $monto = $monto * $tc->compra;
                 else
                     return $this->warningException( __FUNCTION__ , 'Tipo de Moneda no Registrada con Id: '.$solIdMoneda );
-                $jDetalle->tcc = $tc->compra;
-                $jDetalle->tcv = $tc->venta;
                 return $this->setRpta( array( 'monto' => $monto , 'jDetalle' => $jDetalle ) );
             }
             else
@@ -154,7 +155,7 @@ class DepositController extends BaseController{
                     return $this->warningException( __FUNCTION__ , 'Cancelado - No se encontro la solicitud (Cod:'.$inputs['token'].')');
                 else
                 {
-                    if ( $solicitud->idestado != DEPOSITO_HABILITADO )
+                    if ( $solicitud->idestado != APROBADO )
                         return $this->warningException( __FUNCTION__ , 'Cancelado - No se puede depositar la solicitud en esta etapa del flujo: '.$solicitud->idestado );
                     else
                     {
@@ -174,21 +175,22 @@ class DepositController extends BaseController{
                                     return $this->warningException( __FUNCTION__ , 'Cancelado - No se pudo procesar el saldo del fondo' );
                                 else
                                 { 
-                                    $account = Account::find( $inputs['idcuenta'] );
-                                    if ( count( $account ) == 0 )
+                                    $bagoAccount = PlanCta::find( $inputs['num_cuenta'] );
+                                    if ( $bagoAccount->count() == 0 )
                                         return $this->warningException( __FUNCTION__ , 'Cancelado - No se encontro la Cuenta del Banco con Id: '.$inputs['idcuenta'] );
                                     else
-                                        if ( $account->idtipocuenta != BANCO )
-                                            return $this->warningException( __FUNCTION__ , 'Cancelado - La cuenta de Id: '.$account->id.' no es de Bancos');
+                                        if ( $bagoAccount->account->idtipocuenta != BANCO )
+                                            return $this->warningException( __FUNCTION__ , 'Cancelado - La cuenta N°: '.$inputs['num_cuenta'].' no ha sido registrada en el Sistema');
                                         else
                                         {
-                                            $middleRpta = $this->getBankAmount( $detalle , $account , $tc );
+                                            $middleRpta = $this->getBankAmount( $detalle , $bagoAccount->account , $tc );
                                             if ( $middleRpta[status] == ok )
                                             {    
                                                 $newDeposit                     = new Deposit;
                                                 $newDeposit->id                 = $newDeposit->lastId() + 1;
                                                 $newDeposit->num_transferencia  = $inputs['op_number'];
-                                                $newDeposit->idcuenta           = $inputs['idcuenta'];
+                                                //$newDeposit->idcuenta           = $inputs['idcuenta'];
+                                                $newDeposit->num_cuenta         = $inputs['num_cuenta'];
                                                 $newDeposit->total              = round( $middleRpta[data]['monto'] , 2 , PHP_ROUND_HALF_DOWN );
                                                 if( !$newDeposit->save() )
                                                     return $this->warningException( __FUNCTION__ , 'Cancelado - No se pudo procesar el deposito' );
@@ -200,12 +202,13 @@ class DepositController extends BaseController{
                                                         return $this->warningException( __FUNCTION__ , 'Cancelado - No se pudo procesar el detalle de la solicitud');
                                                     else
                                                     {
-                                                        $solicitud->idestado     = DEPOSITADO;
+                                                        $solicitud->idestado = DEPOSITADO;
                                                         if ($solicitud->save() )
                                                         {
                                                             $middleRpta = $this->setStatus( $oldIdestado, DEPOSITADO, Auth::user()->id, USER_CONTABILIDAD, $solicitud->id );
                                                             if ( $middleRpta[status] == ok )
                                                             {
+                                                                Session::put( 'state' , R_REVISADO );
                                                                 DB::commit();
                                                                 return $middleRpta;
                                                             }
@@ -229,4 +232,5 @@ class DepositController extends BaseController{
             return $this->internalException($e,__FUNCTION__);
         }
     }
+    
 }

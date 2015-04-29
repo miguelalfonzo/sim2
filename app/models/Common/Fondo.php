@@ -22,14 +22,24 @@ class Fondo extends Eloquent {
         	return $lastId->id;
  	}
 
+    public function bagoAccount()
+    {
+        return $this->hasOne( 'Expense\PlanCta' , 'ctactaextern' , 'num_cuenta' );
+    }
+
     public static function supFondos()
     {
-        return Fondo::where( 'trim(idusertype)' , SUP )->get();
+        return Fondo::where( 'idusertype' , SUP )->whereNotNull('idcuenta')->get();
     }
 
     public static function gerProdFondos()
     {
-        return Fondo::where('trim(idusertype)', GER_PROD )->get();
+        return Fondo::where('idusertype', GER_PROD )->whereNotNull('idcuenta')->get();
+    }
+
+    public static function asisGerFondos()
+    {
+        return Fondo::where('idusertype' , ASIS_GER )->whereNotNull('idcuenta')->get();
     }
 
     protected function typeMoney()
@@ -40,5 +50,10 @@ class Fondo extends Eloquent {
     protected function account()
     {
         return $this->hasOne('Dmkt\Account','id','idcuenta');
+    }
+
+    protected function userType()
+    {
+        return $this->hasOne( 'Common\TypeUser' , 'codigo' , 'idusertype' );
     }
 }
