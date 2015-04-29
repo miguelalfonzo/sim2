@@ -161,7 +161,7 @@
 			    </div>
 			</div>
 		</div> -->
-		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4 tot-document">
+		<div class="col-xs-6 col-sm-3 col-md-2 col-lg-2 tot-document">
 			<div class="form-expense">
 				<label>IGV</label>
 				<div class="input-group">
@@ -177,18 +177,8 @@
 			 </div>
 		</div>
 
-		<div class="col-xs-12 col-sm-6 col-md-4">
-			<div class="form-expense">
-				<label>Monto Total</label>
-				<div class="input-group">
-			    	<div class="input-group-addon">{{$solicitud->detalle->typemoney->simbolo}}</div>
-			      	<input id="total-expense" class="form-control" type="text" disabled>
-			    </div>
-			</div>
-		</div>
-
 		@if ( Auth::user()->type == CONT )
-			<div id="dreparo" class="col-xs-12 col-sm-6 col-md-4">
+			<div id="dreparo" class="col-xs-6 col-sm-3 col-md-2 col-lg-2">
 				<div class="form-expense">
 					<label>Reparo</label>
 					<div class="input-group">
@@ -204,6 +194,29 @@
 				</div>
 			</div>
 		@endif
+
+		<div class="col-xs-12 col-sm-6 col-md-4">
+			<div class="form-expense">
+				<label>Monto Total</label>
+				<div class="input-group">
+			    	<div class="input-group-addon">{{$solicitud->detalle->typemoney->simbolo}}</div>
+			      	<input id="total-expense" class="form-control" type="text" disabled>
+			    </div>
+			</div>
+		</div>
+
+		@if ( Auth::user()->type == CONT )
+			<div id="dretencion" class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+				<div class="form-expense">
+					<label>Retención</label>
+					<div class="input-group">
+						<div class="input-group-addon">S/.</div>
+						<input class="form-control" type="text">
+					</div>
+				</div>
+			</div>
+		@endif
+
 	</section>
 	<section class="row reg-expense detail-expense" style="margin:0">
 		<div class="col-xs-12 col-sm-12 col-md-12">

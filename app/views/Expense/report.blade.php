@@ -31,7 +31,7 @@
                     <strong><p style="display:inline">Cargo:</strong>&nbsp;Representante Medico</p>
                 @else ( $solicitude->createdBy->type == SUP )
                     <strong>
-                        <p style="display:inline">Colaborador Bagó:</strong>&nbsp;{{$solicitude->cratedBy->sup->full_name}}</p>    
+                        <p style="display:inline">Colaborador Bagó:</strong>&nbsp;{{$solicitude->createdBy->sup->full_name}}</p>    
                     <strong>
                         <p style="display:inline">Cargo:</strong>&nbsp;Supervisor</p>
                 @endif

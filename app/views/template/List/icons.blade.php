@@ -42,7 +42,7 @@
                     </a>
                 @endif   
             @elseif ( Auth::user()->type == TESORERIA )
-                @if( $solicitude->idestado == APROBADO )
+                @if( $solicitude->idestado == DEPOSITO_HABILITADO )
                     <a class="modal_deposit">
                         <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span>
                     </a>
@@ -72,7 +72,7 @@
                     </a>
                 @endif  
             @elseif ( Auth::user()->type == TESORERIA )
-                @if ( $solicitude->idestado == APROBADO )
+                @if ( $solicitude->idestado == DEPOSITO_HABILITADO )
                     <a class="modal_deposit">
                         <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span>
                     </a>

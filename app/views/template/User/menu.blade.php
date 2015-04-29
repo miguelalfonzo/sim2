@@ -15,7 +15,7 @@
                             @else    
                                 <option value="{{$estado->id}}">{{$estado->nombre}}</option>
                             @endif
-                        @elseif ( Auth::user()->type == GER_COM )
+                        @elseif ( in_array( Auth::user()->type , array( GER_COM , CONT , ASIS_GER ) ) )
                             @if( in_array( $estado->id , array( R_APROBADO , R_REVISADO , R_GASTO , R_FINALIZADO , R_NO_AUTORIZADO ) ) )
                                 @if(isset($state))
                                     @if($state == $estado->id)
@@ -26,42 +26,10 @@
                                 @else    
                                     <option value="{{$estado->id}}">{{$estado->nombre}}</option>
                                 @endif
-                            @endif
-                        @elseif ( Auth::user()->type == ASIS_GER ) 
-                            @if($estado->id == R_APROBADO || $estado->id == R_REVISADO || $estado->id == R_GASTO || $estado->id == R_FINALIZADO )
-                                @if(isset($state))
-                                    @if($state == $estado->id)
-                                        <option value="{{$estado->id}}" selected>{{$estado->nombre}}</option>
-                                    @else
-                                        <option value="{{$estado->id}}">{{$estado->nombre}}</option>
-                                    @endif
-                                @else    
-                                    <option value="{{$estado->id}}">{{$estado->nombre}}</option>
-                                @endif
-                            @endif
-                        @elseif( Auth::user()->type == CONT )
-                            @if( in_array( $estado->id , array( R_REVISADO , R_GASTO , R_FINALIZADO ) ) )
-                                @if( isset( $state ) )
-                                    @if( $state == $estado->id )
-                                        <option value="{{$estado->id}}" selected>{{$estado->nombre}}</option>
-                                    @else
-                                        <option value="{{$estado->id}}">{{$estado->nombre}}</option>
-                                    @endif
-                                @else    
-                                    <option value="{{$estado->id}}">{{$estado->nombre}}</option>
-                                @endif
-                            @endif
+                            @endif 
                         @elseif ( Auth::user()->type == TESORERIA )
-                            @if( $estado->id == R_APROBADO || $estado->id == R_REVISADO )
-                                @if(isset($state))
-                                    @if($state == $estado->id)
-                                        <option value="{{$estado->id}}" selected>{{$estado->nombre}}</option>
-                                    @else
-                                        <option value="{{$estado->id}}">{{$estado->nombre}}</option>
-                                    @endif
-                                @else    
-                                    <option value="{{$estado->id}}">{{$estado->nombre}}</option>
-                                @endif
+                            @if( $estado->id == R_REVISADO )
+                                <option value="{{$estado->id}}" selected>{{$estado->nombre}}</option>
                             @endif
                         @endif
                     @endforeach

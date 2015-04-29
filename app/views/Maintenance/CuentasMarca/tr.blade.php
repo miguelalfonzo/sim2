@@ -1,19 +1,17 @@
 <tr type="cuentas-marca">
     <td style="text-align:center" disabled></td>
-    <td class="idfondo" save=2 style="text-align:center">
-        @include('Maintenance.CuentasMarca.fondo')
-    </td>
-    <td class="idcuentafondo" save=1 style="text-align:center">
+    <td class="idfondo" style="text-align:center" disabled></td>
+    <td class="num_cuenta_fondo" save=1 style="text-align:center">
         <input type="text" maxlength=7>
     </td>
     <td class="fcuenta-nombre" disabled style="text-align:center"></td>
     <td class="fcuenta-type" disabled style="text-align:center"></td>
-    <td class="idcuentagasto" save=1 style="text-align:center">
+    <td class="num_cuenta_gasto" save=1 style="text-align:center">
         <input type="text" maxlength=7>
     </td>
     <td class="ecuenta-nombre" style="text-align:center"></td>
     <td class="ecuenta-type" style="text-align:center"></td>
-    <td class="idmarca" save=1 style="text-align:center">
+    <td class="marca_codigo" save=1 style="text-align:center">
         <input type="text" maxlength=6>
     </td>
     <td class="iddocumento" save=1 style="text-align:center">

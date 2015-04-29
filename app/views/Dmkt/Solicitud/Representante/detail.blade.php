@@ -61,21 +61,6 @@
 <!--  Amount Solicitude -->
 @include('Dmkt.Solicitud.Detail.monto')
 
-<!--  Retencion      --> 
-@if ( !is_null( $solicitud->detalle->idretencion ) )
-    <div class="form-group col-sm-6 col-md-4 col-lg-4">
-        <label class="col-sm-8 col-md-8 control-label" for="retencion">
-            {{$solicitud->detalle->typeRetention->descripcion}}
-        </label>
-        <div class="col-sm-12 col-md-12 col-lg-12">
-            <div class="input-group">
-                <span class="input-group-addon">{{$solicitud->detalle->typeRetention->account->typemoney->simbolo}}</span>
-                <input id="retencion" type="text" value="{{$detalle->monto_retencion}}" class="form-control input-md" readonly>
-            </div>
-        </div>
-    </div>
-@endif
-
 <!-- Date Delivery -->
 <div class="form-group col-sm-6 col-md-4 col-lg-4">
     <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="date">Fecha de Entrega</label>
@@ -193,6 +178,3 @@
         </div>
     </div>
 </div>
-
-<!-- RETENCION -->
-@include('Dmkt.Solicitud.Detail.retencion')

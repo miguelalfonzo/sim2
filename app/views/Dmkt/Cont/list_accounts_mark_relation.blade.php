@@ -18,14 +18,14 @@
         @foreach ( $iAccounts as $iAccount )
             <tr row-id="{{$iAccount->id}}" type="cuentas-marca">
                 <td style="text-align: center">{{$iAccount->id}}</td>
-                <td class="idfondo" style="text-align:center">{{$iAccount->accountFondo->fondo->nombre}}</td>
-                <td class="idcuentafondo" editable=3 style="text-align:center">{{$iAccount->accountFondo->num_cuenta}}</td>
-                <td class="fcuenta-nombre" style="text-align:center">{{$iAccount->accountFondo->bagoAccount->ctanombrecta}}</td>
-                <td class="fcuenta-type" style="text-align:center">{{$iAccount->accountFondo->bagoAccount->ctatipocta}}</td>
-                <td class="idcuentagasto" editable=3 style="text-align:center">{{$iAccount->accountExpense->num_cuenta}}</td>
-                <td class="ecuenta-nombre" style="text-align:center">{{$iAccount->accountExpense->bagoAccount->ctanombrecta}}</td>
-                <td class="ecuenta-type" style="text-align:center">{{$iAccount->accountExpense->bagoAccount->ctatipocta}}</td>
-                <td class="idmarca" editable=3 style="text-align:center">{{$iAccount->mark->codigo}}</td>
+                <td class="idfondo" style="text-align:center">{{$iAccount->accountFondo->nombre}}</td>
+                <td class="idcuentafondo" editable=3 style="text-align:center">{{$iAccount->num_cuenta_fondo}}</td>
+                <td class="fondo-cuenta-nombre" style="text-align:center">{{$iAccount->bagoAccountFondo->ctanombrecta}}</td>
+                <td class="fondo-cuenta-type" style="text-align:center">{{$iAccount->bagoAccountFondo->ctatipocta}}</td>
+                <td class="idcuentagasto" editable=3 style="text-align:center">{{$iAccount->num_cuenta_gasto}}</td>
+                <td class="ecuenta-nombre" style="text-align:center">{{$iAccount->bagoAccountExpense->ctanombrecta}}</td>
+                <td class="ecuenta-type" style="text-align:center">{{$iAccount->bagoAccountExpense->ctatipocta}}</td>
+                <td class="idmarca" editable=3 style="text-align:center">{{$iAccount->marca_codigo}}</td>
                 <td class="iddocumento" editable=1 style="text-align:center">{{$iAccount->document->codigo}}</td>
                 <td editable=2 style="text-align:center">
                     <a class="maintenance-edit" href="#">
