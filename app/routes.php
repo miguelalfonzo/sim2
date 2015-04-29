@@ -12,8 +12,6 @@ Route::get('prueba', 'Dmkt\FondoController@test');
 Route::get('testUploadImg', 'BaseController@viewTestUploadImg');
 Route::post('testUploadImgSave', 'BaseController@viewTestUploadImgSave');
 
-
-
 Route::get('clientes-data','TestController@clientsTables');
 Route::get('hola', 'Expense\ExpenseController@test');
 Route::get('a/{token}', 'Expense\ExpenseController@reportExpense');
@@ -21,6 +19,11 @@ Route::get('report-fondo/{token}','Expense\ExpenseController@reportExpenseFondo'
 Route::get('report', 'ExpenseController@reportExpense');
 Route::get('tmp','TestController@tm');
 Route::get('history','TestController@withHistory');
+
+Route::post( 'get-maintenance-info' , 'Maintenance\TableController@getMaintenanceData' );
+Route::post( 'update-maintenance-info' , 'Maintenance\TableController@updateMaintenanceData' );
+Route::post( 'save-maintenance-info' , 'Maintenance\TableController@saveMaintenanceData' );
+Route::post( 'add-maintenance-info' , 'Maintenance\TableController@addMaintenanceData' );
 
 /*
 |--------------------------------------------------------------------------
@@ -97,6 +100,7 @@ Route::group(array('before' => 'cont'), function ()
     Route::post('generate-seat-fondo', 'Dmkt\FondoController@generateSeatFondo');
     Route::post('get-account', 'Dmkt\SolicitudeController@getCuentaContHandler');
     Route::get('list-documents', 'Dmkt\FondoController@listDocuments');
+    Route::get('list-accounts-mark-rel' , 'Expense\ExpenseController@getDailySeatRelation');
     Route::post('cont-document-manage' , 'Expense\ExpenseController@manageDocument');
 });
 /*
@@ -107,7 +111,8 @@ Route::group(array('before' => 'cont'), function ()
 
 Route::group(array('before' => 'tes'), function()
 {
-    Route::post('deposit-solicitude', 'Deposit\DepositController@depositSolicitudeTes');
+    Route::post( 'deposit-solicitude', 'Deposit\DepositController@depositSolicitudeTes');
+    Route::get( 'list-fondos' , 'Dmkt\FondoController@getFondos');
 });
 /*
 |--------------------------------------------------------------------------
@@ -123,7 +128,7 @@ Route::group( array('before' => 'ager') , function()
     Route::get('endfondos/{date}','Dmkt\FondoController@endfondos');
     Route::post('search-rep', 'Source\Seeker@repSource');
     Route::post('info-rep', 'Source\Seeker@repInfo');
-    Route::get('list-fondos/{date}','Dmkt\FondoController@getFondos');
+    Route::get('list-fondos/{date}','Dmkt\FondoController@listSolInst');
     Route::post('get-sol-inst' , 'Dmkt\FondoController@getSolInst');
 });
 

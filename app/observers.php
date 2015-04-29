@@ -1,6 +1,7 @@
 <?php
 
 use \Observer\Transaction;
+
 use \Dmkt\Solicitude;
 use \Dmkt\SolicitudeDetalle;
 use \Dmkt\SolicitudeClient;
@@ -14,7 +15,9 @@ use \System\SolicitudeHistory;
 use \Expense\Expense;
 use \Expense\ExpenseItem;
 use \Expense\ProofType;
-
+use \Dmkt\Account;
+use \Expense\Mark;
+use \Expense\MarkProofAccounts;
 
 	Solicitude::observe( new Transaction() );
 	SolicitudeDetalle::observe( new Transaction() );
@@ -29,3 +32,6 @@ use \Expense\ProofType;
 	Expense::observe( new Transaction() );
 	ExpenseItem::observe( new Transaction() );
 	ProofType::observe( new Transaction() );
+	Account::observe( new Transaction() );
+	Mark::observe( new Transaction() );
+	MarkProofAccounts::observe( new Transaction() );

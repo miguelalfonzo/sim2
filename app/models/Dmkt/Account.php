@@ -7,19 +7,30 @@ class Account extends Eloquent
     protected $table = 'DMKT_RG_CUENTA';
     protected $primaryKey = 'id';
     
-    protected function searchId()
+    public function lastId()
     {
-        $lastId = Account::orderBy('id', 'DESC')->first();
-        if($lastId == null)
+        $lastId = Account::orderBy('id', 'desc')->first();
+        if( $lastId == null )
             return 0;
         else
             return $lastId->id;
+    }
+
+    protected function bagoAccount()
+    {
+        return $this->belongsTo('Expense\PlanCta' , 'num_cuenta' , 'ctactaextern');
     }
 
     public function typeAccount()
     {
         return $this->hasOne('Expense\AccountType','id','idtipocuenta');
     }
+
+    protected function fondo()
+    {
+        return $this->belongsTo('Common\Fondo' , 'id' , 'idcuenta');
+    }
+
 
     protected function typeMoney()
     {

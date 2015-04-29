@@ -28,7 +28,7 @@
         <label class="col-sm-8 col-md-8 control-label" for="cuenta">Nº de Cuenta</label>
         <div class="col-sm-12 col-md-12">
             <input id="cuenta" class="form-control input-md" 
-            value="{{$detalle->num_cuenta}}" readonly>
+            value="{{ $detalle->num_cuenta }}" readonly>
         </div>
     </div>
 @elseif( $solicitud->detalle->idpago == PAGO_CHEQUE )
@@ -36,7 +36,7 @@
     <div class="form-group col-sm-6 col-md-4">
         <label class="col-sm-8 col-md-8 control-label" for="ruc">Ruc</label>
         <div class="col-sm-12 col-md-12">
-            <input id="ruc" type="text" class="form-control input-md"
+            <input type="text" class="form-control input-md"
             value="{{ $detalle->num_ruc }}" maxlength="11" readonly>
         </div>
     </div>
@@ -52,7 +52,7 @@
             <div class="input-group">
                 <span class="input-group-addon">{{$solicitud->detalle->typeMoney->simbolo}}</span>
                 <input id="factura" class="form-control input-md" type="text"
-                value="{{$detalle->monto_factura}}" readonly>
+                value="{{ $detalle->monto_factura }}" readonly>
             </div>
         </div>
     </div>

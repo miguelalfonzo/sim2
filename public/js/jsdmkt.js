@@ -176,18 +176,85 @@ function newSolicitude() {
         $(this).parent().removeClass('has-error');
     });
 
-    
+    function listFondos()
+    {
+        $.ajax({
+            url: server + 'list-fondos',
+            type: 'GET',
+            dataType: 'html'
+        }).fail( function ( statusCode , errorThrown )
+        {
+            ajaxError( statusCode , errorThrown );
+        }).done(function ( response ) 
+        {
+            $("#table_sol_fondo_wrapper").remove();
+            $('.table_sol_fondo').append(response);
+            $('#table_sol_fondo').dataTable(
+            {
+                "order": [ [ 0, "desc" ] ],
+                "bLengthChange": false,
+                'iDisplayLength': 7,
+                "oLanguage": 
+                {
+                    "sSearch": "Buscar: ",
+                    "sZeroRecords": "No hay fondos",
+                    "sInfoEmpty": "No hay fondos",
+                    "sInfo": 'Mostrando _END_ de _TOTAL_',
+                    "oPaginate": 
+                    {
+                        "sPrevious": "Anterior",
+                        "sNext" : "Siguiente"
+                    }
+                }
+            });
+        });   
+    }
+
+    function listAccountsMarkRel()
+    {
+        $.ajax({
+            url: server + 'list-accounts-mark-rel',
+            type: 'GET',
+            dataType: 'html'
+        }).fail( function ( statusCode , errorThrown )
+        {
+            ajaxError( statusCode , errorThrown );
+        }).done(function ( response ) 
+        {
+            $("#table_accounts_mark_rel_wrapper").remove();
+            $('.table_accounts_mark_rel').append(response);
+            $('#table_accounts_mark_rel').dataTable(
+            {
+                "order": [ [ 0, "desc" ] ],
+                "bLengthChange": false,
+                'iDisplayLength': 7,
+                "oLanguage": 
+                {
+                    "sSearch": "Buscar: ",
+                    "sZeroRecords": "No hay fondos",
+                    "sInfoEmpty": "No hay fondos",
+                    "sInfo": 'Mostrando _END_ de _TOTAL_',
+                    "oPaginate": 
+                    {
+                        "sPrevious": "Anterior",
+                        "sNext" : "Siguiente"
+                    }
+                }
+            });
+        });
+    }
 
     function listDocuments()
     {
-        var url = server + 'list-documents';
         $.ajax({
-            url: url,
+            url: server + 'list-documents',
             type: 'GET',
             dataType: 'html'
-
+        }).fail( function ( statusCode , errorThrown)
+        {
+            ajaxError( statusCode , errorThrown );
         }).done(function (data) {
-            $(".fondo_d").remove();
+            $("#table_document_contabilidad_wrapper").remove();
             $('.table_document_contabilidad').append(data);
             $('#table_document_contabilidad').dataTable(
             {
@@ -207,6 +274,61 @@ function newSolicitude() {
                     }
                 }
             });
+        });
+    }
+
+    //Function list Solicitude
+    function listSolicitude()
+    {
+        state = $('#idState').val();
+        var l = Ladda.create($("#search-solicitude")[0]);
+        l.start();
+        $.ajax(
+        {
+            url: server + 'buscar-solicitudes',
+            type: 'POST',
+            data:
+            { 
+                idstate: state,
+                date_start: $('#date_start').val(), 
+                date_end: $('#date_end').val(),
+                _token : document.getElementsByName('_token')[0].value 
+            }
+        }).fail( function ( statusCode , errorThrown )
+        {
+            l.stop();
+            ajaxError( statusCode , errorThrown );
+        }).done(function (data) 
+        {
+            l.stop();
+            if (data.Status == 'Ok' )
+            {
+                $('#table_solicitude_wrapper').remove();
+                $('.table-solicituds').append(data.Data);
+                $('#table_solicitude').dataTable(
+                {
+                    "order": 
+                    [
+                        [ 3, "desc" ] //order date
+                    ],
+                    "bLengthChange": false,
+                    'iDisplayLength': 7,
+                    "oLanguage": 
+                    {
+                        "sSearch": "Buscar: ",
+                        "sZeroRecords": "No hay solicitudes",
+                        "sInfoEmpty": "No hay solicitudes",
+                        "sInfo": 'Mostrando _END_ de _TOTAL_',
+                        "oPaginate": 
+                        {
+                            "sPrevious": "Anterior",
+                            "sNext" : "Siguiente"
+                        }
+                    }
+                });
+            }
+            else
+                responseUI(data.Status + ': ' + data.Description,'red');
         });
     }
 
@@ -318,7 +440,7 @@ function newSolicitude() {
         }
     });
 
-    function listFondos(user, state){
+   /* function listFondos(user, state){
         var url = server + 'list-'+user +'/'+dateactual + '/' + state;
         if(user != 'fondos-contabilidad') {
             url = server + 'list-'+user +'/'+dateactual;
@@ -351,7 +473,7 @@ function newSolicitude() {
                 }
             );
         });
-    }
+    }*/
     
     /* Cancel Solicitude */
     var cancel_solicitude = '.cancel-solicitude';
@@ -608,18 +730,21 @@ function newSolicitude() {
     
     /** --------------------------------------------- CONTABILIDAD ------------------------------------------------- **/
 
-    if(userType === 'C'){
-        //listFondos('fondos-contabilidad', $('#estado_fondo_cont').val());
-        listDocuments();
-        $("#datefondo").val(dateactual);
+    if ( $("#search-solicitude").length == 1 )
+    {
+        if( userType === 'C')
+        {
+            listDocuments();
+            listAccountsMarkRel();
+        }
+        else if ( userType === 'T' )
+            listFondos();
     }
-
 
     var search_solicitude_cont = $('#search_solicitude_cont');
     search_solicitude_cont.on('click', function () {
         searchSolicitudeToDate('cont',this)
     });
-
 
     var search_solicitude_cont = $('#search_solicitude_tes');
     search_solicitude_cont.on('click', function () {
@@ -1175,11 +1300,10 @@ function newSolicitude() {
     {
         $("#add-doc").hide();
         var trElement = $(this).parent().parent();
-        a = $(this); 
         trElement.children().each(function(i,data)
         {
             var tempData = $(data).html();
-            if( !($(data).attr("id") == "icons" || $(data).attr("id") == "pk" || $(data).attr("id") == "sunat" ) )
+            if( !( $(data).attr("id") == "icons" || $(data).attr("id") == "pk" || $(data).attr("id") == "sunat" ) )
                 inputcell(data,tempData);
             else if ( $(data).attr("id") == "icons" )
             {
@@ -1191,6 +1315,202 @@ function newSolicitude() {
             $(data).attr("data-data", tempData);
         });
     });
+
+    $(document).off( 'click' , '.maintenance-add');
+    $(document).on( 'click' , '.maintenance-add' , function()
+    {
+        var button = $(this);
+        $.ajax(
+        {
+            type: 'post' ,
+            url :  server + 'add-maintenance-info' ,
+            data:
+            {
+                _token : $('input[name=_token]').val() ,
+                type   : button.attr("case")
+            }
+        }).fail( function( statusCode , errorThrown )
+        {
+            ajaxError( statusCode , errorThrown );
+        }).done( function( response )
+        {
+            if ( response.Status == 'Ok')
+                button.parent().parent().find('tbody').append( response.Data );
+            else
+                bootbox.alert('<h4 class="red">' + Data.Status + ': ' + Data.Description + '</h4>');            
+        });
+    });
+
+    $(document).off("click", "#add-doc");
+    $(document).on("click", "#add-doc", function()
+    {
+        var style = 'style="text-align: center"';
+        $(this).hide();
+        $(".fondo_d tbody").append('<tr class="new">'
+            + '<td id="pk" ' +style + ' disabled></td>'
+            + '<td id="desc" ' +style + '> <input style="width: 100%;" type="text"> </td>'
+            + '<td id="sunat" ' +style + '> <input style="width: 100%;" type="text"></td>'
+            + '<td id="marca" ' +style + '> <input maxlength="3" style="width: 100%;" type="text"> </td>'
+            + '<td id="igv" ' +style + '> <select style="width: 100%;"><option>Si</option><option>No</option></select> </td>'
+            + '<td id="icons" ' +style + '> '
+            + '<a class="elementSave" data-sol="1" href="#"><span class="glyphicon glyphicon-floppy-disk"></span></a>'
+            + '<a class="elementBack" href="#"><span class="glyphicon glyphicon-remove"></span></a>'
+            + '</td>'
+            + '</tr>')
+    });
+
+    $(document).off( 'click' , '.maintenance-cancel');
+    $(document).on( 'click' , '.maintenance-cancel' , function()
+    {
+        var tr = $(this).parent().parent();
+        switch ( tr.attr('type') )
+        {
+            case 'fondos':
+                listFondos();
+                break;
+            case 'cuentas-marca':
+                listAccountsMarkRel();
+                break;
+        }
+    });
+
+
+    $(document).off('click' , '.maintenance-edit');
+    $(document).on('click' , '.maintenance-edit' , function()
+    {
+        var trElement = $(this).parent().parent();
+        trElement.children().each(function(i,data)
+        {
+            var td = $(data);
+            if ( td.attr('editable') == 1 )
+                enableTd( data );
+            else if ( td.attr('editable') == 2 )
+            {
+                $(data).html('<a class="maintenance-update" href="#">'
+                + '<span class="glyphicon glyphicon-floppy-disk"></span></a>'
+                + '<a class="maintenance-cancel" href="#"><span class="glyphicon glyphicon-remove"></span></a>');        
+            }
+            else if ( td.attr('editable') == 3 )
+            {
+                var val = td.html();
+                td.html('<input type="text" maxlength=7 value="' + val + '">');
+                td.children().numeric();
+            }
+        });
+    });
+
+    $(document).off( 'click' , '.maintenance-save');
+    $(document).on( 'click' , '.maintenance-save' , function()
+    {
+        var trElement = $(this).parent().parent();
+        var aData = {};
+        aData._token = $('input[name=_token]').val();
+        aData.type   = trElement.attr('type');
+        aData.Data   = {};
+        trElement.children().each( function( i , data )
+        {
+            var td = $(data);
+            if ( td.attr('save') == 1 )
+                aData.Data[td[0].className] = td.children().val() ;
+            else if ( td.attr('save') == 2 )
+                aData[td[0].className] = td.children().val() ;
+        });
+        $.ajax(
+        {
+            type: 'post' ,
+            url :  server + 'save-maintenance-info' ,
+            data: aData
+        }).fail( function( statusCode , errorThrown )
+        {
+            ajaxError( statusCode , errorThrown );
+        }).done( function( response )
+        {
+            if ( response.Status == 'Ok')
+            {
+                if ( aData.type == 'fondos' )
+                {
+                    bootbox.alert('<h4 class="green">Fondos Actualizado</h4>');
+                    listFondos();
+                }
+                else
+                {
+                    bootbox.alert('<h4 class="green">Tabla Actualizada</h4>');
+                    listAccountsMarkRel();
+                }
+            }
+            else
+                bootbox.alert('<h4 class="red">' + Data.Status + ': ' + Data.Description + '</h4>');            
+        });
+    });
+
+    $(document).off('click' , '.maintenance-update');
+    $(document).on('click' , '.maintenance-update' , function()
+    {
+        var trElement = $(this).parent().parent();
+        var aData = {};
+        aData._token = $('input[name=_token]').val();
+        aData.id     = trElement.attr('row-id');
+        aData.type   = trElement.attr('type');
+        aData.Data   = {};
+        trElement.children().each( function( i , data )
+        {
+            var td = $(data);
+            if ( td.attr('editable') == 1  || td.attr('editable') == 3 )
+                aData.Data[td[0].className] = td.children().val()
+        });
+        $.ajax(
+        {
+            type: 'post' ,
+            url :  server + 'update-maintenance-info' ,
+            data: aData
+        }).fail( function( statusCode , errorThrown )
+        {
+            ajaxError( statusCode , errorThrown );
+        }).done( function( response )
+        {
+            if ( response.Status == 'Ok')
+            {
+                if ( aData.type == 'fondos' )
+                {
+                    bootbox.alert('<h4 class="green">Fondo Actualizado</h4>');
+                    listFondos();
+                }
+                else if ( aData.type == 'cuentas-marca' )
+                {
+                    bootbox.alert('<h4 class="green">Relaciones Actualizadas</h4>');
+                    listAccountsMarkRel();
+                }
+            }
+            else
+                bootbox.alert('<h4 class="red">' + Data.Status + ': ' + Data.Description + '</h4>');            
+        });
+    });
+
+    function enableTd( data )
+    {
+        var td = $(data);
+        console.log(td);
+        $.ajax(
+        {
+            type: 'post' ,
+            url :  server + 'get-maintenance-info' ,
+            data: 
+            {
+                type   : td[0].className ,
+                val    : td.html(),
+                _token : $('input[name=_token]').val()
+            }
+        }).fail( function( statusCode , errorThrown )
+        {
+            ajaxError( statusCode , errorThrown );
+        }).done( function( response )
+        {
+            if ( response.Status == 'Ok')
+                td.html( response.Data );
+            else
+                bootbox.alert('<h4 class="red">' + Data.Status + ': ' + Data.Description + '</h4>');            
+        });
+    }
 
     function inputcell(data,tempData)
     {
@@ -1291,24 +1611,6 @@ function newSolicitude() {
         }
         else
             bootbox.alert("complete los datos");
-    });
-
-    $(document).off("click", "#add-doc");
-    $(document).on("click", "#add-doc", function()
-    {
-        var style = 'style="text-align: center"';
-        $(this).hide();
-        $(".fondo_d tbody").append('<tr class="new">'
-            + '<td id="pk" ' +style + ' disabled></td>'
-            + '<td id="desc" ' +style + '> <input style="width: 100%;" type="text"> </td>'
-            + '<td id="sunat" ' +style + '> <input style="width: 100%;" type="text"></td>'
-            + '<td id="marca" ' +style + '> <input maxlength="3" style="width: 100%;" type="text"> </td>'
-            + '<td id="igv" ' +style + '> <select style="width: 100%;"><option>Si</option><option>No</option></select> </td>'
-            + '<td id="icons" ' +style + '> '
-            + '<a class="elementSave" data-sol="1" href="#"><span class="glyphicon glyphicon-floppy-disk"></span></a>'
-            + '<a class="elementBack" href="#"><span class="glyphicon glyphicon-remove"></span></a>'
-            + '</td>'
-            + '</tr>')
     });
 
     $(document).off("click", ".elementBack");
@@ -1535,61 +1837,6 @@ function newSolicitude() {
     { 
         listSolicitude();
     });
-
-    //Function list Solicitude
-    function listSolicitude()
-    {
-        state = $('#idState').val();
-        var l = Ladda.create($("#search-solicitude")[0]);
-        l.start();
-        $.ajax(
-        {
-            url: server + 'buscar-solicitudes',
-            type: 'POST',
-            data:
-            { 
-                idstate: state,
-                date_start: $('#date_start').val(), 
-                date_end: $('#date_end').val(),
-                _token : document.getElementsByName('_token')[0].value 
-            }
-        }).fail( function ( statusCode , errorThrown )
-        {
-            l.stop();
-            ajaxError( statusCode , errorThrown );
-        }).done(function (data) 
-        {
-            l.stop();
-            if (data.Status == 'Ok' )
-            {
-                $('#table_solicitude_wrapper').remove();
-                $('.table-solicituds').append(data.Data);
-                $('#table_solicitude').dataTable(
-                {
-                    "order": 
-                    [
-                        [ 3, "desc" ] //order date
-                    ],
-                    "bLengthChange": false,
-                    'iDisplayLength': 7,
-                    "oLanguage": 
-                    {
-                        "sSearch": "Buscar: ",
-                        "sZeroRecords": "No hay solicitudes",
-                        "sInfoEmpty": "No hay solicitudes",
-                        "sInfo": 'Mostrando _END_ de _TOTAL_',
-                        "oPaginate": 
-                        {
-                            "sPrevious": "Anterior",
-                            "sNext" : "Siguiente"
-                        }
-                    }
-                });
-            }
-            else
-                responseUI(data.Status + ': ' + data.Description,'red');
-        });
-    }
 
     function validateNewSol()
     {

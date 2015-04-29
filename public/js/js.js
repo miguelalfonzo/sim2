@@ -1340,28 +1340,27 @@ $(function(){
             var data = {};
             data.seatList = GBDMKT.seatsList;
             data._token   = $("input[name=_token]").val();
+            data.idsolicitud = $('#idsolicitud').attr("rel");
             $.ajax({
                 type: 'post',
                 url: server+"guardar-asiento-gasto",
-                data: data,
-                async: false,
-                beforeSend: function(){
-                    loadingUI('Actualizando ...');
-                },
-                error: function(){
-                    console.log("error al registrar asientos");
-                }
-            }).done( function (result) {
-                if(!result.hasOwnProperty("error"))
+                data: data
+            }).fail( function( statusCode , errorThrown)
+            {
+                console.log(statusCode);
+                console.log(errorThrown);
+                bootbox.alert('<h4 class="red"> No se pudo acceder al servidor </h4>');
+            }).done( function ( result ) 
+            {
+                if( result.Status != 'Ok')
+                    bootbox.alert('<h4>' + result.Status + ': ' + result.Description + '</h4>');
+                else if ( result.Status == 'Ok' )
                 {
-                    
-                    responseUI("Gasto Actualizado","green");
-                    button.hide('slow');
-                    $(".edit-seat").hide('slow');
-                }
-                else
-                {
-                    responseUI("No se ha actualizado el gasto","red");
+                    responseUI( "Asiento Diario Registrado" , "green" );
+                    setTimeout( function()
+                    { 
+                        window.location.href = server + 'show_user'; 
+                    }, 2000);
                 }
             });
         });

@@ -37,8 +37,8 @@ class Expense extends Eloquent {
 
 	public function lastIdIgv()
 	{
-		$lastIdIgv = Expense::orderBy('idigv','desc')->first();
-		if($lastIdIgv == null)
+		$lastIdIgv = Expense::orderBy( 'idigv' , 'desc' )->first();
+		if( $lastIdIgv == null )
             return 0;
         else
             return $lastIdIgv->idigv;	

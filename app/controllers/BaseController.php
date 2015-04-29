@@ -262,7 +262,7 @@ class BaseController extends Controller {
                 }
                 else
                 {
-                    $solicituds->whereNotNull('iddeposito');
+                    $solicituds->detalle->whereNotNull('iddeposito');
                 }
             }
             else if ( Auth::user()->type == ASIS_GER ) 

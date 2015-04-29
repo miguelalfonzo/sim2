@@ -18,7 +18,7 @@
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Solicitud</label>
-						<input id="idsolicitud" type="text" class="form-control" rel="{{$solicitude->idsolicitud}}" value="{{$solicitude->idsolicitud}} - {{mb_convert_case($solicitude->titulo,MB_CASE_TITLE,'UTF-8')}}" disabled>
+						<input id="idsolicitud" type="text" class="form-control" rel="{{$solicitude->id}}" value="{{$solicitude->id}} - {{mb_convert_case($solicitude->titulo,MB_CASE_TITLE,'UTF-8')}}" disabled>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
@@ -32,7 +32,7 @@
 						<label>Monto de la Solicitud</label>
 						<div class="input-group">
 					    	<div id="type-money" class="input-group-addon">{{$solicitude->detalle->typeMoney->simbolo}}</div>
-					      	<input id="deposit" class="form-control" type="text" value="{{$solicitude->monto}}" disabled>
+					      	<input id="deposit" class="form-control" type="text" value="{{ json_decode( $solicitude->detalle->detalle )->monto_aprobado}}" disabled>
 					    </div>
 					</div>
 				</div>
@@ -149,7 +149,9 @@
 												<td class="prefijo">{{ $seatItem->prefijo }}</td>
 												<td class="cbte_proveedor">{{ $seatItem->cbte_proveedor }}</td>
 												<td class="dc">{{ $seatItem->dc }}</td>
-												<td class="importe">{{ $seatItem->importe }}</td>
+												<td class="importe">
+													{{ $seatItem->importe }}
+												</td>
 												<td class="leyenda">{{ $seatItem->leyenda }}</td>
 												<td class="leyenda_variable">{{ $seatItem->leyenda_variable }}</td>
 												<td class="tipo_responsable">{{ $seatItem->tipo_responsable }}</td>
@@ -223,33 +225,32 @@
 					</section>
 				</div>
 			</div>
-
-				
-				<section class="row reg-expense align-center" style="margin:1.5em 0">
-					<div class="col-xs-12 col-sm-12 col-md-12">
-						<a id="saveSeatExpense" class="btn btn-success" style="margin:-2em 2em .5em 0">Generar Asiento Gasto</a>
-						<a id="cancel-seat-cont" href="#" class="btn btn-danger" style="margin:-2em 2em .5em 0">Atras</a>
-					</div>
-				</section>
-			</div>
+	
+			<section class="row reg-expense align-center" style="margin:1.5em 0">
+				<div class="col-xs-12 col-sm-12 col-md-12">
+					<a id="saveSeatExpense" class="btn btn-success" style="margin:-2em 2em .5em 0">Generar Asiento Gasto</a>
+					<a id="cancel-seat-cont" href="#" class="btn btn-danger" style="margin:-2em 2em .5em 0">Atras</a>
+				</div>
+			</section>
 		</div>
 	</div>
+</div>
 
-	<script>
-	@if ( isset($seats) )
-		$(document).ready(function(){
-			GBDMKT = typeof(GBDMKT) === 'undefined' ? {} : GBDMKT;
-			GBDMKT.seatsList = {{ json_encode($seats) }};
-		@if(isset($error))
-			@foreach($error as $errorItem)
-				bootbox.alert("{{ $errorItem['error'] }}: {{ $errorItem['msg'] }}<br> ");
-			@endforeach
-		@endif
-			$('#myTab a').click(function (e) {
-			  e.preventDefault()
-			  $(this).tab('show')
-			})
-		});
+<script>
+@if ( isset($seats) )
+	$(document).ready(function(){
+		GBDMKT = typeof(GBDMKT) === 'undefined' ? {} : GBDMKT;
+		GBDMKT.seatsList = {{ json_encode($seats) }};
+	@if(isset($error))
+		@foreach($error as $errorItem)
+			bootbox.alert("{{ $errorItem['error'] }}: {{ $errorItem['msg'] }}<br> ");
+		@endforeach
 	@endif
-	</script>
+		$('#myTab a').click(function (e) {
+		  e.preventDefault()
+		  $(this).tab('show')
+		})
+	});
+@endif
+</script>
 @stop

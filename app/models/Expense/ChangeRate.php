@@ -18,4 +18,13 @@ class ChangeRate extends Eloquent
         return ChangeRate::where('moneda' , 'DO')->orderBy('fecha','desc')->first();
     }
 
+    protected static function getDateTc( $date )
+    {
+    	$tc = ChangeRate::where('moneda' , 'DO' )->where( 'fecha' , $date)->first();
+    	if ( is_null( $tc ) )
+    		return ChangeRate::getTc();
+    	else
+    		return $tc;
+    }
+
 }

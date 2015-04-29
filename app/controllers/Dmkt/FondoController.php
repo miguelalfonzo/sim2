@@ -107,7 +107,7 @@ class FondoController extends BaseController
         return substr( $rpta , 0 , -2 );
     }
 
-    public function getFondos($start, $export = 0)
+    public function listSolInst($start, $export = 0)
     {
         try
         {
@@ -552,7 +552,7 @@ class FondoController extends BaseController
         }
     }   
 
-    function getFondosTesoreria($start, $export = 0)
+   /* function getFondosTesoreria($start, $export = 0)
     {
         $periodo = $this->period($start);
         
@@ -576,12 +576,19 @@ class FondoController extends BaseController
             return $view;
         }
         
-    }
+    }*/
 
     function getLastDayOfMonth($month, $year)
     {
         return date('d', mktime(0, 0, 0, $month + 1, 1, $year) - 1);
     }
+
+    public function getFondos()
+    {
+        $fondos = Fondo::all();
+        return View::make('Dmkt.Treasury.fondo')->with('fondos' , $fondos);
+    }
+
 
    /* public function getFondosContabilidad($start, $state)
     {
