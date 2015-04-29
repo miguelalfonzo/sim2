@@ -29,17 +29,17 @@ class Fondo extends Eloquent {
 
     public static function supFondos()
     {
-        return Fondo::where( 'idusertype' , SUP )->whereNotNull('idcuenta')->get();
+        return Fondo::where( 'trim(idusertype)' , SUP )->whereNotNull('num_cuenta')->get();
     }
 
     public static function gerProdFondos()
     {
-        return Fondo::where('idusertype', GER_PROD )->whereNotNull('idcuenta')->get();
+        return Fondo::where('trim(idusertype)', GER_PROD )->whereNotNull('num_cuenta')->get();
     }
 
     public static function asisGerFondos()
     {
-        return Fondo::where('idusertype' , ASIS_GER )->whereNotNull('idcuenta')->get();
+        return Fondo::where('trim(idusertype)' , ASIS_GER )->whereNotNull('num_cuenta')->get();
     }
 
     protected function typeMoney()
