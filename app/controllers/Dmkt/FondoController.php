@@ -144,12 +144,12 @@ class FondoController extends BaseController
             foreach( $solicituds as $solicitud )
             {
                 $oldIdestado = $solicitud->idestado;
-                $solicitud->idestado = APROBADO;
+                $solicitud->idestado = DEPOSITO_HABILITADO;
                 if ( !$solicitud->save() )
                     return $this->warningException( __FUNCTION__ , 'No se pudo actualizar la solicitud: '.$solicitud->id );
                 else
                 {
-                    $middleRpta = $this->setStatus( $oldIdestado , APROBADO , Auth::user()->id , USER_TESORERIA , $solicitud->id );
+                    $middleRpta = $this->setStatus( $oldIdestado , DEPOSITO_HABILITADO , Auth::user()->id , USER_TESORERIA , $solicitud->id );
                     if ( $middleRpta[status] != ok )
                         return $middleRpta;
                 }

@@ -251,14 +251,12 @@ class BaseController extends Controller {
                 ->whereIn( 'iduserasigned' , $idUser );
             }
             else if (Auth::user()->type == SUP)
-            {
                 $solicituds->whereIn('created_by', $idUser);
-            } 
             else if ( Auth::user()->type == TESORERIA ) 
             {
                 if ($estado != R_FINALIZADO)
                 {
-                    $solicituds->whereIn( 'idestado' , array( APROBADO , DEPOSITADO ) );
+                    $solicituds->whereIn( 'idestado' , array( DEPOSITO_HABILITADO , DEPOSITADO ) );
                 }
                 else
                 {
@@ -280,9 +278,8 @@ class BaseController extends Controller {
                 });
             }
             else if ( Auth::user()->type == CONT )
-            {
-                $solicituds->whereIn( 'idestado' , array( DEPOSITADO , GASTO_HABILITADO , REGISTRADO , GENERADO ) );  
-            }
+                $solicituds->where('idestado' , '<>' , ACEPTADO );
+
             if ($start != null && $end != null)
             {
                 $solicituds->whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");

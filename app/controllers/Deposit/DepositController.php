@@ -155,7 +155,7 @@ class DepositController extends BaseController{
                     return $this->warningException( __FUNCTION__ , 'Cancelado - No se encontro la solicitud (Cod:'.$inputs['token'].')');
                 else
                 {
-                    if ( $solicitud->idestado != APROBADO )
+                    if ( $solicitud->idestado != DEPOSITO_HABILITADO )
                         return $this->warningException( __FUNCTION__ , 'Cancelado - No se puede depositar la solicitud en esta etapa del flujo: '.$solicitud->idestado );
                     else
                     {
@@ -208,7 +208,6 @@ class DepositController extends BaseController{
                                                             $middleRpta = $this->setStatus( $oldIdestado, DEPOSITADO, Auth::user()->id, USER_CONTABILIDAD, $solicitud->id );
                                                             if ( $middleRpta[status] == ok )
                                                             {
-                                                                Session::put( 'state' , R_REVISADO );
                                                                 DB::commit();
                                                                 return $middleRpta;
                                                             }

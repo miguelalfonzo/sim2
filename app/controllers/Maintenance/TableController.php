@@ -146,45 +146,40 @@ class TableController extends BaseController
 		try
 		{
 			DB::beginTransaction();
-			$middleRpta = $this->processAccount( $val[data]['idcuentafondo'] , 1 );
+			$middleRpta = $this->processAccount( $val[data]['num_cuenta_fondo'] , 1 );
 			if ( $middleRpta[status] == ok )
-			{
-				$val[data]['idcuentafondo'] = $middleRpta[data];
-				$middleRpta = $this->updateFondo( $val['idfondo'] , $val[data]['idcuentafondo'] );
+				$middleRpta = $this->processAccount( $val[data]['num_cuenta_gasto'] , 4 );
 				if ( $middleRpta[status] == ok )
 				{
-					$middleRpta = $this->processAccount( $val[data]['idcuentagasto'] , 4 );
+					$val[data]['idcuentagasto'] = $middleRpta[data];
+					$middleRpta = $this->processMark( $val[data]['idmarca'] );
 					if ( $middleRpta[status] == ok )
 					{
-						$val[data]['idcuentagasto'] = $middleRpta[data];
-						$middleRpta = $this->processMark( $val[data]['idmarca'] );
-						if ( $middleRpta[status] == ok )
+						$val[data]['idmarca'] = $middleRpta[data];
+						$accountsMark = MarkProofAccounts::orderBy('id');
+						foreach ( $val[data] as $key => $data)
+							$accountsMark->where( $key , $data );
+						$accountsMark->get();
+						Log::error( json_encode($accountsMark));
+						if ( $accountsMark->count() == 1 )
+							return $this->warningException( __FUNCTION__ , 'La Relacion ya existes');
+						elseif ( $accountsMark->count() == 0 )
 						{
-							$val[data]['idmarca'] = $middleRpta[data];
-							$accountsMark = MarkProofAccounts::orderBy('id');
-							foreach ( $val[data] as $key => $data)
-								$accountsMark->where( $key , $data );
-							$accountsMark->get();
-							Log::error( json_encode($accountsMark));
-							if ( $accountsMark->count() == 1 )
-								return $this->warningException( __FUNCTION__ , 'La Relacion ya existes');
-							elseif ( $accountsMark->count() == 0 )
+							$accountsMark = new MarkProofAccounts;
+							$accountsMark->id = $accountsMark->lastId() + 1 ;
+							foreach ( $val[data] as $key => $data )
+								$accountsMark->$key = $data;
+							if ( !$accountsMark->save() )
+								return $this->warningException( __FUNCTION__ , 'No se pudo procesar la nueva tabla');
+							else
 							{
-								$accountsMark = new MarkProofAccounts;
-								$accountsMark->id = $accountsMark->lastId() + 1 ;
-								foreach ( $val[data] as $key => $data )
-									$accountsMark->$key = $data;
-								if ( !$accountsMark->save() )
-									return $this->warningException( __FUNCTION__ , 'No se pudo procesar la nueva tabla');
-								else
-								{
-									DB::commit();
-									return $this->setRpta();
-								}
+								DB::commit();
+								return $this->setRpta();
 							}
 						}
 					}
 				}
+			}
 			}
 			DB::rollback();
 			return $middleRpta;

@@ -44,14 +44,14 @@
             @endif
         @elseif ( Auth::user()->type == CONT )
             @if( $solicitud->idtiposolicitud == SOL_REP )
-                @if($solicitud->idestado == APROBADO)
+                @if($solicitud->idestado == APROBADO )
                     <a id="enable-deposit" class="btn btn-success">Habilitar Depósito</a>
                 @endif
             @endif
             @if( $solicitud->idestado == DEPOSITADO )
-                <a id="seat-solicitude" class="btn btn-success">Generar Asiento Diario</a>
+                <a id="seat-solicitude" class="btn btn-success">Generar Asiento</a>
             @endif
-        @elseif ( Auth::user()->type == TESORERIA && $solicitud->idestado == APROBADO )
+        @elseif ( Auth::user()->type == TESORERIA && $solicitud->idestado == DEPOSITO_HABILITADO )
             <a class="btn btn-success" data-toggle="modal" data-target="#myModal" >Registrar Depósito</a>
         @endif
         <a id="button2id" href="{{URL::to('show_user')}}" class="btn btn-primary">

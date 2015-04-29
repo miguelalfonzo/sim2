@@ -67,12 +67,12 @@ class SolicitudeController extends BaseController
             $state = Session::pull('state');
         else
         {
-            if ( in_array( Auth::user()->type , array( GER_COM , TESORERIA , CONT ) ) )
+            if ( in_array( Auth::user()->type , array( GER_COM , CONT , ASIS_GER ) ) )
                 $state = R_APROBADO ;
             else if ( Auth::user()->type == REP_MED || Auth::user()->type == SUP || Auth::user()->type == GER_PROD )
                 $state = R_PENDIENTE;
-            elseif ( Auth::user()->type == ASIS_GER )
-                $state = R_APROBADO ;
+            elseif ( Auth::user()->type == TESORERIA )
+                $state = R_REVISADO ;
         }
         $mWarning = array();
         if (Session::has('warnings'))
@@ -171,7 +171,7 @@ class SolicitudeController extends BaseController
                     $data['solicitud']->status = 1;
                     $data['fondos'] = Fondo::gerProdFondos();
                 }
-                elseif ( Auth::user()->type == TESORERIA && $solicitud->idestado == APROBADO )
+                elseif ( Auth::user()->type == TESORERIA && $solicitud->idestado == DEPOSITO_HABILITADO )
                 {
                     $data['banks'] = Account::banks();
                     if ( is_null($solicitud->detalle->idretencion) )
@@ -190,17 +190,16 @@ class SolicitudeController extends BaseController
                 }
                 elseif ( Auth::user()->type == CONT )
                 {
-                    if ( $solicitud->idestado == APROBADO )
-                        $data['typeRetention'] = TypeRetention::all();
-                    elseif ( count( $solicitud->registerHist ) == 1 )
-                        $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
-                    elseif ( $solicitud->idestado == DEPOSITADO )
+                    if ( $solicitud->idestado == DEPOSITADO )
                     {
                         $data['date'] = $this->getDay();
                         $data['lv'] = $this->textLv( $solicitud );
                     }
                     elseif ( count( $solicitud->registerHist ) == 1 )
+                    {
                         $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
+                        $data['igv'] = Parameter::getIGV();
+                    }
                 }
                 elseif ( in_array( Auth::user()->type , array( REP_MED , ASIS_GER ) ) && ( $solicitud->advanceSeatHist->count() == 1 ) )
                 {
@@ -921,7 +920,6 @@ class SolicitudeController extends BaseController
             $solicitude = Solicitude::where('token', $token)->firstOrFail();
             $oldidestado = $solicitude->idestado;
             $idSol = $solicitude->id;        
-
             $solicitude->idestado = APROBADO;
             if ( isset($inputs['observacion']) )
                 $solicitude->observacion = $inputs['observacion'];
@@ -951,7 +949,7 @@ class SolicitudeController extends BaseController
                     }
                 }
             }
-            $rpta = $this->setStatus( $oldidestado , APROBADO , Auth::user()->id , USER_TESORERIA , $idSol );
+            $rpta = $this->setStatus( $oldidestado , APROBADO , Auth::user()->id , USER_CONTABILIDAD , $idSol );
             if ( $rpta[status] == ok )
                 DB::commit();
             else
@@ -965,14 +963,46 @@ class SolicitudeController extends BaseController
         return $rpta;
     }
 
-    /*public function disBlockSolicitudeGerCom($token)
+    public function enableDeposit()
     {
-        //Desbloquenado La solicitud al presionar el boton Cancelar
-        $solicitude = Solicitude::where('token', $token)->firstOrFail();
-        $solicitude->status = 1 ;
-        $solicitude->save();
-        return Redirect::to('show_user');
-    }*/
+        try
+        {
+            DB::beginTransaction();
+            $inputs = Input::all();
+            $solicitude = Solicitude::find( $inputs['idsolicitude'] );
+            if ( count( $solicitude ) == 0 )
+                return $this->warningException( __FUNCTION__ , 'No se encontro la solicitud con Id: '.$inputs['idsolicitude']);
+            else
+            {
+                if ( $solicitude->idestado != APROBADO )
+                    return $this->warningException( __FUNCTION__ , 'No se puede procesar una solicitud que no ha sido Aprobada');
+                else
+                {
+                    $oldIdestado = $solicitude->idestado;
+                    $solicitude->idestado = DEPOSITO_HABILITADO;
+                    if ( !$solicitude->save())
+                        return $this->warningException( __FUNCTION__ , 'Cancelado - No se pudo procesar la Solicitud' );
+                    else
+                    {
+                        $middleRpta = $this->setStatus( $oldIdestado , DEPOSITO_HABILITADO, Auth::user()->id , USER_TESORERIA , $solicitude->id );
+                        if ($middleRpta[status] == ok)
+                        {
+                            Session::put('state',R_REVISADO);
+                            DB::commit();
+                            return $middleRpta;
+                        }
+                    }
+                }
+            }
+            DB::rollback();
+            return $middleRpta;
+        }
+        catch (Exception $e)
+        {
+            DB::rollback();
+            return $this->internalException($e,__FUNCTION__);
+        }
+    }
 
     /** ---------------------------------------------  Contabilidad -------------------------------------------------*/
 

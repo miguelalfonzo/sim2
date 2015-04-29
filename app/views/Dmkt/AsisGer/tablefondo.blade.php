@@ -23,7 +23,7 @@
                         </span>
                         {{$solicitud->titulo}}
                     </td>
-                    <td style="text-align:center">{{$solicitud->asignedTo->rm->nombres.' '.$solicitud->asignedTo->rm->apellidos}}</td>
+                    <td style="text-align:center">{{$solicitud->asignedTo->rm->full_name}}</td>
                     <td style="text-align:center">
                         {{json_decode($solicitud->detalle->detalle)->num_cuenta}}
                     </td>
