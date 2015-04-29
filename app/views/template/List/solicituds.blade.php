@@ -49,18 +49,14 @@
                 @include('template.List.lastdate')
                 @if( Auth::user()->type == TESORERIA )
                     <td style="display:none;" class="total_deposit">
-                        @if ( $solicitude->idtiposolicitud == SOL_REP )
-                            {{$solicitude->detalle->fondo->account->typemoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_aprobado }}
-                        @elseif ( $solicitude->idtiposolicitud == SOL_INST )
-                            {{$solicitude->detalle->fondo->account->typemoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_aprobado }}
-                        @endif
+                        {{$solicitude->detalle->fondo->typemoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_aprobado }}
                     </td>
                     <td style="display:none" class="tes-ret">
-                    @if ( is_null( $solicitude->detalle->idretencion ) )
-                        0
-                    @else
-                        {{$solicitude->detalle->typeRetention->account->typeMoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_retencion}}
-                    @endif
+                        @if ( is_null( $solicitude->detalle->idretencion ) )
+                            0
+                        @else
+                            {{$solicitude->detalle->typeRetention->account->typeMoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_retencion}}
+                        @endif
                     </td>
                     <td class="text-center deposit">
                         @if ( $solicitude->idtiposolicitud == SOL_REP )
@@ -82,7 +78,7 @@
                                 {{$solicitude->detalle->deposit->account->typeMoney->simbolo.' '.$solicitude->detalle->deposit->total}}
                             @endif
                         @elseif ( $solicitude->idtiposolicitud == SOL_INST )
-                            {{$solicitude->detalle->fondo->account->typemoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_aprobado }}
+                            {{$solicitude->detalle->fondo->typemoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_aprobado }}
                         @endif  
                     </td>
                 @else
@@ -102,7 +98,7 @@
                                 {{ $solicitude->detalle->typeMoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_aprobado}}
                             @endif
                         @elseif ( $solicitude->idtiposolicitud == SOL_INST )
-                            {{$solicitude->detalle->fondo->account->typeMoney->simbolo.''.json_decode($solicitude->detalle->detalle)->monto_aprobado}}
+                            {{$solicitude->detalle->fondo->typeMoney->simbolo.''.json_decode($solicitude->detalle->detalle)->monto_aprobado}}
                         @endif
                     </td>
                 @endif

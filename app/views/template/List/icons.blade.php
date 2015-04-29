@@ -1,9 +1,9 @@
 <td style="text-align: center">
     <div class="div-icons-solicituds">
+        <a href="{{URL::to('ver-solicitud/'.$solicitude->token)}}">
+            <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span>
+        </a>    
         @if ( $solicitude->idtiposolicitud == SOL_REP )
-            <a href="{{URL::to('ver-solicitud/'.$solicitude->token)}}">
-                    <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span>
-            </a>       
             @if( Auth::user()->type == REP_MED)
                 @if($solicitude->idestado == REGISTRADO && Auth::user()->id == $solicitude->iduserasigned )
                     <a target="_blank" href="{{URL::to('a'.'/'.$solicitude->token)}}">
@@ -22,7 +22,7 @@
                 @endif
             @elseif ( Auth::user()->type == SUP )
                 @if( $solicitude->idestado == PENDIENTE && $solicitude->created_by == Auth::user()->id )
-                    <a  href="{{URL::to('editar-solicitud').'/'.$solicitude->token}}">
+                    <a href="{{URL::to('editar-solicitud').'/'.$solicitude->token}}">
                         <span style="padding: 0 5px; font-size: 1.3em"  class="glyphicon glyphicon-pencil"></span>
                     </a>
                     <a href="#" class="cancel-solicitude" data-idsolicitude = "{{$solicitude->id}}"  data-token="{{csrf_token()}}">
@@ -36,7 +36,7 @@
                     </a>
                 @endif   
             @elseif ( Auth::user()->type == TESORERIA )
-                @if( $solicitude->idestado == DEPOSITO_HABILITADO )
+                @if( $solicitude->idestado == APROBADO )
                     <a class="modal_deposit">
                         <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span>
                     </a>
@@ -50,9 +50,6 @@
             @endif
         
         @elseif ( $solicitude->idtiposolicitud == SOL_INST )
-            <a href="{{URL::to('show-fondo/'.$solicitude->token)}}">
-                <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open"></span>
-            </a>    
             @if ( Auth::user()->type == REP_MED )
                 @if($solicitude->idestado == REGISTRADO && Auth::user()->id == $solicitude->iduserasigned )   
                     <a href="{{URL::to('report-fondo')}}/{{$solicitude->token}}">
@@ -66,7 +63,7 @@
                     </a>
                 @endif  
             @elseif ( Auth::user()->type == TESORERIA )
-                @if ( $solicitude->idestado == DEPOSITO_HABILITADO )
+                @if ( $solicitude->idestado == APROBADO )
                     <a class="modal_deposit">
                         <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span>
                     </a>

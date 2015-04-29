@@ -16,10 +16,10 @@
                 <td class="nombre" style="text-align:center">{{$fondo->nombre}}</td>
                 <td class="idusertype" editable=1 style="text-align:center">{{$fondo->userType->descripcion}}</td>
                 <td class="moneda" style="text-align:center">
-                    @if ( is_null( $fondo->account ) )
+                    @if ( is_null( $fondo->num_cuenta ) )
                         -
                     @else
-                        {{$fondo->account->typeMoney->simbolo}}
+                        {{$fondo->typeMoney->simbolo}}
                     @endif
                 </td>
                 <td class="saldo" editable=3 style="text-align:center">{{$fondo->saldo}}</td>

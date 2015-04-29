@@ -51,7 +51,7 @@
             @if( $solicitud->idestado == DEPOSITADO )
                 <a id="seat-solicitude" class="btn btn-success">Generar Asiento Diario</a>
             @endif
-        @elseif ( Auth::user()->type == TESORERIA && $solicitud->idestado == DEPOSITO_HABILITADO )
+        @elseif ( Auth::user()->type == TESORERIA && $solicitud->idestado == APROBADO )
             <a class="btn btn-success" data-toggle="modal" data-target="#myModal" >Registrar Depósito</a>
         @endif
         <a id="button2id" href="{{URL::to('show_user')}}" class="btn btn-primary">

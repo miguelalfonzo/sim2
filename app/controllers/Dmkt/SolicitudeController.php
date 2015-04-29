@@ -67,12 +67,10 @@ class SolicitudeController extends BaseController
             $state = Session::pull('state');
         else
         {
-            if (Auth::user()->type == GER_COM || Auth::user()->type == CONT)
+            if ( in_array( Auth::user()->type , array( GER_COM , TESORERIA , CONT ) ) )
                 $state = R_APROBADO ;
             else if ( Auth::user()->type == REP_MED || Auth::user()->type == SUP || Auth::user()->type == GER_PROD )
                 $state = R_PENDIENTE;
-            elseif ( Auth::user()->type == TESORERIA )
-                $state = R_REVISADO ;
             elseif ( Auth::user()->type == ASIS_GER )
                 $state = R_APROBADO ;
         }
@@ -98,7 +96,7 @@ class SolicitudeController extends BaseController
         }
         if ( Auth::user()->type == ASIS_GER )
         {
-            $data['fondos']  = Fondo::where('idusertype', ASIS_GER )->get();                
+            $data['fondos']  = Fondo::asisGerFondos();                
             $data['etiquetas'] = Label::orderBy('id','asc')->get();
         }
         return View::make('template.User.show',$data);   
@@ -151,66 +149,64 @@ class SolicitudeController extends BaseController
                 return $this->warningException( __FUNCTION__ ,'No se encontro la Solicitud con Codigo: '.$token );
             else
             {
-                if ( $solicitud->idtiposolicitud != SOL_REP )
-                    return $this->warningException( __FUNCTION__ , 'La solicitud con Id: '.$solicitud->id.' no es de Representantes');
-                else
+                $detalle = json_decode($solicitud->detalle->detalle);
+                $data = array(
+                    'solicitud' => $solicitud,
+                    'detalle'   => $detalle
+                );
+                if ( Auth::user()->type == SUP && $solicitud->idestado == PENDIENTE )
                 {
-                    $detalle = json_decode($solicitud->detalle->detalle);
-                    $data = array(
-                        'solicitud' => $solicitud,
-                        'detalle'   => $detalle
-                    );
-                    if ( Auth::user()->type == SUP && $solicitud->idestado == PENDIENTE )
+                    $solicitud->status = BLOCKED;
+                    if ( !$solicitud->save() )
+                        return $this->warningException( __FUNCTION__ , 'No se puede procesar la solicitud para el supervisor');
+                    else
                     {
-                        $solicitud->status = BLOCKED;
-                        if ( !$solicitud->save() )
-                            return $this->warningException( __FUNCTION__ , 'No se puede procesar la solicitud para el supervisor');
-                        else
-                        {
-                            $data['fondos'] = Fondo::supFondos();
-                            $data['solicitud']->status = 1;
-                        }
-                    }
-                    elseif ( Auth::user()->type == GER_PROD && $solicitud->idestado == DERIVADO )
-                    {
+                        $data['fondos'] = Fondo::supFondos();
                         $data['solicitud']->status = 1;
-                        $data['fondos'] = Fondo::gerProdFondos();
                     }
-                    elseif ( Auth::user()->type == TESORERIA && $solicitud->idestado == DEPOSITO_HABILITADO )
-                    {
-                        $data['banks'] = Account::banks();
-                        if ( is_null($solicitud->detalle->idretencion) )
-                            $data['deposito'] = $detalle->monto_aprobado;
-                        else
-                            if ( $solicitud->detalle->typeRetention->account->idtipomoneda == $solicitud->detalle->idmoneda )
-                                $data['deposito'] = $detalle->monto_aprobado - $detalle->monto_retencion ;
-                            else
-                            {
-                                $tc = ChangeRate::getTc();
-                                if ( $solicitud->detalle->idmoneda == SOLES )
-                                    $data['deposito'] = $detalle->monto_aprobado - ( $detalle->monto_retencion * $tc->compra );    
-                                elseif ( $solicitud->detalle->idmoneda == DOLARES )
-                                    $data['deposito'] = $detalle->monto_aprobado - ( $detalle->monto_retencion / $tc->venta );   
-                            }
-                    }
-                    elseif ( Auth::user()->type == CONT )
-                    {
-                        if ( $solicitud->idestado == APROBADO )
-                            $data['typeRetention'] = TypeRetention::all();
-                        elseif ( count( $solicitud->registerHist ) == 1 )
-                            $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
-                        elseif ( $solicitud->idestado == DEPOSITADO )
-                        {
-                            $data['date'] = $this->getDay();
-                            $data['lv'] = $this->textLv( $solicitud );
-                        }
-                        elseif ( count( $solicitud->registerHist ) == 1 )
-                            $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
-                    }
-                    elseif ( in_array( Auth::user()->type , array( REP_MED , ASIS_GER ) ) && count( $solicitud->advanceSeatHist ) == 1 )
-                        $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
-                    return View::make('Dmkt.Solicitud.view', $data);
                 }
+                elseif ( Auth::user()->type == GER_PROD && $solicitud->idestado == DERIVADO )
+                {
+                    $data['solicitud']->status = 1;
+                    $data['fondos'] = Fondo::gerProdFondos();
+                }
+                elseif ( Auth::user()->type == TESORERIA && $solicitud->idestado == APROBADO )
+                {
+                    $data['banks'] = Account::banks();
+                    if ( is_null($solicitud->detalle->idretencion) )
+                        $data['deposito'] = $detalle->monto_aprobado;
+                    else
+                        if ( $solicitud->detalle->typeRetention->account->idtipomoneda == $solicitud->detalle->idmoneda )
+                            $data['deposito'] = $detalle->monto_aprobado - $detalle->monto_retencion ;
+                        else
+                        {
+                            $tc = ChangeRate::getTc();
+                            if ( $solicitud->detalle->idmoneda == SOLES )
+                                $data['deposito'] = $detalle->monto_aprobado - ( $detalle->monto_retencion * $tc->compra );    
+                            elseif ( $solicitud->detalle->idmoneda == DOLARES )
+                                $data['deposito'] = $detalle->monto_aprobado - ( $detalle->monto_retencion / $tc->venta );   
+                        }
+                }
+                elseif ( Auth::user()->type == CONT )
+                {
+                    if ( $solicitud->idestado == APROBADO )
+                        $data['typeRetention'] = TypeRetention::all();
+                    elseif ( count( $solicitud->registerHist ) == 1 )
+                        $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
+                    elseif ( $solicitud->idestado == DEPOSITADO )
+                    {
+                        $data['date'] = $this->getDay();
+                        $data['lv'] = $this->textLv( $solicitud );
+                    }
+                    elseif ( count( $solicitud->registerHist ) == 1 )
+                        $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
+                }
+                elseif ( in_array( Auth::user()->type , array( REP_MED , ASIS_GER ) ) && ( $solicitud->advanceSeatHist->count() == 1 ) )
+                {
+                    $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
+                    $data['igv'] = Parameter::getIGV();
+                }
+                return View::make('Dmkt.Solicitud.view', $data);
             }
         }
         catch ( Exception $e )
@@ -954,7 +950,7 @@ class SolicitudeController extends BaseController
                     }
                 }
             }
-            $rpta = $this->setStatus( $oldidestado , DEPOSITO_HABILITADO , Auth::user()->id , USER_CONTABILIDAD , $idSol );
+            $rpta = $this->setStatus( $oldidestado , APROBADO , Auth::user()->id , USER_TESORERIA , $idSol );
             if ( $rpta[status] == ok )
                 DB::commit();
             else
@@ -1384,70 +1380,6 @@ class SolicitudeController extends BaseController
         }
         return $middleRpta;
     }
-
-    
-
-    // IDKC: CHANGE STATUS => DEPOSITO HABILITADO
-  /*  public function enableDeposit()
-    {
-        try
-        {
-            DB::beginTransaction();
-            $inputs = Input::all();
-            $solicitude = Solicitude::find( $inputs['idsolicitude'] );
-            if ( count( $solicitude ) == 0 )
-                return $this->warningException( __FUNCTION__ , 'No se encontro la solicitud con Id: '.$inputs['idsolicitude']);
-            else
-            {
-                if ( $solicitude->idestado != APROBADO )
-                    return $this->warningException( __FUNCTION__ , 'No se puede procesar una solicitud que no ha sido Aprobada');
-                else
-                {
-                    $oldIdestado = $solicitude->idestado;
-                    $solicitude->idestado = DEPOSITO_HABILITADO;
-                    if ( !$solicitude->save())
-                        return $this->warningException( __FUNCTION__ , 'Cancelado - No se pudo procesar la Solicitud' );
-                    else
-                    {
-                        $val_ret = $inputs['monto_retencion'];
-                        if ( !empty( trim( $val_ret ) ) )
-                        {
-                            if ( !is_numeric( $val_ret ) )
-                                return $this->warningException( __FUNCTION__ , 'La retencion debe ser un valor Númerico' );
-                            elseif ( $val_ret <= 0 )    
-                                return $this->warningException( __FUNCTION__ , 'La retencion debe ser mayor que 0' );
-                            elseif ( empty( trim( $inputs['idretencion'] ) ) )
-                                return $this->warningException( __FUNCTION__ , 'No se encontro el tipo de retencion a registrar' );
-                            else 
-                            {
-                                $sol_detalle = $solicitude->detalle;
-                                $sol_detalle->idretencion = $inputs['idretencion'];
-                                $jDetalle = json_decode($sol_detalle->detalle);
-                                $jDetalle->monto_retencion = round( $val_ret , 2 ,PHP_ROUND_HALF_DOWN );
-                                $sol_detalle->detalle = json_encode($jDetalle);
-                                if ( !$sol_detalle->save() )
-                                    return $this->warningException( __FUNCTION__ , 'Cancelado - No se pudo registrar la retencion' );
-                            }
-                        }
-                        $middleRpta = $this->setStatus( $oldIdestado, DEPOSITO_HABILITADO, Auth::user()->id, USER_TESORERIA , $solicitude->id);
-                        if ($middleRpta[status] == ok)
-                        {
-                            Session::put('state',R_REVISADO);
-                            DB::commit();
-                            return $middleRpta;
-                        }
-                    }
-                }
-            }
-            DB::rollback();
-            return $middleRpta;
-        }
-        catch (Exception $e)
-        {
-            DB::rollback();
-            return $this->internalException($e,__FUNCTION__);
-        }
-    }*/
 
     public function findResponsables()
     {

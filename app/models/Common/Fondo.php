@@ -22,6 +22,11 @@ class Fondo extends Eloquent {
         	return $lastId->id;
  	}
 
+    public function bagoAccount()
+    {
+        return $this->hasOne( 'Expense\PlanCta' , 'ctactaextern' , 'num_cuenta' );
+    }
+
     public static function supFondos()
     {
         return Fondo::where( 'idusertype' , SUP )->whereNotNull('idcuenta')->get();

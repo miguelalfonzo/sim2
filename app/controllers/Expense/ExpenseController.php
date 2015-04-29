@@ -46,7 +46,7 @@ class ExpenseController extends BaseController
         return $array;
     }
 
-    public function showFondo($token)
+  /*  public function showFondo($token)
     {
     	try
     	{
@@ -72,7 +72,7 @@ class ExpenseController extends BaseController
 	                    elseif ( $solicitud->idestado == REGISTRADO )
                 			$data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );    	
                     }
-                    elseif ( Auth::user()->type == TESORERIA && $solicitud->idestado == DEPOSITO_HABILITADO )
+                    elseif ( Auth::user()->type == TESORERIA && $solicitud->idestado == APROBADO )
                     	$data['banks'] = Account::banks();
                     elseif ( Auth::user()->type == REP_MED && count( $solicitud->advanceSeatHist ) != 0  )
                     	$data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
@@ -83,9 +83,9 @@ class ExpenseController extends BaseController
 	    {
 	    	return $this->internalException($e,__FUNCTION__);
 	    }
-	}
+	}*/
 
-	private function expenseData( $solicitud , $monto_aprobado )
+	/*private function expenseData( $solicitud , $monto_aprobado )
     {
         $data = array(
             'typeProof'  => ProofType::orderBy('id','asc')->get(),
@@ -100,9 +100,9 @@ class ExpenseController extends BaseController
             $data['balance'] = $monto_aprobado - $balance;
         }
         return $data;
-    }
+    }*/
 
-	public function showCont($token)
+	/*public function showCont($token)
 	{
 		$date         = $this->getDayAll();
 		$typeProof    = ProofType::all();
@@ -137,7 +137,7 @@ class ExpenseController extends BaseController
 			'name_aproved' => $name_aproved
 		];
  		return View::make('Expense.register_cont',$data);
-	}
+	}*/
 
 	public function registerExpense()
 	{
@@ -565,20 +565,21 @@ class ExpenseController extends BaseController
     private function reportBalance( $solicitud , $detalle , $jDetalle , $mGasto )
 	{
 		$mDeposit = $detalle->deposit->total;
-	    
+	    Log::error( $mDeposit );
     	if ( $detalle->deposit->account->idtipomoneda == DOLARES )
     		$mDeposit = $mDeposit * $jDetalle->tcv;
 
-	    if ( isset( $jDetalle->monto_retencion ))
+	    if ( isset( $jDetalle->monto_retencion ) )
 	    	$monto_retencion = $jDetalle->monto_retencion ;
 	    else
 	    	$monto_retencion = 0;
 	    $mBalance = $mDeposit - ( $mGasto - $monto_retencion );  // - $monto_retencion );
+	    Log::error( $mBalance );
 	    if ( $mBalance > 0)
 	    	$data = array( 'bussiness' => round( $mBalance , 2 , PHP_ROUND_HALF_DOWN ) , 'employed' => 0 );
 	    elseif ( $mBalance < 0 )
 	    	$data = array( 'bussiness' => 0 , 'employed' => round( $mBalance*-1 , 2 , PHP_ROUND_HALF_DOWN ) );
-	    elseif ( $mBalance = 0 )
+	    elseif ( $mBalance == 0 )
 			$data = array( 'bussiness' => 0 , 'employed' => 0 );
 		return $data;
 	}

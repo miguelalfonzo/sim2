@@ -111,14 +111,14 @@ $(function(){
         $("#total").numeric({negative:false});
     //Events: Datepicker, Buttons, Keyup.
         //Calcule the IGV and Balance once typed the total amount per item
-        $(document).on("keyup",".total-item input",function(){
+        $(document).on("keyup",".total-item input",function()
+        {
            calcularIGV();
-           calcularBalance();
         });
         //Calcule the IGV and Balance once typed the imp service
-        $(document).on("keyup","#imp-ser",function(){
+        $(document).on("keyup","#imp-ser",function()
+        {
             calcularIGV();
-            calcularBalance();
         });
         // Datepicker date all classes
         // FIX COLOR IN INPUTS READONLY
@@ -403,11 +403,12 @@ $(function(){
             $("#ruc").prop('disabled', false);
             $("#number-prefix").prop('disabled', false);
             $("#number-serie").prop('disabled', false);
-            //console.log(this);
-            console.log(element);
-            var proof_type_sel = $(element).val();
+            var option = $("#proof-type :selected"); 
+            var igv = option.attr("igv");
+            var marca = option.attr("marca");
+
             //console.log(val);
-            if(proof_type_sel === '1' || proof_type_sel === '4' )//|| proof_type_sel === '6')
+            if( igv == 1 )//|| proof_type_sel === '6')
             {
                 $(".tot-document").show();
                 $('#dreparo').show();
@@ -417,7 +418,7 @@ $(function(){
                 $(".tot-document").hide();
                 $('#dreparo').hide();
             }
-            if(proof_type_sel === '7')
+            if( marca === 'N')
             {
                 // DESHABILITA INPUTS + QUITAR MARCAR DE ERRORES ANTERIORES
                 $("#ruc").prop('disabled', true);
@@ -456,7 +457,6 @@ $(function(){
             {
                 row_item.remove();
                 calcularIGV();
-                calcularBalance();
             }
         });
         //Delete a document already registered
@@ -540,7 +540,8 @@ $(function(){
             row_edit.addClass('select-row');
         });
         //Edit a document already registered
-        $(document).on("click","#table-expense .edit-expense", function( e )
+
+        $(document).on("click"," #table-expense .edit-expense", function( e )
         {
             e.preventDefault();
             $("#ruc-hide").siblings().parent().removeClass('input-group');
@@ -567,12 +568,13 @@ $(function(){
                     _token  : $('input[name=_token]').val(),
                     idgasto : row_expense.attr('data-id')
                 },
-                beforeSend:function(){
+                beforeSend:function()
+                {
                     loadingUI('Cargando Datos');
                 },
-                error:function(){
-                    console.log("error");
-                    $.blockUI();
+                error:function()
+                {
+                    responseUI("No se puede acceder al servidor" ,"red");
                     $(".message-expense").text('No se pueden recuperar los datos del servidor.').show();
                 }
             }).done( function ( response )
@@ -654,7 +656,7 @@ $(function(){
                 row += "</tr>";
 
             var proof_type       = $("#proof-type").val();
-            var proof_type_sel   = $("#proof-type option:selected").text();
+            var proof_type_sel   = $("#proof-type option:selected");
             var ruc              = $("#ruc").val();
             var ruc_hide         = $("#ruc-hide").val();
             var razon            = $("#razon").text();
@@ -669,43 +671,54 @@ $(function(){
             
             //Validación de errores de cabeceras
             var error = 0;
-            if(!ruc){   
-                if(proof_type !== '7'){
+            if(!ruc)
+            {   
+                if( proof_type_sel.attr("marca") !== 'N' )
+                {
                     $("#ruc").attr("placeholder","No se ha ingresado el RUC.");
                     $("#ruc").addClass("error-incomplete");
                     error = 1;
                 }
             }
             if(ruc != ruc_hide){
-                if(proof_type !== '7'){
+                if( proof_type_sel.attr("marca") !== 'N' )
+                {
                     $("#razon").addClass("error-incomplete");
                     $("#razon").html("Busque el RUC otra vez.");
                     error = 1;
                 }
             }
-            if(razon_hide == 0 && razon_edit == 0){
-                if(proof_type !== '7'){
+            if(razon_hide == 0 && razon_edit == 0)
+            {
+                if( proof_type_sel.attr("marca") !== 'N' )
+                {
                     $("#razon").addClass("error-incomplete");
                     $("#razon").html("No ha buscado la Razón Social.");
                     error = 1;
                 }
             }
-            else if(razon_hide == 1 && razon_edit == 0){
-                if(proof_type !== '7'){
+            else if(razon_hide == 1 && razon_edit == 0)
+            {
+                if( proof_type_sel.attr("marca") !== 'N' )
+                {
                     $("#razon").html("No existe el ruc consultado.");
                     $("#razon").removeClass("error-incomplete");
                     error = 1;
                 }
             }
-            if(!number_prefix){
-                if(proof_type !== '7'){
+            if(!number_prefix)
+            {
+                if( proof_type_sel.attr("marca") !== 'N' )
+                {
                     $("#number-prefix").attr("placeholder","Nro. Prejifo vacío");
                     $("#number-prefix").addClass("error-incomplete");
                     error = 1;
                 }
             }
-            if(!number_serie){
-                if(proof_type !== '7'){
+            if(!number_serie)
+            {
+                if( proof_type_sel.attr("marca") !== 'N' )
+                {
                     $("#number-serie").attr("placeholder","Nro. Serie vacío");
                     $("#number-serie").addClass("error-incomplete");
                     error = 1;
@@ -785,7 +798,7 @@ $(function(){
                 
                 if(error_json === 0)
                 {
-                    if(proof_type == '1' || proof_type == '4' || proof_type == '6')
+                    if( proof_type_sel.attr("igv") == 1 )
                     {
                         var sub_total_expense = parseFloat($("#sub-tot").val());
                         var imp_service       = parseFloat($("#imp-ser").val());
@@ -800,7 +813,7 @@ $(function(){
 
                     tot_expense = parseFloat($("#total-expense").val());
                     data.total_expense = tot_expense;
-                    var tot_expenses = calculateTot($(".total").parent(),'.total_expense');
+                    var tot_expenses = calculateTot( $(".total").parent(),'.total_expense' );
                     if( tot_expenses > 0 )
                         if(validateRuc(ruc) === true )
                         {
@@ -813,10 +826,6 @@ $(function(){
                                 }
                                 else if(result.code > 0)
                                 {
-                                    //var new_row = $(row).clone(true,true);
-                                    /*var arr_expense = [proof_type_sel,ruc, razon, voucher_number, date, type_money, tot_expense, result.gastoId];
-                                    newRowExpense(new_row,arr_expense);
-                                    */
                                     responseUI("Gasto Registrado","green");
                                     rechargeExpense().done( function ( data ) 
                                     {
@@ -824,9 +833,6 @@ $(function(){
                                         {
                                             $('#table-expense').html(data.Data);
                                             $("#save-expense").html("Registrar");
-                                            //$(".detail-expense").show();
-                                            //$(".search-ruc").show();
-                                            //$("#ruc-hide").siblings().parent().addClass('input-group');   
                                             tot_expenses = calculateTot($(".total").parent(),'.total_expense');
                                             balance = parseFloat(deposit - tot_expenses);
                                             balance = balance.toFixed(2);
@@ -861,10 +867,6 @@ $(function(){
                                     }
                                     else if(result.code > 0)
                                     {
-                                        //var new_row = $(row).clone(true,true);
-                                        //var arr_expense = [proof_type_sel, ruc, razon, voucher_number, date, type_money, tot_expense, result.gastoId];
-                                        //newRowExpense(new_row,arr_expense);
-                                        //deleteExpense();
                                         responseUI("Gasto Registrado","green");
                                         rechargeExpense().done( function ( data ) 
                                         {
@@ -872,9 +874,6 @@ $(function(){
                                             {
                                                 $('#table-expense').html(data.Data);
                                                 $("#save-expense").html("Registrar");
-                                                //$(".detail-expense").show();
-                                                //$(".search-ruc").show();
-                                                //$("#ruc-hide").siblings().parent().addClass('input-group');   
                                                 tot_expenses = calculateTot($(".total").parent(),'.total_expense');
                                                 balance = parseFloat(deposit - tot_expenses);
                                                 balance = balance.toFixed(2);
@@ -925,14 +924,6 @@ $(function(){
                                             {
                                                 if(result > 0)
                                                 {
-                                                    /*$(".proof-type:eq("+index+")").text(proof_type_sel);
-                                                    $(".ruc:eq("+index+")").text(ruc);
-                                                    $(".razon:eq("+index+")").text(razon);
-                                                    $(".voucher_number:eq("+index+")").text(voucher_number);
-                                                    $(".date_movement:eq("+index+")").text(date);
-                                                    $(".total_expense:eq("+index+")").text(tot_expense);
-                                                    $("#save-expense").html("Registrar");
-                                                    $("#table-expense tbody tr").removeClass("select-row");*/
                                                     responseUI("Gasto Actualizado","green");
                                                     rechargeExpense().done( function ( data ) 
                                                     {
@@ -940,9 +931,6 @@ $(function(){
                                                         {
                                                             $('#table-expense').html(data.Data);
                                                             $("#save-expense").html("Registrar");
-                                                            //$(".detail-expense").show();
-                                                            //$(".search-ruc").show();
-                                                            //$("#ruc-hide").siblings().parent().addClass('input-group');   
                                                             tot_expenses = calculateTot($(".total").parent(),'.total_expense');
                                                             balance = parseFloat(deposit - tot_expenses);
                                                             balance = balance.toFixed(2);
@@ -981,9 +969,6 @@ $(function(){
                                     {
                                         $('#table-expense').html(data.Data);
                                         $("#save-expense").html("Registrar");
-                                        //$(".detail-expense").show();
-                                        //$(".search-ruc").show();
-                                        //$("#ruc-hide").siblings().parent().addClass('input-group');   
                                         tot_expenses = calculateTot($(".total").parent(),'.total_expense');
                                         balance = parseFloat(deposit - tot_expenses);
                                         balance = balance.toFixed(2);
@@ -1015,6 +1000,12 @@ $(function(){
             $("#ruc-hide").siblings().parent().addClass('input-group');
         });
     
+        $(document).on('click' , 'input[name=igv]' , function()
+        {
+            console.log(this);
+            calcularIGV();
+        });
+
         //Search Social Reason in SUNAT once introduced the RUC
         $(".search-ruc").on("click",function(){
 
@@ -1109,6 +1100,7 @@ $(function(){
             $.each(rows,function(){
                 sum += parseFloat($(this).find(clas).html());
             });
+            console.log(sum);
             return sum;
         }
     //Functions
@@ -1159,6 +1151,7 @@ $(function(){
         {
             var balance;
             var deposit = parseFloat(depositado.val());
+            console.log(deposit);
             var tot_expenses = calculateTot($(".total").parent(),'.total_expense');
             var btn_save = $("#save-expense").html();
             var tot_expense = parseFloat($("#total-expense").val());
@@ -1198,8 +1191,10 @@ $(function(){
             };
             //Total variables proof
             var total_item = $(".total-item input");
+            var proof_type_sel = $("#proof-type :selected");
             var sub_total_expense = 0;
             var imp_service = parseFloat($("#imp-ser").val());
+            var igv_percent = $("input[name=igv]:checked").val();
             var igv = 0;
             var total_expense = 0;
             $.each(total_item,function(){
@@ -1210,13 +1205,12 @@ $(function(){
             });
             if(total_expense>0)
             {
-                if($("#proof-type").val()==='1' || $("#proof-type").val()==='4' )
+                if( proof_type_sel.attr("igv") == 1 )
                 {
                     if(!imp_service) imp_service = 0;
-                    
-                    igv = total_expense*IGV;
+                    igv = total_expense*igv_percent;
                     sub_total_expense = total_expense;
-                    $("#sub-tot").val(sub_total_expense.toFixed(2));
+                    $("#sub-tot").val( sub_total_expense.toFixed(2) );
                     total_expense = sub_total_expense + igv + imp_service;
                     
                     $("#igv").val(igv.toFixed(2));
@@ -1232,6 +1226,7 @@ $(function(){
                 $("#igv").val(0);
             }
         }
+
         //Validation and RUC in recorded documents
         function validateRuc(ruc)
         {

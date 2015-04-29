@@ -402,17 +402,16 @@ function newSolicitude() {
         listSolicitude();
 
     //Register Deposit
-    $(document).off("click", ".register-deposit");
-    $(document).on("click",".register-deposit",function(e)
+    $(document).off( "click" , ".register-deposit" );
+    $(document).on( "click" , ".register-deposit" , function( e )
     {
         e.preventDefault();
         var url = 'deposit-solicitude';
         var data = {};
-        //data.type_deposit   = $(this).attr('data-deposit');
         data.op_number      = $("#op-number").val();
         data.token          = $("input[name=token]").val();
         data._token         = $("input[name=_token]").val();
-        data.idcuenta       = $("#bank_account").val();
+        data.num_cuenta     = $("#bank_account").val();
 
         if ($("#op-number").val().trim() === "")
             $("#message-op-number").text("Ingrese el número de Operación");
@@ -440,41 +439,6 @@ function newSolicitude() {
         }
     });
 
-   /* function listFondos(user, state){
-        var url = server + 'list-'+user +'/'+dateactual + '/' + state;
-        if(user != 'fondos-contabilidad') {
-            url = server + 'list-'+user +'/'+dateactual;
-        }
-        $.ajax({
-            url: url,
-            type: 'GET',
-            dataType: 'html'
-
-        }).done(function (data) {
-            $(".fondo_r").remove();
-            $('.table_solicitude_'+user).append(data);
-            $("#datefondo").val(dateactual);
-            $('#table_solicitude_'+user).dataTable({
-                    "order": [
-                        [ 0, "desc" ] //order date
-                    ],
-                    "bLengthChange": false,
-                    'iDisplayLength': 7,
-                    "oLanguage": {
-                        "sSearch": "Buscar: ",
-                        "sZeroRecords": "No hay fondos",
-                        "sInfoEmpty": "No hay fondos",
-                        "sInfo": 'Mostrando _END_ de _TOTAL_',
-                        "oPaginate": {
-                            "sPrevious": "Anterior",
-                            "sNext" : "Siguiente"
-                        }
-                    }
-                }
-            );
-        });
-    }*/
-    
     /* Cancel Solicitude */
     var cancel_solicitude = '.cancel-solicitude';
     $(document).on('click', cancel_solicitude, function (e) 

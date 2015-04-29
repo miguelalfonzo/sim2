@@ -18,7 +18,7 @@ class Account extends Eloquent
 
     protected function bagoAccount()
     {
-        return $this->belongsTo('Expense\PlanCta' , 'num_cuenta' , 'ctactaextern');
+        return $this->belongsTo('Expense\PlanCta' , 'num_cuenta' , 'ctactaextern' );
     }
 
     public function typeAccount()
