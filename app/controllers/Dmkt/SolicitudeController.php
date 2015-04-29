@@ -162,6 +162,7 @@ class SolicitudeController extends BaseController
                     else
                     {
                         $data['fondos'] = Fondo::supFondos();
+                        Log::error($data['fondos']);
                         $data['solicitud']->status = 1;
                     }
                 }

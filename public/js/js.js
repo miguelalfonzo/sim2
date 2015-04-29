@@ -1225,6 +1225,7 @@ $(function(){
                 $("#sub-tot").val(0);
                 $("#igv").val(0);
             }
+            calcularBalance();
         }
 
         //Validation and RUC in recorded documents
