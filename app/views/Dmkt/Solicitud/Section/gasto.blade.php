@@ -189,6 +189,39 @@
 			</div>
 		@endif
 	</section>
+	
+	<section class="container-fluid" >
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Detalle de Evento</h3>
+			</div>
+			<div class="panel-body">
+				<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+					<label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label">Nombre del Evento</label>
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+						<input id="event-name" type="text" class="form-control" maxlength="100">
+					</div>
+				</div>
+				<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+					<label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label">Lugar del Evento</label>
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+						<input id="event-place" type="text" class="form-control" maxlength="100" placeholder="(Opcional)">
+					</div>
+				</div>
+
+				<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+					<label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label">Descripcion del Evento</label>
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+						<textarea id="event-description" type="text" class="form-control"  rows="4" maxlength="250"></textarea>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+	</section>
+
+
+
 	<section class="row reg-expense detail-expense" style="margin:0">
 		<div class="col-xs-12 col-sm-12 col-md-12">
 			<div class="form-expense">

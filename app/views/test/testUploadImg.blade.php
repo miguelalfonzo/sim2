@@ -14,28 +14,29 @@
         <div class="row">
             <div class="span3">
                 <div id="validation-errors"></div>
-                <form class="form-horizontal" id="upload" enctype="multipart/form-data" method="post" action="{{ url('testUploadImgSave') }}" autocomplete="off">
+                <form class="form-horizontal" id="solicitude-upload-image-event" enctype="multipart/form-data" method="post" action="{{ url('testUploadImgSave') }}" autocomplete="off">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-                    <input type="file" name="image" id="image" multiple /> 
+                    <span class="btn btn-info btn-file">
+                        Subir Imagenes <input type="file" name="image[]" id="upload-image-event" multiple="true" /> 
+                    </span>
                 </form>
  
             </div>
-            <div class="span5">
-                <div class="col-xs-6 col-md-3 thumbnail" id="output" style="display:none">
-				</div>
+            <div class="span5" id="output" style="display:none;">
+                
             </div>
         </div>
     </div>
 </div>
 <script>
 $(document).ready(function() {
-	var options = { 
-                beforeSubmit:  showRequest,
-				success:       showResponse,
-				dataType: 'json' 
+	var options = {
+                beforeSubmit:   showRequest,
+				success:        showResponse,
+				dataType:       'json' 
         }; 
- 	$('body').delegate('#image','change', function(){
- 		$('#upload').ajaxForm(options).submit();  		
+ 	$('body').delegate('#upload-image-event','change', function(){
+ 		$('#solicitude-upload-image-event').ajaxForm(options).submit();  		
  	}); 
 });		
 function showRequest(formData, jqForm, options) { 
@@ -56,8 +57,11 @@ function showResponse(response, statusText, xhr, $form)  {
 		});
 		$("#validation-errors").show();
 	} else {
-		 $("#output").html("<img src='"+response.file+"' />");
-		 $("#output").css('display','block');
+        for (var i = response.fileList.length - 1; i >= 0; i--) {
+            response.fileList[i]
+            $("#output").append('<div class="col-xs-6 col-md-3 solicitude_img thumbnail"> <img data-img-id='+ response.fileList[i]['id'] +' src="'+ response.fileList[i]['name'] +'" /></div>');
+            $("#output").css('display','block');
+        };
 	}
 }
 </script>

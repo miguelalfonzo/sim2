@@ -5,14 +5,10 @@ use \User;
 use \Common\State;
 use \Dmkt\Solicitude;
 use \Swift_TransportException;
+use \Common\FileStorage;
 
 class BaseController extends Controller {
 
-    /**
-     * Setup the layout used by the controller.
-     *
-     * @return \BaseController
-     */
 
     public function __construct()
     {
@@ -360,26 +356,51 @@ class BaseController extends Controller {
         return View::make('test.testUploadImg');
     }
     public function viewTestUploadImgSave() {
-        $file = Input::file('image');
-        $input = array('image' => $file);
-        $rules = array(
-            'image' => 'image'
-        );
-        $validator = Validator::make($input, $rules);
-        if ( $validator->fails() )
+
+        $fileList = Input::file('image');
+
+        // $input = array('image' => $file);
+        // $rules = array(
+        //     'image' => 'image'
+        // );
+
+        // $validator = Validator::make($input, $rules);
+        if ( count($fileList) == 0 )
         {
-            return Response::json(['success' => false, 'errors' => $validator->getMessageBag()->toArray()]);
- 
+            return Response::json(array(
+                'success'   => false,
+                'errors'    => 'No se pudo Cargar Archivo'
+            ));
         }
         else {
-            $destinationPath = 'uploads/';
-            //$filename = $file->getClientOriginalName();
-            $filename_ori = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-            $ext = pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
-            $filename = md5(uniqid(rand(), true)).$ext;
-            dd($filename);
-            Input::file('image')->move($destinationPath, $filename);
-            return Response::json(['success' => true, 'file' => asset($destinationPath.$filename)]);
+            $resultFileList = array();
+            
+            foreach ($fileList as $fileKey => $fileItem) {
+                
+                $destinationPath    = FILESTORAGE_DIR;
+                $fileName           = pathinfo($fileItem->getClientOriginalName(), PATHINFO_FILENAME);
+                $fileExt            = pathinfo($fileItem->getClientOriginalName(), PATHINFO_EXTENSION);
+                $fileNameMD5        = md5(uniqid(rand(), true));
+
+                $fileStorage                = new FileStorage;
+                $fileStorage->id            = $fileNameMD5;
+                $fileStorage->name          = pathinfo($fileItem->getClientOriginalName(), PATHINFO_FILENAME);
+                $fileStorage->extension     = $fileExt;
+                $fileStorage->directory     = $destinationPath;
+                $fileStorage->app           = APP_ID;
+                $fileStorage->save();
+
+                $fileItem->move($destinationPath, $fileNameMD5.'.'.$fileExt);
+                $resultFileList[] = array(
+                    'id'   => $fileNameMD5,
+                    'name'      => asset($destinationPath.$fileNameMD5.'.'.$fileExt)
+                );
+
+            }
+            return Response::json(array(
+                'success'   => true,
+                'fileList'  => $resultFileList
+            ));
         }
  
     }
