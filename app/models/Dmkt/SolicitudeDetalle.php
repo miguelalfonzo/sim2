@@ -38,11 +38,6 @@ class SolicitudeDetalle extends Eloquent
         return $this->hasOne('Common\TypePayment','id','idpago');
     }
 
-    protected function typeRetention()
-    {
-        return $this->hasOne('Dmkt\TypeRetention','id','idretencion');
-    }
-
     protected function deposit()
     {
         return $this->hasOne('Common\Deposit','id','iddeposito');

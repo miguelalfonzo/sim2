@@ -14,7 +14,6 @@ use \DB;
 use \Redirect;
 use \PDF;
 use \Client;
-use \Dmkt\TypeRetention;
 use \Log;
 use \Common\Deposit;
 use \BagoUser;
@@ -45,99 +44,6 @@ class ExpenseController extends BaseController
         }
         return $array;
     }
-
-  /*  public function showFondo($token)
-    {
-    	try
-    	{
-    		$solicitud = Solicitude::where( 'token' , $token )->first();
-	        if( count( $solicitud ) == 0 )
-	            return $this->warninException( __FUNCTION__ , 'No se encontro los datos de la Solicitud Institucional' );
-	        else
-	        	if ( $solicitud->idtiposolicitud == SOL_REP )
-	        		return $this->warninException( __FUNCTION__ , 'La solicitud con Id: '.$solicitud->id.' no es Insitucional' );
-	        	else
-	        	{
-
-			        $data['solicitud']	 = $solicitud;
-			        $detalle = json_decode( $solicitud->detalle->detalle );
-			        $data['detalle'] = $detalle;
-			        if ( Auth::user()->type == CONT )
-                    {
-                    	if( $solicitud->idestado == DEPOSITADO )
-                        {
-	                        $data['date'] = $this->getDay();
-	                        $data['lv'] = $solicitud->createdBy->person->full_name.' - '.$solicitud->titulo;
-	                    }
-	                    elseif ( $solicitud->idestado == REGISTRADO )
-                			$data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );    	
-                    }
-                    elseif ( Auth::user()->type == TESORERIA && $solicitud->idestado == APROBADO )
-                    	$data['banks'] = Account::banks();
-                    elseif ( Auth::user()->type == REP_MED && count( $solicitud->advanceSeatHist ) != 0  )
-                    	$data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
-                    return View::make( 'Dmkt.Solicitud.view' , $data );
-			    }
-	    }
-	    catch (Exception $e)
-	    {
-	    	return $this->internalException($e,__FUNCTION__);
-	    }
-	}*/
-
-	/*private function expenseData( $solicitud , $monto_aprobado )
-    {
-        $data = array(
-            'typeProof'  => ProofType::orderBy('id','asc')->get(),
-            'typeExpense' => ExpenseType::order(),
-            'date'         => $this->getDay()
-        );
-        $gastos = $solicitud->expenses;
-        if ( count( $gastos ) > 0 )
-        {
-            $data['expense'] = $gastos;
-            $balance = $gastos->sum('monto');
-            $data['balance'] = $monto_aprobado - $balance;
-        }
-        return $data;
-    }*/
-
-	/*public function showCont($token)
-	{
-		$date         = $this->getDayAll();
-		$typeProof    = ProofType::all();
-		$typeExpense  = ExpenseType::order();
-		$solicitude   = Solicitude::where('token',$token)->firstOrFail();
-		$expense      = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
-		$aproved_user = $solicitude->acceptHist->updatedBy;
-		if($aproved_user->type === 'S')
-		{
-			$name_aproved = $aproved_user->sup->nombres;
-		}
-		if($aproved_user->type === 'P')
-		{
-			$name_aproved = $aproved_user->gerprod->descripcion;
-		}
-		$balance     = $solicitude->monto;
-		if(count($expense)>0)
-		{
-			$balance         = 0;
-			foreach ($expense as $key => $value) {
-				$balance += $value->monto;
-			}
-			$balance= $solicitude->monto - $balance;
- 		}
- 		$data = [
-			'solicitude'   => $solicitude,
-			'typeProof'    => $typeProof,
-			'typeExpense'  => $typeExpense,
-			'date'         => $date,
-			'balance'      => $balance,
-			'expense'      => $expense,
-			'name_aproved' => $name_aproved
-		];
- 		return View::make('Expense.register_cont',$data);
-	}*/
 
 	public function registerExpense()
 	{
@@ -600,11 +506,5 @@ class ExpenseController extends BaseController
 		{
 			return $this->internalException( $e , __FUNCTION__ );
 		}
-	}
-
-	public function getDailySeatRelation()
-	{
-		$iAccounts = MarkProofAccounts::all();
-		return View::make( 'Dmkt.Cont.list_accounts_mark_relation' )->with( 'iAccounts' , $iAccounts )->render();
 	}
 }

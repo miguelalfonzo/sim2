@@ -30,6 +30,8 @@ use \Common\TypeMoney;
 use \Dmkt\Solicitud\Periodo;
 use \Expense\ExpenseType;
 use \Expense\MarkProofAccounts;
+use \Expense\Table;
+use \Expense\Regimen;
 
 class SolicitudeController extends BaseController
 {
@@ -67,12 +69,12 @@ class SolicitudeController extends BaseController
             $state = Session::pull('state');
         else
         {
-            if ( in_array( Auth::user()->type , array( GER_COM , TESORERIA , CONT ) ) )
+            if ( in_array( Auth::user()->type , array( GER_COM , CONT , ASIS_GER ) ) )
                 $state = R_APROBADO ;
             else if ( Auth::user()->type == REP_MED || Auth::user()->type == SUP || Auth::user()->type == GER_PROD )
                 $state = R_PENDIENTE;
-            elseif ( Auth::user()->type == ASIS_GER )
-                $state = R_APROBADO ;
+            elseif ( Auth::user()->type == TESORERIA )
+                $state = R_REVISADO ;
         }
         $mWarning = array();
         if (Session::has('warnings'))
@@ -162,7 +164,6 @@ class SolicitudeController extends BaseController
                     else
                     {
                         $data['fondos'] = Fondo::supFondos();
-                        Log::error($data['fondos']);
                         $data['solicitud']->status = 1;
                     }
                 }
@@ -171,41 +172,29 @@ class SolicitudeController extends BaseController
                     $data['solicitud']->status = 1;
                     $data['fondos'] = Fondo::gerProdFondos();
                 }
-                elseif ( Auth::user()->type == TESORERIA && $solicitud->idestado == APROBADO )
+                elseif ( Auth::user()->type == TESORERIA && $solicitud->idestado == DEPOSITO_HABILITADO )
                 {
                     $data['banks'] = Account::banks();
-                    if ( is_null($solicitud->detalle->idretencion) )
-                        $data['deposito'] = $detalle->monto_aprobado;
-                    else
-                        if ( $solicitud->detalle->typeRetention->account->idtipomoneda == $solicitud->detalle->idmoneda )
-                            $data['deposito'] = $detalle->monto_aprobado - $detalle->monto_retencion ;
-                        else
-                        {
-                            $tc = ChangeRate::getTc();
-                            if ( $solicitud->detalle->idmoneda == SOLES )
-                                $data['deposito'] = $detalle->monto_aprobado - ( $detalle->monto_retencion * $tc->compra );    
-                            elseif ( $solicitud->detalle->idmoneda == DOLARES )
-                                $data['deposito'] = $detalle->monto_aprobado - ( $detalle->monto_retencion / $tc->venta );   
-                        }
+                    $data['deposito'] = $detalle->monto_aprobado;
                 }
                 elseif ( Auth::user()->type == CONT )
                 {
-                    if ( $solicitud->idestado == APROBADO )
-                        $data['typeRetention'] = TypeRetention::all();
-                    elseif ( count( $solicitud->registerHist ) == 1 )
-                        $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
-                    elseif ( $solicitud->idestado == DEPOSITADO )
+                    if ( $solicitud->idestado == DEPOSITADO )
                     {
                         $data['date'] = $this->getDay();
                         $data['lv'] = $this->textLv( $solicitud );
                     }
                     elseif ( count( $solicitud->registerHist ) == 1 )
+                    {
                         $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
+                        $data['igv'] = Table::getIGV();
+                        $data['regimenes'] = Regimen::all();
+                    }
                 }
                 elseif ( in_array( Auth::user()->type , array( REP_MED , ASIS_GER ) ) && ( $solicitud->advanceSeatHist->count() == 1 ) )
                 {
                     $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
-                    $data['igv'] = Parameter::getIGV();
+                    $data['igv'] = Table::getIGV();
                 }
                 return View::make('Dmkt.Solicitud.view', $data);
             }
@@ -921,7 +910,6 @@ class SolicitudeController extends BaseController
             $solicitude = Solicitude::where('token', $token)->firstOrFail();
             $oldidestado = $solicitude->idestado;
             $idSol = $solicitude->id;        
-
             $solicitude->idestado = APROBADO;
             if ( isset($inputs['observacion']) )
                 $solicitude->observacion = $inputs['observacion'];
@@ -951,7 +939,7 @@ class SolicitudeController extends BaseController
                     }
                 }
             }
-            $rpta = $this->setStatus( $oldidestado , APROBADO , Auth::user()->id , USER_TESORERIA , $idSol );
+            $rpta = $this->setStatus( $oldidestado , APROBADO , Auth::user()->id , USER_CONTABILIDAD , $idSol );
             if ( $rpta[status] == ok )
                 DB::commit();
             else
@@ -965,14 +953,46 @@ class SolicitudeController extends BaseController
         return $rpta;
     }
 
-    /*public function disBlockSolicitudeGerCom($token)
+    public function enableDeposit()
     {
-        //Desbloquenado La solicitud al presionar el boton Cancelar
-        $solicitude = Solicitude::where('token', $token)->firstOrFail();
-        $solicitude->status = 1 ;
-        $solicitude->save();
-        return Redirect::to('show_user');
-    }*/
+        try
+        {
+            DB::beginTransaction();
+            $inputs = Input::all();
+            $solicitude = Solicitude::find( $inputs['idsolicitude'] );
+            if ( count( $solicitude ) == 0 )
+                return $this->warningException( __FUNCTION__ , 'No se encontro la solicitud con Id: '.$inputs['idsolicitude']);
+            else
+            {
+                if ( $solicitude->idestado != APROBADO )
+                    return $this->warningException( __FUNCTION__ , 'No se puede procesar una solicitud que no ha sido Aprobada');
+                else
+                {
+                    $oldIdestado = $solicitude->idestado;
+                    $solicitude->idestado = DEPOSITO_HABILITADO;
+                    if ( !$solicitude->save())
+                        return $this->warningException( __FUNCTION__ , 'Cancelado - No se pudo procesar la Solicitud' );
+                    else
+                    {
+                        $middleRpta = $this->setStatus( $oldIdestado , DEPOSITO_HABILITADO, Auth::user()->id , USER_TESORERIA , $solicitude->id );
+                        if ($middleRpta[status] == ok)
+                        {
+                            Session::put('state',R_REVISADO);
+                            DB::commit();
+                            return $middleRpta;
+                        }
+                    }
+                }
+            }
+            DB::rollback();
+            return $middleRpta;
+        }
+        catch (Exception $e)
+        {
+            DB::rollback();
+            return $this->internalException($e,__FUNCTION__);
+        }
+    }
 
     /** ---------------------------------------------  Contabilidad -------------------------------------------------*/
 
@@ -1130,7 +1150,7 @@ class SolicitudeController extends BaseController
                     if($itemLength == $itemKey)
                     {
                         // ASIENTO IGV
-                          $seat = $this->createSeatElement($tempId++, $cuentaMkt, '', $solicitud->id, $account_number, $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_IGV, ASIENTO_GASTO_COD_PROV_IGV, $expense->razon, ASIENTO_GASTO_COD_IGV, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, $expense->igv, $marca, $description_seat_igv, $tipo_responsable, 'IGV');
+                        $seat = $this->createSeatElement($tempId++, $cuentaMkt, '', $solicitud->id, $account_number, $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_IGV, ASIENTO_GASTO_COD_PROV_IGV, $expense->razon, ASIENTO_GASTO_COD_IGV, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, $expense->igv, $marca, $description_seat_igv, $tipo_responsable, 'IGV');
                         array_push($seatListTemp, $seat);
                              // ASIENTO IMPUESTO SERVICIO
                         if(!($expense->imp_serv == null || $expense->imp_serv == 0 || $expense->imp_serv == '')){
@@ -1142,9 +1162,9 @@ class SolicitudeController extends BaseController
                         // ASIENTO REPARO
                         if($expense->reparo == '1')
                         {   
-                                $seat = $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', CUENTA_REPARO_COMPRAS, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_BASE, $expense->igv, $marca, $description_seat_repair_base, '', 'REP');
+                            $seat = $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', CUENTA_REPARO_COMPRAS, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_BASE, $expense->igv, $marca, $description_seat_repair_base, '', 'REP');
                             array_push($seatListTemp, $seat);
-                                 $seat = $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', CUENTA_REPARO_GOBIERNO, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO, $expense->igv, $marca, $description_seat_repair_deposit, '', 'REP');
+                            $seat = $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', CUENTA_REPARO_GOBIERNO, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO, $expense->igv, $marca, $description_seat_repair_deposit, '', 'REP');
                             array_push($seatListTemp, $seat);
                         }
                     }
@@ -1474,10 +1494,6 @@ class SolicitudeController extends BaseController
         {
             DB::beginTransaction();
             $inputs = Input::all();
-            //$oldOolicitude      = Solicitude::where('idsolicitude', $inputs['idsolicitude'])->first();
-            //$oldStatus          = $oldOolicitude->estado;
-            //$idSol              = $oldOolicitude->idsolicitud;
-
             $solicitud = Solicitude::find($inputs['idsolicitude']);
             $oldIdEstado = $solicitud->id;
             $solicitud->idestado = GENERADO;
@@ -1500,74 +1516,3 @@ class SolicitudeController extends BaseController
         }
     } 
 }
-
-    /*public function getResponsables()
-    {
-        try
-        {
-            $inputs = Input::all();
-            $solicitude = Solicitude::find($inputs['idsolicitude']);
-            $fondo = Fondo::find($inputs['idfondo']);
-            $responsables = array();
-            if ( Auth::user()->type == SUP )
-            {
-                if ($fondo->idusertype == SUP)
-                {
-                    if ( $solicitude->createdBy->type == REP_MED )
-                        $resp[] = $solicitude->createdBy->rm;
-                    elseif ( $solicitude->createdBy->type == SUP )
-                        foreach ( $solicitude->createdBy->sup->Reps as $rep )
-                            $resp[] = $rep;
-                    else
-                        return array( status => warning , description => 'Rol del Solicitante no definido: '.$solicitude->createdBy->type);
-                }
-                elseif ($fondo->idusertype == GER_PROD )
-                {
-                    foreach ( $solicitude->families as $family )
-                    {
-                        if ( !is_null($family->marca->manager) )
-                            if (is_null($family->marca->manager->iduser))
-                                return array( status => warning , description => 'El Gerente no se encuentra registrado en el sistema' );
-                            else
-                                $resp[] = $family->marca->manager;
-                        else
-                            return array( status => warning , description => 'No se encontro el encargado (Gerente) de la Marca: '.$family->marca->descripcion );
-                    }   
-                }
-                elseif ($fondo->idusertype == ASIS_GER)
-                {
-                    $asis = User::where('type', ASIS_GER)->get();
-                    foreach ($asis as $asi)
-                        $resp[] = $asi->person;
-                }
-                else
-                    return array( status => warning , description => 'Tipo de Fondo no registrado: '.$fondo->idusertype );
-            }
-            elseif (Auth::user()->type == GER_PROD)
-            {
-                if ($fondo->idusertype == GER_PROD)
-                {
-                    if ( $solicitude->createdBy->type == REP_MED )
-                        $resp[] = $solicitude->createdBy->rm;
-                    elseif ( $solicitude->createdBy->type == SUP )
-                        foreach ( $solicitude->createdBy->sup->Reps as $rep )
-                            $resp[] = $rep;
-                    else
-                        return array( status => warning , description => 'Rol del Solicitante no definido: '.$solicitude->createdBy->type);
-                }
-                elseif ($fondo->idusertype == ASIS_GER)
-                {
-                    $asis = User::where('type', ASIS_GER)->get();
-                    foreach ($asis as $asi)
-                        $resp[] = $asi->person;
-                }
-                else
-                    return array( status => warning , description => 'Tipo de Fondo no registrado: '.$fondo->idusertype );    
-            }
-            return $this->setRpta(array( 'UserType' => Auth::user()->type , 'Type' => $fondo->idusertype , 'Responsables' => array_unique( $resp ) ) );
-        }
-        catch (Exception $e)
-        {
-            return $this->internalException($e,__FUNCTION__);
-        }
-    }*/

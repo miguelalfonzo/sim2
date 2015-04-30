@@ -3,11 +3,12 @@ var pathname = document.location.pathname;
 var pathnameArray= pathname.split("/public/");
 
 server =  pathnameArray.length >0 ? pathnameArray[0]+"/public/" : "";
-var IGV = 0.18;
+//var IGV = 0.18;
 //Funciones Globales
 var datef = new Date();
 var dateactual = (datef.getMonth()+1)+'-'+datef.getFullYear();
-function loadingUI(message){
+function loadingUI(message)
+{
     $.blockUI({ css: {
         border: 'none',
         padding: '15px',
@@ -88,6 +89,14 @@ $(function(){
         window.location.href = server+'generar-asiento-gasto/'+token;
     });
     
+    $("#regimen").on("change" , function()
+    {
+        if ( $(this).val() == 0 )
+            $("#monto-regimen").parent().parent().css("visibility" , "hidden" );
+        else
+            $("#monto-regimen").parent().parent().css("visibility" , "show" );        
+    });
+
     //Default events
         //Calculate the IGV loading
         if(parseFloat($(".total-item").val())) calcularIGV();
@@ -598,6 +607,12 @@ $(function(){
 							$('#dreparo').find('input[name=reparo]')[0].checked = true;
 						else
 							$('#dreparo').find('input[name=reparo]')[1].checked = true;
+
+                    if ( data_response.expense.igv == 0 )
+                        $('input[name=igv]')[1].checked = true;
+                    else
+                        $('input[name=igv]')[0].checked = true;
+    
                     date = data_response.expense.fecha_movimiento.split('-');
                     //date = data_response.date.split('-');
                     date = date[2].substring(0,2)+'/'+date[1]+'/'+date[0];
@@ -656,6 +671,8 @@ $(function(){
                 row += "</tr>";
 
             var proof_type       = $("#proof-type").val();
+            var regimen          = $("#regimen").val();
+            var monto_regimen    = $("#monto_regimen").val();
             var proof_type_sel   = $("#proof-type option:selected");
             var ruc              = $("#ruc").val();
             var ruc_hide         = $("#ruc-hide").val();

@@ -45,6 +45,16 @@ class MarkProofAccounts extends Eloquent
 
 	public function accountFondo()
 	{
-		return $this->hasOne( 'Dmkt\Account' , 'id' , 'idcuentafondo' );
+		return $this->hasOne( 'Common\Fondo' , 'num_cuenta' , 'num_cuenta_fondo' );
+	}
+
+	protected function bagoAccountFondo()
+	{
+		return $this->hasOne( 'Expense\PlanCta' , 'ctactaextern' , 'num_cuenta_fondo' );
+	}
+
+	protected function bagoAccountExpense()
+	{
+		return $this->hasOne( 'Expense\PlanCta' , 'ctactaextern' , 'num_cuenta_gasto' );
 	}
 }

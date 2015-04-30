@@ -13,7 +13,7 @@ class SolicitudeHistory extends Eloquent{
 
     protected function getUpdatedAtAttribute( $attr )
     {
-        return \Carbon\Carbon::parse( $attr )->format('Y-m-d h:i');
+        return \Carbon\Carbon::parse( $attr )->format('Y-m-d H:i');
     }
 
 

@@ -5,6 +5,9 @@
         </a>    
         @if ( $solicitude->idtiposolicitud == SOL_REP )
             @if( Auth::user()->type == REP_MED)
+                <a data-toggle="modal" data-target=".timeLineModal">
+                    <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-flag"></span>
+                </a>
                 @if($solicitude->idestado == REGISTRADO && Auth::user()->id == $solicitude->iduserasigned )
                     <a target="_blank" href="{{URL::to('a'.'/'.$solicitude->token)}}">
                         <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-print"></span>
@@ -36,7 +39,7 @@
                     </a>
                 @endif   
             @elseif ( Auth::user()->type == TESORERIA )
-                @if( $solicitude->idestado == APROBADO )
+                @if( $solicitude->idestado == DEPOSITO_HABILITADO )
                     <a class="modal_deposit">
                         <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span>
                     </a>
@@ -51,6 +54,9 @@
         
         @elseif ( $solicitude->idtiposolicitud == SOL_INST )
             @if ( Auth::user()->type == REP_MED )
+                <a data-toggle="modal" data-target=".timeLineModal">
+                    <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-flag"></span>
+                </a>
                 @if($solicitude->idestado == REGISTRADO && Auth::user()->id == $solicitude->iduserasigned )   
                     <a href="{{URL::to('report-fondo')}}/{{$solicitude->token}}">
                         <span class="glyphicon glyphicon-print" style="padding: 0 5px; font-size: 1.3em"></span>
@@ -63,7 +69,7 @@
                     </a>
                 @endif  
             @elseif ( Auth::user()->type == TESORERIA )
-                @if ( $solicitude->idestado == APROBADO )
+                @if ( $solicitude->idestado == DEPOSITO_HABILITADO )
                     <a class="modal_deposit">
                         <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-usd"></span>
                     </a>

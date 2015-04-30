@@ -128,6 +128,7 @@
         @endforeach
     </tbody>
 </table>
+@include('template.Modals.timeLine')
 <!-- <script>
     $('.element').tooltip();
 </script> -->

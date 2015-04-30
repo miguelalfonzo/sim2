@@ -121,18 +121,7 @@ class DepositController extends BaseController{
         try
         {
             $jDetalle = json_decode( $detalle->detalle );
-            if ( is_null( $detalle->idretencion ) )
-                return $this->verifyMoneyType( $detalle->idmoneda , $bank->idtipomoneda , $jDetalle->monto_aprobado , $tc , $jDetalle );
-            else
-                if ( $detalle->typeRetention->account->idtipomoneda == $detalle->idmoneda )
-                    return $this->verifyMoneyType( $detalle->idmoneda , $bank->idtipomoneda , ( $jDetalle->monto_aprobado - $jDetalle->monto_retencion ) , $tc , $jDetalle );
-                else
-                    if ( $detalle->idmoneda == SOLES )
-                        return $this->verifyMoneyType( $detalle->idmoneda , $bank->idtipomoneda , $this->amountRate( $jDetalle , $tc , 1 ) , $tc , $jDetalle );
-                    elseif ( $detalle->idmoneda == DOLARES )
-                        return $this->verifyMoneyType( $detalle->idmoneda , $bank->idtipomoneda , $this->amountRate( $jDetalle , $tc , 2 ) , $tc , $jDetalle );
-                    else
-                        return $this->warningException( __FUNCTION , 'La moneda (Id: '.$detalle->idmoneda.') no cuenta con un registro de Tipo de Cambio en el sistema' );      
+            return $this->verifyMoneyType( $detalle->idmoneda , $bank->idtipomoneda , $jDetalle->monto_aprobado , $tc , $jDetalle );
         }                      
         catch ( Exception $e )
         {
@@ -155,7 +144,7 @@ class DepositController extends BaseController{
                     return $this->warningException( __FUNCTION__ , 'Cancelado - No se encontro la solicitud (Cod:'.$inputs['token'].')');
                 else
                 {
-                    if ( $solicitud->idestado != APROBADO )
+                    if ( $solicitud->idestado != DEPOSITO_HABILITADO )
                         return $this->warningException( __FUNCTION__ , 'Cancelado - No se puede depositar la solicitud en esta etapa del flujo: '.$solicitud->idestado );
                     else
                     {
@@ -208,7 +197,6 @@ class DepositController extends BaseController{
                                                             $middleRpta = $this->setStatus( $oldIdestado, DEPOSITADO, Auth::user()->id, USER_CONTABILIDAD, $solicitud->id );
                                                             if ( $middleRpta[status] == ok )
                                                             {
-                                                                Session::put( 'state' , R_REVISADO );
                                                                 DB::commit();
                                                                 return $middleRpta;
                                                             }

@@ -20,10 +20,11 @@ Route::get('report', 'ExpenseController@reportExpense');
 Route::get('tmp','TestController@tm');
 Route::get('history','TestController@withHistory');
 
-Route::post( 'get-maintenance-info' , 'Maintenance\TableController@getMaintenanceData' );
+Route::post( 'get-cell-maintenance-info' , 'Maintenance\TableController@getMaintenanceCellData' );
 Route::post( 'update-maintenance-info' , 'Maintenance\TableController@updateMaintenanceData' );
 Route::post( 'save-maintenance-info' , 'Maintenance\TableController@saveMaintenanceData' );
 Route::post( 'add-maintenance-info' , 'Maintenance\TableController@addMaintenanceData' );
+Route::post( 'get-table-maintenance-info' , 'Maintenance\TableController@getMaintenanceTableData');
 
 /*
 |--------------------------------------------------------------------------
@@ -100,7 +101,6 @@ Route::group(array('before' => 'cont'), function ()
     Route::post('generate-seat-fondo', 'Dmkt\FondoController@generateSeatFondo');
     Route::post('get-account', 'Dmkt\SolicitudeController@getCuentaContHandler');
     Route::get('list-documents', 'Dmkt\FondoController@listDocuments');
-    Route::get('list-accounts-mark-rel' , 'Expense\ExpenseController@getDailySeatRelation');
     Route::post('cont-document-manage' , 'Expense\ExpenseController@manageDocument');
 });
 /*

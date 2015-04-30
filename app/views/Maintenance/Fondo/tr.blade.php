@@ -4,7 +4,7 @@
         <input type="text">
     </td>
     <td class="idusertype" save=1 style="text-align:center">
-        @include('Maintenance.usertype')
+        @include('Maintenance.Fondo.usertype')
     </td>
     <td class="moneda" style="text-align:center" disabled></td>
     <td class="saldo" save=1 style="text-align:center">

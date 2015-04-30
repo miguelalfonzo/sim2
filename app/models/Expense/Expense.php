@@ -3,9 +3,6 @@
 namespace Expense;
 
 use \Eloquent;
-use \Dmkt\Activity;
-use \Expense\ProofType;
-use \Expense\ExpenseItem;
 
 class Expense extends Eloquent {
 

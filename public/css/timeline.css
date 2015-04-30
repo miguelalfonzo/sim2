@@ -1,0 +1,120 @@
+.stage {
+	display: inline-block;
+	min-height: 112px;
+	position: relative;
+	text-align: center;
+}
+
+.stage-container {
+	padding: 15px 0px 4px;
+}
+
+.stage-content {
+	margin: 0 auto;
+	max-height: 52px;
+	padding-left: 17px;
+	width: 153px;
+}
+
+.stage-header {
+	-webkit-border-radius: 50%;
+	background-color: #eaeaea;
+	border-radius: 50%;
+	border: 1px solid #d9d9d9;
+	color: #a9a9a9;
+	display: inline-block;
+	font-size: 20px;
+	height: 50px;
+	position: relative;
+	text-align: center;
+	width: 50px;
+	z-index: 1;
+}
+
+.stage-title {
+	color: #464646;
+	font: 400 14px 'calibriregular', sans-serif;
+	padding-left: 0px;
+	text-align: center;
+}
+
+.stage-info {
+	color: #a8a8a8;
+	font-family: 'calibriregular', sans-serif;
+	font-size: 11px;
+	line-height: 1.4;
+	text-align: left;
+}
+
+#tmm-form-wizard .stage.tmm-current:after, #tmm-form-wizard .stage.tmm-current:before{
+	background-color: #fb6b5b;
+	border: none;
+}
+
+.stage:before {
+	background-color: #eaeaea;
+	border-bottom: 1px solid #d9d9d9;
+	border-top: 1px solid #d9d9d9;
+	content: '';
+	height: 5px;
+	left: 0;
+	margin-top: -33px;
+	position: absolute;
+	top: 45%;
+	width: 50%;
+}
+
+.stage:after {
+	background-color: #eaeaea;
+	border-bottom: 1px solid #d9d9d9;
+	border-top: 1px solid #d9d9d9;
+	content: '';
+	height: 5px;
+	margin-top: -33px;
+	position: absolute;
+	right: 0;
+	top: 45%;
+	width: 50%;
+}
+
+.stage:first-child:before{
+ 	display: none;
+}
+
+.stage:last-child:after{
+ 	display: none;
+}
+
+.stage-pending{
+	background-color: yellow;
+	border: 1px solid yellow;	
+}
+
+.stage-rejected{
+	background-color: red;
+	border: 1px solid red;	
+}
+
+.stage-success{
+	background-color: green;
+	border: 1px solid green;
+}
+
+.pending:after, .pending:before{
+	background-color: yellow;
+	border-bottom: 1px solid yellow;
+	border-top: 1px solid yellow;
+}
+
+
+.rejected:before, .rejected:after{
+	background-color: red;
+	border-bottom: 1px solid red;
+	border-top: 1px solid red;
+}
+
+.success:after, .success:before{
+	background-color: green;
+	border-bottom: 1px solid green;
+	border-top: 1px solid green;
+}

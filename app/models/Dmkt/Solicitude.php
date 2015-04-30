@@ -17,7 +17,7 @@ class Solicitude extends Eloquent{
 
     protected function getCreatedAtAttribute( $attr )
     {
-        return \Carbon\Carbon::parse( $attr )->format('Y-m-d h:i');
+        return \Carbon\Carbon::parse( $attr )->format('Y-m-d H:i');
     }
 
     public function searchId()
