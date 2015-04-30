@@ -1,4 +1,4 @@
-<table class="table table-hover table-bordered table-condensed dataTable" id="table_accounts_mark_rel" style="width: 100%">
+<table class="table table-hover table-bordered table-condensed dataTable" id="table_cuentas-marca" style="width: 100%">
     <thead>
         <tr>
             <th>#</th>
@@ -17,7 +17,7 @@
     <tbody>
         @foreach ( $iAccounts as $iAccount )
             <tr row-id="{{$iAccount->id}}" type="cuentas-marca">
-                <td style="text-align: center">{{$iAccount->id}}</td>
+                <td style="text-align:center">{{$iAccount->id}}</td>
                 <td class="idfondo" style="text-align:center">
                     @if ( is_null( $iAccount->accountFondo ) )
                         -
@@ -37,7 +37,6 @@
                     <a class="maintenance-edit" href="#">
                         <span class="glyphicon glyphicon-pencil"></span>
                     </a>
-                    <!-- <a class="elementDelete" href="#"><span class="glyphicon glyphicon-remove"></span></a> -->
                 </td>
             </tr>
         @endforeach

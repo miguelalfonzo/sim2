@@ -23,9 +23,6 @@
                         </a>
                     @endif
                 @endif
-                <a href="{{URL::to('a'.'/'.$solicitude->token)}}">
-                    <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-print"></span>
-                </a>
             @elseif ( Auth::user()->type == SUP )
                 @if( $solicitude->idestado == PENDIENTE && $solicitude->created_by == Auth::user()->id )
                     <a href="{{URL::to('editar-solicitud').'/'.$solicitude->token}}">

@@ -14,7 +14,6 @@ use \DB;
 use \Redirect;
 use \PDF;
 use \Client;
-use \Dmkt\TypeRetention;
 use \Log;
 use \Common\Deposit;
 use \BagoUser;
@@ -507,11 +506,5 @@ class ExpenseController extends BaseController
 		{
 			return $this->internalException( $e , __FUNCTION__ );
 		}
-	}
-
-	public function getDailySeatRelation()
-	{
-		$iAccounts = MarkProofAccounts::all();
-		return View::make( 'Dmkt.Cont.list_accounts_mark_relation' )->with( 'iAccounts' , $iAccounts )->render();
 	}
 }

@@ -12,16 +12,17 @@ use \Expense\MarkProofAccounts;
 use \Expense\Mark;
 use \Dmkt\Account;
 use \Expense\PlanCta;
+use \Common\TypeMoney;
 use \DB;
 use \Log;
 
 class TableController extends BaseController
 {
 
-	public function getMaintenanceData()
+	public function getMaintenanceCellData()
 	{
 		$inputs = Input::all();
-
+		Log::error($inputs);
 		switch( $inputs['type'] )
 		{
 			case 'idusertype':
@@ -30,8 +31,48 @@ class TableController extends BaseController
 				return $this->maintenanceGetFondo( $inputs['val'] );
 			case 'iddocumento':
 				return $this->maintenanceGetTipoDocumento( $inputs['val'] );
-
+			case 'idtipomoneda':
+				return $this->maintenanceGetTipoMoneda( $inputs['val'] );
 		}
+	}
+
+	private function maintenanceGetTipoMoneda( $val )
+	{
+		$data = array( 'monedas' => TypeMoney::all() , 'val' => $val );
+		return $this->setRpta( View::make( 'Maintenance.moneda')->with( $data)->render() );
+	}
+
+	public function getMaintenanceTableData()
+	{
+		$inputs = Input::all();
+
+		switch( $inputs['type'] )
+		{
+			case 'cuentas-marca':
+				return $this->getDailySeatRelation();
+			case 'fondo':
+				return $this->getFondos();
+			case 'fondo-cuenta':
+				return $this->getFondoAccount();
+		}
+	}
+
+	private function getFondos()
+    {
+        $fondos = Fondo::all();
+        return $this->setRpta( View::make('Maintenance.Fondo.table')->with('fondos' , $fondos)->render() );
+    }
+
+	private function getDailySeatRelation()
+	{
+		$iAccounts = MarkProofAccounts::all();
+		return $this->setRpta( View::make( 'Maintenance.CuentasMarca.table' )->with( 'iAccounts' , $iAccounts )->render() );
+	}
+
+	private function getFondoAccount()
+	{
+		$fondos = Fondo::all();
+		return $this->setRpta( View::make( 'Maintenance.FondoCuenta.table' )->with( 'fondos' , $fondos )->render() );
 	}
 
 	private function maintenanceGetTipoDocumento( $val )
@@ -63,6 +104,8 @@ class TableController extends BaseController
 				return $this->maintenanceUpdateFondo( $inputs );
 			case 'cuentas-marca':
 				return $this->maintenanceUpdateCuentasMarca( $inputs );
+			case 'fondo-cuenta':
+				return $this->maintenanceUpdateFondo( $inputs);
 		}
 	}
 

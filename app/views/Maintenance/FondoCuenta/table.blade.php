@@ -1,22 +1,20 @@
-<table class="table table-hover table-bordered table-condensed dataTable" id="table_sol_fondo" style="width: 100%">
+<table class="table table-hover table-bordered table-condensed dataTable" id="table_fondo-cuenta" style="width: 100%">
     <thead>
         <tr>
             <th>#</th>
-            <th>Nombre</th>
-            <th>Usuario</th>
+            <th>Fondo</th>
             <th>Moneda</th>
-            <th>Saldo</th>
+            <th>Cuenta</th>
             <th>Edición</th>
         </tr>
     </thead>
     <tbody>
         @foreach ( $fondos as $fondo )
-            <tr row-id="{{$fondo->id}}" type="fondo">
+            <tr row-id="{{$fondo->id}}" type="fondo-cuenta">
                 <td style="text-align:center">{{$fondo->id}}</td>
                 <td class="nombre" style="text-align:center">{{$fondo->nombre}}</td>
-                <td class="idusertype" editable=1 style="text-align:center">{{$fondo->userType->descripcion}}</td>
-                <td class="moneda" style="text-align:center">S/.</td>
-                <td class="saldo" editable=3 style="text-align:center">{{$fondo->saldo}}</td>
+                <td class="idtipomoneda" editable=1 style="text-align:center">{{$fondo->typeMoney->simbolo}}</td>
+                <td class="num_cuenta" editable=3 style="text-align:center">{{$fondo->num_cuenta}}</td>
                 <td editable=2 style="text-align:center">
                     <a class="maintenance-edit">
                         <span class="glyphicon glyphicon-pencil"></span>

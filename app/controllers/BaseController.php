@@ -260,7 +260,10 @@ class BaseController extends Controller {
                 }
                 else
                 {
-                    $solicituds->detalle->whereNotNull('iddeposito');
+                    $solicituds->whereHas( 'detalle' , function ($q)
+                    {
+                        $q->whereNotNull('iddeposito');
+                    });
                 }
             }
             else if ( Auth::user()->type == ASIS_GER ) 

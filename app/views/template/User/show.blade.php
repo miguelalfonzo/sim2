@@ -26,6 +26,12 @@
                     </a>
                 </li>
                 <li>
+                    <a href="#fondo-cuenta" role="tab" data-toggle="tab">
+                        <i class="fa fa-user"></i>
+                        Mantenimiento de Cuentas
+                    </a>
+                </li>
+                <li>
                     <a href="#account-mark-rel" role="tab" data-toggle="tab">
                         <i class="fa fa-user"></i>
                         Mantenimiento de Cuentas-Marcas
@@ -63,10 +69,20 @@
                     </div>
                 </div>
 
+                <!-- Mantenimiento de Cuenta del Fondo -->
+                <div class="tab-pane fade" id="fondo-cuenta">
+                    <div class="panel panel-default">
+                        <div class="panel-body panel-default table_fondo-cuenta"></div>
+                    </div>
+                    <div>
+                       <input class="btn btn-primary maintenance-add" type="hidden" case="fondo-cuenta">
+                    </div>
+                </div>
+
                 <!-- Mantenimeinto de Cuentas y Marcas -->
                 <div class="tab-pane fade" id="account-mark-rel">
                     <div class="panel panel-default">
-                        <div class="panel-body panel-default table_accounts_mark_rel"></div>
+                        <div class="panel-body panel-default table_cuentas-marca"></div>
                     </div>
                     <div>
                        <input class="btn btn-primary maintenance-add" type="button" case="cuentas-marca" value="Agregar">
@@ -78,7 +94,7 @@
                 <!-- Mantenimiento de los Fondos de las Solicitudes -->
                 <div class="tab-pane fade" id="sol-fondo">
                     <div class="panel panel-default">
-                        <div class="panel-body panel-default table_sol_fondo"></div>
+                        <div class="panel-body panel-default table_fondo"></div>
                     </div>
                     <div>
                        <input class="btn btn-primary maintenance-add" type="button" case="fondo" value="Agregar">
