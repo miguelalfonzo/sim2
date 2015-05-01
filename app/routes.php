@@ -95,7 +95,7 @@ Route::group(array('before' => 'cont'), function ()
     Route::post('update-expense-cont', 'Expense\ExpenseController@updateExpense');
 
     //Fondos
-    Route::get('list-fondos-contabilidad/{date}/{estado}','Dmkt\FondoController@getFondosContabilidad');
+    //Route::get('list-fondos-contabilidad/{date}/{estado}','Dmkt\FondoController@getFondosContabilidad');
     Route::get('generar-asiento-fondo/{token}', 'Dmkt\FondoController@viewGenerateSeatFondo');
     Route::get('generar-asiento-fondo-gasto/{token}', 'Dmkt\SolicitudeController@viewGenerateSeatExpense');
     Route::post('generate-seat-fondo', 'Dmkt\FondoController@generateSeatFondo');

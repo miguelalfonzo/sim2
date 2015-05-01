@@ -1708,8 +1708,6 @@ function newSolicitude() {
         {
             if (data.Status == 'Ok')
             {
-                $('.estado-cuenta-deposito').first().val(data.Data.Total.Soles);
-                $('.estado-cuenta-deposito').last().val(data.Data.Total.Dolares);
                 $('#table_estado_cuenta_wrapper').remove();
                 $('.table_estado_cuenta').append(data.Data.View);
                 $('#table_estado_cuenta').dataTable(
@@ -1732,6 +1730,11 @@ function newSolicitude() {
                         }
                     }
                 });
+                if ( data.Data.Total !== undefined )
+                {
+                    $('.estado-cuenta-deposito').first().val(data.Data.Total.Soles);
+                    $('.estado-cuenta-deposito').last().val(data.Data.Total.Dolares);
+                }
             }
             else
                 responseUI('Error del Sistema','red');

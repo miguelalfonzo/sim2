@@ -601,6 +601,22 @@ $(function(){
                     $("#razon").attr("data-edit",1);
                     $("#number-prefix").val(data_response.expense.num_prefijo).attr("disabled",true);
                     $("#number-serie").val(data_response.expense.num_serie).attr("disabled",true);
+                    
+                    if ( $("#regimen").length == 1 )
+                    {
+                        if ( data_response.expense.idtipotributo === null )
+                        {
+                            $("#regimen").val(0);
+                            $("#monto-regimen").val('').parent().parent().css("visibility" , "hidden" ); 
+                        }
+                        else
+                        {
+                            $("#regimen").val(data_response.expense.idtipotributo);
+                            if ( data_response.expense.idtipotributo >= 1 )
+                                $("#monto-regimen").val(data_response.expense.monto_tributo).parent().parent().css("visibility" , "show" ); 
+                        }
+                        $("#monto-regimen").numeric({negative:false});
+                    }
 
 					if ( !$('#dreparo').find('input[name=reparo]').length == 0)
 						if ( data_response.expense.reparo == true )          
@@ -670,9 +686,6 @@ $(function(){
                 row += "<th><a class='delete-expense' href='#'><span class='glyphicon glyphicon-remove'></span></a></th>";
                 row += "</tr>";
 
-            var proof_type       = $("#proof-type").val();
-            var regimen          = $("#regimen").val();
-            var monto_regimen    = $("#monto_regimen").val();
             var proof_type_sel   = $("#proof-type option:selected");
             var ruc              = $("#ruc").val();
             var ruc_hide         = $("#ruc-hide").val();
@@ -684,7 +697,7 @@ $(function(){
             var voucher_number   = number_prefix+"-"+number_serie;
             var date             = $("#date").val();
             var desc_expense     = $("#desc-expense").val();
-            var balance      = parseFloat($("#balance").val());
+            var balance          = parseFloat($("#balance").val());
             
             //Validación de errores de cabeceras
             var error = 0;
@@ -767,7 +780,9 @@ $(function(){
             {
                 data._token        = $('input[name=_token]').val();
                 data.token         = $('input[name=token]').val();
-                data.proof_type    = proof_type;
+                data.proof_type    = $("#proof-type").val();
+                data.idregimen     = $("#regimen").val();
+                data.monto_regimen = $("#monto-regimen").val();
                 data.ruc           = ruc;
                 data.razon         = razon;
                 data.number_prefix = number_prefix;
@@ -819,10 +834,12 @@ $(function(){
                     {
                         var sub_total_expense = parseFloat($("#sub-tot").val());
                         var imp_service       = parseFloat($("#imp-ser").val());
-                        var igv               = parseFloat($("#igv").val());
+                        var igv               = $("input[name=igv]:checked").val();
+                        
                         if(isNaN(sub_total_expense)) sub_total_expense = 0;
                         if(isNaN(imp_service)) imp_service = 0;
                         if(isNaN(igv)) igv = 0;
+                        
                         data.sub_total_expense = sub_total_expense;
                         data.imp_service = imp_service;
                         data.igv = igv;
@@ -961,6 +978,7 @@ $(function(){
                                                 }
                                                 else
                                                 {
+                                                    console.log(result);
                                                     responseUI("No se ha actualizado el gasto","red");
                                                     $(".message-expense").text("No se ha podido actualizar el detalle de gastos");
                                                 }
