@@ -1722,9 +1722,9 @@ function newSolicitude() {
     function ajaxError(statusCode,errorThrown)
     {
         if (statusCode.status == 0) 
-            responseUI('<font color="black">Internet: Problemas de Conexion</font>','yellow');    
+            bootbox.alert('<h4 class="yellow">Internet: Problemas de Conexion</h4>');    
         else
-            responseUI('Error del Sistema','red');  
+            bootbox.alert('<h4 class="red">Error del Sistema</h4>');  
     }
 
     function listAccountState(date)

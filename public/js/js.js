@@ -20,7 +20,8 @@ function loadingUI(message)
     }, message: '<h2><img style="margin-right: 30px" src="' + server + 'img/spiffygif.gif" >' + message + '</h2>'});
 }
 
-function responseUI(message,color){
+function responseUI( message,color )
+{
     $.unblockUI();
     $.blockUI({ css: {
         border: 'none',
@@ -36,7 +37,17 @@ function responseUI(message,color){
     },2000);
 }
 
-$(function(){
+$(function()
+{
+
+    function ajaxError(statusCode,errorThrown)
+    {
+        if (statusCode.status == 0) 
+            bootbox.alert('<h4 class="yellow">Internet: Problemas de Conexion</h4>');    
+        else
+            bootbox.alert('<h4 class="red">Error del Sistema</h4>');  
+    }
+
     //Vars
     var token          = $('input[name=token]').val();
     var type_money     = $("#type-money").html();
@@ -362,29 +373,27 @@ $(function(){
         //Enable deposit
         $("#enable-deposit").on("click",function(e){
             e.preventDefault();
-            bootbox.confirm("¿Esta seguro que desea habilitar el depósito?", function(result) {
+            bootbox.confirm("<h4>¿Esta seguro que desea habilitar el depósito?</h4>", function( result ) 
+            {
                 if(result)
                 {
-                    if(validateRet() === true)
+                    data._token       = $("input[name=_token]").val();
+                    data.idsolicitude = $("input[name=idsolicitude]").val();
+                    data.idretencion  = $("select[name=retencion]").val();
+                    data.monto_retencion = $("input[name=monto_retencion]").val();
+                    
+                    $.post( server + 'revisar-solicitud' , data ).done( function ( data )
                     {
-                        data._token       = $("input[name=_token]").val();
-                        data.idsolicitude = $("input[name=idsolicitude]").val();
-                        data.idretencion  = $("select[name=retencion]").val();
-                        data.monto_retencion = $("input[name=monto_retencion]").val();
-                        $.post(server+'enable-deposit', data)
-                        .done(function (data){
                         if(data.Status == "Ok")
                         {
-                            bootbox.alert("<p class='green'>Se habilito el depósito correctamente.</p>", function(){
+                            bootbox.alert("<h4 class='green'>Se reviso la solicitud correctamente.</h4>", function()
+                            {
                                 window.location.href = server+'show_user';
                             });
                         }
                         else
                             bootbox.alert("<h4 class='red'>" + data.Status + ": " + data.Description +  "</h4>");
-                        });
-                    }
-                    else
-                        console.log("false");
+                    });
                 }
             });
         });
@@ -1517,15 +1526,35 @@ $(function(){
                 if ( response.Status == 'Ok' )
                 {
                     var modal = $('#documents_Modal');
-                    modal.find('#subtotal').val( response.Data.moneda + ' ' + response.Data.sub_tot );
-                    modal.find('#igv').val( response.Data.moneda + ' ' + response.Data.igv );
-                    modal.find('#imp-serv').val( response.Data.moneda + ' ' + response.Data.imp_serv );
+                    if ( response.Data.sub_tot === null )
+                        modal.find('#subtotal').val('').parent().parent().hide();
+                    else
+                        modal.find('#subtotal').val( response.Data.moneda + ' ' + response.Data.sub_tot ).parent().parent().show();
+                    if ( response.Data.igv === null )
+                        modal.find('#igv').val('').parent().parent().hide();
+                    else    
+                        modal.find('#igv').val( response.Data.moneda + ' ' + response.Data.igv ).parent().parent().show();
+                    if ( response.Data.imp_serv === null )
+                        modal.find('#imp-serv').val('').parent().parent().hide();
+                    else
+                        modal.find('#imp-serv').val( response.Data.moneda + ' ' + response.Data.imp_serv ).parent().parent().show();
                     if ( response.Data.reparo == 0 )
                         modal.find('#reparo').val( 'No' );
                     else if ( response.Data.reparo == 1 )
                         modal.find('#reparo').val( 'Si' );
                     modal.find('#total').val( response.Data.moneda + ' ' + response.Data.monto );
-                    modal.find('input[name=idDocumento]').val( response.Data.id );                 
+                    modal.find('input[name=idDocumento]').val( response.Data.id );
+                    
+                    if ( response.Data.idtipotributo == null )
+                    {
+                        modal.find('#regimen').val( 0 );
+                        modal.find('#monto-regimen').val( response.Data.monto_tributo ).parent().parent().css( 'visibility' , 'hidden' ); 
+                    }
+                    else
+                    {
+                        modal.find('#regimen').val( response.Data.idtipotributo );
+                        modal.find('#monto-regimen').val( response.Data.monto_tributo ).parent().parent().css( 'visibility' , 'show' );
+                    }
                     modal.modal();
                 }
                 else
@@ -1533,8 +1562,8 @@ $(function(){
             });
         });
 
-        $(document).off( 'click' , 'update-document' );
-        $(document).on( 'click' , 'update-document' , function(e)
+        $(document).off( 'click' , '#update-document' );
+        $(document).on( 'click' , '#update-document' , function(e)
         {
             var modal = $('#documents_Modal');
             $.ajax(
@@ -1554,7 +1583,10 @@ $(function(){
             }).done( function ( response ) 
             {
                 if ( response.Status == 'Ok' )
+                {
                     bootbox.alert('<h4 class="green">Documento Actualizado</h4>')
+                    modal.modal('hide');
+                }
                 else
                     bootbox.alert('<h4 class="red">' + data.Status + ': ' + data.Description + '</h4>' );
             });

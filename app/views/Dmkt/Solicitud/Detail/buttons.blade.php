@@ -45,7 +45,7 @@
         @elseif ( Auth::user()->type == CONT )
             @if( $solicitud->idtiposolicitud == SOL_REP )
                 @if($solicitud->idestado == APROBADO )
-                    <a id="enable-deposit" class="btn btn-success">Habilitar Depósito</a>
+                    <a id="enable-deposit" class="btn btn-success">Confirmar</a>
                 @endif
             @endif
             @if( $solicitud->idestado == DEPOSITADO )

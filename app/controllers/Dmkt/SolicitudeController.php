@@ -958,29 +958,38 @@ class SolicitudeController extends BaseController
         return $rpta;
     }
 
-    public function enableDeposit()
+    public function checkSolicitud()
     {
         try
         {
             DB::beginTransaction();
             $inputs = Input::all();
-            $solicitude = Solicitude::find( $inputs['idsolicitude'] );
-            if ( count( $solicitude ) == 0 )
-                return $this->warningException( __FUNCTION__ , 'No se encontro la solicitud con Id: '.$inputs['idsolicitude']);
+            $solicitud = Solicitude::find( $inputs['idsolicitude'] );
+            if ( is_null( $solicitud ) )
+                return $this->warningException( __FUNCTION__ , 'Cancelado - No se encontro la solicitud con Id: '.$inputs['idsolicitude']);
             else
             {
-                if ( $solicitude->idestado != APROBADO )
-                    return $this->warningException( __FUNCTION__ , 'No se puede procesar una solicitud que no ha sido Aprobada');
+                if ( $solicitud->idestado != APROBADO )
+                    return $this->warningException( __FUNCTION__ , 'Cancelado - No se puede procesar una solicitud que no ha sido Aprobada');
                 else
                 {
-                    $oldIdestado = $solicitude->idestado;
-                    $solicitude->idestado = DEPOSITO_HABILITADO;
-                    if ( !$solicitude->save())
+                    $oldIdestado = $solicitud->idestado;
+                    if ( $solicitud->detalle->idmotivo == REEMBOLSO )
+                    {
+                        $solicitud->idestado = GASTO_HABILITADO;
+                        $toUser = $solicitud->iduserasigned;
+                    }
+                    else
+                    {
+                        $solicitud->idestado = DEPOSITO_HABILITADO;
+                        $toUser = USER_TESORERIA;
+                    }
+                    if ( !$solicitud->save() )
                         return $this->warningException( __FUNCTION__ , 'Cancelado - No se pudo procesar la Solicitud' );
                     else
                     {
-                        $middleRpta = $this->setStatus( $oldIdestado , DEPOSITO_HABILITADO, Auth::user()->id , USER_TESORERIA , $solicitude->id );
-                        if ($middleRpta[status] == ok)
+                        $middleRpta = $this->setStatus( $oldIdestado , $solicitud->idestado , Auth::user()->id , $toUser , $solicitud->id );
+                        if ( $middleRpta[status] == ok )
                         {
                             Session::put('state',R_REVISADO);
                             DB::commit();

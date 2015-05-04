@@ -484,24 +484,28 @@ class ExpenseController extends BaseController
 
     private function reportBalance( $solicitud , $detalle , $jDetalle , $mGasto )
 	{
-		$mDeposit = $detalle->deposit->total;
-	    Log::error( $mDeposit );
-    	if ( $detalle->deposit->account->idtipomoneda == DOLARES )
-    		$mDeposit = $mDeposit * $jDetalle->tcv;
-
-	    if ( isset( $jDetalle->monto_retencion ) )
-	    	$monto_retencion = $jDetalle->monto_retencion ;
-	    else
-	    	$monto_retencion = 0;
-	    $mBalance = $mDeposit - ( $mGasto - $monto_retencion );  // - $monto_retencion );
-	    Log::error( $mBalance );
-	    if ( $mBalance > 0)
-	    	$data = array( 'bussiness' => round( $mBalance , 2 , PHP_ROUND_HALF_DOWN ) , 'employed' => 0 );
-	    elseif ( $mBalance < 0 )
-	    	$data = array( 'bussiness' => 0 , 'employed' => round( $mBalance*-1 , 2 , PHP_ROUND_HALF_DOWN ) );
-	    elseif ( $mBalance == 0 )
-			$data = array( 'bussiness' => 0 , 'employed' => 0 );
-		return $data;
+		if ( is_null( $detalle->deposit ) )
+			return array( 'bussiness' => '-' , 'employed' => '-' );
+		else
+		{
+			$mDeposit = $detalle->deposit->total;
+		    if ( $detalle->deposit->account->idtipomoneda == DOLARES )
+	    		$mDeposit = $mDeposit * $jDetalle->tcv;
+		    
+		    if ( isset( $jDetalle->monto_retencion ) )
+		    	$monto_retencion = $jDetalle->monto_retencion ;
+		    else
+		    	$monto_retencion = 0;
+		    $mBalance = $mDeposit - ( $mGasto - $monto_retencion );  // - $monto_retencion );
+		    if ( $mBalance > 0)
+		    	return array( 'bussiness' => round( $mBalance , 2 , PHP_ROUND_HALF_DOWN ) , 'employed' => 0 );
+		    elseif ( $mBalance < 0 )
+		    	return array( 'bussiness' => 0 , 'employed' => round( $mBalance*-1 , 2 , PHP_ROUND_HALF_DOWN ) );
+		    elseif ( $mBalance == 0 )
+				return array( 'bussiness' => 0 , 'employed' => 0 );
+			else
+				return $this->warninException( __FUNCTION__ , 'No se pudo procesar el Balance( '.$mBalance.' )' );
+		}
 	}
 
 	public function getExpenses()
@@ -547,22 +551,28 @@ class ExpenseController extends BaseController
 		try 
 		{
 			$inputs = Input::all();
-			$document = Expense::find( $inputs['id'] )
+			$document = Expense::find( $inputs['id'] );
 			if ( is_null( $document ) )
 				return $this->warninException( __FUNCTION__ , 'No se encontro el documento con Id: '.$inputs['id'] );
 			else
 			{
-				
+				$regimenes = Regimen::lists( 'id' );
 				if ( in_array( $inputs['idregimen'] , $regimenes ) )
 				{
 					$document->idtipotributo = $inputs['idregimen'];
 					$document->monto_tributo = $inputs['monto'];
 				}
-				else
+				elseif ( $inputs['idregimen'] == 0 )
 				{
 					$document->idtipotributo = null;
 					$document->monto_tributo = null;		
 				}
+				else
+					return $this->warninException( __FUNCTION__ , 'No esta registrado la retencion o detracción con Id: '.$inputs['idregimen'] );
+				if ( !$document->save() )
+					return $this->warninException( __FUNCTION__ , 'No se pudo actualizar el documento' );
+				else
+					return $this->setRpta();
 			}	
 		} 
 		catch ( Exception $e ) 

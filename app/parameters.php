@@ -95,3 +95,6 @@ const FONDO = 1;
 const BANCO = 2;
 const RETENCION = 3;
 const GASTO = 4;
+
+//MOTIVO DE LA SOLICITUD
+const REEMBOLSO = 3;

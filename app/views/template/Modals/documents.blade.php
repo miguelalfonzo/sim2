@@ -29,12 +29,7 @@
                             <input id="imp-serv" class="form-control" type="text" disabled>
                         </div>
                     </div>
-                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                        <div class="form-expense">
-                            <label>Reparo</label>
-                            <input id="reparo" class="form-control" type="text" disabled>
-                        </div>
-                    </div>
+                    
                     <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                         <div class="form-expense">
                             <label>Total</label>
@@ -42,6 +37,13 @@
                         </div>
                     </div>
 
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                        <div class="form-expense">
+                            <label>Reparo</label>
+                            <input id="reparo" class="form-control" type="text" disabled>
+                        </div>
+                    </div>
+                    
                     <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                         <div class="form-expense">
                             <label>Retención o Detracción</label>
@@ -66,7 +68,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <a href="#" class="btn btn-success update-document" style="margin-right: 1em;">Actualizar</a>
+                <a href="#" id="update-document" class="btn btn-success" style="margin-right: 1em;">Actualizar</a>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
             </div>
         </div>

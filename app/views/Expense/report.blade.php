@@ -37,13 +37,6 @@
                 @endif
                 <strong><p style="display:inline">Ciudad:</strong>&nbsp;Lima</p>
             </section>
-            <section style="text-align:center;margin-top:2em;">
-                <strong><p style="display:inline">Fecha de Depósito:</strong>&nbsp;{{$solicitude->detalle->deposit->updated_at}}</p>
-                <strong><p style="display:inline">N° de Depósito:</strong>&nbsp;{{$solicitude->detalle->deposit->num_transferencia}}</p>
-                @if ( isset($detalle->tcc) && isset($detalle->tcv) )
-                    <strong><p style="display:inline">T. Cambio:</strong>&nbsp;C: {{$detalle->tcc}} V: {{$detalle->tcv}}</p>
-                @endif
-            </section>
             <section style="margin-top:2em;">
                 <table class="table">
                     <thead>
@@ -104,10 +97,14 @@
                                     <strong>
                                         <span class="symbol">S/.</span>
                                         <span class="total-expense">
-                                            @if ( $solicitude->detalle->deposit->account->idtipomoneda == DOLARES )
-                                                {{ round ( $solicitude->detalle->deposit->total * $detalle->tcv , 2 , PHP_ROUND_HALF_DOWN ) }}
+                                            @if ( is_null( $solicitude->detalle->deposit ) )
+                                                -
                                             @else
-                                                {{ $solicitude->detalle->deposit->total }}    
+                                                @if ( $solicitude->detalle->deposit->account->idtipomoneda == DOLARES )
+                                                    {{ round ( $solicitude->detalle->deposit->total * $detalle->tcv , 2 , PHP_ROUND_HALF_DOWN ) }}
+                                                @else
+                                                    {{ $solicitude->detalle->deposit->total }}    
+                                                @endif
                                             @endif
                                         </span>
                                     </strong>
