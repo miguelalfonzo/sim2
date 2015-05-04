@@ -27,4 +27,16 @@ class ChangeRate extends Eloquent
     		return $tc;
     }
 
+    protected static function getTcv( $date )
+    {
+        $tc = ChangeRate::where('fecha' , $date)->where('moneda' ,'DO')->first();
+        if ( is_null( $tc ) )
+        {
+            $tc = ChangeRate::getTc();
+            return $tc->venta;
+        }
+        else
+            return $tc->venta;
+    }
+
 }

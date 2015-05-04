@@ -62,8 +62,6 @@
 	</div>
 @endif
 
-
-
 <!-- Modal Deposito -->
 @include('template.Modals.deposit-min')
 

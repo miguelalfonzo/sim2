@@ -10,5 +10,14 @@
         		</div>
              </div>
         </div>
+        @if ( Auth::user()->type == TESORERIA )
+            <div class="input-group">
+                <span class="input-group-addon">S/.</span>
+                <input type="text" class="estado-cuenta-deposito form-control input-md" readonly>
+                <span class="input-group-addon">$</span>
+                <input type="text" class="estado-cuenta-deposito form-control input-md" readonly>
+            </div>
+        @endif
     </div>
+    
 </div>

@@ -152,26 +152,20 @@
 			    </div>
 			</div>
 		</div>
-		<!-- <div class="col-xs-12 col-sm-6 col-md-4 tot-document">
-			<div class="form-expense">
-				<label>IGV</label>
-				<div class="input-group">
-			    	<div class="input-group-addon">{{$solicitud->detalle->typemoney->simbolo}}</div>
-			      	<input id="igv" class="form-control" type="text" value=0>
-			    </div>
-			</div>
-		</div> -->
 		<div class="col-xs-6 col-sm-3 col-md-2 col-lg-2 tot-document">
 			<div class="form-expense">
 				<label>IGV</label>
 				<div class="input-group">
 					<div class="btn-group">
-						<label class="btn btn-default">
-					 		<input value={{$igv}} type="radio" name="igv" style="margin-top:.5em;" checked>Si
-						</label>
-						<label class="btn btn-default">
-							<input value=0 type="radio" name="igv" style="margin-top:.5em;">No
-						</label> 
+						@foreach( $igv as $igvsn )
+							<label class="btn btn-default">
+							@if ( $igvsn->codigo == 1 )
+								<input value={{$igvsn->numero/100}} type="radio" name="igv" style="margin-top:.5em;" checked>Si
+							@elseif ( $igvsn->codigo == 2 )
+								<input value={{$igvsn->numero/100}} type="radio" name="igv" style="margin-top:.5em;">No
+							@endif
+							</label>
+						@endforeach
 					</div>
 			    </div>
 			 </div>
@@ -206,13 +200,25 @@
 		</div>
 
 		@if ( Auth::user()->type == CONT )
-			<div id="dretencion" class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+			
+			<!-- Retencion o Detraccion -->
+			<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
 				<div class="form-expense">
-					<label>Retención</label>
-					<div class="input-group">
-						<div class="input-group-addon">S/.</div>
-						<input class="form-control" type="text">
-					</div>
+					<label>Retención o Detracción</label>
+					<select id="regimen" class="form-control">
+                    	<option value=0 selected>NO APLICA</option>	
+                    	@foreach( $regimenes as $regimen )
+	                        <option value="{{$regimen->id}}">{{$regimen->descripcion}}</option>                          
+                    	@endforeach
+                	</select>
+				</div>
+			</div>
+
+			<!-- Monto de la Retencion -->
+			<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" style="visibility:hidden">
+				<div class="form-expense">
+					<label>Monto de la Retención o Detracción</label>
+					<input id="monto-regimen" type="text" class="form-control">
 				</div>
 			</div>
 		@endif

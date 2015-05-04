@@ -121,18 +121,7 @@ class DepositController extends BaseController{
         try
         {
             $jDetalle = json_decode( $detalle->detalle );
-            if ( is_null( $detalle->idretencion ) )
-                return $this->verifyMoneyType( $detalle->idmoneda , $bank->idtipomoneda , $jDetalle->monto_aprobado , $tc , $jDetalle );
-            else
-                if ( $detalle->typeRetention->account->idtipomoneda == $detalle->idmoneda )
-                    return $this->verifyMoneyType( $detalle->idmoneda , $bank->idtipomoneda , ( $jDetalle->monto_aprobado - $jDetalle->monto_retencion ) , $tc , $jDetalle );
-                else
-                    if ( $detalle->idmoneda == SOLES )
-                        return $this->verifyMoneyType( $detalle->idmoneda , $bank->idtipomoneda , $this->amountRate( $jDetalle , $tc , 1 ) , $tc , $jDetalle );
-                    elseif ( $detalle->idmoneda == DOLARES )
-                        return $this->verifyMoneyType( $detalle->idmoneda , $bank->idtipomoneda , $this->amountRate( $jDetalle , $tc , 2 ) , $tc , $jDetalle );
-                    else
-                        return $this->warningException( __FUNCTION , 'La moneda (Id: '.$detalle->idmoneda.') no cuenta con un registro de Tipo de Cambio en el sistema' );      
+            return $this->verifyMoneyType( $detalle->idmoneda , $bank->idtipomoneda , $jDetalle->monto_aprobado , $tc , $jDetalle );
         }                      
         catch ( Exception $e )
         {

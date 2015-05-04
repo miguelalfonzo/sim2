@@ -14,7 +14,6 @@ use \DB;
 use \Redirect;
 use \PDF;
 use \Client;
-use \Dmkt\TypeRetention;
 use \Log;
 use \Common\Deposit;
 use \BagoUser;
@@ -206,8 +205,9 @@ class ExpenseController extends BaseController
 				$expenseEdit->razon 		= $inputs['razon'];
 				$expenseEdit->monto 		= $inputs['total_expense'];
 
-	            if($inputs['proof_type'] == '1' || $inputs['proof_type'] == '4' || $inputs['proof_type'] == '6')
-	                if(isset($inputs['igv']) || isset($inputs['imp_service']))
+				$proof_type = ProofType::find( $inputs['proof_type'] );
+	            if ( $proof_type->igv == 1 )
+	                if ( isset( $inputs['igv'] ) && isset( $inputs['imp_service'] ) )
 	                {
 	                    $expenseEdit->igv = $inputs['igv'];
 	                    $expenseEdit->imp_serv = $inputs['imp_service'];
@@ -222,6 +222,18 @@ class ExpenseController extends BaseController
 	                $expenseEdit->sub_tot  = null;
 	            }
 
+	            if ( isset( $inputs['idregimen']))
+		            if ( $inputs['idregimen'] == 0 )
+		            {
+		            	$expenseEdit->idtipotributo = null;
+		            	$expenseEdit->monto_tributo = null;
+		            }
+		            elseif ( $inputs['idregimen'] >= 1 )
+		            {
+	            		$expenseEdit->idtipotributo = $inputs['idregimen'];
+		            	$expenseEdit->monto_tributo = $inputs['monto_regimen'];    	
+		            }
+
 				$expenseEdit->idcomprobante = $inputs['proof_type'];
 				$date = $inputs['date_movement'];
 		        list($d, $m, $y) = explode('/', $date);
@@ -229,6 +241,7 @@ class ExpenseController extends BaseController
 		        $date = date("Y/m/d", $d);
 		        $expenseEdit->fecha_movimiento = $date;
 		        $expenseEdit->descripcion = $inputs['desc_expense'];
+		        
 		        if( isset( $inputs['rep'] ) )
 					$expenseEdit->reparo = $inputs['rep'];
 				
@@ -507,11 +520,5 @@ class ExpenseController extends BaseController
 		{
 			return $this->internalException( $e , __FUNCTION__ );
 		}
-	}
-
-	public function getDailySeatRelation()
-	{
-		$iAccounts = MarkProofAccounts::all();
-		return View::make( 'Dmkt.Cont.list_accounts_mark_relation' )->with( 'iAccounts' , $iAccounts )->render();
 	}
 }

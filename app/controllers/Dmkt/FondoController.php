@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Developer
- * Date: 13/11/2014
- * Time: 05:15 PM
- */
+
 namespace Dmkt;
 
 use \BaseController;
@@ -15,7 +10,6 @@ use \Redirect;
 use \Auth;
 use \Validator;
 use \Excel;
-use \Common\Fondo;
 use \Expense\Entry;
 use \Log;
 use \Expense\ProofType;
@@ -552,60 +546,10 @@ class FondoController extends BaseController
         }
     }   
 
-   /* function getFondosTesoreria($start, $export = 0)
-    {
-        $periodo = $this->period($start);
-        
-        if ($export) {
-            $fondos = FondoInstitucional::where("periodo", $periodo)->get(array(
-                'institucion',
-                'repmed',
-                'cuenta',
-                'supervisor',
-                'total'
-            ));
-            return $fondos;
-        } else {
-            $fondos = FondoInstitucional::where("periodo", $periodo)->where('terminado', TERMINADO)->get();
-            $estado = 1;
-            foreach ($fondos as $fondo) {
-                if($fondo->depositado == PDTE_DEPOSITO)
-                    $estado = PDTE_DEPOSITO;
-            }
-            $view   = View::make('Treasury.list_fondos')->with('fondos', $fondos)->with('sum', $fondos->sum('total'))->with('estado', $estado);
-            return $view;
-        }
-        
-    }*/
+
 
     function getLastDayOfMonth($month, $year)
     {
         return date('d', mktime(0, 0, 0, $month + 1, 1, $year) - 1);
     }
-
-    public function getFondos()
-    {
-        $fondos = Fondo::all();
-        return View::make('Dmkt.Treasury.fondo')->with('fondos' , $fondos);
-    }
-
-
-   /* public function getFondosContabilidad($start, $state)
-    {
-        $periodo = $this->period($start);
-        
-        if($state == '1') {
-            $state = FONDO_DEPOSITADO;
-            $fondos = FondoInstitucional::where("periodo", $periodo)->where('terminado', TERMINADO)->where('depositado', $state)->where('registrado','<>', FONDO_REGISTRADO)->get();
-        }
-        else {
-            $state = FONDO_REGISTRADO;
-            $fondos = FondoInstitucional::where("periodo", $periodo)->where('terminado', TERMINADO)->where('registrado', $state)->get();
-        }
-        $view   = View::make('Dmkt.Cont.list_fondos')->with('fondos', $fondos)->with('sum', $fondos->sum('total'));
-        return $view;
-    }*/
-    
-    
-
 }

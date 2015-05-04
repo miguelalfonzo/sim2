@@ -7,6 +7,7 @@
                 <th>Solicitado por</th>
                 <th>Aprobado por</th>
                 <th>Monto Depositado</th>
+                <th>Saldo</th>
                 <th>Fecha Creación</th>
                 <th>Fecha de Culminación</th>
             </tr>
@@ -43,7 +44,10 @@
                                 {{$cuenta->acceptHist->user->gerProd->full_name}}
                             @endif
                         @endif
-                        <td class="text-center">{{$cuenta->detalle->deposit->account->typeMoney->simbolo.' '.$cuenta->detalle->deposit->total}}</td>
+                        <td class="text-center">
+                            {{$cuenta->detalle->deposit->account->typeMoney->simbolo.' '.$cuenta->detalle->deposit->total}}
+                        </td>
+                        <td>{{$cuenta->saldo}}</td>
                         <td class="text-center">{{$cuenta->created_at}}</td>
                         <td class="text-center">{{$cuenta->updated_at}}</td>
                     </tr>

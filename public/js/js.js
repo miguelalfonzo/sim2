@@ -3,11 +3,12 @@ var pathname = document.location.pathname;
 var pathnameArray= pathname.split("/public/");
 
 server =  pathnameArray.length >0 ? pathnameArray[0]+"/public/" : "";
-var IGV = 0.18;
+//var IGV = 0.18;
 //Funciones Globales
 var datef = new Date();
 var dateactual = (datef.getMonth()+1)+'-'+datef.getFullYear();
-function loadingUI(message){
+function loadingUI(message)
+{
     $.blockUI({ css: {
         border: 'none',
         padding: '15px',
@@ -88,6 +89,14 @@ $(function(){
         window.location.href = server+'generar-asiento-gasto/'+token;
     });
     
+    $("#regimen").on("change" , function()
+    {
+        if ( $(this).val() == 0 )
+            $("#monto-regimen").parent().parent().css("visibility" , "hidden" );
+        else
+            $("#monto-regimen").parent().parent().css("visibility" , "show" );        
+    });
+
     //Default events
         //Calculate the IGV loading
         if(parseFloat($(".total-item").val())) calcularIGV();
@@ -592,12 +601,34 @@ $(function(){
                     $("#razon").attr("data-edit",1);
                     $("#number-prefix").val(data_response.expense.num_prefijo).attr("disabled",true);
                     $("#number-serie").val(data_response.expense.num_serie).attr("disabled",true);
+                    
+                    if ( $("#regimen").length == 1 )
+                    {
+                        if ( data_response.expense.idtipotributo === null )
+                        {
+                            $("#regimen").val(0);
+                            $("#monto-regimen").val('').parent().parent().css("visibility" , "hidden" ); 
+                        }
+                        else
+                        {
+                            $("#regimen").val(data_response.expense.idtipotributo);
+                            if ( data_response.expense.idtipotributo >= 1 )
+                                $("#monto-regimen").val(data_response.expense.monto_tributo).parent().parent().css("visibility" , "show" ); 
+                        }
+                        $("#monto-regimen").numeric({negative:false});
+                    }
 
 					if ( !$('#dreparo').find('input[name=reparo]').length == 0)
 						if ( data_response.expense.reparo == true )          
 							$('#dreparo').find('input[name=reparo]')[0].checked = true;
 						else
 							$('#dreparo').find('input[name=reparo]')[1].checked = true;
+
+                    if ( data_response.expense.igv == 0 )
+                        $('input[name=igv]')[1].checked = true;
+                    else
+                        $('input[name=igv]')[0].checked = true;
+    
                     date = data_response.expense.fecha_movimiento.split('-');
                     //date = data_response.date.split('-');
                     date = date[2].substring(0,2)+'/'+date[1]+'/'+date[0];
@@ -655,7 +686,6 @@ $(function(){
                 row += "<th><a class='delete-expense' href='#'><span class='glyphicon glyphicon-remove'></span></a></th>";
                 row += "</tr>";
 
-            var proof_type       = $("#proof-type").val();
             var proof_type_sel   = $("#proof-type option:selected");
             var ruc              = $("#ruc").val();
             var ruc_hide         = $("#ruc-hide").val();
@@ -667,7 +697,7 @@ $(function(){
             var voucher_number   = number_prefix+"-"+number_serie;
             var date             = $("#date").val();
             var desc_expense     = $("#desc-expense").val();
-            var balance      = parseFloat($("#balance").val());
+            var balance          = parseFloat($("#balance").val());
             
             //Validación de errores de cabeceras
             var error = 0;
@@ -750,7 +780,9 @@ $(function(){
             {
                 data._token        = $('input[name=_token]').val();
                 data.token         = $('input[name=token]').val();
-                data.proof_type    = proof_type;
+                data.proof_type    = $("#proof-type").val();
+                data.idregimen     = $("#regimen").val();
+                data.monto_regimen = $("#monto-regimen").val();
                 data.ruc           = ruc;
                 data.razon         = razon;
                 data.number_prefix = number_prefix;
@@ -802,10 +834,12 @@ $(function(){
                     {
                         var sub_total_expense = parseFloat($("#sub-tot").val());
                         var imp_service       = parseFloat($("#imp-ser").val());
-                        var igv               = parseFloat($("#igv").val());
+                        var igv               = $("input[name=igv]:checked").val();
+                        
                         if(isNaN(sub_total_expense)) sub_total_expense = 0;
                         if(isNaN(imp_service)) imp_service = 0;
                         if(isNaN(igv)) igv = 0;
+                        
                         data.sub_total_expense = sub_total_expense;
                         data.imp_service = imp_service;
                         data.igv = igv;
@@ -944,6 +978,7 @@ $(function(){
                                                 }
                                                 else
                                                 {
+                                                    console.log(result);
                                                     responseUI("No se ha actualizado el gasto","red");
                                                     $(".message-expense").text("No se ha podido actualizar el detalle de gastos");
                                                 }
