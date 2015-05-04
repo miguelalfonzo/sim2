@@ -1557,8 +1557,8 @@ $(function(){
                     bootbox.alert('<h4 class="green">Documento Actualizado</h4>')
                 else
                     bootbox.alert('<h4 class="red">' + data.Status + ': ' + data.Description + '</h4>' );
-            }
-        }
+            });
+        });
 
         $(document).off("click", ".modal_deposit");
         $(document).on("click", ".modal_deposit", function(e)

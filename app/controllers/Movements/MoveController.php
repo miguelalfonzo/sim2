@@ -15,7 +15,7 @@ use \Validator;
 
 class MoveController extends BaseController
 {
-	public function __construct()
+ public function __construct()
     {
         parent::__construct();
         $this->beforeFilter('active-user');
@@ -86,7 +86,7 @@ class MoveController extends BaseController
                 }
             }
             return $middleRpta;
-    	}
+        }
     }
 
     private function setDates($date)

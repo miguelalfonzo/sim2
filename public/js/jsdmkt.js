@@ -66,6 +66,15 @@ function newSolicitude() {
         autoclose: true
     };
 
+    $(document).off("click", ".timeLine");
+    $(document).on("click", ".timeLine", function(e){
+        e.preventDefault();
+        var state = $(this).parent().parent().parent().find('#timeLine').val();
+        var html = $('.timeLineModal').html();
+        console.log(html);
+        console.log(state);
+    });
+
     //NEW OR EDIT SOLICITUDE BY RM OR SUP CLIENTES
    /* $.getJSON(server + "getclients", function (data) {
         clients = data;

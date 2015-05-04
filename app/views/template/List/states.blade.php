@@ -26,4 +26,4 @@
             {{$solicitude->state->nombre}}
         </span>
     @endif
-</td> 
+</td>
