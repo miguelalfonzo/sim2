@@ -96,11 +96,13 @@ class SolicitudeController extends BaseController
             $data['tc'] = ChangeRate::getTc();    
             $data['banks'] = Account::banks();
         }
-        if ( Auth::user()->type == ASIS_GER )
+        elseif ( Auth::user()->type == ASIS_GER )
         {
             $data['fondos']  = Fondo::asisGerFondos();                
             $data['etiquetas'] = Label::orderBy('id','asc')->get();
         }
+        elseif ( Auth::user()->type == CONT )
+            $data['proofTypes'] = ProofType::order();
         return View::make('template.User.show',$data);   
     }
 

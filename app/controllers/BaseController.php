@@ -281,9 +281,8 @@ class BaseController extends Controller {
                 });
             }
             else if ( Auth::user()->type == CONT )
-                $solicituds->where('idestado' , '<>' , ACEPTADO );
-
-            if ($start != null && $end != null)
+                $solicituds->where( 'idestado' , '<>' , ACEPTADO );
+            if ( $start != null && $end != null )
             {
                 $solicituds->whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
                 $rSolicituds->whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
@@ -310,13 +309,12 @@ class BaseController extends Controller {
             $rSolicituds = $rSolicituds->orderBy('id', 'ASC')->get();
             if ( Auth::user()->type == REP_MED )
                 $solicituds = $solicituds->merge($rSolicituds);
-            $rpta = $this->setRpta($solicituds);
+            return $this->setRpta($solicituds);
         }
         catch (Exception $e)
         {
-            $rpta = $this->internalException($e,__FUNCTION__);
+            return $this->internalException($e,__FUNCTION__);
         }
-        return $rpta;
     }
 
     protected function userType()

@@ -15,7 +15,7 @@
                             @else    
                                 <option value="{{$estado->id}}">{{$estado->nombre}}</option>
                             @endif
-                        @elseif ( in_array( Auth::user()->type , array( GER_COM , CONT , ASIS_GER ) ) )
+                        @elseif ( in_array( Auth::user()->type , array( GER_COM , ASIS_GER ) ) )
                             @if( in_array( $estado->id , array( R_APROBADO , R_REVISADO , R_GASTO , R_FINALIZADO , R_NO_AUTORIZADO ) ) )
                                 @if(isset($state))
                                     @if($state == $estado->id)
@@ -31,31 +31,25 @@
                             @if( $estado->id == R_REVISADO )
                                 <option value="{{$estado->id}}" selected>{{$estado->nombre}}</option>
                             @endif
+                        @elseif ( Auth::user()->type == CONT )
+                            @if( in_array( $estado->id , array( R_APROBADO , R_REVISADO , R_GASTO , R_FINALIZADO ) ) )
+                                @if(isset($state))
+                                    @if($state == $estado->id)
+                                        <option value="{{$estado->id}}" selected>{{$estado->nombre}}</option>
+                                    @else
+                                        <option value="{{$estado->id}}">{{$estado->nombre}}</option>
+                                    @endif
+                                @else    
+                                    <option value="{{$estado->id}}">{{$estado->nombre}}</option>
+                                @endif
+                            @endif
                         @endif
                     @endforeach
                 </select>
             </div>
         </div>
-        <div class="form-group col-sm-3 col-md-3" style="padding-right: 0">
-            <div class="" style="padding: 0">
-                <div class="input-group ">
-                    <span class="input-group-addon">
-                        <i class="glyphicon glyphicon-calendar"></i>
-                    </span>
-                    <input id="date_start" type="text" style="background-color:#FFF" class="form-control" placeholder="Desde" readonly>
-                </div>
-            </div>
-        </div>
-        <div class="form-group col-sm-3 col-md-3" style="padding-right: 0">
-            <div class="" style="padding: 0">
-                <div class="input-group ">
-                    <span class="input-group-addon">
-                        <i class="glyphicon glyphicon-calendar"></i>
-                    </span>
-                    <input id="date_end" type="text" style="background-color:#FFF" class="form-control" placeholder="Hasta" readonly>
-                </div>
-            </div>
-        </div>
+        
+        @include('Dmkt.User.date_picker')
         
         @if (Auth::user()->type == GER_COM )
             <div class="form-group col-sm-3 col-md-3 button-new-solicitude" style="text-align: left">

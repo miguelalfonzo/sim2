@@ -8,8 +8,12 @@ function newSolicitude() {
     var amountfac = $('#amount-fac');
     var input_client = $('.input-client');
     var selectfamily = $('.selectfamily');
-    var data_start = $('#date_start');
-    var data_end = $('#date_end');
+    var date_start = $('.date_start').first();
+    var date_end = $('.date_end').first();
+
+    var doc_start = $('.date_start').last();
+    var doc_end = $('.date_end').last();
+
     var amount_fac = $('#amountfac');
     var solicitude_monto =  $('.solicitude_monto');
     var select_type_payment = $('.selectTypePayment');
@@ -166,10 +170,10 @@ function newSolicitude() {
     selectfamily.on('click', function () {
         $(this).css('border-color', 'none')
     });
-    data_start.on('focus', function () {
+    date_start.on('focus', function () {
         $(this).parent().removeClass('has-error');
     });
-    data_end.on('focus', function () {
+    date_end.on('focus', function () {
         $(this).parent().removeClass('has-error');
     });
     input_file_factura.on('focus', function () {
@@ -266,9 +270,9 @@ function newSolicitude() {
             data:
             { 
                 idstate: state,
-                date_start: $('#date_start').val(), 
-                date_end: $('#date_end').val(),
-                _token : document.getElementsByName('_token')[0].value 
+                date_start: date_start.val(), 
+                date_end: date_end.val(),
+                _token : $('input[name=_token]').val() 
             }
         }).fail( function ( statusCode , errorThrown )
         {
@@ -594,13 +598,13 @@ function newSolicitude() {
         searchSolicitudeToDate('sup',this)
     });*/
 
-    $("#date_start").datepicker({
+    $(".date_start").datepicker({
         language: 'es',
         endDate: new Date(),
         format: 'dd/mm/yyyy'
     });
 
-    $("#date_end").datepicker({
+    $(".date_end").datepicker({
         //startDate: new Date($.datepicker.formatDate('dd, mm, yy', new Date($('#date_start').val()))),
         language: 'es',
         endDate: new Date(),
