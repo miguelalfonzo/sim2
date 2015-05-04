@@ -1125,11 +1125,12 @@ $(function(){
         }
     //Handling Classes
         //Removing errros
-        $(document).on("focus","input",function(){
+        /*$(document).on("focus","input",function()
+        {
             $(this).removeClass("error-incomplete").attr("placeholder",'');
             $(".message-expense").hide();
         });
-        //Calculating sum of rows
+        *///Calculating sum of rows
         function calculateTot(rows,clas){
             var sum = 0;
             $.each(rows,function(){
@@ -1465,7 +1466,6 @@ $(function(){
                         }
                     }).done( function (result) 
                     {
-                        console.log(result);
                         e=result;
                         if(!result.hasOwnProperty("error"))
                         {
@@ -1494,6 +1494,72 @@ $(function(){
 
         });
         
+        $(document).off( 'click' , '.modal-document');
+        $(document).on( 'click' , '.modal-document' , function(e)
+        {
+            var tr = $(this).parent().parent().parent();
+            console.log(tr);
+
+            $.ajax(
+            {
+                type: 'post',
+                url: server+"get-document-detail",
+                data: 
+                {
+                    id : tr.attr( 'row-id') ,
+                    _token : $( 'input[name=_token]' ).val()
+                }
+            }).fail( function( statusCode , errorThrown )
+            {
+                ajaxError( statusCode , errorThrown );
+            }).done( function ( response ) 
+            {
+                if ( response.Status == 'Ok' )
+                {
+                    var modal = $('#documents_Modal');
+                    modal.find('#subtotal').val( response.Data.moneda + ' ' + response.Data.sub_tot );
+                    modal.find('#igv').val( response.Data.moneda + ' ' + response.Data.igv );
+                    modal.find('#imp-serv').val( response.Data.moneda + ' ' + response.Data.imp_serv );
+                    if ( response.Data.reparo == 0 )
+                        modal.find('#reparo').val( 'No' );
+                    else if ( response.Data.reparo == 1 )
+                        modal.find('#reparo').val( 'Si' );
+                    modal.find('#total').val( response.Data.moneda + ' ' + response.Data.monto );
+                    modal.find('input[name=idDocumento]').val( response.Data.id );                 
+                    modal.modal();
+                }
+                else
+                    bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+            });
+        });
+
+        $(document).off( 'click' , 'update-document' );
+        $(document).on( 'click' , 'update-document' , function(e)
+        {
+            var modal = $('#documents_Modal');
+            $.ajax(
+            {
+                type: 'post',
+                url: server + 'update-document' ,
+                data: 
+                {
+                    id : modal.find( 'input[name=idDocumento]' ).val() ,
+                    idregimen : modal.find( '#regimen' ).val() ,
+                    monto : modal.find( '#monto-regimen' ).val() ,
+                    _token : $( 'input[name=_token]').val()
+                }
+            }).fail( function( statusCode , errorThrown )
+            {
+                ajaxError( statusCode , errorThrown );
+            }).done( function ( response ) 
+            {
+                if ( response.Status == 'Ok' )
+                    bootbox.alert('<h4 class="green">Documento Actualizado</h4>')
+                else
+                    bootbox.alert('<h4 class="red">' + data.Status + ': ' + data.Description + '</h4>' );
+            }
+        }
+
         $(document).off("click", ".modal_deposit");
         $(document).on("click", ".modal_deposit", function(e)
         {

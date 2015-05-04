@@ -1,5 +1,5 @@
 <div class="form-group col-xs-12 col-sm-6 col-md-3 col-lg-3">
-    <div class="">
+    <div>
         <div class="input-group">
             <span class="input-group-addon">
                 <i class="glyphicon glyphicon-calendar"></i>
@@ -9,7 +9,7 @@
     </div>
 </div>
 <div class="form-group col-xs-12 col-sm-6 col-md-3 col-lg-3">
-    <div class="">
+    <div>
         <div class="input-group">
             <span class="input-group-addon">
                 <i class="glyphicon glyphicon-calendar"></i>

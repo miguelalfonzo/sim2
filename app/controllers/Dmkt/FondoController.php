@@ -201,7 +201,7 @@ class FondoController extends BaseController
     public function listDocuments()
     {
         $docs = ProofType::order();
-        $view = View::make('Dmkt.Cont.list_documents')->with('docs',$docs);
+        $view = View::make('Dmkt.Cont.list_documents_type')->with('docs',$docs);
         return $view;
     }
 

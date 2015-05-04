@@ -521,4 +521,53 @@ class ExpenseController extends BaseController
 			return $this->internalException( $e , __FUNCTION__ );
 		}
 	}
+
+	public function getDocument()
+	{
+		try
+		{
+			$inputs = Input::all();
+			$document = Expense::find( $inputs['id'] );
+			if ( is_null( $document ) )
+				return $this->warninException( __FUNCTION__ , 'No se encontro el documento con Id: '.$inputs['id'] );
+			else
+			{
+				$document->moneda = $document->solicitud->detalle->typeMoney->simbolo ;
+				return $this->setRpta( $document );
+			}
+		}
+		catch ( Exception $e )
+		{
+			return $this->internalException( $e , __FUNCTION__ );
+		}
+	}
+
+	public function updateDocument()
+	{
+		try 
+		{
+			$inputs = Input::all();
+			$document = Expense::find( $inputs['id'] )
+			if ( is_null( $document ) )
+				return $this->warninException( __FUNCTION__ , 'No se encontro el documento con Id: '.$inputs['id'] );
+			else
+			{
+				
+				if ( in_array( $inputs['idregimen'] , $regimenes ) )
+				{
+					$document->idtipotributo = $inputs['idregimen'];
+					$document->monto_tributo = $inputs['monto'];
+				}
+				else
+				{
+					$document->idtipotributo = null;
+					$document->monto_tributo = null;		
+				}
+			}	
+		} 
+		catch ( Exception $e ) 
+		{
+			return $this->internalException( $e , __FUNCTION__ );	
+		}
+	}
 }

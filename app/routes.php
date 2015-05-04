@@ -87,21 +87,25 @@ Route::group(array('before' => 'cont'), function ()
     Route::get('generar-asiento-gasto/{token}', 'Dmkt\SolicitudeController@viewGenerateSeatExpense');
     Route::post('guardar-asiento-gasto', 'Dmkt\SolicitudeController@saveSeatExpense');
     Route::post('generate-seat-expense', 'Dmkt\SolicitudeController@generateSeatExpense');
-
-    //RM
-    Route::get('revisar-gasto/{token}', 'Expense\ExpenseController@showCont');
+    Route::post('get-account', 'Dmkt\SolicitudeController@getCuentaContHandler');
+    Route::get('list-documents-type', 'Dmkt\FondoController@listDocuments');
+    Route::post('list-documents', 'Movements\MoveController@searchDocs');
+    
+    Route::post('cont-document-manage' , 'Expense\ExpenseController@manageDocument');
     Route::post('consultarRucCont', 'Expense\RucController@show');
     Route::get('edit-expense-cont', 'Expense\ExpenseController@editExpense');
-    Route::post('update-expense-cont', 'Expense\ExpenseController@updateExpense');
+    Route::post('get-document-detail' , 'Expense\ExpenseController@getDocument');
+    Route::post('update-document' , 'Expense\ExpenseController@updateDocument');
+
+    //RM
+    //Route::get('revisar-gasto/{token}', 'Expense\ExpenseController@showCont');
+    //Route::post('update-expense-cont', 'Expense\ExpenseController@updateExpense');
 
     //Fondos
     //Route::get('list-fondos-contabilidad/{date}/{estado}','Dmkt\FondoController@getFondosContabilidad');
-    Route::get('generar-asiento-fondo/{token}', 'Dmkt\FondoController@viewGenerateSeatFondo');
-    Route::get('generar-asiento-fondo-gasto/{token}', 'Dmkt\SolicitudeController@viewGenerateSeatExpense');
-    Route::post('generate-seat-fondo', 'Dmkt\FondoController@generateSeatFondo');
-    Route::post('get-account', 'Dmkt\SolicitudeController@getCuentaContHandler');
-    Route::get('list-documents', 'Dmkt\FondoController@listDocuments');
-    Route::post('cont-document-manage' , 'Expense\ExpenseController@manageDocument');
+    //Route::get('generar-asiento-fondo/{token}', 'Dmkt\FondoController@viewGenerateSeatFondo');
+    //Route::get('generar-asiento-fondo-gasto/{token}', 'Dmkt\SolicitudeController@viewGenerateSeatExpense');
+    //Route::post('generate-seat-fondo', 'Dmkt\FondoController@generateSeatFondo');
 });
 /*
 |--------------------------------------------------------------------------

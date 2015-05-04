@@ -68,10 +68,10 @@
                 <!-- Busqueda de Documentos -->
                 <div class="tab-pane fade" id="documentos">
                     <div class="panel panel-default">
-                        @include('Dmkt.Cont.documents_menu')    
+                        @include('Dmkt.Cont.documents_menu')
+                        @include('template.Modals.documents')   
                     </div>
                 </div>
-
 
                 <!-- Mantenimiento de Documentos -->
                 <div class="tab-pane fade" id="mantenimiento">

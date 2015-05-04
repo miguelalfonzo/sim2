@@ -102,7 +102,10 @@ class SolicitudeController extends BaseController
             $data['etiquetas'] = Label::orderBy('id','asc')->get();
         }
         elseif ( Auth::user()->type == CONT )
+        {
             $data['proofTypes'] = ProofType::order();
+            $data['regimenes'] = Regimen::all();      
+        }
         return View::make('template.User.show',$data);   
     }
 

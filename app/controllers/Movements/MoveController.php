@@ -9,6 +9,9 @@ use \DateTime;
 use \Auth;
 use \View;
 use \Expense\ChangeRate;
+use \Expense\ProofType;
+use \Expense\Expense;
+use \Validator;
 
 class MoveController extends BaseController
 {
@@ -34,7 +37,6 @@ class MoveController extends BaseController
                 {
                     foreach ( $middleRpta[data] as $solicitud )
                     { 
-                        Log::error('1');
                         $detalle = $solicitud->detalle;
                         $jDetalle = json_decode($detalle->detalle);
                         $deposito = $detalle->deposit;
@@ -94,5 +96,52 @@ class MoveController extends BaseController
             'end'   => (new DateTime('01-'.$date))->format('t/m/y')
         );
         return $dates;
+    }
+
+    public function searchDocs()
+    {
+        try
+        {
+            $inputs = Input::all();
+            $rules = array( 'date_start' => 'required|date_format:"d/m/Y"' , 'date_end' => 'required|date_format:"d/m/Y"' );
+            $validator = Validator::make( $inputs , $rules );
+            if ( $validator->fails() ) 
+                return $this->warningException( __FUNCTION__ , substr($this->msgValidator($validator), 0 , -1 ) );
+            else
+            {
+                $middleRpta = $this->getDocs( $inputs['idProof'] , $inputs['date_start'] , $inputs['date_end'] , $inputs['val'] );
+                if ( $middleRpta[status] == ok )
+                    return $this->setRpta( View::make('Dmkt.Cont.list_documents')->with( 'proofs' , $middleRpta[data] )->render() );
+                else
+                    return $middleRpta;
+            }
+        }
+        catch( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
+    }
+
+    private function getDocs( $idProof , $start , $end , $val )
+    {
+        try
+        {
+            $documents = Expense::orderBy( 'updated_at' , 'desc');
+            $documents->where( 'idcomprobante' , $idProof );
+
+            if ( is_numeric( $val) )
+                $documents->where( function ( $q ) use ( $val )
+                {
+                    $q->where( 'num_prefijo' , $val )->orWhere( 'num_serie' , $val )->orWhere( 'RUC' , $val )->orWhere( 'UPPER( razon )' , 'like' , '%strtoupper( $val )%' );
+                });
+            else
+                $documents->where( 'UPPER( razon )' , 'like' , '%'.strtoupper( $val ).'%' );
+            $documents->whereRaw( "fecha_movimiento between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')");
+            return $this->setRpta( $documents->get() );
+        }
+        catch ( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
     }
 }

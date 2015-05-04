@@ -282,11 +282,6 @@ class BaseController extends Controller {
             }
             else if ( Auth::user()->type == CONT )
                 $solicituds->where( 'idestado' , '<>' , ACEPTADO );
-            if ( $start != null && $end != null )
-            {
-                $solicituds->whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
-                $rSolicituds->whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
-            }
 
             if ($estado != R_TODOS)
             { 
@@ -305,8 +300,13 @@ class BaseController extends Controller {
                     });
                 });
             }
+
+            $solicituds->whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
+            $rSolicituds->whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
+        
             $solicituds = $solicituds->orderBy('id', 'ASC')->get();
             $rSolicituds = $rSolicituds->orderBy('id', 'ASC')->get();
+            
             if ( Auth::user()->type == REP_MED )
                 $solicituds = $solicituds->merge($rSolicituds);
             return $this->setRpta($solicituds);

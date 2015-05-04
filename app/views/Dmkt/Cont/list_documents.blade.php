@@ -1,28 +1,28 @@
-<table class="table table-hover table-bordered table-condensed dataTable" id="table_document_contabilidad" style="width: 100%">
+<table class="table table-hover table-bordered table-condensed dataTable" id="table_documents">
     <thead>
         <tr>
             <th>#</th>
-            <th>Tipo de Documento</th>
-            <th>Cuenta SUNAT</th>
-            <th>Tipo</th>
-            <th>IGV</th>
-            <th>Edicion</th>
+            <th>RUC</th>
+            <th>Razón Social</th>
+            <th>N°</th>
+            <th>Fecha Mov.</th>
+            <th>Descripcion</th>
+            <th>Edición</th>
         </tr>
     </thead>
     <tbody>
-        @foreach ($docs as $doc)
-            <tr>
-                <td id="pk" class="col-md-1" style="text-align: center">{{$doc->id}}</td>
-                <td id="desc" class="col-md-3" style="text-align: center">{{$doc->descripcion}}</td>
-                <td id="sunat" class="col-md-3" style="text-align: center">{{$doc->cta_sunat}}</td>
-                <td id="marca" class="col-md-2" style="text-align: center">{{$doc->marca}}</td>
-                @if ( $doc->igv == 1 )
-                    <td id="igv" class="col-md-1" style="text-align: center">Si</td>
-                @elseif ( $doc->igv == 0) 
-                    <td id="igv" class="col-md-1" style="text-align: center">No</td>
-                @endif
-                <td id="icons" class="col-md-1" style="text-align: center">
-                    <a class="elementEdit" href="#"><span class="glyphicon glyphicon-pencil"></span></a> <!-- <a class="elementDelete" href="#"><span class="glyphicon glyphicon-remove"></span></a> -->
+        @foreach ($proofs as $proof )
+            <tr row-id="{{$proof->id}}">
+                <td class="pk" style="text-align:center">{{$proof->id}}</td>
+                <td class="ruc" style="text-align:center">{{$proof->ruc}}</td>
+                <td class="razon" style="text-align:center">{{$proof->razon}}</td>
+                <td class="number" style="text-align:center">{{$proof->num_prefijo.'-'.$proof->num_serie}}</td>
+                <td class="fecha_movimiento" style="text-align:center">{{$proof->fecha_movimiento}}</td>
+                <td class="descripcion" style="text-align:center">{{$proof->descripcion}}</td>
+                <td style="text-align:center">
+                    <div>
+                        <a href="#" class="modal-document"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-pencil"></span></a>    
+                    </div>
                 </td>
             </tr>
         @endforeach
