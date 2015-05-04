@@ -24,8 +24,9 @@
     <tbody>
         @foreach($solicituds as $solicitude)
             <tr>
+                <input type="hidden" id="timeLine" value="{{$solicitude->idestado}}">
                 @if ( in_array(Auth::user()->type , array( TESORERIA,GER_COM) ))
-                    <input type="hidden" id="sol_token" class="i-tokens" value="{{$solicitude->token}}">  
+                    <input type="hidden" id="sol_token" class="i-tokens" value="{{$solicitude->token}}">
                     @if(!is_null($solicitude->response))
                         @if($solicitude->response->type == REP_MED)
                             <input type="hidden" value="{{$solicitude->response->rm->full_name}}" class="benef">
@@ -128,7 +129,9 @@
         @endforeach
     </tbody>
 </table>
-@include('template.Modals.timeLine')
+@if(Auth::user()->type == REP_MED)
+    @include('template.Modals.timeLine')
+@endif
 <!-- <script>
     $('.element').tooltip();
 </script> -->

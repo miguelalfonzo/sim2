@@ -5,7 +5,7 @@
         </a>    
         @if ( $solicitude->idtiposolicitud == SOL_REP )
             @if( Auth::user()->type == REP_MED)
-                <a data-toggle="modal" data-target=".timeLineModal">
+                <a class="timeLine">
                     <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-flag"></span>
                 </a>
                 @if($solicitude->idestado == REGISTRADO && Auth::user()->id == $solicitude->iduserasigned )
