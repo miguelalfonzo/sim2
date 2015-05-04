@@ -23,7 +23,7 @@ class MoveController extends BaseController
 
     public function searchMove()
     {
-     $date = Input::get('date');
+    	$date = Input::get('date');
         if ( empty( $date ) )
             return $this->warningException('El campo fecha se encuentra vacio',__FUNCTION__,'Empty Date');
         else            
@@ -86,7 +86,7 @@ class MoveController extends BaseController
                 }
             }
             return $middleRpta;
-     }
+        }
     }
 
     private function setDates($date)

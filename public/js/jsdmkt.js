@@ -185,71 +185,47 @@ function newSolicitude() {
         $(this).parent().removeClass('has-error');
     });
 
-    function listFondos()
+    function listMaintenanceTable( type )
     {
-        $.ajax({
-            url: server + 'list-fondos',
-            type: 'GET',
-            dataType: 'html'
+        $.ajax(
+        {
+            url: server + 'get-table-maintenance-info',
+            type: 'POST' ,
+            data:
+            {
+                _token : $('input[name=_token]').val(),
+                type   : type
+            }
         }).fail( function ( statusCode , errorThrown )
         {
             ajaxError( statusCode , errorThrown );
         }).done(function ( response ) 
         {
-            $("#table_sol_fondo_wrapper").remove();
-            $('.table_sol_fondo').append(response);
-            $('#table_sol_fondo').dataTable(
+            if ( response.Status == 'Ok' )
             {
-                "order": [ [ 0, "desc" ] ],
-                "bLengthChange": false,
-                'iDisplayLength': 7,
-                "oLanguage": 
+                $('#table_' + type + '_wrapper').remove();
+                $('.table_' + type ).append(response.Data);
+                $('#table_' + type ).dataTable(
                 {
-                    "sSearch": "Buscar: ",
-                    "sZeroRecords": "No hay fondos",
-                    "sInfoEmpty": "No hay fondos",
-                    "sInfo": 'Mostrando _END_ de _TOTAL_',
-                    "oPaginate": 
+                    "order": [ [ 0, "desc" ] ],
+                    "bLengthChange": false,
+                    'iDisplayLength': 7,
+                    "oLanguage": 
                     {
-                        "sPrevious": "Anterior",
-                        "sNext" : "Siguiente"
+                        "sSearch": "Buscar: ",
+                        "sZeroRecords": "No hay Informacion",
+                        "sInfoEmpty": "No hay Informacion",
+                        "sInfo": 'Mostrando _END_ de _TOTAL_',
+                        "oPaginate": 
+                        {
+                            "sPrevious": "Anterior",
+                            "sNext" : "Siguiente"
+                        }
                     }
-                }
-            });
-        });   
-    }
-
-    function listAccountsMarkRel()
-    {
-        $.ajax({
-            url: server + 'list-accounts-mark-rel',
-            type: 'GET',
-            dataType: 'html'
-        }).fail( function ( statusCode , errorThrown )
-        {
-            ajaxError( statusCode , errorThrown );
-        }).done(function ( response ) 
-        {
-            $("#table_accounts_mark_rel_wrapper").remove();
-            $('.table_accounts_mark_rel').append(response);
-            $('#table_accounts_mark_rel').dataTable(
-            {
-                "order": [ [ 0, "desc" ] ],
-                "bLengthChange": false,
-                'iDisplayLength': 7,
-                "oLanguage": 
-                {
-                    "sSearch": "Buscar: ",
-                    "sZeroRecords": "No hay fondos",
-                    "sInfoEmpty": "No hay fondos",
-                    "sInfo": 'Mostrando _END_ de _TOTAL_',
-                    "oPaginate": 
-                    {
-                        "sPrevious": "Anterior",
-                        "sNext" : "Siguiente"
-                    }
-                }
-            });
+                });
+            }
+            else
+                bootbox.alert('<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
         });
     }
 
@@ -622,10 +598,10 @@ function newSolicitude() {
 */
     var form_acepted_solicitude = $('#form_make_activity');
 
-    var search_solicitude_sup = $('#search_solicitude_sup');
+    /*var search_solicitude_sup = $('#search_solicitude_sup');
     search_solicitude_sup.on('click', function () {
         searchSolicitudeToDate('sup',this)
-    });
+    });*/
 
     $("#date_start").datepicker({
         language: 'es',
@@ -705,24 +681,26 @@ function newSolicitude() {
 
     if ( $("#search-solicitude").length == 1 )
     {
-        if( userType === 'C')
+        var section = $('.maintenance-add');
+        section.each( function()
         {
+            listMaintenanceTable( $(this).attr("case") );
+        });
+        if( userType === 'C')
             listDocuments();
-            listAccountsMarkRel();
-        }
-        else if ( userType === 'T' )
-            listFondos();
+        //else if ( userType === 'T' )
+            
     }
 
-    var search_solicitude_cont = $('#search_solicitude_cont');
+    /*var search_solicitude_cont = $('#search_solicitude_cont');
     search_solicitude_cont.on('click', function () {
         searchSolicitudeToDate('cont',this)
-    });
+    });*/
 
-    var search_solicitude_cont = $('#search_solicitude_tes');
+    /*var search_solicitude_cont = $('#search_solicitude_tes');
     search_solicitude_cont.on('click', function () {
         searchSolicitudeToDate('tes',this)
-    });
+    });*/
 
     /** --------------------------------------------- ASISTENCIA DE GERENCIA ------------------------------------------------- **/
 
@@ -1336,15 +1314,8 @@ function newSolicitude() {
     $(document).on( 'click' , '.maintenance-cancel' , function()
     {
         var tr = $(this).parent().parent();
-        switch ( tr.attr('type') )
-        {
-            case 'fondos':
-                listFondos();
-                break;
-            case 'cuentas-marca':
-                listAccountsMarkRel();
-                break;
-        }
+        
+        listMaintenanceTable( tr.attr('type')  );
     });
 
 
@@ -1400,16 +1371,8 @@ function newSolicitude() {
         {
             if ( response.Status == 'Ok')
             {
-                if ( aData.type == 'fondo' )
-                {
-                    bootbox.alert('<h4 class="green">Fondos Actualizado</h4>');
-                    listFondos();
-                }
-                else
-                {
-                    bootbox.alert('<h4 class="green">Tabla Actualizada</h4>');
-                    listAccountsMarkRel();
-                }
+                bootbox.alert('<h4 class="green">Tabla Actualizada</h4>');
+                listMaintenanceTable( aData.type );
             }
             else
                 bootbox.alert('<h4 class="red">' + Data.Status + ': ' + Data.Description + '</h4>');            
@@ -1443,16 +1406,8 @@ function newSolicitude() {
         {
             if ( response.Status == 'Ok')
             {
-                if ( aData.type == 'fondos' )
-                {
-                    bootbox.alert('<h4 class="green">Fondo Actualizado</h4>');
-                    listFondos();
-                }
-                else if ( aData.type == 'cuentas-marca' )
-                {
-                    bootbox.alert('<h4 class="green">Relaciones Actualizadas</h4>');
-                    listAccountsMarkRel();
-                }
+                bootbox.alert('<h4 class="green">Relaciones Actualizadas</h4>');
+                listMaintenanceTable( aData.type );
             }
             else
                 bootbox.alert('<h4 class="red">' + Data.Status + ': ' + Data.Description + '</h4>');            
@@ -1466,7 +1421,7 @@ function newSolicitude() {
         $.ajax(
         {
             type: 'post' ,
-            url :  server + 'get-maintenance-info' ,
+            url :  server + 'get-cell-maintenance-info' ,
             data: 
             {
                 type   : td[0].className ,
@@ -1763,7 +1718,7 @@ function newSolicitude() {
             if (data.Status == 'Ok')
             {
                 $('#table_estado_cuenta_wrapper').remove();
-                $('.table_estado_cuenta').append(data.Data);
+                $('.table_estado_cuenta').append(data.Data.View);
                 $('#table_estado_cuenta').dataTable(
                 {
                     "order": [
@@ -1784,6 +1739,11 @@ function newSolicitude() {
                         }
                     }
                 });
+                if ( data.Data.Total !== undefined )
+                {
+                    $('.estado-cuenta-deposito').first().val(data.Data.Total.Soles);
+                    $('.estado-cuenta-deposito').last().val(data.Data.Total.Dolares);
+                }
             }
             else
                 responseUI('Error del Sistema','red');
