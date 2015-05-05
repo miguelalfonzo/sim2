@@ -1083,27 +1083,32 @@ class SolicitudeController extends BaseController
         $result   = array();
         $seatList = array();
         $AadvanceSeat = $solicitud->baseEntry;
-        if ( is_null( $AadvanceSeat ) )
+        /*if ( is_null( $AadvanceSeat ) )
             return $this->warningException( __FUNCTION__ , 'No se encontro registros del asiento de anticipo D/C: "D" para la solicitud');
         else
         {
             Log::error('ASIENTO GASTO');
-        $cuentaMkt      = $solicitud->baseEntry->num_cuenta;
-        $idcuentaMkt = $solicitud->baseEntry->account->id;
-
-        $accountResult  = $this->getCuentaCont($cuentaMkt);
+        */
         $account_number = '';
         $marcaNumber    = '';
-        if(!isset($accountResult['error']))
+        $cuentaMkt      = '';
+        if ( !is_null( $AadvanceSeat ) )
         {
-            $account_number = $accountResult['account'][0]->num_cuenta;
-            $idaccount_number = $accountResult['account'][0]->id;
-            $marcaNumber = MarkProofAccounts::getMarks( $idcuentaMkt , $idaccount_number );
-            $marcaNumber = $marcaNumber[0]->codigo; 
-        }
-        else
-            $result['error'][] = $accountResult['error'];
+            $cuentaMkt      = $solicitud->baseEntry->num_cuenta;
+            $idcuentaMkt = $solicitud->baseEntry->account->id;
 
+            $accountResult  = $this->getCuentaCont($cuentaMkt);
+
+            if(!isset($accountResult['error']))
+            {
+                $account_number = $accountResult['account'][0]->num_cuenta;
+                $idaccount_number = $accountResult['account'][0]->id;
+                $marcaNumber = MarkProofAccounts::getMarks( $idcuentaMkt , $idaccount_number );
+                $marcaNumber = $marcaNumber[0]->codigo; 
+            }
+            else
+                $result['error'][] = $accountResult['error'];
+        }
         $userElement = $solicitud->asignedTo;
 
         $tipo_responsable = $userElement->tipo_responsable;
@@ -1188,27 +1193,41 @@ class SolicitudeController extends BaseController
             else
             {
                 // ASIENTO DOCUMENT - NO ITEM
-                    $description_seat_other_doc = strtoupper($username.' '. $expense->descripcion);
-
-                    /*if ( $solicitud->detalle->idmoneda == DOLARES )
+                $description_seat_other_doc = strtoupper($username.' '. $expense->descripcion);
+                
+                if ( $expense->idcomprobante = RECIBO_HONORARIO )
+                {
+                    if ( is_null( $expense->idtipotributo) )
+                        array_push( $seatListTemp , $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', $account_number, $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_BASE, ASIENTO_GASTO_COD_PROV, $expense->razon, ASIENTO_GASTO_COD, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, $expense->monto, $marca, $description_seat_other_doc, $tipo_responsable, '' ) );
+                    else
                     {
-                        $nTc = ChangeRate::getDateTc( $expense->fecha_movimiento );
-                        $expense->monto = $expense->monto * $nTc->venta;
+                        if ( $solicitud->detalle->idmotivo == REEMBOLSO )
+                        {
+                            array_push( $seatListTemp , $this->createSeatElement($tempId++, '' , $solicitud->id, '', $account_number, $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_BASE, ASIENTO_GASTO_COD_PROV, $expense->razon, ASIENTO_GASTO_COD, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, $expense->monto, $marca, $description_seat_other_doc, $tipo_responsable, '' ) );
+                            array_push( $seatListTemp , $this->createSeatElement($tempId++, 4699700 , $solicitud->id, '', 4699700 , $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_BASE, ASIENTO_GASTO_COD_PROV, $expense->razon, ASIENTO_GASTO_COD, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_DEPOSITO , $expense->monto_tributo, $marca, $description_seat_other_doc, $tipo_responsable, '' ) );
+                            array_push( $seatListTemp , $this->createSeatElement($tempId++, 4212300 , $solicitud->id, '', 4212300 , $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_BASE, ASIENTO_GASTO_COD_PROV, $expense->razon, ASIENTO_GASTO_COD, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_DEPOSITO , $expense->monto - $expense->monto_tributo , $marca, $description_seat_other_doc, $tipo_responsable, '' ) );                       
+                        }
+                        else
+                        {
+                            array_push( $seatListTemp , $this->createSeatElement($tempId++, '' , $solicitud->id, '', $account_number, $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_BASE, ASIENTO_GASTO_COD_PROV, $expense->razon, ASIENTO_GASTO_COD, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, $expense->monto, $marca, $description_seat_other_doc, $tipo_responsable, '' ) );
+                            array_push( $seatListTemp , $this->createSeatElement($tempId++, 4699700 , $solicitud->id, '', $account_number, $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_BASE, ASIENTO_GASTO_COD_PROV, $expense->razon, ASIENTO_GASTO_COD, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_DEPOSITO , $expense->monto_tributo, $marca, $description_seat_other_doc, $tipo_responsable, '' ) );
+                            array_push( $seatListTemp , $this->createSeatElement($tempId++, $cuentaMkt , $solicitud->id, '', $account_number, $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_BASE, ASIENTO_GASTO_COD_PROV, $expense->razon, ASIENTO_GASTO_COD, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_DEPOSITO , $expense->monto - $expense->monto_tributo , $marca, $description_seat_other_doc, $tipo_responsable, '' ) );                           
+                        }
                     }
-                    */$seat = $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', $account_number, $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_BASE, ASIENTO_GASTO_COD_PROV, $expense->razon, ASIENTO_GASTO_COD, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, $expense->monto, $marca, $description_seat_other_doc, $tipo_responsable, '');
-                    array_push($seatListTemp, $seat);
+                }    
+                else
+                    array_push( $seatListTemp , $this->createSeatElement( $tempId++ , $cuentaMkt , $solicitud->id , '' , $account_number , $comprobante->cta_sunat , $fecha_origen , ASIENTO_GASTO_IVA_BASE , ASIENTO_GASTO_COD_PROV , $expense->razon , ASIENTO_GASTO_COD , $expense->ruc , $expense->num_prefijo , $expense->num_serie , ASIENTO_GASTO_BASE , $expense->monto , $marca , $description_seat_other_doc , $tipo_responsable , '' ) );
             }
             $seatList = array_merge($seatList, $seatListTemp);
         }
         // CONTRAPARTE ASIENTO DE ANTICIPO
 
         $description_seat_back = strtoupper($username .' '. $solicitud->titulo);
-        //Log::error('ASIENTO DE GASTO DEL ANTICIPO');
-        $seat = $this->createSeatElement($tempId++, $cuentaMkt , $solicitud->id, '', $cuentaMkt , '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO , $AadvanceSeat->importe, '', $description_seat_back, '', 'CAN');        
-        array_push($seatList, $seat);
+        
+        if ( $solicitud->detalle->idmotivo != REEMBOLSO )
+            $seatList[] = $this->createSeatElement($tempId++, $cuentaMkt , $solicitud->id, '', $cuentaMkt , '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO , json_decode( $solicitud->detalle->detalle )->monto_aprobado , '', $description_seat_back, '', 'CAN');        
         $result['seatList'] = $seatList;
         return $result;
-        }
     }
 
     public function viewGenerateSeatExpense($token)
@@ -1216,25 +1235,24 @@ class SolicitudeController extends BaseController
         $solicitud = Solicitude::where('token', $token)->first();
 
         $expenses = $solicitud->expenses; 
-            $clientes   = array();
-            $nom = '';
-            foreach($solicitud->clients as $client)
+        $clientes   = array();
+        $nom = '';
+        foreach($solicitud->clients as $client)
+        {
+            if ($client->from_table == TB_DOCTOR)
             {
-                if ($client->from_table == TB_DOCTOR)
-                {
-                    $doctors = $client->doctors;
-                    $nom = $doctors->pefnombres.' '.$doctors->pefpaterno.' '.$doctors->pefmaterno;            
-                }
-                elseif ($client->from_table == TB_INSTITUTE)
-                    $nom = $client->institutes->pejrazon;
-                else
-                    $nom = 'No encontrado';
-                array_push($clientes,$nom);
+                $doctors = $client->doctors;
+                $nom = $doctors->pefnombres.' '.$doctors->pefpaterno.' '.$doctors->pefmaterno;            
             }
-            $clientes = implode(',',$clientes);
-        //}
-        $typeProof  = ProofType::all();
-        $date       = $this->getDay();
+            elseif ($client->from_table == TB_INSTITUTE)
+                $nom = $client->institutes->pejrazon;
+            else
+                $nom = 'No encontrado';
+            array_push($clientes,$nom);
+        }
+        $clientes     = implode(',',$clientes);
+        $typeProof    = ProofType::all();
+        $date         = $this->getDay();
         $expenseItem  = array();
         foreach ( $expenses as $expense ) 
         {
@@ -1265,17 +1283,8 @@ class SolicitudeController extends BaseController
             $tempArray          = array();
             $tempArray['error'] = $resultSeats['error'];
             $data = array_merge($data, $tempArray);
-        }
-        
+        }    
         return View::make('Dmkt.Cont.SeatExpense', $data);
-        
-
-        //print_r($data);
-        /*if( $solicitud->idtiposolicitud == SOL_REP ){
-            return View::make('Dmkt.Cont.SeatExpense', $data);
-        }else{
-            return View::make('Dmkt.Cont.SeatExpenseFondo', $data);
-        }*/
     }
 
     // IDKC: CHANGE STATUS => GENERADO
@@ -1289,10 +1298,6 @@ class SolicitudeController extends BaseController
             
             foreach ($dataInputs['seatList'] as $key => $seatItem) 
             {
-                /*list($day, $month, $year) = explode('/', $seatItem['fec_origen']);
-                $dateTemp = mktime(11, 14, 54, $month, $day, $year);
-                $fec_origen = date("Y/m/d", $dateTemp);
-                */
                 $seat = new Entry;
                 $seat->id           = $seat->searchId() + 1;
                 $seat->num_cuenta   = $seatItem['numero_cuenta'];

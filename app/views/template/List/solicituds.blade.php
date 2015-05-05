@@ -109,9 +109,9 @@
                 <td class="text-center">{{$solicitude->created_at}}</td> <!--date_format(date_create($solicitude->created_at), 'd/m/Y' ) -->
                 <td class="text-center">
                     @if ( $solicitude->idtiposolicitud == SOL_REP )
-                        {{ $solicitude->detalle->typeReason->nombre}}
+                        {{ $solicitude->detalle->reason->nombre }}
                     @elseif ( $solicitude->idtiposolicitud == SOL_INST ) 
-                        {{ $solicitude->typesolicitude->nombre}}
+                        {{ $solicitude->typesolicitude->nombre }}
                     @endif
                 </td>
                 @include('template.List.icons')

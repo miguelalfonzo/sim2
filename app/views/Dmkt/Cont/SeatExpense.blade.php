@@ -83,18 +83,6 @@
 	                    </div>							
 					</div>
 				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4" style="display:none;">
-					<div class="form-expense">
-						<label>Número de Depósito</label>
-						<input type="text" class="form-control" value="{{$solicitude->iddeposito}}" disabled>
-					</div>
-				</div>
-				<div class="col-xs-12 col-sm-6 col-md-4">
-					<div class="form-expense">
-						<label>Fecha de Depósito</label>
-						<input type="text" class="form-control" value="{{date_format(date_create($solicitude->detalle->deposit->created_at), 'd/m/Y')}}" disabled>
-					</div>
-				</div>
 			</section>
 			<hr>
 			<div>
