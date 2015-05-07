@@ -14,7 +14,7 @@
     {{ HTML::style('css/bootstrap-lightbox.css')}}
     {{ HTML::style('css/bootstrap.min.css') }}
     {{ HTML::style('css/jquery-ui.min.css') }}
-    {{ HTML::style('css/datepicker.css') }}
+    {{ HTML::style('css/bootstrap-datepicker3.css') }}
     {{ HTML::style('css/ladda-themeless.min.css') }}
     {{ HTML::style('css/stylos.css') }}
     {{ HTML::style('css/typeahead.css') }}
@@ -80,7 +80,7 @@
 {{ HTML::script('js/jquery.numeric.js') }}
 {{ HTML::script('js/bootstrap.min.js') }}
 {{ HTML::script('js/bootstrap-datepicker.js') }}
-{{ HTML::script('js/locales/bootstrap-datepicker.es.js') }}
+{{ HTML::script('js/locales/bootstrap-datepicker.es.min.js') }}
 {{ HTML::script('js/spin.min.js') }}
 {{ HTML::script('js/ladda.min.js') }}
 {{ HTML::script('js/bootbox.min.js') }}

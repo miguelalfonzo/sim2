@@ -43,7 +43,7 @@
 	font-family: 'calibriregular', sans-serif;
 	font-size: 11px;
 	line-height: 1.4;
-	text-align: left;
+	text-align: center;
 }
 
 #tmm-form-wizard .stage.tmm-current:after, #tmm-form-wizard .stage.tmm-current:before{
@@ -86,35 +86,34 @@
 }
 
 .stage-pending{
-	background-color: yellow;
-	border: 1px solid yellow;	
+	background-color: #f0ad4e;
+	border: 1px solid #f0ad4e;	
 }
 
 .stage-rejected{
-	background-color: red;
-	border: 1px solid red;	
+	background-color: #ac2925;
+	border: 1px solid #ac2925;	
 }
 
 .stage-success{
-	background-color: green;
-	border: 1px solid green;
+	background-color: #4cae4c;
+	border: 1px solid #4cae4c;
 }
 
 .pending:after, .pending:before{
-	background-color: yellow;
-	border-bottom: 1px solid yellow;
-	border-top: 1px solid yellow;
+	background-color: #f0ad4e;
+	border-bottom: 1px solid #f0ad4e;
+	border-top: 1px solid #f0ad4e;
 }
 
-
 .rejected:before, .rejected:after{
-	background-color: red;
-	border-bottom: 1px solid red;
-	border-top: 1px solid red;
+	background-color: #ac2925;
+	border-bottom: 1px solid #ac2925;
+	border-top: 1px solid #ac2925;
 }
 
 .success:after, .success:before{
-	background-color: green;
-	border-bottom: 1px solid green;
-	border-top: 1px solid green;
+	background-color: #4cae4c;
+	border-bottom: 1px solid #4cae4c;
+	border-top: 1px solid #4cae4c;
 }

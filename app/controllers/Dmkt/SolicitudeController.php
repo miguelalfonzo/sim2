@@ -107,11 +107,11 @@ class SolicitudeController extends BaseController
     public function newSolicitude()
     {
         $typesolicituds = SolicitudReason::all();
-        $etiquetas = Label::orderBy('id','asc')->get();
-        $typePayments = TypePayment::all();
-        $typesMoney = TypeMoney::all();
-        $families = Marca::orderBy('descripcion', 'Asc')->get();
-        $data = array(
+        $etiquetas      = Label::orderBy('id','asc')->get();
+        $typePayments   = TypePayment::all();
+        $typesMoney     = TypeMoney::all();
+        $families       = Marca::orderBy('descripcion', 'Asc')->get();
+        $data           = array(
             'typesolicituds' => $typesolicituds,
             'etiquetas'      => $etiquetas,
             'typePayments'   => $typePayments,

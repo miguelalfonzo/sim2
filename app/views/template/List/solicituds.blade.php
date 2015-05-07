@@ -128,7 +128,9 @@
         @endforeach
     </tbody>
 </table>
-@include('template.Modals.timeLine')
+@if(Auth::type = 'REP_MED')
+    @include('template.Modals.timeLine')
+@endif
 <!-- <script>
     $('.element').tooltip();
 </script> -->
