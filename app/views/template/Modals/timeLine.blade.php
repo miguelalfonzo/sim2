@@ -5,8 +5,8 @@
 	<div class="container-fluid hide">
 		<div class="thumbnail">
 			<div class="stage-container">
-				<div class="stage success col-md-3 col-sm-3">
-					<div class="stage-header stage-success"></div>
+				<div class="stage col-md-3 col-sm-3">
+					<div class="stage-header"></div>
 					<div class="stage-content">
 						<h3 class="stage-title">Reg. Solicitud</h3>
 						<div class="stage-info">
@@ -14,8 +14,8 @@
 						</div> 
 					</div>
 				</div>
-				<div class="stage pending col-md-3 col-sm-3">
-					<div class="stage-header stage-pending"></div>
+				<div class="stage col-md-3 col-sm-3">
+					<div class="stage-header"></div>
 					<div class="stage-content">
 						<h3 class="stage-title">Eval. Solicitud</h3>
 						<div class="stage-info">
@@ -45,8 +45,8 @@
 			</div>
 			<div class="clearfix"></div>
 			<div class="stage-container" style="margin-top:2em;">
-				<div class="stage success col-md-3 col-sm-3">
-					<div class="stage-header stage-success"></div>
+				<div class="stage col-md-3 col-sm-3">
+					<div class="stage-header"></div>
 					<div class="stage-content">
 						<h3 class="stage-title">Dep. Solicitud</h3>
 						<div class="stage-info">
@@ -54,8 +54,8 @@
 						</div> 
 					</div>
 				</div>
-				<div class="stage pending col-md-3 col-sm-3">
-					<div class="stage-header stage-pending"></div>
+				<div class="stage col-md-3 col-sm-3">
+					<div class="stage-header"></div>
 					<div class="stage-content">
 						<h3 class="stage-title">Asiento Solicitud</h3>
 						<div class="stage-info">
@@ -82,7 +82,6 @@
 					</div>
 				</div>
 			</div>
-
 			<div class="clearfix"></div>
 			<br>
 		</div>
