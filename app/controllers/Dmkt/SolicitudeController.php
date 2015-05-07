@@ -852,7 +852,6 @@ class SolicitudeController extends BaseController
         try
         {
             $inputs = Input::all();
-            Log::error($inputs);
             $rules = array(
                 'sols' => 'required'
             );
@@ -1050,12 +1049,6 @@ class SolicitudeController extends BaseController
         $rpta = MarkProofAccounts::listExpenses( $accountFondo->id );
         return $rpta;
 
-        /*foreach ( $mDCs as $mDC )
-            $accountExpense[] = $mDC->getExpenseAccount;
-        $accountFondo->tExpense = $accountExpense;
-        $accountFondo->accountGasto = $accountExpense;
-
-        return $this->getCuentaCont($dataInputs['cuentaMkt']);*/
     }
 
     public function getCuentaCont($cuentaMkt){
@@ -1088,28 +1081,6 @@ class SolicitudeController extends BaseController
         $seatList = array();
         //AadvanceSeat = $solicitud->baseEntry;
         $fondo = $solicitud->detalle->fondo;
-        
-        /*if ( is_null( $AadvanceSeat ) )
-            return $this->warningException( __FUNCTION__ , 'No se encontro registros del asiento de anticipo D/C: "D" para la solicitud');
-        else
-        {
-            Log::error('ASIENTO GASTO');
-        $cuentaMkt      = $solicitud->baseEntry->num_cuenta;
-        $idcuentaMkt = $solicitud->baseEntry->account->id;
-
-        $accountResult  = $this->getCuentaCont($cuentaMkt);
-        $account_number = '';
-        $marcaNumber    = '';
-        if(!isset($accountResult['error']))
-        {
-            $account_number = $accountResult['account'][0]->num_cuenta;
-            $idaccount_number = $accountResult['account'][0]->id;
-            $marcaNumber = MarkProofAccounts::getMarks( $idcuentaMkt , $idaccount_number );
-            $marcaNumber = $marcaNumber[0]->codigo; 
-        }
-        else
-            $result['error'][] = $accountResult['error'];
-        */
 
         $cuentaExpense = '';
         $marcaNumber    = '';
@@ -1415,7 +1386,7 @@ class SolicitudeController extends BaseController
                         $tbEntry = new Entry;
                         $tbEntry->id = $tbEntry->searchId()+1;
                         $tbEntry->num_cuenta = $inputs['number_account'][$i];
-                        $tbEntry->fec_origen = $solicitude->detalle->deposit->updated_at ;
+                        $tbEntry->fec_origen = date( 'Y-m-d' , strtotime( (string)$solicitude->detalle->deposit->updated_at ) );
                         $tbEntry->d_c = $inputs['dc'][$i];
                         $tbEntry->importe = $inputs['total'][$i];
                         $tbEntry->leyenda = trim($inputs['leyenda']);
