@@ -358,7 +358,7 @@ class TableController extends BaseController
 	private function maintenanceAddCuentasMarca()
 	{
 		$data = array( 'fondos' => Fondo::all() , 'docs' => Proof::all() );
-		return $this->setRpta( View::make( 'Maintenance.CuentasMarca.tr')->with( $data )->render() );
+		return $this->setRpta( View::make( 'Maintenance.Cuentasmarca.tr')->with( $data )->render() );
 	}
 
 	private function maintenanceAddFondo()

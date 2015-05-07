@@ -618,15 +618,15 @@ class SolicitudeController extends BaseController
 
     private function textAccepted( $solicitude )
     {
-        if ( $solicitud->idtiposolicitud == SOL_REP )
+        if ( $solicitude->idtiposolicitud == SOL_REP )
             if ( $solicitude->acceptHist->user->type == SUP )
                 return $solicitude->acceptHist->user->sup->nombres.' '.$solicitude->acceptHist->user->sup->apellidos;
             elseif ( $solicitude->acceptHist->user->type == GER_PROD )
                 return $solicitude->acceptHist->user->gerProd->descripcion;
             else
                 return 'No encontrado';
-        /*else if ( $solicitud->idtiposolicitud == SOL_INST )
-            return $solicitude->createdBy->person->full_name.' '.$so*/
+        else if ( $solicitude->idtiposolicitud == SOL_INST )
+            return $solicitude->createdBy->person->full_name;
     }
 
     private function textClients( $solicitude )

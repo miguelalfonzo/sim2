@@ -13,15 +13,13 @@ class Manager extends Eloquent{
         return $this->hasMany('Dmkt\SolicitudeGer','idgerprod','id');
     }
     
-    function searchId(){
-
+    function searchId()
+    {
         $lastId = Manager::orderBy('id', 'DESC')->first();
-        if($lastId == null){
+        if($lastId == null)
             return 0;
-        }else{
+        else
             return $lastId->id;
-        }
-
     }
 
 }
