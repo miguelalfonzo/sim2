@@ -59,7 +59,7 @@
 					<span class="input-group-addon">
 						<i class="glyphicon glyphicon-calendar"></i>
 					</span>
-					<input id="date" type="text" class="form-control" maxlength="10" value="{{$date['toDay']}}" readonly>
+					<input id="date" type="text" class="form-control" maxlength="10" readonly>
 					<input id="last-date" type="hidden" value="{{$date['lastDay']}}">
 				</div>
 			</div>

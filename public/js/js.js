@@ -157,20 +157,28 @@ $(function()
         $('.date>input[readonly]').css('background-color', "#fff");
         if(!($('.date>input:not([disabled])').length == 0))
         {
-            a = $('#last-date').val();
-            console.log(a);
-            console.log($('#last-date').val());
-            console.log( "{{$data['date']['toDay']}}" );
-            $(".date").datepicker({
+            var toDate = "";
+            $(".date").datepicker(
+            {
                 language: 'es',
-                startDate: '06/05/2015' ,
-                endDate:  '"' + $('#last-date').val() + '"' ,
+                startDate: toDate == "" ? "{{$data['date']['toDay']}}" : toDate,
+                endDate: $("#last-date").val(),
                 format: 'dd/mm/yyyy'
             });
             //selected a date hide the datepicker
             $(".date").on("change",function(){
                 $(this).datepicker('hide');
+            });   
+            /*$(".date").datepicker({
+                language: 'es',
+                startDate: '{{$data["date"]["toDay"]}}' ,
+                endDate:  '{{$data["date"]["lastDay"]}}' ,
+                format: 'dd/mm/yyyy'
             });
+            //selected a date hide the datepicker
+            $(".date").on("change",function(){
+                $(this).datepicker('hide');
+            });*/
         }
         $("#cancel-expense").on("click",function(e){
             e.preventDefault();

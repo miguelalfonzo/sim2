@@ -215,7 +215,8 @@ class SolicitudeController extends BaseController
         $data = array(
             'typeProof'    => ProofType::orderBy('id','asc')->get(),
             'typeExpense'  => ExpenseType::order(),
-            'date'         => array( 'toDay' => $solicitud->created_at , 'lastDay' => json_decode( $solicitud->detalle->detalle )->monto_aprobado )
+            //'date'         => array( 'toDay' => $solicitud->created_at , 'lastDay' => json_decode( $solicitud->detalle->detalle )->monto_aprobado )
+            'date'         => $this->getDay()
         );
         $gastos = $solicitud->expenses;
         if ( count( $gastos ) > 0 )
@@ -617,12 +618,15 @@ class SolicitudeController extends BaseController
 
     private function textAccepted( $solicitude )
     {
-        if ( $solicitude->acceptHist->user->type == SUP )
-            return $solicitude->acceptHist->user->sup->nombres.' '.$solicitude->acceptHist->user->sup->apellidos;
-        elseif ( $solicitude->acceptHist->user->type == GER_PROD )
-            return $solicitude->acceptHist->user->gerProd->descripcion;
-        else
-            return 'No encontrado';
+        if ( $solicitud->idtiposolicitud == SOL_REP )
+            if ( $solicitude->acceptHist->user->type == SUP )
+                return $solicitude->acceptHist->user->sup->nombres.' '.$solicitude->acceptHist->user->sup->apellidos;
+            elseif ( $solicitude->acceptHist->user->type == GER_PROD )
+                return $solicitude->acceptHist->user->gerProd->descripcion;
+            else
+                return 'No encontrado';
+        /*else if ( $solicitud->idtiposolicitud == SOL_INST )
+            return $solicitude->createdBy->person->full_name.' '.$so*/
     }
 
     private function textClients( $solicitude )
