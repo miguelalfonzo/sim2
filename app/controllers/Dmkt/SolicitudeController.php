@@ -1013,12 +1013,14 @@ class SolicitudeController extends BaseController
 
     /** ---------------------------------------------  Contabilidad -------------------------------------------------*/
 
-    public function getTypeDoc($id){
+    public function getTypeDoc( $id )
+    {
         return json_decode(ProofType::find($id)->toJson());
     }
+
     public function createSeatElement($tempId, $cuentaMkt, $solicitudId, $fondoId, $account_number, $cod_snt, $fecha_origen, $iva, $cod_prov, $nom_prov, $cod, $ruc, $serie, $numero, $dc, $monto, $marca, $descripcion, $tipo_responsable, $type){
         $seat = array(
-            'tempId'            => $tempId,             // Temporal
+            //'tempId'            => $tempId,             // Temporal
             'cuentaMkt'         => $cuentaMkt,          // TEMPORAL
             'solicitudId'       => intval($solicitudId),
             'fondoId'           => intval($fondoId),
@@ -1044,14 +1046,13 @@ class SolicitudeController extends BaseController
 
     public function getCuentaContHandler()
     {
-        $dataInputs  = Input::all();    
-        $accountFondo = Account::where( 'num_cuenta' , $dataInputs['cuentaMkt'] )->first();
-        $rpta = MarkProofAccounts::listExpenses( $accountFondo->id );
-        return $rpta;
-
+        $dataInputs   = Input::all();    
+        $accountFondo = Account::where( 'num_cuenta' , $dataInputs[ 'cuentaMkt' ] )->first();
+        return MarkProofAccounts::listData( $accountFondo->num_cuenta );
     }
 
-    public function getCuentaCont($cuentaMkt){
+    public function getCuentaCont( $cuentaMkt )
+    {
         $result = array();
         if(!empty($cuentaMkt))
         {
@@ -1075,7 +1076,7 @@ class SolicitudeController extends BaseController
         return $result;
     }
 
-    public function generateSeatExpenseData( $solicitud , $fondo, $iduser )
+    public function generateSeatExpenseData( $solicitud )
     {    
         $result   = array();
         $seatList = array();
@@ -1109,7 +1110,7 @@ class SolicitudeController extends BaseController
         $userElement = $solicitud->asignedTo;
 
         $tipo_responsable = $userElement->tipo_responsable;
-        $username= '';
+        $username = '';
 
         $userType       = $userElement->type;
         if($userType == REP_MED )
@@ -1119,8 +1120,6 @@ class SolicitudeController extends BaseController
         elseif ( $userType == ASIS_GER )
             $username = $userElement->person->full_name;
         
-        $tempId=1;
-        
         if ( $solicitud->documentList->count() == 0 )
         {
             $result['seatList'] = array();
@@ -1128,112 +1127,90 @@ class SolicitudeController extends BaseController
         }
         else
         {
+            $tempId=1;
+    
             foreach( $solicitud->documentList as $expense )
             {
-                $comprobante             = $this->getTypeDoc($expense->idcomprobante);
-                $comprobante->marcaArray =  explode(",", $comprobante->marca);
+                $comprobante             =  $this->getTypeDoc( $expense->idcomprobante );
+                $comprobante->marcaArray =  explode( ',' , $comprobante->marca);
                 $marca = '';
-                if($marcaNumber == '')
+                if( $marcaNumber == '' )
                 {
                     $errorTemp = array(
                         'error' => ERROR_NOT_FOUND_MARCA,
                         'msg'   => MESSAGE_NOT_FOUND_MARCA
                     );
-                    if(!isset($result['error']) || !in_array($errorTemp, $result['error']))
+                    if( !isset( $result['error'] ) || !in_array( $errorTemp, $result['error'] ) )
                         $result['error'][] = $errorTemp;
                 }
                 else
-                {
-                    if (count( $comprobante->marcaArray ) == 2 && (boolean) $comprobante->igv == true) 
-                    {
+                    if ( count( $comprobante->marcaArray ) == 2 && (boolean) $comprobante->igv == true ) 
                         if ( $expense->igv > 0 )
-                            $marca = $marcaNumber == '' ? '' : $marcaNumber.$comprobante->marcaArray[1];
+                            $marca = $marcaNumber == '' ? '' : $marcaNumber . $comprobante->marcaArray[1];
                         else
-                            $marca = $marcaNumber == '' ? '' : $marcaNumber.$comprobante->marcaArray[0]; 
-                    }
+                            $marca = $marcaNumber == '' ? '' : $marcaNumber . $comprobante->marcaArray[0]; 
                     else
-                        $marca = $marcaNumber == '' ? '' : $marcaNumber.$comprobante->marcaArray[0];
-                }
+                        $marca = $marcaNumber == '' ? '' : $marcaNumber . $comprobante->marcaArray[0];
 
-                $seatListTemp = array();
-                $fecha_origen =  date("d/m/Y", strtotime($expense->fecha_movimiento));
+                $fecha_origen =  date( 'd/m/Y' , strtotime( $expense->fecha_movimiento ) );
                 // COMPROBANTES CON IGV
-                if( (boolean) $comprobante->igv === true)
+                if ( (boolean) $comprobante->igv === true )
                 {
-                    $itemLength = count($expense->itemList)-1;
+                    $itemLength = count( $expense->itemList ) - 1;
                     $total_neto = 0;
-                    foreach ($expense->itemList as $itemKey => $itemElement) 
+                    foreach ( $expense->itemList as $itemKey => $itemElement ) 
                     {
-                        $description_seat_item           = strtoupper($username .' '. $itemElement->cantidad .' '.$itemElement->descripcion);
-                        $description_seat_igv            = strtoupper($expense->razon);
-                        $description_seat_repair_base    = strtoupper($username .' '.$expense->descripcion .'-REP '. substr($comprobante->descripcion,0,1).'/' .$expense->num_prefijo .'-'. $expense->num_serie);
-                        $description_seat_repair_deposit = strtoupper('REPARO IGV MKT '. substr($comprobante->descripcion,0,1).'/' .$expense->num_prefijo .'-'. $expense->num_serie .' '.$expense->razon);
+                        $description_seat_item           = strtoupper( $username .' '. $itemElement->cantidad .' '. $itemElement->descripcion );
+                        $description_seat_igv            = strtoupper( $expense->razon );
+                        $description_seat_repair_base    = strtoupper( $username .' '. $expense->descripcion . '-REP ' . substr( $comprobante->descripcion , 0 , 1). '/' .$expense->num_prefijo .'-'. $expense->num_serie );
+                        $description_seat_repair_deposit = strtoupper( 'REPARO IGV MKT '. substr( $comprobante->descripcion , 0 , 1 ) . '/' .$expense->num_prefijo . '-' . $expense->num_serie .' '. $expense->razon );
                         
                         // ASIENTO ITEM
-                        $seat = $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', $cuentaExpense , $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_BASE, ASIENTO_GASTO_COD_PROV_IGV, $expense->razon, ASIENTO_GASTO_COD_IGV, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, $itemElement->importe, $marca, $description_seat_item, $tipo_responsable, '');
-                        
+                        $seatList[] = $this->createSeatElement( $tempId++ , $cuentaMkt, $solicitud->id, '', $cuentaExpense , $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_BASE, ASIENTO_GASTO_COD_PROV_IGV, $expense->razon, ASIENTO_GASTO_COD_IGV, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, $itemElement->importe, $marca , $description_seat_item , $tipo_responsable , '' );
                         $total_neto += $itemElement->importe;
-                        array_push($seatListTemp, $seat);
-                        if($itemLength == $itemKey)
-                        {
-                            // ASIENTO IGV
-                            $seat = $this->createSeatElement($tempId++, $cuentaMkt, '', $solicitud->id, $cuentaExpense , $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_IGV, ASIENTO_GASTO_COD_PROV_IGV, $expense->razon, ASIENTO_GASTO_COD_IGV, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, $expense->igv, $marca, $description_seat_igv, $tipo_responsable, 'IGV');
-                            array_push($seatListTemp, $seat);
-                                 // ASIENTO IMPUESTO SERVICIO
-                            if(!($expense->imp_serv == null || $expense->imp_serv == 0 || $expense->imp_serv == '')){
-                                $porcentaje = $total_neto/$expense->imp_serv;
-                                $description_seat_tax_service    = strtoupper('SERVICIO '. $porcentaje .'% '. $expense->descripcion);
-                                $seat = $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', $cuentaExpense , '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_BASE, $expense->imp_serv, $marca, $description_seat_tax_service, '', 'SER');       
-                                array_push($seatListTemp, $seat);
-                            }
-                            // ASIENTO REPARO
-                            if($expense->reparo == '1')
-                            {   
-                                $seat = $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', CUENTA_REPARO_COMPRAS, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_BASE, $expense->igv, $marca, $description_seat_repair_base, '', 'REP');
-                                array_push($seatListTemp, $seat);
-                                $seat = $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', CUENTA_REPARO_GOBIERNO, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO, $expense->igv, $marca, $description_seat_repair_deposit, '', 'REP');
-                                array_push($seatListTemp, $seat);
-                            }
-                        }
-                    } 
-                // TODOS LOS OTROS DOCUMENTOS
+                    }
+                    $seatList[] = $this->createSeatElement($tempId++, $cuentaMkt, '', $solicitud->id, $cuentaExpense , $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_IGV, ASIENTO_GASTO_COD_PROV_IGV, $expense->razon, ASIENTO_GASTO_COD_IGV, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, $expense->igv, $marca, $description_seat_igv, $tipo_responsable, 'IGV');
+                    
+                    //ASIENTO IMPUESTO SERVICIO
+                    if( !( $expense->imp_serv == null || $expense->imp_serv == 0 || $expense->imp_serv == '' ) )
+                    {
+                        $porcentaje = $total_neto / $expense->imp_serv;
+                        $description_seat_tax_service    = strtoupper('SERVICIO '. $porcentaje .'% '. $expense->descripcion);
+                        $seatList[] = $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', $cuentaExpense , '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_BASE, $expense->imp_serv, $marca, $description_seat_tax_service, '', 'SER');       
+                    }
+                    //ASIENTO REPARO
+                    if( $expense->reparo == 1 )
+                    {   
+                        $seatList[] = $this->createSeatElement( $tempId++, $cuentaMkt, $solicitud->id, '' , CUENTA_REPARO_COMPRAS, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_BASE, $expense->igv, $marca, $description_seat_repair_base, '', 'REP');
+                        $seatList[] = $this->createSeatElement( $tempId++, $cuentaMkt, $solicitud->id, '' , CUENTA_REPARO_GOBIERNO, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO, $expense->igv, $marca, $description_seat_repair_deposit, '', 'REP');
+                    }
                 }
-                else
+                else //TODOS LOS OTROS DOCUMENTOS
                 {
-                    // ASIENTO DOCUMENT - NO ITEM
-                        $description_seat_other_doc = strtoupper($username.' '. $expense->descripcion);
-
-                        /*if ( $solicitud->detalle->idmoneda == DOLARES )
-                        {
-                            $nTc = ChangeRate::getDateTc( $expense->fecha_movimiento );
-                            $expense->monto = $expense->monto * $nTc->venta;
-                        }
-                        */
-                        $seat = $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', $cuentaExpense , $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_BASE, ASIENTO_GASTO_COD_PROV, $expense->razon, ASIENTO_GASTO_COD, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, $expense->monto, $marca, $description_seat_other_doc, $tipo_responsable, '');
-                        array_push( $seatListTemp, $seat );
+                    //ASIENTO DOCUMENT - NO ITEM
+                    $description_seat_other_doc = strtoupper( $username.' '. $expense->descripcion );
+                    $seatList[] = $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', $cuentaExpense , $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_BASE, ASIENTO_GASTO_COD_PROV, $expense->razon, ASIENTO_GASTO_COD, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, $expense->monto, $marca, $description_seat_other_doc, $tipo_responsable, ''); 
                 }
-                $seatList = array_merge($seatList, $seatListTemp);
+                //$seatList = array_merge($seatList, $seatListTemp);
             }  
             // CONTRAPARTE ASIENTO DE ANTICIPO
-            $description_seat_back = strtoupper($username .' '. $solicitud->titulo);
+            $description_seat_back = strtoupper( $username .' '. $solicitud->titulo );
             //Log::error('ASIENTO DE GASTO DEL ANTICIPO');
-            $seat = $this->createSeatElement( $tempId++, $cuentaMkt , $solicitud->id, '', $cuentaMkt , '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO , json_decode( $solicitud->detalle->detalle )->monto_aprobado , '', $description_seat_back, '', 'CAN');        
-            array_push($seatList, $seat);
+            $seatList[]  = $this->createSeatElement( $tempId++, $cuentaMkt , $solicitud->id, '', $cuentaMkt , '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO , json_decode( $solicitud->detalle->detalle )->monto_aprobado , '', $description_seat_back, '', 'CAN');        
             $result['seatList'] = $seatList;
             return $result;
         }
     }
 
-    public function viewGenerateSeatExpense($token)
+    public function viewGenerateSeatExpense( $token )
     {
-        $solicitud = Solicitude::where('token', $token)->first();
-
-        $expenses = $solicitud->expenses; 
+        $solicitud  = Solicitude::where( 'token' , $token)->first();
+        $expenses   = $solicitud->expenses; 
         $clientes   = array();
-        $nom = '';
-        foreach($solicitud->clients as $client)
+        
+        foreach( $solicitud->clients as $client )
         {
-            if ($client->from_table == TB_DOCTOR)
+            if ( $client->from_table == TB_DOCTOR )
             {
                 $doctors = $client->doctors;
                 $nom = $doctors->pefnombres.' '.$doctors->pefpaterno.' '.$doctors->pefmaterno;            
@@ -1242,27 +1219,26 @@ class SolicitudeController extends BaseController
                 $nom = $client->institutes->pejrazon;
             else
                 $nom = 'No encontrado';
-            array_push($clientes,$nom);
+            $clientes[] = $nom;
         }
-        $clientes     = implode(',',$clientes);
+        $clientes     = implode( ',' , $clientes );
         $typeProof    = ProofType::all();
         $date         = $this->getDay();
         $expenseItem  = array();
+
         foreach ( $expenses as $expense ) 
         {
             $expenseItems      = $expense->items;
             $expense->itemList = $expenseItems;
             $expense->count    = count( $expenseItems );
         }
+
         $solicitud->documentList = $expenses;
-        $resultSeats             = $this->generateSeatExpenseData($solicitud, null, null);
+        $resultSeats             = $this->generateSeatExpenseData( $solicitud );
 
-        Log::error(json_encode($resultSeats));
+        Log::error( json_encode( $resultSeats ) );
 
-        $seatList                = $resultSeats['seatList'];
-
-        $solicitude = Solicitude::where('token', $token)->first();
-        Log::error( json_encode ( $solicitude) );
+        $seatList = $resultSeats['seatList'];
 
         $data = array(
             'solicitud'   => $solicitud,
@@ -1270,13 +1246,13 @@ class SolicitudeController extends BaseController
             'date'        => $date,
             'clientes'    => $clientes,
             'typeProof'   => $typeProof,
-            'seats'       => json_decode(json_encode($seatList))
+            'seats'       => json_decode( json_encode( $seatList ) )
         );
 
-        if(isset($resultSeats['error'])){
-            $tempArray          = array();
-            $tempArray['error'] = $resultSeats['error'];
-            $data = array_merge($data, $tempArray);
+        if( isset( $resultSeats['error'] ) )
+        {
+            $tempArray  = array( 'error' => $resultSeats['error'] );
+            $data       = array_merge( $data , $tempArray );
         }    
         return View::make('Dmkt.Cont.SeatExpense', $data);
     }
@@ -1289,14 +1265,14 @@ class SolicitudeController extends BaseController
             DB::beginTransaction();
             $result = array();
             $dataInputs  = Input::all();
-            
-            foreach ($dataInputs['seatList'] as $key => $seatItem) 
+            Log::error( json_encode( $dataInputs ) );
+            foreach ( $dataInputs['seatList'] as $key => $seatItem ) 
             {
                 $seat = new Entry;
                 $seat->id           = $seat->searchId() + 1;
                 $seat->num_cuenta   = $seatItem['numero_cuenta'];
                 $seat->cc           = $seatItem['codigo_sunat'];
-                $seat->fec_origen   = $seatItem['fec_origen']; // $fec_origen;
+                $seat->fec_origen   = date( 'Y-m-d' , strtotime( $seatItem[ 'fec_origen' ] ) );
                 $seat->iva          = $seatItem['iva'];
                 $seat->cod_pro      = $seatItem['cod_prov'];
                 $seat->nom_prov     = $seatItem['nombre_proveedor'];
@@ -1326,7 +1302,7 @@ class SolicitudeController extends BaseController
                 $middleRpta = $this->setStatus( $oldIdEstado, GENERADO , $userId, $userId , $solicitud->id );
                 if ( $middleRpta[status] == ok )
                 {
-                    DB::commit();
+                    //DB::commit();
                     Session::put('state' , R_FINALIZADO );
                 }
             }
@@ -1342,24 +1318,24 @@ class SolicitudeController extends BaseController
 
   
 
-    public function viewSeatSolicitude($token)
+    /*public function viewSeatSolicitude($token)
     {
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $data = [
             'solicitude' => $solicitude
         ];
         return View::make('Dmkt.Cont.view_seat_solicitude', $data);
-    }
+    }*/
 
 
     public function viewSeatExpense($token)
     {
         $solicitude = Solicitude::where('token', $token)->firstOrFail();
         $expense = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
-        $data = [
+        $data = array(
             'solicitude' => $solicitude,
             'expense' => $expense
-        ];
+        );
         return View::make('Dmkt.Cont.register_seat_expense', $data);
     }
 

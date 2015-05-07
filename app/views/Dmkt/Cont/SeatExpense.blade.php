@@ -124,7 +124,7 @@
 										<tbody>
 											@if ( isset( $seats ) )
 											@foreach($seats as $seatItem)
-											<tr data-id="{{ $seatItem->tempId }}" class="{{ $seatItem->type == 'IGV' ? 'info' : ($seatItem->type == 'SER' ? 'warning' : ($seatItem->type == 'REP' ? 'danger' : ($seatItem->type == 'CAN' ? 'success' : ''))) }}">
+											<tr class="{{ $seatItem->type == 'IGV' ? 'info' : ($seatItem->type == 'SER' ? 'warning' : ($seatItem->type == 'REP' ? 'danger' : ($seatItem->type == 'CAN' ? 'success' : ''))) }}">
 												<td class="cuenta editable" data-cuenta_mkt="{{ $seatItem->cuentaMkt }}">{{ $seatItem->numero_cuenta }}</td>
 												<td class="codigo_sunat">{{ $seatItem->codigo_sunat }}</td>
 												<td class="numero_origen"></td>

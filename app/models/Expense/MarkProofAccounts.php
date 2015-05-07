@@ -23,9 +23,9 @@ class MarkProofAccounts extends Eloquent
 		return MarkProofAccounts::where('DMKT_RG_CUENTA_GASTO_MARCA.num_cuenta_gasto' , $num_cuenta_expense )->where('dmkt_rg_cuenta_gasto_marca.num_cuenta_fondo' , $num_cuenta_mkt )->select( 'marca_codigo')->get();
 	} 
 
-	protected static function listExpenses( $id_cuenta_mkt )
+	protected static function listData( $num_cuenta )
 	{
-		return MarkProofAccounts::where('idcuentafondo' , $id_cuenta_mkt)->with( 'accountFondo' , 'accountExpense' , 'mark' , 'document')->get();
+		return MarkProofAccounts::where( 'num_cuenta_fondo' , $num_cuenta )->with( 'accountFondo' , 'accountExpense' , 'mark' , 'document' , 'bagoAccountExpense' )->get();
 	}
 
 	public function accountExpense()
@@ -53,7 +53,7 @@ class MarkProofAccounts extends Eloquent
 		return $this->hasOne( 'Expense\PlanCta' , 'ctactaextern' , 'num_cuenta_fondo' );
 	}
 
-	protected function bagoAccountExpense()
+	public function bagoAccountExpense()
 	{
 		return $this->hasOne( 'Expense\PlanCta' , 'ctactaextern' , 'num_cuenta_gasto' );
 	}

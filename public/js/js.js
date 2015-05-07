@@ -1384,21 +1384,21 @@ $(function()
                 return true;
             }
         }
-        $(document).off("click", "#saveSeatExpense");
-        $(document).on("click", "#saveSeatExpense", function(){
+        $( document ).off( 'click' , '#saveSeatExpense' );
+        $( document ).on( 'click' , '#saveSeatExpense' , function()
+        {
             var button = $(this);
             var data = {};
             data.seatList = GBDMKT.seatsList;
             data._token   = $("input[name=_token]").val();
             data.idsolicitud = $('#idsolicitud').attr("rel");
-            $.ajax({
+            $.ajax(
+            {
                 type: 'post',
                 url: server+"guardar-asiento-gasto",
                 data: data
             }).fail( function( statusCode , errorThrown)
             {
-                console.log(statusCode);
-                console.log(errorThrown);
                 bootbox.alert('<h4 class="red"> No se pudo acceder al servidor </h4>');
             }).done( function ( result ) 
             {
@@ -1469,10 +1469,11 @@ $(function()
                 var editElement = $(data);
                 var typeElement = editElement.attr("class").replace("editable", "").trim();
 
-                if(typeElement == 'cuenta'){
+                if(typeElement == 'cuenta')
+                {
                     var data = {};
                     data.cuentaMkt = editElement.attr("data-cuenta_mkt");
-                    data._token   = $("input[name=_token]").val();
+                    data._token    = $("input[name=_token]").val();
                     $.ajax({
                         type: 'post',
                         url: server+"get-account",
@@ -1491,7 +1492,7 @@ $(function()
                             a = result;
                             $(result).each(function(i,option)
                             {
-                                var tempOption = $('<option value="'+ option.account_expense.num_cuenta +'">'+ option.account_fondo.nombre +' | '+ option.account_expense.num_cuenta +' | '+ option.account_expense.nombre +'</option>');
+                                var tempOption = $('<option value="'+ option.account_expense.num_cuenta +'">'+ option.account_fondo.nombre +' | '+ option.account_expense.num_cuenta +' | '+ option.bago_account_expense.ctanombrecta +'</option>');
                                 tempOption.attr('data-marca', option.mark.codigo + option.document.codigo);
                                 console.log( tempOption);
                                 select_temp.append(tempOption);
