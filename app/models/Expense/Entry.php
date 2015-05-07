@@ -24,9 +24,9 @@ class Entry extends Eloquent
         return $this->hasOne( 'Dmkt\Account' , 'num_cuenta' , 'num_cuenta');
     }
 
-    public function setFecOrigenAttribute($value)
+    /*public function setFecOrigenAttribute($value)
     {
         $this->attributes['fec_origen'] = \Carbon\Carbon::createFromFormat( 'd/m/Y', $value );
-    }
+    }*/
 
 }
