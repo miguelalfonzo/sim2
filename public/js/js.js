@@ -7,6 +7,7 @@ server =  pathnameArray.length >0 ? pathnameArray[0]+"/public/" : "";
 //Funciones Globales
 var datef = new Date();
 var dateactual = (datef.getMonth()+1)+'-'+datef.getFullYear();
+
 function loadingUI(message)
 {
     $.blockUI({ css: {
@@ -129,36 +130,48 @@ $(function()
         $("#ret1").numeric({negative:false});
         $("#ret2").numeric({negative:false});
         $("#total").numeric({negative:false});
-    //Events: Datepicker, Buttons, Keyup.
+        //Events: Datepicker, Buttons, Keyup.
         //Calcule the IGV and Balance once typed the total amount per item
-        $(document).on("keyup",".total-item input",function()
-        {
-           calcularIGV();
-        });
-        //Calcule the IGV and Balance once typed the imp service
-        $(document).on("keyup","#imp-ser",function()
+        $(document).on("keyup",".total-item input" , function()
         {
             calcularIGV();
         });
+        //Calcule the IGV and Balance once typed the imp service
+        $(document).on("keyup","#imp-ser" , function()
+        {
+            calcularIGV();
+        });
+
+        $(document).on("keyup","#igv" , function()
+        {
+            calcularBalance();
+        });
+
+        $(document).on("keyup","#sub-tot" , function()
+        {
+            calcularBalance();
+        });
+
         // Datepicker date all classes
         // FIX COLOR IN INPUTS READONLY
         $('.date>input[readonly]').css('background-color', "#fff");
-        if(!($('.date>input:not([disabled])').length == 0)){
-            //var toDate = $(".date>input").val();
-            var toDate = "";
+        if(!($('.date>input:not([disabled])').length == 0))
+        {
+            a = $('#last-date').val();
+            console.log(a);
+            console.log($('#last-date').val());
+            console.log( "{{$data['date']['toDay']}}" );
             $(".date").datepicker({
                 language: 'es',
-                startDate: toDate == "" ? "{{$data['date']['toDay']}}" : toDate,
-                endDate: $("#last-date").val(),
+                startDate: '06/05/2015' ,
+                endDate:  '"' + $('#last-date').val() + '"' ,
                 format: 'dd/mm/yyyy'
             });
             //selected a date hide the datepicker
             $(".date").on("change",function(){
                 $(this).datepicker('hide');
             });
-            //$(".date").datepicker( "setDate" , typeof($("#last-date").val()) != 'undefined' ? $("#last-date").val() : toDate);
         }
-        //Cancel the view button to register expense
         $("#cancel-expense").on("click",function(e){
             e.preventDefault();
             if (typeUser.value == "AG")
@@ -633,17 +646,16 @@ $(function()
 						else
 							$('#dreparo').find('input[name=reparo]')[1].checked = true;
 
-                    if ( data_response.expense.igv == 0 )
-                        $('input[name=igv]')[1].checked = true;
-                    else
-                        $('input[name=igv]')[0].checked = true;
-    
+                    $('#igv').val( data_response.expense.igv );
+                    
                     date = data_response.expense.fecha_movimiento.split('-');
                     //date = data_response.date.split('-');
                     date = date[2].substring(0,2)+'/'+date[1]+'/'+date[0];
                     $("#date").val(date);
                     $("#desc-expense").val(data_response.expense.descripcion);
-                    $.each(data_response.data,function(index,value){
+                    $.each(data_response.data,function(index,value)
+                    {
+                        console.log( index + value );
                         var row_add = row_item_first.clone();
                         row_add.find('.quantity input').val(value.cantidad);
                         row_add.find('.description input').val(value.descripcion);
@@ -843,7 +855,7 @@ $(function()
                     {
                         var sub_total_expense = parseFloat($("#sub-tot").val());
                         var imp_service       = parseFloat($("#imp-ser").val());
-                        var igv               = $("input[name=igv]:checked").val();
+                        var igv               = $("#igv").val();
                         
                         if(isNaN(sub_total_expense)) sub_total_expense = 0;
                         if(isNaN(imp_service)) imp_service = 0;
@@ -1043,12 +1055,6 @@ $(function()
             $(".search-ruc").show();
             $("#ruc-hide").siblings().parent().addClass('input-group');
         });
-    
-        $(document).on('click' , 'input[name=igv]' , function()
-        {
-            console.log(this);
-            calcularIGV();
-        });
 
         //Search Social Reason in SUNAT once introduced the RUC
         $(".search-ruc").on("click",function(){
@@ -1093,26 +1099,28 @@ $(function()
                         $("#ruc").attr("disabled",false);
                     }
                 }).done(function (response){
-                    if(response.error == undefined){
+                    if(response.error == undefined)
+                    {
                         $("#razon").val(2);
                         $("#ruc-hide").val(ruc);
                         $("#razon").html(response['razon_social']);
-                    }else{
-                        if(response.code == 1){
+                    }
+                    else
+                    {
+                        if(response.code == 1)
                             $("#razon").html("RUC menor a 11 digitos.");
-                        }
-                        if(response.code == 2){
+                        if(response.code == 2)
+                        {
                             $("#ruc").addClass("error-incomplete");
                             $("#razon").val(1);
                             $("#razon").html("No existe el RUC consultado.");
-                        }if(response.code == 4){
-                            $("#razon").html(response.error + ". "+ response.msg);
                         }
+                        if(response.code == 4)
+                            $("#razon").html(response.error + ". "+ response.msg );
                         $("#ruc-hide").val(ruc);
-                        //$("#razon").html(response.razon_social);
-                        l.stop();
-                        $("#ruc").attr("disabled",false);
                     }
+                    l.stop();
+                    $("#ruc").attr("disabled",false);
                 });
             }
         });
@@ -1132,23 +1140,17 @@ $(function()
                 }
             });
         }
-    //Handling Classes
-        //Removing errros
-        /*$(document).on("focus","input",function()
-        {
-            $(this).removeClass("error-incomplete").attr("placeholder",'');
-            $(".message-expense").hide();
-        });
-        *///Calculating sum of rows
+        
+        //Calculating sum of rows
         function calculateTot(rows,clas){
             var sum = 0;
-            $.each(rows,function(){
+            $.each(rows,function()
+            {
                 sum += parseFloat($(this).find(clas).html());
             });
-            console.log(sum);
             return sum;
         }
-    //Functions
+    
         //Add Expense
         function newRowExpense(row,arr)
         {
@@ -1196,7 +1198,6 @@ $(function()
         {
             var balance;
             var deposit = parseFloat(depositado.val());
-            console.log(deposit);
             var tot_expenses = calculateTot($(".total").parent(),'.total_expense');
             var btn_save = $("#save-expense").html();
             var tot_expense = parseFloat($("#total-expense").val());
@@ -1230,17 +1231,16 @@ $(function()
         //Calculate the IGV
         function calcularIGV()
         {
-            var typeUser = 'R';
-            if($(".user").attr('data-typeUser')){
-                typeUser = 'C';
-            };
-            //Total variables proof
+            //Total variables Proof
+
+
+
+
             var total_item = $(".total-item input");
             var proof_type_sel = $("#proof-type :selected");
             var sub_total_expense = 0;
             var imp_service = parseFloat($("#imp-ser").val());
-            var igv_percent = $("input[name=igv]:checked").val();
-            var igv = 0;
+            var igv_percent = $('#igv').attr('igv') / 100;
             var total_expense = 0;
             $.each(total_item,function(){
                 if(!$.isNumeric($(this).val()))
@@ -1248,21 +1248,22 @@ $(function()
                 else
                     total_expense += parseFloat($(this).val());
             });
-            if(total_expense>0)
+            
+            if ( total_expense > 0 )
             {
                 if( proof_type_sel.attr("igv") == 1 )
                 {
                     if(!imp_service) imp_service = 0;
-                    igv = total_expense*igv_percent;
-                    sub_total_expense = total_expense;
+                    var igv = total_expense * igv_percent;
+                    sub_total_expense = total_expense - igv;
                     $("#sub-tot").val( sub_total_expense.toFixed(2) );
                     total_expense = sub_total_expense + igv + imp_service;
                     
-                    $("#igv").val(igv.toFixed(2));
-                    $("#total-expense").val(total_expense.toFixed(2));
+                    $("#igv").val( igv.toFixed(2) );
+                    $("#total-expense").val( total_expense.toFixed(2) );
                 }
                 else
-                    $("#total-expense").val(total_expense.toFixed(2));
+                    $("#total-expense").val( total_expense.toFixed(2) );
             }
             else
             {
@@ -1650,5 +1651,41 @@ $(function()
             $("#detail_solicitude span:last-child").removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
             $("#detail_solicitude span:first-child").text('Mostrar');
             $("#collapseOne").collapse('toggle');
-        } 
+        }
+
+        $('#ruc').click( function()
+        {
+            $(this).removeClass('error-incomplete').attr( 'placeholder' , '' );
+        });
+
+        $('#number-prefix').click( function()
+        {
+            $(this).removeClass('error-incomplete').attr( 'placeholder' , '' );
+        });
+
+        $('#number-serie').click( function()
+        {
+            $(this).removeClass('error-incomplete').attr( 'placeholder' , '' );
+        });
+
+        $('#desc-expense').click( function()
+        {
+            $(this).removeClass('error-incomplete').attr( 'placeholder' , '' );
+        });
+
+        $('.quantity input').click( function()
+        {
+            $(this).removeClass('error-incomplete').attr( 'placeholder' , '' );
+        });
+
+        $('.description input').click( function()
+        {
+            $(this).removeClass('error-incomplete').attr( 'placeholder' , '' );
+        });
+
+        $('.total-item input').click( function()
+        {
+            $(this).removeClass('error-incomplete').attr( 'placeholder' , '' );
+        });
+
 });

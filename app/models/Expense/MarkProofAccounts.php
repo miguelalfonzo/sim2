@@ -18,9 +18,9 @@ class MarkProofAccounts extends Eloquent
             return $lastId->id;
     }
 
-	protected static function getMarks( $id_cuenta_mkt , $id_cuenta_cont )
+	protected static function getMarks( $num_cuenta_mkt , $num_cuenta_expense )
 	{
-		return MarkProofAccounts::leftJoin('DMKT_RG_MARCA b' , 'b.id ' , '=' , 'dmkt_rg_cuenta_gasto_marca.idmarca')->where('DMKT_RG_CUENTA_GASTO_MARCA.idcuentagasto' , $id_cuenta_cont)->where('dmkt_rg_cuenta_gasto_marca.idcuentafondo' , $id_cuenta_mkt )->select( 'b.*')->get();
+		return MarkProofAccounts::where('DMKT_RG_CUENTA_GASTO_MARCA.num_cuenta_gasto' , $num_cuenta_expense )->where('dmkt_rg_cuenta_gasto_marca.num_cuenta_fondo' , $num_cuenta_mkt )->select( 'marca_codigo')->get();
 	} 
 
 	protected static function listExpenses( $id_cuenta_mkt )

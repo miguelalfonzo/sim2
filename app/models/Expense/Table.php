@@ -10,6 +10,6 @@ class Table extends Eloquent{
 	
 	protected static function getIGV()
 	{
-		return Table::where('tipo','143')->get();	
+		return Table::where('tipo','143')->where('codigo' , '1' )->first();	
 	}
 }

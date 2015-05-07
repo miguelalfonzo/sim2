@@ -24,7 +24,7 @@ use \Dmkt\Account;
 class ExpenseController extends BaseController
 {
 
-	private function getDayAll(){
+/*	private function getDayAll(){
 		$lastDay = date('j/m/Y');
 		$now=date('Y/m/j');
 		$nuevafecha = strtotime('-2 month', strtotime($now));
@@ -34,7 +34,7 @@ class ExpenseController extends BaseController
 			'lastDay'	=> $lastDay
 		);
 		return $date;
-	}
+	}*/
 
 	private function objectToArray($object)
     {
@@ -381,13 +381,14 @@ class ExpenseController extends BaseController
 
 
 
-	public function reportExpense($token){
-		$solicitude = Solicitude::where('token',$token)->firstOrFail();
+	public function reportExpense($token)
+	{
+		$solicitud = Solicitude::where('token',$token)->firstOrFail();
 		$detalle = $solicitude->detalle;
-		$jDetalle = json_decode( $solicitude->detalle->detalle );
+		$jDetalle = json_decode( $solicitud->detalle->detalle );
 		$clientes   = array();
 		$cmps = array();
-		foreach($solicitude->clients as $client)
+		foreach($solicitud->clients as $client)
         {
             if ($client->from_table == TB_DOCTOR)
             {
@@ -408,31 +409,31 @@ class ExpenseController extends BaseController
         }
         $clientes = implode(',',$clientes);
         $cmps = implode(',',$cmps);
-		if($solicitude->createdBy->type == REP_MED )
-			$created_by = $solicitude->rm->nombres.' '.$solicitude->rm->apellidos;
+		if($solicitud->createdBy->type == REP_MED )
+			$created_by = $solicitud->rm->full_name;
 		else if ($solicitude->createdBy->type == SUP )
-			$created_by = $solicitude->sup->nombres.' '.$solicitude->sup->apellidos;
+			$created_by = $solicitud->sup->full_name;
 		else
 			$created_by = 'Usuario no Autorizado';
 		$dni = new BagoUser;
-		$dni = $dni->dni($solicitude->createdBy->username);
+		$dni = $dni->dni($solicitud->createdBy->username);
 		if ($dni[status] == ok )
 			$dni = $dni[data];
 		else
 			$dni = '';
-		$expenses = $solicitude->expenses;
-		$aproved_user = User::where('id',$solicitude->acceptHist->updated_by)->firstOrFail();
-		if($aproved_user->type == GER_PROD )
+		$expenses = $solicitud->expenses;
+		$aproved_user = User::where( 'id' , $solicitud->acceptHist->updated_by )->firstOrFail();
+		if( $aproved_user->type == GER_PROD )
 		{
 			$name_aproved = $aproved_user->gerprod->descripcion;
 			$charge = "Gerente de Producto";
 		}
-		if($aproved_user->type == SUP )
+		if( $aproved_user->type == SUP )
 		{
 			$name_aproved = $aproved_user->sup->nombres;
 			$charge = "Supervisor";
 		}
-		if ( $solicitude->detalle->idmoneda == DOLARES )
+		if ( $solicitud->detalle->idmoneda == DOLARES )
 		{
 			foreach( $expenses as $expense )
 			{
@@ -441,18 +442,18 @@ class ExpenseController extends BaseController
 					$expense->tc = ChangeRate::getTc();
 				else	
 					$expense->tc = $eTc;
-				Log::error( json_encode( $expense->tc ));
 				$expense->monto = round ( $expense->monto * $expense->tc->compra , 2 , PHP_ROUND_HALF_DOWN );
 			}
 		}
 
 		$total = $expenses->sum('monto');
 		$data = array(
-			'solicitude' => $solicitude,
+			'solicitud'  => $solicitud,
 			'detalle'	 => $jDetalle,
 			'clientes'	 => $clientes,
 			'cmps'		 => $cmps,
-			'date'       => $this->getDay(),
+			//'date'       => $this->getDay(),
+			'date'		 => array( 'toDay' => $solicitud->created_at , 'lastDay' => $jDetalle->fecha_entrega ),
 			'name'       => $name_aproved,
 			'dni' 		 => $dni,
 			'created_by' => $created_by,
