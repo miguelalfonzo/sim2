@@ -69,10 +69,31 @@ function newSolicitude() {
     $(document).off("click", ".timeLine");
     $(document).on("click", ".timeLine", function(e){
         e.preventDefault();
-        var state = $(this).parent().parent().parent().find('#timeLine').val();
-        var html = $('.timeLineModal').html();
-        console.log(html);
-        console.log(state);
+        var state = parseInt($(this).parent().parent().parent().find('#timeLine').val(), 10);
+        state--;
+        var html  = $('.timeLineModal').clone();
+        html.find('.container-fluid').removeClass('hide');
+        html.find('.stage').eq(state).addClass('success');
+        html.find('.stage .stage-header').eq(0).addClass('stage-success');
+        /*$.each(html.find('.stage'), function(key, value){
+            key++;
+            if(state === 1 && (key === state)){
+                $(this).addClass('success');
+                $(this).find('.stage-header').addClass('stage-success');
+            }
+        });*/
+        var h     = $(html).html();
+        bootbox.dialog({
+            message: h,
+            title: "Línea del Tiempo",
+            buttons: {
+                danger: {
+                    label: "Cancelar",
+                    className: "btn-default"
+                }
+            },
+            size: "large"
+        });
     });
 
     //NEW OR EDIT SOLICITUDE BY RM OR SUP CLIENTES
