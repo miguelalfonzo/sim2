@@ -38,8 +38,26 @@ class TableController extends BaseController
 
 	private function maintenanceGetTipoMoneda( $val )
 	{
-		$data = array( 'monedas' => TypeMoney::all() , 'val' => $val );
-		return $this->setRpta( View::make( 'Maintenance.moneda')->with( $data)->render() );
+		$data = array( 'datos' => TypeMoney::all() , 'val' => $val , 'key' => 'simbolo' );
+		return $this->setRpta( View::make( 'Maintenance.td')->with( $data)->render() );
+	}
+
+	private function maintenanceGetTipoDocumento( $val )
+	{
+		$data = array( 'datos' => Proof::all() , 'val' => $val , 'key' => 'codigo' );
+		return $this->setRpta( View::make( 'Maintenance.td' )->with( $data )->render() );
+	}
+
+	private function maintenanceGetTipoUsuario( $val )
+	{
+		$data = array( 'datos' => TypeUser::dmkt() , 'val' => $val , 'key' => 'descripcion' );
+		return $this->setRpta( View::make( 'Maintenance.td')->with( $data )->render() );
+	}
+
+	private function maintenanceGetFondo( $val )
+	{
+		$data = array( 'datos' => Fondo::all() , 'val' => $val , 'key' => 'nombre' );
+		return $this->setRpta( View::make( 'Maintenance.td')->with( $data)->render() );
 	}
 
 	public function getMaintenanceTableData()
@@ -73,25 +91,6 @@ class TableController extends BaseController
 	{
 		$fondos = Fondo::all();
 		return $this->setRpta( View::make( 'Maintenance.FondoCuenta.table' )->with( 'fondos' , $fondos )->render() );
-	}
-
-	private function maintenanceGetTipoDocumento( $val )
-	{
-		$data = array( 'docs' => Proof::all() , 'val' => $val );
-		return $this->setRpta( View::make( 'Maintenance.CuentasMarca.documento' )->with( $data )->render() );
-
-	}
-
-	private function maintenanceGetTipoUsuario( $val )
-	{
-		$data = array( 'userTypes' => TypeUser::dmkt() , 'val' => $val );
-		return $this->setRpta( View::make( 'Maintenance.Fondo.usertype')->with( $data )->render() );
-	}
-
-	private function maintenanceGetFondo( $val )
-	{
-		$data = array( 'fondos' => Fondo::all() , 'val' => $val );
-		return $this->setRpta( View::make( 'Maintenance.CuentasMarca.fondo')->with( $data)->render() );
 	}
 
 	public function updateMaintenanceData()
@@ -359,7 +358,7 @@ class TableController extends BaseController
 	private function maintenanceAddCuentasMarca()
 	{
 		$data = array( 'fondos' => Fondo::all() , 'docs' => Proof::all() );
-		return $this->setRpta( View::make( 'Maintenance.CuentasMarca.tr')->with( $data )->render() );
+		return $this->setRpta( View::make( 'Maintenance.Cuentasmarca.tr')->with( $data )->render() );
 	}
 
 	private function maintenanceAddFondo()

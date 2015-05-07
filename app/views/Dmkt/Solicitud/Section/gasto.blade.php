@@ -59,7 +59,7 @@
 					<span class="input-group-addon">
 						<i class="glyphicon glyphicon-calendar"></i>
 					</span>
-					<input id="date" type="text" class="form-control" maxlength="10" value="{{$date['toDay']}}" readonly>
+					<input id="date" type="text" class="form-control" maxlength="10" readonly>
 					<input id="last-date" type="hidden" value="{{$date['lastDay']}}">
 				</div>
 			</div>
@@ -143,7 +143,7 @@
 			    </div>
 			</div>
 		</div>
-		<div class="col-xs-12 col-sm-6 col-md-4 tot-document">
+		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4 tot-document">
 			<div class="form-expense">
 				<label>Impuesto por Servicio</label>
 				<div class="input-group">
@@ -152,49 +152,23 @@
 			    </div>
 			</div>
 		</div>
-		<div class="col-xs-6 col-sm-3 col-md-2 col-lg-2 tot-document">
+		
+		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4 tot-document">
 			<div class="form-expense">
 				<label>IGV</label>
 				<div class="input-group">
-					<div class="btn-group">
-						@foreach( $igv as $igvsn )
-							<label class="btn btn-default">
-							@if ( $igvsn->codigo == 1 )
-								<input value={{$igvsn->numero/100}} type="radio" name="igv" style="margin-top:.5em;" checked>Si
-							@elseif ( $igvsn->codigo == 2 )
-								<input value={{$igvsn->numero/100}} type="radio" name="igv" style="margin-top:.5em;">No
-							@endif
-							</label>
-						@endforeach
-					</div>
+			    	<div class="input-group-addon">{{$solicitud->detalle->typemoney->simbolo}}</div>
+			      	<input id="igv" class="form-control" type="text" igv="{{$igv->numero}}">
 			    </div>
-			 </div>
-		</div>
-
-		@if ( Auth::user()->type == CONT )
-			<div id="dreparo" class="col-xs-6 col-sm-3 col-md-2 col-lg-2">
-				<div class="form-expense">
-					<label>Reparo</label>
-					<div class="input-group">
-						<div class="btn-group" role="group">
-							<label class="btn btn-default">
-						 		<input value="1" type="radio" name="reparo" style="margin-top:.5em;">Si
-							</label>
-							<label class="btn btn-default">
-								<input value="0" type="radio" name="reparo" style="margin-top:.5em;" checked>No
-							</label> 
-						</div>
-				    </div>
-				</div>
 			</div>
-		@endif
+		</div>
 
 		<div class="col-xs-12 col-sm-6 col-md-4">
 			<div class="form-expense">
 				<label>Monto Total</label>
 				<div class="input-group">
 			    	<div class="input-group-addon">{{$solicitud->detalle->typemoney->simbolo}}</div>
-			      	<input id="total-expense" class="form-control" type="text" disabled>
+			      	<input id="total-expense" class="form-control" type="text">
 			    </div>
 			</div>
 		</div>
@@ -221,6 +195,24 @@
 					<input id="monto-regimen" type="text" class="form-control">
 				</div>
 			</div>
+
+			<!-- REPARO -->
+			<div id="dreparo" class="col-xs-6 col-sm-3 col-md-2 col-lg-2">
+				<div class="form-expense">
+					<label>Reparo</label>
+					<div class="input-group">
+						<div class="btn-group" role="group">
+							<label class="btn btn-default">
+						 		<input value="1" type="radio" name="reparo" style="margin-top:.5em;">Si
+							</label>
+							<label class="btn btn-default">
+								<input value="0" type="radio" name="reparo" style="margin-top:.5em;" checked>No
+							</label> 
+						</div>
+				    </div>
+				</div>
+			</div>
+
 		@endif
 
 	</section>

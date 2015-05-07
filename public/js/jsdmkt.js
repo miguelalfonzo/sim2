@@ -8,8 +8,12 @@ function newSolicitude() {
     var amountfac = $('#amount-fac');
     var input_client = $('.input-client');
     var selectfamily = $('.selectfamily');
-    var data_start = $('#date_start');
-    var data_end = $('#date_end');
+    var date_start = $('.date_start').first();
+    var date_end = $('.date_end').first();
+
+    var doc_start = $('.date_start').last();
+    var doc_end = $('.date_end').last();
+
     var amount_fac = $('#amountfac');
     var solicitude_monto =  $('.solicitude_monto');
     var select_type_payment = $('.selectTypePayment');
@@ -61,6 +65,15 @@ function newSolicitude() {
         language: "es",
         autoclose: true
     };
+
+    $(document).off("click", ".timeLine");
+    $(document).on("click", ".timeLine", function(e){
+        e.preventDefault();
+        var state = $(this).parent().parent().parent().find('#timeLine').val();
+        var html = $('.timeLineModal').html();
+        console.log(html);
+        console.log(state);
+    });
 
     //NEW OR EDIT SOLICITUDE BY RM OR SUP CLIENTES
    /* $.getJSON(server + "getclients", function (data) {
@@ -166,10 +179,10 @@ function newSolicitude() {
     selectfamily.on('click', function () {
         $(this).css('border-color', 'none')
     });
-    data_start.on('focus', function () {
+    date_start.on('focus', function () {
         $(this).parent().removeClass('has-error');
     });
-    data_end.on('focus', function () {
+    date_end.on('focus', function () {
         $(this).parent().removeClass('has-error');
     });
     input_file_factura.on('focus', function () {
@@ -220,39 +233,6 @@ function newSolicitude() {
         });
     }
 
-    function listDocuments()
-    {
-        $.ajax({
-            url: server + 'list-documents',
-            type: 'GET',
-            dataType: 'html'
-        }).fail( function ( statusCode , errorThrown)
-        {
-            ajaxError( statusCode , errorThrown );
-        }).done(function (data) {
-            $("#table_document_contabilidad_wrapper").remove();
-            $('.table_document_contabilidad').append(data);
-            $('#table_document_contabilidad').dataTable(
-            {
-                "order": [ [ 0, "desc" ] ],
-                "bLengthChange": false,
-                'iDisplayLength': 7,
-                "oLanguage": 
-                {
-                    "sSearch": "Buscar: ",
-                    "sZeroRecords": "No hay fondos",
-                    "sInfoEmpty": "No hay fondos",
-                    "sInfo": 'Mostrando _END_ de _TOTAL_',
-                    "oPaginate": 
-                    {
-                        "sPrevious": "Anterior",
-                        "sNext" : "Siguiente"
-                    }
-                }
-            });
-        });
-    }
-
     //Function list Solicitude
     function listSolicitude()
     {
@@ -266,9 +246,9 @@ function newSolicitude() {
             data:
             { 
                 idstate: state,
-                date_start: $('#date_start').val(), 
-                date_end: $('#date_end').val(),
-                _token : document.getElementsByName('_token')[0].value 
+                date_start: date_start.val(), 
+                date_end: date_end.val(),
+                _token : $('input[name=_token]').val() 
             }
         }).fail( function ( statusCode , errorThrown )
         {
@@ -305,6 +285,90 @@ function newSolicitude() {
             }
             else
                 responseUI(data.Status + ': ' + data.Description,'red');
+        });
+    }
+
+    function listDocuments()
+    {
+        var l = Ladda.create( $("#search-documents")[0] );
+        l.start();
+        
+        $.ajax({
+            url: server + 'list-documents',
+            type: 'POST',
+            data:
+            {
+                idProof      : $('#idProof').val() ,
+                date_start   : doc_start.val() ,
+                date_end     : doc_end.val() ,
+                val          : $('#doc-search-key').val() ,
+                _token       : $('input[name=_token]').val()
+            }
+        }).fail( function ( statusCode , errorThrown)
+        {
+            l.stop();
+            ajaxError( statusCode , errorThrown );
+        }).done(function (data)
+        {
+            l.stop();
+            if ( data.Status == 'Ok' )
+            {
+                $("#table_documents_wrapper").remove();
+                $('.table-documents').append(data.Data);
+                $('#table_documents').dataTable(
+                {
+                    "order": [ [ 0, "desc" ] ],
+                    "bLengthChange": false,
+                    'iDisplayLength': 7,
+                    "oLanguage": 
+                    {
+                        "sSearch": "Buscar: ",
+                        "sZeroRecords": "No hay fondos",
+                        "sInfoEmpty": "No hay fondos",
+                        "sInfo": 'Mostrando _END_ de _TOTAL_',
+                        "oPaginate": 
+                        {
+                            "sPrevious": "Anterior",
+                            "sNext" : "Siguiente"
+                        }
+                    }
+                });
+            }
+            else
+                bootbox.alert( '<h4 class=red>' + data.Status + ': ' + data.Description + '</h4>');
+        });
+    }
+
+    function listDocumentsType()
+    {
+        $.ajax({
+            url: server + 'list-documents-type',
+            type: 'GET',
+            dataType: 'html'
+        }).fail( function ( statusCode , errorThrown)
+        {
+            ajaxError( statusCode , errorThrown );
+        }).done(function (data) {
+            $("#table_document_contabilidad_wrapper").remove();
+            $('.table_document_contabilidad').append(data);
+            $('#table_document_contabilidad').dataTable(
+            {
+                "order": [ [ 0, "desc" ] ],
+                "bLengthChange": false,
+                'iDisplayLength': 7,
+                "oLanguage": 
+                {
+                    "sSearch": "Buscar: ",
+                    "sZeroRecords": "No hay fondos",
+                    "sInfoEmpty": "No hay fondos",
+                    "sInfo": 'Mostrando _END_ de _TOTAL_',
+                    "oPaginate": 
+                    {
+                        "sPrevious": "Anterior",
+                        "sNext" : "Siguiente"
+                    }
+                }
+            });
         });
     }
 
@@ -583,24 +647,16 @@ function newSolicitude() {
             idamount.parent().parent().parent().removeClass("has-error").addClass("has-success");
         }
     }
-    /*amount_families.on('focus', function () {
-        amount_error_families.text('');
-    });
-*/
+
     var form_acepted_solicitude = $('#form_make_activity');
 
-    /*var search_solicitude_sup = $('#search_solicitude_sup');
-    search_solicitude_sup.on('click', function () {
-        searchSolicitudeToDate('sup',this)
-    });*/
-
-    $("#date_start").datepicker({
+    $(".date_start").datepicker({
         language: 'es',
         endDate: new Date(),
         format: 'dd/mm/yyyy'
     });
 
-    $("#date_end").datepicker({
+    $(".date_end").datepicker({
         //startDate: new Date($.datepicker.formatDate('dd, mm, yy', new Date($('#date_start').val()))),
         language: 'es',
         endDate: new Date(),
@@ -628,11 +684,6 @@ function newSolicitude() {
     });
 
     /** ---------------------------------------------- GERENTE PRODUCTO -------------------------------------------- **/
-
-    var search_solicitude_gercom = $('#search_solicitude_gercom');
-    search_solicitude_gercom.on('click', function () {
-        searchSolicitudeToDate('gercom',this)
-    });
 
     if ( $('#deny_solicitude').length != 0 )
     {
@@ -678,20 +729,8 @@ function newSolicitude() {
             listMaintenanceTable( $(this).attr("case") );
         });
         if( userType === 'C')
-            listDocuments();
-        //else if ( userType === 'T' )
-            
+            listDocumentsType();          
     }
-
-    /*var search_solicitude_cont = $('#search_solicitude_cont');
-    search_solicitude_cont.on('click', function () {
-        searchSolicitudeToDate('cont',this)
-    });*/
-
-    /*var search_solicitude_cont = $('#search_solicitude_tes');
-    search_solicitude_cont.on('click', function () {
-        searchSolicitudeToDate('tes',this)
-    });*/
 
     /** --------------------------------------------- ASISTENCIA DE GERENCIA ------------------------------------------------- **/
 
@@ -1234,7 +1273,7 @@ function newSolicitude() {
     $(document).off("click",".elementCancel");
     $(document).on("click",".elementCancel", function()
     {
-        listDocuments();
+        listDocumentsType();
     });
 
     $(document).off("click", ".elementEdit");
@@ -1521,7 +1560,7 @@ function newSolicitude() {
                     if (data.Status == 'Ok')
                     {
                         responseUI('Datos Registrados','green');
-                        listDocuments();
+                        listDocumentsType();
                     }
                     else
                         responseUI('<font color="black">Warning:Verificar la consistencia de la Informacion</font>','yellow');    
@@ -1683,9 +1722,9 @@ function newSolicitude() {
     function ajaxError(statusCode,errorThrown)
     {
         if (statusCode.status == 0) 
-            responseUI('<font color="black">Internet: Problemas de Conexion</font>','yellow');    
+            bootbox.alert('<h4 class="yellow">Internet: Problemas de Conexion</h4>');    
         else
-            responseUI('Error del Sistema','red');  
+            bootbox.alert('<h4 class="red">Error del Sistema</h4>');  
     }
 
     function listAccountState(date)
@@ -1708,8 +1747,6 @@ function newSolicitude() {
         {
             if (data.Status == 'Ok')
             {
-                $('.estado-cuenta-deposito').first().val(data.Data.Total.Soles);
-                $('.estado-cuenta-deposito').last().val(data.Data.Total.Dolares);
                 $('#table_estado_cuenta_wrapper').remove();
                 $('.table_estado_cuenta').append(data.Data.View);
                 $('#table_estado_cuenta').dataTable(
@@ -1732,6 +1769,11 @@ function newSolicitude() {
                         }
                     }
                 });
+                if ( data.Data.Total !== undefined )
+                {
+                    $('.estado-cuenta-deposito').first().val(data.Data.Total.Soles);
+                    $('.estado-cuenta-deposito').last().val(data.Data.Total.Dolares);
+                }
             }
             else
                 responseUI('Error del Sistema','red');
@@ -1752,12 +1794,19 @@ function newSolicitude() {
             else
                 listAccountState(date);
     });
+    
     /* Filter all solicitude by date */
-    var search_solicitude = $('#search-solicitude');
-    search_solicitude.on('click', function()
+    $('#search-solicitude').on('click', function()
     { 
         listSolicitude();
     });
+
+    $('#search-documents').on('click', function()
+    { 
+        listDocuments();
+    });
+
+
 
     function validateNewSol()
     {

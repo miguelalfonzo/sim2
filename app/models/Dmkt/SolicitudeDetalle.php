@@ -23,7 +23,7 @@ class SolicitudeDetalle extends Eloquent
         return $this->hasOne('Dmkt\Solicitud\Periodo','id','idperiodo');
     }
 
-    protected function typeReason()
+    protected function reason()
     {
         return $this->hasOne('Dmkt\SolicitudReason','id','idmotivo');
     }

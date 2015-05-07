@@ -24,8 +24,9 @@
     <tbody>
         @foreach($solicituds as $solicitude)
             <tr>
+                <input type="hidden" id="timeLine" value="{{$solicitude->idestado}}">
                 @if ( in_array(Auth::user()->type , array( TESORERIA,GER_COM) ))
-                    <input type="hidden" id="sol_token" class="i-tokens" value="{{$solicitude->token}}">  
+                    <input type="hidden" id="sol_token" class="i-tokens" value="{{$solicitude->token}}">
                     @if(!is_null($solicitude->response))
                         @if($solicitude->response->type == REP_MED)
                             <input type="hidden" value="{{$solicitude->response->rm->full_name}}" class="benef">
@@ -108,9 +109,9 @@
                 <td class="text-center">{{$solicitude->created_at}}</td> <!--date_format(date_create($solicitude->created_at), 'd/m/Y' ) -->
                 <td class="text-center">
                     @if ( $solicitude->idtiposolicitud == SOL_REP )
-                        {{ $solicitude->detalle->typeReason->nombre}}
+                        {{ $solicitude->detalle->reason->nombre }}
                     @elseif ( $solicitude->idtiposolicitud == SOL_INST ) 
-                        {{ $solicitude->typesolicitude->nombre}}
+                        {{ $solicitude->typesolicitude->nombre }}
                     @endif
                 </td>
                 @include('template.List.icons')
@@ -128,7 +129,8 @@
         @endforeach
     </tbody>
 </table>
-@if(Auth::type = 'REP_MED')
+
+@if(Auth::user()->type == REP_MED)
     @include('template.Modals.timeLine')
 @endif
 <!-- <script>

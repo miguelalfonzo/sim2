@@ -20,6 +20,12 @@
             @include('template.User.li_estado_cuenta')
             @if( Auth::user()->type == CONT)
                 <li>
+                    <a href="#documentos" role="tab" data-toggle="tab">
+                        <i class="fa fa-user"></i>
+                        Documentos
+                    </a>
+                </li>
+                <li>
                     <a href="#mantenimiento" role="tab" data-toggle="tab">
                         <i class="fa fa-user"></i>
                         Mantenimiento de Documentos
@@ -59,6 +65,14 @@
             @include('template.tb_estado_cuenta')
             
             @if (Auth::user()->type == CONT)
+                <!-- Busqueda de Documentos -->
+                <div class="tab-pane fade" id="documentos">
+                    <div class="panel panel-default">
+                        @include('Dmkt.Cont.documents_menu')
+                        @include('template.Modals.documents')   
+                    </div>
+                </div>
+
                 <!-- Mantenimiento de Documentos -->
                 <div class="tab-pane fade" id="mantenimiento">
                     <div class="panel panel-default">

@@ -97,12 +97,17 @@ const RETENCION = 3;
 const GASTO = 4;
 
 
-	/*
-	|--------------------------------------------------------------------------
-	| TESTING
-	|--------------------------------------------------------------------------
-	*/
-	const FILESTORAGE_DIR = 'uploads/';
-	const APP_ID = 2;
+/*
+|--------------------------------------------------------------------------
+| TESTING
+|--------------------------------------------------------------------------
+*/
+const FILESTORAGE_DIR = 'uploads/';
+const APP_ID = 2;
 
+//MOTIVO DE LA SOLICITUD
+const REEMBOLSO = 3;
+
+//TIPO DE DOCUMENTO
+const RECIBO_HONORARIO = 2;
 

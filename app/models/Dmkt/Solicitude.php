@@ -102,13 +102,6 @@ class Solicitude extends Eloquent{
         return $this->hasOne('Dmkt\SolicitudeGer','idsolicitud','id');
     }
 
-    
-
-    protected function reasonSolicitude()
-    {
-        return $this->hasOne('Dmkt\SolicitudReason','id','idtiposolicitud');
-    }
-
     protected function response()
     {
         return $this->belongsTo('User','iduserasigned');

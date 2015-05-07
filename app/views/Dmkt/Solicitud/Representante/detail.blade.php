@@ -6,7 +6,7 @@
     <label class="col-sm-8 col-md-8 col-lg-4 control-label" for="reason">Tipo Solicitud</label>
     <div class="col-sm-12 col-md-12">
         <input id="reason" type="text" class="form-control input-md"
-        value="{{$solicitud->detalle->typeReason->nombre}}" readonly>
+        value="{{$solicitud->detalle->reason->nombre}}" readonly>
     </div>
 </div>
 

@@ -24,7 +24,7 @@ use \Dmkt\Account;
 class ExpenseController extends BaseController
 {
 
-	private function getDayAll(){
+/*	private function getDayAll(){
 		$lastDay = date('j/m/Y');
 		$now=date('Y/m/j');
 		$nuevafecha = strtotime('-2 month', strtotime($now));
@@ -34,7 +34,7 @@ class ExpenseController extends BaseController
 			'lastDay'	=> $lastDay
 		);
 		return $date;
-	}
+	}*/
 
 	private function objectToArray($object)
     {
@@ -205,8 +205,9 @@ class ExpenseController extends BaseController
 				$expenseEdit->razon 		= $inputs['razon'];
 				$expenseEdit->monto 		= $inputs['total_expense'];
 
-	            if($inputs['proof_type'] == '1' || $inputs['proof_type'] == '4' || $inputs['proof_type'] == '6')
-	                if(isset($inputs['igv']) || isset($inputs['imp_service']))
+				$proof_type = ProofType::find( $inputs['proof_type'] );
+	            if ( $proof_type->igv == 1 )
+	                if ( isset( $inputs['igv'] ) && isset( $inputs['imp_service'] ) )
 	                {
 	                    $expenseEdit->igv = $inputs['igv'];
 	                    $expenseEdit->imp_serv = $inputs['imp_service'];
@@ -221,6 +222,18 @@ class ExpenseController extends BaseController
 	                $expenseEdit->sub_tot  = null;
 	            }
 
+	            if ( isset( $inputs['idregimen']))
+		            if ( $inputs['idregimen'] == 0 )
+		            {
+		            	$expenseEdit->idtipotributo = null;
+		            	$expenseEdit->monto_tributo = null;
+		            }
+		            elseif ( $inputs['idregimen'] >= 1 )
+		            {
+	            		$expenseEdit->idtipotributo = $inputs['idregimen'];
+		            	$expenseEdit->monto_tributo = $inputs['monto_regimen'];    	
+		            }
+
 				$expenseEdit->idcomprobante = $inputs['proof_type'];
 				$date = $inputs['date_movement'];
 		        list($d, $m, $y) = explode('/', $date);
@@ -228,6 +241,7 @@ class ExpenseController extends BaseController
 		        $date = date("Y/m/d", $d);
 		        $expenseEdit->fecha_movimiento = $date;
 		        $expenseEdit->descripcion = $inputs['desc_expense'];
+		        
 		        if( isset( $inputs['rep'] ) )
 					$expenseEdit->reparo = $inputs['rep'];
 				
@@ -367,13 +381,14 @@ class ExpenseController extends BaseController
 
 
 
-	public function reportExpense($token){
-		$solicitude = Solicitude::where('token',$token)->firstOrFail();
+	public function reportExpense($token)
+	{
+		$solicitud = Solicitude::where('token',$token)->firstOrFail();
 		$detalle = $solicitude->detalle;
-		$jDetalle = json_decode( $solicitude->detalle->detalle );
+		$jDetalle = json_decode( $solicitud->detalle->detalle );
 		$clientes   = array();
 		$cmps = array();
-		foreach($solicitude->clients as $client)
+		foreach($solicitud->clients as $client)
         {
             if ($client->from_table == TB_DOCTOR)
             {
@@ -394,31 +409,31 @@ class ExpenseController extends BaseController
         }
         $clientes = implode(',',$clientes);
         $cmps = implode(',',$cmps);
-		if($solicitude->createdBy->type == REP_MED )
-			$created_by = $solicitude->rm->nombres.' '.$solicitude->rm->apellidos;
+		if($solicitud->createdBy->type == REP_MED )
+			$created_by = $solicitud->rm->full_name;
 		else if ($solicitude->createdBy->type == SUP )
-			$created_by = $solicitude->sup->nombres.' '.$solicitude->sup->apellidos;
+			$created_by = $solicitud->sup->full_name;
 		else
 			$created_by = 'Usuario no Autorizado';
 		$dni = new BagoUser;
-		$dni = $dni->dni($solicitude->createdBy->username);
+		$dni = $dni->dni($solicitud->createdBy->username);
 		if ($dni[status] == ok )
 			$dni = $dni[data];
 		else
 			$dni = '';
-		$expenses = $solicitude->expenses;
-		$aproved_user = User::where('id',$solicitude->acceptHist->updated_by)->firstOrFail();
-		if($aproved_user->type == GER_PROD )
+		$expenses = $solicitud->expenses;
+		$aproved_user = User::where( 'id' , $solicitud->acceptHist->updated_by )->firstOrFail();
+		if( $aproved_user->type == GER_PROD )
 		{
 			$name_aproved = $aproved_user->gerprod->descripcion;
 			$charge = "Gerente de Producto";
 		}
-		if($aproved_user->type == SUP )
+		if( $aproved_user->type == SUP )
 		{
 			$name_aproved = $aproved_user->sup->nombres;
 			$charge = "Supervisor";
 		}
-		if ( $solicitude->detalle->idmoneda == DOLARES )
+		if ( $solicitud->detalle->idmoneda == DOLARES )
 		{
 			foreach( $expenses as $expense )
 			{
@@ -427,18 +442,18 @@ class ExpenseController extends BaseController
 					$expense->tc = ChangeRate::getTc();
 				else	
 					$expense->tc = $eTc;
-				Log::error( json_encode( $expense->tc ));
 				$expense->monto = round ( $expense->monto * $expense->tc->compra , 2 , PHP_ROUND_HALF_DOWN );
 			}
 		}
 
 		$total = $expenses->sum('monto');
 		$data = array(
-			'solicitude' => $solicitude,
+			'solicitud'  => $solicitud,
 			'detalle'	 => $jDetalle,
 			'clientes'	 => $clientes,
 			'cmps'		 => $cmps,
-			'date'       => $this->getDay(),
+			//'date'       => $this->getDay(),
+			'date'		 => array( 'toDay' => $solicitud->created_at , 'lastDay' => $jDetalle->fecha_entrega ),
 			'name'       => $name_aproved,
 			'dni' 		 => $dni,
 			'created_by' => $created_by,
@@ -470,24 +485,28 @@ class ExpenseController extends BaseController
 
     private function reportBalance( $solicitud , $detalle , $jDetalle , $mGasto )
 	{
-		$mDeposit = $detalle->deposit->total;
-	    Log::error( $mDeposit );
-    	if ( $detalle->deposit->account->idtipomoneda == DOLARES )
-    		$mDeposit = $mDeposit * $jDetalle->tcv;
-
-	    if ( isset( $jDetalle->monto_retencion ) )
-	    	$monto_retencion = $jDetalle->monto_retencion ;
-	    else
-	    	$monto_retencion = 0;
-	    $mBalance = $mDeposit - ( $mGasto - $monto_retencion );  // - $monto_retencion );
-	    Log::error( $mBalance );
-	    if ( $mBalance > 0)
-	    	$data = array( 'bussiness' => round( $mBalance , 2 , PHP_ROUND_HALF_DOWN ) , 'employed' => 0 );
-	    elseif ( $mBalance < 0 )
-	    	$data = array( 'bussiness' => 0 , 'employed' => round( $mBalance*-1 , 2 , PHP_ROUND_HALF_DOWN ) );
-	    elseif ( $mBalance == 0 )
-			$data = array( 'bussiness' => 0 , 'employed' => 0 );
-		return $data;
+		if ( is_null( $detalle->deposit ) )
+			return array( 'bussiness' => '-' , 'employed' => '-' );
+		else
+		{
+			$mDeposit = $detalle->deposit->total;
+		    if ( $detalle->deposit->account->idtipomoneda == DOLARES )
+	    		$mDeposit = $mDeposit * $jDetalle->tcv;
+		    
+		    if ( isset( $jDetalle->monto_retencion ) )
+		    	$monto_retencion = $jDetalle->monto_retencion ;
+		    else
+		    	$monto_retencion = 0;
+		    $mBalance = $mDeposit - ( $mGasto - $monto_retencion );  // - $monto_retencion );
+		    if ( $mBalance > 0)
+		    	return array( 'bussiness' => round( $mBalance , 2 , PHP_ROUND_HALF_DOWN ) , 'employed' => 0 );
+		    elseif ( $mBalance < 0 )
+		    	return array( 'bussiness' => 0 , 'employed' => round( $mBalance*-1 , 2 , PHP_ROUND_HALF_DOWN ) );
+		    elseif ( $mBalance == 0 )
+				return array( 'bussiness' => 0 , 'employed' => 0 );
+			else
+				return $this->warninException( __FUNCTION__ , 'No se pudo procesar el Balance( '.$mBalance.' )' );
+		}
 	}
 
 	public function getExpenses()
@@ -505,6 +524,61 @@ class ExpenseController extends BaseController
 		catch ( Exception $e )
 		{
 			return $this->internalException( $e , __FUNCTION__ );
+		}
+	}
+
+	public function getDocument()
+	{
+		try
+		{
+			$inputs = Input::all();
+			$document = Expense::find( $inputs['id'] );
+			if ( is_null( $document ) )
+				return $this->warninException( __FUNCTION__ , 'No se encontro el documento con Id: '.$inputs['id'] );
+			else
+			{
+				$document->moneda = $document->solicitud->detalle->typeMoney->simbolo ;
+				return $this->setRpta( $document );
+			}
+		}
+		catch ( Exception $e )
+		{
+			return $this->internalException( $e , __FUNCTION__ );
+		}
+	}
+
+	public function updateDocument()
+	{
+		try 
+		{
+			$inputs = Input::all();
+			$document = Expense::find( $inputs['id'] );
+			if ( is_null( $document ) )
+				return $this->warninException( __FUNCTION__ , 'No se encontro el documento con Id: '.$inputs['id'] );
+			else
+			{
+				$regimenes = Regimen::lists( 'id' );
+				if ( in_array( $inputs['idregimen'] , $regimenes ) )
+				{
+					$document->idtipotributo = $inputs['idregimen'];
+					$document->monto_tributo = $inputs['monto'];
+				}
+				elseif ( $inputs['idregimen'] == 0 )
+				{
+					$document->idtipotributo = null;
+					$document->monto_tributo = null;		
+				}
+				else
+					return $this->warninException( __FUNCTION__ , 'No esta registrado la retencion o detracción con Id: '.$inputs['idregimen'] );
+				if ( !$document->save() )
+					return $this->warninException( __FUNCTION__ , 'No se pudo actualizar el documento' );
+				else
+					return $this->setRpta();
+			}	
+		} 
+		catch ( Exception $e ) 
+		{
+			return $this->internalException( $e , __FUNCTION__ );	
 		}
 	}
 }

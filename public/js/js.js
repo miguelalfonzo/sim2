@@ -7,6 +7,7 @@ server =  pathnameArray.length >0 ? pathnameArray[0]+"/public/" : "";
 //Funciones Globales
 var datef = new Date();
 var dateactual = (datef.getMonth()+1)+'-'+datef.getFullYear();
+
 function loadingUI(message)
 {
     $.blockUI({ css: {
@@ -20,7 +21,8 @@ function loadingUI(message)
     }, message: '<h2><img style="margin-right: 30px" src="' + server + 'img/spiffygif.gif" >' + message + '</h2>'});
 }
 
-function responseUI(message,color){
+function responseUI( message,color )
+{
     $.unblockUI();
     $.blockUI({ css: {
         border: 'none',
@@ -36,7 +38,17 @@ function responseUI(message,color){
     },2000);
 }
 
-$(function(){
+$(function()
+{
+
+    function ajaxError(statusCode,errorThrown)
+    {
+        if (statusCode.status == 0) 
+            bootbox.alert('<h4 class="yellow">Internet: Problemas de Conexion</h4>');    
+        else
+            bootbox.alert('<h4 class="red">Error del Sistema</h4>');  
+    }
+
     //Vars
     var token          = $('input[name=token]').val();
     var type_money     = $("#type-money").html();
@@ -118,24 +130,36 @@ $(function(){
         $("#ret1").numeric({negative:false});
         $("#ret2").numeric({negative:false});
         $("#total").numeric({negative:false});
-    //Events: Datepicker, Buttons, Keyup.
+        //Events: Datepicker, Buttons, Keyup.
         //Calcule the IGV and Balance once typed the total amount per item
-        $(document).on("keyup",".total-item input",function()
-        {
-           calcularIGV();
-        });
-        //Calcule the IGV and Balance once typed the imp service
-        $(document).on("keyup","#imp-ser",function()
+        $(document).on("keyup",".total-item input" , function()
         {
             calcularIGV();
         });
+        //Calcule the IGV and Balance once typed the imp service
+        $(document).on("keyup","#imp-ser" , function()
+        {
+            calcularIGV();
+        });
+
+        $(document).on("keyup","#igv" , function()
+        {
+            calcularBalance();
+        });
+
+        $(document).on("keyup","#sub-tot" , function()
+        {
+            calcularBalance();
+        });
+
         // Datepicker date all classes
         // FIX COLOR IN INPUTS READONLY
         $('.date>input[readonly]').css('background-color', "#fff");
-        if(!($('.date>input:not([disabled])').length == 0)){
-            //var toDate = $(".date>input").val();
+        if(!($('.date>input:not([disabled])').length == 0))
+        {
             var toDate = "";
-            $(".date").datepicker({
+            $(".date").datepicker(
+            {
                 language: 'es',
                 startDate: toDate == "" ? "{{$data['date']['toDay']}}" : toDate,
                 endDate: $("#last-date").val(),
@@ -144,10 +168,18 @@ $(function(){
             //selected a date hide the datepicker
             $(".date").on("change",function(){
                 $(this).datepicker('hide');
+            });   
+            /*$(".date").datepicker({
+                language: 'es',
+                startDate: '{{$data["date"]["toDay"]}}' ,
+                endDate:  '{{$data["date"]["lastDay"]}}' ,
+                format: 'dd/mm/yyyy'
             });
-            //$(".date").datepicker( "setDate" , typeof($("#last-date").val()) != 'undefined' ? $("#last-date").val() : toDate);
+            //selected a date hide the datepicker
+            $(".date").on("change",function(){
+                $(this).datepicker('hide');
+            });*/
         }
-        //Cancel the view button to register expense
         $("#cancel-expense").on("click",function(e){
             e.preventDefault();
             if (typeUser.value == "AG")
@@ -362,29 +394,27 @@ $(function(){
         //Enable deposit
         $("#enable-deposit").on("click",function(e){
             e.preventDefault();
-            bootbox.confirm("¿Esta seguro que desea habilitar el depósito?", function(result) {
+            bootbox.confirm("<h4>¿Esta seguro que desea habilitar el depósito?</h4>", function( result ) 
+            {
                 if(result)
                 {
-                    if(validateRet() === true)
+                    data._token       = $("input[name=_token]").val();
+                    data.idsolicitude = $("input[name=idsolicitude]").val();
+                    data.idretencion  = $("select[name=retencion]").val();
+                    data.monto_retencion = $("input[name=monto_retencion]").val();
+                    
+                    $.post( server + 'revisar-solicitud' , data ).done( function ( data )
                     {
-                        data._token       = $("input[name=_token]").val();
-                        data.idsolicitude = $("input[name=idsolicitude]").val();
-                        data.idretencion  = $("select[name=retencion]").val();
-                        data.monto_retencion = $("input[name=monto_retencion]").val();
-                        $.post(server+'enable-deposit', data)
-                        .done(function (data){
                         if(data.Status == "Ok")
                         {
-                            bootbox.alert("<p class='green'>Se habilito el depósito correctamente.</p>", function(){
+                            bootbox.alert("<h4 class='green'>Se reviso la solicitud correctamente.</h4>", function()
+                            {
                                 window.location.href = server+'show_user';
                             });
                         }
                         else
                             bootbox.alert("<h4 class='red'>" + data.Status + ": " + data.Description +  "</h4>");
-                        });
-                    }
-                    else
-                        console.log("false");
+                    });
                 }
             });
         });
@@ -601,6 +631,22 @@ $(function(){
                     $("#razon").attr("data-edit",1);
                     $("#number-prefix").val(data_response.expense.num_prefijo).attr("disabled",true);
                     $("#number-serie").val(data_response.expense.num_serie).attr("disabled",true);
+                    
+                    if ( $("#regimen").length == 1 )
+                    {
+                        if ( data_response.expense.idtipotributo === null )
+                        {
+                            $("#regimen").val(0);
+                            $("#monto-regimen").val('').parent().parent().css("visibility" , "hidden" ); 
+                        }
+                        else
+                        {
+                            $("#regimen").val(data_response.expense.idtipotributo);
+                            if ( data_response.expense.idtipotributo >= 1 )
+                                $("#monto-regimen").val(data_response.expense.monto_tributo).parent().parent().css("visibility" , "show" ); 
+                        }
+                        $("#monto-regimen").numeric({negative:false});
+                    }
 
 					if ( !$('#dreparo').find('input[name=reparo]').length == 0)
 						if ( data_response.expense.reparo == true )          
@@ -608,17 +654,16 @@ $(function(){
 						else
 							$('#dreparo').find('input[name=reparo]')[1].checked = true;
 
-                    if ( data_response.expense.igv == 0 )
-                        $('input[name=igv]')[1].checked = true;
-                    else
-                        $('input[name=igv]')[0].checked = true;
-    
+                    $('#igv').val( data_response.expense.igv );
+                    
                     date = data_response.expense.fecha_movimiento.split('-');
                     //date = data_response.date.split('-');
                     date = date[2].substring(0,2)+'/'+date[1]+'/'+date[0];
                     $("#date").val(date);
                     $("#desc-expense").val(data_response.expense.descripcion);
-                    $.each(data_response.data,function(index,value){
+                    $.each(data_response.data,function(index,value)
+                    {
+                        console.log( index + value );
                         var row_add = row_item_first.clone();
                         row_add.find('.quantity input').val(value.cantidad);
                         row_add.find('.description input').val(value.descripcion);
@@ -670,9 +715,6 @@ $(function(){
                 row += "<th><a class='delete-expense' href='#'><span class='glyphicon glyphicon-remove'></span></a></th>";
                 row += "</tr>";
 
-            var proof_type       = $("#proof-type").val();
-            var regimen          = $("#regimen").val();
-            var monto_regimen    = $("#monto_regimen").val();
             var proof_type_sel   = $("#proof-type option:selected");
             var ruc              = $("#ruc").val();
             var ruc_hide         = $("#ruc-hide").val();
@@ -684,7 +726,7 @@ $(function(){
             var voucher_number   = number_prefix+"-"+number_serie;
             var date             = $("#date").val();
             var desc_expense     = $("#desc-expense").val();
-            var balance      = parseFloat($("#balance").val());
+            var balance          = parseFloat($("#balance").val());
             
             //Validación de errores de cabeceras
             var error = 0;
@@ -767,7 +809,9 @@ $(function(){
             {
                 data._token        = $('input[name=_token]').val();
                 data.token         = $('input[name=token]').val();
-                data.proof_type    = proof_type;
+                data.proof_type    = $("#proof-type").val();
+                data.idregimen     = $("#regimen").val();
+                data.monto_regimen = $("#monto-regimen").val();
                 data.ruc           = ruc;
                 data.razon         = razon;
                 data.number_prefix = number_prefix;
@@ -819,10 +863,12 @@ $(function(){
                     {
                         var sub_total_expense = parseFloat($("#sub-tot").val());
                         var imp_service       = parseFloat($("#imp-ser").val());
-                        var igv               = parseFloat($("#igv").val());
+                        var igv               = $("#igv").val();
+                        
                         if(isNaN(sub_total_expense)) sub_total_expense = 0;
                         if(isNaN(imp_service)) imp_service = 0;
                         if(isNaN(igv)) igv = 0;
+                        
                         data.sub_total_expense = sub_total_expense;
                         data.imp_service = imp_service;
                         data.igv = igv;
@@ -961,6 +1007,7 @@ $(function(){
                                                 }
                                                 else
                                                 {
+                                                    console.log(result);
                                                     responseUI("No se ha actualizado el gasto","red");
                                                     $(".message-expense").text("No se ha podido actualizar el detalle de gastos");
                                                 }
@@ -1016,12 +1063,6 @@ $(function(){
             $(".search-ruc").show();
             $("#ruc-hide").siblings().parent().addClass('input-group');
         });
-    
-        $(document).on('click' , 'input[name=igv]' , function()
-        {
-            console.log(this);
-            calcularIGV();
-        });
 
         //Search Social Reason in SUNAT once introduced the RUC
         $(".search-ruc").on("click",function(){
@@ -1066,26 +1107,28 @@ $(function(){
                         $("#ruc").attr("disabled",false);
                     }
                 }).done(function (response){
-                    if(response.error == undefined){
+                    if(response.error == undefined)
+                    {
                         $("#razon").val(2);
                         $("#ruc-hide").val(ruc);
                         $("#razon").html(response['razon_social']);
-                    }else{
-                        if(response.code == 1){
+                    }
+                    else
+                    {
+                        if(response.code == 1)
                             $("#razon").html("RUC menor a 11 digitos.");
-                        }
-                        if(response.code == 2){
+                        if(response.code == 2)
+                        {
                             $("#ruc").addClass("error-incomplete");
                             $("#razon").val(1);
                             $("#razon").html("No existe el RUC consultado.");
-                        }if(response.code == 4){
-                            $("#razon").html(response.error + ". "+ response.msg);
                         }
+                        if(response.code == 4)
+                            $("#razon").html(response.error + ". "+ response.msg );
                         $("#ruc-hide").val(ruc);
-                        //$("#razon").html(response.razon_social);
-                        l.stop();
-                        $("#ruc").attr("disabled",false);
                     }
+                    l.stop();
+                    $("#ruc").attr("disabled",false);
                 });
             }
         });
@@ -1105,22 +1148,17 @@ $(function(){
                 }
             });
         }
-    //Handling Classes
-        //Removing errros
-        $(document).on("focus","input",function(){
-            $(this).removeClass("error-incomplete").attr("placeholder",'');
-            $(".message-expense").hide();
-        });
+        
         //Calculating sum of rows
         function calculateTot(rows,clas){
             var sum = 0;
-            $.each(rows,function(){
+            $.each(rows,function()
+            {
                 sum += parseFloat($(this).find(clas).html());
             });
-            console.log(sum);
             return sum;
         }
-    //Functions
+    
         //Add Expense
         function newRowExpense(row,arr)
         {
@@ -1168,7 +1206,6 @@ $(function(){
         {
             var balance;
             var deposit = parseFloat(depositado.val());
-            console.log(deposit);
             var tot_expenses = calculateTot($(".total").parent(),'.total_expense');
             var btn_save = $("#save-expense").html();
             var tot_expense = parseFloat($("#total-expense").val());
@@ -1202,17 +1239,16 @@ $(function(){
         //Calculate the IGV
         function calcularIGV()
         {
-            var typeUser = 'R';
-            if($(".user").attr('data-typeUser')){
-                typeUser = 'C';
-            };
-            //Total variables proof
+            //Total variables Proof
+
+
+
+
             var total_item = $(".total-item input");
             var proof_type_sel = $("#proof-type :selected");
             var sub_total_expense = 0;
             var imp_service = parseFloat($("#imp-ser").val());
-            var igv_percent = $("input[name=igv]:checked").val();
-            var igv = 0;
+            var igv_percent = $('#igv').attr('igv') / 100;
             var total_expense = 0;
             $.each(total_item,function(){
                 if(!$.isNumeric($(this).val()))
@@ -1220,21 +1256,22 @@ $(function(){
                 else
                     total_expense += parseFloat($(this).val());
             });
-            if(total_expense>0)
+            
+            if ( total_expense > 0 )
             {
                 if( proof_type_sel.attr("igv") == 1 )
                 {
                     if(!imp_service) imp_service = 0;
-                    igv = total_expense*igv_percent;
-                    sub_total_expense = total_expense;
+                    var igv = total_expense * igv_percent;
+                    sub_total_expense = total_expense - igv;
                     $("#sub-tot").val( sub_total_expense.toFixed(2) );
                     total_expense = sub_total_expense + igv + imp_service;
                     
-                    $("#igv").val(igv.toFixed(2));
-                    $("#total-expense").val(total_expense.toFixed(2));
+                    $("#igv").val( igv.toFixed(2) );
+                    $("#total-expense").val( total_expense.toFixed(2) );
                 }
                 else
-                    $("#total-expense").val(total_expense.toFixed(2));
+                    $("#total-expense").val( total_expense.toFixed(2) );
             }
             else
             {
@@ -1447,7 +1484,6 @@ $(function(){
                         }
                     }).done( function (result) 
                     {
-                        console.log(result);
                         e=result;
                         if(!result.hasOwnProperty("error"))
                         {
@@ -1476,6 +1512,95 @@ $(function(){
 
         });
         
+        $(document).off( 'click' , '.modal-document');
+        $(document).on( 'click' , '.modal-document' , function(e)
+        {
+            var tr = $(this).parent().parent().parent();
+            console.log(tr);
+
+            $.ajax(
+            {
+                type: 'post',
+                url: server+"get-document-detail",
+                data: 
+                {
+                    id : tr.attr( 'row-id') ,
+                    _token : $( 'input[name=_token]' ).val()
+                }
+            }).fail( function( statusCode , errorThrown )
+            {
+                ajaxError( statusCode , errorThrown );
+            }).done( function ( response ) 
+            {
+                if ( response.Status == 'Ok' )
+                {
+                    var modal = $('#documents_Modal');
+                    if ( response.Data.sub_tot === null )
+                        modal.find('#subtotal').val('').parent().parent().hide();
+                    else
+                        modal.find('#subtotal').val( response.Data.moneda + ' ' + response.Data.sub_tot ).parent().parent().show();
+                    if ( response.Data.igv === null )
+                        modal.find('#igv').val('').parent().parent().hide();
+                    else    
+                        modal.find('#igv').val( response.Data.moneda + ' ' + response.Data.igv ).parent().parent().show();
+                    if ( response.Data.imp_serv === null )
+                        modal.find('#imp-serv').val('').parent().parent().hide();
+                    else
+                        modal.find('#imp-serv').val( response.Data.moneda + ' ' + response.Data.imp_serv ).parent().parent().show();
+                    if ( response.Data.reparo == 0 )
+                        modal.find('#reparo').val( 'No' );
+                    else if ( response.Data.reparo == 1 )
+                        modal.find('#reparo').val( 'Si' );
+                    modal.find('#total').val( response.Data.moneda + ' ' + response.Data.monto );
+                    modal.find('input[name=idDocumento]').val( response.Data.id );
+                    
+                    if ( response.Data.idtipotributo == null )
+                    {
+                        modal.find('#regimen').val( 0 );
+                        modal.find('#monto-regimen').val( response.Data.monto_tributo ).parent().parent().css( 'visibility' , 'hidden' ); 
+                    }
+                    else
+                    {
+                        modal.find('#regimen').val( response.Data.idtipotributo );
+                        modal.find('#monto-regimen').val( response.Data.monto_tributo ).parent().parent().css( 'visibility' , 'show' );
+                    }
+                    modal.modal();
+                }
+                else
+                    bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+            });
+        });
+
+        $(document).off( 'click' , '#update-document' );
+        $(document).on( 'click' , '#update-document' , function(e)
+        {
+            var modal = $('#documents_Modal');
+            $.ajax(
+            {
+                type: 'post',
+                url: server + 'update-document' ,
+                data: 
+                {
+                    id : modal.find( 'input[name=idDocumento]' ).val() ,
+                    idregimen : modal.find( '#regimen' ).val() ,
+                    monto : modal.find( '#monto-regimen' ).val() ,
+                    _token : $( 'input[name=_token]').val()
+                }
+            }).fail( function( statusCode , errorThrown )
+            {
+                ajaxError( statusCode , errorThrown );
+            }).done( function ( response ) 
+            {
+                if ( response.Status == 'Ok' )
+                {
+                    bootbox.alert('<h4 class="green">Documento Actualizado</h4>')
+                    modal.modal('hide');
+                }
+                else
+                    bootbox.alert('<h4 class="red">' + data.Status + ': ' + data.Description + '</h4>' );
+            });
+        });
+
         $(document).off("click", ".modal_deposit");
         $(document).on("click", ".modal_deposit", function(e)
         {
@@ -1534,5 +1659,41 @@ $(function(){
             $("#detail_solicitude span:last-child").removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
             $("#detail_solicitude span:first-child").text('Mostrar');
             $("#collapseOne").collapse('toggle');
-        } 
+        }
+
+        $('#ruc').click( function()
+        {
+            $(this).removeClass('error-incomplete').attr( 'placeholder' , '' );
+        });
+
+        $('#number-prefix').click( function()
+        {
+            $(this).removeClass('error-incomplete').attr( 'placeholder' , '' );
+        });
+
+        $('#number-serie').click( function()
+        {
+            $(this).removeClass('error-incomplete').attr( 'placeholder' , '' );
+        });
+
+        $('#desc-expense').click( function()
+        {
+            $(this).removeClass('error-incomplete').attr( 'placeholder' , '' );
+        });
+
+        $('.quantity input').click( function()
+        {
+            $(this).removeClass('error-incomplete').attr( 'placeholder' , '' );
+        });
+
+        $('.description input').click( function()
+        {
+            $(this).removeClass('error-incomplete').attr( 'placeholder' , '' );
+        });
+
+        $('.total-item input').click( function()
+        {
+            $(this).removeClass('error-incomplete').attr( 'placeholder' , '' );
+        });
+
 });

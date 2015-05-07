@@ -13,6 +13,11 @@ class Expense extends Eloquent {
 		return $this->hasOne('Dmkt\Activity','idsolicitud','idsolicitud');
 	}
 
+	protected function getFechaMovimientoAttribute( $attr )
+    {
+        return \Carbon\Carbon::parse( $attr )->format('Y-m-d');
+    }
+
 	protected function proof()
 	{
 		return $this->hasOne('Expense\ProofType','id','idcomprobante');
@@ -21,6 +26,11 @@ class Expense extends Eloquent {
     protected function items()
     {
         return $this->hasMany('Expense\ExpenseItem','idgasto','id');
+    }
+
+    protected function solicitud()
+    {
+    	return $this->hasOne( 'Dmkt\Solicitude' , 'id' , 'idsolicitud' );
     }
 
     public function lastId()

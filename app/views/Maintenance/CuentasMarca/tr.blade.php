@@ -15,7 +15,7 @@
         <input type="text" maxlength=6>
     </td>
     <td class="iddocumento" save=1 style="text-align:center">
-        @include('Maintenance.CuentasMarca.documento')
+        @include('Maintenance.Cuentasmarca.documento')
     </td>
     <td style="text-align:center">
         <a class="maintenance-save" href="#">
