@@ -72,7 +72,7 @@
                 <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label" for="textinput">Ruc</label>
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                     <input id="ruc" class="form-control input-md" maxlength="11" name="ruc" type="text"
-                           value="{{isset($detalle->numruc) ? $detalle->numruc : null }}">
+                           value="{{isset($detalle->num_ruc) ? $detalle->num_ruc : null }}">
                 </div>
             </div>
             <div id="div_number_account" class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">

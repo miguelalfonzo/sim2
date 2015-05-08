@@ -281,12 +281,12 @@ class SolicitudeController extends BaseController
             } 
             else if ($typePayment == 2) 
             {
-                $jDetalle->numruc = $ruc;
+                $jDetalle->num_ruc = $ruc;
                 unset($jDetalle->numcuenta);
             } 
             else if ($typePayment == 3) 
             {
-                $jDetalle->numcuenta = $account;
+                $jDetalle->numc_uenta = $account;
                 unset($jDetalle->numruc);
             }
             return $this->setRpta( $jDetalle );
@@ -438,7 +438,7 @@ class SolicitudeController extends BaseController
                     if ($inputs['type_solicitude']   == REASON_REGALO )
                     {
                         $filename = uniqid() . '.' . $image->getClientOriginalExtension();
-                        $path                    = public_path( IMAGE_PATH . $filename);
+                        $path     = public_path( IMAGE_PATH . $filename);
                         Image::make($image->getRealPath())->resize(WIDTH,HEIGHT)->save($path);
                         $detalle['image']        = $filename;
                         $detalle['monto_factura']    = round( $inputs['amount_fac'] , 2 , PHP_ROUND_HALF_DOWN );
