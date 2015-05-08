@@ -160,6 +160,7 @@ $(function()
             var toDate = "";
             $(".date").datepicker(
             {
+                orientation: "auto",
                 language: 'es',
                 startDate: toDate == "" ? "{{$data['date']['toDay']}}" : toDate,
                 endDate: $("#last-date").val(),

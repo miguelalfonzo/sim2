@@ -70,18 +70,23 @@ function newSolicitude() {
     $(document).on("click", ".timeLine", function(e){
         e.preventDefault();
         var state = parseInt($(this).parent().parent().parent().find('#timeLine').val(), 10);
-        state--;
         var html  = $('.timeLineModal').clone();
         html.find('.container-fluid').removeClass('hide');
-        html.find('.stage').eq(state).addClass('success');
-        html.find('.stage .stage-header').eq(0).addClass('stage-success');
-        /*$.each(html.find('.stage'), function(key, value){
-            key++;
-            if(state === 1 && (key === state)){
-                $(this).addClass('success');
-                $(this).find('.stage-header').addClass('stage-success');
+        if(state == 11){
+            for (var i = 0 ; i < 2; i++) {
+                html.find('.stage').eq(i).addClass('success');
+                html.find('.stage .stage-header').eq(i).addClass('stage-success');
             }
-        });*/
+            html.find('.stage').eq(2).addClass('pending');
+            html.find('.stage .stage-header').eq(2).addClass('stage-pending');
+        }else{
+            for (var i = 0 ; i < state; i++) {
+                html.find('.stage').eq(i).addClass('success');
+                html.find('.stage .stage-header').eq(i).addClass('stage-success');
+            }
+            html.find('.stage').eq(state).addClass('pending');
+            html.find('.stage .stage-header').eq(state).addClass('stage-pending'); 
+        }
         var h     = $(html).html();
         bootbox.dialog({
             message: h,
