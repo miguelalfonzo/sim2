@@ -259,3 +259,14 @@ table thead th, table th
     cursor: inherit;
     display: block;
 }
+
+.btn-icon-medium {
+	padding  : 0 5px; 
+	font-size: 1.3em;
+}
+.btn-group-icon-lg > .btn {
+  padding: 10px 13px;
+  font-size: 18px;
+  line-height: 1.33;
+  border-radius: 6px;
+}

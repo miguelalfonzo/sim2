@@ -14,15 +14,16 @@
     {{ HTML::style('css/bootstrap-lightbox.css')}}
     {{ HTML::style('css/bootstrap.min.css') }}
     {{ HTML::style('css/jquery-ui.min.css') }}
-    {{ HTML::style('css/bootstrap-datepicker3.css') }}
     {{ HTML::style('css/ladda-themeless.min.css') }}
     {{ HTML::style('css/stylos.css') }}
     {{ HTML::style('css/typeahead.css') }}
     {{ HTML::style('css/main.css') }}
+    {{ HTML::style('css/datepicker3.css') }}
     {{ HTML::script('js/jquery_2.1.0.min.js') }}
     {{ HTML::script('js/jquery-ui.min.js') }}
     {{ HTML::script('js/jquery.dataTables.min.js') }}
     {{ HTML::script('js/dataTables.bootstrap.js') }}
+    
 </head>
 <body>
 <header>
