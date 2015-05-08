@@ -69,7 +69,7 @@ function newSolicitude() {
     $(document).off("click", ".timeLine");
     $(document).on("click", ".timeLine", function(e){
         e.preventDefault();
-        var state = parseInt($(this).parent().parent().parent().find('#timeLine').val(), 10);
+        var state = parseInt($(this).parent().parent().parent().find('#timeLineStatus').val(), 10);
         var html  = $('.timeLineModal').clone();
         html.find('.container-fluid').removeClass('hide');
         if(state == 11){

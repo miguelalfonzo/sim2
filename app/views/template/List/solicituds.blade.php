@@ -24,7 +24,11 @@
     <tbody>
         @foreach($solicituds as $solicitude)
             <tr>
-                <input type="hidden" id="timeLine" value="{{$solicitude->idestado}}">
+                @if($solicitude->idestado == ACEPTADO)
+                    <input type="hidden" id="timeLineStatus" value="{{$solicitude->idestado}}" data-accept="{{$solicitud->acceptHist->updated_by}}">
+                @else
+                     <input type="hidden" id="timeLineStatus" value="{{$solicitude->idestado}}">
+                @endif
                 @if ( in_array(Auth::user()->type , array( TESORERIA,GER_COM) ))
                     <input type="hidden" id="sol_token" class="i-tokens" value="{{$solicitude->token}}">
                     @if(!is_null($solicitude->response))
