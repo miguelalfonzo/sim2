@@ -24,10 +24,12 @@
     <tbody>
         @foreach($solicituds as $solicitude)
             <tr>
-                @if($solicitude->idestado == ACEPTADO)
-                    <input type="hidden" id="timeLineStatus" value="{{$solicitude->idestado}}" data-accept="{{$solicitud->acceptHist->updated_by}}">
+                @if($solicitude->idestado == ACEPTADO || $solicitude->idestado == APROBADO || $solicitude->idestado == DEPOSITADO || $solicitude->idestado == REGISTRADO || $solicitude->idestado == ENTREGADO || $solicitude->idestado == GENERADO || $solicitude->idestado == GASTO_HABILITADO || $solicitude->idestado == DEPOSITO_HABILITADO)
+                    <input type="hidden" id="timeLineStatus" value="{{$solicitude->idestado}}" data-accept="{{$solicitude->acceptHist->user_from}}">
+                @elseif($solicitude->idestado == RECHAZADO)
+                    <input type="hidden" id="timeLineStatus" value="{{$solicitude->idestado}}" data-rejected="{{$solicitude->rejectedHist->user_from}}">
                 @else
-                     <input type="hidden" id="timeLineStatus" value="{{$solicitude->idestado}}">
+                    <input type="hidden" id="timeLineStatus" value="{{$solicitude->idestado}}">
                 @endif
                 @if ( in_array(Auth::user()->type , array( TESORERIA,GER_COM) ))
                     <input type="hidden" id="sol_token" class="i-tokens" value="{{$solicitude->token}}">

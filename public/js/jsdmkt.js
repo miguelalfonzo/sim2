@@ -41,7 +41,10 @@ function newSolicitude() {
     var CANCELADO =  8;
     var RECHAZADO = 9;
     var TODOS = 10;
-    
+    var DERIVADO = 11;
+    var POR_DEPOSITAR = 13;
+    var POR_REGISTRAR = 12;
+
     //NUEVOS ESTADOS
     var R_PENDIENTE = 1;
     var R_APROBADO = 2;
@@ -70,22 +73,82 @@ function newSolicitude() {
     $(document).on("click", ".timeLine", function(e){
         e.preventDefault();
         var state = parseInt($(this).parent().parent().parent().find('#timeLineStatus').val(), 10);
+        var accept = $(this).parent().parent().parent().find('#timeLineStatus').data('accept');
+        var rejected = $(this).parent().parent().parent().find('#timeLineStatus').data('rejected');
         var html  = $('.timeLineModal').clone();
         html.find('.container-fluid').removeClass('hide');
-        if(state == 11){
+        if(state == DERIVADO){
             for (var i = 0 ; i < 2; i++) {
                 html.find('.stage').eq(i).addClass('success');
                 html.find('.stage .stage-header').eq(i).addClass('stage-success');
             }
             html.find('.stage').eq(2).addClass('pending');
             html.find('.stage .stage-header').eq(2).addClass('stage-pending');
-        }else{
-            for (var i = 0 ; i < state; i++) {
+        }else if(state == POR_DEPOSITAR){
+            for (var i = 0 ; i <= 3; i++) {
+                if(accept == 'S' && i != 2){
+                    html.find('.stage').eq(i).addClass('success');
+                    html.find('.stage .stage-header').eq(i).addClass('stage-success');
+                }else if(accept == 'P'){
+                    html.find('.stage').eq(i).addClass('success');
+                    html.find('.stage .stage-header').eq(i).addClass('stage-success');
+                }
+            }
+            html.find('.stage').eq(4).addClass('pending');
+            html.find('.stage .stage-header').eq(4).addClass('stage-pending');
+        }else if(state == POR_REGISTRAR){
+            for (var i = 0 ; i <= 5; i++) {
+                if(accept == 'S' && i != 2){
+                    html.find('.stage').eq(i).addClass('success');
+                    html.find('.stage .stage-header').eq(i).addClass('stage-success');
+                }else if(accept == 'P'){
+                    html.find('.stage').eq(i).addClass('success');
+                    html.find('.stage .stage-header').eq(i).addClass('stage-success');
+                }
+            }
+            html.find('.stage').eq(6).addClass('pending');
+            html.find('.stage .stage-header').eq(6).addClass('stage-pending');
+        }else if(state == REGISTRADO){
+            for (var i = 0 ; i <= 6; i++) {
+                if(accept == 'S' && i != 2){
+                    html.find('.stage').eq(i).addClass('success');
+                    html.find('.stage .stage-header').eq(i).addClass('stage-success');
+                }else if(accept == 'P'){
+                    html.find('.stage').eq(i).addClass('success');
+                    html.find('.stage .stage-header').eq(i).addClass('stage-success');
+                }
+            }
+            html.find('.stage').eq(7).addClass('pending');
+            html.find('.stage .stage-header').eq(7).addClass('stage-pending');
+        }else if(state == ACEPTADO || state == APROBADO || state == DEPOSITADO){
+            for (var i = 0 ; i <= state; i++) {
+                if(accept == 'S' && i != 2){
+                    html.find('.stage').eq(i).addClass('success');
+                    html.find('.stage .stage-header').eq(i).addClass('stage-success');
+                }else if(accept == 'P'){
+                    html.find('.stage').eq(i).addClass('success');
+                    html.find('.stage .stage-header').eq(i).addClass('stage-success');
+                }
+            }
+            html.find('.stage').eq(state+1).addClass('pending');
+            html.find('.stage .stage-header').eq(state+1).addClass('stage-pending');
+        }else if(state == CANCELADO){
+            html.find('.stage').eq(0).addClass('rejected');
+            html.find('.stage .stage-header').eq(0).addClass('stage-rejected');
+        }else if(state == RECHAZADO){
+            if(rejected == 'S'){
+                var pos = 1;
+            }else if(rejected == 'P'){
+                var pos = 2;
+            }else if(rejected == 'G'){
+                var pos = 3;
+            }
+            for (var i = 0 ; i < pos; i++) {
                 html.find('.stage').eq(i).addClass('success');
                 html.find('.stage .stage-header').eq(i).addClass('stage-success');
             }
-            html.find('.stage').eq(state).addClass('pending');
-            html.find('.stage .stage-header').eq(state).addClass('stage-pending'); 
+            html.find('.stage').eq(pos).addClass('rejected');
+            html.find('.stage .stage-header').eq(pos).addClass('stage-rejected');
         }
         var h     = $(html).html();
         bootbox.dialog({

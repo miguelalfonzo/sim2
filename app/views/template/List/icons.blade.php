@@ -54,7 +54,7 @@
         @endif
         @elseif ( $solicitude->idtiposolicitud == SOL_INST )
         @if ( Auth::user()->type == REP_MED )
-        <a class="btn btn-default" data-toggle="modal" data-target=".timeLineModal">
+        <a class="btn btn-default timeLine">
         <span  class="glyphicon glyphicon-flag"></span>
         </a>
         @if($solicitude->idestado == REGISTRADO && Auth::user()->id == $solicitude->iduserasigned )   
