@@ -384,7 +384,7 @@ class ExpenseController extends BaseController
 	public function reportExpense($token)
 	{
 		$solicitud = Solicitude::where('token',$token)->firstOrFail();
-		$detalle = $solicitude->detalle;
+		$detalle = $solicitud->detalle;
 		$jDetalle = json_decode( $solicitud->detalle->detalle );
 		$clientes   = array();
 		$cmps = array();
@@ -461,7 +461,7 @@ class ExpenseController extends BaseController
 			'expenses'   => $expenses,
 			'total'      => $total
 		);
-		$data['balance'] = $this->reportBalance( $solicitude , $detalle , $jDetalle , $total );
+		$data['balance'] = $this->reportBalance( $solicitud , $detalle , $jDetalle , $total );
 		$html = View::make('Expense.report',$data)->render();
 		return PDF::load($html, 'A4', 'landscape')->show();
 	}

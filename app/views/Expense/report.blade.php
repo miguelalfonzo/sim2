@@ -14,24 +14,24 @@
         <main>
             <section style="text-align:center;margin-top:2.5em;">
                 <strong><p style="display:inline">Fecha:</strong>&nbsp;{{$date['toDay']}}</p>
-                @if ( $solicitude->acceptHist->updatedBy->type == SUP )
-                    <strong><p style="display:inline">Autorizado por:</strong>&nbsp;{{$solicitude->acceptHist->updatedBy->sup->full_name}}</p>
+                @if ( $solicitud->acceptHist->updatedBy->type == SUP )
+                    <strong><p style="display:inline">Autorizado por:</strong>&nbsp;{{$solicitud->acceptHist->updatedBy->sup->full_name}}</p>
                     <strong><p style="display:inline">Cargo:</strong>&nbsp;Supervisor</p>
-                @elseif ( $solicitude->acceptHist->updatedBy->type == GER_PROD )
-                    <strong><p style="display:inline">Autorizado por:</strong>&nbsp;{{$solicitude->acceptHist->updatedBy->gerProd->full_name}}</p>
+                @elseif ( $solicitud->acceptHist->updatedBy->type == GER_PROD )
+                    <strong><p style="display:inline">Autorizado por:</strong>&nbsp;{{$solicitud->acceptHist->updatedBy->gerProd->full_name}}</p>
                     <strong><p style="display:inline">Cargo:</strong>&nbsp;G. Producto</p>
                 @endif    
-                <strong><p style="display:inline">Fondo:</strong>&nbsp;{{mb_convert_case($solicitude->detalle->fondo->nombre,MB_CASE_TITLE,'UTF-8')}}</p>
-                <strong><p style="display:inline">Código Comercial:</strong>&nbsp;{{$solicitude->id}}</p>
+                <strong><p style="display:inline">Fondo:</strong>&nbsp;{{mb_convert_case($solicitud->detalle->fondo->nombre,MB_CASE_TITLE,'UTF-8')}}</p>
+                <strong><p style="display:inline">Código Comercial:</strong>&nbsp;{{$solicitud->id}}</p>
             </section>
             <section style="text-align:center;margin-top:2em;">
-                @if ( $solicitude->createdBy->type == REP_MED )
+                @if ( $solicitud->createdBy->type == REP_MED )
                     <strong>
-                        <p style="display:inline">Colaborador Bagó:</strong>&nbsp;{{$solicitude->createdBy->rm->full_name}}</p>
+                        <p style="display:inline">Colaborador Bagó:</strong>&nbsp;{{$solicitud->createdBy->rm->full_name}}</p>
                     <strong><p style="display:inline">Cargo:</strong>&nbsp;Representante Medico</p>
-                @else ( $solicitude->createdBy->type == SUP )
+                @else ( $solicitud->createdBy->type == SUP )
                     <strong>
-                        <p style="display:inline">Colaborador Bagó:</strong>&nbsp;{{$solicitude->createdBy->sup->full_name}}</p>    
+                        <p style="display:inline">Colaborador Bagó:</strong>&nbsp;{{$solicitud->createdBy->sup->full_name}}</p>    
                     <strong>
                         <p style="display:inline">Cargo:</strong>&nbsp;Supervisor</p>
                 @endif
@@ -97,13 +97,13 @@
                                     <strong>
                                         <span class="symbol">S/.</span>
                                         <span class="total-expense">
-                                            @if ( is_null( $solicitude->detalle->deposit ) )
+                                            @if ( is_null( $solicitud->detalle->deposit ) )
                                                 -
                                             @else
-                                                @if ( $solicitude->detalle->deposit->account->idtipomoneda == DOLARES )
-                                                    {{ round ( $solicitude->detalle->deposit->total * $detalle->tcv , 2 , PHP_ROUND_HALF_DOWN ) }}
+                                                @if ( $solicitud->detalle->deposit->account->idtipomoneda == DOLARES )
+                                                    {{ round ( $solicitud->detalle->deposit->total * $detalle->tcv , 2 , PHP_ROUND_HALF_DOWN ) }}
                                                 @else
-                                                    {{ $solicitude->detalle->deposit->total }}    
+                                                    {{ $solicitud->detalle->deposit->total }}    
                                                 @endif
                                             @endif
                                         </span>
