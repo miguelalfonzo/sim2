@@ -9,6 +9,15 @@
                     Solicitudes
                 </a>
             </li>
+            @include('template.User.li_estado_cuenta')
+            <!-- if ( in_array( Auth::user()->type , array( REP_MED , SUP ) ) )
+                <li>
+                    <a href="#new-sol" role="tab" data-toggle="tab">
+                        <icon class="fa fa-home"></icon>
+                        Registrar Fondos
+                    </a>
+                </li>
+             -->
             @if ( Auth::user()->type == ASIS_GER )
                 <li>
                     <a href="#fondos" role="tab" data-toggle="tab">
@@ -16,9 +25,7 @@
                         Registrar Fondos
                     </a>
                 </li>
-            @endif
-            @include('template.User.li_estado_cuenta')
-            @if( Auth::user()->type == CONT)
+            @elseif( Auth::user()->type == CONT )
                 <li>
                     <a href="#documentos" role="tab" data-toggle="tab">
                         <i class="fa fa-user"></i>
@@ -43,8 +50,7 @@
                         Mantenimiento de Cuentas-Marcas
                     </a>
                 </li>
-            @endif
-            @if ( Auth::user()->type == TESORERIA )
+            @elseif ( Auth::user()->type == TESORERIA )
                 <li>
                     <a href="#sol-fondo" role="tab" data-toggle="tab">
                         <i class="fa fa-user"></i>
@@ -63,7 +69,12 @@
                 </div>
             </div>
             @include('template.tb_estado_cuenta')
-            
+            <!-- if ( in_array( Auth::user()->type , array( REP_MED , SUP ) ) )
+                <div class="tab-pane fade" id="new-sol">
+                    <div class="panel panel-default">
+                        include('Dmkt.Solicitud.Representante.detail')
+                    </div>
+                </div> -->
             @if (Auth::user()->type == CONT)
                 <!-- Busqueda de Documentos -->
                 <div class="tab-pane fade" id="documentos">
@@ -102,9 +113,7 @@
                        <input class="btn btn-primary maintenance-add" type="button" case="cuentas-marca" value="Agregar">
                     </div>
                 </div>
-            @endif
-
-            @if ( Auth::user()->type == TESORERIA )
+            @elseif ( Auth::user()->type == TESORERIA )
                 <!-- Mantenimiento de los Fondos de las Solicitudes -->
                 <div class="tab-pane fade" id="sol-fondo">
                     <div class="panel panel-default">
@@ -115,10 +124,8 @@
                     </div>
                 </div>
             @endif
-            
             <!-- Solicitud Institucional -->
             @include('template.User.institucion')
-
         </div>
         <div>
             <a id="show_leyenda" style="margin-left: 15px" href="#">Ver leyenda</a>

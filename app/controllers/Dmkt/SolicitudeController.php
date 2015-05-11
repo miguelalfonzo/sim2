@@ -32,6 +32,7 @@ use \Expense\ExpenseType;
 use \Expense\MarkProofAccounts;
 use \Expense\Table;
 use \Expense\Regimen;
+use \stdClass;
 
 class SolicitudeController extends BaseController
 {
@@ -153,7 +154,7 @@ class SolicitudeController extends BaseController
         {
             $solicitud = Solicitude::where('token', $token)->first();
             if ( count( $solicitud) == 0 )
-                return $this->warningException( __FUNCTION__ ,'No se encontro la Solicitud con Codigo: '.$token );
+                return $this->warningException( __FUNCTION__ , 'No se encontro la Solicitud con Codigo: '.$token );
             else
             {
                 $detalle = json_decode($solicitud->detalle->detalle);
@@ -276,18 +277,18 @@ class SolicitudeController extends BaseController
         {
             if ($typePayment == 1) 
             {
-                unset($jDetalle->numruc);
-                unset($jDetalle->numcuenta);
+                unset($jDetalle->num_ruc);
+                unset($jDetalle->num_cuenta);
             } 
-            else if ($typePayment == 2) 
+            else if ($typePayment == PAGO_CHEQUE ) 
             {
                 $jDetalle->num_ruc = $ruc;
-                unset($jDetalle->numcuenta);
+                unset($jDetalle->num_cuenta);
             } 
-            else if ($typePayment == 3) 
+            else if ($typePayment == PAGO_DEPOSITO )
             {
-                $jDetalle->numc_uenta = $account;
-                unset($jDetalle->numruc);
+                $jDetalle->num_cuenta = $account;
+                unset($jDetalle->num_ruc);
             }
             return $this->setRpta( $jDetalle );
         }
@@ -431,45 +432,51 @@ class SolicitudeController extends BaseController
                     return $this->warningException( __FUNCTION__ , 'No se pudo registrar la solicitud');
                 else 
                 {
-                    $detalle    = array(
-                        'monto_solicitado'  => round( $inputs['monto'] , 2 , PHP_ROUND_HALF_DOWN ),
-                        'fecha_entrega'     => $inputs['fecha']
-                    );                       
-                    if ($inputs['type_solicitude']   == REASON_REGALO )
+                    $detalle    = new stdClass();
+                    $detalle->monto_solicitado  = round( $inputs['monto'] , 2 , PHP_ROUND_HALF_DOWN );
+                    $detalle->fecha_entrega     = $inputs['fecha'];
+
+                    if ( $inputs['type_solicitude']   == REASON_REGALO )
                     {
-                        $filename = uniqid() . '.' . $image->getClientOriginalExtension();
-                        $path     = public_path( IMAGE_PATH . $filename);
+                        $filename                = uniqid() . '.' . $image->getClientOriginalExtension();
+                        $path                    = public_path( IMAGE_PATH . $filename);
                         Image::make($image->getRealPath())->resize(WIDTH,HEIGHT)->save($path);
-                        $detalle['image']        = $filename;
-                        $detalle['monto_factura']    = round( $inputs['amount_fac'] , 2 , PHP_ROUND_HALF_DOWN );
+                        $detalle->image          = $filename;
+                        $detalle->monto_factura  = round( $inputs['amount_fac'] , 2 , PHP_ROUND_HALF_DOWN );
                     }
                     
-                    if ($inputs['pago']      == PAGO_CHEQUE )
-                        $detalle['num_ruc']        = $inputs['ruc'];
-                    elseif ($inputs['pago']  == PAGO_DEPOSITO )
-                        $detalle['num_cuenta']     = $inputs['number_account'];
-                    
-                    $solicitud_detalle->detalle      = json_encode($detalle);
-                    $solicitud_detalle->idmoneda     = $inputs['moneda'];
-                    $solicitud_detalle->idmotivo     = $inputs['type_solicitude'];
-                    $solicitud_detalle->idpago       = $inputs['pago'];
-                    if ( !$solicitud_detalle->save() )
-                        return $this->warningException( __FUNCTION__ , 'No se pudo registrar los detalles de la solicitud');
-                    else
+                    $middleRpta = $this->unsetPago( $detalle , $inputs['pago'] , $inputs['ruc'] , $inputs['number_account'] );
+                    if ( $middleRpta[status] == ok )
                     {
-                        $middleRpta = $this->setClients( $solicitud->id , $inputs['clientes'] , $inputs['tables'] );
-                        if ( $middleRpta[status] == ok )
+                        $detalle = $middleRpta[data];
+                        
+                        /*if ($inputs['pago']      == PAGO_CHEQUE )
+                            $detalle['num_ruc']        = $inputs['ruc'];
+                        elseif ($inputs['pago']  == PAGO_DEPOSITO )
+                            $detalle['num_cuenta']     = $inputs['number_account'];
+                        */
+                        $solicitud_detalle->detalle      = json_encode($detalle);
+                        $solicitud_detalle->idmoneda     = $inputs['moneda'];
+                        $solicitud_detalle->idmotivo     = $inputs['type_solicitude'];
+                        $solicitud_detalle->idpago       = $inputs['pago'];
+                        if ( !$solicitud_detalle->save() )
+                            return $this->warningException( __FUNCTION__ , 'No se pudo registrar los detalles de la solicitud');
+                        else
                         {
-                            $middleRpta = $this->setFamilies( $solicitud->id , $inputs['familias'] );
+                            $middleRpta = $this->setClients( $solicitud->id , $inputs['clientes'] , $inputs['tables'] );
                             if ( $middleRpta[status] == ok )
                             {
-                                $user = Auth::user();
-                                $toUserId = $this->toUser( $user );
-                                $middleRpta = $this->setStatus( 0 , PENDIENTE, $user->id, $toUserId, $solicitud->id);
-                                if ($middleRpta[status] == ok)
+                                $middleRpta = $this->setFamilies( $solicitud->id , $inputs['familias'] );
+                                if ( $middleRpta[status] == ok )
                                 {
-                                    DB::commit();
-                                    return $this->setRpta( Auth::user()->type );
+                                    $user = Auth::user();
+                                    $toUserId = $this->toUser( $user );
+                                    $middleRpta = $this->setStatus( 0 , PENDIENTE, $user->id, $toUserId, $solicitud->id);
+                                    if ($middleRpta[status] == ok)
+                                    {
+                                        DB::commit();
+                                        return $this->setRpta( Auth::user()->type );
+                                    }
                                 }
                             }
                         }
@@ -1302,7 +1309,7 @@ class SolicitudeController extends BaseController
                 $middleRpta = $this->setStatus( $oldIdEstado, GENERADO , $userId, $userId , $solicitud->id );
                 if ( $middleRpta[status] == ok )
                 {
-                    //DB::commit();
+                    DB::commit();
                     Session::put('state' , R_FINALIZADO );
                 }
             }
