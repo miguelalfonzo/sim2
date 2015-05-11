@@ -115,7 +115,11 @@
                 <td class="text-center">{{$solicitude->created_at}}</td> <!--date_format(date_create($solicitude->created_at), 'd/m/Y' ) -->
                 <td class="text-center">
                     @if ( $solicitude->idtiposolicitud == SOL_REP )
-                        {{ $solicitude->detalle->reason->nombre }}
+                        @if ( is_null( $solicitude->detalle->reason ) )
+                            -
+                        @else    
+                            {{ $solicitude->detalle->reason->nombre }}
+                        @endif
                     @elseif ( $solicitude->idtiposolicitud == SOL_INST ) 
                         {{ $solicitude->typesolicitude->nombre }}
                     @endif

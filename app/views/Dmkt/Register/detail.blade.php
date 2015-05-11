@@ -14,9 +14,9 @@
     </div>
     
 
-    <div class="form-group col-sm-6 col-md-4">
-        <label class="col-sm-8 col-md-8 control-label" for="textinput">Tipo Solicitud</label>
-        <div class="col-sm-12 col-md-12">
+    <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+        <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label" for="textinput">Motivo</label>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <select class="form-control selecttypesolicitude" name="type_solicitude">
                 @foreach( $typesolicituds as $type )
                     @if(isset($solicitude) && $solicitude->detalle->idmotivo == $type->id)
@@ -160,7 +160,7 @@
     <!-- Button (Double) -->
     <div class="form-group col-sm-12 col-md-12" style="margin-top: 20px">
         <div class="col-sm-12 col-md-12" style="text-align: center">
-            @if(isset($solicitude))
+            @if ( isset( $solicitude ) )
                 @if($solicitude->blocked == 0)
                     <button id="button1id" name="button1id" class="btn btn-primary">
                         {{isset($solicitude) ? 'Actualizar' : 'Crear'}}

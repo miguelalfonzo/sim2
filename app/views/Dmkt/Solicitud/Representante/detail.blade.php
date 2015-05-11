@@ -1,10 +1,10 @@
 <!--    Name Solicitude  -->
 @include('Dmkt.Solicitud.Detail.titulo')
 
-<!-- Type Solicitude  -->
-<div class="form-group col-sm-6 col-md-4 col-lg-4">
-    <label class="col-sm-8 col-md-8 col-lg-4 control-label" for="reason">Tipo Solicitud</label>
-    <div class="col-sm-12 col-md-12">
+<!-- MOTIVO  -->
+<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+    <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label" for="reason">Motivo</label>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
         <input id="reason" type="text" class="form-control input-md"
         value="{{$solicitud->detalle->reason->nombre}}" readonly>
     </div>

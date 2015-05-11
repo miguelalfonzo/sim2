@@ -64,6 +64,24 @@ class SolicitudeController extends BaseController
         return $result;
     }
     /** ----------------------------------  Representante Medico ---------------------------------- */
+
+    public function newSolicitude()
+    {
+        $typesolicituds = SolicitudReason::all();
+        $etiquetas      = Label::orderBy('id','asc')->get();
+        $typePayments   = TypePayment::all();
+        $typesMoney     = TypeMoney::all();
+        $families       = Marca::orderBy('descripcion', 'Asc')->get();
+        $data           = array(
+            'typesolicituds' => $typesolicituds,
+            'etiquetas'      => $etiquetas,
+            'typePayments'   => $typePayments,
+            'typesMoney'     => $typesMoney,
+            'families'       => $families
+        );
+        return View::make('Dmkt.Register.solicitude', $data);
+    }
+
     public function showUser()
     {
         if (Session::has('state'))
@@ -108,23 +126,6 @@ class SolicitudeController extends BaseController
             $data['regimenes'] = Regimen::all();      
         }
         return View::make('template.User.show',$data);   
-    }
-
-    public function newSolicitude()
-    {
-        $typesolicituds = SolicitudReason::all();
-        $etiquetas      = Label::orderBy('id','asc')->get();
-        $typePayments   = TypePayment::all();
-        $typesMoney     = TypeMoney::all();
-        $families       = Marca::orderBy('descripcion', 'Asc')->get();
-        $data           = array(
-            'typesolicituds' => $typesolicituds,
-            'etiquetas'      => $etiquetas,
-            'typePayments'   => $typePayments,
-            'typesMoney'     => $typesMoney,
-            'families'       => $families
-        );
-        return View::make('Dmkt.Register.solicitude', $data);
     }
 
     public function editSolicitude($token)
