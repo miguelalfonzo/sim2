@@ -1,6 +1,6 @@
 <?php
 
-namespace Dmkt\Solicitud;
+namespace Dmkt;
 use \Eloquent;
 
 class Periodo extends Eloquent

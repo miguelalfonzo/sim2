@@ -1,11 +1,11 @@
-<div class="form-group col-sm-6 col-md-4">
-    <label class="col-sm-8 col-md-8 control-label" for="selectfamily">Familia</label>
-    <ul id="listfamily" class="col-sm-12 col-md-12">
+<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+    <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label">Productos</label>
+    <ul id="listfamily" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
         @if ( !isset( $solicitude) )
             <li>
                 <div style="position: relative">
-                    <select id="selectfamily" name="familias[]" class="form-control selectfamily" style="margin-bottom:10px ">
-                        @foreach($families as $family)
+                    <select id="selectfamily" name="productos[]" class="form-control selectfamily" style="margin-bottom:10px ">
+                        @foreach( $families as $family )
                             <option value="{{$family->id}}">{{$family->descripcion}}</option>
                         @endforeach
                     </select>
@@ -15,12 +15,12 @@
                 </div>
             </li>
         @else
-            @foreach ( $solicitude->families as $solFamily )
+            @foreach ( $solicitud->families as $solFamily )
                 <li>
                     <div style="position: relative">
-                        <select id="selectfamily" name="familias[]" class="form-control selectfamily" style="margin-bottom:10px ">
+                        <select id="selectfamily" name="productos[]" class="form-control selectfamily" style="margin-bottom:10px ">
                             @foreach($families as $family)
-                                @if($solFamily->idfamilia == $family->id)
+                                @if( $solFamily->idfamilia == $family->id )
                                     <option value="{{$family->id}}" selected>{{$family->descripcion}}</option>
                                 @else
                                     <option value="{{$family->id}}">{{$family->descripcion}}</option>

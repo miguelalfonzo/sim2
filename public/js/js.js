@@ -120,7 +120,7 @@ $(function()
         $("#number-prefix").numeric({negative:false,decimal:false});
         $("#number-serie").numeric({negative:false,decimal:false});
         $("#op-number").numeric({negative:false,decimal:false});
-        $("#number_account").numeric({negative:false,decimal:false});
+        //$("#number_account").numeric({negative:false,decimal:false});
         //only numbers floats
         $("#imp-ser").numeric({negative:false});
         $(".total-item input").numeric({negative:false});

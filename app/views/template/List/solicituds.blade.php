@@ -3,8 +3,10 @@
         <tr>
             <th>#</th>
             <th>Solicitud</th>
+            <th>Solicitado por</th>
+            <th>Fecha de Solicitud</th>
             <th>Aprobado por</th>
-            <th>Actualizado el</th>
+            <th>Fecha de Aprobación</th>
             @if(Auth::user()->type == TESORERIA)
                 <th style="display:none">Solicitado</th>
                 <th style="display:none">Retencion</th>
@@ -13,7 +15,6 @@
                 <th>Monto</th>
             @endif
             <th>Estado</th>
-            <th>Fecha de Creación</th>
             <th>Tipo</th>
             <th style="width:auto">Edicion</th>
             @if (Auth::user()->type == GER_COM)
@@ -31,12 +32,12 @@
                 @else
                     <input type="hidden" id="timeLineStatus" value="{{$solicitude->idestado}}">
                 @endif
-                @if ( in_array(Auth::user()->type , array( TESORERIA,GER_COM) ))
+                @if ( in_array( Auth::user()->type , array( TESORERIA , GER_COM ) ))
                     <input type="hidden" id="sol_token" class="i-tokens" value="{{$solicitude->token}}">
-                    @if(!is_null($solicitude->response))
-                        @if($solicitude->response->type == REP_MED)
+                    @if( !is_null($solicitude->response ) )
+                        @if( $solicitude->response->type == REP_MED )
                             <input type="hidden" value="{{$solicitude->response->rm->full_name}}" class="benef">
-                        @elseif($solicitude->response->type == ASIS_GER)
+                        @elseif( $solicitude->response->type == ASIS_GER )
                             <input type="hidden" value="{{$solicitude->response->person->full_name}}" class="benef">
                         @else
                             <input type="hidden" value="Usuario no autorizado" class="benef">
@@ -52,6 +53,20 @@
                     @endif
                     <label>{{$solicitude->titulo}}</label>
                 </td>
+                <td class="text-center">
+                    @if ( $solicitude->createdBy->type == REP_MED )
+                        {{$solicitude->createdBy->rm->full_name}}
+                    @elseif ( $solicitude->createdBy->type == SUP )
+                        {{$solicitude->createdBy->sup->full_name}}
+                    @elseif ( $solicitude->createdBy->type == GER_PROD )
+                        {{$solicitude->createdBy->descripcion}}
+                    @elseif ( $solicitude->createdBy->type == ASIS_GER )
+                        {{$solicitude->createdBy->person->full_name}}
+                    @else
+                        No Registrado
+                    @endif
+                </td>
+                <td class="text-center">{{$solicitude->created_at}}</td>
                 @include('template.List.last_user')
                 @include('template.List.lastdate')
                 @if( Auth::user()->type == TESORERIA )
@@ -112,7 +127,6 @@
 
                 @include('template.List.states')
                 
-                <td class="text-center">{{$solicitude->created_at}}</td> <!--date_format(date_create($solicitude->created_at), 'd/m/Y' ) -->
                 <td class="text-center">
                     @if ( $solicitude->idtiposolicitud == SOL_REP )
                         @if ( is_null( $solicitude->detalle->reason ) )

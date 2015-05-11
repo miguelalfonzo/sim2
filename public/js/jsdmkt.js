@@ -2,33 +2,33 @@ newSolicitude();
 function newSolicitude() {
 
     /* Declare Variables */
-    var title = $('#idtitle');
-    var amount = $('#idestimate');
-    var delivery_date = $('#delivery_date');
-    var amountfac = $('#amount-fac');
-    var input_client = $('.input-client');
-    var selectfamily = $('.selectfamily');
+    //MENU
     var date_start = $('.date_start').first();
     var date_end = $('.date_end').first();
+
+    //NEW SOLICITUD
+    var title = $('input[name=titulo]');
+    var amount = $('input[name=monto]');
+    var idamount = $('input[name=monto]');
+    var delivery_date = $('input[name=fecha]');
+    var amount_fac = $('input[name=monto_factura]');
+    var input_client = $('.input-client');
+    var selectfamily = $('.selectfamily');
+    var ruc = $('input[name=ruc]');
+    var select_type_payment = $('select[name=pago]');
+    var input_file_factura = $('#input-file-factura');
+    var isSetImage = $('#isSetImage');
+    var comprobante = $('#comprobante');
+    
 
     var doc_start = $('.date_start').last();
     var doc_end = $('.date_end').last();
 
-    var amount_fac = $('#amountfac');
-    var solicitude_monto =  $('.solicitude_monto');
-    var select_type_payment = $('.selectTypePayment');
-    var solicitude_ruc = $('#div_ruc');
-    var solicitude_number_account = $('#div_number_account');
-    var number_account = $('#number_account');
-    var idamount = $('#amount');
-    var select_type_solicitude = $('.selecttypesolicitude');
-    var input_file_factura = $('#input-file-factura');
-    var comprobante = $('#comprobante');
-    var isSetImage = $('#isSetImage');
+    //VALIDACION DE MONTOS DE FAMILIAS
     var amount_error_families = $('#amount_error_families');
+    
+    //TIPO DE USUARIO
     var userType = $('#typeUser').val();//tipo de usuario se encuentra en main
-    var clients = [];
-    var validate = 0; // si cambia  a 1 hay errores
     
     //SUB-ESTADOS
     var PENDIENTE =1;
@@ -49,7 +49,9 @@ function newSolicitude() {
     var R_PENDIENTE = 1;
     var R_APROBADO = 2;
     var R_REVISADO = 3;
-    var R_NO_AUTORIZADO = 4;
+    var R_GASTOS = 4;
+    var R_FINALIZADO = 5;
+    var R_NO_AUTORIZADO = 6;
     var R_TODOS = 10;
     //USERS
     var REP_MED   = 'R';
@@ -205,46 +207,45 @@ function newSolicitude() {
     });
 
     //Validations
-    amount.numeric();
-    idamount.numeric({negative: false});
-    amount_fac.numeric();
-    number_account.numeric();
+    amount.numeric({negative:false});
+    amount_fac.numeric({negative:false});
+    ruc.numeric({negative:false,decimal:false});
     
-    if (select_type_solicitude.val() != 2) 
+    if ( $('select[name=actividad] option:selected').attr('image') != 1 ) 
     {
-        solicitude_monto.hide();
+        amount_fac.parent().parent().hide();
         comprobante.hide();
     }
-
-    select_type_solicitude.on('change', function () 
+    else if ( $('select[name=actividad] option:selected').attr('image') == 1 )
     {
-        if ( $(this).val() == 1 || $(this).val() == 3) 
+        amount_fac.parent().parent().show();
+        comprobante.show();        
+    }
+
+    $('select[name=actividad]').on('change', function () 
+    {
+        if ( $('select[name=actividad] option:selected').attr('image') != 1 ) 
         {
-            solicitude_monto.hide();
+            amount_fac.parent().parent().hide();
             comprobante.hide();
         }
-        else if ( $(this).val() == 2 )
+        else if ( $('select[name=actividad] option:selected').attr('image') == 1 )
         {
-            solicitude_monto.show();
-            comprobante.show();
-        } 
+            amount_fac.parent().parent().show();
+            comprobante.show();        
+        }
     });
 
-    //select type payment
-    if(select_type_payment.val()!=2)  solicitude_ruc.hide();
-    if(select_type_payment.val()!=3)  solicitude_number_account.hide();
+    //TIPO DE ENTREGA
+    if( select_type_payment.val()!=2 )  
+        ruc.parent().parent().hide();
+    
     select_type_payment.on('change', function()
     {
-        if($(this).val() == 1){
-            solicitude_ruc.hide();
-            solicitude_number_account.hide();
-        }else if($(this).val()== 2){
-            solicitude_ruc.show();
-            solicitude_number_account.hide();
-        }else if($(this).val() == 3){
-            solicitude_ruc.hide();
-            solicitude_number_account.show();
-        }
+        if($(this).val() == 1)
+            ruc.parent().parent().hide();
+        else if($(this).val()== 2)
+            ruc.parent().parent().show();
     });
 
     title.on('focus', function () {
@@ -257,9 +258,6 @@ function newSolicitude() {
         $(this).parent().removeClass('has-error');
     });
     input_client.on('focus', function () {
-        $(this).parent().removeClass('has-error')
-    });
-    amountfac.on('focus', function () {
         $(this).parent().removeClass('has-error')
     });
     amount_fac.on('focus', function () {
@@ -275,6 +273,9 @@ function newSolicitude() {
         $(this).parent().removeClass('has-error');
     });
     input_file_factura.on('focus', function () {
+        $(this).parent().removeClass('has-error');
+    });
+    ruc.on('focus', function () {
         $(this).parent().removeClass('has-error');
     });
 
@@ -1715,12 +1716,10 @@ function newSolicitude() {
                     });
                            
                 }
-            }).on('typeahead:selected', function (evento, suggestion , dataset)
+            }).on('typeahead:selected', function ( evento, suggestion , dataset )
             {
                 console.log(dataset);
-                console.log(dataset == 'clients');
-                console.log(suggestion);
-                if (dataset == 'clients')
+                if ( dataset == 'clients' )
                 {
                     var input = $(this);
                     input.parent().after('<button type="button" class="btn-delete-client" style="z-index: 2"><span class="glyphicon glyphicon-remove"></span></button>');
@@ -1734,21 +1733,21 @@ function newSolicitude() {
                     input.parent().children('.span-alert').removeClass('glyphicon glyphicon-remove form-control-feedback');
                     input.attr('disabled','disabled');
                 }
-                else if (dataset == 'reps');
+                else if ( dataset == 'reps' )
                 {
                     $(this).attr('data-select','true');
                     $(this).attr('data-cod',suggestion.value);
                     $(this).val(suggestion.label );
                     $(this).attr('disabled',true).parent().parent().addClass('has-success');
                     $('.edit-repr').fadeIn();
-                    repInfo(suggestion.value).done( function (result)
+                    repInfo( suggestion.value ).done( function (result)
                     {
-                        if (result.Data.cuenta)
+                        if ( result.Data.cuenta )
                         {
                             fondo_cuenta.val(result.Data.cuenta);
                             fondo_cuenta.attr('disabled',true).parent().removeClass('has-error').addClass('has-success');        
                         }
-                        if (result.Data.sup)
+                        if ( result.Data.sup )
                         {
                             fondo_supervisor.val(result.Data.sup.nombre);
                             fondo_supervisor.attr('data-cod',result.Data.sup.idsup);
@@ -1928,7 +1927,7 @@ function newSolicitude() {
             input_client.addClass('input-placeholder-error');
             aux = 1;
         }
-        if( select_type_solicitude.val() == 2 )
+        if( $('select[name=actividad] option:selected').attr('image') == 1 )
         {
             if ( !amount_fac.val() ) 
             {
@@ -1945,12 +1944,21 @@ function newSolicitude() {
                 aux = 1;
             }
         }
+        if ( $('select[name=pago] option:selected').val() == 2 )
+        {
+            if ( !ruc.val() )
+            {
+                ruc.parent().addClass('has-error');
+                ruc.attr('placeholder', 'Ingrese RUC').addClass('input-placeholder-error');
+                aux = 1;
+            }
+        }
         return aux;
     }
 
     //Validate send register solicitude
-    $('#button1id').off('click');
-    $('#button1id').on( 'click' , function ( e ) 
+    $('#registrar').off('click');
+    $('#registrar').on( 'click' , function ( e ) 
     {
         e.preventDefault();
         var aux = 0;
@@ -1999,7 +2007,7 @@ function newSolicitude() {
         }
         
         var families = $('.selectfamily');
-        families.each(function (index) 
+        families.each( function (index) 
         {
             families_input[index] = $(this).val();
         });

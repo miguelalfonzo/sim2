@@ -175,7 +175,7 @@ Route::group(array('before' => 'rm_ager'), function ()
 });
 Route::group(array('before' => 'rm_sup'), function ()
 {    
-    Route::get('nueva-solicitud-rm', 'Dmkt\SolicitudeController@newSolicitude');
+    Route::get('nueva-solicitud', 'Dmkt\SolicitudeController@newSolicitude');
     Route::post('registrar-solicitud', 'Dmkt\SolicitudeController@registerSolicitude');
     Route::get('editar-solicitud/{id}', 'Dmkt\SolicitudeController@editSolicitude');
     Route::post('editar-solicitud', 'Dmkt\SolicitudeController@formEditSolicitude');

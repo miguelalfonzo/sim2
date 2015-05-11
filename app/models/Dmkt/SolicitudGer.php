@@ -1,16 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Developer
- * Date: 09/09/14
- * Time: 04:11 PM
- */
-
 
 namespace Dmkt;
-use \Eloquent;
-class SolicitudeGer extends Eloquent{
 
+use \Eloquent;
+
+class SolicitudGer extends Eloquent
+{
     protected $table = 'DMKT_RG_SOLICITUD_GERENTE';
     protected $primaryKey = 'id';
 

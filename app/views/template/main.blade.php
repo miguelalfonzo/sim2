@@ -32,7 +32,7 @@
     @else
         {{ HTML::link('/show_user', '', array('id' => 'logo', 'title' => 'Bagó Perú', 'alt' => 'Bagó Perú')) }}
     @endif
-    <a id="logout" href="{{URL::to('logout')}}" title="Cear sesión" alt="Cerrar) sesión">
+    <a id="logout" href="{{URL::to('logout')}}" title="Cerrar Sesión" alt="Cerrar Sesión">
         <bdi>{{strtoupper(Auth::user()->username)}}  | 
             <span class="closed-session">Cerrar sesión</span>
             <span class="off"></span>
@@ -59,7 +59,7 @@
         <input id="typeUser" type="hidden" value="T">
         @endif
         @if(Auth::user()->type == 'AG')
-                <input id="typeUser" type="hidden" value="AG">
+            <input id="typeUser" type="hidden" value="AG">
         @endif
     @endif
 

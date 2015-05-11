@@ -1,9 +1,9 @@
 <?php
 
-use \System\SolicitudeHistory;
+use \System\SolicitudHistory;
 use \User;
 use \Common\State;
-use \Dmkt\Solicitude;
+use \Dmkt\Solicitud;
 use \Swift_TransportException;
 use \Common\FileStorage;
 
@@ -122,7 +122,7 @@ class BaseController extends Controller {
     public function postman($idsolicitud, $fromEstado, $toEstado, $toUser){
         try 
         {
-            $solicitud = Solicitude::find($idsolicitud);
+            $solicitud = Solicitud::find($idsolicitud);
             $msg        = '';
             $subject    = 'Solicitud N° '.$idsolicitud;
             $user_name  = $toUser != null ? $toUser->getName() : '';
@@ -198,7 +198,7 @@ class BaseController extends Controller {
                 'user_to'     => $user_to->type,
                 'notified'    => $notified
                 );
-            $statusSolicitude = SolicitudeHistory::firstOrNew($fData);
+            $statusSolicitude = SolicitudHistory::firstOrNew($fData);
             if (!isset($statusSolicitude->rn))
             {
                 $statusSolicitude->id           = $statusSolicitude->lastId() + 1;
@@ -206,7 +206,7 @@ class BaseController extends Controller {
                 $statusSolicitude->idsolicitude = $idsolicitude;
             }
             else
-                $statusSolicitude = SolicitudeHistory::find($statusSolicitude->id);
+                $statusSolicitude = SolicitudHistory::find($statusSolicitude->id);
             $statusSolicitude->status_from  = $status_from;
             $statusSolicitude->user_from    = $user_from->type;
             $statusSolicitude->user_to      = $user_to->type;
@@ -231,11 +231,11 @@ class BaseController extends Controller {
     {
         try
         {
-            $solicituds = Solicitude::with(array('histories' => function($q)
+            $solicituds = Solicitud::with(array('histories' => function($q)
             {
                 $q->orderBy('created_at','DESC');  
             }));
-            $rSolicituds = Solicitude::with(array('histories' => function($q)
+            $rSolicituds = Solicitud::with(array('histories' => function($q)
             {
                 $q->orderBy('created_at','DESC');  
             }));

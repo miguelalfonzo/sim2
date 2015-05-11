@@ -75,10 +75,10 @@
                 </div>
             </div>
         @endif
-        @if (Auth::user()->type == REP_MED || Auth::user()->type == SUP)
+        @if ( Auth::user()->type == REP_MED || Auth::user()->type == SUP )
             <div class="form-group col-sm-3 col-md-3 button-new-solicitude" style="text-align: right; padding: 0">
                 <div style="padding: 0">
-                    <a href="{{URL::to('nueva-solicitud-rm')}}" id="singlebutton" name="singlebutton" class="btn btn-primary">
+                    <a href="{{URL::to('nueva-solicitud')}}" id="singlebutton" name="singlebutton" class="btn btn-primary">
                         Nueva Solicitud
                     </a>
                 </div>

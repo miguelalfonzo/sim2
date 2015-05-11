@@ -4,7 +4,7 @@ namespace System;
 
 use \Eloquent;
 
-class SolicitudeHistory extends Eloquent{
+class SolicitudHistory extends Eloquent{
 	
     protected $table = 'DMKT_RG_SOLICITUD_HISTORIAL';
     protected $fillable = array('id','status_to');
@@ -16,18 +16,17 @@ class SolicitudeHistory extends Eloquent{
         return \Carbon\Carbon::parse( $attr )->format('Y-m-d H:i');
     }
 
-
 	public function lastId()
     {
-		$lastId = SolicitudeHistory::orderBy('id','desc')->first();
-		if($lastId == null)
+		$lastId = SolicitudHistory::orderBy('id','desc')->first();
+		if( $lastId == null )
             return 0;
         else
             return $lastId->id;
 	}
 
 	public function lastState() {
-        return $this->belongsTo('Dmkt/Solicitude');
+        return $this->belongsTo('Dmkt/Solicitud');
     }
 
     public function user(){

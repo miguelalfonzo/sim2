@@ -3,14 +3,14 @@
 namespace Dmkt;
 use \Eloquent;
 
-class SolicitudeClient extends Eloquent
+class SolicitudClient extends Eloquent
 {
     protected $table = 'DMKT_RG_SOLICITUD_CLIENTE';
     protected $primaryKey = 'id';
 
-    public function searchId()
+    public function lastId()
     {
-        $lastId = SolicitudeClient::orderBy('id', 'DESC')->first();
+        $lastId = SolicitudClient::orderBy('id', 'DESC')->first();
         if($lastId == null)
             return 0;
         else

@@ -4,15 +4,15 @@ namespace Dmkt;
 
 use Eloquent;
 
-class SolicitudeDetalle extends Eloquent
+class SolicitudDetalle extends Eloquent
 {
 	protected $table = 'DMKT_RG_SOLICITUD_DETALLE';
     protected $primaryKey = 'id';    
  
-    public function searchId()
+    public function lastId()
     {
-        $lastId = SolicitudeDetalle::orderBy('id', 'DESC')->first();
-        if($lastId == null)
+        $lastId = SolicitudDetalle::orderBy('id', 'DESC')->first();
+        if( $lastId == null )
             return 0;
         else
         	return $lastId->id;

@@ -3,15 +3,15 @@
 namespace Dmkt;
 use \Eloquent;
 
-class SolicitudeFamily extends Eloquent
+class SolicitudFamily extends Eloquent
 {
     protected $table = 'DMKT_RG_SOLICITUD_FAMILIA';
     protected $primaryKey = 'id';
 
-    public function searchId()
+    public function lastId()
     {
-        $lastId = SolicitudeFamily::orderBy('id', 'DESC')->first();
-        if($lastId == null)
+        $lastId = SolicitudFamily::orderBy('id', 'DESC')->first();
+        if( $lastId == null )
             return 0;
         else
             return $lastId->id;

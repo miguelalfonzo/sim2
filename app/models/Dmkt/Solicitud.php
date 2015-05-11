@@ -4,7 +4,7 @@ namespace Dmkt;
 
 use \Eloquent;
 
-class Solicitude extends Eloquent{
+class Solicitud extends Eloquent{
 
 
     protected $table = 'DMKT_RG_SOLICITUD';
@@ -20,10 +20,10 @@ class Solicitude extends Eloquent{
         return \Carbon\Carbon::parse( $attr )->format('Y-m-d H:i');
     }
 
-    public function searchId()
+    public function lastId()
     {
-        $lastId = Solicitude::orderBy('id', 'DESC')->first();
-        if($lastId == null)
+        $lastId = Solicitud::orderBy('id', 'DESC')->first();
+        if( $lastId == null )
             return 0;
         else
             return $lastId->id;
@@ -31,7 +31,7 @@ class Solicitude extends Eloquent{
 
     protected static function solInst( $periodo )
     {
-        return Solicitude::orderBy('id','desc')->whereHas('detalle' , function ($q ) use ( $periodo )
+        return Solicitud::orderBy('id','desc')->whereHas('detalle' , function ($q ) use ( $periodo )
         {
             $q->whereHas('periodo' , function ( $t ) use ( $periodo )
             {
@@ -54,25 +54,25 @@ class Solicitude extends Eloquent{
 
     protected function advanceSeatHist()
     {
-        return $this->hasMany( 'System\SolicitudeHistory' , 'idsolicitude' , 'id' )->where( 'status_to' , GASTO_HABILITADO );
+        return $this->hasMany( 'System\SolicitudHistory' , 'idsolicitude' , 'id' )->where( 'status_to' , GASTO_HABILITADO );
     }
 
     public function acceptHist()
     {
-        return $this->hasOne('System\SolicitudeHistory','idsolicitude','id')->where( 'status_to' , ACEPTADO );
+        return $this->hasOne('System\SolicitudHistory','idsolicitude','id')->where( 'status_to' , ACEPTADO );
     }
 
     public function rejectedHist(){
-        return $this->hasOne('System\SolicitudeHistory','idsolicitude','id')->where( 'status_to' , RECHAZADO );
+        return $this->hasOne('System\SolicitudHistory','idsolicitude','id')->where( 'status_to' , RECHAZADO );
     }
 
     public function histories(){
-        return $this->hasMany('System\SolicitudeHistory','idsolicitude');
+        return $this->hasMany('System\SolicitudHistory','idsolicitude');
     }
 
     public function detalle()
     {
-        return $this->hasOne('Dmkt\SolicitudeDetalle','id','iddetalle');
+        return $this->hasOne('Dmkt\SolicitudDetalle','id','iddetalle');
     }
 
 
@@ -80,20 +80,20 @@ class Solicitude extends Eloquent{
 
     protected function registerHist()
     {
-        return $this->hasOne('System\SolicitudeHistory','idsolicitude','id')->where('status_to' , REGISTRADO );
+        return $this->hasOne('System\SolicitudHistory','idsolicitude','id')->where('status_to' , REGISTRADO );
     }
 
     protected function typeSolicitude()
     {
-        return $this->hasOne('Dmkt\SolicitudeType','id','idtiposolicitud');
+        return $this->hasOne('Dmkt\SolicitudType','id','idtiposolicitud');
     }
 
     protected function families(){
-        return $this->hasMany('Dmkt\SolicitudeFamily','idsolicitud','id');
+        return $this->hasMany('Dmkt\SolicitudFamily','idsolicitud','id');
     }
 
     protected function clients(){
-        return $this->hasMany('Dmkt\SolicitudeClient','idsolicitud','id');
+        return $this->hasMany('Dmkt\SolicitudClient','idsolicitud','id');
     }
 
     protected function createdBy()
@@ -103,7 +103,7 @@ class Solicitude extends Eloquent{
 
     public function gerente()
     {
-        return $this->hasOne('Dmkt\SolicitudeGer','idsolicitud','id');
+        return $this->hasOne('Dmkt\SolicitudGer','idsolicitud','id');
     }
 
     protected function response()
@@ -121,9 +121,9 @@ class Solicitude extends Eloquent{
         return $this->hasOne('Dmkt\Sup','iduser','created_by')->select('nombres,apellidos,iduser,idsup');;
     }
 
-    protected function etiqueta()
+    protected function actividad()
     {
-        return $this->hasOne('Dmkt\Label','id','idetiqueta');
+        return $this->hasOne('Dmkt\SolicitudActivity','id','idetiqueta');
     }
 
     protected function expenses()
