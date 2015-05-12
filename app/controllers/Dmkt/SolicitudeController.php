@@ -114,7 +114,7 @@ class SolicitudeController extends BaseController
     {
         $data = array( 
             'reasons'     => SolicitudReason::all() ,
-            'activities'  => SolicitudActivity::orderBy('id','asc')->get(),
+            'activities'  => SolicitudActivity::order(),
             'payments'    => TypePayment::all(),
             'currencies'  => TypeMoney::all(),
             'families'    => Marca::orderBy('descripcion', 'ASC')->get(),
@@ -126,15 +126,16 @@ class SolicitudeController extends BaseController
     public function editSolicitude($token)
     {
         $data = array(
-            'solicitud'    => Solicitud::where('token', $token)->firstOrFail(),
-            'reasons'      => SolicitudReason::all(),
-            'etiquetas'    => Label::order(),
-            'typePayments' => TypePayment::all(),
-            'typesMoney'   => TypeMoney::all(),
-            'families'     => Marca::orderBy('descripcion', 'ASC')->get()
+            'solicitud'   => Solicitud::where('token', $token)->firstOrFail(),
+            'reasons'     => SolicitudReason::all(),
+            'activities'  => SolicitudActivity::order(),
+            'payments'    => TypePayment::all(),
+            'currencies'  => TypeMoney::all(),
+            'families'    => Marca::orderBy('descripcion', 'ASC')->get(),
+            'investments' => InvestmentType::order()    
         );
         $data['detalle'] = json_decode( $data['solicitud']->detalle->detalle );
-        return View::make('Dmkt.Register.solicitude', $data);
+        return View::make('Dmkt.Register.solicitud', $data);
     }
 
     public function viewSolicitude($token)
@@ -218,30 +219,49 @@ class SolicitudeController extends BaseController
         return $data;
     }
 
-    private function validateInputSolRep( $inputs , $type )
+    private function validateInputSolRep( $inputs )
     {
         try
-        {           
+        {          
+            Log::error( $inputs ); 
             $rules = array(
-                'reason'     => 'required|min:1|in:'.implode( ',' , SolicitudReason::lists('id') ),
-                'inversion'  => 'required|min:1|in:'.implode( ',' , InvestmentType::lists('id') ),
-                'actividad'  => 'required|numeric|in:'.implode( ',' , SolicitudActivity::lists( 'id' ) ),
-                'titulo'     => 'required|min:1',
-                'moneda'     => 'required|numeric|in:'.implode( ',' , TypeMoney::lists( 'id') ),
-                'monto'      => 'required|numeric|min:1',
-                'pago'       => 'required|numeric|in:'.implode( ',' , TypePayment::lists( 'id' ) ),
-                'fecha'      => 'required|date_format:"d/m/Y"',
-                'productos'  => 'required|array|min:1',
-                'clientes'   => 'required|array|min:1',
-            
-                'monto_factura' => 'required|numeric|min:1',
-                'file'          => 'required|max:700|mimes:jpeg,gif'
+                'reason'        => 'required|numeric|min:1|in:'.implode( ',' , SolicitudReason::lists('id') ),
+                'inversion'     => 'required|numeric|min:1|in:'.implode( ',' , InvestmentType::lists('id') ),
+                'actividad'     => 'required|numeric|in:'.implode( ',' , SolicitudActivity::lists( 'id' ) ),
+                'titulo'        => 'required|min:1',
+                'moneda'        => 'required|numeric|in:'.implode( ',' , TypeMoney::lists( 'id') ),
+                'monto'         => 'required|numeric|min:1',
+                'pago'          => 'required|numeric|in:'.implode( ',' , TypePayment::lists( 'id' ) ),
+                'fecha'         => 'required|date_format:"d/m/Y"',
+                'productos'     => 'required|array|min:1',
+                'clientes'      => 'required|array|min:1'
             );
+        
             $validator = Validator::make($inputs, $rules);
             if ( $validator->fails() ) 
-                return $this->warningException( __FUNCTION__ , substr($this->msgValidator($validator), 0 , -1 ) );
+                return $this->warningException( __FUNCTION__ , substr( $this->msgValidator($validator) , 0 , -1 ) );
             else
-                return $this->setRpta();
+            {
+                $actividad = SolicitudActivity::find( $inputs[ 'actividad' ] );
+                $rules = array();
+                if ( $actividad->imagen === 1 )
+                {
+                    $rules[ 'monto_factura' ] = 'required|numeric|min:1';
+                    $rules[ 'file']           = 'required|max:700|mimes:jpeg,gif'; 
+                }
+                if ( $inputs[ 'pago'] == PAGO_CHEQUE )
+                    $rules['ruc'] = 'required|numeric|digits:11';
+                if ( count( $rules ) == 0 )
+                    return $this->setRpta();
+                else
+                {
+                    $validator = Validator::make($inputs, $rules);
+                    if ( $validator->fails() ) 
+                        return $this->warningException( __FUNCTION__ , substr( $this->msgValidator($validator) , 0 , -1 ) );
+                    else
+                        return $this->setRpta();
+                }
+            }
         }
         catch ( Exception $e )
         {
@@ -393,7 +413,7 @@ class SolicitudeController extends BaseController
                     return $this->warningException( __FUNCTION__ , 'No se pudo registrar la solicitud');
                 else 
                 {
-                    $jDetalle    = new stdClass();
+                    $jDetalle = new stdClass();
                     $jDetalle->monto_solicitado  = round( $inputs['monto'] , 2 , PHP_ROUND_HALF_DOWN );
                     $jDetalle->fecha_entrega     = $inputs['fecha'];
 
@@ -413,7 +433,7 @@ class SolicitudeController extends BaseController
                         $jDetalle = $middleRpta[data];
                         $detalle->detalle      = json_encode($jDetalle);
                         $detalle->idmoneda     = $inputs['moneda'];
-                        $detalle->idmotivo     = $inputs['actividad'];
+                        $detalle->idmotivo     = $inputs['reason'];
                         $detalle->idpago       = $inputs['pago'];
                         if ( !$detalle->save() )
                             return $this->warningException( __FUNCTION__ , 'No se pudo registrar los detalles de la solicitud');

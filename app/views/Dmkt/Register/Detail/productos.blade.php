@@ -1,6 +1,6 @@
-<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
-    <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label">Productos</label>
-    <ul id="listfamily" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+<div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6">
+    <label class="col-xs-12 col-sm-12 col-md-10 col-lg-10 control-label">Productos</label>
+    <ul id="listfamily" class="col-xs-12 col-sm-12 col-md-10 col-lg-10">
         @if ( !isset( $solicitude) )
             <li>
                 <div style="position: relative">

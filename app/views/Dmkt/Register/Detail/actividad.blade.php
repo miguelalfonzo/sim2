@@ -3,7 +3,7 @@
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
         <select class="form-control" name="actividad">
             @foreach( $activities as $activity )
-                @if ( isset( $solicitud ) && $solicitud->idetiqueta == $etiqueta->id )
+                @if ( isset( $solicitud ) && $solicitud->idetiqueta == $activity->id )
                     <option value="{{ $activity->id }}" image="{{ $activity->imagen }}" selected>{{ $activity->nombre }}</option>
                 @else
                     <option value="{{ $activity->id }}" image="{{ $activity->imagen }}">{{ $activity->nombre }}</option>

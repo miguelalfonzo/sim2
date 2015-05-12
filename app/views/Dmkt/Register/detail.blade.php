@@ -1,5 +1,5 @@
-<form id="form-register-solicitude" class="" method="post" 
-action="{{isset($solicitud) ? 'editar-solicitud' : 'registrar-solicitud' }}" enctype="multipart/form-data">
+<form id="form-register-solicitude" class="" method="post" enctype="multipart/form-data"
+action="{{isset($solicitud) ? 'editar-solicitud' : 'registrar-solicitud' }}">
     {{Form::token()}}
     @if(isset($solicitud))
         <input value="{{$solicitud->id}}" name="idsolicitud" type="hidden">
@@ -12,7 +12,7 @@ action="{{isset($solicitud) ? 'editar-solicitud' : 'registrar-solicitud' }}" enc
             <select class="form-control" name="reason">
                 @foreach( $reasons as $reason )
                     @if ( $reason->id != 2 )
-                        @if( isset( $solicitud ) && $solicitud->detalle->idmotivo == $type->id)
+                        @if( isset( $solicitud ) && $solicitud->detalle->idmotivo == $reason->id)
                             <option selected value="{{$reason->id}}">{{$reason->nombre}}</option>
                         @else
                             <option value="{{$reason->id}}">{{$reason->nombre}}</option>
@@ -23,7 +23,15 @@ action="{{isset($solicitud) ? 'editar-solicitud' : 'registrar-solicitud' }}" enc
         </div>
     </div>
 
-    <!-- Tipo de Inversion -->
+    <!-- BUSQUEDA DE CLIENTES -->
+    <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+        <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label">Clientes</label>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <input class="form-control input-md cliente-seeker" type="text" style="display:inline">
+        </div>
+    </div>
+
+    <!-- TIPO DE INVERSION -->
     <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
         <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label" for="inversion">Tipo de Inversion</label>
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -39,9 +47,10 @@ action="{{isset($solicitud) ? 'editar-solicitud' : 'registrar-solicitud' }}" enc
         </div>
     </div>
 
-    <!-- Tipo de Actividad -->
+    <!-- TIPO DE ACTIVIDAD -->
     @include('Dmkt.Register.Detail.actividad')
 
+    <!-- NOMBRE DE LA SOLICITUD -->
     <div class="form-group col-sm-6 col-md-4">
         <label class="col-sm-8 col-md-8 control-label" for="titulo">Nombre Solicitud</label>
         <div class="col-sm-12 col-md-12">
@@ -80,7 +89,7 @@ action="{{isset($solicitud) ? 'editar-solicitud' : 'registrar-solicitud' }}" enc
             <select name="pago" class="form-control">
                 @foreach( $payments as $payment )
                     @if ( $payment->id != 3 )
-                        @if(isset($solicitud) && $solicitud->detalle->idpago == $paymentType->id)
+                        @if(isset($solicitud) && $solicitud->detalle->idpago == $payment->id)
                             <option value="{{$payment->id}}" selected>{{$payment->nombre}}</option>
                         @else
                             <option value="{{$payment->id}}">{{$payment->nombre}}</option>
@@ -91,7 +100,7 @@ action="{{isset($solicitud) ? 'editar-solicitud' : 'registrar-solicitud' }}" enc
         </div>
     </div>
 
-    <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4" id="div_ruc">
+    <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
         <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label" for="ruc">Ruc</label>
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <input class="form-control input-md" maxlength="11" name="ruc" type="text"
@@ -112,12 +121,20 @@ action="{{isset($solicitud) ? 'editar-solicitud' : 'registrar-solicitud' }}" enc
         </div>
     </div>
 
-    <!-- Clientes -->
-    @include('Dmkt.Register.Detail.clientes')
-
-    <!-- Productos -->
-    @include('Dmkt.Register.Detail.productos')
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
         
+        <!-- PRODUCTOS -->
+        @include('Dmkt.Register.Detail.productos')
+
+        <!-- LISTA DE CLIENTES -->
+        <div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6">
+            <label class="col-xs-12 col-sm-12 col-md-10 col-lg-10 control-label" for="ruc">Lista de Clientes</label>
+            <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
+                <ul class="list-group" id="clientes"></ul>
+            </div>
+        </div>
+    </div>
+
     <!-- Ver Comprobante -->
     @include('Dmkt.Register.Detail.comprobante')
    

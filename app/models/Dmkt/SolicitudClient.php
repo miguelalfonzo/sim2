@@ -17,19 +17,24 @@ class SolicitudClient extends Eloquent
             return $lastId->id;
     }
 
-    function client()
+    protected function doctor()
     {
-        return $this->hasOne('Dmkt\Client','clcodigo','idcliente');
+        return $this->hasOne('Client\Doctor','pefcodpers','idcliente');
     }
 
-    function doctors()
+    protected function institution()
     {
-        return $this->hasOne('Dmkt\Doctor','pefcodpers','idcliente');
+        return $this->hasOne('Client\Institution','pejcodpers','idcliente');
     }
 
-    function institutes()
+    protected function pharmacy()
     {
-        return $this->hasOne('Dmkt\Institute','pejcodpers','idcliente');
-    }  
+        return $this->hasOne('Client\Pharmacy' , 'pejcodpers' , 'idcliente');
+    }
+
+    protected function distrimedclient()
+    {
+        return $this->hasOne('Client\DistrimedClient' , 'clcodigo' , 'idcliente');
+    }
 
 }

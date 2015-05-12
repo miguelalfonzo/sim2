@@ -10,6 +10,6 @@ class SolicitudActivity extends Eloquent
 
     protected static function order()
     {
-    	return Label::orderBy('id','asc')->get();
+    	return SolicitudActivity::orderBy('id','asc')->get();
     }
 }

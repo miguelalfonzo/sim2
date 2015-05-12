@@ -8,11 +8,11 @@ function newSolicitude() {
 
     //NEW SOLICITUD
     var title = $('input[name=titulo]');
+    var clientes = $('#clientes');
+    var search_cliente = $('.cliente-seeker');
     var amount = $('input[name=monto]');
-    var idamount = $('input[name=monto]');
     var delivery_date = $('input[name=fecha]');
     var amount_fac = $('input[name=monto_factura]');
-    var input_client = $('.input-client');
     var selectfamily = $('.selectfamily');
     var ruc = $('input[name=ruc]');
     var select_type_payment = $('select[name=pago]');
@@ -257,8 +257,9 @@ function newSolicitude() {
     delivery_date.on('focus', function () {
         $(this).parent().removeClass('has-error');
     });
-    input_client.on('focus', function () {
-        $(this).parent().removeClass('has-error')
+    search_cliente.on('focus', function () {
+        $(this).parent().parent().removeClass('has-error');
+        clientes.parent().parent().removeClass('has-error');
     });
     amount_fac.on('focus', function () {
         $(this).parent().removeClass('has-error')
@@ -641,7 +642,6 @@ function newSolicitude() {
                                     {
                                         bootbox.alert('<h4 class="green">Solicitud Cancelada</h4>' , function ()
                                         {
-                                            console.log(data);
                                             if ( data.Type == 1 )
                                             {
                                                 $("#idState").val(6);
@@ -667,10 +667,10 @@ function newSolicitude() {
     var amount_families = $('.amount_families');
     amount_families.numeric({negative: false});
     
-    idamount.keyup( function ()
+    /*idamount.keyup( function ()
     {
         verifySum( this , 2 );
-    });
+    });*/
 
     amount_families.keyup( function ()
     {
@@ -1071,7 +1071,7 @@ function newSolicitude() {
         });
     });
 
-    $(document).on('click','.edit-fondo',function(e)
+    $(document).on('click','.edit-fondo' , function(e)
     {
         e.preventDefault();
         $('#table_solicitude_fondos > tbody > tr').css('background-color','');
@@ -1322,7 +1322,8 @@ function newSolicitude() {
                 else
                 {
                     $('#myModal').modal('hide');
-                    bootbox.alert("<p class='green'>Se registro el asiento contable correctamente.</p>", function(){
+                    bootbox.alert("<p class='green'>Se registro el asiento contable correctamente.</p>", function()
+                    {
                         $('#table_solicitude_fondos-tesoreria_wrapper').remove();
                         $('.table_solicitude_fondos-tesoreria').append(data);
                         $('#table_solicitude_fondos-tesoreria').dataTable({
@@ -1352,12 +1353,6 @@ function newSolicitude() {
     $(document).on('show.bs.modal', '#myModal', function (e) {
         $("#message-op-number").html('');
         $("#op-number").val('');
-    });
-    $(document).off('focus', '.input-client');
-    $(document).on('focus', '.input-client', function(){
-        $(this).val("");
-        $(this).attr("data-valor","");
-        $(this).attr("value","");
     });
 
     $(document).off("click",".elementCancel");
@@ -1434,7 +1429,6 @@ function newSolicitude() {
     $(document).on( 'click' , '.maintenance-cancel' , function()
     {
         var tr = $(this).parent().parent();
-        
         listMaintenanceTable( tr.attr('type')  );
     });
 
@@ -1537,7 +1531,6 @@ function newSolicitude() {
     function enableTd( data )
     {
         var td = $(data);
-        console.log(td);
         $.ajax(
         {
             type: 'post' ,
@@ -1671,7 +1664,6 @@ function newSolicitude() {
     function seeker(element,name,url){
         if (element.length != 0)
         {
-            console.log(element);
             element.typeahead(
             {
                 minLength: 3,
@@ -1689,7 +1681,7 @@ function newSolicitude() {
                     ].join('\n'),
                     suggestion: function(data)
                     {
-                        return '<p><strong>' + data.label + '</strong></p>';
+                        return '<p><strong>' + data.type + ': ' + data.label + '</strong></p>';
                     }
                 },
                 source: function (request , response)
@@ -1710,28 +1702,54 @@ function newSolicitude() {
                         },
                     }).done( function (data)
                     {
-                        if (!data.Status == 'Ok')
+                        if ( data.Status != 'Ok')
                             data.Data = '{"value":"0","label":"Error en la busqueda"}';   
-                        response(data.Data);
-                    });
-                           
+                        response( data.Data );
+                    });              
                 }
             }).on('typeahead:selected', function ( evento, suggestion , dataset )
             {
-                console.log(dataset);
+                var input = $(this);
                 if ( dataset == 'clients' )
                 {
-                    var input = $(this);
-                    input.parent().after('<button type="button" class="btn-delete-client" style="z-index: 2"><span class="glyphicon glyphicon-remove"></span></button>');
-                    input.parent().addClass('has-success has-feedback');
-                    input.attr("name",dataset+'[]');
-                    input.attr("table",suggestion.table);
-                    input.attr("pk",suggestion.value);
-                    input.removeClass('has-error has-feedback');
-                    input.parent().children('.span-alert').addClass('glyphicon glyphicon-ok form-control-feedback');
-                    input.attr('data-valor','all');
-                    input.parent().children('.span-alert').removeClass('glyphicon glyphicon-remove form-control-feedback');
-                    input.attr('disabled','disabled');
+                    $.ajax(
+                    {
+                        type: 'post',
+                        url: server + 'get-client-view' ,
+                        data:
+                        {
+                            "_token": $("input[name=_token]").val(),
+                            "data": suggestion
+                        },
+                    }).fail( function( statusCode , errorThrown )
+                    {
+                        ajaxError( statusCode , errorThrown );
+                    }).done( function ( data )
+                    {
+                        if ( data.Status != 'Ok')
+                            responseUI( 'Problema de Conexion' , 'red' );
+                        else if ( data.Status == 'Ok' )
+                        {
+                            if ( $('#clientes').children().length >= 1 )
+                            {
+                                var aux = 0;
+                                $('#clientes').children().each( function()
+                                {
+                                    var li = $(this);
+                                    if ( li.attr('pk') == suggestion.value && li.attr('table') == suggestion.table )
+                                        aux = 1;
+                                });
+                                if ( aux == 0 )
+                                {
+                                    $('#clientes').append( data.Data );
+                                    $('.btn-delete-client').css( 'display' , 'inline' );
+                                }        
+                            }
+                            else
+                                $('#clientes').append( data.Data );
+                        }
+                    });
+                    input.typeahead( 'val' , '' );
                 }
                 else if ( dataset == 'reps' )
                 {
@@ -1773,30 +1791,21 @@ function newSolicitude() {
             error: function(statusCode,errorThrown)
             {
                 ajaxError(statusCode,errorThrown);
-
             }
         });  
     }
-   
-    $(document).off('click', '#btn-add-client');
-    $(document).on('click', '#btn-add-client', function () 
-    {
-        $('<li>' +
-            '<div style="position: relative">' +
-                '<input id="idclient0" "name="clientes[]" type="text" placeholder="" style="margin-bottom: 10px"' + 
-                'class="form-control input-md input-client cliente-seeker">' +
-                '<button type="button" class="btn-delete-client" style="z-index: 2">' +
-                '<span class="glyphicon glyphicon-remove">' +
-                '</span></button></div></li>').appendTo('#listclient');
-        var lastInput = $("#listclient").children().last().find("#idclient0");
-        seeker(lastInput,'clients','search-client');   
-    });
 
-    $(document).on("click", ".btn-delete-client", function () {
-        var li = $(this).parent().parent();
+    $(document).off( 'click' , '.btn-delete-client' );
+    $(document).on( 'click' , '.btn-delete-client' , function () 
+    {
+        var li = $(this).parent();
         var ul = li.parent();
-        if (ul.children().length > 1)
-            li.remove(); 
+        if ( ul.children().length > 1 )
+        {
+            li.remove();
+            if ( ul.children().length == 1 )
+                $('.btn-delete-client').css( 'display' , 'none' );
+        }
     });
 
     $( document ).ready(function() 
@@ -1805,11 +1814,9 @@ function newSolicitude() {
         seeker($('.rep-seeker'),'reps','search-rep');
     });
 
-
-
     function ajaxError(statusCode,errorThrown)
     {
-        if (statusCode.status == 0) 
+        if ( statusCode.status == 0 ) 
             bootbox.alert('<h4 class="yellow">Internet: Problemas de Conexion</h4>');    
         else
             bootbox.alert('<h4 class="red">Error del Sistema</h4>');  
@@ -1833,7 +1840,7 @@ function newSolicitude() {
             }
         }).done( function (data)
         {
-            if (data.Status == 'Ok')
+            if ( data.Status == 'Ok' )
             {
                 $('#table_estado_cuenta_wrapper').remove();
                 $('.table_estado_cuenta').append(data.Data.View);
@@ -1899,7 +1906,7 @@ function newSolicitude() {
     function validateNewSol()
     {
         var aux = 0;
-        if (!title.val()) 
+        if ( !title.val() ) 
         {
             title.parent().addClass('has-error');
             title.attr('placeholder', 'Ingrese nombre de la solicitud');
@@ -1920,11 +1927,19 @@ function newSolicitude() {
             delivery_date.addClass('input-placeholder-error');
             aux = 1;
         }
-        if (!input_client.val()) 
+        /*if (!input_client.val()) 
         {
             input_client.parent().addClass('has-error');
             input_client.attr('placeholder', 'Ingrese Cliente');
             input_client.addClass('input-placeholder-error');
+            aux = 1;
+        }*/
+
+        if ( clientes.children().length == 0 )
+        {
+            search_cliente.attr( 'placeholder' , 'Ingrese el Cliente' ).addClass('input-placeholder-error');
+            search_cliente.parent().parent().addClass('has-error');
+            clientes.parent().parent().addClass('has-error');
             aux = 1;
         }
         if( $('select[name=actividad] option:selected').attr('image') == 1 )
@@ -1962,49 +1977,19 @@ function newSolicitude() {
     {
         e.preventDefault();
         var aux = 0;
-        var clients_input = [];
-        var clients_table = [];
+        var d_clients = [];
+        var d_tables = [];
         var families_input = [];
         
         aux = validateNewSol();
-     
-        //validate fields client are correct
-        $( '.input-client' ).each( function ( index ) 
+        
+        //Validate fields client are correct
+        clientes.children().each( function ()
         {
             elem = $(this);
-            if ( !$(this).attr('data-valor') ) 
-            {
-                aux = 1;
-                $(this).parent().addClass('has-error has-feedback');
-                $(this).parent().children('.span-alert').addClass('span-alert glyphicon glyphicon-remove form-control-feedback');
-                $(this).val('');
-                $(this).attr('placeholder','Especifique Cliente');
-                $(this).addClass('input-placeholder-error');
-            }
-            else
-            {
-                clients_input[index] = elem.attr("pk");
-                clients_table[index] = elem.attr("table");
-            }
+            d_clients.push( elem.attr("pk") );
+            d_tables.push( elem.attr("table") );
         });
-
-        //Validate of fields duplicate in clients
-        for ( var i = 0 ; i < clients_input.length ; i++ ) 
-        {
-            $( '.input-client' ).each( function ( index ) 
-            {
-                if (index != i && clients_input[i] === $( this ).val() ) 
-                {
-                    var ind = clients_input.indexOf( $( this ).val() );
-                    clients_input[ index ] = '';
-                    $(this).parent().removeClass('has-success has-feedback');
-                    $(this).parent().addClass('has-error has-feedback');
-                    $(this).parent().children('.span-alert').addClass('span-alert glyphicon glyphicon-remove form-control-feedback');
-                    $(".clients_repeat").text('Datos Repetidos').css('color', 'red');
-                    aux=1;
-                }
-            });
-        }
         
         var families = $('.selectfamily');
         families.each( function (index) 
@@ -2012,7 +1997,7 @@ function newSolicitude() {
             families_input[index] = $(this).val();
         });
 
-        for (var i = 0 ; i < families_input.length; i++) 
+        for ( var i = 0 ; i < families_input.length ; i++ ) 
         {
             families.each( function ( index ) 
             {
@@ -2031,8 +2016,8 @@ function newSolicitude() {
         {
             var form = $('#form-register-solicitude');
             var formData = new FormData(form[0]);
-            formData.append("clientes[]",clients_input);
-            formData.append("tables[]",clients_table);
+            formData.append( "clientes[]", d_clients );
+            formData.append( "tables[]" , d_tables );
             var rute = form.attr('action');
             var message1 = 'Registrando';
             var message2 = '<strong style="color: green">Solicitud Registrada</strong>';
@@ -2073,7 +2058,7 @@ function newSolicitude() {
             });
         }
         else
-            responseUI( 'Complete los campos' , 'red' );
+            responseUI( 'Verifique los Datos' , 'red' );
     });
 
     $(document).off("click",".sol-obs");

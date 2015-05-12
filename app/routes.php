@@ -180,6 +180,7 @@ Route::group(array('before' => 'rm_sup'), function ()
     Route::get('editar-solicitud/{id}', 'Dmkt\SolicitudeController@editSolicitude');
     Route::post('editar-solicitud', 'Dmkt\SolicitudeController@formEditSolicitude');
     Route::post('search-client', 'Source\Seeker@clientSource');
+    Route::post('get-client-view' , 'Source\Seeker@getClientView');
 });
 
 Route::group(array('before' => 'sys_user'), function ()

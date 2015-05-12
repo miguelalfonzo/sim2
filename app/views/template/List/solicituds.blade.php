@@ -47,8 +47,8 @@
                 <td class="text-center id_solicitud">{{$solicitude->id}}</td>
                 <td class="text-left sol_titulo">
                     @if (!is_null($solicitude->idetiqueta))
-                        <span class="label" style="margin-right:1em;background-color:{{$solicitude->etiqueta->color}}">
-                            {{$solicitude->etiqueta->nombre}}
+                        <span class="label" style="margin-right:1em;background-color:{{$solicitude->actividad->color}}">
+                            {{$solicitude->actividad->nombre}}
                         </span>
                     @endif
                     <label>{{$solicitude->titulo}}</label>
@@ -153,10 +153,6 @@
         @endforeach
     </tbody>
 </table>
-
-@if(Auth::user()->type == REP_MED)
+@if( Auth::user()->type == REP_MED)
     @include('template.Modals.timeLine')
 @endif
-<!-- <script>
-    $('.element').tooltip();
-</script> -->
