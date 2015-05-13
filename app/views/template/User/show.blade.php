@@ -50,6 +50,13 @@
                         Mantenimiento de Cuentas-Marcas
                     </a>
                 </li>
+            @elseif ( Auth::user()->type == GER_PROD )
+                <li>
+                    <a href="#rentabilidad" role="tab" data-toggle="tab">
+                        <i class="fa fa-user"></i>
+                        Reporte de Rentabilidad
+                    </a>
+                </li>
             @elseif ( Auth::user()->type == TESORERIA )
                 <li>
                     <a href="#sol-fondo" role="tab" data-toggle="tab">
@@ -111,6 +118,13 @@
                     </div>
                     <div>
                        <input class="btn btn-primary maintenance-add" type="button" case="cuentas-marca" value="Agregar">
+                    </div>
+                </div>
+            @elseif ( Auth::user()->type == GER_PROD )
+                <!-- Mantenimiento de los Fondos de las Solicitudes -->
+                <div class="tab-pane fade" id="rentabilidad">
+                    <div class="panel panel-default">
+                        <div class="panel-body panel-default table_rentabilidad"></div>
                     </div>
                 </div>
             @elseif ( Auth::user()->type == TESORERIA )

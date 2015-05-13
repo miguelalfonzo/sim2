@@ -14,7 +14,6 @@ use \Expense\Entry;
 use \Log;
 use \Expense\ProofType;
 use \Exception;
-use Dmkt\Solicitud\Periodo;
 use Common\TypeMoney;
 
 class FondoController extends BaseController

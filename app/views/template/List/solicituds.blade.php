@@ -26,7 +26,7 @@
         @foreach($solicituds as $solicitude)
             <tr>
                 @if($solicitude->idestado == ACEPTADO || $solicitude->idestado == APROBADO || $solicitude->idestado == DEPOSITADO || $solicitude->idestado == REGISTRADO || $solicitude->idestado == ENTREGADO || $solicitude->idestado == GENERADO || $solicitude->idestado == GASTO_HABILITADO || $solicitude->idestado == DEPOSITO_HABILITADO)
-                    <input type="hidden" id="timeLineStatus" value="{{$solicitude->idestado}}" data-accept="{{$solicitude->acceptHist->user_from}}">
+                    <input type="hidden" id="timeLineStatus" value="{{$solicitude->idestado}}" data-accept="$solicitude->acceptHist->user_from">
                 @elseif($solicitude->idestado == RECHAZADO)
                     <input type="hidden" id="timeLineStatus" value="{{$solicitude->idestado}}" data-rejected="{{$solicitude->rejectedHist->user_from}}">
                 @else

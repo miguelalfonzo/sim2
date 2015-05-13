@@ -1,3 +1,4 @@
+<section class="row" style="padding:0.3em 1em">
 <!--    Name Solicitude  -->
 @include('Dmkt.Solicitud.Detail.titulo')
 
@@ -178,3 +179,4 @@
         </div>
     </div>
 </div>
+</section>

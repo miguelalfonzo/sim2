@@ -1,9 +1,6 @@
 @if ( ( $solicitud->iduserasigned == Auth::user()->id  && $solicitud->idestado == GASTO_HABILITADO ) || ( Auth::user()->type == CONT && $solicitud->idestado == REGISTRADO )  )
 	<section class="row reg-expense">
 		<input type="hidden" name="idgasto">
-		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-			<hr>
-		</div>
 		<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
 			<label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label">Tipo de Comprobante</label>
 			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -212,9 +209,16 @@
 				    </div>
 				</div>
 			</div>
-
 		@endif
+	</section>
 
+	<section class="row reg-expense detail-expense" style="margin:0">
+		<div class="col-xs-12 col-sm-12 col-md-12">
+			<div class="form-expense">
+				<button id="save-expense" type="button" class="btn btn-primary">Registrar</button>
+				<div class="inline"><p class="inline message-expense"></p></div>
+			</div>
+		</div>
 	</section>
 	
 	<section class="container-fluid" >
@@ -246,32 +250,19 @@
 			</div>
 		</div>
 	</section>
-
-
-
-	<section class="row reg-expense detail-expense" style="margin:0">
-		<div class="col-xs-12 col-sm-12 col-md-12">
-			<div class="form-expense">
-				<button id="save-expense" type="button" class="btn btn-primary">Registrar</button>
-				<div class="inline"><p class="inline message-expense"></p></div>
+	<section class="row reg-expense" style="margin:0">
+			<div class="col-xs-12 col-sm-12 col-md-12">
+				<div class="form-expense">
+					<div class="table-responsive">
+						<table id="table-expense" class="table table-bordered">
+							@if ( isset($expense) )
+								@include('Dmkt.Solicitud.Section.gasto-table')
+							@endif
+						</table>
+					</div>
+				<input id="tot-edit-hidden" type="hidden">
 			</div>
 		</div>
 	</section>
-
-<section class="row reg-expense" style="margin:0">
-		<div class="col-xs-12 col-sm-12 col-md-12">
-			<div class="form-expense">
-				<div class="table-responsive">
-					<table id="table-expense" class="table table-bordered">
-						@if ( isset($expense) )
-							@include('Dmkt.Solicitud.Section.gasto-table')
-						@endif
-					</table>
-				</div>
-			<input id="tot-edit-hidden" type="hidden">
-		</div>
-	</div>
-</section>
-
 @endif
 

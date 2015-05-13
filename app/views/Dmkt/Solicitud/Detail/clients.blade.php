@@ -18,16 +18,16 @@
                             <div>
                                 @if ( $client->from_table == TB_DOCTOR )
                                     <input class="form-control input-md" type="text"
-                                    value="{{$client->doctors->full_name}}" readonly>
+                                    value="{{$client->doctor->full_name}}" readonly>
                                 @elseif ( $client->from_table == 'FICPEF.PERSONAJUR' )
                                     <input class="form-control input-md" type="text"
-                                    value="{{$client->farmacia->full_name}}" readonly>
+                                    value="{{$client->pharmacy->full_name}}" readonly>
                                 @elseif ( $client->from_table == 'FICPE.PERSONAJUR' )
                                     <input class="form-control input-md" type="text"
                                     value="{{$client->institution->full_name}}" readonly>
                                 @elseif ( $client->from_table == 'VTADIS.CLIENTES')
                                     <input class="form-control input-md" type="text"
-                                    value="{{$client->distrimed->full_name}}" readonly>
+                                    value="{{$client->distrimedclient->full_name}}" readonly>
                                 @else
                                     <input class="form-control input-md" type="text"
                                     value="Repositorio Desconocido" readonly>    
