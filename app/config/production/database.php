@@ -25,8 +25,8 @@ return array(
 			'host' => '192.168.1.4',
 			'port' => '1521',
 			'database' => 'BDBAGO',
-			'username' => 'outdvp',
-			'password' => 'outdvp',
+			'username' => 'sim',
+			'password' => 'sim',
 			'charset' => 'utf8',
 			'prefix' => '',
         )

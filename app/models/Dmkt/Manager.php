@@ -5,7 +5,7 @@ namespace Dmkt;
 use \Eloquent;
 class Manager extends Eloquent{
 
-    protected $table = 'GERENTES';
+    protected $table = 'OUTDVP.GERENTES';
     protected $primaryKey = 'id';
 
     protected function getFullNameAttribute()
@@ -19,7 +19,7 @@ class Manager extends Eloquent{
 
     public function solicituds()
     {
-        return $this->hasMany('Dmkt\SolicitudeGer','idgerprod','id');
+        return $this->hasMany('Dmkt\SolicitudGer','idgerprod','id');
     }
     
     function searchId()

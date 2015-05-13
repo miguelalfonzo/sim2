@@ -6,7 +6,7 @@ use \Auth;
 use \BaseController;
 use \View;
 use \Dmkt\Activity;
-use \Dmkt\Solicitude;
+use \Dmkt\Solicitud;
 use \User;
 use \Common\State;
 use \Input;
@@ -52,7 +52,7 @@ class ExpenseController extends BaseController
 			DB::beginTransaction();
 			$result = array(); 
 			$inputs = Input::all();
-	        $solicitude = Solicitude::where( 'token' , $inputs['token'] )->first();
+	        $solicitude = Solicitud::where( 'token' , $inputs['token'] )->first();
  
 	    	$resultCode = null;
 	    	$proof = ProofType::find( $inputs['proof_type']);
@@ -288,7 +288,7 @@ class ExpenseController extends BaseController
 			DB::beginTransaction();
 			$inputs = Input::all();
 			$token = $inputs['token'];
-			$solicitud  = Solicitude::where('token',$token)->first();
+			$solicitud  = Solicitud::where('token',$token)->first();
 			if( count($solicitud) == 0 )
 				return $this->warninException( __FUNCTION__ , 'No se encontro la solicitud');
 			else
@@ -319,7 +319,7 @@ class ExpenseController extends BaseController
 	}
 
 	public function viewExpense($token){
-		$solicitude = Solicitude::where('token',$token)->firstOrFail();
+		$solicitude = Solicitud::where('token',$token)->firstOrFail();
 		if(count($solicitude)>0)
 		{
 			$expenses = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
@@ -383,7 +383,7 @@ class ExpenseController extends BaseController
 
 	public function reportExpense($token)
 	{
-		$solicitud = Solicitude::where('token',$token)->firstOrFail();
+		$solicitud = Solicitud::where('token',$token)->firstOrFail();
 		$detalle = $solicitud->detalle;
 		$jDetalle = json_decode( $solicitud->detalle->detalle );
 		$clientes   = array();
@@ -468,7 +468,7 @@ class ExpenseController extends BaseController
 
 	public function reportExpenseFondo($token)
 	{
-        $fondo = Solicitude::where('token',$token)->first();
+        $fondo = Solicitud::where('token',$token)->first();
         $detalle = $fondo->detalle;
         $jDetalle = json_decode( $detalle->detalle );
         $expense = $fondo->expenses;
@@ -514,7 +514,7 @@ class ExpenseController extends BaseController
 		try
 		{
 			$inputs = Input::all();
-			$solicitud = Solicitude::find( $inputs['idsolicitud']);
+			$solicitud = Solicitud::find( $inputs['idsolicitud']);
 			$data = array(
 				'solicitud' => $solicitud,
 				'expense'   => $solicitud->expenses

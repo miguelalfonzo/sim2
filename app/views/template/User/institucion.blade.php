@@ -35,7 +35,7 @@
                         </div>
 
                         <!-- ETIQUETA -->
-                        @include('Dmkt.Register.label')
+                        @include('Dmkt.Register.Detail.actividad')
 
                         <!-- REPRESENTANTE -->
                         <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">

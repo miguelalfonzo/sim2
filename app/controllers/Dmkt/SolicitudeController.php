@@ -100,7 +100,7 @@ class SolicitudeController extends BaseController
         elseif ( Auth::user()->type == ASIS_GER )
         {
             $data['fondos']  = Fondo::asisGerFondos();                
-            $data['etiquetas'] = Label::orderBy('id','asc')->get();
+            $data['activities'] = SolicitudActivity::order();
         }
         elseif ( Auth::user()->type == CONT )
         {

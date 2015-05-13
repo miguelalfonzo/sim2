@@ -8,7 +8,7 @@ use \Carbon\Carbon;
 
 class Deposit extends Eloquent{
 
-	protected $table = 'DMKT_RG_DEPOSITO';
+	protected $table = 'DEPOSITO';
 	protected $primaryKey = 'id';
 	
 	protected function getUpdatedAtAttribute( $attr )

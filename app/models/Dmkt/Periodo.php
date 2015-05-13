@@ -5,7 +5,7 @@ use \Eloquent;
 
 class Periodo extends Eloquent
 {
-    protected $table = 'DMKT_RG_PERIODO';
+    protected $table = 'PERIODO';
     protected $primaryKey = 'id';
 
     public function searchId()

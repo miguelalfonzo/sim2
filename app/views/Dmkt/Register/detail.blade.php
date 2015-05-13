@@ -130,7 +130,19 @@ action="{{isset($solicitud) ? 'editar-solicitud' : 'registrar-solicitud' }}">
         <div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6">
             <label class="col-xs-12 col-sm-12 col-md-10 col-lg-10 control-label" for="ruc">Lista de Clientes</label>
             <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
-                <ul class="list-group" id="clientes"></ul>
+                <ul class="list-group" id="clientes">
+                    @if ( isset( $solicitud ) )
+                        @foreach ( $solicitud->clients as $client )
+                            <li class="list-group-item" table="{{$client->from_table}}" pk="{{$client->idcliente}}">
+                                <b>{{$client->idcliente}}</b>
+                                <button type='button' class='btn-delete-client' style="z-index:2; display:none">
+                                    <span class="glyphicon glyphicon-remove red" style="margin-left:20px ; float:right;"></span>
+                                </button>
+                                <span class="badge">{{$client->from_table}}</span>
+                            </li>
+                        @endforeach
+                    @endif
+                </ul>
             </div>
         </div>
     </div>

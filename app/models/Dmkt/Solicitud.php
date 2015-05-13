@@ -4,10 +4,9 @@ namespace Dmkt;
 
 use \Eloquent;
 
-class Solicitud extends Eloquent{
-
-
-    protected $table = 'DMKT_RG_SOLICITUD';
+class Solicitud extends Eloquent
+{
+    protected $table = 'SOLICITUD';
     protected $primaryKey = 'id';
 
     protected function getFecOriginAttribute()

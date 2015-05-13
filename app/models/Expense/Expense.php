@@ -6,7 +6,7 @@ use \Eloquent;
 
 class Expense extends Eloquent {
 
-	protected $table= 'DMKT_RG_GASTO';
+	protected $table= 'GASTO';
 	protected $primaryKey = 'id';
 
 	public function idSolicitude(){

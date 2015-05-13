@@ -5,7 +5,7 @@ use \Eloquent;
 
 class SolicitudActivity extends Eloquent
 {
-    protected $table = 'DMKT_RG_ETIQUETA';
+    protected $table = 'ETIQUETA';
     protected $primaryKey = 'id';
 
     protected static function order()

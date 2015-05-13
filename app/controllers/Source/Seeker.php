@@ -16,8 +16,7 @@ use \View;
 use \Validator;
 
 class Seeker extends BaseController 
-{
-	
+{	
 	/*private function clientsTables()
 	{
 		$tables = array( 'VTA.CLIENTES' , 'SIP.MEDICOS2' );
@@ -49,17 +48,17 @@ class Seeker extends BaseController
 					' {"name":"FICPEF.PERSONAJUR",'.
 					' "wheres":{"likes":["PEJNRODOC","PEJRAZON"], '.
 					' "equal":{"PEJESTADO":1 , "PEJTIPPERJ":1 }}, '.
-					' "selects":["PEJCODPERS","( PEJNRODOC || \'-\' || PEJRAZON )" , "\'FARMACIA\'" ]}, '.
-					' {"name":"FICPE.PERSONAJUR",'.
+					' "selects":["PEJCODPERS","( PEJNRODOC || \'-\' || PEJRAZON )" , "\'FARMACIA\'" ]}] ';
+					/*' {"name":"FICPE.PERSONAJUR",'.
 					' "wheres":{"likes":[ "PEJRAZON" ], '.
 					' "equal":{"PEJESTADO":1 , "PEJTIPPERJ":2 }}, '.
-					' "selects":["PEJCODPERS","PEJRAZON" , "\'INSTITUCION\'" ]}, '.
-					' {"name":"VTADIS.CLIENTES",'.
+					' "selects":["PEJCODPERS","PEJRAZON" , "\'INSTITUCION\'" ]}] ';*/
+					/*' {"name":"VTADIS.CLIENTES",'.
 					' "wheres":{"likes":[ "CLRUT" , "CLNOMBRE" ], '.
 					' "equal":{ "CLESTADO":1 }, '.
 					' "in":{ "CLCLASE": [ 1 , 6 ] } }, '.
 					' "selects":[ "CLCODIGO" , " ( CLRUT || \'-\' || CLNOMBRE ) " , "CASE WHEN CLCLASE = 1 THEN \'DISTRIBUIDOR\' WHEN CLCLASE = 6 THEN \'BODEGA\' END" ]} '.
-					']';
+					']';*/
 	    	$cAlias = array( 'value' , 'label' , 'type' );
 	    	return Response::Json( $this->searchSeeker( $inputs['sVal'] , $json , $cAlias ) );
 		}

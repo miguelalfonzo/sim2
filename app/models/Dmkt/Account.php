@@ -4,7 +4,7 @@ namespace Dmkt;
 use \Eloquent;
 class Account extends Eloquent
 {
-    protected $table = 'DMKT_RG_CUENTA';
+    protected $table = 'CUENTA';
     protected $primaryKey = 'id';
     
     public function lastId()
@@ -53,8 +53,8 @@ class Account extends Eloquent
 
     protected static function getExpenseAccount( $cuenta_mkt )
     {
-        return Account::leftJoin('DMKT_RG_CUENTA_GASTO_MARCA b' , 'b.num_cuenta_fondo' , '=' , 'dmkt_rg_cuenta.num_cuenta' )
-        ->leftJoin('DMKT_RG_CUENTA c' , 'c.num_cuenta' , '=' , 'b.num_cuenta_gasto' )->select('c.*')->where('dmkt_rg_cuenta.num_cuenta' , $cuenta_mkt )->get();
+        return Account::leftJoin('CUENTA_GASTO_MARCA b' , 'b.num_cuenta_fondo' , '=' , 'cuenta.num_cuenta' )
+        ->leftJoin('CUENTA c' , 'c.num_cuenta' , '=' , 'b.num_cuenta_gasto' )->select('c.*')->where('cuenta.num_cuenta' , $cuenta_mkt )->get();
     }
 
 }

@@ -10,7 +10,7 @@ use \Eloquent;
 
 class State extends Eloquent
 {
-    protected $table = 'DMKT_RG_SUB_ESTADO';
+    protected $table = 'SUB_ESTADO';
     protected $primaryKey = 'idestado';
 
 	function rangeState()

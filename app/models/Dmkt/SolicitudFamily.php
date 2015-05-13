@@ -5,7 +5,7 @@ use \Eloquent;
 
 class SolicitudFamily extends Eloquent
 {
-    protected $table = 'DMKT_RG_SOLICITUD_FAMILIA';
+    protected $table = 'SOLICITUD_FAMILIA';
     protected $primaryKey = 'id';
 
     public function lastId()
