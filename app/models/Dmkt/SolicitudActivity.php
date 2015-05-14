@@ -12,4 +12,9 @@ class SolicitudActivity extends Eloquent
     {
     	return SolicitudActivity::orderBy('id','asc')->get();
     }
+
+    public function investmentActivity()
+    {
+    	return $this->hasMany('Dmkt\InvestmentActivity' , 'id_actividad' , 'id' );
+    }
 }

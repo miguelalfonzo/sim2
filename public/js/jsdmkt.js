@@ -1741,12 +1741,14 @@ function newSolicitude() {
                                 });
                                 if ( aux == 0 )
                                 {
-                                    $('#clientes').append( data.Data );
+                                    $('#clientes').append( data.Data.View );
                                     $('.btn-delete-client').css( 'display' , 'inline' );
                                 }        
                             }
                             else
-                                $('#clientes').append( data.Data );
+                                $('#clientes').append( data.Data.View );
+                            filterSelect( $('select[name=inversion]') , data.Data.id_inversion );
+                            filterSelect( $('select[name=actividad]') , data.Data.id_actividad );
                         }
                     });
                     input.typeahead( 'val' , '' );
@@ -1777,6 +1779,20 @@ function newSolicitude() {
         }
     }
 
+    function filterSelect( element , ids )
+    {
+        var select = $(element);
+        if ( clientes.children().length == 1 )
+        {
+            select.val('');
+            select.children().filter(function( index ) 
+            {
+                return $.inArray( $(this).val() ,  ids ) == -1;
+            }).hide();
+        }
+    }
+
+
     function repInfo(rm)
     {
         return $.ajax(
@@ -1795,16 +1811,54 @@ function newSolicitude() {
         });  
     }
 
+    function clientFilter( table )
+    {
+        $.ajax(
+        {
+            type: 'post' ,
+            url: server + 'filtro_cliente' ,
+            data:
+            {
+                "_token": $("input[name=_token]").val(),
+                "tabla": table
+            }
+        }).fail( function ( statusCode , errorThrown )
+        {
+            ajaxError( statusCode , errorThrown );
+        }).done( function ( response )
+        {
+            if ( response.Status === 'Ok' )
+            {
+                $( 'select[name=actividad]' ).val('').children().show();
+                $( 'select[name=inversion]' ).val('').children().show();
+
+                filterSelect( $( 'select[name=actividad]' ) , response.Data.id_actividad );
+                filterSelect( $( 'select[name=inversion]' ) , response.Data.id_inversion );
+            }
+            else
+                bootbox.alert( '<h4 class="red">' + data.Status + ': ' + data.Description + '</h4>');
+        });  
+    }
+
     $(document).off( 'click' , '.btn-delete-client' );
     $(document).on( 'click' , '.btn-delete-client' , function () 
     {
         var li = $(this).parent();
         var ul = li.parent();
-        if ( ul.children().length > 1 )
+        if ( li.index() == 0 && ul.children().length > 1 )
         {
+            var table = li.attr('table');
             li.remove();
-            if ( ul.children().length == 1 )
-                $('.btn-delete-client').css( 'display' , 'none' );
+            var old_li2 = ul.children().first();
+            if ( table !== old_li2.attr( "table" ) )
+                clientFilter( old_li2.attr( "table" ) );
+        }
+        else
+            li.remove();
+        if ( ul.children().length === 0 )
+        {
+            $('select[name=inversion]').children().show();
+            $('select[name=actividad]').children().show();               
         }
     });
 

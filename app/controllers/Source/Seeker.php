@@ -14,6 +14,9 @@ use \Dmkt\CtaRm;
 use \Users\Visitador;
 use \View;
 use \Validator;
+use \Dmkt\SolicitudActivity;
+use \Dmkt\InvestmentActivity;
+use \Dmkt\InvestmentType;
 
 class Seeker extends BaseController 
 {	
@@ -190,6 +193,35 @@ class Seeker extends BaseController
             if ($validator->fails()) 
                 return $this->warningException( __FUNCTION__ , substr($this->msgValidator($validator) , 0 , -1 ) );
             else
-    			return $this->setRpta( View::make( 'Seeker.client' )->with( $inputs['data'] )->render() );
+            {
+            	if ( $inputs['data']['type'] == 'FARMACIA' )
+            		$tipo_cliente = 2;
+            	else if ( $inputs['data']['type'] == 'DOCTOR')
+            		$tipo_cliente = 1;
+
+        		/*$act = SolicitudActivity::where('tipo_cliente' , $tipo_cliente )->with( array( 'investmentActivity' => function( $q )
+        		{
+        			$q->with('investment');	
+        		}))->get();*/
+
+				$act = SolicitudActivity::where('tipo_cliente' , $tipo_cliente )->lists('id');
+				$inv = InvestmentActivity::whereIn( 'id_actividad' , $act )->lists( 'id_inversion');
+				//$inv = InvestmentType::whereIn( 'id ' , $inv_act )->lists( 'id');
+
+
+        		Log::error( $act );
+        		Log::error( $inv );
+        		//Log::error( $inv );
+				
+        		/*$inv_act = $act->with( 'investmentActivity' );
+        		
+        		$inv = $inv_act->investment;
+        		*/            	
+        		return $this->setRpta( array( 
+        			'View' => View::make( 'Seeker.client' )->with( $inputs['data'] )->render() , 
+        			'id_actividad' => $act ,
+        			'id_inversion' => $inv 
+        		));
+            }
     }
 }

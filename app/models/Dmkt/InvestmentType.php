@@ -12,4 +12,9 @@ class InvestmentType extends Eloquent
     {
     	return InvestmentType::orderBy('id','asc')->get();
     }
+
+    protected function investmentActivity()
+    {
+    	return $this->hasMany('Dmkt\InvestmentActivity' , 'id_inversion' , 'id' );
+    }
 }
