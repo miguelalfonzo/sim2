@@ -7,19 +7,23 @@ function newSolicitude() {
     var date_end = $('.date_end').first();
 
     //NEW SOLICITUD
-    var title = $('input[name=titulo]');
-    var clientes = $('#clientes');
-    var search_cliente = $('.cliente-seeker');
-    var amount = $('input[name=monto]');
+    var reason        = $('select[name=motivo]');
+    var investment    = $('select[name=inversion]');
+    var activity      = $('select[name=actividad]');
+    var title         = $('input[name=titulo]');
+    var currency      = $('select[name=moneda]');
+    var amount        = $('input[name=monto]');
+    var payment       = $('select[name=payment]');
     var delivery_date = $('input[name=fecha]');
-    var amount_fac = $('input[name=monto_factura]');
-    var selectfamily = $('.selectfamily');
-    var ruc = $('input[name=ruc]');
-    var select_type_payment = $('select[name=pago]');
-    var input_file_factura = $('#input-file-factura');
-    var isSetImage = $('#isSetImage');
-    var comprobante = $('#comprobante');
+    var products      = $('.products');
+    var clients       = $('#clientes');
+
+    var invoice_amount  = $('input[name=monto_factura]');
+    var invoice_img     = $('input[name=factura]');
+    var ruc                = $('input[name=ruc]');
+    var isSetImage         = $('#isSetImage');
     
+    var search_cliente = $('.cliente-seeker');
 
     var doc_start = $('.date_start').last();
     var doc_end = $('.date_end').last();
@@ -31,17 +35,17 @@ function newSolicitude() {
     var userType = $('#typeUser').val();//tipo de usuario se encuentra en main
     
     //SUB-ESTADOS
-    var PENDIENTE =1;
-    var ACEPTADO = 2;
-    var APROBADO = 3;
-    var DEPOSITADO = 4;
-    var REGISTRADO = 5;
-    var ENTREGADO = 6;
-    var GENERADO = 7;
-    var CANCELADO =  8;
-    var RECHAZADO = 9;
-    var TODOS = 10;
-    var DERIVADO = 11;
+    var PENDIENTE     = 1;
+    var ACEPTADO      = 2;
+    var APROBADO      = 3;
+    var DEPOSITADO    = 4;
+    var REGISTRADO    = 5;
+    var ENTREGADO     = 6;
+    var GENERADO      = 7;
+    var CANCELADO     = 8;
+    var RECHAZADO     = 9;
+    var TODOS         = 10;
+    var DERIVADO      = 11;
     var POR_DEPOSITAR = 13;
     var POR_REGISTRAR = 12;
 
@@ -208,24 +212,24 @@ function newSolicitude() {
 
     //Validations
     amount.numeric({negative:false});
-    amount_fac.numeric({negative:false});
+    invoice_amount.numeric({negative:false});
     ruc.numeric({negative:false,decimal:false});
     
     if ( $('select[name=actividad] option:selected').attr('image') != 1 ) 
     {
-        amount_fac.parent().parent().hide();
-        comprobante.hide();
+        invoice_amount.parent().parent().hide();
+        invoice_img.parent().parent().parent().parent().parent().hide();
     }
     else if ( $('select[name=actividad] option:selected').attr('image') == 1 )
     {
-        amount_fac.parent().parent().show();
-        comprobante.show();        
+        invoice_amount.parent().parent().show();
+        invoice_img.parent().parent().parent().parent().parent().show();        
     }
 
     $( 'select[name=inversion]' ).on( 'change' , function()
     {
         inversionChange( $(this).val() );
-    }
+    });
 
     $( 'select[name=actividad]' ).on( 'change' , function() 
     {
@@ -237,12 +241,13 @@ function newSolicitude() {
         console.log( id_inversion );
         $.ajax(
         {
-            url: server + 'cambio-inversion',
+            url: server + 'filtro-inversion',
             type: 'POST' ,
             data:
             {
-                _token : $('input[name=_token]').val(),
-                id_inversion : id_inversion
+                _token : $('input[name=_token]').val() ,
+                id_inversion : id_inversion ,
+                tipo_cliente : clients.children().first().attr('tipo_cliente')
             }
         }).fail( function ( statusCode , errorThrown )
         {
@@ -252,11 +257,11 @@ function newSolicitude() {
             if ( response.Status === 'Ok' )
             {
                 $('select[name=actividad]').val('');
-                filterSelect( $('select[name=actividad]') , response.Data.id_actividad );
+                filterSelect( $('select[name=actividad]') , response.Data , 'inversion' );
                 activityChange();
             }
             else
-                bootbox.alert( '<h4>' + response.Status + ': ' + response.Description + '</h4>');
+                bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
         });
     }
 
@@ -264,22 +269,22 @@ function newSolicitude() {
     {
         if ( $('select[name=actividad] option:selected').attr('image') != 1 ) 
         {
-            amount_fac.parent().parent().hide();
-            comprobante.hide();
+            invoice_amount.parent().parent().hide();
+            invoice_img.parent().parent().parent().parent().parent().hide();
         }
         else if ( $('select[name=actividad] option:selected').attr('image') == 1 )
         {
-            amount_fac.parent().parent().show();
-            comprobante.show();        
+            invoice_amount.parent().parent().show();
+            invoice_img.parent().parent().parent().parent().parent().show();        
         }
     }
 
 
     //TIPO DE ENTREGA
-    if( select_type_payment.val()!=2 )  
+    if( payment.val()!=2 )  
         ruc.parent().parent().hide();
     
-    select_type_payment.on('change', function()
+    payment.on('change', function()
     {
         if($(this).val() == 1)
             ruc.parent().parent().hide();
@@ -298,12 +303,12 @@ function newSolicitude() {
     });
     search_cliente.on('focus', function () {
         $(this).parent().parent().removeClass('has-error');
-        clientes.parent().parent().removeClass('has-error');
+        clients.parent().parent().removeClass('has-error');
     });
-    amount_fac.on('focus', function () {
+    invoice_amount.on('focus', function () {
         $(this).parent().removeClass('has-error')
     });
-    selectfamily.on('click', function () {
+    products.on('click', function () {
         $(this).css('border-color', 'none')
     });
     date_start.on('focus', function () {
@@ -312,7 +317,7 @@ function newSolicitude() {
     date_end.on('focus', function () {
         $(this).parent().removeClass('has-error');
     });
-    input_file_factura.on('focus', function () {
+    invoice_img.on('focus', function () {
         $(this).parent().removeClass('has-error');
     });
     ruc.on('focus', function () {
@@ -794,22 +799,7 @@ function newSolicitude() {
 
     $('.btn-file :file').on('fileselect', function (event, numFiles, label) {
 
-        input_file_factura.val(label);
-    });
-
-    $(document).on('change', '.btn-file :file', function (e) {
-
-        var file = e.target.files[0],
-            imageType = /image.*/;
-        if (!file.type.match(imageType))
-            alert('ingrese solo imagenes');
-        else 
-        {
-            var input = $(this),
-            numFiles = input.get(0).files ? input.get(0).files.length : 1,
-            label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
-            input.trigger('fileselect', [numFiles, label]);
-        }
+        invoice_img.val(label);
     });
 
     /** ---------------------------------------------- GERENTE PRODUCTO -------------------------------------------- **/
@@ -1286,6 +1276,7 @@ function newSolicitude() {
 
     function addImage(e) 
     {
+        a = e;
         var file = e.target.files[0],
             imageType = /image.*/;
         if (!file.type.match(imageType))
@@ -1295,11 +1286,29 @@ function newSolicitude() {
             var reader = new FileReader();
             reader.onload = fileOnload;
             reader.readAsDataURL(file);
+            console.log( reader);
+            invoice_img.parent().parent().parent().children().last().val( file.name );
         }
     }
 
-    input_file_factura.on("change", function(e)
+    /* $(document).on('change', '.btn-file :file', function (e) {
+
+        var file = e.target.files[0],*/
+       //     imageType = /image.*/;
+        /*if (!file.type.match(imageType))
+            alert('ingrese solo imagenes');
+        else 
+        {
+            var input = $(this),
+            numFiles = input.get(0).files ? input.get(0).files.length : 1,
+            label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+            input.trigger('fileselect', [numFiles, label]);
+        }
+    });*/
+
+    invoice_img.on("change", function(e)
     {
+        console.log(e);
         addImage(e);
     });
 
@@ -1784,8 +1793,8 @@ function newSolicitude() {
                             }
                             else
                                 $('#clientes').append( data.Data.View );
-                            filterSelect( $('select[name=inversion]') , data.Data.id_inversion );
-                            filterSelect( $('select[name=actividad]') , data.Data.id_actividad );
+                            filterSelect( $('select[name=inversion]') , data.Data.id_inversion , 'cliente' );
+                            filterSelect( $('select[name=actividad]') , data.Data.id_actividad , 'cliente' );
                             activityChange();
                         }
                     });
@@ -1817,16 +1826,27 @@ function newSolicitude() {
         }
     }
 
-    function filterSelect( element , ids )
+    function filterSelect( element , ids , type )
     {
         var select = $(element);
-        if ( clientes.children().length == 1 )
+        if ( type === 'cliente' && clients.children().length == 1 )
         {
+            select.val('').children().show();
             select.val('');
+            select.children().attr( '[type=' + type + ']' );
             select.children().filter(function( index ) 
             {
                 return $.inArray( $(this).val() ,  ids ) == -1;
             }).hide();
+        }
+        else if ( type === 'inversion' )
+        {
+            select.val('');
+            select.children().filter( '[type=' + type + ']').show();
+            select.children().filter( function( index ) 
+            {
+                return $.inArray( $(this).val() ,  ids ) == -1;
+            }).attr( 'type' , type ).hide();   
         }
     }
 
@@ -1867,10 +1887,8 @@ function newSolicitude() {
         {
             if ( response.Status === 'Ok' )
             {
-                $( 'select[name=actividad]' ).val('').children().show();
-                $( 'select[name=inversion]' ).val('').children().show();
-                filterSelect( $( 'select[name=actividad]' ) , response.Data.id_actividad );
-                filterSelect( $( 'select[name=inversion]' ) , response.Data.id_inversion );
+                filterSelect( $( 'select[name=actividad]' ) , response.Data.id_actividad , 'cliente' );
+                filterSelect( $( 'select[name=inversion]' ) , response.Data.id_inversion , 'cliente' );
                 activityChange();
             }
             else
@@ -2019,39 +2037,39 @@ function newSolicitude() {
             delivery_date.addClass('input-placeholder-error');
             aux = 1;
         }
-        /*if (!input_client.val()) 
+        if (!delivery_date.val()) 
         {
-            input_client.parent().addClass('has-error');
-            input_client.attr('placeholder', 'Ingrese Cliente');
-            input_client.addClass('input-placeholder-error');
+            delivery_date.parent().addClass('has-error');
+            delivery_date.attr('placeholder', 'Ingrese Fecha');
+            delivery_date.addClass('input-placeholder-error');
             aux = 1;
-        }*/
+        }
 
-        if ( clientes.children().length == 0 )
+        if ( clients.children().length == 0 )
         {
             search_cliente.attr( 'placeholder' , 'Ingrese el Cliente' ).addClass('input-placeholder-error');
             search_cliente.parent().parent().addClass('has-error');
-            clientes.parent().parent().addClass('has-error');
+            clients.parent().parent().addClass('has-error');
             aux = 1;
         }
         if( $('select[name=actividad] option:selected').attr('image') == 1 )
         {
-            if ( !amount_fac.val() ) 
+            if ( !invoice_amount.val() ) 
             {
-                amount_fac.parent().addClass('has-error');
-                amount_fac.attr('placeholder', 'Ingrese Monto de la Factura');
-                amount_fac.addClass('input-placeholder-error');
+                invoice_amount.parent().addClass('has-error');
+                invoice_amount.attr('placeholder', 'Ingrese Monto de la Factura');
+                invoice_amount.addClass('input-placeholder-error');
                 aux = 1;
             }
-            if( !input_file_factura.val() && isSetImage.val()==null )
+            if( !invoice_img.val() && isSetImage.val() == null )
             {
-                input_file_factura.parent().addClass('has-error');
-                input_file_factura.attr('placeholder', 'Ingrese Imagen');
-                input_file_factura.addClass('input-placeholder-error');
+                invoice_img.parent().addClass('has-error');
+                invoice_img.attr('placeholder', 'Ingrese Imagen');
+                invoice_img.addClass('input-placeholder-error');
                 aux = 1;
             }
         }
-        if ( $('select[name=pago] option:selected').val() == 2 )
+        if ( $('select[name=payment] option:selected').val() == 2 )
         {
             if ( !ruc.val() )
             {
@@ -2076,14 +2094,14 @@ function newSolicitude() {
         aux = validateNewSol();
         
         //Validate fields client are correct
-        clientes.children().each( function ()
+        clients.children().each( function ()
         {
             elem = $(this);
             d_clients.push( elem.attr("pk") );
             d_tables.push( elem.attr("table") );
         });
         
-        var families = $('.selectfamily');
+        var families = $('.products');
         families.each( function (index) 
         {
             families_input[index] = $(this).val();

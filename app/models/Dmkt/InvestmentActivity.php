@@ -15,7 +15,7 @@ class InvestmentActivity extends Eloquent
 
     protected function activity()
     {
-    	return $this->hasOne( 'Dmkt\SolicitudActivity' , 'id' , 'id_actividad' );
+    	return $this->hasOne( 'Dmkt\Activity' , 'id' , 'id_actividad' );
     }
 
     public function investment()

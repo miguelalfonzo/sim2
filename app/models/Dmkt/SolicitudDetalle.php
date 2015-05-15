@@ -25,7 +25,7 @@ class SolicitudDetalle extends Eloquent
 
     protected function reason()
     {
-        return $this->hasOne('Dmkt\SolicitudReason','id','idmotivo');
+        return $this->hasOne('Dmkt\Reason','id','idmotivo');
     }
 
     protected function typeMoney()

@@ -99,7 +99,7 @@ class SolicitudeController extends BaseController
         elseif ( Auth::user()->type == ASIS_GER )
         {
             $data['fondos']  = Fondo::asisGerFondos();                
-            $data['activities'] = SolicitudActivity::order();
+            $data['activities'] = Activity::order();
         }
         elseif ( Auth::user()->type == CONT )
         {
@@ -112,8 +112,8 @@ class SolicitudeController extends BaseController
     public function newSolicitude()
     {
         $data = array( 
-            'reasons'     => SolicitudReason::all() ,
-            'activities'  => SolicitudActivity::order(),
+            'reasons'     => Reason::all() ,
+            'activities'  => Activity::order(),
             'payments'    => TypePayment::all(),
             'currencies'  => TypeMoney::all(),
             'families'    => Marca::orderBy('descripcion', 'ASC')->get(),
@@ -126,8 +126,8 @@ class SolicitudeController extends BaseController
     {
         $data = array(
             'solicitud'   => Solicitud::where('token', $token)->firstOrFail(),
-            'reasons'     => SolicitudReason::all(),
-            'activities'  => SolicitudActivity::order(),
+            'reasons'     => Reason::all(),
+            'activities'  => Activity::order(),
             'payments'    => TypePayment::all(),
             'currencies'  => TypeMoney::all(),
             'families'    => Marca::orderBy('descripcion', 'ASC')->get(),
@@ -224,9 +224,9 @@ class SolicitudeController extends BaseController
         {          
             Log::error( $inputs ); 
             $rules = array(
-                'reason'        => 'required|numeric|min:1|in:'.implode( ',' , SolicitudReason::lists('id') ),
+                'motivo'        => 'required|numeric|min:1|in:'.implode( ',' , Reason::lists('id') ),
                 'inversion'     => 'required|numeric|min:1|in:'.implode( ',' , InvestmentType::lists('id') ),
-                'actividad'     => 'required|numeric|in:'.implode( ',' , SolicitudActivity::lists( 'id' ) ),
+                'actividad'     => 'required|numeric|in:'.implode( ',' , Activity::lists( 'id' ) ),
                 'titulo'        => 'required|min:1',
                 'moneda'        => 'required|numeric|in:'.implode( ',' , TypeMoney::lists( 'id') ),
                 'monto'         => 'required|numeric|min:1',
@@ -241,7 +241,7 @@ class SolicitudeController extends BaseController
                 return $this->warningException( __FUNCTION__ , substr( $this->msgValidator($validator) , 0 , -1 ) );
             else
             {
-                $actividad = SolicitudActivity::find( $inputs[ 'actividad' ] );
+                $actividad = Activity::find( $inputs[ 'actividad' ] );
                 $rules = array();
                 if ( $actividad->imagen === 1 )
                 {
@@ -384,30 +384,36 @@ class SolicitudeController extends BaseController
         }
     }
 
+    private function inputSol( $solicitud , $i )
+    {
+        $solicitud->titulo          = $i['titulo'];
+        $solicitud->descripcion     = $i['descripcion'];
+        $solicitud->idestado        = PENDIENTE;
+        $solicitud->idactividad     = $i['actividad'];
+        $solicitud->idinversion     = $i['inversion'];
+        $solicitud->idtiposolicitud = SOL_REP;
+        $solicitud->status          = ACTIVE;
+    }
+
     public function registerSolicitude()
     {
         try
         {
             DB::beginTransaction();
             $inputs = Input::all();
-            $image = Input::file('file');
+            $image = Input::file('factura');
             $middleRpta = $this->validateInputSolRep( $inputs , 1 );
             if ( $middleRpta[status] == ok )
             {
                 $solicitud = new Solicitud;
-                $solicitud->id                       = $solicitud->lastId() + 1;
-                $solicitud->titulo                   = $inputs['titulo'];
-                $solicitud->descripcion              = $inputs['descripcion'];
-                $solicitud->idestado                 = PENDIENTE;
-                $solicitud->idetiqueta               = $inputs['actividad'];
-                $solicitud->idtiposolicitud          = SOL_REP;
-                $solicitud->token                    = sha1( md5( uniqid( $solicitud->id , true ) ) );
-                $solicitud->status                   = ACTIVE;
+                $solicitud->id          = $solicitud->lastId() + 1;
+                $detalle                = new SolicitudDetalle;
+                $detalle->id            = $detalle->lastId() + 1;
+                $solicitud->iddetalle   = $detalle->id;
+                $solicitud->token       = sha1( md5( uniqid( $solicitud->id , true ) ) );
                 
-                $detalle                   = new SolicitudDetalle;
-                $detalle->id               = $detalle->lastId() + 1;
-                $solicitud->iddetalle      = $detalle->id;
-
+                $this->inputSol( $solicitud , $inputs );
+                
                 if ( !$solicitud->save() )
                     return $this->warningException( __FUNCTION__ , 'No se pudo registrar la solicitud');
                 else 
@@ -416,8 +422,8 @@ class SolicitudeController extends BaseController
                     $jDetalle->monto_solicitado  = round( $inputs['monto'] , 2 , PHP_ROUND_HALF_DOWN );
                     $jDetalle->fecha_entrega     = $inputs['fecha'];
 
-                    $actividad = SolicitudActivity::find( $inputs[ 'actividad' ] );
-                    if ( $actividad->imagen == 1 )
+                    $actividad = Activity::find( $inputs[ 'actividad' ] );
+                    if ( $actividad->imagen == 1 && $image->isValid() )
                     {
                         $filename                 = uniqid() . '.' . $image->getClientOriginalExtension();
                         $path                     = public_path( IMAGE_PATH . $filename);
@@ -432,7 +438,7 @@ class SolicitudeController extends BaseController
                         $jDetalle = $middleRpta[data];
                         $detalle->detalle      = json_encode($jDetalle);
                         $detalle->idmoneda     = $inputs['moneda'];
-                        $detalle->idmotivo     = $inputs['reason'];
+                        $detalle->idmotivo     = $inputs['motivo'];
                         $detalle->idpago       = $inputs['pago'];
                         if ( !$detalle->save() )
                             return $this->warningException( __FUNCTION__ , 'No se pudo registrar los detalles de la solicitud');

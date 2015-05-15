@@ -3,14 +3,14 @@
 namespace Dmkt;
 use \Eloquent;
 
-class SolicitudActivity extends Eloquent
+class Activity extends Eloquent
 {
-    protected $table = 'ETIQUETA';
+    protected $table = 'ACTIVIDAD';
     protected $primaryKey = 'id';
 
     protected static function order()
     {
-    	return SolicitudActivity::orderBy('id','asc')->get();
+    	return Activity::orderBy('id','asc')->get();
     }
 
     public function investmentActivity()

@@ -122,7 +122,7 @@ class Solicitud extends Eloquent
 
     protected function actividad()
     {
-        return $this->hasOne('Dmkt\SolicitudActivity','id','idetiqueta');
+        return $this->hasOne('Dmkt\Activity','id','idetiqueta');
     }
 
     protected function expenses()

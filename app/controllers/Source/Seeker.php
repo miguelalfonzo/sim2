@@ -14,7 +14,7 @@ use \Dmkt\CtaRm;
 use \Users\Visitador;
 use \View;
 use \Validator;
-use \Dmkt\SolicitudActivity;
+use \Dmkt\Activity;
 use \Dmkt\InvestmentActivity;
 use \Dmkt\InvestmentType;
 use \Client\ClientType;
@@ -182,7 +182,7 @@ class Seeker extends BaseController
             {
             	$tipo_cliente = $inputs[ 'data' ][ 'id_tipo_cliente'];
 
-				$act = SolicitudActivity::where('tipo_cliente' , $tipo_cliente )->lists('id');
+				$act = Activity::where('tipo_cliente' , $tipo_cliente )->lists('id');
 				$inv = InvestmentActivity::whereIn( 'id_actividad' , $act )->lists( 'id_inversion');
         		
         		return $this->setRpta( array( 

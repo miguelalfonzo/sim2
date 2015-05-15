@@ -182,6 +182,7 @@ Route::group(array('before' => 'rm_sup'), function ()
     Route::post('search-client', 'Source\Seeker@clientSource');
     Route::post('get-client-view' , 'Source\Seeker@getClientView');
     Route::post('filtro_cliente' , 'Dmkt\Client@getInvestmentActivity');
+    Route::post('filtro-inversion' , 'Dmkt\Client@getActivities');
 });
 
 Route::group(array('before' => 'sys_user'), function ()

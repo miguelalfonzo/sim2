@@ -4,7 +4,7 @@
         <select class="form-control" name="actividad">
             <option value="" disabled selected>SELECCIONE LA ACTIVIDAD</option>
             @foreach( $activities as $activity )
-                @if ( isset( $solicitud ) && $solicitud->idetiqueta == $activity->id )
+                @if ( isset( $solicitud ) && $solicitud->idactividad == $activity->id )
                     <option value="{{ $activity->id }}" image="{{ $activity->imagen }}" selected>{{ $activity->nombre }}</option>
                 @else
                     <option value="{{ $activity->id }}" image="{{ $activity->imagen }}">{{ $activity->nombre }}</option>
