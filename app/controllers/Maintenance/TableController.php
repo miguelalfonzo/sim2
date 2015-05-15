@@ -15,6 +15,7 @@ use \Expense\PlanCta;
 use \Common\TypeMoney;
 use \DB;
 use \Log;
+use \Exception;
 
 class TableController extends BaseController
 {

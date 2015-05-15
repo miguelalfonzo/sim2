@@ -12,6 +12,7 @@ use \Expense\ChangeRate;
 use \Expense\ProofType;
 use \Expense\Expense;
 use \Validator;
+use \Exception;
 
 class MoveController extends BaseController
 {

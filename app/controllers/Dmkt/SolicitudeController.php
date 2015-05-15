@@ -44,9 +44,8 @@ class SolicitudeController extends BaseController
     function objectToArray($object)
     {
         $array = array();
-        foreach ($object as $member => $data) {
+        foreach ($object as $member => $data) 
             $array[$member] = $data;
-        }
         return $array;
     }
 

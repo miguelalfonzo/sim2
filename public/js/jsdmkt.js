@@ -222,7 +222,45 @@ function newSolicitude() {
         comprobante.show();        
     }
 
-    $('select[name=actividad]').on('change', function () 
+    $( 'select[name=inversion]' ).on( 'change' , function()
+    {
+        inversionChange( $(this).val() );
+    }
+
+    $( 'select[name=actividad]' ).on( 'change' , function() 
+    {
+        activityChange();
+    });
+
+    function inversionChange( id_inversion )
+    {
+        console.log( id_inversion );
+        $.ajax(
+        {
+            url: server + 'cambio-inversion',
+            type: 'POST' ,
+            data:
+            {
+                _token : $('input[name=_token]').val(),
+                id_inversion : id_inversion
+            }
+        }).fail( function ( statusCode , errorThrown )
+        {
+            ajaxError( statusCode , errorThrown );
+        }).done( function ( response )
+        {
+            if ( response.Status === 'Ok' )
+            {
+                $('select[name=actividad]').val('');
+                filterSelect( $('select[name=actividad]') , response.Data.id_actividad );
+                activityChange();
+            }
+            else
+                bootbox.alert( '<h4>' + response.Status + ': ' + response.Description + '</h4>');
+        });
+    }
+
+    function activityChange()
     {
         if ( $('select[name=actividad] option:selected').attr('image') != 1 ) 
         {
@@ -234,7 +272,8 @@ function newSolicitude() {
             amount_fac.parent().parent().show();
             comprobante.show();        
         }
-    });
+    }
+
 
     //TIPO DE ENTREGA
     if( select_type_payment.val()!=2 )  
@@ -1173,7 +1212,7 @@ function newSolicitude() {
     function removeinput(data){
 
         var rep = data.parent().find('input:text');
-        rep.typeahead('val','');
+        rep.typeahead( 'val' , '' );
         rep.attr('disabled', false).attr('data-select',"false").focus().parent().parent().removeClass('has-success');
         fondo_cuenta.val('').attr('disabled', false).parent().removeClass("has-success");
         fondo_supervisor.val('').attr('disabled',false).attr('data-cod',0).parent().removeClass("has-success");
@@ -1202,7 +1241,7 @@ function newSolicitude() {
         searchFondos(datefondo, aux);
     });
 
-    function searchFondos(datefondo , aux) 
+    function searchFondos( datefondo , aux ) 
     {
         var url = server + 'list-fondos/' + datefondo;
         $('#loading-fondo').attr('class','show');
@@ -1245,7 +1284,8 @@ function newSolicitude() {
         });
     }
 
-    function addImage(e) {
+    function addImage(e) 
+    {
         var file = e.target.files[0],
             imageType = /image.*/;
         if (!file.type.match(imageType))
@@ -1736,19 +1776,17 @@ function newSolicitude() {
                                 $('#clientes').children().each( function()
                                 {
                                     var li = $(this);
-                                    if ( li.attr('pk') == suggestion.value && li.attr('table') == suggestion.table )
+                                    if ( li.attr('pk') == suggestion.value && li.attr('tipo_cliente') == suggestion.id_tipo_cliente )
                                         aux = 1;
                                 });
                                 if ( aux == 0 )
-                                {
                                     $('#clientes').append( data.Data.View );
-                                    $('.btn-delete-client').css( 'display' , 'inline' );
-                                }        
                             }
                             else
                                 $('#clientes').append( data.Data.View );
                             filterSelect( $('select[name=inversion]') , data.Data.id_inversion );
                             filterSelect( $('select[name=actividad]') , data.Data.id_actividad );
+                            activityChange();
                         }
                     });
                     input.typeahead( 'val' , '' );
@@ -1811,7 +1849,7 @@ function newSolicitude() {
         });  
     }
 
-    function clientFilter( table )
+    function clientFilter( tipo_cliente )
     {
         $.ajax(
         {
@@ -1820,7 +1858,7 @@ function newSolicitude() {
             data:
             {
                 "_token": $("input[name=_token]").val(),
-                "tabla": table
+                "tipo_cliente": tipo_cliente
             }
         }).fail( function ( statusCode , errorThrown )
         {
@@ -1831,9 +1869,9 @@ function newSolicitude() {
             {
                 $( 'select[name=actividad]' ).val('').children().show();
                 $( 'select[name=inversion]' ).val('').children().show();
-
                 filterSelect( $( 'select[name=actividad]' ) , response.Data.id_actividad );
                 filterSelect( $( 'select[name=inversion]' ) , response.Data.id_inversion );
+                activityChange();
             }
             else
                 bootbox.alert( '<h4 class="red">' + data.Status + ': ' + data.Description + '</h4>');
@@ -1847,11 +1885,11 @@ function newSolicitude() {
         var ul = li.parent();
         if ( li.index() == 0 && ul.children().length > 1 )
         {
-            var table = li.attr('table');
+            var table = li.attr('tipo_cliente');
             li.remove();
             var old_li2 = ul.children().first();
-            if ( table !== old_li2.attr( "table" ) )
-                clientFilter( old_li2.attr( "table" ) );
+            if ( table !== old_li2.attr( "tipo_cliente" ) )
+                clientFilter( old_li2.attr( "tipo_cliente" ) );
         }
         else
             li.remove();

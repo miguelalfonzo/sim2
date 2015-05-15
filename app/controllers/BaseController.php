@@ -6,13 +6,13 @@ use \Common\State;
 use \Dmkt\Solicitud;
 use \Swift_TransportException;
 use \Common\FileStorage;
+use \Exception;
 
 class BaseController extends Controller {
 
 
     public function __construct()
     {
-        // Perform CSRF check on all post/put/patch/delete requests
         $this->beforeFilter('csrf', array('on' => array('post', 'put', 'patch', 'delete')));
     }
 
@@ -95,6 +95,8 @@ class BaseController extends Controller {
         $rpta[status] = error;
         $rpta[description] = desc_error;
         Log::error($exception);
+        Log::error( json_encode( oci_error() ) );
+        Log::error( $exception->getMessage() );
         Mail::send('soporte', array( 'msg' => $exception ), function($message) use($function)
         {
             $message->to(SOPORTE_EMAIL);

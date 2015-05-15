@@ -17,6 +17,8 @@ use \Validator;
 use \Dmkt\SolicitudActivity;
 use \Dmkt\InvestmentActivity;
 use \Dmkt\InvestmentType;
+use \Client\ClientType;
+use \Exception;
 
 class Seeker extends BaseController 
 {	
@@ -47,22 +49,22 @@ class Seeker extends BaseController
 			$json = ' [{"name":"FICPE.PERSONAFIS" , '.
 					' "wheres":{"likes":["PEFNRODOC1","(PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)"], '.
 					' "equal":{"PEFESTADO":1}},'.
-					' "selects":["PEFCODPERS","( PEFNRODOC1 || \'-\' || PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)" , "\'DOCTOR\'" ]}, '.
+					' "selects":["PEFCODPERS","( PEFNRODOC1 || \'-\' || PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)" , "\'DOCTOR\'" , 1 ]}, '.
 					' {"name":"FICPEF.PERSONAJUR",'.
 					' "wheres":{"likes":["PEJNRODOC","PEJRAZON"], '.
 					' "equal":{"PEJESTADO":1 , "PEJTIPPERJ":1 }}, '.
-					' "selects":["PEJCODPERS","( PEJNRODOC || \'-\' || PEJRAZON )" , "\'FARMACIA\'" ]}] ';
-					/*' {"name":"FICPE.PERSONAJUR",'.
+					' "selects":["PEJCODPERS","( PEJNRODOC || \'-\' || PEJRAZON )" , "\'FARMACIA\'" , 2 ]}, '.
+					' {"name":"FICPE.PERSONAJUR",'.
 					' "wheres":{"likes":[ "PEJRAZON" ], '.
 					' "equal":{"PEJESTADO":1 , "PEJTIPPERJ":2 }}, '.
-					' "selects":["PEJCODPERS","PEJRAZON" , "\'INSTITUCION\'" ]}] ';*/
-					/*' {"name":"VTADIS.CLIENTES",'.
+					' "selects":["PEJCODPERS","PEJRAZON" , "\'INSTITUCION\'" , 3 ]}, '.
+					' {"name":"VTADIS.CLIENTES",'.
 					' "wheres":{"likes":[ "CLRUT" , "CLNOMBRE" ], '.
 					' "equal":{ "CLESTADO":1 }, '.
 					' "in":{ "CLCLASE": [ 1 , 6 ] } }, '.
-					' "selects":[ "CLCODIGO" , " ( CLRUT || \'-\' || CLNOMBRE ) " , "CASE WHEN CLCLASE = 1 THEN \'DISTRIBUIDOR\' WHEN CLCLASE = 6 THEN \'BODEGA\' END" ]} '.
-					']';*/
-	    	$cAlias = array( 'value' , 'label' , 'type' );
+					' "selects":[ "CLCODIGO" , " ( CLRUT || \'-\' || CLNOMBRE ) " , "CASE WHEN CLCLASE = 1 THEN \'DISTRIBUIDOR\' WHEN CLCLASE = 6 THEN \'BODEGA\' END" , "CASE WHEN CLCLASE = 1 THEN 4 WHEN CLCLASE = 6 THEN 5 END" ]} '.
+					']';
+	    	$cAlias = array( 'value' , 'label' , 'type' , 'id_tipo_cliente' );
 	    	return Response::Json( $this->searchSeeker( $inputs['sVal'] , $json , $cAlias ) );
 		}
 		catch (Exception $e)
@@ -77,6 +79,7 @@ class Seeker extends BaseController
 		{
 			$inputs = Input::all();
 			$rm = Visitador::find($inputs['rm']);
+			$cuenta = $rm->cuenta;
 			if (count($cuenta) == 0)
 				$cuenta = null;
 			else
@@ -98,14 +101,10 @@ class Seeker extends BaseController
 		try
 		{
 			$inputs = Input::all();
-			$json = '[{"name":"FICPE.VISITADOR","wheres":{"likes":["VISLEGAJO","(VISNOMBRE || \' \' || VISPATERNO || \' \' || VISMATERNO)"],"equal":{"VISACTIVO":"S","LENGTH(VISLEGAJO)":8}},"selects":["VISVISITADOR","(VISNOMBRE || \' \' || VISPATERNO || \' \' || VISMATERNO)"]}]';
-			$cAlias = array('value','label');
+			$json = '[{"name":"FICPE.VISITADOR","wheres":{"likes":["VISLEGAJO","(VISNOMBRE || \' \' || VISPATERNO || \' \' || VISMATERNO)"],"equal":{"VISACTIVO":"S","LENGTH(VISLEGAJO)":8}},"selects":["VISVISITADOR","(VISNOMBRE || \' \' || VISPATERNO || \' \' || VISMATERNO)" , "\'REP\'" ]}]';
+			$cAlias = array('value','label' , 'type' );
 	    	
 			return $this->searchSeeker( $inputs['sVal'] , $json , $cAlias );
-			/*$like = "VISNOMBRE || ' ' || VISMATERNO || ' ' || VISPATERNO";
-	    	$reps = DB::TABLE('FICPE.VISITADOR')->SELECT('VISVISITADOR')->WHERE("UPPER(".$like.")","like","%".strtoupper($sVal)."%")->get();
-	    	return $reps;
-	    	$rpta = $this->searchSeeker($inputs['sVal'],$json);*/
 		}
 		catch (Exception $e)
 		{
@@ -130,7 +129,6 @@ class Seeker extends BaseController
 			    		$query = DB::table($table->name);
 			    		foreach ( $table->wheres as $key => $where )
 			    		{
-			    			Log::error( $key );
 			    			if ( $key == 'likes' )
 			    			{
 			    				foreach ( $where as $key => $like )
@@ -144,27 +142,18 @@ class Seeker extends BaseController
 			    			else if ( $key == 'in' )
 			    			{
 			    				foreach ( $where as $key => $in )
-			    				{
-			    					Log::error( 'IN ');
-			    					Log::error( $key );
-			    					Log::error( $in );
 			    					$query->whereIn( $key , $in );
-			    				}
 			    			}
 			    		}
-			    		/*foreach ( $table->wheres->equal as $key => $value )
-			    			$query->where( $key,$value);
-			    		foreach ( $table->wheres->in as $key => $value )
-			    			$query->whereIn( $key , $value );*/
 			    		for ( $i=0 ; $i< count( $cAlias ) ; $i++ )
 			    			$select = $select. ' ' .$table->selects[$i]. ' as "' .$cAlias[$i]. '",';			
 			    		$select = substr($select,0,-1);
-			    		$query->select(DB::raw($select));
+			    		$query->select( DB::raw( $select ) );
 			    		$query->take(2);
 			    		$tms = $query->get();
-			    		for ($i=0; $i < count($tms); $i++)
-			    			$tms[$i]->table = $table->name;
-			    		$array = array_merge($tms,$array);
+			    		foreach ( $tms as $tm )
+			    			$tm->table = $table->name;
+			    		$array = array_merge( $tms , $array );
 			    	}	    		
 			    	return $this->setRpta($array);
 			    }
@@ -174,54 +163,38 @@ class Seeker extends BaseController
 		    else
 		    	return $this->warningException( __FUNCTION__ , 'Input Vacio (Post: "Json" Vacio)');   
 	    }
-	    catch (Exception $e)
+	    catch ( Exception $e )
 	   	{
-	    	return $this->internalException($e,__FUNCTION__);
+	    	return $this->internalException( $e, __FUNCTION__ );
     	}
     }
 
     public function getClientView()
     {
-    	$inputs = Input::all();
-    	$rules = array(
-    		'value' => 'required|numeric|min:1',
-    		'label' => 'required|min:1',
-    		'table'	=> 'required|min:1',
-    		'type'	=> 'required|min:1'
-    	);
-    	$validator = Validator::make( $inputs[ 'data' ] , $rules );
+    	try
+    	{
+	    	$inputs = Input::all();
+	    	$rules = array(	'id_tipo_cliente' => 'required|min:1|in:'.implode( ',' , ClientType::lists('id') ) );
+	    	$validator = Validator::make( $inputs[ 'data' ] , $rules );
             if ($validator->fails()) 
                 return $this->warningException( __FUNCTION__ , substr($this->msgValidator($validator) , 0 , -1 ) );
             else
             {
-            	if ( $inputs['data']['type'] == 'FARMACIA' )
-            		$tipo_cliente = 2;
-            	else if ( $inputs['data']['type'] == 'DOCTOR')
-            		$tipo_cliente = 1;
-
-        		/*$act = SolicitudActivity::where('tipo_cliente' , $tipo_cliente )->with( array( 'investmentActivity' => function( $q )
-        		{
-        			$q->with('investment');	
-        		}))->get();*/
+            	$tipo_cliente = $inputs[ 'data' ][ 'id_tipo_cliente'];
 
 				$act = SolicitudActivity::where('tipo_cliente' , $tipo_cliente )->lists('id');
 				$inv = InvestmentActivity::whereIn( 'id_actividad' , $act )->lists( 'id_inversion');
-				//$inv = InvestmentType::whereIn( 'id ' , $inv_act )->lists( 'id');
-
-
-        		Log::error( $act );
-        		Log::error( $inv );
-        		//Log::error( $inv );
-				
-        		/*$inv_act = $act->with( 'investmentActivity' );
         		
-        		$inv = $inv_act->investment;
-        		*/            	
         		return $this->setRpta( array( 
-        			'View' => View::make( 'Seeker.client' )->with( $inputs['data'] )->render() , 
+        			'View' => View::make( 'Seeker.client' )->with( $inputs[ 'data' ] )->render() , 
         			'id_actividad' => $act ,
         			'id_inversion' => $inv 
         		));
             }
+        }
+        catch ( Exception $e )
+        {
+        	return $this->internalException( $e , __FUNCTION__ );
+        }
     }
 }

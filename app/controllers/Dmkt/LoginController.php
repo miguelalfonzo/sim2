@@ -10,6 +10,7 @@ use \Redirect;
 use \Auth;
 use \Validator;
 use User;
+use \Exception;
 
 class LoginController extends BaseController{
 

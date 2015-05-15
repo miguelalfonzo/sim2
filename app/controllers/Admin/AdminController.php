@@ -23,6 +23,7 @@ use \Common\Person;
 use User;
 use \Hash;
 use \Session;
+use \Exception;
 
 
 class AdminController extends BaseController
