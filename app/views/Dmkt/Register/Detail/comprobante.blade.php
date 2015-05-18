@@ -1,8 +1,8 @@
- @if( isset($solicitude) && (  $solicitude->idtiposolicitud == SOL_REP && $solicitude->detalle->idmotivo == REASON_REGALO )  )
+ @if( isset( $solicitud ) && (  $solicitud->idtiposolicitud == SOL_REP && $solicitud->activity->imagen == 1 )  )
     <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+        <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label" >Comprobante</label>
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-            <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label"> </label>
-            <a class="btn btn-primary btn-md" data-toggle="modal" data-target="#myFac">
+            <a class="btn btn-primary" data-toggle="modal" data-target="#myFac" style="width:100%">
                 Ver Comprobante
             </a>
         </div>

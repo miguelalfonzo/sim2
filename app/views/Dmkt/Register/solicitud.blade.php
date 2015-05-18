@@ -10,10 +10,12 @@
             @endif
             <small style="float: right; margin-top: -10px">
                 <strong>Usuario : 
-                @if( Auth::user()->type == REP_MED ) 
+                @if ( Auth::user()->type == REP_MED ) 
                     {{Auth::user()->rm->full_name}}
-                @else
-                    {{Auth::user()->sup->full_name}} 
+                @elseif ( Auth::user()->type == SUP )
+                    {{Auth::user()->sup->full_name}}
+                @elseif ( Auth::user()->type == GER_PROD )
+                    {{Auth::user()->gerProd->descripcion}} 
                 @endif
                 </strong>
             </small>

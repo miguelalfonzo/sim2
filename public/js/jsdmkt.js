@@ -13,15 +13,14 @@ function newSolicitude() {
     var title         = $('input[name=titulo]');
     var currency      = $('select[name=moneda]');
     var amount        = $('input[name=monto]');
-    var payment       = $('select[name=payment]');
+    var payment       = $('select[name=pago]');
     var delivery_date = $('input[name=fecha]');
     var products      = $('.products');
     var clients       = $('#clientes');
 
     var invoice_amount  = $('input[name=monto_factura]');
     var invoice_img     = $('input[name=factura]');
-    var ruc                = $('input[name=ruc]');
-    var isSetImage         = $('#isSetImage');
+    var ruc             = $('input[name=ruc]');
     
     var search_cliente = $('.cliente-seeker');
 
@@ -1276,24 +1275,27 @@ function newSolicitude() {
 
     function addImage(e) 
     {
-        a = e;
         var file = e.target.files[0],
             imageType = /image.*/;
         if (!file.type.match(imageType))
-            responseUI('Ingrese solo Imagenes','blue');
+            bootbox.alert('<h4 class=blue">Ingrese solo Imagenes</h4>');
         else 
         {
             var reader = new FileReader();
             reader.onload = fileOnload;
             reader.readAsDataURL(file);
-            console.log( reader);
             invoice_img.parent().parent().parent().children().last().val( file.name );
         }
     }
 
+    function fileOnload( event ) 
+    {
+        $('.img-responsive').attr("src", event.target.result );
+    }
+
     /* $(document).on('change', '.btn-file :file', function (e) {
 
-        var file = e.target.files[0],*/
+        var file = e.target.files[0],*/ 
        //     imageType = /image.*/;
         /*if (!file.type.match(imageType))
             alert('ingrese solo imagenes');
@@ -1311,11 +1313,6 @@ function newSolicitude() {
         console.log(e);
         addImage(e);
     });
-
-    function fileOnload(e) {
-        var result = e.target.result;
-        $('#imgSalida').attr("src", result);
-    }
 
     /* Menu */
     var navItems = $('.admin-menu li > a');
@@ -2054,14 +2051,14 @@ function newSolicitude() {
         }
         if( $('select[name=actividad] option:selected').attr('image') == 1 )
         {
-            if ( !invoice_amount.val() ) 
+            if ( ! invoice_amount.val() ) 
             {
                 invoice_amount.parent().addClass('has-error');
                 invoice_amount.attr('placeholder', 'Ingrese Monto de la Factura');
                 invoice_amount.addClass('input-placeholder-error');
                 aux = 1;
             }
-            if( !invoice_img.val() && isSetImage.val() == null )
+            if(  ! invoice_img.val() && $( '.img-responsive' ).attr('src').trim() === '' )
             {
                 invoice_img.parent().addClass('has-error');
                 invoice_img.attr('placeholder', 'Ingrese Imagen');
@@ -2088,7 +2085,7 @@ function newSolicitude() {
         e.preventDefault();
         var aux = 0;
         var d_clients = [];
-        var d_tables = [];
+        var d_clients_type = [];
         var families_input = [];
         
         aux = validateNewSol();
@@ -2098,7 +2095,7 @@ function newSolicitude() {
         {
             elem = $(this);
             d_clients.push( elem.attr("pk") );
-            d_tables.push( elem.attr("table") );
+            d_clients_type.push( elem.attr("tipo_cliente") );
         });
         
         var families = $('.products');
@@ -2127,7 +2124,7 @@ function newSolicitude() {
             var form = $('#form-register-solicitude');
             var formData = new FormData(form[0]);
             formData.append( "clientes[]", d_clients );
-            formData.append( "tables[]" , d_tables );
+            formData.append( "tipos_cliente[]" , d_clients_type );
             var rute = form.attr('action');
             var message1 = 'Registrando';
             var message2 = '<strong style="color: green">Solicitud Registrada</strong>';
@@ -2151,7 +2148,7 @@ function newSolicitude() {
             }).done(function ( data )
             {
                 $.unblockUI();
-                if(data.Status == 'Ok')
+                if(data.Status == 'Ok' )
                 {
                     responseUI('Solicitud Registrada', 'green');
                     setTimeout( function()

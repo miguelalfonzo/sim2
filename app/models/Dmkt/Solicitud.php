@@ -22,7 +22,7 @@ class Solicitud extends Eloquent
     public function lastId()
     {
         $lastId = Solicitud::orderBy('id', 'DESC')->first();
-        if( $lastId == null )
+        if( is_null( $lastId ) )
             return 0;
         else
             return $lastId->id;
@@ -120,9 +120,9 @@ class Solicitud extends Eloquent
         return $this->hasOne('Dmkt\Sup','iduser','created_by')->select('nombres,apellidos,iduser,idsup');;
     }
 
-    protected function actividad()
+    protected function activity()
     {
-        return $this->hasOne('Dmkt\Activity','id','idetiqueta');
+        return $this->hasOne('Dmkt\Activity','id','idactividad');
     }
 
     protected function expenses()

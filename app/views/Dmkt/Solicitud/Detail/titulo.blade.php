@@ -4,7 +4,7 @@
     </label>
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
         <div class="input-group">
-            <span class="input-group-addon">{{$solicitud->actividad->nombre}}</span>
+            <span class="input-group-addon">{{$solicitud->activity->nombre}}</span>
             <input id="titulo" class="form-control input-md" type="text"
             value="{{$solicitud->titulo}}" readonly>
         </div>

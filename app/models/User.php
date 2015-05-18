@@ -56,6 +56,11 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
     public function apps(){
         return $this->hasMany('Common\UserApp' ,'iduser','id');
     }
+
+    public function simApp(){
+        return $this->hasOne('Common\UserApp' , 'iduser' , 'id' )->where( 'idapp' , SISTEMA_SIM );
+    }
+
     public function getName(){
         $username= '';
 

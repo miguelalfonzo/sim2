@@ -4,18 +4,8 @@
         <div class="form-group col-sm-2 col-md-2" style="padding: 0">
             <div>
                 <select id="idState" name="idstate" class="form-control selectestatesolicitude">
-                    @foreach($states as $estado)
-                        @if ( Auth::user()->type == REP_MED || Auth::user()->type == SUP || Auth::user()->type == GER_PROD )
-                            @if(isset($state))
-                                @if($state == $estado->id)
-                                    <option value="{{$estado->id}}" selected>{{$estado->nombre}}</option>
-                                @else
-                                    <option value="{{$estado->id}}">{{$estado->nombre}}</option>
-                                @endif
-                            @else    
-                                <option value="{{$estado->id}}">{{$estado->nombre}}</option>
-                            @endif
-                        @elseif ( in_array( Auth::user()->type , array( GER_COM , ASIS_GER ) ) )
+                    @foreach( $states as $estado )
+                        @if ( in_array( Auth::user()->type , array( GER_COM , ASIS_GER ) ) )
                             @if( in_array( $estado->id , array( R_APROBADO , R_REVISADO , R_GASTO , R_FINALIZADO , R_NO_AUTORIZADO ) ) )
                                 @if(isset($state))
                                     @if($state == $estado->id)
@@ -42,6 +32,16 @@
                                 @else    
                                     <option value="{{$estado->id}}">{{$estado->nombre}}</option>
                                 @endif
+                            @endif
+                        @elseif ( ! Auth::user()->simApp->count() !== 0 )
+                            @if( isset( $state ) )
+                                @if( $state == $estado->id )
+                                    <option value="{{$estado->id}}" selected>{{$estado->nombre}}</option>
+                                @else
+                                    <option value="{{$estado->id}}">{{$estado->nombre}}</option>
+                                @endif
+                            @else    
+                                <option value="{{$estado->id}}">{{$estado->nombre}}</option>
                             @endif
                         @endif
                     @endforeach
@@ -75,7 +75,7 @@
                 </div>
             </div>
         @endif
-        @if ( Auth::user()->type == REP_MED || Auth::user()->type == SUP )
+        @if ( in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD ) ) )
             <div class="form-group col-sm-3 col-md-3 button-new-solicitude" style="text-align: right; padding: 0">
                 <div style="padding: 0">
                     <a href="{{URL::to('nueva-solicitud')}}" id="singlebutton" name="singlebutton" class="btn btn-primary">

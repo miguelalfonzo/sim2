@@ -173,7 +173,7 @@ Route::group(array('before' => 'rm_ager'), function ()
     // Expense
     
 });
-Route::group(array('before' => 'rm_sup'), function ()
+Route::group(array('before' => 'rm_sup_gerprod'), function ()
 {    
     Route::get('nueva-solicitud', 'Dmkt\SolicitudeController@newSolicitude');
     Route::post('registrar-solicitud', 'Dmkt\SolicitudeController@registerSolicitude');

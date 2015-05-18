@@ -60,6 +60,8 @@ action="{{isset($solicitud) ? 'editar-solicitud' : 'registrar-solicitud' }}">
             </div>
         </div>
     </div>
+    <!-- Ver Comprobante -->
+    @include('Dmkt.Register.Detail.comprobante')
     
     <div style="clear:both">
     <!-- PRODUCTOS -->
@@ -72,12 +74,12 @@ action="{{isset($solicitud) ? 'editar-solicitud' : 'registrar-solicitud' }}">
             <ul class="list-group" id="clientes">
                 @if ( isset( $solicitud ) )
                     @foreach ( $solicitud->clients as $client )
-                        <li class="list-group-item" table="{{$client->from_table}}" pk="{{$client->idcliente}}">
-                            <b>{{$client->idcliente}}</b>
-                            <button type='button' class='btn-delete-client' style="z-index:2; display:none">
+                        <li class="list-group-item" tipo_cliente="{{$client->id_tipo_cliente}}" pk="{{$client->idcliente}}">
+                            <b>{{ $client->{$client->clientType->relacion}->full_name }}</b>
+                            <button type='button' class='btn-delete-client' style="z-index:2">
                                 <span class="glyphicon glyphicon-remove red" style="margin-left:20px ; float:right;"></span>
                             </button>
-                            <span class="badge">{{$client->from_table}}</span>
+                            <span class="badge">{{$client->clientType->descripcion}}</span>
                         </li>
                     @endforeach
                 @endif
@@ -85,8 +87,7 @@ action="{{isset($solicitud) ? 'editar-solicitud' : 'registrar-solicitud' }}">
         </div>
     </div>
     </div>
-    <!-- Ver Comprobante -->
-    @include('Dmkt.Register.Detail.comprobante')
+    
    
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 10px">
         <div class="form-group">

@@ -32,9 +32,18 @@ class SolicitudClient extends Eloquent
         return $this->hasOne('Client\Pharmacy' , 'pejcodpers' , 'idcliente');
     }
 
-    protected function distrimedclient()
+    protected function warehouse()
     {
-        return $this->hasOne('Client\DistrimedClient' , 'clcodigo' , 'idcliente');
+        return $this->hasOne('Client\DistrimedClient' , 'clcodigo' , 'idcliente')->where( 'clclase' , 1 )->where( 'clestado' , 1 );
+    }    
+
+    protected function distributor()
+    {
+        return $this->hasOne('Client\DistrimedClient' , 'clcodigo' , 'idcliente')->where( 'clclase' , 6 )->where( 'clestado' , 1 );
     }
 
+    protected function clientType()
+    {
+        return $this->hasOne( 'Client\ClientType' , 'id' , 'id_tipo_cliente' );
+    }
 }

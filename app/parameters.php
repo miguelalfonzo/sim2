@@ -69,6 +69,7 @@ const GER_COM = 'G';
 const CONT = 'C';
 const TESORERIA = 'T';
 const ASIS_GER = 'AG';
+const GER_PROM = 'GP';
 
 //TABLAS EXTERNAS
 const TB_DOCTOR = 'FICPE.PERSONAFIS';
@@ -111,3 +112,5 @@ const REEMBOLSO = 3;
 //TIPO DE DOCUMENTO
 const RECIBO_HONORARIO = 2;
 
+//CODIGO DEL SISTEMA
+const SISTEMA_SIM = 2;

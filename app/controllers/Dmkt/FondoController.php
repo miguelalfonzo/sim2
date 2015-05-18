@@ -50,7 +50,7 @@ class FondoController extends BaseController
                 $rm = $solInst->asignedTo->rm;
                 $data = array(
                     'titulo'    => $solInst->titulo,
-                    'idetiqueta'  => $solInst->idetiqueta,
+                    'idactividad'  => $solInst->idactividad,
                     'rm'            => $rm->nombres.' '.$rm->apellidos ,
                     'idrm'          => $rm->idrm ,
                     'supervisor'    => $jDetalle->supervisor ,
@@ -374,7 +374,7 @@ class FondoController extends BaseController
         {
             $rules = array(
                 'institucion' => 'required|min:3',
-                'idetiqueta'  => 'required|numeric|min:1',
+                'idactividad'  => 'required|numeric|min:1',
                 'codrepmed'   => 'required|numeric|min:1',
                 'supervisor'  => 'required|min:4',
                 'codsup'      => 'required|numeric|min:0',
@@ -442,7 +442,7 @@ class FondoController extends BaseController
                         $solicitud->id              = $solicitud->searchId() + 1;
                         $solicitud->titulo          = $inputs['institucion'];
                         $solicitud->idestado        = PENDIENTE;
-                        $solicitud->idetiqueta      = $inputs['idetiqueta'];
+                        $solicitud->idactividad      = $inputs['idactividad'];
                         $solicitud->idtiposolicitud = SOL_INST;
                         $solicitud->iduserasigned   = $middleRpta[data];
                         $solicitud->token           = sha1(md5(uniqid($solicitud->id, true)));
@@ -512,7 +512,7 @@ class FondoController extends BaseController
                             if ( $middleRpta[status] == ok )
                             {
                                 $solInst->titulo     = $inputs['institucion'];
-                                $solInst->idetiqueta = $inputs['idetiqueta'];
+                                $solInst->idactividad = $inputs['idactividad'];
                                 $solInst->iduserasigned = $middleRpta[data];
                                 if ( !$solInst->save() )
                                     return $this->warningException( __FUNCTION__ , 'No se pudo actualizar la solicitud: '.$inputs['idsolicitud'] );

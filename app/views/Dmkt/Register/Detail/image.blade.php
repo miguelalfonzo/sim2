@@ -1,6 +1,6 @@
-@if ( !isset( $solicitude ) || ( isset( $solicitude ) &&  $solicitude->idtiposolicitud == SOL_REP && $solicitude->detalle->idmotivo != REASON_REGALO ) )
+@if ( ! isset( $solicitud ) || ( isset( $solicitud ) && $solicitud->activity->imagen != 1 ) )
     <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
-        <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label" for="file">Factura
+        <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label" for="factura">Factura
             <small>(solo imagenes)</small>
         </label>
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">

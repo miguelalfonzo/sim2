@@ -1,16 +1,11 @@
 <?php
 
-use \System\SolicitudHistory;
-use \User;
-use \Common\State;
 use \Dmkt\Solicitud;
-use \Swift_TransportException;
-use \Common\FileStorage;
-use \Exception;
+use \Common\State;
+use \System\SolicitudHistory;
 
-class BaseController extends Controller {
-
-
+class BaseController extends Controller 
+{
     public function __construct()
     {
         $this->beforeFilter('csrf', array('on' => array('post', 'put', 'patch', 'delete')));
@@ -165,7 +160,8 @@ class BaseController extends Controller {
         return $rpta;
     }
 
-    public function setStatus( $status_from, $status_to, $user_from_id, $user_to_id, $idsolicitude){
+    public function setStatus( $status_from , $status_to , $user_from_id , $user_to_id , $idsolicitude )
+    {
         try
         {
             $fromStatus = State::where('idestado', $status_from)->first();
@@ -309,9 +305,9 @@ class BaseController extends Controller {
                 $solicituds = $solicituds->merge($rSolicituds);
             return $this->setRpta($solicituds);
         }
-        catch (Exception $e)
+        catch ( Exception $e )
         {
-            return $this->internalException($e,__FUNCTION__);
+            return $this->internalException( $e, __FUNCTION__ );
         }
     }
 
@@ -320,39 +316,37 @@ class BaseController extends Controller {
         try
         {
             $user = Auth::user();
-            if ($user->type == SUP)
+            if ( $user->type == SUP )
             { 
                 $reps = $user->Sup->Reps;
                 $users_ids = array();
                 foreach ($reps as $rm)
                     $users_ids[] = $rm->iduser;
                 $users_ids[] = $user->id;
-                $rpta = $this->setRpta($users_ids);
+                return $this->setRpta($users_ids);
             }
-            else if ($user->type == GER_PROD)
+            else if ( $user->type == GER_PROD )
             {
                 $solicitud_ids = [];
                 $solicituds = $user->gerProd->solicituds;
                 foreach ($solicituds as $sol)
                     $solicitud_ids[] = $sol->idsolicitud; // jalo los ids de las solicitudes pertenecientes al gerente de producto
                 $solicitud_ids[] = 0; // el cero va para que tenga al menos con que comparar, para que no salga error
-                $rpta = $this->setRpta($solicitud_ids);
+                return $this->setRpta( $solicitud_ids );
             }
-            else if ($user->type == REP_MED)
-                $rpta = $this->setRpta(array($user->id));
-            else if ($user->type == ASIS_GER)
-                $rpta = $this->setRpta(array($user->id));    
+            else if ( in_array( $user->type , array( REP_MED , ASIS_GER , GER_PROM ) ) )
+                return $this->setRpta(array($user->id));
             else if (in_array($user->type,array(GER_COM,CONT,TESORERIA)))
-                $rpta = $this->setRpta(array());
+                return $this->setRpta(array());
             else
-                $rpta = $this->warningException('Se ha solicitado buscar solicitudes por un usuario con rol no autorizado: '.$user->type,__FUNCTION__,'Unauthorized User');
+                return $this->warningException( __FUNCTION__ , 'Se ha solicitado buscar solicitudes por un usuario con rol no autorizado: '.$user->type );
         }
         catch (Exception $e)
         {
-            $rpta = $this->internalException($e,__FUNCTION__);
+            return $this->internalException($e,__FUNCTION__);
         }
-        return $rpta;
     }
+
     public function viewTestUploadImg(){
         return View::make('test.testUploadImg');
     }

@@ -65,19 +65,19 @@ class SolicitudeController extends BaseController
 
     public function showUser()
     {
-        if (Session::has('state'))
+        if ( Session::has('state') )
             $state = Session::pull('state');
         else
         {
             if ( in_array( Auth::user()->type , array( GER_COM , CONT , ASIS_GER ) ) )
                 $state = R_APROBADO ;
-            else if ( Auth::user()->type == REP_MED || Auth::user()->type == SUP || Auth::user()->type == GER_PROD )
+            else if ( in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD , GER_PROM ) ) )
                 $state = R_PENDIENTE;
             elseif ( Auth::user()->type == TESORERIA )
                 $state = R_REVISADO ;
         }
         $mWarning = array();
-        if (Session::has('warnings'))
+        if ( Session::has('warnings') )
         {
             $warnings = Session::pull('warnings');
             $mWarning[status] = ok ;
@@ -222,7 +222,6 @@ class SolicitudeController extends BaseController
     {
         try
         {          
-            Log::error( $inputs ); 
             $rules = array(
                 'motivo'        => 'required|numeric|min:1|in:'.implode( ',' , Reason::lists('id') ),
                 'inversion'     => 'required|numeric|min:1|in:'.implode( ',' , InvestmentType::lists('id') ),
@@ -243,10 +242,10 @@ class SolicitudeController extends BaseController
             {
                 $actividad = Activity::find( $inputs[ 'actividad' ] );
                 $rules = array();
-                if ( $actividad->imagen === 1 )
+                if ( $actividad->imagen == 1 )
                 {
                     $rules[ 'monto_factura' ] = 'required|numeric|min:1';
-                    $rules[ 'file']           = 'required|max:700|mimes:jpeg,gif'; 
+                    $rules[ 'factura' ]       = 'required|max:700|mimes:jpeg,gif'; 
                 }
                 if ( $inputs[ 'pago'] == PAGO_CHEQUE )
                     $rules['ruc'] = 'required|numeric|digits:11';
@@ -268,90 +267,35 @@ class SolicitudeController extends BaseController
         } 
     }
 
-    private function unsetPago( $jDetalle , $typePayment , $ruc )
+    private function setPago( &$jDetalle , $paymentType , $ruc )
     {
-        try
-        {
-            if ( $typePayment != PAGO_CHEQUE ) 
-                unset($jDetalle->num_ruc);
-            else if ($typePayment == PAGO_CHEQUE ) 
-                $jDetalle->num_ruc = $ruc;
-            return $this->setRpta( $jDetalle );
-        }
-        catch ( Exception $e )
-        {
-            return $this->internalException( $e , __FUNCTION__);
-        }
+        if ( $paymentType != PAGO_CHEQUE ) 
+            unset( $jDetalle->num_ruc );
+        else if ( $paymentType == PAGO_CHEQUE ) 
+            $jDetalle->num_ruc = $ruc;
     }
 
-    private function unsetImage( $oldType , $jDetalle , $typeSolicitude , $image , $factura)
-    {
-        try
-        {
-            if ( ( $typeSolicitude == 1 || $typeSolicitude == 3 ) && $oldType == 2 ) 
-            {
-                $path = public_path('img/reembolso/' . $jDetalle->image);
-                @unlink($path);
-                unset($jDetalle->monto_factura);
-                unset($jDetalle->image);
-            }
-            elseif ( $typeSolicitude == 2 )
-            {
-                if ( $oldType == 2 )
-                {
-                    if ( is_object( $image ) )
-                    {
-                        $path = public_path('img/reembolso/' . $jDetalle->image);
-                        @unlink($path);
-                        $filename = uniqid() . '.' . $image->getClientOriginalExtension();
-                        $path = public_path('img/reembolso/' . $filename);
-                        Image::make($image->getRealPath())->resize(800, 600)->save($path);
-                        $jDetalle->image = $filename;
-                    }
-                    $jDetalle->monto_factura = round( $factura , 2 , PHP_ROUND_HALF_DOWN );  
-                }
-                else
-                {
-                    if ( !is_object( $image ) )
-                        return $this->warningException(__FUNCTION__,'No ha ingresado la imagen de la Factura');
-                    else
-                    {
-                        $filename = uniqid() . '.' . $image->getClientOriginalExtension();
-                        $path = public_path('img/reembolso/' . $filename);
-                        Image::make($image->getRealPath())->resize(800, 600)->save($path);
-                        $jDetalle->image = $filename;
-                        $jDetalle->monto_factura = round( $factura , 2 , PHP_ROUND_HALF_DOWN );  
-                    }       
-                }
-            }
-            return $this->setRpta($jDetalle);
-        }
-        catch ( Exception $e )
-        {
-            return $this->internalException( $e , __FUNCTION__);
-        }
-    }
-
-    private function setClients( $idSolicitud , $clients , $tables )
+    private function setClients( $idSolicitud , $clients , $types )
     {
         try
         {
             $clients = explode(',',$clients[0]);
-            $tables = explode(',',$tables[0]);    
+            $tables = explode(',',$types[0]);    
             if ( count($clients) != count($tables) )
-                return $this->warningException(__FUNCTION__,'El numero de clientes ingresado no contiene el mismo numero de fuentes');
+                return $this->warningException( __FUNCTION__ , 'El numero de clientes ingresado no contiene el mismo numero de fuentes' );
             else
             { 
                 SolicitudClient::where('idsolicitud' , $idSolicitud )->delete();
-                for ($i=0;$i< count($clients);$i++) 
+                for ( $i=0 ; $i< count($clients) ; $i++ ) 
                 {        
                     $client = new SolicitudClient;
                     $client->id = $client->lastId() + 1;
                     $client->idsolicitud = $idSolicitud;
                     $client->idcliente = $clients[$i];
-                    $client->from_table = $tables[$i];
+                    //$client->from_table = $tables[$i];
+                    $client->id_tipo_cliente = $types[$i];
                     if ( !$client->save() )
-                        return $this->warningException(__FUNCTION__,'No se pudo procesar a los clientes de la solicitud');
+                        return $this->warningException( __FUNCTION__ , 'No se pudo procesar a los clientes de la solicitud' );
                 }
                 return $this->setRpta();
             }
@@ -384,15 +328,59 @@ class SolicitudeController extends BaseController
         }
     }
 
-    private function inputSol( $solicitud , $i )
+    private function setInvoice( $type , $oldActivity , $jDetalle , $inputs )
     {
-        $solicitud->titulo          = $i['titulo'];
-        $solicitud->descripcion     = $i['descripcion'];
-        $solicitud->idestado        = PENDIENTE;
-        $solicitud->idactividad     = $i['actividad'];
-        $solicitud->idinversion     = $i['inversion'];
-        $solicitud->idtiposolicitud = SOL_REP;
-        $solicitud->status          = ACTIVE;
+        try
+        {
+            $actividad = Activity::find( $inputs[ 'actividad' ] );
+
+            if ( $type === 'REGISTRAR' )
+            {
+                dd(0);
+                if ( $actividad->imagen == 1 )
+                    $this->setImage( $jDetalle , $inputs[ 'factura' ] , $inputs[ 'monto_factura'] );
+            }
+            elseif ( $type === 'ACTUALIZAR' )
+            {
+                if ( $oldActivity->imagen == 1 && $actividad->imagen != 1 ) 
+                {
+                    dd(1);
+                    $path = public_path('img/reembolso/' . $jDetalle->image );
+                    @unlink( $path );
+                    unset( $jDetalle->monto_factura );
+                    unset( $jDetalle->image );
+                }
+                elseif ( $actividad->imagen == 1 )
+                {
+                    dd(2);
+                    if ( $solicitud->activity->imagen == 1 )
+                    {
+                        $path = public_path( 'img/reembolso/' . $jDetalle->image );
+                        @unlink( $path );
+                    }
+                    $this->setImage( $jDetalle , $inputs[ 'factura' ] , $inputs[ 'monto_factura']  ); 
+                }
+            }
+
+            dd($type);
+            return $this->setRpta( $jDetalle );
+        }
+        catch ( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__);
+        }
+    }
+
+    private function setImage( &$jDetalle , $image , $monto )
+    {
+        $filename = uniqid() . '.' . $image->getClientOriginalExtension();
+        $path = public_path( 'img/reembolso/' . $filename);
+        Image::make( $image->getRealPath() )->resize( WIDTH , HEIGHT )->save( $path );
+        Log::error( json_encode($jDetalle));
+        $jDetalle->image = $filename;
+        $jDetalle->monto_factura = round( $monto , 2 , PHP_ROUND_HALF_DOWN );
+        Log::error( json_encode($jDetalle));
+        
     }
 
     public function registerSolicitude()
@@ -401,64 +389,42 @@ class SolicitudeController extends BaseController
         {
             DB::beginTransaction();
             $inputs = Input::all();
-            $image = Input::file('factura');
-            $middleRpta = $this->validateInputSolRep( $inputs , 1 );
+            $middleRpta = $this->validateInputSolRep( $inputs );
             if ( $middleRpta[status] == ok )
             {
-                $solicitud = new Solicitud;
-                $solicitud->id          = $solicitud->lastId() + 1;
-                $detalle                = new SolicitudDetalle;
-                $detalle->id            = $detalle->lastId() + 1;
-                $solicitud->iddetalle   = $detalle->id;
-                $solicitud->token       = sha1( md5( uniqid( $solicitud->id , true ) ) );
+                $solicitud             = new Solicitud;
+                $solicitud->id         = $solicitud->lastId() + 1;
+                $detalle               = new SolicitudDetalle;
+                $detalle->id           = $detalle->lastId() + 1;
+                $solicitud->iddetalle  = $detalle->id;
+                $solicitud->token      = sha1( md5( uniqid( $solicitud->id , true ) ) );
                 
-                $this->inputSol( $solicitud , $inputs );
+                $this->setSolicitud( $solicitud , $inputs );
                 
-                if ( !$solicitud->save() )
-                    return $this->warningException( __FUNCTION__ , 'No se pudo registrar la solicitud');
+                if ( ! $solicitud->save() )
+                    return $this->warningException( __FUNCTION__ , 'No se pudo registrar la solicitud' );
                 else 
                 {
                     $jDetalle = new stdClass();
-                    $jDetalle->monto_solicitado  = round( $inputs['monto'] , 2 , PHP_ROUND_HALF_DOWN );
-                    $jDetalle->fecha_entrega     = $inputs['fecha'];
-
-                    $actividad = Activity::find( $inputs[ 'actividad' ] );
-                    if ( $actividad->imagen == 1 && $image->isValid() )
+                    $this->setJsonDetalle( $jDetalle , $solicitud->activity , $inputs , 'REGISTRAR' );
+                    $detalle->detalle      = json_encode( $jDetalle );
+                    Log::error( json_encode( $detalle->detalle));
+                    $this->setDetalle( $detalle , $inputs );
+                    if ( !$detalle->save() )
+                        return $this->warningException( __FUNCTION__ , 'No se pudo registrar los detalles de la solicitud');
+                    else
                     {
-                        $filename                 = uniqid() . '.' . $image->getClientOriginalExtension();
-                        $path                     = public_path( IMAGE_PATH . $filename);
-                        Image::make($image->getRealPath())->resize(WIDTH,HEIGHT)->save($path);
-                        $jDetalle->image          = $filename;
-                        $jDetalle->monto_factura  = round( $inputs['monto_factura'] , 2 , PHP_ROUND_HALF_DOWN );
-                    }
-                    
-                    $middleRpta = $this->unsetPago( $jDetalle , $inputs['pago'] , $inputs['ruc'] );
-                    if ( $middleRpta[status] == ok )
-                    {
-                        $jDetalle = $middleRpta[data];
-                        $detalle->detalle      = json_encode($jDetalle);
-                        $detalle->idmoneda     = $inputs['moneda'];
-                        $detalle->idmotivo     = $inputs['motivo'];
-                        $detalle->idpago       = $inputs['pago'];
-                        if ( !$detalle->save() )
-                            return $this->warningException( __FUNCTION__ , 'No se pudo registrar los detalles de la solicitud');
-                        else
+                        $middleRpta = $this->setClients( $solicitud->id , $inputs['clientes'] , $inputs['tipos_cliente'] );
+                        if ( $middleRpta[status] == ok )
                         {
-                            $middleRpta = $this->setClients( $solicitud->id , $inputs['clientes'] , $inputs['tables'] );
+                            $middleRpta = $this->setFamilies( $solicitud->id , $inputs['productos'] );
                             if ( $middleRpta[status] == ok )
                             {
-                                $middleRpta = $this->setFamilies( $solicitud->id , $inputs['productos'] );
-                                if ( $middleRpta[status] == ok )
-                                {
-                                    $user = Auth::user();
-                                    $toUserId = $this->toUser( $user );
-                                    $middleRpta = $this->setStatus( 0 , PENDIENTE, $user->id, $toUserId, $solicitud->id);
-                                    if ($middleRpta[status] == ok)
-                                    {
-                                        DB::commit();
-                                        return $this->setRpta( Auth::user()->type );
-                                    }
-                                }
+                                $user = Auth::user();
+                                $toUserId = $this->toUser( $user );
+                                $middleRpta = $this->setStatus( 0 , PENDIENTE, $user->id, $toUserId, $solicitud->id);
+                                if ($middleRpta[status] == ok)
+                                    DB::commit();
                             }
                         }
                     }
@@ -487,6 +453,38 @@ class SolicitudeController extends BaseController
             return 0;
     }
 
+    private function setSolicitud( $solicitud , $inputs )
+    {
+        $solicitud->titulo          = $inputs['titulo'];
+        $solicitud->idactividad     = $inputs['actividad'];
+        $solicitud->idinversion     = $inputs['inversion'];
+        $solicitud->descripcion     = $inputs['descripcion'];
+        $solicitud->idestado        = PENDIENTE;
+        $solicitud->idtiposolicitud = SOL_REP;
+        $solicitud->status          = ACTIVE;
+    }
+
+    private function setDetalle( $detalle , $inputs )
+    {
+        $detalle->idmoneda     = $inputs['moneda'];
+        $detalle->idmotivo     = $inputs['motivo'];
+        $detalle->idpago       = $inputs['pago'];
+    }                  
+
+    private function setJsonDetalle( &$jDetalle , $oldActivity , $inputs , $type )  
+    {
+        $jDetalle->monto_solicitado  =  round( $inputs['monto'] , 2 , PHP_ROUND_HALF_DOWN );
+        $jDetalle->fecha_entrega     =  $inputs['fecha']; 
+        Log::error( json_encode($jDetalle));
+                    
+        $this->setInvoice( $type , $oldActivity , $jDetalle , $inputs );    
+        Log::error( json_encode($jDetalle));
+                    
+        $this->setPago( $jDetalle , $inputs['pago'] , $inputs['ruc'] );            
+        Log::error( json_encode($jDetalle));
+                    
+    }
+
     public function formEditSolicitude()
     {
         try
@@ -496,53 +494,37 @@ class SolicitudeController extends BaseController
             $middleRpta = $this->validateInputSolRep( $inputs , 2 );
             if ( $middleRpta[status] == ok )
             {     
-                $solicitud                 =  Solicitud::find( $inputs['idsolicitude'] );
-                $solicitud->titulo         =  $inputs['titulo'];
-                $solicitud->descripcion    =  $inputs['descripcion'];
-                $solicitud->idetiqueta     =  $inputs['etiqueta'];
+                $solicitud =  Solicitud::find( $inputs['idsolicitud'] );
+                $actividad = $solicitud->actividad;
+                $this->setSolicitud( $solicitud , $inputs );
                 if ( !$solicitud->save() )
                     return array( status => warning , description => 'No se pudo procesar la solicitud');
                 else
                 {
-                    $typeSol = $inputs['type_solicitude'];
-
                     $detalle  = $solicitud->detalle;
                     $jDetalle = json_decode( $detalle->detalle );
-                    $jDetalle->monto_solicitado  =  round( $inputs['monto'] , 2 , PHP_ROUND_HALF_DOWN );
-                    $jDetalle->fecha_entrega     =  $inputs['fecha'];  
-                
-                    $middleRpta = $this->unsetImage( $detalle->idmotivo , $jDetalle , $typeSol , Input::file('file') , $inputs['amount_fac'] );    
-                    if ( $middleRpta[status] == ok )
+                    Log::error( json_encode($jDetalle));
+                    $this->setJsonDetalle( $jDetalle , $actividad , $inputs , 'ACTUALIZAR' );
+                    Log::error( json_encode($jDetalle));
+                    $detalle->detalle       =  json_encode( $jDetalle );
+                    $this->setDetalle( $detalle , $inputs );
+                    if (!$detalle->save() )
+                        return array( status => warning , description => 'No se pudo procesar los detalles de la solicitud' );
+                    else
                     {
-                        $middleRpta = $this->unsetPago( $middleRpta[data] , $inputs['pago'] , $inputs['ruc'] );
+                        $middleRpta = $this->setClients( $solicitud->id , $inputs['clientes'] , $inputs['tipos_cliente'] );
                         if ( $middleRpta[status] == ok )
                         {
-                            $detalle->detalle       =  json_encode( $middleRpta[data] );
-                            $detalle->idmotivo      =  $typeSol;
-                            $detalle->idpago        =  $inputs['pago'];
-                            $detalle->idmoneda      =  $inputs['moneda'];
-                            if (!$detalle->save() )
-                                return array( status => warning , description => 'No se pudo procesar los detalles de la solicitud' );
-                            else
+                            $middleRpta = $this->setFamilies( $solicitud->id , $inputs['productos'] );
+                            if ( $middleRpta[status] == ok )
                             {
-                                $middleRpta = $this->setClients( $solicitud->id , $inputs['clientes'] , $inputs['tables'] );
-                                if ( $middleRpta[status] == ok )
-                                {
-                                    $middleRpta = $this->setFamilies( $solicitud->id , $inputs['familias'] );
-                                    if ( $middleRpta[status] == ok )
-                                    {
-                                        $user = Auth::user();
-                                        $toUserId = $this->toUser( $user );
-                                        $middleRpta = $this->setStatus( 0 , PENDIENTE, $user->id, $toUserId, $inputs['idsolicitude'] );
-                                        if ( $middleRpta[status] == ok)
-                                        {     
-                                            DB::commit();
-                                            return $middleRpta;
-                                        }
-                                    }
-                                }   
+                                $user = Auth::user();
+                                $toUserId = $this->toUser( $user );
+                                $middleRpta = $this->setStatus( 0 , PENDIENTE, $user->id, $toUserId, $inputs['idsolicitud'] );
+                                if ( $middleRpta[status] == ok)
+                                    DB::commit();
                             }
-                        }
+                        }   
                     }
                 }
             }
@@ -577,8 +559,8 @@ class SolicitudeController extends BaseController
                 $end = date('t-m-Y', strtotime($m));
             $rpta = $this->userType();
             if ($rpta[status] == ok)
-                $middleRpta = $this->searchSolicituds($estado,$rpta[data],$start,$end);
-                if ($middleRpta[status] == ok)
+                $middleRpta = $this->searchSolicituds( $estado , $rpta[data] , $start , $end );
+                if ( $middleRpta[status] == ok )
                 {
                     $data = array( 'solicituds' => $middleRpta[data] );
                     if ( Auth::user()->type == TESORERIA )
@@ -595,9 +577,6 @@ class SolicitudeController extends BaseController
         }
         return $rpta;
     }
-
-    
-
 
     private function textLv( $solicitude )
     {
@@ -1077,17 +1056,12 @@ class SolicitudeController extends BaseController
         if ( !is_null( $fondo ) )
         {
             $cuentaMkt      = $fondo->num_cuenta;
-            //Log::error( json_encode( $fondo ) );
-            //$idcuentaMkt    = $fondo->account->id;
-
+            
             $cuentaExpense  = Account::getExpenseAccount( $cuentaMkt );
-            //Log::error( json_encode( $cuentaExpense ) );
-
+            
             if( !is_null( $cuentaExpense[0]->num_cuenta ) )
             {
-                //Log::error( json_encode( $cuentaExpense ));
                 $cuentaExpense   = $cuentaExpense[0]->num_cuenta;
-                //$idCuentaExpense = $cuentaExpense[0]->id;
                 $marcaNumber     = MarkProofAccounts::getMarks( $cuentaMkt , $cuentaExpense );
                 $marcaNumber     = $marcaNumber[0]->marca_codigo; 
             }
@@ -1183,7 +1157,6 @@ class SolicitudeController extends BaseController
             }  
             // CONTRAPARTE ASIENTO DE ANTICIPO
             $description_seat_back = strtoupper( $username .' '. $solicitud->titulo );
-            //Log::error('ASIENTO DE GASTO DEL ANTICIPO');
             $seatList[]  = $this->createSeatElement( $tempId++, $cuentaMkt , $solicitud->id, '', $cuentaMkt , '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO , json_decode( $solicitud->detalle->detalle )->monto_aprobado , '', $description_seat_back, '', 'CAN');        
             $result['seatList'] = $seatList;
             return $result;
@@ -1224,8 +1197,6 @@ class SolicitudeController extends BaseController
         $solicitud->documentList = $expenses;
         $resultSeats             = $this->generateSeatExpenseData( $solicitud );
 
-        Log::error( json_encode( $resultSeats ) );
-
         $seatList = $resultSeats['seatList'];
 
         $data = array(
@@ -1253,7 +1224,6 @@ class SolicitudeController extends BaseController
             DB::beginTransaction();
             $result = array();
             $dataInputs  = Input::all();
-            Log::error( json_encode( $dataInputs ) );
             foreach ( $dataInputs['seatList'] as $key => $seatItem ) 
             {
                 $seat = new Entry;
