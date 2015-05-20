@@ -1,5 +1,30 @@
 <div class="form-group col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px">
     <div class="col-sm-12 col-md-12 col-lg-12" style="text-align: center">
+        
+        @if ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO , APROBADO ) )
+              && $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario === Auth::user()->type
+              && in_array( Auth::user()->id , $solicitud->gerente->lists( 'id_gerprod' ) ) )
+            @if ( Auth::user()->type == SUP ) 
+                <a class="btn btn-primary" id="search_responsable">
+                    Aceptar
+                </a>
+                <a class="btn btn-primary" id="derived">
+                    Derivar
+                </a>
+            @elseif ( Auth::user()->type == GER_PROD )
+                <a class="btn btn-primary" id="search_responsable">
+                    Aceptar
+                </a>
+            @elseif( Auth::user()->type == GER_COM )
+             <a name="button1id" data-token ="{{$solicitud->token}}" class="btn btn-primary approved_solicitude">
+                    Aprobar
+                </a>
+            @endif
+            <a id="deny_solicitude" name="button1id" class="btn btn-primary">
+                Rechazar
+            </a>
+        @endif
+
         @if( Auth::user()->type == REP_MED )
             @if ( $solicitud->idestado == GASTO_HABILITADO && $solicitud->iduserasigned == Auth::user()->id )
                 <a id="finish-expense" class="btn btn-success">
@@ -10,36 +35,6 @@
             @if ( $solicitud->idestado == GASTO_HABILITADO && $solicitud->iduserasigned == Auth::user()->id )
                 <a id="finish-expense" class="btn btn-success">
                     Terminar
-                </a>
-            @endif
-        @elseif ( Auth::user()->type == SUP )
-            @if( $solicitud->idestado == PENDIENTE )
-                <a class="btn btn-primary" id="search_responsable">
-                    Aceptar
-                </a>
-                <a class="btn btn-primary" id="derived">
-                    Derivar
-                </a>
-                <a class="btn btn-danger" id="deny_solicitude">
-                    Rechazar
-                </a>
-            @endif
-        @elseif ( Auth::user()->type == GER_PROD )
-            @if($solicitud->idestado == DERIVADO)
-                <a id="search_responsable" class="btn btn-primary">
-                    Aceptar
-                </a>
-                <a id="deny_solicitude" name="button1id" class="btn btn-primary">
-                    Rechazar
-                </a>
-            @endif
-        @elseif ( Auth::user()->type == GER_COM )
-            @if($solicitud->idestado == ACEPTADO)
-                <a name="button1id" data-token ="{{$solicitud->token}}" class="btn btn-primary approved_solicitude">
-                    Aprobar
-                </a>
-                <a id="deny_solicitude" name="button1id" class="btn btn-primary">
-                    Rechazar
                 </a>
             @endif
         @elseif ( Auth::user()->type == CONT )

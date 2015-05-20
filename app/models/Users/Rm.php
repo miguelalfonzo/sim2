@@ -26,7 +26,7 @@ class Rm extends Eloquent
 
     function rmSup()
     {
-        return $this->belongsTo( 'Dmkt\Sup' , 'idsup' , 'idsup' );
+        return $this->belongsTo( 'Users\Sup' , 'idsup' , 'idsup' );
     }
 
     function user(){

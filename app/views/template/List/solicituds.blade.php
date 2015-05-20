@@ -23,92 +23,92 @@
         </tr>
     </thead>
     <tbody>
-        @foreach($solicituds as $solicitude)
+        @foreach( $solicituds as $solicitud )
             <tr>
-                @if($solicitude->idestado == ACEPTADO || $solicitude->idestado == APROBADO || $solicitude->idestado == DEPOSITADO || $solicitude->idestado == REGISTRADO || $solicitude->idestado == ENTREGADO || $solicitude->idestado == GENERADO || $solicitude->idestado == GASTO_HABILITADO || $solicitude->idestado == DEPOSITO_HABILITADO)
-                    <input type="hidden" id="timeLineStatus" value="{{$solicitude->idestado}}" data-accept="$solicitude->acceptHist->user_from">
-                @elseif($solicitude->idestado == RECHAZADO)
-                    <input type="hidden" id="timeLineStatus" value="{{$solicitude->idestado}}" data-rejected="{{$solicitude->rejectedHist->user_from}}">
+                @if($solicitud->idestado == ACEPTADO || $solicitud->idestado == APROBADO || $solicitud->idestado == DEPOSITADO || $solicitud->idestado == REGISTRADO || $solicitud->idestado == ENTREGADO || $solicitud->idestado == GENERADO || $solicitud->idestado == GASTO_HABILITADO || $solicitud->idestado == DEPOSITO_HABILITADO)
+                    <input type="hidden" id="timeLineStatus" value="{{$solicitud->idestado}}" data-accept="$solicitud->acceptHist->user_from">
+                @elseif($solicitud->idestado == RECHAZADO)
+                    <input type="hidden" id="timeLineStatus" value="{{$solicitud->idestado}}" data-rejected="{{$solicitud->rejectedHist->user_from}}">
                 @else
-                    <input type="hidden" id="timeLineStatus" value="{{$solicitude->idestado}}">
+                    <input type="hidden" id="timeLineStatus" value="{{$solicitud->idestado}}">
                 @endif
                 @if ( in_array( Auth::user()->type , array( TESORERIA , GER_COM ) ))
-                    <input type="hidden" id="sol_token" class="i-tokens" value="{{$solicitude->token}}">
-                    @if( !is_null($solicitude->response ) )
-                        @if( $solicitude->response->type == REP_MED )
-                            <input type="hidden" value="{{$solicitude->response->rm->full_name}}" class="benef">
-                        @elseif( $solicitude->response->type == ASIS_GER )
-                            <input type="hidden" value="{{$solicitude->response->person->full_name}}" class="benef">
+                    <input type="hidden" id="sol_token" class="i-tokens" value="{{$solicitud->token}}">
+                    @if( !is_null($solicitud->response ) )
+                        @if( $solicitud->response->type == REP_MED )
+                            <input type="hidden" value="{{$solicitud->response->rm->full_name}}" class="benef">
+                        @elseif( $solicitud->response->type == ASIS_GER )
+                            <input type="hidden" value="{{$solicitud->response->person->full_name}}" class="benef">
                         @else
                             <input type="hidden" value="Usuario no autorizado" class="benef">
                         @endif
                     @endif
                 @endif
-                <td class="text-center id_solicitud">{{$solicitude->id}}</td>
+                <td class="text-center id_solicitud">{{$solicitud->id}}</td>
                 <td class="text-left sol_titulo">
-                    @if (!is_null($solicitude->idetiqueta))
-                        <span class="label" style="margin-right:1em;background-color:{{$solicitude->actividad->color}}">
-                            {{$solicitude->actividad->nombre}}
+                    @if (! is_null( $solicitud->id_actividad ) )
+                        <span class="label" style="margin-right:1em;background-color:{{$solicitud->activity->color}}">
+                            {{$solicitud->activity->nombre}}
                         </span>
                     @endif
-                    <label>{{$solicitude->titulo}}</label>
+                    <label>{{$solicitud->titulo}}</label>
                 </td>
                 @include('template.List.first_user')
-                <td class="text-center">{{$solicitude->created_at}}</td>
+                <td class="text-center">{{$solicitud->created_at}}</td>
                 @include('template.List.last_user')
                 @include('template.List.lastdate')
                 @if( Auth::user()->type == TESORERIA )
                     <td style="display:none;" class="total_deposit">
-                        {{$solicitude->detalle->fondo->typemoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_aprobado }}
+                        {{$solicitud->detalle->fondo->typemoney->simbolo.' '.json_decode($solicitud->detalle->detalle)->monto_aprobado }}
                     </td>
                     <td style="display:none" class="tes-ret">
-                        @if ( is_null( $solicitude->detalle->idretencion ) )
+                        @if ( is_null( $solicitud->detalle->idretencion ) )
                             0
                         @else
-                            {{$solicitude->detalle->typeRetention->account->typeMoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_retencion}}
+                            {{$solicitud->detalle->typeRetention->account->typeMoney->simbolo.' '.json_decode($solicitud->detalle->detalle)->monto_retencion}}
                         @endif
                     </td>
                     <td class="text-center deposit">
-                        @if ( $solicitude->idtiposolicitud == SOL_REP )
-                            @if ( is_null( $solicitude->detalle->iddeposito ) )
-                                @if ( is_null( $solicitude->detalle->idretencion) )
-                                    {{$solicitude->detalle->typemoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_aprobado }}
+                        @if ( $solicitud->idtiposolicitud == SOL_REP )
+                            @if ( is_null( $solicitud->detalle->iddeposito ) )
+                                @if ( is_null( $solicitud->detalle->idretencion) )
+                                    {{$solicitud->detalle->typemoney->simbolo.' '.json_decode($solicitud->detalle->detalle)->monto_aprobado }}
                                 @else
-                                    @if ( $solicitude->detalle->typeRetention->account->idtipomoneda == $solicitude->detalle->idmoneda )
-                                        {{$solicitude->detalle->typemoney->simbolo.' '.(json_decode($solicitude->detalle->detalle)->monto_aprobado - json_decode($solicitude->detalle->detalle)->monto_retencion)}}
+                                    @if ( $solicitud->detalle->typeRetention->account->idtipomoneda == $solicitud->detalle->idmoneda )
+                                        {{$solicitud->detalle->typemoney->simbolo.' '.(json_decode($solicitud->detalle->detalle)->monto_aprobado - json_decode($solicitud->detalle->detalle)->monto_retencion)}}
                                     @else
-                                        @if ( $solicitude->detalle->idmoneda == SOLES )
-                                            {{$solicitude->detalle->typemoney->simbolo.' '.( json_decode( $solicitude->detalle->detalle )->monto_aprobado - ( json_decode( $solicitude->detalle->detalle )->monto_retencion*$tc->compra ) ) }}    
-                                        @elseif ( $solicitude->detalle->idmoneda == DOLARES )
-                                            {{$solicitude->detalle->typemoney->simbolo.' '.( json_decode( $solicitude->detalle->detalle )->monto_aprobado - ( json_decode( $solicitude->detalle->detalle )->monto_retencion/$tc->venta ) ) }}   
+                                        @if ( $solicitud->detalle->idmoneda == SOLES )
+                                            {{$solicitud->detalle->typemoney->simbolo.' '.( json_decode( $solicitud->detalle->detalle )->monto_aprobado - ( json_decode( $solicitud->detalle->detalle )->monto_retencion*$tc->compra ) ) }}    
+                                        @elseif ( $solicitud->detalle->idmoneda == DOLARES )
+                                            {{$solicitud->detalle->typemoney->simbolo.' '.( json_decode( $solicitud->detalle->detalle )->monto_aprobado - ( json_decode( $solicitud->detalle->detalle )->monto_retencion/$tc->venta ) ) }}   
                                         @endif
                                     @endif
                                 @endif
                             @else
-                                {{$solicitude->detalle->deposit->account->typeMoney->simbolo.' '.$solicitude->detalle->deposit->total}}
+                                {{$solicitud->detalle->deposit->account->typeMoney->simbolo.' '.$solicitud->detalle->deposit->total}}
                             @endif
-                        @elseif ( $solicitude->idtiposolicitud == SOL_INST )
-                            {{$solicitude->detalle->fondo->typemoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_aprobado }}
+                        @elseif ( $solicitud->idtiposolicitud == SOL_INST )
+                            {{$solicitud->detalle->fondo->typemoney->simbolo.' '.json_decode($solicitud->detalle->detalle)->monto_aprobado }}
                         @endif  
                     </td>
                 @else
                     <td class="text-center total_deposit">
-                        @if ( $solicitude->idtiposolicitud == SOL_REP )
-                            @if ($solicitude->id_estado == PENDIENTE || $solicitude->id_estado == DERIVADO )
-                                {{ $solicitude->detalle->typeMoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_solicitado }}
-                            @elseif ($solicitude->id_estado == ACEPTADO )
-                                {{ $solicitude->detalle->typeMoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_aceptado }}
-                            @elseif ( in_array( $solicitude->id_estado , array( RECHAZADO , CANCELADO) ) )
+                        @if ( $solicitud->idtiposolicitud == SOL_REP )
+                            @if ($solicitud->id_estado == PENDIENTE || $solicitud->id_estado == DERIVADO )
+                                {{ $solicitud->detalle->typeMoney->simbolo.' '.json_decode($solicitud->detalle->detalle)->monto_solicitado }}
+                            @elseif ($solicitud->id_estado == ACEPTADO )
+                                {{ $solicitud->detalle->typeMoney->simbolo.' '.json_decode($solicitud->detalle->detalle)->monto_aceptado }}
+                            @elseif ( in_array( $solicitud->id_estado , array( RECHAZADO , CANCELADO) ) )
                                 @if ( isset($detalle->monto_aceptado))
-                                    {{ $solicitude->detalle->typeMoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_aceptado }}
+                                    {{ $solicitud->detalle->typeMoney->simbolo.' '.json_decode($solicitud->detalle->detalle)->monto_aceptado }}
                                 @else
-                                    {{ $solicitude->detalle->typeMoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_solicitado }}
+                                    {{ $solicitud->detalle->typeMoney->simbolo.' '.json_decode($solicitud->detalle->detalle)->monto_solicitado }}
                                 @endif
                             @else
-                                {{ $solicitude->detalle->typeMoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_aprobado}}
+                                {{ $solicitud->detalle->typeMoney->simbolo.' '.json_decode($solicitud->detalle->detalle)->monto_aprobado}}
                             @endif
-                        @elseif ( $solicitude->idtiposolicitud == SOL_INST )
-                            {{$solicitude->detalle->fondo->typeMoney->simbolo.''.json_decode($solicitude->detalle->detalle)->monto_aprobado}}
+                        @elseif ( $solicitud->idtiposolicitud == SOL_INST )
+                            {{$solicitud->detalle->fondo->typeMoney->simbolo.''.json_decode($solicitud->detalle->detalle)->monto_aprobado}}
                         @endif
                     </td>
                 @endif
@@ -116,20 +116,20 @@
                 @include('template.List.states')
                 
                 <td class="text-center">
-                    @if ( $solicitude->idtiposolicitud == SOL_REP )
-                        @if ( is_null( $solicitude->detalle->reason ) )
+                    @if ( $solicitud->idtiposolicitud == SOL_REP )
+                        @if ( is_null( $solicitud->detalle->reason ) )
                             -
                         @else    
-                            {{ $solicitude->detalle->reason->nombre }}
+                            {{ $solicitud->detalle->reason->nombre }}
                         @endif
-                    @elseif ( $solicitude->idtiposolicitud == SOL_INST ) 
-                        {{ $solicitude->typesolicitude->nombre }}
+                    @elseif ( $solicitud->idtiposolicitud == SOL_INST ) 
+                        {{ $solicitud->typesolicitude->nombre }}
                     @endif
                 </td>
                 @include('template.List.icons')
                 @if ( Auth::user()->type == GER_COM )
                     <td class="text-center">
-                    @if( $solicitude->idestado != ACEPTADO)
+                    @if( $solicitud->idestado != ACEPTADO)
                         <input type="checkbox" name="mass-aprov" disabled/>
                     @else
                         <input type="checkbox" name="mass-aprov"/>

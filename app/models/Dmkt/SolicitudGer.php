@@ -11,7 +11,7 @@ class SolicitudGer extends Eloquent
 
     public function lastId()
     {
-        $lastId = SolicitudeGer::orderBy( 'id' , 'DESC' )->first();
+        $lastId = SolicitudGer::orderBy( 'id' , 'DESC' )->first();
         if( is_null( $lastId ) )
             return 0;
         else

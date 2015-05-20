@@ -242,22 +242,32 @@ class BaseController extends Controller
             {
                 $q->orderBy('created_at','DESC');  
             }));
-            /*$rSolicituds = Solicitud::with(array('histories' => function($q)
+            
+            if ( in_array( Auth::user()->type , array ( REP_MED , SUP , GER_PROD , GER_PROM ) ) )
             {
-                $q->orderBy('created_at','DESC');  
-            }));*/
-
-            if ( Auth::user()->type == REP_MED )
-            {
-                $solicituds->whereIn( 'created_by' , $idUser )->orWhere( function( $query) use ( $idUser )
+                Log::error( Auth::user()->id );
+                $solicituds->where( function ( $query )
                 {
-                    $query->whereNotIn( 'created_by' , $idUser )->where( 'iduserasigned' , $idUser );
+                    $query->where( function ( $query )
+                    {
+                        $query->where( 'created_by' , '<>' , Auth::user()->id )
+                        ->where( function ( $query )
+                        {
+                            $query->where( 'id_user_assign' , '<>' , Auth::user()->id )->orWhereNull( 'id_user_assign' );
+                        })->whereHas( 'gerente' , function( $query )
+                        {
+                            $query->where( 'id_gerprod' , Auth::user()->id );
+                        });
+                    })->orWhere( function ( $query )
+                    {
+                        $query->where( 'created_by' , Auth::user()->id )->orWhere( function ( $query )
+                        {
+                            $query->where( 'created_by' , '<>' , Auth::user()->id )->where( 'id_user_assign' , Auth::user()->id );
+                        });
+                    });
                 });
-//                $rSolicituds->whereNotIn( 'created_by' , $idUser )->where( 'iduserasigned' , $idUser );
             }
-            else if ( Auth::user()->type == SUP )
-                $solicituds->whereIn('created_by', $idUser);
-            else if ( Auth::user()->type == TESORERIA ) 
+            if ( Auth::user()->type == TESORERIA ) 
             {
                 if ($estado != R_FINALIZADO)
                 {
@@ -271,34 +281,17 @@ class BaseController extends Controller
                     });
                 }
             }
-            else if ( Auth::user()->type == ASIS_GER ) 
-            {
-                $solicituds->where( function ( $q ) use ( $idUser )
-                {
-                    $q->where('iduserasigned' , $idUser )->orWhereIn('created_by' , $idUser );
-                });
-            }
-            else if ( Auth::user()->type == GER_PROD )
-            {
-                $solicituds->where( function ( $query ) 
-                {
-                    $query->where( 'created_by' , '<>' , Auth::user()->id )->whereHas( 'gerente' , function( $query )
-                    {
-                        $query->where( 'id_gerprod' , Auth::user()->id );
-                    });
-                });
-                $solicituds->orWhere( 'created_by' , Auth::user()->id );
-            }
             else if ( Auth::user()->type == CONT )
-                $solicituds->where( 'idestado' , '<>' , ACEPTADO );
+                $solicituds->where( 'id_estado' , '<>' , ACEPTADO );
 
             if ($estado != R_TODOS)
             { 
-                $solicituds->whereHas('state', function ($q) use($estado)
+                Log::error( ' estado ');
+                $solicituds->whereHas( 'state' , function ( $q ) use( $estado )
                 {
-                    $q->whereHas('rangeState', function ($t) use($estado)
+                    $q->whereHas( 'rangeState' , function ( $t ) use( $estado )
                     {
-                        $t->where('id',$estado);
+                        $t->where( 'id' , $estado );
                     });
                 });
                 

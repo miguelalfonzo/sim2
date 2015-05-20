@@ -2079,8 +2079,8 @@ function newSolicitude() {
     }
 
     //Validate send register solicitude
-    $('#registrar').off('click');
-    $('#registrar').on( 'click' , function ( e ) 
+    $( '#registrar' ).off( 'click' );
+    $( '#registrar' ).on( 'click' , function ( e ) 
     {
         e.preventDefault();
         var aux = 0;
@@ -2128,7 +2128,7 @@ function newSolicitude() {
             var rute = form.attr('action');
             var message1 = 'Registrando';
             var message2 = '<strong style="color: green">Solicitud Registrada</strong>';
-            if (rute == 'editar-solicitud') 
+            if ( $( 'input[name=idsolicitud]' ) ) 
             {
                 message1 = 'Actualizando';
                 message2 = '<strong style="color: green">Solicitud Actualizada</strong>';

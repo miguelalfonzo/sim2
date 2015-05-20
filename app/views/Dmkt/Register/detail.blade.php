@@ -1,7 +1,7 @@
-<form id="form-register-solicitude" class="" method="post" enctype="multipart/form-data"
-action="{{isset($solicitud) ? 'editar-solicitud' : 'registrar-solicitud' }}">
-    {{Form::token()}}
-    @if(isset($solicitud))
+<form id="form-register-solicitude" class="" method="post" enctype="multipart/form-data" action="registrar-solicitud">
+    {{ Form::token() }}
+
+    @if( isset( $solicitud ) )
         <input value="{{$solicitud->id}}" name="idsolicitud" type="hidden">
     @endif
     

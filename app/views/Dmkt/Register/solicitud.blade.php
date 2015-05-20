@@ -15,7 +15,7 @@
                 @elseif ( Auth::user()->type == SUP )
                     {{Auth::user()->sup->full_name}}
                 @elseif ( Auth::user()->type == GER_PROD )
-                    {{Auth::user()->gerProd->descripcion}} 
+                    {{Auth::user()->gerProd->full_name}} 
                 @endif
                 </strong>
             </small>

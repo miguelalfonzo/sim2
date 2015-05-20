@@ -87,11 +87,11 @@ class Solicitud extends Eloquent
         return $this->hasOne('Dmkt\SolicitudType','id','idtiposolicitud');
     }
 
-    protected function products(){
+    public function products(){
         return $this->hasMany( 'Dmkt\SolicitudProduct' , 'id_solicitud' , 'id' );
     }
 
-    protected function clients(){
+    public function clients(){
         return $this->hasMany( 'Dmkt\SolicitudClient' , 'id_solicitud' , 'id' );
     }
 
@@ -102,7 +102,7 @@ class Solicitud extends Eloquent
 
     public function gerente()
     {
-        return $this->hasOne( 'Dmkt\SolicitudGer' , 'id_solicitud' , 'id' );
+        return $this->hasMany( 'Dmkt\SolicitudGer' , 'id_solicitud' , 'id' );
     }
 
     protected function response()
@@ -112,12 +112,12 @@ class Solicitud extends Eloquent
 
     protected function rm()
     {
-        return $this->hasOne('Dmkt\Rm','iduser','created_by')->select('nombres,apellidos,iduser');
+        return $this->hasOne('Users\Rm','iduser','created_by')->select('nombres,apellidos,iduser');
     }
 
     protected function sup()
     {
-        return $this->hasOne('Dmkt\Sup','iduser','created_by')->select('nombres,apellidos,iduser,idsup');;
+        return $this->hasOne('Users\Sup','iduser','created_by')->select('nombres,apellidos,iduser,idsup');;
     }
 
     protected function activity()
@@ -138,5 +138,20 @@ class Solicitud extends Eloquent
     protected function depositEntrys()
     {
         return $this->hasMany( 'Expense\Entry' , 'id_solicitud' )->where( 'd_c' , ASIENTO_GASTO_DEPOSITO );
+    }
+
+    protected function policies()
+    {
+        return $this->hasMany( 'Policy\AprovalPolicy' , 'id_inversion' , 'id_inversion');
+    }
+
+    public function aprovalPolicy( $order )
+    {
+        return $this->hasMany( 'Policy\AprovalPolicy' , 'id_inversion' , 'id_inversion' )->where( 'orden' , $order )->first();            
+    }
+
+    protected function investment()
+    {
+        return $this->hasOne( 'Dmkt\InvestmentType' , 'id' , 'id_inversion' );
     }
 }

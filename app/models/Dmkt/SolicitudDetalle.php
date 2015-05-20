@@ -9,6 +9,41 @@ class SolicitudDetalle extends Eloquent
 	protected $table = 'SOLICITUD_DETALLE';
     protected $primaryKey = 'id';    
  
+    protected function getMontoActualAttribute()
+    {
+        $jDetalle = json_decode( $this->detalle );
+        if ( isset( $jDetalle->monto_aprobado ) )
+            return $jDetalle->monto_aprobado;
+        else if ( isset( $jDetalle->monto_aceptado ) )
+            return $jDetalle->monto_aceptado;
+        else if ( isset( $jDetalle->monto_validado ) )
+            return $jDetalle->monto_validado;
+        else if ( isset( $jDetalle->monto_solicitado ) )
+            return $jDetalle->monto_solicitado;
+        else
+            return 0;
+    }
+
+    protected function getFechaEntregaAttribute()
+    {
+        return json_decode( $this->detalle )->fecha_entrega;
+    }
+
+    protected function getNumRucAttribute()
+    {
+        return json_decode( $this->detalle )->num_ruc;
+    }
+
+    protected function getMontoFacturaAttribute()
+    {
+        return json_decode( $this->detalle )->monto_factura;
+    }
+
+    protected function getImageAttribute()
+    {
+        return json_decode( $this->detalle )->image;
+    }
+
     public function lastId()
     {
         $lastId = SolicitudDetalle::orderBy('id', 'DESC')->first();

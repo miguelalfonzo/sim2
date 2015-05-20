@@ -34,6 +34,7 @@ use \Expense\Regimen;
 use \stdClass;
 use \Policy\AprovalPolicy;
 use \Users\Manager;
+use \Users\Sup;
 
 class SolicitudeController extends BaseController
 {
@@ -124,31 +125,38 @@ class SolicitudeController extends BaseController
         try
         {
             $solicitud = Solicitud::where('token', $token)->first();
+            $user = Auth::user();
             if ( count( $solicitud) == 0 )
                 return $this->warningException( __FUNCTION__ , 'No se encontro la Solicitud con Codigo: '.$token );
             else
             {
-                $detalle = json_decode($solicitud->detalle->detalle);
                 $data = array(
-                    'solicitud' => $solicitud,
-                    'detalle'   => $detalle
+                    'solicitud' => $solicitud ,
+                    'detalle'   => $solicitud->detalle
                 );
-                if ( Auth::user()->type == SUP && $solicitud->id_estado == PENDIENTE )
+                if  ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO , APROBADO ) )
+                    && $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario === $user->type
+                    && in_array( $user->id , $solicitud->gerente->lists( 'id_gerprod' ) ) )
                 {
                     $solicitud->status = BLOCKED;
                     if ( !$solicitud->save() )
-                        return $this->warningException( __FUNCTION__ , 'No se puede procesar la solicitud para el supervisor');
+                        return $this->warningException( 'No se puede procesar la solicitud para el '. $userType->descripcion , __FUNCTION__ , __LINE__ , __FILE__ );
                     else
                     {
-                        $data['fondos'] = Fondo::supFondos();
+                        if ( $user->type == SUP )
+                            $data['fondos'] = Fondo::supFondos();
+                        elseif ( $user->type == GER_PROD )
+                            $data['fondos'] = Fondo::gerProdFondos();
+                        else
+                            $data[ 'fondos' ] = Fondo::all();    
                         $data['solicitud']->status = 1;
                     }
                 }
-                elseif ( Auth::user()->type == GER_PROD && $solicitud->id_estado == DERIVADO )
+                /*elseif ( Auth::user()->type == GER_PROD && $solicitud->id_estado == DERIVADO )
                 {
                     $data['solicitud']->status = 1;
                     $data['fondos'] = Fondo::gerProdFondos();
-                }
+                }*/
                 elseif ( Auth::user()->type == TESORERIA && $solicitud->id_estado == DEPOSITO_HABILITADO )
                 {
                     $data['banks'] = Account::banks();
@@ -173,6 +181,9 @@ class SolicitudeController extends BaseController
                     $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
                     $data['igv'] = Table::getIGV();
                 }
+                Log::error( $solicitud->histories->count() );
+                Log::error( json_encode( $solicitud->aprovalPolicy( $solicitud->histories->count() ) ) );
+                Log::error( $solicitud->gerente->lists( 'id_gerprod' ) );
                 return View::make('Dmkt.Solicitud.view', $data);
             }
         }
@@ -264,7 +275,6 @@ class SolicitudeController extends BaseController
                 return $this->warningException( 'Hay un error con los tipos de clientes de la solicitud' , __FUNCTION__ , __LINE__ , __DIR__ );
             else
             { 
-                SolicitudClient::where('id_solicitud' , $idSolicitud )->delete();
                 for ( $i = 0 ; $i < count( $clients ) ; $i++ ) 
                 {        
                     $solClient = new SolicitudClient;
@@ -284,19 +294,19 @@ class SolicitudeController extends BaseController
         }                    
     }
 
-    private function setGerProd( $idsGerProd , $idsolicitud )
+    private function setGerProd( $idsGerProd , $idSolicitud , $usersType )
     {
         try
         {
-            SolicitudGer::deleteSolicitud( $idSolicitud );
             foreach ( $idsGerProd as $idGerProd )
             {
-                $solGer = new SolicitudeGer;
-                $solGer->id = $sol_ger->lastId() + 1 ;
-                $solGer->id_solicitud = $solicitud->id;
+                $solGer = new SolicitudGer;
+                $solGer->id = $solGer->lastId() + 1 ;
+                $solGer->id_solicitud = $idSolicitud;
                 $solGer->id_gerprod = $idGerProd;
-                $sol_ger->status    = 1 ;
-                if ( ! $sol_ger->save() )
+                $solGer->tipo_usuario = $usersType;
+                $solGer->status    = 1 ;
+                if ( ! $solGer->save() )
                     return $this->warningException( 'No se pudo derivar al Ger. Prod N°: ' . $idGerProd , __FUNCTION__ , __LINE__ , __FILE__ );
             }
             return $this->setRpta();
@@ -311,8 +321,7 @@ class SolicitudeController extends BaseController
     {
         try
         {
-            SolicitudProduct::where( 'id_solicitud' , $idSolicitud )->delete();
-            foreach ($idsProducto as $idProducto) 
+            foreach ( $idsProducto as $idProducto ) 
             {
                 $solProduct               = new SolicitudProduct;
                 $solProduct->id           = $solProduct->lastId() + 1;
@@ -321,6 +330,7 @@ class SolicitudeController extends BaseController
                 if( ! $solProduct->save() )
                     return $this->warningException( __FUNCTION__ , 'No se pudo procesar los productos de la solicitud' );
             }
+            Log::error( json_encode( $solProduct ) );
             return $this->setRpta();
         }
         catch ( Exception $e )
@@ -329,30 +339,13 @@ class SolicitudeController extends BaseController
         }
     }
 
-    private function setInvoice( $type , $oldActivity , $jDetalle , $inputs )
+    private function setInvoice( $jDetalle , $inputs )
     {
         try
         {
             $actividad = Activity::find( $inputs[ 'actividad' ] );
-
-            if ( $type === 'REGISTRAR' )
-                if ( $actividad->imagen == 1 )
-                    $this->setImage( $jDetalle , $inputs[ 'factura' ] , $inputs[ 'monto_factura'] );
-            elseif ( $type === 'ACTUALIZAR' )
-            {
-                if ( $oldActivity->imagen == 1 && $actividad->imagen != 1 ) 
-                {
-                    @unlink( public_path( 'img/reembolso/' . $jDetalle->image ) );
-                    unset( $jDetalle->monto_factura );
-                    unset( $jDetalle->image );
-                }
-                elseif ( $actividad->imagen == 1 )
-                {
-                    if ( $solicitud->activity->imagen == 1 )
-                        @unlink( public_path( 'img/reembolso/' . $jDetalle->image ) );
-                    $this->setImage( $jDetalle , $inputs[ 'factura' ] , $inputs[ 'monto_factura']  ); 
-                }
-            }
+            if ( $actividad->imagen == 1 )
+                $this->setImage( $jDetalle , $inputs[ 'factura' ] , $inputs[ 'monto_factura'] );
             return $this->setRpta( $jDetalle );
         }
         catch ( Exception $e )
@@ -370,6 +363,17 @@ class SolicitudeController extends BaseController
         $jDetalle->monto_factura = round( $monto , 2 , PHP_ROUND_HALF_DOWN );
     }
 
+    private function unsetRelations( $solicitud )
+    {
+        $detalle = $solicitud->detalle;
+        $solicitud->products()->delete();
+        $solicitud->clients()->delete();
+        $solicitud->gerente()->delete();
+        if ( $solicitud->activity->imagen == 1 )
+            @unlink( public_path( 'img/reembolso/' . $detalle->image ) );
+        $detalle->delete();
+    }
+
     public function registerSolicitude()
     {
         try
@@ -379,11 +383,22 @@ class SolicitudeController extends BaseController
             $middleRpta = $this->validateInputSolRep( $inputs );
             if ( $middleRpta[status] == ok )
             {
-                $solicitud             = new Solicitud;
-                $solicitud->id         = $solicitud->lastId() + 1;
+                if ( Input::has( 'idsolicitud') )
+                {
+                    $solicitud = Solicitud::find( $inputs[ 'idsolicitud'] );
+                    $this->unsetRelations( $solicitud );
+                }
+                else
+                {
+                    $solicitud = new Solicitud;
+                    $solicitud->id = $solicitud->lastId() + 1;
+                }
+                Log::error( json_encode( $solicitud) ); 
+                //$solicitud             = new Solicitud;
+                //$solicitud->id         = $solicitud->lastId() + 1;
                 $detalle               = new SolicitudDetalle;
                 $detalle->id           = $detalle->lastId() + 1;
-                $solicitud->id_detalle  = $detalle->id;
+                $solicitud->id_detalle = $detalle->id;
                 $solicitud->token      = sha1( md5( uniqid( $solicitud->id , true ) ) );   
                 $this->setSolicitud( $solicitud , $inputs );
 
@@ -391,9 +406,11 @@ class SolicitudeController extends BaseController
                     return $this->warningException( 'No se pudo registrar la solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
                 else 
                 {
+                    Log::error( json_encode( $solicitud ) );
+
                     Session::put( 'id_solicitud' , $solicitud->id );
                     $jDetalle = new stdClass();
-                    $this->setJsonDetalle( $jDetalle , $solicitud->activity , $inputs , 'REGISTRAR' );
+                    $this->setJsonDetalle( $jDetalle , $inputs );
                     $detalle->detalle      = json_encode( $jDetalle );
                     Log::error( json_encode( $detalle->detalle));
                     $this->setDetalle( $detalle , $inputs );
@@ -401,16 +418,18 @@ class SolicitudeController extends BaseController
                         return $this->warningException( __FUNCTION__ , 'No se pudo registrar los detalles de la solicitud');
                     else
                     {
+                        Log::error( json_encode( $detalle ) );
                         $middleRpta = $this->setClients( $solicitud->id , $inputs['clientes'] , $inputs['tipos_cliente'] );
                         if ( $middleRpta[status] == ok )
                         {
                             $middleRpta = $this->setProducts( $solicitud->id , $inputs['productos'] );
                             if ( $middleRpta[status] == ok )
                             {
-                                $middleRpta = $this->toUser( $inputs['inversion'] , $inputs['productos'] , $solicitud->id , 1 );
+                                $middleRpta = $this->toUser( $inputs['inversion'] , $inputs['productos'] , 1 );
                                 Log::error( json_encode($middleRpta ));
                                 if ( $middleRpta[ status ] == ok )
                                 {
+                                    Log::error( json_encode( $solicitud->gerente ) );
                                     $middleRpta = $this->setStatus( 0 , PENDIENTE, Auth::user()->id , $middleRpta[ data ] , Session::pull( 'id_solicitud' ) );
                                     //dd( $middleRpta );
                                     if ( $middleRpta[status] == ok )
@@ -431,7 +450,20 @@ class SolicitudeController extends BaseController
         }
     }
 
-    private function toUser( $investmentType , $idsProducto , $idSolicitud , $order )
+    private function setJsonDetalle( &$jDetalle , $inputs )  
+    {
+        $jDetalle->monto_solicitado  =  round( $inputs['monto'] , 2 , PHP_ROUND_HALF_DOWN );
+        $jDetalle->fecha_entrega     =  $inputs['fecha']; 
+        Log::error( json_encode($jDetalle));
+                    
+        $this->setInvoice( $jDetalle , $inputs );    
+        Log::error( json_encode($jDetalle));
+                    
+        $this->setPago( $jDetalle , $inputs['pago'] , $inputs['ruc'] );            
+        Log::error( json_encode($jDetalle));            
+    }
+
+    private function toUser( $investmentType , $idsProducto , $order )
     {
         try
         {
@@ -447,33 +479,34 @@ class SolicitudeController extends BaseController
                 Log::error( 'check');     
                 if ( $userType == SUP )
                 {
-                    if ( Auth::user()->type == REP_MED )
-                        return $this->setRpta( Sup::getSup()->iduser );
-                    else if ( Auth::user()->type == SUP )
-                        return $this->setRpta( Auth::user()->id );
+                    if ( Auth::user()->type === REP_MED )
+                        $idsUser = Sup::getSup()->iduser;
+                    else if ( Auth::user()->type === SUP )
+                        $idsUser = Auth::user()->id;
+                    else
+                        $idsUser = Sup::all()->lists( 'iduser');
                 }
                 else if ( $userType == GER_PROD )
                 {
                     $idsGerProd = array_unique( Marca::whereIn( 'id' , $idsProducto )->lists( 'gerente_id' ) );
                     $idsUser = Manager::whereIn( 'id' , $idsGerProd )->lists( 'iduser' );
-                    $users = User::whereIn( 'id' , $idsUser );
-                    if ( $users->count() != count( $idsGerProd) )
-                        return $this->warningException( 'Uno o mas de los siguientes Gerentes de Producto no estan registrados en el sistema: ' . implode( ' , ' , $idsGerProd) , __FUNCTION__ , __LINE__ , __FILE__ );
-                    else
-                    {
-                        $middleRpta = $this->setGerProd( $idsUser , Session::get( 'id_solicitud') );
-                        return $this->setRpta( $idsUser );
-                    }
+                    if ( count( $idsUser ) != count( $idsGerProd) )
+                        return $this->warningException( 'Uno o mas de los siguientes Gerentes de Producto no estan registrados en el sistema: ' . implode( ' , ' , $idsGerProd ) , __FUNCTION__ , __LINE__ , __FILE__ );
                 }
                 else
                 {
                     Log::error( 'user');
                     $user = User::getUserType( $userType );
                     if ( count( $user ) === 0 )
-                        return $this->warningException( 'No se encuentra el usuario: ' . $userType , __FUNCTION__ , __LINE__ , __DIR__ );
+                        return $this->warningException( 'No se encuentra el usuario: ' . $userType , __FUNCTION__ , __LINE__ , __FILE__ );
                     else                
-                        return $this->setRpta( $user->id );
+                        $idsUser = $user->lists( 'id' );
                 }
+                $middleRpta = $this->setGerProd( $idsUser , Session::get( 'id_solicitud') , $userType );
+                if ( $middleRpta[ status ] == ok )
+                    return $this->setRpta( $idsUser );
+                else
+                    return $middleRpta;
             }
         }
         catch ( Exception $e )
@@ -500,73 +533,6 @@ class SolicitudeController extends BaseController
         $detalle->id_pago       = $inputs['pago'];
     }                  
 
-    private function setJsonDetalle( &$jDetalle , $oldActivity , $inputs , $type )  
-    {
-        $jDetalle->monto_solicitado  =  round( $inputs['monto'] , 2 , PHP_ROUND_HALF_DOWN );
-        $jDetalle->fecha_entrega     =  $inputs['fecha']; 
-        Log::error( json_encode($jDetalle));
-                    
-        $this->setInvoice( $type , $oldActivity , $jDetalle , $inputs );    
-        Log::error( json_encode($jDetalle));
-                    
-        $this->setPago( $jDetalle , $inputs['pago'] , $inputs['ruc'] );            
-        Log::error( json_encode($jDetalle));
-                    
-    }
-
-    public function formEditSolicitude()
-    {
-        try
-        {
-            DB::beginTransaction();
-            $inputs = Input::all();
-            $middleRpta = $this->validateInputSolRep( $inputs , 2 );
-            if ( $middleRpta[status] == ok )
-            {     
-                $solicitud =  Solicitud::find( $inputs['idsolicitud'] );
-                $actividad = $solicitud->actividad;
-                $this->setSolicitud( $solicitud , $inputs );
-                if ( !$solicitud->save() )
-                    return array( status => warning , description => 'No se pudo procesar la solicitud');
-                else
-                {
-                    $detalle  = $solicitud->detalle;
-                    $jDetalle = json_decode( $detalle->detalle );
-                    Log::error( json_encode($jDetalle));
-                    $this->setJsonDetalle( $jDetalle , $actividad , $inputs , 'ACTUALIZAR' );
-                    Log::error( json_encode($jDetalle));
-                    $detalle->detalle       =  json_encode( $jDetalle );
-                    $this->setDetalle( $detalle , $inputs );
-                    if (!$detalle->save() )
-                        return array( status => warning , description => 'No se pudo procesar los detalles de la solicitud' );
-                    else
-                    {
-                        $middleRpta = $this->setClients( $solicitud->id , $inputs['clientes'] , $inputs['tipos_cliente'] );
-                        if ( $middleRpta[status] == ok )
-                        {
-                            $middleRpta = $this->setFamilies( $solicitud->id , $inputs['productos'] );
-                            if ( $middleRpta[status] == ok )
-                            {
-                                $user = Auth::user();
-                                $toUserId = $this->toUser( $user );
-                                $middleRpta = $this->setStatus( 0 , PENDIENTE, $user->id, $toUserId, $inputs['idsolicitud'] );
-                                if ( $middleRpta[status] == ok)
-                                    DB::commit();
-                            }
-                        }   
-                    }
-                }
-            }
-            DB::rollback();
-            return $middleRpta;
-        }
-        catch(Exception $e)
-        {
-            DB::rollback();
-            return $this->internalException($e,__FUNCTION__);
-        }
-    }
-
     public function searchDmkt()
     {
         try
@@ -587,7 +553,7 @@ class SolicitudeController extends BaseController
             else
                 $end = date('t-m-Y', strtotime($m));
             $rpta = $this->userType();
-            if ($rpta[status] == ok)
+            if ( $rpta[status] == ok )
                 $middleRpta = $this->searchSolicituds( $estado , $rpta[data] , $start , $end );
                 if ( $middleRpta[status] == ok )
                 {
@@ -1301,18 +1267,6 @@ class SolicitudeController extends BaseController
             return $this->internalException( $e , __FUNCTION__ );        
         }
     }
-
-  
-
-    /*public function viewSeatSolicitude($token)
-    {
-        $solicitude = Solicitud::where('token', $token)->firstOrFail();
-        $data = [
-            'solicitude' => $solicitude
-        ];
-        return View::make('Dmkt.Cont.view_seat_solicitude', $data);
-    }*/
-
 
     public function viewSeatExpense($token)
     {

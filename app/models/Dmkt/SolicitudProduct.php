@@ -10,7 +10,7 @@ class SolicitudProduct extends Eloquent
 
     public function lastId()
     {
-        $lastId = SolicitudProduct::orderBy('id', 'DESC')->first();
+        $lastId = SolicitudProduct::orderBy( 'id' , 'DESC' )->first();
         if( is_null( $lastId ) )
             return 0;
         else
@@ -19,6 +19,6 @@ class SolicitudProduct extends Eloquent
 
     public function marca()
     {
-        return $this->hasOne( 'Dmkt\Marca' , 'id' , 'idfamilia' );
+        return $this->hasOne( 'Dmkt\Marca' , 'id' , 'id_producto' );
     }
 }
