@@ -15,12 +15,12 @@
                 </div>
             </li>
         @else
-            @foreach ( $solicitud->families as $solFamily )
+            @foreach ( $solicitud->products as $solProduct )
                 <li>
                     <div style="position: relative">
                         <select id="selectfamily" name="productos[]" class="form-control selectfamily" style="margin-bottom:10px ">
-                            @foreach($families as $family)
-                                @if( $solFamily->idfamilia == $family->id )
+                            @foreach( $families as $family )
+                                @if( $solProduct->id_producto == $family->id )
                                     <option value="{{$family->id}}" selected>{{$family->descripcion}}</option>
                                 @else
                                     <option value="{{$family->id}}">{{$family->descripcion}}</option>

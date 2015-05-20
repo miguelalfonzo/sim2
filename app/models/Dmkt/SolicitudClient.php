@@ -19,27 +19,27 @@ class SolicitudClient extends Eloquent
 
     protected function doctor()
     {
-        return $this->hasOne('Client\Doctor','pefcodpers','idcliente');
+        return $this->hasOne('Client\Doctor','pefcodpers','id_cliente');
     }
 
     protected function institution()
     {
-        return $this->hasOne('Client\Institution','pejcodpers','idcliente');
+        return $this->hasOne('Client\Institution','pejcodpers','id_cliente');
     }
 
     protected function pharmacy()
     {
-        return $this->hasOne('Client\Pharmacy' , 'pejcodpers' , 'idcliente');
+        return $this->hasOne('Client\Pharmacy' , 'pejcodpers' , 'id_cliente');
     }
 
     protected function warehouse()
     {
-        return $this->hasOne('Client\DistrimedClient' , 'clcodigo' , 'idcliente')->where( 'clclase' , 1 )->where( 'clestado' , 1 );
+        return $this->hasOne('Client\DistrimedClient' , 'clcodigo' , 'id_cliente')->where( 'clclase' , 1 )->where( 'clestado' , 1 );
     }    
 
     protected function distributor()
     {
-        return $this->hasOne('Client\DistrimedClient' , 'clcodigo' , 'idcliente')->where( 'clclase' , 6 )->where( 'clestado' , 1 );
+        return $this->hasOne('Client\DistrimedClient' , 'clcodigo' , 'id_cliente')->where( 'clclase' , 6 )->where( 'clestado' , 1 );
     }
 
     protected function clientType()

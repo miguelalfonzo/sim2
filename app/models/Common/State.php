@@ -11,10 +11,10 @@ use \Eloquent;
 class State extends Eloquent
 {
     protected $table = 'SUB_ESTADO';
-    protected $primaryKey = 'idestado';
+    protected $primaryKey = 'id';
 
 	function rangeState()
 	{
-        return $this->hasOne('Common\StateRange','id','idstate');
+        return $this->hasOne( 'Common\StateRange' , 'id' , 'id_estado' );
     }
 }

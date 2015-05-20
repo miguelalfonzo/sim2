@@ -1,5 +1,5 @@
 <td class="text-center">
-    @if ( $solicitude->idestado != PENDIENTE )
+    @if ( $solicitude->id_estado != PENDIENTE )
         @if( count( $solicitude->histories ) != 0 )
             @if (is_object($solicitude->histories[0]->user ) )
                 @if ($solicitude->histories[0]->user->type == REP_MED)

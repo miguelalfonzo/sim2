@@ -74,7 +74,7 @@ action="{{isset($solicitud) ? 'editar-solicitud' : 'registrar-solicitud' }}">
             <ul class="list-group" id="clientes">
                 @if ( isset( $solicitud ) )
                     @foreach ( $solicitud->clients as $client )
-                        <li class="list-group-item" tipo_cliente="{{$client->id_tipo_cliente}}" pk="{{$client->idcliente}}">
+                        <li class="list-group-item" tipo_cliente="{{$client->id_tipo_cliente}}" pk="{{$client->id_cliente}}">
                             <b>{{ $client->{$client->clientType->relacion}->full_name }}</b>
                             <button type='button' class='btn-delete-client' style="z-index:2">
                                 <span class="glyphicon glyphicon-remove red" style="margin-left:20px ; float:right;"></span>

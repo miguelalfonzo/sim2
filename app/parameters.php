@@ -62,14 +62,14 @@ const R_NO_AUTORIZADO = 6;
 const R_TODOS = 10;
 
 //CODIGO USUARIOS
-const REP_MED = 'R';
-const SUP = 'S';
-const GER_PROD = 'P';
-const GER_COM = 'G';
-const CONT = 'C';
+const REP_MED   = 'R';
+const SUP 	    = 'S';
+const GER_PROD  = 'P';
+const GER_PROM  = 'GP';
+const GER_COM   = 'G';
+const CONT 	    = 'C';
 const TESORERIA = 'T';
-const ASIS_GER = 'AG';
-const GER_PROM = 'GP';
+const ASIS_GER  = 'AG';
 
 //TABLAS EXTERNAS
 const TB_DOCTOR = 'FICPE.PERSONAFIS';

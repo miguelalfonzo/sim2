@@ -11,6 +11,7 @@
 		<ol>
 			<li>User: {{Auth::user()->id.' '.Auth::user()->username}}</li>
 			<li>Description: {{$description}}</li>
+			<li>Function: {{$function}}
 		</ol>
 	@elseif( isset( $subject ) )
 		<h1>

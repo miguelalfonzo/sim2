@@ -4,7 +4,7 @@
         <select class="form-control" name="inversion">
             <option value="" disabled selected>SELECCIONE LA INVERSIÓN</option>
             @foreach( $investments as $investment )
-                @if( isset( $solicitud ) && $solicitud->idinversion == $investment->id )
+                @if( isset( $solicitud ) && $solicitud->id_inversion == $investment->id )
                     <option selected value="{{$investment->id}}">{{$investment->nombre}}</option>
                 @else
                     <option value="{{$investment->id}}">{{$investment->nombre}}</option>

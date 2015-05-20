@@ -9,14 +9,18 @@ class SolicitudGer extends Eloquent
     protected $table = 'SOLICITUD_GERENTE';
     protected $primaryKey = 'id';
 
-    function searchId(){
-        $lastId = SolicitudeGer::orderBy('id', 'DESC')->first();
-        if($lastId == null){
+    public function lastId()
+    {
+        $lastId = SolicitudeGer::orderBy( 'id' , 'DESC' )->first();
+        if( is_null( $lastId ) )
             return 0;
-        }else{
+        else
             return $lastId->id;
-        }
+    }
 
+    protected static function deleteSolicitud( $idSolicitud )
+    {
+        SolicitudeGer::where( 'id_solicitud' , $idSolicitud )->delete();
     }
 
 }

@@ -23,22 +23,27 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	 */
 	protected $hidden = array('password', 'remember_token');
 
-    function searchId()
+    function lastId()
     {
-        $lastId = User::orderBy('id', 'DESC')->first();
-        if($lastId == null)
+        $lastId = User::orderBy( 'id' , 'DESC' )->first();
+        if( is_null( $lastId ) )
             return 0;
         else
             return $lastId->id;
     }
+
+    protected static function getUserType( $userType ){
+        return User::where( 'tipo' , $userType )->lists( 'id' );
+    }
+    
     protected function person(){
-        return $this->hasOne('Common\Person','iduser','id');
+        return $this->hasOne('Users\Person','iduser','id');
     }
     public function rm(){
-        return $this->hasOne('Dmkt\Rm','iduser','id');
+        return $this->hasOne('Users\Rm','iduser','id');
     }
     public function sup(){
-        return $this->hasOne('Dmkt\Sup','iduser','id');
+        return $this->hasOne('Users\Sup','iduser','id');
     }
 
     public function solicituds(){
@@ -46,7 +51,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
     }
 
     public function gerProd(){
-        return $this->hasOne('Dmkt\Manager','iduser','id');
+        return $this->hasOne('Users\Manager','iduser','id');
     }
 
     public function type(){
@@ -61,27 +66,19 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
         return $this->hasOne('Common\UserApp' , 'iduser' , 'id' )->where( 'idapp' , SISTEMA_SIM );
     }
 
-    public function getName(){
-        $username= '';
-
-        $userType       = $this->type;
-        if($userType == 'R'){
-            $username .= $this->rm->nombres .' ';
-            $username .= $this->rm->apellidos;
-        }
-        elseif($userType == 'S')
-        {
-            $username .= $this->sup->nombres .' ';
-            $username .= $this->sup->apellidos;
-        }
-        elseif($userType == 'P'){
+    public function getName()
+    {
+        $username = '';
+        $userType = $this->type;
+        if( $userType == REP_MED )
+            $username .= $this->rm->full_name ;
+        elseif( $userType == SUP )
+            $username .= $this->sup->full_name;
+        elseif( $userType == GER_PROD )
             $username = $this->gerProd->descripcion;
-        }else{
-            $username .= $this->person->nombres .' ';
-            $username .= $this->person->apellidos;
-        }
+        else
+            $username .= $this->person->full_name;
         return $username;
-        
     }
 
 }

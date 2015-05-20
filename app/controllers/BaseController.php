@@ -71,15 +71,16 @@ class BaseController extends Controller
         return $rpta;
     }
 
-    protected function warningException( $function , $description )
+    protected function warningException( $description , $function , $line , $directory )
     {
         $rpta = array();
         $rpta[status] = warning;
         $rpta[description] = $description;
-        Mail::send('soporte', array( 'description' => $description ), function($message) use($function)
+        Mail::send( 'soporte' , array( 'description' => $description , 'function' => $function , 'line' => $line , 'directory' => $directory ) , 
+        function( $message ) use( $function )
         {
-            $message->to(SOPORTE_EMAIL);
-            $message->subject(warning.' - Function: '.$function);      
+            $message->to( SOPORTE_EMAIL );
+            $message->subject( warning.' - Function: '.$function);      
         });
         return $rpta;
     }
@@ -116,64 +117,77 @@ class BaseController extends Controller
         return $rpta;
     }
 
-    public function postman($idsolicitud, $fromEstado, $toEstado, $toUser){
+    public function postman($idSolicitud, $fromEstado, $toEstado, $toUser)
+    {
         try 
         {
-            $solicitud = Solicitud::find($idsolicitud);
-            $msg        = '';
-            $subject    = 'Solicitud N° '.$idsolicitud;
-            $user_name  = $toUser != null ? $toUser->getName() : '';
-            $user_email = $toUser != null ? $toUser->email : '';
-            if($user_name != '' && $user_email != ''){
+            $solicitud = Solicitud::find( $idSolicitud );
+            $subject    = 'Solicitud N° '.$idSolicitud;
+            
+            $user_email = $toUser->lists('email');
+            $user_name  = array();
+            foreach ( $toUser as $user )
+                $user_name[] = $user->getName();
+            
+            Log::error( $user_email );
+            Log::error( $user_name );
+            
+            if( count( $user_name ) != 0 && count( $user_email ) != 0 )
+            {
                 $data = array(
-                    'solicitud_id'          => $idsolicitud,
-                    'msg'                   => $msg,
-                    'solicitud_estado'      => $toEstado,
-                    'solicitud_titulo'      => $solicitud->titulo,
-                    'solicitud_descripcion' => $solicitud->descripcion//,
-                    /*'solicitud_tipo_moneda' => $solicitud->typemoney->simbolo,
-                    'solicitud_monto'       => $solicitud->monto*/
+                    'solicitud_id'          => $idSolicitud ,
+                    'solicitud_estado'      => $toEstado ,
+                    'solicitud_titulo'      => $solicitud->titulo ,
+                    'solicitud_descripcion' => $solicitud->descripcion
                 );
 
-                Mail::send('emails.notification', $data, function($message) use ($subject, $user_name, $user_email){
-                    $message->to($user_email, $user_name)->subject($subject);
+                Mail::send('emails.notification', $data, function($message) use ($subject, $user_name, $user_email)
+                {
+                    $message->to( $user_email , $user_name )->subject($subject);
                 });
+                return $this->setRpta();
             }
             else
             {
-                Mail::send('soporte', array( 'subject' => 'No se pudo enviar email, debido a que el usuario o password son Incorrectos' ), function($message) use ($subject)
+                Mail::send('soporte', array( 'subject' => 'No se pudo enviar email, debido a que el usuario o password son Incorrectos' ) , function($message) use ($subject)
                 {
                     $message->to(SOPORTE_EMAIL)->subject('PostMan [BaseController:89]:');
                 });
                 Log::error("IDKC [BaseController:109]: No se pudo enviar email, debido a que el usuario o password son Incorrectos");
+                return $this->warningException( 'Usuarios Incorrectos' , __FUNCTION__ , __LINE__ , __FILE__ );
             }
-            $rpta = $this->setRpta();
         }
-        catch (Swift_TransportException $e)
+        catch ( Swift_TransportException $e )
         {
-            $rpta = $this->warningException($e,__FUNCTION__,"Mail Host: Can't Establish a Conecction");
+            return $this->warningException( "Mail Host: Can't Establish a Conecction" , __FUNCTION__ , __LINE__ , __FILE__ );
         }
         catch (Exception $e)
         {
-            $rpta = $this->internalException($e,__FUNCTION__);
+            return $this->internalException($e,__FUNCTION__);
         }
-        return $rpta;
     }
 
-    public function setStatus( $status_from , $status_to , $user_from_id , $user_to_id , $idsolicitude )
+    public function setStatus( $status_from , $status_to , $user_from_id , $user_to_id , $idSolicitud )
     {
         try
         {
-            $fromStatus = State::where('idestado', $status_from)->first();
-            $toStatus   = State::where('idestado', $status_to)->first();
-            $fromUser   = User::where('id', $user_from_id)->first();
-            $toUser     = User::where('id', $user_to_id)->first();
+            Log::error( $user_to_id );
+            $fromStatus = State::where( 'id' , $status_from )->first();
+            $toStatus   = State::where( 'id' , $status_to )->first();
+            $fromUser   = User::where( 'id' , $user_from_id )->first();
+            
+            if ( is_array( $user_to_id ) )
+                $toUser     = User::whereIn( 'id' , $user_to_id )->get();
+            else
+                $toUser     = User::where( 'id' , $user_to_id )->get();
+            Log::error( json_encode( $toUser ));
             $statusNameFrom = $fromStatus == null ? '' : $fromStatus->nombre;
             $statusNameTo   = $toStatus == null ? '' : $toStatus->nombre;
             // POSTMAN: send email
-            $rpta = $this->postman($idsolicitude, $statusNameFrom, $statusNameTo, $toUser);
-            if ($rpta[status] == ok || $rpta[status] == warning)
-                $rpta = $this->updateStatusSolicitude( $status_from, $status_to , $fromUser, $toUser, $idsolicitude, 0);
+            $rpta = $this->postman( $idSolicitud , $statusNameFrom , $statusNameTo , $toUser );
+            Log::error( $rpta );
+            if ( $rpta[status] == ok || $rpta[status] == warning )
+                $rpta = $this->updateStatusSolicitude( $status_from , $status_to , $fromUser , $idSolicitud , 0 );
             return $rpta;
         }
         catch (Exception $e)
@@ -182,35 +196,30 @@ class BaseController extends Controller
         }
     }
 
-    public function updateStatusSolicitude( $status_from, $status_to, $user_from, $user_to, $idsolicitude, $notified)
+    public function updateStatusSolicitude( $status_from , $status_to , $user_from , $idSolicitud , $notified )
     {   
         try
         {         
             $fData = array(
                 'status_to'   => $status_to,
-                'idsolicitude'=> $idsolicitude,
-                );
-            $vData = array(
-                'status_from' => $status_from,
-                'user_from'   => $user_from->type,
-                'user_to'     => $user_to->type,
-                'notified'    => $notified
-                );
+                'id_solicitud'=> $idSolicitud,
+            );
             $statusSolicitude = SolicitudHistory::firstOrNew($fData);
-            if (!isset($statusSolicitude->rn))
+            if ( ! isset( $statusSolicitude->rn ) )
             {
                 $statusSolicitude->id           = $statusSolicitude->lastId() + 1;
                 $statusSolicitude->status_to    = $status_to;
-                $statusSolicitude->idsolicitude = $idsolicitude;
+                $statusSolicitude->id_solicitud = $idSolicitud;
             }
             else
-                $statusSolicitude = SolicitudHistory::find($statusSolicitude->id);
+                $statusSolicitude = SolicitudHistory::find( $statusSolicitude->id );
             $statusSolicitude->status_from  = $status_from;
             $statusSolicitude->user_from    = $user_from->type;
-            $statusSolicitude->user_to      = $user_to->type;
+            $statusSolicitude->user_to      = Session::pull( 'usertype' );
             $statusSolicitude->notified     = $notified;
             $statusSolicitude->updated_at   = Carbon\Carbon::now();
             $statusSolicitude->save();
+            Log::error( json_encode( $statusSolicitude ));
             return $this->setRpta();
         }
         catch (Exception $e)
@@ -233,18 +242,20 @@ class BaseController extends Controller
             {
                 $q->orderBy('created_at','DESC');  
             }));
-            $rSolicituds = Solicitud::with(array('histories' => function($q)
+            /*$rSolicituds = Solicitud::with(array('histories' => function($q)
             {
                 $q->orderBy('created_at','DESC');  
-            }));
+            }));*/
 
-            if (Auth::user()->type == REP_MED)
+            if ( Auth::user()->type == REP_MED )
             {
-                $solicituds->whereIn('created_by', $idUser);
-                $rSolicituds->whereNotIn('created_by', $idUser)
-                ->whereIn( 'iduserasigned' , $idUser );
+                $solicituds->whereIn( 'created_by' , $idUser )->orWhere( function( $query) use ( $idUser )
+                {
+                    $query->whereNotIn( 'created_by' , $idUser )->where( 'iduserasigned' , $idUser );
+                });
+//                $rSolicituds->whereNotIn( 'created_by' , $idUser )->where( 'iduserasigned' , $idUser );
             }
-            else if (Auth::user()->type == SUP)
+            else if ( Auth::user()->type == SUP )
                 $solicituds->whereIn('created_by', $idUser);
             else if ( Auth::user()->type == TESORERIA ) 
             {
@@ -269,10 +280,14 @@ class BaseController extends Controller
             }
             else if ( Auth::user()->type == GER_PROD )
             {
-                $solicituds->whereHas('gerente' , function( $g ) 
+                $solicituds->where( function ( $query ) 
                 {
-                    $g->where('idgerprod', Auth::user()->id);
+                    $query->where( 'created_by' , '<>' , Auth::user()->id )->whereHas( 'gerente' , function( $query )
+                    {
+                        $query->where( 'id_gerprod' , Auth::user()->id );
+                    });
                 });
+                $solicituds->orWhere( 'created_by' , Auth::user()->id );
             }
             else if ( Auth::user()->type == CONT )
                 $solicituds->where( 'idestado' , '<>' , ACEPTADO );
@@ -286,23 +301,13 @@ class BaseController extends Controller
                         $t->where('id',$estado);
                     });
                 });
-                $rSolicituds->whereHas('state', function ($q) use($estado)
-                {
-                    $q->whereHas('rangeState', function ($t) use($estado)
-                    {
-                        $t->where('id',$estado);
-                    });
-                });
+                
             }
 
             $solicituds->whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
-            $rSolicituds->whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
-        
-            $solicituds = $solicituds->orderBy('id', 'ASC')->get();
-            $rSolicituds = $rSolicituds->orderBy('id', 'ASC')->get();
             
-            if ( Auth::user()->type == REP_MED )
-                $solicituds = $solicituds->merge($rSolicituds);
+            $solicituds = $solicituds->orderBy('id', 'ASC')->get();
+            
             return $this->setRpta($solicituds);
         }
         catch ( Exception $e )

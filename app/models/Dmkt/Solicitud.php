@@ -43,7 +43,7 @@ class Solicitud extends Eloquent
 
     public function state()
     {
-        return $this->hasOne('Common\State','idestado','idestado');
+        return $this->hasOne( 'Common\State' , 'id' , 'id_estado' );
     }
 
     public function asignedTo()
@@ -53,25 +53,25 @@ class Solicitud extends Eloquent
 
     protected function advanceSeatHist()
     {
-        return $this->hasMany( 'System\SolicitudHistory' , 'idsolicitude' , 'id' )->where( 'status_to' , GASTO_HABILITADO );
+        return $this->hasMany( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->where( 'status_to' , GASTO_HABILITADO );
     }
 
     public function acceptHist()
     {
-        return $this->hasOne('System\SolicitudHistory','idsolicitude','id')->where( 'status_to' , ACEPTADO );
+        return $this->hasOne('System\SolicitudHistory','id_solicitud','id')->where( 'status_to' , ACEPTADO );
     }
 
     public function rejectedHist(){
-        return $this->hasOne('System\SolicitudHistory','idsolicitude','id')->where( 'status_to' , RECHAZADO );
+        return $this->hasOne('System\SolicitudHistory','id_solicitud','id')->where( 'status_to' , RECHAZADO );
     }
 
     public function histories(){
-        return $this->hasMany('System\SolicitudHistory','idsolicitude');
+        return $this->hasMany('System\SolicitudHistory','id_solicitud');
     }
 
     public function detalle()
     {
-        return $this->hasOne('Dmkt\SolicitudDetalle','id','iddetalle');
+        return $this->hasOne( 'Dmkt\SolicitudDetalle' , 'id' , 'id_detalle' );
     }
 
 
@@ -79,7 +79,7 @@ class Solicitud extends Eloquent
 
     protected function registerHist()
     {
-        return $this->hasOne('System\SolicitudHistory','idsolicitude','id')->where('status_to' , REGISTRADO );
+        return $this->hasOne('System\SolicitudHistory','id_solicitud','id')->where('status_to' , REGISTRADO );
     }
 
     protected function typeSolicitude()
@@ -87,12 +87,12 @@ class Solicitud extends Eloquent
         return $this->hasOne('Dmkt\SolicitudType','id','idtiposolicitud');
     }
 
-    protected function families(){
-        return $this->hasMany('Dmkt\SolicitudFamily','idsolicitud','id');
+    protected function products(){
+        return $this->hasMany( 'Dmkt\SolicitudProduct' , 'id_solicitud' , 'id' );
     }
 
     protected function clients(){
-        return $this->hasMany('Dmkt\SolicitudClient','idsolicitud','id');
+        return $this->hasMany( 'Dmkt\SolicitudClient' , 'id_solicitud' , 'id' );
     }
 
     protected function createdBy()
@@ -102,7 +102,7 @@ class Solicitud extends Eloquent
 
     public function gerente()
     {
-        return $this->hasOne('Dmkt\SolicitudGer','idsolicitud','id');
+        return $this->hasOne( 'Dmkt\SolicitudGer' , 'id_solicitud' , 'id' );
     }
 
     protected function response()
@@ -122,21 +122,21 @@ class Solicitud extends Eloquent
 
     protected function activity()
     {
-        return $this->hasOne('Dmkt\Activity','id','idactividad');
+        return $this->hasOne('Dmkt\Activity','id','id_actividad');
     }
 
     protected function expenses()
     {
-        return $this->hasMany( '\Expense\Expense' , 'idsolicitud' , 'id' )->orderBy( 'updated_at' , 'desc');
+        return $this->hasMany( '\Expense\Expense' , 'id_solicitud' , 'id' )->orderBy( 'updated_at' , 'desc');
     }
 
     protected function baseEntry()
     {
-        return $this->hasOne( 'Expense\Entry' , 'idsolicitud' )->where( 'd_c' , ASIENTO_GASTO_BASE );
+        return $this->hasOne( 'Expense\Entry' , 'id_solicitud' )->where( 'd_c' , ASIENTO_GASTO_BASE );
     }
 
     protected function depositEntrys()
     {
-        return $this->hasMany( 'Expense\Entry' , 'idsolicitud' )->where( 'd_c' , ASIENTO_GASTO_DEPOSITO );
+        return $this->hasMany( 'Expense\Entry' , 'id_solicitud' )->where( 'd_c' , ASIENTO_GASTO_DEPOSITO );
     }
 }

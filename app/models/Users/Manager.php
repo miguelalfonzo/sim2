@@ -1,9 +1,11 @@
 <?php
 
+namespace Users;
 
-namespace Dmkt;
 use \Eloquent;
-class Manager extends Eloquent{
+
+class Manager extends Eloquent
+{
 
     protected $table = 'OUTDVP.GERENTES';
     protected $primaryKey = 'id';
@@ -17,18 +19,17 @@ class Manager extends Eloquent{
             return $name[0];
     }
 
-    public function solicituds()
-    {
-        return $this->hasMany('Dmkt\SolicitudGer','idgerprod','id');
-    }
-    
-    function searchId()
+    public function lastId()
     {
         $lastId = Manager::orderBy('id', 'DESC')->first();
-        if($lastId == null)
+        if( is_null( $lastId ) )
             return 0;
         else
             return $lastId->id;
     }
 
+    public function solicituds()
+    {
+        return $this->hasMany( 'Dmkt\SolicitudGer' , 'id_gerprod' , 'id' );
+    }
 }

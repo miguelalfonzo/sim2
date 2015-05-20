@@ -136,11 +136,6 @@ Route::group( array('before' => 'ager') , function()
     Route::post('get-sol-inst' , 'Dmkt\FondoController@getSolInst');
 });
 
-Route::group( array( 'before' => 'rm_sup_ager' ), function ()
-{
-    Route::post('cancelar-solicitud', 'Dmkt\SolicitudeController@cancelSolicitude');
-});
-
 Route::group(array('before' => 'sup_gerprod'), function ()
 {
     Route::post('asignar-solicitud-responsable', 'Dmkt\SolicitudeController@asignarResponsableSolicitud');
@@ -183,6 +178,7 @@ Route::group(array('before' => 'rm_sup_gerprod'), function ()
     Route::post('get-client-view' , 'Source\Seeker@getClientView');
     Route::post('filtro_cliente' , 'Dmkt\Client@getInvestmentActivity');
     Route::post('filtro-inversion' , 'Dmkt\Client@getActivities');
+    Route::post('cancelar-solicitud', 'Dmkt\SolicitudeController@cancelSolicitude');
 });
 
 Route::group(array('before' => 'sys_user'), function ()

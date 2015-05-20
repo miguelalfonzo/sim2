@@ -1,14 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Developer
- * Date: 06/10/14
- * Time: 04:16 PM
- */
 
-namespace Common;
+namespace Users;
+
 use \Eloquent;
-class Person extends Eloquent{
+
+class Person extends Eloquent
+{
 
     protected $table = 'OUTDVP.PERSONAS';
     protected $primaryKey = 'idpersona';

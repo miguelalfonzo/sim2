@@ -1,6 +1,6 @@
 <?php
 
-namespace Dmkt;
+namespace Users;
 
 use \Eloquent;
 

@@ -11,11 +11,11 @@ class DistrimedClient extends Eloquent
 
     protected function getFullNameAttribute()
     {
-    	if ( $this->attributes->clclase == 1 )
-        	return 'DISTRIBUIDOR: '.$this->attributes[ 'clrut' ].'-'.$this->attributes[ 'clnombre' ];
-    	else if ( $this->attributes->clclase == 6 )
-    		return 'BODEGA: '.$this->attributes[ 'clrut' ].'-'.$this->attributes[ 'clnombre' ];
+    	if ( $this->clclase == 1 )
+        	return $this->clrut . '-' . $this->clnombre;
+    	else if ( $this->clclase == 6 )
+    		return $this->clrut . '-' . $this->clnombre;
     	else
-    		return '--- : '.$this->attributes[ 'clrut' ].'-'.$this->attributes[ 'clnombre' ];	
+    		return $this->clrut . '-' . $this->clnombre;	
     }
 }

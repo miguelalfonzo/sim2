@@ -146,15 +146,6 @@ Route::filter( 'rm_sup_gerprod' , function ()
             return Redirect::to( 'show_user' );
 });
 
-Route::filter( 'rm_sup_ager' , function () 
-{
-    if ( ! Auth::check() || Auth::user()->simApp->count() === 0 ) 
-        return Redirect::to( 'login' );
-    else     
-        if ( ! in_array( Auth::user()->type , array( REP_MED , SUP , ASIS_GER ) ) )
-            return Redirect::to( 'show_user' );                
-});
-
 /*
 |--------------------------------------------------------------------------
 | CSRF Protection Filter

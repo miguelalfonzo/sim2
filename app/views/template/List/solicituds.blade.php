@@ -53,19 +53,7 @@
                     @endif
                     <label>{{$solicitude->titulo}}</label>
                 </td>
-                <td class="text-center">
-                    @if ( $solicitude->createdBy->type == REP_MED )
-                        {{$solicitude->createdBy->rm->full_name}}
-                    @elseif ( $solicitude->createdBy->type == SUP )
-                        {{$solicitude->createdBy->sup->full_name}}
-                    @elseif ( $solicitude->createdBy->type == GER_PROD )
-                        {{$solicitude->createdBy->descripcion}}
-                    @elseif ( $solicitude->createdBy->type == ASIS_GER )
-                        {{$solicitude->createdBy->person->full_name}}
-                    @else
-                        No Registrado
-                    @endif
-                </td>
+                @include('template.List.first_user')
                 <td class="text-center">{{$solicitude->created_at}}</td>
                 @include('template.List.last_user')
                 @include('template.List.lastdate')
@@ -106,11 +94,11 @@
                 @else
                     <td class="text-center total_deposit">
                         @if ( $solicitude->idtiposolicitud == SOL_REP )
-                            @if ($solicitude->idestado == PENDIENTE || $solicitude->idestado == DERIVADO )
+                            @if ($solicitude->id_estado == PENDIENTE || $solicitude->id_estado == DERIVADO )
                                 {{ $solicitude->detalle->typeMoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_solicitado }}
-                            @elseif ($solicitude->idestado == ACEPTADO )
+                            @elseif ($solicitude->id_estado == ACEPTADO )
                                 {{ $solicitude->detalle->typeMoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_aceptado }}
-                            @elseif ( in_array( $solicitude->idestado , array( RECHAZADO , CANCELADO) ) )
+                            @elseif ( in_array( $solicitude->id_estado , array( RECHAZADO , CANCELADO) ) )
                                 @if ( isset($detalle->monto_aceptado))
                                     {{ $solicitude->detalle->typeMoney->simbolo.' '.json_decode($solicitude->detalle->detalle)->monto_aceptado }}
                                 @else
@@ -148,7 +136,6 @@
                     @endif
                     </td>
                 @endif
-               
             </tr>
         @endforeach
     </tbody>
