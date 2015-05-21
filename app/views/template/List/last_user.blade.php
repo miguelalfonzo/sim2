@@ -7,7 +7,7 @@
                 @elseif ($solicitud->lastHistory->user->type == SUP)
                     {{ $solicitud->lastHistory->user->sup->full_name }}
                 @elseif ($solicitud->lastHistory->user->type == GER_PROD)
-                    {{ ucwords(strtolower($solicitud->lastHistory->user->gerProd->full_name))}}
+                    {{ $solicitud->lastHistory->user->gerProd->full_name }}
                 @elseif ( $solicitud->lastHistory->user->simApp->count() != 0 )
                     {{ $solicitud->lastHistory->user->person->full_name }}
                 @else

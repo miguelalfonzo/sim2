@@ -11,7 +11,7 @@ class SolicitudClient extends Eloquent
     public function lastId()
     {
         $lastId = SolicitudClient::orderBy('id', 'DESC')->first();
-        if($lastId == null)
+        if( is_null( $lastId ) )
             return 0;
         else
             return $lastId->id;

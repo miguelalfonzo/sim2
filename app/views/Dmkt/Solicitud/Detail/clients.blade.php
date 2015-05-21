@@ -17,7 +17,7 @@
                         <div class="form-group">
                             <div>
                                 <input class="form-control input-md" type="text"
-                                value="{{$client->clientType->descripcion .': '. $client->{$client->clientType->relacion}->full_name}}" readonly>
+                                value="{{ $client->{$client->clientType->relacion}->full_name }}" readonly>
                             </div>
                         </div>
                     @endif

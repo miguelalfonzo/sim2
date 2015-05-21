@@ -268,17 +268,21 @@ class SolicitudeController extends BaseController
     {
         try
         {
+            $clients = explode( ',' , $clients[0] );
+            $types   = explode( ',' , $types[0] );
             if ( count( $clients ) != count( $types ) )
                 return $this->warningException( 'Hay un error con los tipos de clientes de la solicitud' , __FUNCTION__ , __LINE__ , __DIR__ );
             else
             { 
                 for ( $i = 0 ; $i < count( $clients ) ; $i++ ) 
-                {        
+                {       
+                    Log::error( $i ); 
                     $solClient = new SolicitudClient;
                     $solClient->id = $solClient->lastId() + 1;
                     $solClient->id_solicitud = $idSolicitud;
                     $solClient->id_cliente = $clients[$i];
                     $solClient->id_tipo_cliente = $types[$i];
+                    Log::error( $solClient );
                     if ( ! $solClient->save() )
                         return $this->warningException( 'No se pudo procesar a los clientes de la solicitud' , __FUNCTION__ , __LINE__ , __DIR__ );
                 }
@@ -681,8 +685,8 @@ class SolicitudeController extends BaseController
                         if ( $middleRpta[ status ] == ok )
                         {
                             Session::put('state' , $solicitud->state->rangeState->id );
-                            dd( $middleRpta );
-                            //DB::commit();
+                            //dd( $middleRpta );
+                            DB::commit();
                         }
                     }
                 }
@@ -742,6 +746,9 @@ class SolicitudeController extends BaseController
                     else
                     {
                         Log::error( json_encode( $detalle ) );
+                        Log::error( $inputs['clientes']);
+                        Log::error( $inputs['tipos_cliente']);
+                        
                         $middleRpta = $this->setClients( $solicitud->id , $inputs['clientes'] , $inputs['tipos_cliente'] );
                         if ( $middleRpta[status] == ok )
                         {
@@ -1367,11 +1374,17 @@ class SolicitudeController extends BaseController
                         array_push( $responsables , $asistente->person );
                     if( $solicitud->createdBy->type == REP_MED )
                         array_push( $responsables , $solicitud->createdBy->rm );
-                    elseif( $solicitud->createdBy->type == SUP )
+                    else
                     {
-                        $rms = $solicitud->createdBy->sup->reps;
-                        foreach ( $rms as $rm )
-                            $responsables[] = $rm;
+                        if ( Auth::user()->type == SUP )
+                        {
+                            $rms = Auth::user()->sup->reps;
+                            $responsables = array_merge( $responsables , $rms->toArray() );
+                        //    foreach ( $rms as $rm )
+                          //      $responsables[] = $rm;
+                        }
+                        else
+                            $responsables = array_merge( $responsables , Rm::all()->toArray() );
                     }
                     return $this->setRpta( $responsables );
                 }
@@ -1379,7 +1392,7 @@ class SolicitudeController extends BaseController
                     return $this->warningException( __FUNCTION__ , 'No se puede buscar los responsable de la solicitud con Id: '.$solicitud->id. ' debido a que no se encuentra PENDIENTE');
             }
             else 
-                return $this->setRpta( array() );    
+                return $this->setRpta( '' );    
         }
         catch (Exception $e)
         {

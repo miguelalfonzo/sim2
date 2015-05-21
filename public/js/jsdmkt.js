@@ -35,6 +35,7 @@ function newSolicitude() {
     var _token       = $( 'input[name=_token]' );
 
     var idState = $("#idState");
+
     //VALIDACION DE MONTOS DE FAMILIAS
     var amount_error_families = $('#amount_error_families');
     
@@ -81,6 +82,9 @@ function newSolicitude() {
         language: "es",
         autoclose: true
     };
+
+    $('.btn_cancel_fondo').hide();
+    $('.btn_edit_fondo').hide();
 
     $(document).off("click", ".timeLine");
     $(document).on("click", ".timeLine", function(e){
@@ -1032,7 +1036,7 @@ function newSolicitude() {
                         {
                             list = list + '<li><input type="radio" name="responsables"  value="' + entry.iduser + '"> ' + entry.nombres + ' ' + entry.apellidos + '</li>';    
                         });
-                        bootbox.confirm("<ul>" + list + "</ul>", function (result) 
+                        bootbox.confirm( message + '<ul>' + list + '</ul>', function ( result ) 
                         {
                             if (result) 
                             {
@@ -1086,11 +1090,6 @@ function newSolicitude() {
             }
         });
     }
-
-    
-
-    /*$('.btn_cancel_fondo').hide();
-    $('.btn_edit_fondo').hide();*/
 
     $(document).on('click','#terminate-fondo',function(e)
     {

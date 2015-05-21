@@ -13,10 +13,10 @@ class Manager extends Eloquent
     protected function getFullNameAttribute()
     {
         $name = explode( ' ' , trim( $this->attributes['descripcion'] ) );
-        if ( count($name) == 2 )
-            return substr( $name[0] , 0 , 1 ).'. '.$name[1];
+        if ( count( $name ) == 2 )
+            return ucwords( strtolower( substr( $name[ 0 ] , 0 , 1 ) . '. ' . $name[1] ) );
         else
-            return $name[0];
+            return ucwords( strtolower( $name[ 0 ] ) );
     }
 
     public function lastId()
