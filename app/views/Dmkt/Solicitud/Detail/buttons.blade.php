@@ -4,23 +4,10 @@
         @if ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO , APROBADO ) )
               && $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario === Auth::user()->type
               && in_array( Auth::user()->id , $solicitud->gerente->lists( 'id_gerprod' ) ) )
-            @if ( Auth::user()->type == SUP ) 
-                <a class="btn btn-primary" id="search_responsable">
-                    Aceptar
-                </a>
-                <a class="btn btn-primary" id="derived">
-                    Derivar
-                </a>
-            @elseif ( Auth::user()->type == GER_PROD )
-                <a class="btn btn-primary" id="search_responsable">
-                    Aceptar
-                </a>
-            @elseif( Auth::user()->type == GER_COM )
-             <a name="button1id" data-token ="{{$solicitud->token}}" class="btn btn-primary approved_solicitude">
-                    Aprobar
-                </a>
-            @endif
-            <a id="deny_solicitude" name="button1id" class="btn btn-primary">
+            <a class="btn btn-success" id="search_responsable">
+                Aceptar
+            </a>
+            <a id="deny_solicitude" class="btn btn-danger">
                 Rechazar
             </a>
         @endif
@@ -49,7 +36,7 @@
         @elseif ( Auth::user()->type == TESORERIA && $solicitud->idestado == DEPOSITO_HABILITADO )
             <a class="btn btn-success" data-toggle="modal" data-target="#myModal" >Registrar Depósito</a>
         @endif
-        <a id="button2id" href="{{URL::to('show_user')}}" class="btn btn-primary">
+        <a href="{{URL::to('show_user')}}" class="btn btn-primary">
             Regresar
         </a>
     </div>

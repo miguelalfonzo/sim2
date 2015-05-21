@@ -24,9 +24,17 @@ function newSolicitude() {
     
     var search_cliente = $('.cliente-seeker');
 
+    var idamount = $('#amount');
+
     var doc_start = $('.date_start').last();
     var doc_end = $('.date_end').last();
 
+    var cancel_solicitude = '.cancel-solicitude';
+
+    var id_solicitud = $( 'input[name=idsolicitude]' );
+    var _token       = $( 'input[name=_token]' );
+
+    var idState = $("#idState");
     //VALIDACION DE MONTOS DE FAMILIAS
     var amount_error_families = $('#amount_error_families');
     
@@ -613,19 +621,7 @@ function newSolicitude() {
         }
     });
 
-    /* Cancel Solicitude */
-    var cancel_solicitude = '.cancel-solicitude';
-    $(document).on('click', cancel_solicitude, function (e) 
-    {
-        e.preventDefault();
-        elem = $( this );
-        var data = 
-        {
-            idsolicitud: elem.attr('data-idsolicitude') ,
-            _token : elem.attr('data-token')
-        };
-        cancelDialog( data );
-    });
+    
 
     $(document).on('click' , '.delete-fondo' , function (e)
     {
@@ -638,82 +634,17 @@ function newSolicitude() {
         cancelDialog( data );
     });
 
-    function cancelDialog  ( data )
-    {
-        bootbox.dialog(
-        {
-            title : '<h4>¿Esta seguro que desea cancelar esta solicitud?</h4>',
-            message :  '<div class="form-group">' +
-                       '<label class="control-label">Observación</label> ' +
-                       '<div><textarea class="form-control sol-obs" maxlength="200"></textarea></div>' +
-                       '</div>',          
-            onEscape: function () 
-            {
-                bootbox.hideAll();
-            },
-            buttons: 
-            {
-                danger: 
-                {
-                    label:'Cancelar',
-                    className: 'btn-primary',
-                    callback: function ( result ) 
-                    {
-                        bootbox.hideAll();
-                    }
-                },
-                success:
-                { 
-                    label :'Aceptar',
-                    className: 'btn-default',
-                    callback : function ( result ) 
-                    {
-                        if ($(".sol-obs").val() == "" )
-                        {
-                            $(".sol-obs").attr("placeholder","Ingresar Observación").parent().parent().addClass("has-error").focus();
-                            return false;
-                        }
-                        else
-                        {
-                            if ( result )
-                            {
-                                data['observacion'] = $('.sol-obs').val();
-                                $.post(server + 'cancelar-solicitud', data )
-                                .done(function ( data ) 
-                                {
-                                    if ( data.Status == 'Ok')
-                                    {
-                                        bootbox.alert('<h4 class="green">Solicitud Cancelada</h4>' , function ()
-                                        {
-                                            if ( data.Type == 1 )
-                                            {
-                                                $("#idState").val(6);
-                                                listSolicitude();
-                                            }
-                                            else if ( data.Type == 2)
-                                                searchFondos( $('.date_month').first().val() );   
-                                        });
-                                    }
-                                    else
-                                        bootbox.alert('<h4 style="color:red">' + data.Status + ': ' + data.Description +'</h4>');
-                                });
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
+   
 
     /**------------------------------------------------ SUPERVISOR ---------------------------------------------------*/
 
     var amount_families = $('.amount_families');
     amount_families.numeric({negative: false});
     
-    /*idamount.keyup( function ()
+    idamount.keyup( function ()
     {
         verifySum( this , 2 );
-    });*/
+    });
 
     amount_families.keyup( function ()
     {
@@ -808,13 +739,34 @@ function newSolicitude() {
         verifySum( idamount[0] , 2);
     }
 
-    $('#deny_solicitude').on('click', function (e) {
+    /* Cancel Solicitude */
+    $(document).off( 'click' , cancel_solicitude );
+    $(document).on( 'click' , cancel_solicitude, function () 
+    {
+        //e.preventDefault();
+        elem = $( this );
+        var data = 
+        {
+            idsolicitud: elem.attr('data-idsolicitude') ,
+            _token : elem.attr('data-token')
+        };
+        cancelDialog( data , '¿Esta seguro que desea cancelar esta solicitud?' );
+    });
 
-        if ( $(".sol-obs").val() == "" )
+    $('#deny_solicitude').on('click', function (e)
+    {
+        var data =
+        {
+            idsolicitud : id_solicitud.val() ,
+            _token      : _token.val()   
+        }
+        cancelDialog( data , '¿Esta seguro que desea rechazar esta solicitud?' );
+        /*if ( $(".sol-obs").val() == "" )
         {
             $(".sol-obs").attr("placeholder","Ingresar Observación").parent().parent().addClass("has-error").focus();
         }
-        else
+        */
+        /*else
         {
             bootbox.confirm('¿Esta seguro que desea rechazar esta solicitud?', function (result) 
             {
@@ -834,8 +786,77 @@ function newSolicitude() {
                     });
                 }
             });
-        }
+        }*/
     });
+
+    function cancelDialog  ( data , message )
+    {
+        bootbox.dialog(
+        {
+            title : '<h4>' + message + '</h4>',
+            message :  '<div class="form-group">' +
+                       '<label class="control-label">Observación</label> ' +
+                       '<div><textarea class="form-control sol-obs" maxlength="200"></textarea></div>' +
+                       '</div>',          
+            onEscape: function () 
+            {
+                bootbox.hideAll();
+            },
+            buttons: 
+            {
+                danger: 
+                {
+                    label:'Cancelar',
+                    className: 'btn-primary',
+                    callback: function ( result ) 
+                    {
+                        bootbox.hideAll();
+                    }
+                },
+                success:
+                { 
+                    label :'Aceptar',
+                    className: 'btn-default',
+                    callback : function ( result ) 
+                    {
+                        if ($(".sol-obs").val() == "" )
+                        {
+                            $(".sol-obs").attr("placeholder","Ingresar Observación").parent().parent().addClass("has-error").focus();
+                            return false;
+                        }
+                        else
+                        {
+                            if ( result )
+                            {
+                                data['observacion'] = $('.sol-obs').val();
+                                $.post(server + 'cancelar-solicitud', data )
+                                .done(function ( data ) 
+                                {
+                                    if ( data.Status == 'Ok')
+                                    {
+                                        bootbox.alert('<h4 class="green">Solicitud Cancelada</h4>' , function ()
+                                        {
+                                            if ( data.Type == 1 )
+                                            {
+                                                idState.val(6);
+                                                listSolicitude();
+                                            }
+                                            else if ( data.Type == 2 )
+                                                searchFondos( $('.date_month').first().val() );
+                                            else if ( data.Type == 3 )
+                                                window.location.href = server + 'show_user';
+                                        });
+                                    }
+                                    else
+                                        bootbox.alert('<h4 style="color:red">' + data.Status + ': ' + data.Description +'</h4>');
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
     
     /** --------------------------------------------- CONTABILIDAD ------------------------------------------------- **/
 
@@ -1000,25 +1021,32 @@ function newSolicitude() {
             {
                 if (data.Status == 'Ok' )
                 {
-                    var list='';
-                    data.Data.forEach(function(entry)
+                    console.log( data.Data );
+                    if ( data.Data == '' )
+                        acceptedSolicitude();
+                    else
                     {
-                        list = list + '<li><input type="radio" name="responsables"  value="' + entry.iduser + '"> ' + entry.nombres + ' ' + entry.apellidos + '</li>';    
-                    });
-                    bootbox.confirm("<h5 id='validate'>Seleccione el Responsable</h5><ul>" + list + "</ul>", function (result) 
-                    {
-                        if (result) 
+                        var list='';
+                        message = '<h5 id="validate">Para aceptar la solicitud seleccione el Responsable</h5>';
+                        data.Data.forEach(function(entry)
                         {
-                            var resp = $("input[name=responsables]:checked");
-                            if (resp.length == 0 )
+                            list = list + '<li><input type="radio" name="responsables"  value="' + entry.iduser + '"> ' + entry.nombres + ' ' + entry.apellidos + '</li>';    
+                        });
+                        bootbox.confirm("<ul>" + list + "</ul>", function (result) 
+                        {
+                            if (result) 
                             {
-                                $("#validate").css("color","red");
-                                return false; 
+                                var resp = $("input[name=responsables]:checked");
+                                if (resp.length == 0 )
+                                {
+                                    $("#validate").css("color","red");
+                                    return false; 
+                                }
+                                else
+                                    acceptedSolicitude( resp.val() );
                             }
-                            else
-                                acceptedSolicitude(resp.val());
-                        }
-                    });
+                        });
+                    }
                 }
                 else
                     bootbox.alert("<h4 style='color:red'>" + data.Status + ": " + data.Description + "</h4>");
@@ -1061,8 +1089,8 @@ function newSolicitude() {
 
     
 
-    $('.btn_cancel_fondo').hide();
-    $('.btn_edit_fondo').hide();
+    /*$('.btn_cancel_fondo').hide();
+    $('.btn_edit_fondo').hide();*/
 
     $(document).on('click','#terminate-fondo',function(e)
     {
@@ -1224,11 +1252,11 @@ function newSolicitude() {
         $('#table_solicitude_fondos > tbody > tr').css('background-color','');
     });
 
-    $("#estado_fondo_cont").on("change", function(e){
+    /*$("#estado_fondo_cont").on("change", function(e){
         var datefondo = $("#datefondo").val();
         var aux = 'fondos-contabilidad';
         searchFondos(datefondo, aux);
-    });
+    });*/
 
     function searchFondos( datefondo , aux ) 
     {

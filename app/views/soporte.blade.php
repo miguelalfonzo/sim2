@@ -10,8 +10,10 @@
 	@elseif( isset( $description) )
 		<ol>
 			<li>User: {{Auth::user()->id.' '.Auth::user()->username}}</li>
+			<li>Function: {{$function}}</li>
+			<li>Line: {{$line}}</li>
+			<li>File: {{$file}}</li>
 			<li>Description: {{$description}}</li>
-			<li>Function: {{$function}}
 		</ol>
 	@elseif( isset( $subject ) )
 		<h1>

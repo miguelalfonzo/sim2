@@ -17,7 +17,7 @@
                                 <span class="input-group-addon">
                                     {{ $detalle->typemoney->simbolo }}
                                 </span>
-                                @if ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO , APROBADO ) )
+                                @if ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) )
                                       && $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario === Auth::user()->type
                                       && in_array( Auth::user()->id , $solicitud->gerente->lists( 'id_gerprod' ) ) )
                                     <input name="amount_assigned[]" type="text"

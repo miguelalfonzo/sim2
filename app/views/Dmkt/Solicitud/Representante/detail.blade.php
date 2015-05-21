@@ -98,7 +98,7 @@
     @include('Dmkt.Solicitud.Detail.tasa')
 
     <!-- Observation-->
-    @include('Dmkt.Solicitud.Detail.observacion')
+    @include('Dmkt.Solicitud.Detail.anotation')
 
 
     @if( $solicitud->activity->imagen == 1 )

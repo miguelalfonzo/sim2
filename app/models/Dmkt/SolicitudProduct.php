@@ -17,6 +17,11 @@ class SolicitudProduct extends Eloquent
             return $lastId->id;
     }
 
+    protected function getSolProducts( $idSolProduct )
+    {
+        return SolicitudProduct::whereIn( 'id' , $idSolProduct )->lists( 'id_producto' );
+    }
+
     public function marca()
     {
         return $this->hasOne( 'Dmkt\Marca' , 'id' , 'id_producto' );

@@ -48,7 +48,7 @@ class Solicitud extends Eloquent
 
     public function asignedTo()
     {
-        return $this->hasOne('User','id','iduserasigned');
+        return $this->hasOne('User','id','id_user_assign');
     }
 
     protected function advanceSeatHist()
@@ -67,6 +67,10 @@ class Solicitud extends Eloquent
 
     public function histories(){
         return $this->hasMany('System\SolicitudHistory','id_solicitud');
+    }
+
+    public function lastHistory(){
+        return $this->hasOne( 'System\SolicitudHistory' , 'id_solicitud' )->orderBy( 'updated_at' , 'desc' );
     }
 
     public function detalle()
@@ -97,7 +101,7 @@ class Solicitud extends Eloquent
 
     protected function createdBy()
     {
-        return $this->belongsTo('User','created_by');
+        return $this->belongsTo( 'User' , 'created_by' );
     }
 
     public function gerente()

@@ -13,4 +13,9 @@ class AprovalPolicy extends Eloquent
     {
     	return AprovalPolicy::where( 'id_inversion ' , $investment )->where( 'orden' , $order )->select( 'tipo_usuario' )->first();
     }
+
+    protected static function getUserInvestmentPolicy( $investment , $userType )
+    {
+    	return AprovalPolicy::where( 'id_inversion' , $investment )->where( 'tipo_usuario' , $userType )->first();
+    }
 }

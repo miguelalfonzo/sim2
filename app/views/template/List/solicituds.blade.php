@@ -129,11 +129,13 @@
                 @include('template.List.icons')
                 @if ( Auth::user()->type == GER_COM )
                     <td class="text-center">
-                    @if( $solicitud->idestado != ACEPTADO)
-                        <input type="checkbox" name="mass-aprov" disabled/>
-                    @else
-                        <input type="checkbox" name="mass-aprov"/>
-                    @endif
+                        @if ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) )
+                              && $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario === Auth::user()->type
+                              && in_array( Auth::user()->id , $solicitud->gerente->lists( 'id_gerprod' ) ) )
+                            <input type="checkbox" name="mass-aprov">
+                        @else
+                            <input type="checkbox" name="mass-aprov" disabled>
+                        @endif
                     </td>
                 @endif
             </tr>

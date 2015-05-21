@@ -113,12 +113,12 @@ Route::filter( 'sup_gerprod_gercom' , function ()
             return Redirect::to( 'show_user' );
 });
 
-Route::filter( 'sup_gerprod' , function () 
+Route::filter( 'sup_gerprod_gerprom_gercom' , function () 
 {
     if ( ! Auth::check() || Auth::user()->simApp->count() === 0 ) 
         return Redirect::to( 'login' );
     else     
-        if ( ! in_array( Auth::user()->type , array( SUP , GER_PROD ) ) )
+        if ( ! in_array( Auth::user()->type , array( SUP , GER_PROD , GER_PROM , GER_COM ) ) )
             return Redirect::to( 'show_user' );
 });
 

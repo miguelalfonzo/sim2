@@ -53,11 +53,11 @@ Route::get('recharge', function(){
 |--------------------------------------------------------------------------
 */
 
-Route::group(array('before' => 'sup'), function () 
+/*Route::group(array('before' => 'sup'), function () 
 {
     Route::post('buscar-gerprod', 'Dmkt\SolicitudeController@findGerProd');
     Route::post('derivar-solicitud', 'Dmkt\SolicitudeController@deriveSolRep');
-});
+});*/
 
 /*
 |--------------------------------------------------------------------------
@@ -136,17 +136,17 @@ Route::group( array('before' => 'ager') , function()
     Route::post('get-sol-inst' , 'Dmkt\FondoController@getSolInst');
 });
 
-Route::group(array('before' => 'sup_gerprod'), function ()
+Route::group(array('before' => 'sup_gerprod_gerprom_gercom'), function ()
 {
-    Route::post('asignar-solicitud-responsable', 'Dmkt\SolicitudeController@asignarResponsableSolicitud');
+    //Route::post('asignar-solicitud-responsable', 'Dmkt\SolicitudeController@asignarResponsableSolicitud');
     Route::post('aceptar-solicitud', 'Dmkt\SolicitudeController@acceptedSolicitude');
     Route::post('buscar-responsable' , 'Dmkt\SolicitudeController@findResponsables');
 });
 
-Route::group(array('before' => 'sup_gerprod_gercom'), function ()
+/*Route::group(array('before' => 'sup_gerprod_gercom'), function ()
 {
     Route::post('rechazar-solicitud', 'Dmkt\SolicitudeController@denySolicitude');
-});
+});*/
 
 Route::group(array('before' => 'rm_cont_ager'), function () 
 {
@@ -178,7 +178,7 @@ Route::group(array('before' => 'rm_sup_gerprod'), function ()
     Route::post('get-client-view' , 'Source\Seeker@getClientView');
     Route::post('filtro_cliente' , 'Dmkt\Client@getInvestmentActivity');
     Route::post('filtro-inversion' , 'Dmkt\Client@getActivities');
-    Route::post('cancelar-solicitud', 'Dmkt\SolicitudeController@cancelSolicitude');
+   
 });
 
 Route::group(array('before' => 'sys_user'), function ()
@@ -190,6 +190,7 @@ Route::group(array('before' => 'sys_user'), function ()
     Route::get('show_user', 'Dmkt\SolicitudeController@showUser');
     Route::get('ver-solicitud/{token}', 'Dmkt\SolicitudeController@viewSolicitude');
     Route::get('show-fondo/{token}','Expense\ExpenseController@showFondo');
+    Route::post('cancelar-solicitud', 'Dmkt\SolicitudeController@cancelSolicitude');
     
 });
 

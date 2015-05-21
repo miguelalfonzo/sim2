@@ -1337,7 +1337,7 @@ $(function()
         }
 
         //Validation inputs retention for discount background
-        function validateRet()
+        /*function validateRet()
         {
             var arrayRet = [];
             var j        = 0;
@@ -1384,7 +1384,8 @@ $(function()
                 }
                 return true;
             }
-        }
+        }*/
+        
         $( document ).off( 'click' , '#saveSeatExpense' );
         $( document ).on( 'click' , '#saveSeatExpense' , function()
         {

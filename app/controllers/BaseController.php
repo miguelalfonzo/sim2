@@ -71,12 +71,12 @@ class BaseController extends Controller
         return $rpta;
     }
 
-    protected function warningException( $description , $function , $line , $directory )
+    protected function warningException( $description , $function , $line , $file )
     {
         $rpta = array();
         $rpta[status] = warning;
         $rpta[description] = $description;
-        Mail::send( 'soporte' , array( 'description' => $description , 'function' => $function , 'line' => $line , 'directory' => $directory ) , 
+        Mail::send( 'soporte' , array( 'description' => $description , 'function' => $function , 'line' => $line , 'file' => $file ) , 
         function( $message ) use( $function )
         {
             $message->to( SOPORTE_EMAIL );
@@ -172,23 +172,36 @@ class BaseController extends Controller
         try
         {
             Log::error( $user_to_id );
+            
             $fromStatus = State::where( 'id' , $status_from )->first();
             $toStatus   = State::where( 'id' , $status_to )->first();
+            
+            $statusNameFrom = $fromStatus == null ? '' : $fromStatus->nombre;
+            $statusNameTo   = $toStatus == null ? '' : $toStatus->nombre;
+            
             $fromUser   = User::where( 'id' , $user_from_id )->first();
             
             if ( is_array( $user_to_id ) )
                 $toUser     = User::whereIn( 'id' , $user_to_id )->get();
             else
                 $toUser     = User::where( 'id' , $user_to_id )->get();
+            
             Log::error( json_encode( $toUser ));
-            $statusNameFrom = $fromStatus == null ? '' : $fromStatus->nombre;
-            $statusNameTo   = $toStatus == null ? '' : $toStatus->nombre;
+            
+            
+            Log::error('status');
+            Log::error( $statusNameFrom );
+            Log::error( $statusNameTo );
+
             // POSTMAN: send email
             $rpta = $this->postman( $idSolicitud , $statusNameFrom , $statusNameTo , $toUser );
             Log::error( $rpta );
-            if ( $rpta[status] == ok || $rpta[status] == warning )
-                $rpta = $this->updateStatusSolicitude( $status_from , $status_to , $fromUser , $idSolicitud , 0 );
-            return $rpta;
+            if ( $rpta[status] == ok  )
+                return $this->updateStatusSolicitude( $status_from , $status_to , $fromUser , $idSolicitud , 1 );
+            else if ( $rpta[status] == warning )
+                return $this->updateStatusSolicitude( $status_from , $status_to , $fromUser , $idSolicitud , 0 );
+            else
+                return $rpta;
         }
         catch (Exception $e)
         {

@@ -1,15 +1,15 @@
 <td class="text-center">
     @if ( $solicitud->id_estado != PENDIENTE )
-        @if( count( $solicitud->histories ) != 0 )
-            @if (is_object($solicitud->histories[0]->user ) )
-                @if ($solicitud->histories[0]->user->type == REP_MED)
-                    {{ $solicitud->histories[0]->user->rm->full_name }}
-                @elseif ($solicitud->histories[0]->user->type == SUP)
-                    {{ $solicitud->histories[0]->user->sup->full_name }}
-                @elseif ($solicitud->histories[0]->user->type == GER_PROD)
-                    {{ ucwords(strtolower($solicitud->histories[0]->user->gerProd->full_name))}}
-                @elseif ( in_array($solicitud->histories[0]->user->type, array(GER_COM,CONT,TESORERIA,ASIS_GER) ))
-                    {{ $solicitud->histories[0]->user->person->full_name }}
+        @if( $solicitud->lastHistory->count() != 0 )
+            @if (is_object($solicitud->lastHistory->user ) )
+                @if ($solicitud->lastHistory->user->type == REP_MED)
+                    {{ $solicitud->lastHistory->user->rm->full_name }}
+                @elseif ($solicitud->lastHistory->user->type == SUP)
+                    {{ $solicitud->lastHistory->user->sup->full_name }}
+                @elseif ($solicitud->lastHistory->user->type == GER_PROD)
+                    {{ ucwords(strtolower($solicitud->lastHistory->user->gerProd->full_name))}}
+                @elseif ( $solicitud->lastHistory->user->simApp->count() != 0 )
+                    {{ $solicitud->lastHistory->user->person->full_name }}
                 @else
                     Usuario no autorizado
                 @endif

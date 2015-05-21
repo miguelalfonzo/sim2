@@ -13,8 +13,13 @@ class State extends Eloquent
     protected $table = 'SUB_ESTADO';
     protected $primaryKey = 'id';
 
-	function rangeState()
+	public function rangeState()
 	{
         return $this->hasOne( 'Common\StateRange' , 'id' , 'id_estado' );
+    }
+
+    protected function getCancelStates()
+    {
+    	return State::whereIn( 'id_estado' , array( PENDIENTE , DERIVADO , ACEPTADO ) )->lists( 'id' );
     }
 }
