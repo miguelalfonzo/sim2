@@ -43,7 +43,7 @@ class LoginController extends BaseController{
             );
             if ( Auth::attempt( $userdata ) && Auth::user()->active == 1 )
             {
-                if ( Auth::user()->simApp->count() === 0 )
+                if ( is_null( Auth::user()->simApp ) )
                     return View::make( 'Dmkt.login' )->with( array( 'message' => 'Usuario no autorizado' ) );
                 else
                     return Redirect::to( 'show_user' );

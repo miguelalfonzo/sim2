@@ -68,9 +68,10 @@ Log::useDailyFiles(storage_path().'/logs/log.txt');
 |
 */
 
-App::error(function(Exception $exception, $code)
+App::error( function( Exception $exception, $code)
 {
-	Log::error($exception);
+	Log::error( $exception );
+	return View::make( 'soporte')->with( 'exception' , $exception );
 });
 
 App::missing(function($exception)

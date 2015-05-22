@@ -109,6 +109,11 @@ class Solicitud extends Eloquent
         return $this->hasMany( 'Dmkt\SolicitudGer' , 'id_solicitud' , 'id' );
     }
 
+    protected function managerEdit()
+    {
+        return $this->hasMany( 'Dmkt\SolicitudGer' , 'id_solicitud'  , 'id' )->where( 'permiso' , 1 );
+    }
+
     protected function response()
     {
         return $this->belongsTo('User','iduserasigned');
@@ -157,5 +162,10 @@ class Solicitud extends Eloquent
     protected function investment()
     {
         return $this->hasOne( 'Dmkt\InvestmentType' , 'id' , 'id_inversion' );
+    }
+
+    public function orderProducts()
+    {
+        return $this->hasMany( 'Dmkt\SolicitudProduct' , 'id_solicitud' )->orderBy( 'updated_at' , 'DESC' );
     }
 }

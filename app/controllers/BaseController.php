@@ -73,33 +73,26 @@ class BaseController extends Controller
 
     protected function warningException( $description , $function , $line , $file )
     {
-        $rpta = array();
-        $rpta[status] = warning;
-        $rpta[description] = $description;
         Mail::send( 'soporte' , array( 'description' => $description , 'function' => $function , 'line' => $line , 'file' => $file ) , 
         function( $message ) use( $function )
         {
             $message->to( SOPORTE_EMAIL );
             $message->subject( warning.' - Function: '.$function);      
         });
-        return $rpta;
+        return array( status => warning , description => $description );
     }
 
     protected function internalException( $exception , $function )
     {
-        $rpta = array();
-        $rpta[status] = error;
-        $rpta[description] = desc_error;
-        Log::error($exception);
+        Log::error( $exception );
         Log::error( json_encode( oci_error() ) );
         Log::error( $exception->getMessage() );
-        Mail::send('soporte', array( 'msg' => $exception ), function($message) use($function)
+        Mail::send('soporte', array( 'exception' => $exception ), function( $message ) use( $function )
         {
             $message->to(SOPORTE_EMAIL);
             $message->subject(error.' - Function: '.$function);      
-        }
-        );
-        return $rpta;
+        });
+        return array( status => error , description => $exception );
     }
 
     private function validateJson()
@@ -154,12 +147,12 @@ class BaseController extends Controller
                     $message->to(SOPORTE_EMAIL)->subject('PostMan [BaseController:89]:');
                 });
                 Log::error("IDKC [BaseController:109]: No se pudo enviar email, debido a que el usuario o password son Incorrectos");
-                return $this->warningException( 'Usuarios Incorrectos' , __FUNCTION__ , __LINE__ , __FILE__ );
+                return $this->warningException( 'No se encontro los usuarios para la solicitud n°: '.$idSolicitud , __FUNCTION__ , __LINE__ , __FILE__ );
             }
         }
         catch ( Swift_TransportException $e )
         {
-            return $this->warningException( "Mail Host: Can't Establish a Conecction" , __FUNCTION__ , __LINE__ , __FILE__ );
+            return $this->warningException( "Swift_TransportException: No se pudo enviar el correo al destinatario" , __FUNCTION__ , __LINE__ , __FILE__ );
         }
         catch (Exception $e)
         {
@@ -216,19 +209,18 @@ class BaseController extends Controller
             $fData = array(
                 'status_to'   => $status_to,
                 'id_solicitud'=> $idSolicitud,
+                'user_to'     => Session::pull( 'usertype' )
             );
             $statusSolicitude = SolicitudHistory::firstOrNew($fData);
             if ( ! isset( $statusSolicitude->rn ) )
             {
+                Log::error( json_encode($statusSolicitude));
                 $statusSolicitude->id           = $statusSolicitude->lastId() + 1;
-                $statusSolicitude->status_to    = $status_to;
-                $statusSolicitude->id_solicitud = $idSolicitud;
             }
             else
                 $statusSolicitude = SolicitudHistory::find( $statusSolicitude->id );
             $statusSolicitude->status_from  = $status_from;
             $statusSolicitude->user_from    = $user_from->type;
-            $statusSolicitude->user_to      = Session::pull( 'usertype' );
             $statusSolicitude->notified     = $notified;
             $statusSolicitude->updated_at   = Carbon\Carbon::now();
             $statusSolicitude->save();
@@ -243,19 +235,14 @@ class BaseController extends Controller
 
     protected function setRpta( $data='' )
     {
-        $rpta = array(status => ok, 'Data' => $data);
-        return $rpta;
+        return array( status => ok , 'Data' => $data );
     }
 
     protected function searchSolicituds($estado,$idUser,$start,$end)
     {
         try
         {
-            $solicituds = Solicitud::with(array('histories' => function($q)
-            {
-                $q->orderBy('created_at','DESC');  
-            }));
-            
+            $solicituds = Solicitud::whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
             if ( in_array( Auth::user()->type , array ( REP_MED , SUP , GER_PROD , GER_PROM ) ) )
             {
                 Log::error( Auth::user()->id );
@@ -297,7 +284,7 @@ class BaseController extends Controller
             else if ( Auth::user()->type == CONT )
                 $solicituds->where( 'id_estado' , '<>' , ACEPTADO );
 
-            if ($estado != R_TODOS)
+            if ( $estado != R_TODOS)
             { 
                 Log::error( ' estado ');
                 $solicituds->whereHas( 'state' , function ( $q ) use( $estado )
@@ -309,8 +296,6 @@ class BaseController extends Controller
                 });
                 
             }
-
-            $solicituds->whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
             
             $solicituds = $solicituds->orderBy('id', 'ASC')->get();
             
@@ -345,16 +330,14 @@ class BaseController extends Controller
                 $solicitud_ids[] = 0; // el cero va para que tenga al menos con que comparar, para que no salga error
                 return $this->setRpta( $solicitud_ids );
             }
-            else if ( in_array( $user->type , array( REP_MED , ASIS_GER , GER_PROM ) ) )
-                return $this->setRpta(array($user->id));
-            else if (in_array($user->type,array(GER_COM,CONT,TESORERIA)))
-                return $this->setRpta(array());
+            else if ( ! is_null( $user->simApp ) )
+                return $this->setRpta( array( $user->id ) );
             else
-                return $this->warningException( __FUNCTION__ , 'Se ha solicitado buscar solicitudes por un usuario con rol no autorizado: '.$user->type );
+                return $this->warningException( 'Se ha solicitado buscar solicitudes por un usuario no autorizado: '.$user->id , __FUNCTION__ , __LINE__ , __FILE__ );
         }
         catch (Exception $e)
         {
-            return $this->internalException($e,__FUNCTION__);
+            return $this->internalException( $e , __FUNCTION__ );
         }
     }
 

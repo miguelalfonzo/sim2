@@ -6,7 +6,7 @@
 		<th>Nro. Comprobante</th>
 		<th>Fecha</th>
 		<th>Monto Total</th>
-		@if ( $solicitud->idestado == GASTO_HABILITADO || Auth::user()->type == CONT )
+		@if ( $solicitud->id_estado == GASTO_HABILITADO || Auth::user()->type == CONT )
 			<th>Editar</th>
 			<th>Eliminar</th>
 		@endif
@@ -24,7 +24,7 @@
 				<span class="type_money">{{$solicitud->detalle->typemoney->simbolo}}</span>
 				<span class="total_expense">{{(real)$val->monto}}</span>
 			</th>
-			@if ( $solicitud->idestado == GASTO_HABILITADO || Auth::user()->type == CONT )
+			@if ( $solicitud->id_estado == GASTO_HABILITADO || Auth::user()->type == CONT )
 				<th>
 					<a href="#" class="edit-expense">
 						<span class="glyphicon glyphicon-pencil"></span>

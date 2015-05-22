@@ -50,7 +50,7 @@ Route::filter('active-user',function()
 
 Route::filter('sup', function () 
 {
-    if ( ! Auth::check() || Auth::user()->simApp->count() === 0 ) 
+    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
         return Redirect::to( 'login' );
     else     
         if ( ! Auth::user()->type  === SUP )
@@ -60,7 +60,7 @@ Route::filter('sup', function ()
 
 Route::filter( 'cont' , function () 
 {
-    if ( ! Auth::check() || Auth::user()->simApp->count() === 0 ) 
+    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
         return Redirect::to( 'login' );
     else     
         if ( ! Auth::user()->type  === CONT )
@@ -69,7 +69,7 @@ Route::filter( 'cont' , function ()
 
 Route::filter( 'tes' , function () 
 {
-    if ( ! Auth::check() || Auth::user()->simApp->count() === 0 ) 
+    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
         return Redirect::to( 'login' );
     else     
         if ( ! Auth::user()->type  === TESORERIA )
@@ -78,7 +78,7 @@ Route::filter( 'tes' , function ()
 
 Route::filter( 'gercom' , function ()
 {
-    if ( ! Auth::check() || Auth::user()->simApp->count() === 0 ) 
+    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
         return Redirect::to( 'login' );
     else     
         if ( ! Auth::user()->type  === GER_COM )
@@ -88,7 +88,7 @@ Route::filter( 'gercom' , function ()
 //Asistente de Gerencia
 Route::filter( 'ager' , function()
 {
-    if ( ! Auth::check() || Auth::user()->simApp->count() === 0 ) 
+    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
         return Redirect::to( 'login' );
     else     
         if ( ! Auth::user()->type  === ASIS_GER )
@@ -97,7 +97,7 @@ Route::filter( 'ager' , function()
 
 Route::filter( 'rm_cont_ager' , function () 
 {
-    if ( ! Auth::check() || Auth::user()->simApp->count() === 0 ) 
+    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
         return Redirect::to( 'login' );
     else     
         if ( ! in_array( Auth::user()->type , array( REP_MED , CONT , ASIS_GER ) ) )
@@ -106,7 +106,7 @@ Route::filter( 'rm_cont_ager' , function ()
 
 Route::filter( 'sup_gerprod_gercom' , function () 
 {
-    if ( ! Auth::check() || Auth::user()->simApp->count() === 0 ) 
+    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
         return Redirect::to( 'login' );
     else     
         if ( ! in_array( Auth::user()->type , array( SUP , GER_PROD , GER_COM ) ) )
@@ -115,7 +115,7 @@ Route::filter( 'sup_gerprod_gercom' , function ()
 
 Route::filter( 'sup_gerprod_gerprom_gercom' , function () 
 {
-    if ( ! Auth::check() || Auth::user()->simApp->count() === 0 ) 
+    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
         return Redirect::to( 'login' );
     else     
         if ( ! in_array( Auth::user()->type , array( SUP , GER_PROD , GER_PROM , GER_COM ) ) )
@@ -124,7 +124,7 @@ Route::filter( 'sup_gerprod_gerprom_gercom' , function ()
 
 Route::filter( 'rm_ager' , function () 
 {
-    if ( ! Auth::check() || Auth::user()->simApp->count() === 0 ) 
+    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
         return Redirect::to( 'login' );
     else     
         if ( ! in_array( Auth::user()->type , array( REP_MED , ASIS_GER ) ) )
@@ -133,13 +133,13 @@ Route::filter( 'rm_ager' , function ()
 
 Route::filter( 'sys_user' , function () 
 {
-    if ( ( ! Auth::check() ) || Auth::user()->simApp->count() === 0 )
+    if ( ( ! Auth::check() ) || ( ! is_null( Auth::user()->simApp ) && is_null( Auth::user()->simApp ) ) )
         return Redirect::to('login');
 });
 
 Route::filter( 'rm_sup_gerprod' , function () 
 {
-    if ( ! Auth::check() || Auth::user()->simApp->count() === 0 ) 
+    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
         return Redirect::to( 'login' );
     else     
         if ( ! in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD ) ) )

@@ -1,4 +1,4 @@
-@if ( ( $solicitud->iduserasigned == Auth::user()->id  && $solicitud->idestado == GASTO_HABILITADO ) || ( Auth::user()->type == CONT && $solicitud->idestado == REGISTRADO )  )
+@if ( ( $solicitud->iduserasigned == Auth::user()->id  && $solicitud->id_estado == GASTO_HABILITADO ) || ( Auth::user()->type == CONT && $solicitud->id_estado == REGISTRADO )  )
 	<section class="row reg-expense">
 		<input type="hidden" name="idgasto">
 		<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">

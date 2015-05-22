@@ -1,11 +1,12 @@
 <html>
-	@if( isset( $msg ) )
+	@if( isset( $exception ) )
 		<ol>
 			<li>User: {{Auth::user()->id.' '.Auth::user()->username}}</li>
-			<li>Error: {{$msg->getMessage()}}</li>
-			<li>File: {{$msg->getFile()}}</li>
-			<li>Line: {{$msg->getLine()}}</li>
-			<li>Description: {{$msg->getTraceAsString()}}</li>
+			<li>Error: {{$exception->getMessage()}}</li>
+			<li>Code: {{$exception->getCode()}}
+			<li>File: {{$exception->getFile()}}</li>
+			<li>Line: {{$exception->getLine()}}</li>
+			<li>Description: {{$exception->getTraceAsString()}}</li>
 		</ol>
 	@elseif( isset( $description) )
 		<ol>

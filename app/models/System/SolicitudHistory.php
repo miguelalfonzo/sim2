@@ -7,10 +7,9 @@ use \Eloquent;
 class SolicitudHistory extends Eloquent{
 	
     protected $table = 'SOLICITUD_HISTORIAL';
-    protected $fillable = array('id','status_to');
+    protected $fillable = array( 'user_to' , 'id_solicitud' , 'status_to');
 	protected $primaryKey = 'id';
-    public $timestamps = true;
-
+    
     protected function getUpdatedAtAttribute( $attr )
     {
         return \Carbon\Carbon::parse( $attr )->format('Y-m-d H:i');

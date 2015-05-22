@@ -41,7 +41,7 @@ class DepositController extends BaseController{
         if ( $detalle->idmoneda == $fondo->idtipomoneda )
         {
             if ( $monto > $fondo->saldo )
-                return $this->warningException( __FUNCTION__ , $msg );
+                return $this->warningException( $msg , __FUNCTION__ , __LINE__ , __FILE__ );
             else
                 return $this->setRpta($monto);
         }
@@ -58,9 +58,8 @@ class DepositController extends BaseController{
                 else
                     return $this->setRpta( $monto/$tc->venta);
             else
-                return $this->warningException( __FUNCTION__ , 'Tipo de Moneda no registrada: '.$detalle->typeMoney->descripcion );
+                return $this->warningException( 'Tipo de Moneda no registrada: ' . $detalle->id_moneda , __FUNCTION__ , __LINE__ , __FILE__ );
         }
-        return $this->warningException( __FUNCTION__ , 'No se pudo procesar el fondo de la solicitud');
     }
 
     private function validateInpustDeposit( $inputs )
@@ -74,7 +73,7 @@ class DepositController extends BaseController{
             );
             $validator = Validator::make($inputs, $rules);
             if ($validator->fails()) 
-                return $this->warningException( __FUNCTION__ , substr($this->msgValidator($validator), 0 , -1 ) );
+                return $this->warningException( substr($this->msgValidator($validator), 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
             else
                 return $this->setRpta();
         }

@@ -684,11 +684,11 @@ function newSolicitude() {
             amount_error_families.text('Ingresar el monto de la familia').css('color', 'red');
             idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
         }
-        else if ( type == 1 && parseFloat( $( element ).val() ) === 0 ) 
+        /*else if ( type == 1 && parseFloat( $( element ).val() ) === 0 ) 
         {
             amount_error_families.text('El monto de la familia no debe ser igual a 0').css('color', 'red');
             idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
-        }
+        }*/
         else if ( type == 1 && parseFloat( $( element ).val() ) < 0 ) 
         {
             amount_error_families.text('El monto de la familia no debe ser menora 0').css('color', 'red');
@@ -740,7 +740,7 @@ function newSolicitude() {
 
     if ( $('#deny_solicitude').length != 0 )
     {
-        verifySum( idamount[0] , 2);
+        verifySum( idamount[0] , 2 );
     }
 
     /* Cancel Solicitude */
@@ -2201,7 +2201,7 @@ function newSolicitude() {
         $(this).removeAttr("placeholder").parent().parent().removeClass("has-error");
     });
 
-    $("#btn-mass-approve").click(function()
+    $("#btn-mass-approve").click( function()
     {
         var checks = $("input[name=mass-aprov]:checked").length;
         if (checks == 0)
@@ -2245,31 +2245,18 @@ function newSolicitude() {
                     {
                         $.unblockUI();
                         if(data.Status == 'Ok')
-                        {
-                            bootbox.alert("<h4 style='color:green'>Solicitudes Aprobadas</h4>", function()
-                            {
-                                listSolicitude();
-                                colorTr(data.Description);
-                            });
-                        }
+                            var color = 'green';
                         else if(data.Status == 'Warning')
-                        {
-                            bootbox.alert("<h4 style='color:yellow'>No se han podido aprobar todas las solicitudes</h4>", function()
-                            {
-                                listSolicitude();
-                                colorTr(data.Description);
-                            });
-                        }
+                            var color = 'gold';
                         else if(data.Status == 'Danger')
-                        {
-                            bootbox.alert("<h4 style='color:red'>No se han podido aprobar las solicitudes</h4>", function()
-                            {
-                                listSolicitude();
-                                colorTr(data.Description);
-                            });   
-                        }
+                            var color = 'red';
                         else
-                            responseUI(data.Status + ': ' + data.Description,'red');
+                            var color = '';
+                        bootbox.alert("<h4 style='color:" + color + "'>" + data.Description + "</h4>", function()
+                        {
+                                listSolicitude();
+                                colorTr(data.token);
+                        });
                     });
                 }
             });

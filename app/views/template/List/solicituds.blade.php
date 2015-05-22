@@ -25,12 +25,12 @@
     <tbody>
         @foreach( $solicituds as $solicitud )
             <tr>
-                @if($solicitud->idestado == ACEPTADO || $solicitud->idestado == APROBADO || $solicitud->idestado == DEPOSITADO || $solicitud->idestado == REGISTRADO || $solicitud->idestado == ENTREGADO || $solicitud->idestado == GENERADO || $solicitud->idestado == GASTO_HABILITADO || $solicitud->idestado == DEPOSITO_HABILITADO)
-                    <input type="hidden" id="timeLineStatus" value="{{$solicitud->idestado}}" data-accept="$solicitud->acceptHist->user_from">
-                @elseif($solicitud->idestado == RECHAZADO)
-                    <input type="hidden" id="timeLineStatus" value="{{$solicitud->idestado}}" data-rejected="{{$solicitud->rejectedHist->user_from}}">
+                @if($solicitud->id_estado == ACEPTADO || $solicitud->id_estado == APROBADO || $solicitud->id_estado == DEPOSITADO || $solicitud->id_estado == REGISTRADO || $solicitud->id_estado == ENTREGADO || $solicitud->id_estado == GENERADO || $solicitud->id_estado == GASTO_HABILITADO || $solicitud->id_estado == DEPOSITO_HABILITADO)
+                    <input type="hidden" id="timeLineStatus" value="{{$solicitud->id_estado}}" data-accept="$solicitud->acceptHist->user_from">
+                @elseif($solicitud->id_estado == RECHAZADO)
+                    <input type="hidden" id="timeLineStatus" value="{{$solicitud->id_estado}}" data-rejected="{{$solicitud->rejectedHist->user_from}}">
                 @else
-                    <input type="hidden" id="timeLineStatus" value="{{$solicitud->idestado}}">
+                    <input type="hidden" id="timeLineStatus" value="{{$solicitud->id_estado}}">
                 @endif
                 @if ( in_array( Auth::user()->type , array( TESORERIA , GER_COM ) ))
                     <input type="hidden" id="sol_token" class="i-tokens" value="{{$solicitud->token}}">
@@ -59,57 +59,27 @@
                 @include('template.List.lastdate')
                 @if( Auth::user()->type == TESORERIA )
                     <td style="display:none;" class="total_deposit">
-                        {{$solicitud->detalle->fondo->typemoney->simbolo.' '.json_decode($solicitud->detalle->detalle)->monto_aprobado }}
+                        {{ $solicitud->detalle->fondo->typemoney->simbolo .' '. $solicitud->detalle->monto_actual }}
                     </td>
                     <td style="display:none" class="tes-ret">
                         @if ( is_null( $solicitud->detalle->idretencion ) )
                             0
                         @else
-                            {{$solicitud->detalle->typeRetention->account->typeMoney->simbolo.' '.json_decode($solicitud->detalle->detalle)->monto_retencion}}
+                            {{$solicitud->detalle->typeRetention->account->typeMoney->simbolo.' '.json_decode($solicitud->detalle->detalle)->monto_retencion }}
                         @endif
                     </td>
                     <td class="text-center deposit">
-                        @if ( $solicitud->idtiposolicitud == SOL_REP )
-                            @if ( is_null( $solicitud->detalle->iddeposito ) )
-                                @if ( is_null( $solicitud->detalle->idretencion) )
-                                    {{$solicitud->detalle->typemoney->simbolo.' '.json_decode($solicitud->detalle->detalle)->monto_aprobado }}
-                                @else
-                                    @if ( $solicitud->detalle->typeRetention->account->idtipomoneda == $solicitud->detalle->idmoneda )
-                                        {{$solicitud->detalle->typemoney->simbolo.' '.(json_decode($solicitud->detalle->detalle)->monto_aprobado - json_decode($solicitud->detalle->detalle)->monto_retencion)}}
-                                    @else
-                                        @if ( $solicitud->detalle->idmoneda == SOLES )
-                                            {{$solicitud->detalle->typemoney->simbolo.' '.( json_decode( $solicitud->detalle->detalle )->monto_aprobado - ( json_decode( $solicitud->detalle->detalle )->monto_retencion*$tc->compra ) ) }}    
-                                        @elseif ( $solicitud->detalle->idmoneda == DOLARES )
-                                            {{$solicitud->detalle->typemoney->simbolo.' '.( json_decode( $solicitud->detalle->detalle )->monto_aprobado - ( json_decode( $solicitud->detalle->detalle )->monto_retencion/$tc->venta ) ) }}   
-                                        @endif
-                                    @endif
-                                @endif
-                            @else
-                                {{$solicitud->detalle->deposit->account->typeMoney->simbolo.' '.$solicitud->detalle->deposit->total}}
+                        @if ( is_null( $solicitud->detalle->iddeposito ) )
+                            @if ( $solicitud->detalle->id_moneda == SOLES )
+                                {{$solicitud->detalle->typemoney->simbolo .' '. ( $solicitud->detalle->monto_actual - ( json_decode( $solicitud->detalle->detalle )->monto_retencion*$tc->compra ) ) }}    
+                            @elseif ( $solicitud->detalle->id_moneda == DOLARES )
+                                {{$solicitud->detalle->typemoney->simbolo . ' ' . ( $solicitud->detalle->monto_actual - ( json_decode( $solicitud->detalle->detalle )->monto_retencion/$tc->venta ) ) }}   
                             @endif
-                        @elseif ( $solicitud->idtiposolicitud == SOL_INST )
-                            {{$solicitud->detalle->fondo->typemoney->simbolo.' '.json_decode($solicitud->detalle->detalle)->monto_aprobado }}
-                        @endif  
+                        @endif
                     </td>
                 @else
                     <td class="text-center total_deposit">
-                        @if ( $solicitud->idtiposolicitud == SOL_REP )
-                            @if ($solicitud->id_estado == PENDIENTE || $solicitud->id_estado == DERIVADO )
-                                {{ $solicitud->detalle->typeMoney->simbolo.' '.json_decode($solicitud->detalle->detalle)->monto_solicitado }}
-                            @elseif ($solicitud->id_estado == ACEPTADO )
-                                {{ $solicitud->detalle->typeMoney->simbolo.' '.json_decode($solicitud->detalle->detalle)->monto_aceptado }}
-                            @elseif ( in_array( $solicitud->id_estado , array( RECHAZADO , CANCELADO) ) )
-                                @if ( isset($detalle->monto_aceptado))
-                                    {{ $solicitud->detalle->typeMoney->simbolo.' '.json_decode($solicitud->detalle->detalle)->monto_aceptado }}
-                                @else
-                                    {{ $solicitud->detalle->typeMoney->simbolo.' '.json_decode($solicitud->detalle->detalle)->monto_solicitado }}
-                                @endif
-                            @else
-                                {{ $solicitud->detalle->typeMoney->simbolo.' '.json_decode($solicitud->detalle->detalle)->monto_aprobado}}
-                            @endif
-                        @elseif ( $solicitud->idtiposolicitud == SOL_INST )
-                            {{$solicitud->detalle->fondo->typeMoney->simbolo.''.json_decode($solicitud->detalle->detalle)->monto_aprobado}}
-                        @endif
+                        {{ $solicitud->detalle->typeMoney->simbolo . ' ' . $solicitud->detalle->monto_actual }}
                     </td>
                 @endif
 
@@ -131,7 +101,7 @@
                     <td class="text-center">
                         @if ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) )
                               && $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario === Auth::user()->type
-                              && in_array( Auth::user()->id , $solicitud->gerente->lists( 'id_gerprod' ) ) )
+                              && in_array( Auth::user()->id , $solicitud->managerEdit->lists( 'id_gerprod' ) ) )
                             <input type="checkbox" name="mass-aprov">
                         @else
                             <input type="checkbox" name="mass-aprov" disabled>

@@ -19,6 +19,11 @@ class Manager extends Eloquent
             return ucwords( strtolower( $name[ 0 ] ) );
     }
 
+    protected static function getGerProdNotRegisteredName( $uniqueIdsGerProd )
+    {
+        return Manager::whereIn( 'id' , $uniqueIdsGerProd )->whereNull( 'iduser' )->get()->lists( 'full_name' );
+    }
+
     public function lastId()
     {
         $lastId = Manager::orderBy('id', 'DESC')->first();

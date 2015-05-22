@@ -20,7 +20,7 @@
                     Solicitud
                 </a>
             </li>
-            @if ( ( $solicitud->iduserasigned == Auth::user()->id  && $solicitud->idestado == GASTO_HABILITADO ) || ( Auth::user()->type == CONT && $solicitud->idestado == REGISTRADO )  )
+            @if ( ( $solicitud->iduserasigned == Auth::user()->id  && $solicitud->id_estado == GASTO_HABILITADO ) || ( Auth::user()->type == CONT && $solicitud->id_estado == REGISTRADO )  )
                 <li>
                     <a href="#document" role="tab" data-toggle="tab">
                         <icon class="fa fa-home"></icon>
@@ -45,7 +45,7 @@
                         @include('Dmkt.Solicitud.Institucional.detail')
                     @endif
                     <!-- ASIENTO DE ANTICIPO -->
-                    @if ( Auth::user()->type == CONT && $solicitud->idestado == DEPOSITADO )
+                    @if ( Auth::user()->type == CONT && $solicitud->id_estado == DEPOSITADO )
                         @include('template.Seat.advance_table')
                     @endif
                 </form>
