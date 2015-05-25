@@ -70,6 +70,7 @@
             <div class="tab-pane fade active in" id="solicitudes">
                 <div class="panel panel-default">
                     @include('template.User.menu')
+                    @include('template.Modals.temporal_user')
                     @if( Auth::user()->type == TESORERIA )
                         @include('template.Modals.deposit')
                     @endif

@@ -58,7 +58,7 @@ class Solicitud extends Eloquent
 
     public function acceptHist()
     {
-        return $this->hasOne('System\SolicitudHistory','id_solicitud','id')->where( 'status_to' , ACEPTADO );
+        return $this->hasOne('System\SolicitudHistory','id_solicitud','id')->where( 'status_to' , ACEPTADO )->orderBy( 'updated_at' , 'DESC' );
     }
 
     public function rejectedHist(){

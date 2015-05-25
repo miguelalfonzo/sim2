@@ -102,15 +102,23 @@ class Seeker extends BaseController
 		{
 			$inputs = Input::all();
 			$json = '[{"name":"FICPE.VISITADOR","wheres":{"likes":["VISLEGAJO","(VISNOMBRE || \' \' || VISPATERNO || \' \' || VISMATERNO)"],"equal":{"VISACTIVO":"S","LENGTH(VISLEGAJO)":8}},"selects":["VISVISITADOR","(VISNOMBRE || \' \' || VISPATERNO || \' \' || VISMATERNO)" , "\'REP\'" ]}]';
-			$cAlias = array('value','label' , 'type' );
-	    	
+			$cAlias = array('value','label' , 'type' );	
 			return $this->searchSeeker( $inputs['sVal'] , $json , $cAlias );
 		}
 		catch (Exception $e)
 		{
 			return $this->internalException( $e , __FUNCTION__ );
 		}
-		//return Response::Json($rpta);
+	}
+
+	public function userSource()
+	{
+		$inputs = Input::all();
+		$json = '[{ "name": "OUTDVP.DMKT_RG_SUPERVISOR" , "wheres":{ "likes": ["( NOMBRES || \' \' || APELLIDOS )" ] , "notnull": ["IDUSER"] } , "selects" : [ "IDUSER" , "( NOMBRES || \' \' || APELLIDOS )" , "\'SUPERVISOR\'" ] } , ' . 
+				'{ "name" : "OUTDVP.GERENTES" , "wheres":{ "likes": ["DESCRIPCION"] , "notnull" : [ "IDUSER" ] } , "selects" : [ "IDUSER" , "DESCRIPCION" , "\'G. PRODUCTO\'"] } ]';
+		$cAlias = array( 'value' , 'label' , "type" );
+		Log::error( $json );
+		return $this->searchSeeker( $inputs['sVal'] , $json , $cAlias );			
 	}
 
     private function searchSeeker($inputs,$json,$cAlias)
@@ -144,6 +152,11 @@ class Seeker extends BaseController
 			    				foreach ( $where as $key => $in )
 			    					$query->whereIn( $key , $in );
 			    			}
+			    			else if ( $key === 'notnull' )
+			    			{
+			    				foreach ( $where as $key => $field )
+			    					$query->whereNotNull( $field );
+			    			}
 			    		}
 			    		for ( $i=0 ; $i< count( $cAlias ) ; $i++ )
 			    			$select = $select. ' ' .$table->selects[$i]. ' as "' .$cAlias[$i]. '",';			
@@ -154,14 +167,15 @@ class Seeker extends BaseController
 			    		foreach ( $tms as $tm )
 			    			$tm->table = $table->name;
 			    		$array = array_merge( $tms , $array );
-			    	}	    		
+			    	}
+			    	Log::error( json_encode( $array) );
 			    	return $this->setRpta($array);
 			    }
 			    else
-			    	return $this->warningException( __FUNCTION__ , 'Json: Formato Incorrecto' );
+			    	return $this->warningException( 'Json: Formato Incorrecto' , __FUNCTION__ , __LINE__ , __FILE__ );
 		    }
 		    else
-		    	return $this->warningException( __FUNCTION__ , 'Input Vacio (Post: "Json" Vacio)');   
+		    	return $this->warningException( 'Input Vacio (Post: "Json" Vacio)' , __FUNCTION__ , __LINE__ , __FILE__ );   
 	    }
 	    catch ( Exception $e )
 	   	{

@@ -2,8 +2,8 @@
     <div class="col-sm-12 col-md-12 col-lg-12" style="text-align: center">
         
         @if ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) )
-              && $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario === Auth::user()->type
-              && in_array( Auth::user()->id , $solicitud->managerEdit->lists( 'id_gerprod' ) ) )
+              && in_array( $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario , array( Auth::user()->type , Auth::user()->tempType() ) )
+              && ( array_intersect ( array( Auth::user()->id , Auth::user()->tempId() ) , $solicitud->managerEdit->lists( 'id_gerprod' ) ) ) )
             <a class="btn btn-success" id="search_responsable">
                 Aceptar
             </a>

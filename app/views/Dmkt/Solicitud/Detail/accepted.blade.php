@@ -6,17 +6,17 @@
         <div class="col-sm-12 col-md-12 col-lg-12">
             <div class="input-group">
                 <span class="input-group-addon">
-                    {{ $solicitud->asignedTo->userType->descripcion }}
+                    {{ $solicitud->acceptHist->user->userType->descripcion }}
                 </span>  
-                @if ( $solicitude->acceptHist->user->type == SUP )
+                @if ( $solicitud->acceptHist->user->type == SUP )
                     <input type="text" class="form-control input-md"  readonly
-                    value="{{$solicitude->acceptHist->user->sup->full_name}}">
-                @elseif( $solicitude->acceptHist->user->type == GER_PROD )
+                    value="{{$solicitud->acceptHist->user->sup->full_name}}">
+                @elseif( $solicitud->acceptHist->user->type == GER_PROD )
                     <input type="text" class="form-control input-md"  readonly
-                    value="{{$solicitude->acceptHist->user->gerProd->full_name}}">
+                    value="{{$solicitud->acceptHist->user->gerProd->full_name}}">
                 @else
                     <input type="text" class="form-control input-md"  readonly
-                    value="{{$solicitude->acceptHist->user->person->full_name}}">
+                    value="{{$solicitud->acceptHist->user->person->full_name}}">
                 @endif
             </div>
         </div>

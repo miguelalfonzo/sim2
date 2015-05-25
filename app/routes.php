@@ -43,21 +43,10 @@ Route::get('logout', array('uses' => 'Dmkt\LoginController@doLogout'));
 |--------------------------------------------------------------------------
 */
 
-Route::get('recharge', function(){
+Route::get( 'recharge' , function()
+{
     return View::make('recharge');
 });
-
-/*
-|--------------------------------------------------------------------------
-| SUPERVISOR
-|--------------------------------------------------------------------------
-*/
-
-/*Route::group(array('before' => 'sup'), function () 
-{
-    Route::post('buscar-gerprod', 'Dmkt\SolicitudeController@findGerProd');
-    Route::post('derivar-solicitud', 'Dmkt\SolicitudeController@deriveSolRep');
-});*/
 
 /*
 |--------------------------------------------------------------------------
@@ -96,17 +85,8 @@ Route::group(array('before' => 'cont'), function ()
     Route::get('edit-expense-cont', 'Expense\ExpenseController@editExpense');
     Route::post('get-document-detail' , 'Expense\ExpenseController@getDocument');
     Route::post('update-document' , 'Expense\ExpenseController@updateDocument');
-
-    //RM
-    //Route::get('revisar-gasto/{token}', 'Expense\ExpenseController@showCont');
-    //Route::post('update-expense-cont', 'Expense\ExpenseController@updateExpense');
-
-    //Fondos
-    //Route::get('list-fondos-contabilidad/{date}/{estado}','Dmkt\FondoController@getFondosContabilidad');
-    //Route::get('generar-asiento-fondo/{token}', 'Dmkt\FondoController@viewGenerateSeatFondo');
-    //Route::get('generar-asiento-fondo-gasto/{token}', 'Dmkt\SolicitudeController@viewGenerateSeatExpense');
-    //Route::post('generate-seat-fondo', 'Dmkt\FondoController@generateSeatFondo');
 });
+
 /*
 |--------------------------------------------------------------------------
 | TESORERIA
@@ -118,6 +98,7 @@ Route::group(array('before' => 'tes'), function()
     Route::post( 'deposit-solicitude', 'Deposit\DepositController@depositSolicitudeTes');
     Route::get( 'list-fondos' , 'Dmkt\FondoController@getFondos');
 });
+
 /*
 |--------------------------------------------------------------------------
 | ASISTENTE GERENCIA
@@ -138,15 +119,12 @@ Route::group( array('before' => 'ager') , function()
 
 Route::group(array('before' => 'sup_gerprod_gerprom_gercom'), function ()
 {
-    //Route::post('asignar-solicitud-responsable', 'Dmkt\SolicitudeController@asignarResponsableSolicitud');
+    Route::post( 'search-users' , 'Source\Seeker@userSource');
+    Route::post( 'confirm-temporal-user' , 'User\UserController@assignTemporalUser');
+    Route::get( 'remove-temporal-user' , 'User\UserController@removeTemporalUser');
     Route::post('aceptar-solicitud', 'Dmkt\SolicitudeController@acceptedSolicitude');
     Route::post('buscar-responsable' , 'Dmkt\SolicitudeController@findResponsables');
 });
-
-/*Route::group(array('before' => 'sup_gerprod_gercom'), function ()
-{
-    Route::post('rechazar-solicitud', 'Dmkt\SolicitudeController@denySolicitude');
-});*/
 
 Route::group(array('before' => 'rm_cont_ager'), function () 
 {
@@ -161,13 +139,10 @@ Route::group(array('before' => 'rm_cont_ager'), function ()
 
 Route::group(array('before' => 'rm_ager'), function ()
 {
-    //Route::get('registrar-gasto/{token}', 'Expense\ExpenseController@show');
     Route::post('end-expense', 'Expense\ExpenseController@finishExpense');
-    Route::get('ver-gasto/{token}', 'Expense\ExpenseController@viewExpense');
-    
-    // Expense
-    
+    Route::get('ver-gasto/{token}', 'Expense\ExpenseController@viewExpense'); 
 });
+
 Route::group(array('before' => 'rm_sup_gerprod'), function ()
 {    
     Route::get('nueva-solicitud', 'Dmkt\SolicitudeController@newSolicitude');

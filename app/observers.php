@@ -1,6 +1,7 @@
 <?php
 
 use \Observer\Transaction;
+use \Observer\SoftDelete;
 
 use \Dmkt\Solicitud;
 use \Dmkt\SolicitudDetalle;
@@ -19,7 +20,7 @@ use \Dmkt\Account;
 use \Expense\Mark;
 use \Expense\MarkProofAccounts;
 use \Common\FileStorage;
-	
+use \Users\TemporalUser;
 	
 	Solicitud::observe(			new Transaction());
 	SolicitudDetalle::observe(	new Transaction());
@@ -38,3 +39,5 @@ use \Common\FileStorage;
 	Mark::observe( 				new Transaction());
 	MarkProofAccounts::observe( new Transaction());
 	FileStorage::observe(		new Transaction());
+	//TemporalUser::observe(      new Transaction());
+	TemporalUser::observe(      new SoftDelete() );

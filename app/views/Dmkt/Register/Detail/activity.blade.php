@@ -2,10 +2,18 @@
     <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label">Tipo de Actividad</label>
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
         <select class="form-control" name="actividad">
-            <option value="" disabled selected>SELECCIONE LA ACTIVIDAD</option>
+            @if ( isset( $solicitud) )
+                <option value="" disabled style="display:none">SELECCIONE LA ACTIVIDAD</option>
+            @else
+                <option value="" disabled selected style="display:none">SELECCIONE LA ACTIVIDAD</option>
+            @endif
             @foreach( $activities as $activity )
-                @if ( isset( $solicitud ) && $solicitud->id_actividad == $activity->id )
-                    <option value="{{ $activity->id }}" image="{{ $activity->imagen }}" selected>{{ $activity->nombre }}</option>
+                @if ( isset( $solicitud ) )
+                    @if ( $solicitud->id_actividad == $activity->id )
+                        <option selected value="{{ $activity->id }}" image="{{ $activity->imagen }}">{{ $activity->nombre }}</option>
+                    @else
+                        <option value="{{ $activity->id }}" image="{{ $activity->imagen }}" style="display:none">{{ $activity->nombre }}</option>
+                    @endif
                 @else
                     <option value="{{ $activity->id }}" image="{{ $activity->imagen }}">{{ $activity->nombre }}</option>
                 @endif

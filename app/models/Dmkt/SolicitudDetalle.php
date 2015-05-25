@@ -31,12 +31,20 @@ class SolicitudDetalle extends Eloquent
 
     protected function getNumRucAttribute()
     {
-        return json_decode( $this->detalle )->num_ruc;
+        $jDetalle = json_decode( $this->detalle );
+        if ( isset( $jDetalle->num_ruc ) )
+            return $jDetalle->num_ruc;
+        else
+            return 0;
     }
 
     protected function getMontoFacturaAttribute()
     {
-        return json_decode( $this->detalle )->monto_factura;
+        $jDetalle = json_decode( $this->detalle );
+        if ( isset( $jDetalle->monto_factura ) )
+            return $jDetalle->monto_factura;
+        else
+            return 0;
     }
 
     protected function getImageAttribute()

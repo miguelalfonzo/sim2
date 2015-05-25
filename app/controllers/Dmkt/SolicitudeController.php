@@ -109,9 +109,9 @@ class SolicitudeController extends BaseController
                        'payments'    => TypePayment::all(),
                        'currencies'  => TypeMoney::all(),
                        'families'    => Marca::orderBy('descripcion', 'ASC')->get(),
-                       'investments' => InvestmentType::order(),
-                       'detalle'     => $data['solicitud']->detalle );
-        
+                       'investments' => InvestmentType::order() );
+
+        $data[ 'detalle' ] = $data['solicitud']->detalle ;
         return View::make('Dmkt.Register.solicitud', $data);
     }
 
@@ -126,19 +126,20 @@ class SolicitudeController extends BaseController
             else
             {
                 $data = array( 'solicitud' => $solicitud , 'detalle'   => $solicitud->detalle );
-                if  ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO , APROBADO ) )
-                    && $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario === $user->type
-                    && in_array( $user->id , $solicitud->managerEdit->lists( 'id_gerprod' ) ) )
+                $typeUser = $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario;
+                if ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) )
+                    && in_array( $typeUser , array( Auth::user()->type , Auth::user()->tempType() ) )
+                    && ( array_intersect ( array( Auth::user()->id , Auth::user()->tempId() ) , $solicitud->managerEdit->lists( 'id_gerprod' ) ) ) )
                 {
                     $solicitud->status = BLOCKED;
                     $solicitud->save();
-                    
-                    if ( $user->type == SUP )
+                    $data[ 'fondos' ] = Fondo::getFunds( $typeUser );
+                    /*if ( $user->type == SUP || $user->tempType() == SUP )
                         $data['fondos'] = Fondo::supFondos();
-                    elseif ( $user->type == GER_PROD )
+                    elseif ( $user->type == GER_PROD || $user->tempType() == GER_PROD )
                         $data['fondos'] = Fondo::gerProdFondos();
                     else
-                        $data[ 'fondos' ] = Fondo::all();    
+                        $data[ 'fondos' ] = Fondo::all();*/    
                     $data['solicitud']->status = 1;
                 }
                 elseif ( Auth::user()->type == TESORERIA && $solicitud->id_estado == DEPOSITO_HABILITADO )
@@ -521,8 +522,9 @@ class SolicitudeController extends BaseController
 
     private function verifyPolicy( $solicitud , $monto )
     {
-        $aprovalPolicy = AprovalPolicy::getUserInvestmentPolicy( $solicitud->id_inversion , Auth::user()->type );
-        if ( $aprovalPolicy->count() == 0 )
+        $type = array( Auth::user()->type , Auth::user()->tempType() );
+        $aprovalPolicy = AprovalPolicy::getUserInvestmentPolicy( $solicitud->id_inversion , $type , $solicitud->histories->count() );
+        if ( is_null( $aprovalPolicy ) )
             return $this->warningException( 'No se encontro la politica de aprobacion para la inversion: '. $solicitud->id_inversion . ' y su rol: ' . Auth::user()->type , __FUNCTION__ , __LINE__ , __FILE__ );    
         if ( is_null( $aprovalPolicy->desde ) && is_null( $aprovalPolicy->hasta ) )
             return $this->setRpta( DERIVADO );
@@ -538,10 +540,7 @@ class SolicitudeController extends BaseController
             else if ( $monto < $aprovalPolicy->desde )
                 return $this->warningException( 'Por Politica solo puede aceptar para este Tipo de Inversion montos mayores a: '. $aprovalPolicy->desde , __FUNCTION__ , __LINE__ , __FILE__ );
             else
-            {
                 return $this->setRpta( APROBADO );
-                return $this->warningException( 'APROBADO: '. $aprovalPolicy->hasta , __FUNCTION__ , __LINE__ , __FILE__ );
-            }
         }
     }
 
@@ -747,8 +746,14 @@ class SolicitudeController extends BaseController
                             $solDetalle = $solicitud->detalle;
                             $solDetalle->id_fondo = $idFondo;
                             $detalle = json_decode( $solicitud->detalle->detalle );
-                            $detalle->monto_aceptado = round( $inputs[ 'monto' ] , 2 , PHP_ROUND_HALF_DOWN );
-                            $solDetalle->detalle = json_encode($detalle);
+                            
+                            $monto = round( $inputs[ 'monto' ] , 2 , PHP_ROUND_HALF_DOWN );
+                            if ( $solicitud->id_estado == ACEPTADO )
+                                $detalle->monto_aceptado = $monto;
+                            else if ( $solicitud->id_estado == APROBADO );
+                                $detalle->monto_aprobado = $monto;
+
+                            $solDetalle->detalle = json_encode( $detalle );
                             if ( ! $solDetalle->save() )
                                 return $this->warningException( __FUNCTION__ , 'No se pudo procesar el detalle de la solicitud' ); 
                             else
@@ -780,7 +785,7 @@ class SolicitudeController extends BaseController
                         $middleRpta = $this->setStatus( $oldIdEstado , $solicitud->id_estado , Auth::user()->id , $toUser , $solicitud->id );
                         if ( $middleRpta[ status ] == ok )
                         {
-                            Session::put('state' , $solicitud->state->rangeState->id );
+                            Session::put( 'state' , $solicitud->state->rangeState->id );
                             DB::commit();
                             return $middleRpta ;
                         }

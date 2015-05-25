@@ -1734,7 +1734,9 @@ function newSolicitude() {
         $("#add-doc").show();
     });
 
-    function seeker(element,name,url){
+    function seeker( element , name , url )
+    {
+        console.log( element );
         if (element.length != 0)
         {
             element.typeahead(
@@ -1783,7 +1785,15 @@ function newSolicitude() {
             }).on('typeahead:selected', function ( evento, suggestion , dataset )
             {
                 var input = $(this);
-                if ( dataset == 'clients' )
+                if ( dataset === 'users' )
+                {
+                    $( this ).attr( 'readonly' , '' ).attr( 'data-cod' , suggestion.value ).parent().parent().addClass( 'has-success' );
+                    
+                    console.log( evento );
+                    console.log( suggestion );
+                    console.log( dataset );
+                }
+                else if ( dataset == 'clients' )
                 {
                     $.ajax(
                     {
@@ -1853,7 +1863,7 @@ function newSolicitude() {
     function filterSelect( element , ids , type )
     {
         var select = $(element);
-        if ( type === 'cliente' && clients.children().length == 1 )
+        if ( ( type === 'cliente' && clients.children().length == 1 ) || ( type === 'eliminacion' && clients.children().length >= 1 ) ) 
         {
             select.val('').children().show();
             select.val('');
@@ -1893,8 +1903,9 @@ function newSolicitude() {
         });  
     }
 
-    function clientFilter( tipo_cliente )
+    function clientFilter( tipo_cliente , tipo_filtro )
     {
+        tipo_filtro = typeof tipo_filtro !== 'undefined' ? tipo_filtro : 'cliente';
         $.ajax(
         {
             type: 'post' ,
@@ -1911,8 +1922,8 @@ function newSolicitude() {
         {
             if ( response.Status === 'Ok' )
             {
-                filterSelect( $( 'select[name=actividad]' ) , response.Data.id_actividad , 'cliente' );
-                filterSelect( $( 'select[name=inversion]' ) , response.Data.id_inversion , 'cliente' );
+                filterSelect( $( 'select[name=actividad]' ) , response.Data.id_actividad , tipo_filtro );
+                filterSelect( $( 'select[name=inversion]' ) , response.Data.id_inversion , tipo_filtro );
                 activityChange();
             }
             else
@@ -1927,11 +1938,12 @@ function newSolicitude() {
         var ul = li.parent();
         if ( li.index() == 0 && ul.children().length > 1 )
         {
+            console.log( 'cambio de cliente');
             var table = li.attr('tipo_cliente');
             li.remove();
             var old_li2 = ul.children().first();
-            if ( table !== old_li2.attr( "tipo_cliente" ) )
-                clientFilter( old_li2.attr( "tipo_cliente" ) );
+            if ( table !== old_li2.attr( 'tipo_cliente' ) )
+                clientFilter( old_li2.attr( 'tipo_cliente' ) , 'eliminacion' );
         }
         else
             li.remove();
@@ -1944,8 +1956,10 @@ function newSolicitude() {
 
     $( document ).ready(function() 
     {
-        seeker($('.cliente-seeker'),'clients','search-client');
-        seeker($('.rep-seeker'),'reps','search-rep');
+        seeker( $( '.cliente-seeker' ) , 'clients' , 'search-client' );
+        seeker( $( '.rep-seeker' ) , 'reps' , 'search-rep' );
+        seeker( $( '#user-seeker' ) , 'users' , 'search-users' );
+
     });
 
     function ajaxError(statusCode,errorThrown)

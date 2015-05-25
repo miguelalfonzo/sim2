@@ -63,10 +63,20 @@
                 </div>
             </div>
         @endif
+        @if ( Auth::user()->type == SUP )
+            <div class="form-group col-xs-6 col-sm-2 col-md-1 col-lg-1" style="text-align: left; padding: 0">
+                <div>
+                    <a class="btn btn-primary" data-toggle="modal" data-target="#modal-temporal-user">
+                        Derivacion de Usuario
+                    </a>
+                </div>
+            </div>    
+        @endif
+
         @if ( in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD ) ) )
-            <div class="form-group col-sm-3 col-md-3 button-new-solicitude" style="text-align: right; padding: 0">
-                <div style="padding: 0">
-                    <a href="{{URL::to('nueva-solicitud')}}" id="singlebutton" name="singlebutton" class="btn btn-primary">
+            <div class="form-group col-xs-6 col-sm-2 col-md-2 col-lg-2" style="text-align: right; padding: 0">
+                <div>
+                    <a href="{{URL::to('nueva-solicitud')}}" class="btn btn-primary">
                         Nueva Solicitud
                     </a>
                 </div>

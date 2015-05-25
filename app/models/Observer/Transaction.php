@@ -7,13 +7,13 @@ use \Auth;
 
 class Transaction 
 {
-    public function creating(Eloquent $model)
+    public function creating( Eloquent $model )
     {
         $model->created_by = Auth::user()->id;
         $model->updated_by = Auth::user()->id;
     }
 
-    public function updating(Eloquent $model)
+    public function updating( Eloquent $model )
     {
         $model->updated_by = Auth::user()->id;
     }

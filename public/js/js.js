@@ -1637,32 +1637,6 @@ $(function()
             $("#total-deposit").val( tr.find('.deposit').text().trim() );
             $('#enable_deposit_Modal').modal();
         });
-        
-        //$("#collapseOne").collapse('toggle');
-        
-        $(document).off("click", "#detail_solicitude");
-        $(document).on("click", "#detail_solicitude", function(e)
-        {
-            e.preventDefault();
-            if($("#collapseOne").hasClass('in'))
-            {
-                $("#detail_solicitude span:last-child").removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
-                $("#detail_solicitude span:first-child").text('Mostrar');
-            }
-            else
-            {
-                $("#detail_solicitude span:last-child").removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
-                $("#detail_solicitude span:first-child").text('Ocultar');
-            }
-            $("#collapseOne").collapse('toggle');
-        });
-
-        if ( $(".search-ruc").length == 1 )
-        {
-            $("#detail_solicitude span:last-child").removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
-            $("#detail_solicitude span:first-child").text('Mostrar');
-            $("#collapseOne").collapse('toggle');
-        }
 
         $('#ruc').click( function()
         {
@@ -1699,4 +1673,74 @@ $(function()
             $(this).removeClass('error-incomplete').attr( 'placeholder' , '' );
         });
 
+        $('#edit-user').click( function()
+        {
+            $( "#user-seeker" ).typeahead( 'val' , '').attr( 'readonly' , false ).attr( 'data-cod' , '' ).parent().parent().removeClass( 'has-success' );
+        });
+
+        $('#button-confirm-temporal-user').click( function()
+        {
+            var user = $( '#user-seeker' );
+            console.log( user );
+            if ( user.parent().parent().hasClass( 'has-success' ) === false )
+            {
+                $('#modal-temporal-user').modal('hide');
+                responseUI( 'Ingrese el Usuario' , 'red' );
+            }
+            else
+            {
+                if ( user.attr( 'data-cod' ).trim() === '' )
+                {
+                    $('#modal-temporal-user').modal('hide');
+                    responseUI( 'No se encontrol el Id del Usuario' + user.val() , 'red' );
+                }
+                else
+                {
+                    console.log('ajax');
+                    $.ajax(
+                    {
+                        type : 'POST' ,
+                        url  : server + 'confirm-temporal-user' ,
+                        data :
+                        {
+                            _token : $( 'input[name=_token]').val() ,
+                            iduser : $('#user-seeker').attr('data-cod')
+                        }
+                    }).fail( function( statusCode , errorThrown )
+                    {
+                        ajaxError( statusCode , errorThrown );
+                    }).done( function( response )
+                    {
+                        if ( response.Status === 'Ok' )
+                        {
+                            $('#modal-temporal-user').modal('hide');
+                            responseUI( 'Asignacion Correcta' , 'green' );
+                        }
+                        else
+                            bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>' );
+                    });
+                }  
+            }
+        });
+
+        $('#button-remove-temporal-user').click( function()
+        {
+             $.ajax(
+            {
+                type : 'GET' ,
+                url  : server + 'remove-temporal-user'
+            }).fail( function( statusCode , errorThrown )
+            {
+                ajaxError( statusCode , errorThrown );
+            }).done( function( response )
+            {   
+                if ( response.Status === 'Ok' )
+                {
+                    $('#modal-temporal-user').modal('hide');
+                    responseUI( 'Se quito la asignacion' , 'green' );        
+                }
+                else
+                    bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>' );       
+            });
+        });
 });

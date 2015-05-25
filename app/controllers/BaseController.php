@@ -256,7 +256,7 @@ class BaseController extends Controller
                             $query->where( 'id_user_assign' , '<>' , Auth::user()->id )->orWhereNull( 'id_user_assign' );
                         })->whereHas( 'gerente' , function( $query )
                         {
-                            $query->where( 'id_gerprod' , Auth::user()->id );
+                            $query->where( 'id_gerprod' , Auth::user()->id )->orWhere( 'id_gerprod' , Auth::user()->tempId() );
                         });
                     })->orWhere( function ( $query )
                     {
