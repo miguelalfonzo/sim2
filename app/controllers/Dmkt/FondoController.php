@@ -136,8 +136,8 @@ class FondoController extends BaseController
         {
             foreach( $solicituds as $solicitud )
             {
-                $oldIdestado = $solicitud->idestado;
-                $solicitud->idestado = DEPOSITO_HABILITADO;
+                $oldIdestado = $solicitud->id_estado;
+                $solicitud->id_estado = DEPOSITO_HABILITADO;
                 if ( !$solicitud->save() )
                     return $this->warningException( __FUNCTION__ , 'No se pudo actualizar la solicitud: '.$solicitud->id );
                 else
@@ -438,16 +438,16 @@ class FondoController extends BaseController
                     $middleRpta = $this->validateRm( $inputs['codrepmed'] , $inputs['codsup'] );
                     if ( $middleRpta[status] == ok )
                     {
-                        $solicitud                  = new Solicitude;
+                        $solicitud                  = new Solicitud;
                         $solicitud->id              = $solicitud->searchId() + 1;
                         $solicitud->titulo          = $inputs['institucion'];
-                        $solicitud->idestado        = PENDIENTE;
+                        $solicitud->id_estado        = PENDIENTE;
                         $solicitud->idactividad      = $inputs['idactividad'];
                         $solicitud->idtiposolicitud = SOL_INST;
                         $solicitud->iduserasigned   = $middleRpta[data];
                         $solicitud->token           = sha1(md5(uniqid($solicitud->id, true)));
                         
-                        $detalle                    = new SolicitudeDetalle;
+                        $detalle                    = new SolicitudDetalle;
                         $detalle->id                = $detalle->searchId() + 1;
 
                         $solicitud->iddetalle       = $detalle->id;
@@ -504,7 +504,7 @@ class FondoController extends BaseController
                                 return $this->warningException( __FUNCTION__ , 'La solicitud no tiene Id de Tipo: #'.$inputs['idsolicitud']);
                             else
                                 return $this->warningException( __FUNCTION__ , 'La solicitud no es Institucional: #'.$inputs['idsolicitud'].'-'.$solInst->typeSolicitude->nombre);
-                        elseif ( $solInst->idestado != PENDIENTE )
+                        elseif ( $solInst->id_estado != PENDIENTE )
                             return $this->warningException( __FUNCTION__ , 'Esta solicitud ya ha sido procesada: #'.$inputs['idsolicitud'].'-'.$solInst->state->nombre);
                         else
                         {

@@ -13,14 +13,10 @@
     @include('Dmkt.Solicitud.Detail.monto')
 
     <!-- TIPO DE PAGO -->
-    <div class="form-group col-sm-6 col-md-4" >
-        <label class="col-sm-8 col-md-8 control-label">Tipo de Entrega</label>
-        <div class="col-sm-12 col-md-12">
-            <select class="form-control selectTypePayment" disabled>
-                <option selected value="{{$solicitud->detalle->typePayment->id}}">
-                    {{$solicitud->detalle->typePayment->nombre}}
-                </option>
-            </select>
+    <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4" >
+        <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label">Tipo de Entrega</label>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <input class="form-control" value="{{$solicitud->detalle->typePayment->nombre}}" disabled>
         </div>
     </div>
 

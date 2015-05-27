@@ -43,24 +43,24 @@ class MoveController extends BaseController
                         $deposito = $detalle->deposit;
                         if ( $deposito->account->idtipomoneda == DOLARES )
                         {
-                            if ( $detalle->idmoneda == DOLARES )
+                            if ( $detalle->id_moneda == DOLARES )
                             {
                                 foreach( $solicitud->expenses as $expense )
                                     $expense->total = $expense->total * ChangeRate::getTcv( $expense->fecha_movimiento );
                                 $solicitud->saldo = ( $jDetalle->monto_aprobado * $jDetalle->tcv ) - $solicitud->expenses->sum('total');
                             }
-                            elseif ( $detalle->idmoneda == SOLES )
+                            elseif ( $detalle->id_moneda == SOLES )
                                 $solicitud->saldo = ( $jDetalle->monto_aprobado * $jDetalle->tcv ) - $solicitud->expenses->sum('total');
                         }
                         elseif ( $deposito->account->idtipomoneda == SOLES )
                         {
-                            if ( $detalle->idmoneda == DOLARES )
+                            if ( $detalle->id_moneda == DOLARES )
                             {
                                 foreach( $solicitud->expenses as $expense )
                                     $expense->total = $expense->total * ChangeRate::getTcv( $expense->fecha_movimiento );
                                 $solicitud->saldo = $jDetalle->monto_aprobado - $solicitud->expenses->sum('total');
                             }
-                            elseif ( $detalle->idmoneda == SOLES )
+                            elseif ( $detalle->id_moneda == SOLES )
                                 $solicitud->saldo = $jDetalle->monto_aprobado - $solicitud->expenses->sum('total');    
                         }
                     }

@@ -22,24 +22,6 @@ use \Exception;
 
 class Seeker extends BaseController 
 {	
-	/*private function clientsTables()
-	{
-		$tables = array( 'VTA.CLIENTES' , 'SIP.MEDICOS2' );
-		$wheres = array( 'clcodigo , clnombre,clrutholding','rutmed,patmed,matmed,nommed');
-		$selects = array('clcodigo,clnombre',"rutmed,(patmed||' '||matmed||' '||nommed)");
-		$sJson = array();
-		for ($i=0;$i<count($tables) ;$i++)
-		{
-			$tab = array();
-			$tab['name'] = $tables[$i];
-			$where = explode(',',$wheres[$i]);
-			$tab['wheres'] = $where;
-			$select = explode(',',$selects[$i]);
-			$tab['selects'] = $select;
-			$sJson[] = $tab;
-		}
-		return json_encode($sJson);
-	}*/
 
 	public function clientSource()
 	{
@@ -117,71 +99,62 @@ class Seeker extends BaseController
 		$json = '[{ "name": "OUTDVP.DMKT_RG_SUPERVISOR" , "wheres":{ "likes": ["( NOMBRES || \' \' || APELLIDOS )" ] , "notnull": ["IDUSER"] } , "selects" : [ "IDUSER" , "( NOMBRES || \' \' || APELLIDOS )" , "\'SUPERVISOR\'" ] } , ' . 
 				'{ "name" : "OUTDVP.GERENTES" , "wheres":{ "likes": ["DESCRIPCION"] , "notnull" : [ "IDUSER" ] } , "selects" : [ "IDUSER" , "DESCRIPCION" , "\'G. PRODUCTO\'"] } ]';
 		$cAlias = array( 'value' , 'label' , "type" );
-		Log::error( $json );
 		return $this->searchSeeker( $inputs['sVal'] , $json , $cAlias );			
 	}
 
     private function searchSeeker($inputs,$json,$cAlias)
     {
-    	try
+		if (!empty($inputs))
     	{
-	    	if (!empty($inputs))
+	    	$json = json_decode($json);
+    		if (json_last_error() == JSON_ERROR_NONE)
 	    	{
-		    	$json = json_decode($json);
-	    		if (json_last_error() == JSON_ERROR_NONE)
+		    	$array = array();
+		    	foreach ($json as $table)
 		    	{
-			    	$array = array();
-			    	foreach ($json as $table)
-			    	{
-			    		$select = '';
-			    		$query = DB::table($table->name);
-			    		foreach ( $table->wheres as $key => $where )
-			    		{
-			    			if ( $key == 'likes' )
-			    			{
-			    				foreach ( $where as $key => $like )
-			    					$query->orWhereRaw(" UPPER(" .$like. ") like '%" .strtoupper( $inputs ). "%' ");
-			    			}
-			    			else if ( $key == 'equal' )
-			    			{
-			    				foreach ( $where as $key => $equal )
-			    					$query->where( $key , $equal );
-			    			}
-			    			else if ( $key == 'in' )
-			    			{
-			    				foreach ( $where as $key => $in )
-			    					$query->whereIn( $key , $in );
-			    			}
-			    			else if ( $key === 'notnull' )
-			    			{
-			    				foreach ( $where as $key => $field )
-			    					$query->whereNotNull( $field );
-			    			}
-			    		}
-			    		for ( $i=0 ; $i< count( $cAlias ) ; $i++ )
-			    			$select = $select. ' ' .$table->selects[$i]. ' as "' .$cAlias[$i]. '",';			
-			    		$select = substr($select,0,-1);
-			    		$query->select( DB::raw( $select ) );
-			    		$query->take(2);
-			    		$tms = $query->get();
-			    		foreach ( $tms as $tm )
-			    			$tm->table = $table->name;
-			    		$array = array_merge( $tms , $array );
-			    	}
-			    	Log::error( json_encode( $array) );
-			    	return $this->setRpta($array);
-			    }
-			    else
-			    	return $this->warningException( 'Json: Formato Incorrecto' , __FUNCTION__ , __LINE__ , __FILE__ );
+		    		$select = '';
+		    		$query = DB::table($table->name);
+		    		foreach ( $table->wheres as $key => $where )
+		    		{
+		    			if ( $key == 'likes' )
+		    			{
+		    				foreach ( $where as $key => $like )
+		    					$query->orWhereRaw(" UPPER(" .$like. ") like '%" .strtoupper( $inputs ). "%' ");
+		    			}
+		    			else if ( $key == 'equal' )
+		    			{
+		    				foreach ( $where as $key => $equal )
+		    					$query->where( $key , $equal );
+		    			}
+		    			else if ( $key == 'in' )
+		    			{
+		    				foreach ( $where as $key => $in )
+		    					$query->whereIn( $key , $in );
+		    			}
+		    			else if ( $key === 'notnull' )
+		    			{
+		    				foreach ( $where as $key => $field )
+		    					$query->whereNotNull( $field );
+		    			}
+		    		}
+		    		for ( $i=0 ; $i< count( $cAlias ) ; $i++ )
+		    			$select = $select. ' ' .$table->selects[$i]. ' as "' .$cAlias[$i]. '",';			
+		    		$select = substr($select,0,-1);
+		    		$query->select( DB::raw( $select ) );
+		    		$query->take(2);
+		    		$tms = $query->get();
+		    		foreach ( $tms as $tm )
+		    			$tm->table = $table->name;
+		    		$array = array_merge( $tms , $array );
+		    	}
+		    	return $this->setRpta($array);
 		    }
 		    else
-		    	return $this->warningException( 'Input Vacio (Post: "Json" Vacio)' , __FUNCTION__ , __LINE__ , __FILE__ );   
+		    	return $this->warningException( 'Json: Formato Incorrecto' , __FUNCTION__ , __LINE__ , __FILE__ );
 	    }
-	    catch ( Exception $e )
-	   	{
-	    	return $this->internalException( $e, __FUNCTION__ );
-    	}
-    }
+	    else
+	    	return $this->warningException( 'Input Vacio (Post: "Json" Vacio)' , __FUNCTION__ , __LINE__ , __FILE__ );   
+	}
 
     public function getClientView()
     {

@@ -20,8 +20,10 @@
                 <div class="modal-body">
                     @if (!isset($detalle->image))
                         <h3>No se ingreso una imagen</h3>
+                        <img class="img-responsive" src="">
                     @elseif (!file_exists(public_path().'/'.IMAGE_PATH.$detalle->image))
                         <h3>No se encontro la imagen en el sistema</h3>
+                        <img class="img-responsive" src="">
                     @else
                         <img class="img-responsive" src="{{asset(IMAGE_PATH.$detalle->image)}}">
                     @endif 

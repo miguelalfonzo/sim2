@@ -293,8 +293,8 @@ class ExpenseController extends BaseController
 				return $this->warninException( __FUNCTION__ , 'No se encontro la solicitud');
 			else
 			{
-				$oldIdEstado = $solicitud->idestado;
-				$solicitud->idestado = REGISTRADO;
+				$oldIdEstado = $solicitud->id_estado;
+				$solicitud->id_estado = REGISTRADO;
 				if ( !$solicitud->save() )
 					return $this->warninException( __FUNCTION__ , 'No se pudo procesar la solicitud');
 				else

@@ -34,11 +34,15 @@
                 @endif
                 @if ( in_array( Auth::user()->type , array( TESORERIA , GER_COM ) ))
                     <input type="hidden" id="sol_token" class="i-tokens" value="{{$solicitud->token}}">
-                    @if( !is_null($solicitud->response ) )
-                        @if( $solicitud->response->type == REP_MED )
-                            <input type="hidden" value="{{$solicitud->response->rm->full_name}}" class="benef">
-                        @elseif( $solicitud->response->type == ASIS_GER )
-                            <input type="hidden" value="{{$solicitud->response->person->full_name}}" class="benef">
+                    @if( ! is_null( $solicitud->id_user_assign ) )
+                        @if( $solicitud->assign->type == REP_MED )
+                            <input type="hidden" value="{{$solicitud->assign->rm->full_name}}" class="benef">
+                        @elseif( $solicitud->assign->type == SUP )
+                            <input type="hidden" value="{{$solicitud->assign->sup->full_name}}" class="benef">
+                        @elseif ( $solicitudd->assign->type == GER_COM )
+                            <input type="hidden" value="{{ $solicitud->assign->gerProd->full_name}}" class="benef">
+                        @elseif ( !is_null( $solicitud->assign->simApp ) )
+                            <input type="hidden" value="{{ $solicitud->assign->person->full_name}}" class="benef">
                         @else
                             <input type="hidden" value="Usuario no autorizado" class="benef">
                         @endif
@@ -59,7 +63,7 @@
                 @include('template.List.lastdate')
                 @if( Auth::user()->type == TESORERIA )
                     <td style="display:none;" class="total_deposit">
-                        {{ $solicitud->detalle->fondo->typemoney->simbolo .' '. $solicitud->detalle->monto_actual }}
+                        {{ $solicitud->detalle->monto_actual }}
                     </td>
                     <td style="display:none" class="tes-ret">
                         @if ( is_null( $solicitud->detalle->idretencion ) )
@@ -69,12 +73,10 @@
                         @endif
                     </td>
                     <td class="text-center deposit">
-                        @if ( is_null( $solicitud->detalle->iddeposito ) )
-                            @if ( $solicitud->detalle->id_moneda == SOLES )
-                                {{$solicitud->detalle->typemoney->simbolo .' '. ( $solicitud->detalle->monto_actual - ( json_decode( $solicitud->detalle->detalle )->monto_retencion*$tc->compra ) ) }}    
-                            @elseif ( $solicitud->detalle->id_moneda == DOLARES )
-                                {{$solicitud->detalle->typemoney->simbolo . ' ' . ( $solicitud->detalle->monto_actual - ( json_decode( $solicitud->detalle->detalle )->monto_retencion/$tc->venta ) ) }}   
-                            @endif
+                        @if ( is_null( $solicitud->detalle->id_deposito ) )
+                            {{ $solicitud->detalle->typemoney->simbolo .' '. $solicitud->detalle->monto_actual }}    
+                        @else
+                            {{ $solicitud->detalle->deposit->account->typeMoney->simbolo . ' ' . $solicitud->detalle->deposit->total }}
                         @endif
                     </td>
                 @else

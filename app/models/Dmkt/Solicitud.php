@@ -114,9 +114,9 @@ class Solicitud extends Eloquent
         return $this->hasMany( 'Dmkt\SolicitudGer' , 'id_solicitud'  , 'id' )->where( 'permiso' , 1 );
     }
 
-    protected function response()
+    protected function assign()
     {
-        return $this->belongsTo('User','iduserasigned');
+        return $this->belongsTo( 'User' , 'id_user_assign' );
     }
 
     protected function rm()

@@ -4,7 +4,7 @@
         <select name="pago" class="form-control">
             @foreach( $payments as $payment )
                 @if ( $payment->id != 3 )
-                    @if(isset($solicitud) && $solicitud->detalle->idpago == $payment->id)
+                    @if( isset( $solicitud ) && $solicitud->detalle->id_pago == $payment->id )
                         <option value="{{$payment->id}}" selected>{{$payment->nombre}}</option>
                     @else
                         <option value="{{$payment->id}}">{{$payment->nombre}}</option>

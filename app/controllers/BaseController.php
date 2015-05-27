@@ -82,17 +82,17 @@ class BaseController extends Controller
         return array( status => warning , description => $description );
     }
 
-    protected function internalException( $exception , $function )
+    protected function internalException( $exception , $function , $type = 'System' )
     {
         Log::error( $exception );
-        Log::error( json_encode( oci_error() ) );
+        Log::error( oci_error() );
         Log::error( $exception->getMessage() );
         Mail::send('soporte', array( 'exception' => $exception ), function( $message ) use( $function )
         {
             $message->to(SOPORTE_EMAIL);
-            $message->subject(error.' - Function: '.$function);      
+            $message->subject(error.' - Function: '.$function);
         });
-        return array( status => error , description => $exception );
+        return array( status => error , description => $type. ': '.$exception->getMessage() );
     }
 
     private function validateJson()
@@ -121,10 +121,7 @@ class BaseController extends Controller
             $user_name  = array();
             foreach ( $toUser as $user )
                 $user_name[] = $user->getName();
-            
-            Log::error( $user_email );
-            Log::error( $user_name );
-            
+        
             if( count( $user_name ) != 0 && count( $user_email ) != 0 )
             {
                 $data = array(
@@ -162,75 +159,47 @@ class BaseController extends Controller
 
     public function setStatus( $status_from , $status_to , $user_from_id , $user_to_id , $idSolicitud )
     {
-        try
-        {
-            Log::error( $user_to_id );
-            
-            $fromStatus = State::where( 'id' , $status_from )->first();
-            $toStatus   = State::where( 'id' , $status_to )->first();
-            
-            $statusNameFrom = $fromStatus == null ? '' : $fromStatus->nombre;
-            $statusNameTo   = $toStatus == null ? '' : $toStatus->nombre;
-            
-            $fromUser   = User::where( 'id' , $user_from_id )->first();
-            
-            if ( is_array( $user_to_id ) )
-                $toUser     = User::whereIn( 'id' , $user_to_id )->get();
-            else
-                $toUser     = User::where( 'id' , $user_to_id )->get();
-            
-            Log::error( json_encode( $toUser ));
-            
-            
-            Log::error('status');
-            Log::error( $statusNameFrom );
-            Log::error( $statusNameTo );
+        $fromStatus = State::where( 'id' , $status_from )->first();
+        $toStatus   = State::where( 'id' , $status_to )->first();
+        
+        $statusNameFrom = $fromStatus == null ? '' : $fromStatus->nombre;
+        $statusNameTo   = $toStatus == null ? '' : $toStatus->nombre;
+        
+        $fromUser   = User::where( 'id' , $user_from_id )->first();
+        
+        if ( is_array( $user_to_id ) )
+            $toUser     = User::whereIn( 'id' , $user_to_id )->get();
+        else
+            $toUser     = User::where( 'id' , $user_to_id )->get();
 
-            // POSTMAN: send email
-            $rpta = $this->postman( $idSolicitud , $statusNameFrom , $statusNameTo , $toUser );
-            Log::error( $rpta );
-            if ( $rpta[status] == ok  )
-                return $this->updateStatusSolicitude( $status_from , $status_to , $fromUser , $idSolicitud , 1 );
-            else if ( $rpta[status] == warning )
-                return $this->updateStatusSolicitude( $status_from , $status_to , $fromUser , $idSolicitud , 0 );
-            else
-                return $rpta;
-        }
-        catch (Exception $e)
-        {
-            return $this->internalException( $e , __FUNCTION__ );
-        }
+        // POSTMAN: send email
+        $rpta = $this->postman( $idSolicitud , $statusNameFrom , $statusNameTo , $toUser );
+        if ( $rpta[status] == ok  )
+            return $this->updateStatusSolicitude( $status_from , $status_to , $fromUser , $idSolicitud , 1 );
+        else if ( $rpta[status] == warning )
+            return $this->updateStatusSolicitude( $status_from , $status_to , $fromUser , $idSolicitud , 0 );
+        else
+            return $rpta;
     }
 
     public function updateStatusSolicitude( $status_from , $status_to , $user_from , $idSolicitud , $notified )
     {   
-        try
-        {         
-            $fData = array(
-                'status_to'   => $status_to,
-                'id_solicitud'=> $idSolicitud,
-                'user_to'     => Session::pull( 'usertype' )
-            );
+            $fData = array( 'status_to'    => $status_to ,
+                            'id_solicitud' => $idSolicitud ,
+                            'user_to'      => Session::pull( 'usertype' ) );
+
             $statusSolicitude = SolicitudHistory::firstOrNew($fData);
             if ( ! isset( $statusSolicitude->rn ) )
-            {
-                Log::error( json_encode($statusSolicitude));
-                $statusSolicitude->id           = $statusSolicitude->lastId() + 1;
-            }
+                $statusSolicitude->id = $statusSolicitude->lastId() + 1;
             else
                 $statusSolicitude = SolicitudHistory::find( $statusSolicitude->id );
+            
             $statusSolicitude->status_from  = $status_from;
             $statusSolicitude->user_from    = $user_from->type;
             $statusSolicitude->notified     = $notified;
             $statusSolicitude->updated_at   = Carbon\Carbon::now();
             $statusSolicitude->save();
-            Log::error( json_encode( $statusSolicitude ));
             return $this->setRpta();
-        }
-        catch (Exception $e)
-        {
-            return $this->internalException($e,__FUNCTION__);
-        }
     }
 
     protected function setRpta( $data='' )
@@ -240,71 +209,61 @@ class BaseController extends Controller
 
     protected function searchSolicituds($estado,$idUser,$start,$end)
     {
-        try
+        $solicituds = Solicitud::whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
+        if ( in_array( Auth::user()->type , array ( REP_MED , SUP , GER_PROD , GER_PROM ) ) )
         {
-            $solicituds = Solicitud::whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
-            if ( in_array( Auth::user()->type , array ( REP_MED , SUP , GER_PROD , GER_PROM ) ) )
+            $solicituds->where( function ( $query )
             {
-                Log::error( Auth::user()->id );
-                $solicituds->where( function ( $query )
+                $query->where( function ( $query )
                 {
-                    $query->where( function ( $query )
+                    $query->where( 'created_by' , '<>' , Auth::user()->id )
+                    ->where( function ( $query )
                     {
-                        $query->where( 'created_by' , '<>' , Auth::user()->id )
-                        ->where( function ( $query )
-                        {
-                            $query->where( 'id_user_assign' , '<>' , Auth::user()->id )->orWhereNull( 'id_user_assign' );
-                        })->whereHas( 'gerente' , function( $query )
-                        {
-                            $query->where( 'id_gerprod' , Auth::user()->id )->orWhere( 'id_gerprod' , Auth::user()->tempId() );
-                        });
-                    })->orWhere( function ( $query )
+                        $query->where( 'id_user_assign' , '<>' , Auth::user()->id )->orWhereNull( 'id_user_assign' );
+                    })->whereHas( 'gerente' , function( $query )
                     {
-                        $query->where( 'created_by' , Auth::user()->id )->orWhere( function ( $query )
-                        {
-                            $query->where( 'created_by' , '<>' , Auth::user()->id )->where( 'id_user_assign' , Auth::user()->id );
-                        });
+                        $query->where( 'id_gerprod' , Auth::user()->id )->orWhere( 'id_gerprod' , Auth::user()->tempId() );
+                    });
+                })->orWhere( function ( $query )
+                {
+                    $query->where( 'created_by' , Auth::user()->id )->orWhere( function ( $query )
+                    {
+                        $query->where( 'created_by' , '<>' , Auth::user()->id )->where( 'id_user_assign' , Auth::user()->id );
                     });
                 });
-            }
-            if ( Auth::user()->type == TESORERIA ) 
+            });
+        }
+        if ( Auth::user()->type == TESORERIA ) 
+        {
+            if ($estado != R_FINALIZADO)
             {
-                if ($estado != R_FINALIZADO)
-                {
-                    $solicituds->whereIn( 'idestado' , array( DEPOSITO_HABILITADO , DEPOSITADO ) );
-                }
-                else
-                {
-                    $solicituds->whereHas( 'detalle' , function ($q)
-                    {
-                        $q->whereNotNull('iddeposito');
-                    });
-                }
+                $solicituds->whereIn( 'id_estado' , array( DEPOSITO_HABILITADO , DEPOSITADO ) );
             }
-            else if ( Auth::user()->type == CONT )
-                $solicituds->where( 'id_estado' , '<>' , ACEPTADO );
+            else
+            {
+                $solicituds->whereHas( 'detalle' , function ($q)
+                {
+                    $q->whereNotNull('iddeposito');
+                });
+            }
+        }
+        else if ( Auth::user()->type == CONT )
+            $solicituds->where( 'id_estado' , '<>' , ACEPTADO );
 
-            if ( $estado != R_TODOS)
-            { 
-                Log::error( ' estado ');
-                $solicituds->whereHas( 'state' , function ( $q ) use( $estado )
+        if ( $estado != R_TODOS)
+        { 
+            $solicituds->whereHas( 'state' , function ( $q ) use( $estado )
+            {
+                $q->whereHas( 'rangeState' , function ( $t ) use( $estado )
                 {
-                    $q->whereHas( 'rangeState' , function ( $t ) use( $estado )
-                    {
-                        $t->where( 'id' , $estado );
-                    });
+                    $t->where( 'id' , $estado );
                 });
-                
-            }
-            
-            $solicituds = $solicituds->orderBy('id', 'ASC')->get();
-            
-            return $this->setRpta($solicituds);
+            });    
         }
-        catch ( Exception $e )
-        {
-            return $this->internalException( $e, __FUNCTION__ );
-        }
+        
+        $solicituds = $solicituds->orderBy('id', 'ASC')->get();
+        
+        return $this->setRpta($solicituds);
     }
 
     protected function userType()

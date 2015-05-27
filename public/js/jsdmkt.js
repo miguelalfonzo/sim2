@@ -20,6 +20,7 @@ function newSolicitude() {
 
     var invoice_amount  = $('input[name=monto_factura]');
     var invoice_img     = $('input[name=factura]');
+    var comprobante_img = $( '.img-responsive' );
     var ruc             = $('input[name=ruc]');
     
     var search_cliente = $('.cliente-seeker');
@@ -237,19 +238,18 @@ function newSolicitude() {
         invoice_img.parent().parent().parent().parent().parent().show();        
     }
 
-    $( 'select[name=inversion]' ).on( 'change' , function()
+    investment.on( 'change' , function()
     {
         inversionChange( $(this).val() );
     });
 
-    $( 'select[name=actividad]' ).on( 'change' , function() 
+    activity.on( 'change' , function() 
     {
         activityChange();
     });
 
     function inversionChange( id_inversion )
     {
-        console.log( id_inversion );
         $.ajax(
         {
             url: server + 'filtro-inversion',
@@ -267,8 +267,8 @@ function newSolicitude() {
         {
             if ( response.Status === 'Ok' )
             {
-                $('select[name=actividad]').val('');
-                filterSelect( $('select[name=actividad]') , response.Data , 'inversion' );
+                activity.val('');
+                filterSelect( activity , response.Data , 'inversion' );
                 activityChange();
             }
             else
@@ -282,11 +282,13 @@ function newSolicitude() {
         {
             invoice_amount.parent().parent().hide();
             invoice_img.parent().parent().parent().parent().parent().hide();
+            $('a[data-target=#myFac]').parent().parent().hide();
         }
         else if ( $('select[name=actividad] option:selected').attr('image') == 1 )
         {
             invoice_amount.parent().parent().show();
             invoice_img.parent().parent().parent().parent().parent().show();        
+            $('a[data-target=#myFac]').parent().parent().show();
         }
     }
 
@@ -329,10 +331,11 @@ function newSolicitude() {
         $(this).parent().removeClass('has-error');
     });
     invoice_img.on('focus', function () {
-        $(this).parent().removeClass('has-error');
+        $(this).parent().parent().parent().parent().parent().removeClass('has-error');
+        $(this).parent().parent().parent().children('input').removeClass('input-placeholder-error');
     });
     ruc.on('focus', function () {
-        $(this).parent().removeClass('has-error');
+        $(this).parent().parent().removeClass('has-error');
     });
 
     function listMaintenanceTable( type )
@@ -1251,12 +1254,6 @@ function newSolicitude() {
         $('#table_solicitude_fondos > tbody > tr').css('background-color','');
     });
 
-    /*$("#estado_fondo_cont").on("change", function(e){
-        var datefondo = $("#datefondo").val();
-        var aux = 'fondos-contabilidad';
-        searchFondos(datefondo, aux);
-    });*/
-
     function searchFondos( datefondo , aux ) 
     {
         var url = server + 'list-fondos/' + datefondo;
@@ -1504,7 +1501,6 @@ function newSolicitude() {
         var tr = $(this).parent().parent();
         listMaintenanceTable( tr.attr('type')  );
     });
-
 
     $(document).off('click' , '.maintenance-edit');
     $(document).on('click' , '.maintenance-edit' , function()
@@ -1813,22 +1809,22 @@ function newSolicitude() {
                             responseUI( 'Problema de Conexion' , 'red' );
                         else if ( data.Status == 'Ok' )
                         {
-                            if ( $('#clientes').children().length >= 1 )
+                            if ( clients.children().length >= 1 )
                             {
                                 var aux = 0;
-                                $('#clientes').children().each( function()
+                                clients.children().each( function()
                                 {
                                     var li = $(this);
                                     if ( li.attr('pk') == suggestion.value && li.attr('tipo_cliente') == suggestion.id_tipo_cliente )
                                         aux = 1;
                                 });
                                 if ( aux == 0 )
-                                    $('#clientes').append( data.Data.View );
+                                    clients.append( data.Data.View );
                             }
                             else
-                                $('#clientes').append( data.Data.View );
-                            filterSelect( $('select[name=inversion]') , data.Data.id_inversion , 'cliente' );
-                            filterSelect( $('select[name=actividad]') , data.Data.id_actividad , 'cliente' );
+                                clients.append( data.Data.View );
+                            filterSelect( investment , data.Data.id_inversion , 'cliente' );
+                            filterSelect( activity , data.Data.id_actividad , 'cliente' );
                             activityChange();
                         }
                     });
@@ -1922,8 +1918,8 @@ function newSolicitude() {
         {
             if ( response.Status === 'Ok' )
             {
-                filterSelect( $( 'select[name=actividad]' ) , response.Data.id_actividad , tipo_filtro );
-                filterSelect( $( 'select[name=inversion]' ) , response.Data.id_inversion , tipo_filtro );
+                filterSelect( activity , response.Data.id_actividad , tipo_filtro );
+                filterSelect( investment , response.Data.id_inversion , tipo_filtro );
                 activityChange();
             }
             else
@@ -1949,8 +1945,8 @@ function newSolicitude() {
             li.remove();
         if ( ul.children().length === 0 )
         {
-            $('select[name=inversion]').children().show();
-            $('select[name=actividad]').children().show();               
+            investment.children().show();
+            activity.children().show();               
         }
     });
 
@@ -2075,14 +2071,6 @@ function newSolicitude() {
             delivery_date.addClass('input-placeholder-error');
             aux = 1;
         }
-        if (!delivery_date.val()) 
-        {
-            delivery_date.parent().addClass('has-error');
-            delivery_date.attr('placeholder', 'Ingrese Fecha');
-            delivery_date.addClass('input-placeholder-error');
-            aux = 1;
-        }
-
         if ( clients.children().length == 0 )
         {
             search_cliente.attr( 'placeholder' , 'Ingrese el Cliente' ).addClass('input-placeholder-error');
@@ -2099,19 +2087,29 @@ function newSolicitude() {
                 invoice_amount.addClass('input-placeholder-error');
                 aux = 1;
             }
-            if(  ! invoice_img.val() && $( '.img-responsive' ).attr('src').trim() === '' )
+            if ( ( invoice_img.length === 0 || invoice_img.val().trim() === '' ) && ( comprobante_img.length === 0 || comprobante_img.attr('src').trim() === '' ) )
             {
-                invoice_img.parent().addClass('has-error');
-                invoice_img.attr('placeholder', 'Ingrese Imagen');
-                invoice_img.addClass('input-placeholder-error');
+                console.log('error img');
                 aux = 1;
+                if ( invoice_img.length !== 0 )
+                {
+                    console.log('img 1');
+                    invoice_img.parent().parent().parent().parent().parent().addClass('has-error');
+                    invoice_img.parent().parent().parent().children('input').attr('placeholder', 'Ingrese Imagen').addClass('input-placeholder-error');
+                }
+                else if ( comprobante_img.length !== 0 )
+                {
+                    console.log('img 2');
+                    comprobante_img.parent().parent().parent().addClass('has-error');
+                    comprobante_img.attr('placeholder', 'Ingrese Imagen').addClass('input-placeholder-error');
+                }
             }
         }
-        if ( $('select[name=payment] option:selected').val() == 2 )
+        if ( payment.val() == 2 )
         {
             if ( !ruc.val() )
             {
-                ruc.parent().addClass('has-error');
+                ruc.parent().parent().addClass('has-error');
                 ruc.attr('placeholder', 'Ingrese RUC').addClass('input-placeholder-error');
                 aux = 1;
             }
@@ -2139,8 +2137,8 @@ function newSolicitude() {
             d_clients_type.push( elem.attr("tipo_cliente") );
         });
         
-        var families = $('.products');
-        families.each( function (index) 
+        
+        products.each( function (index) 
         {
             families_input[index] = $(this).val();
         });
@@ -2164,8 +2162,16 @@ function newSolicitude() {
         {
             var form = $('#form-register-solicitude');
             var formData = new FormData(form[0]);
-            formData.append( "clientes[]", d_clients );
-            formData.append( "tipos_cliente[]" , d_clients_type );
+            console.log(d_clients);
+            console.log(d_clients_type);
+            d_clients.forEach( function( entry )
+            {
+                formData.append( "clientes[]", entry );
+            });   
+            d_clients_type.forEach( function( entry )
+            {
+                formData.append( "tipos_cliente[]" , entry );
+            });
             var rute = form.attr('action');
             var message1 = 'Registrando';
             var message2 = '<strong style="color: green">Solicitud Registrada</strong>';

@@ -9,6 +9,16 @@ class SolicitudDetalle extends Eloquent
 	protected $table = 'SOLICITUD_DETALLE';
     protected $primaryKey = 'id';    
  
+    protected function getTccAttribute()
+    {
+        return json_decode( $this->detalle )->tcc;
+    }
+
+    protected function getTcvAttribute()
+    {
+        return json_decode( $this->detalle )->tcv;
+    }
+
     protected function getMontoActualAttribute()
     {
         $jDetalle = json_decode( $this->detalle );
@@ -44,12 +54,16 @@ class SolicitudDetalle extends Eloquent
         if ( isset( $jDetalle->monto_factura ) )
             return $jDetalle->monto_factura;
         else
-            return 0;
+            return null;
     }
 
     protected function getImageAttribute()
     {
-        return json_decode( $this->detalle )->image;
+        $jDetalle = json_decode( $this->detalle );
+        if ( isset( $jDetalle->image ) )
+            return $jDetalle->image;
+        else
+            return null;
     }
 
     public function lastId()

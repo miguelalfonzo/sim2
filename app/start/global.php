@@ -1,11 +1,5 @@
 <?php
 
-/*
- *Define constant
- *
- *
- */
-
 define('PENDIENTE', 1);
 define('ACEPTADO', 2);
 define('APROBADO', 3);
@@ -71,8 +65,10 @@ Log::useDailyFiles(storage_path().'/logs/log.txt');
 App::error( function( Exception $exception, $code)
 {
 	Log::error( $exception );
-	return View::make( 'soporte')->with( 'exception' , $exception );
+	return View::make( 'soporte' )->with( 'exception' , $exception );
 });
+
+
 
 App::missing(function($exception)
 {
@@ -108,4 +104,5 @@ App::down(function()
 
 require app_path().'/filters.php';
 require app_path().'/parameters.php';
-require app_path().'/observers.php';  
+require app_path().'/observers.php';
+require app_path().'/validator.php';
