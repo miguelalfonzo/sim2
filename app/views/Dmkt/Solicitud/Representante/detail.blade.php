@@ -156,11 +156,11 @@
     <!-- Description Solicitude -->
     <div class="col-sm-12 col-md-12 col-lg-12" style="margin-top: 10px">
         <div class="form-group col-sm-12 col-md-12 col-lg-12">
-            <label class="col-sm-8 col-md-8 col-lg-8 control-label" for="textarea">
+            <label class="col-sm-8 col-md-8 col-lg-8 control-label">
                 Descripcion de la Solicitud
             </label>
             <div class="col-sm-12 col-md-12 col-lg-12">
-                <textarea class="form-control" name="textarea" readonly>{{$solicitud->descripcion}}</textarea>
+                <textarea class="form-control" readonly>{{$solicitud->descripcion}}</textarea>
             </div>
         </div>
     </div>

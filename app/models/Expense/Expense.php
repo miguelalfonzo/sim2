@@ -9,10 +9,6 @@ class Expense extends Eloquent {
 	protected $table= 'GASTO';
 	protected $primaryKey = 'id';
 
-	public function idSolicitude(){
-		return $this->hasOne('Dmkt\Activity','idsolicitud','idsolicitud');
-	}
-
 	protected function getFechaMovimientoAttribute( $attr )
     {
         return \Carbon\Carbon::parse( $attr )->format('Y-m-d');
@@ -36,7 +32,7 @@ class Expense extends Eloquent {
     public function lastId()
     {
 		$lastId = Expense::orderBy('id','desc')->first();
-		if($lastId == null)
+		if( is_null( $lastId ) )
             return 0;
         else
             return $lastId->id;

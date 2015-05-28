@@ -164,7 +164,7 @@ class Seeker extends BaseController
 	    	$rules = array(	'id_tipo_cliente' => 'required|min:1|in:'.implode( ',' , ClientType::lists('id') ) );
 	    	$validator = Validator::make( $inputs[ 'data' ] , $rules );
             if ($validator->fails()) 
-                return $this->warningException( __FUNCTION__ , substr($this->msgValidator($validator) , 0 , -1 ) );
+                return $this->warningException( substr($this->msgValidator($validator) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
             else
             {
             	$tipo_cliente = $inputs[ 'data' ][ 'id_tipo_cliente'];

@@ -22,13 +22,15 @@
 							<td class="dc">D</td>
 							<td>S/.</td>
 							<td class="total">
-								@if ( $solicitud->detalle->idmoneda == DOLARES )
+								@if ( $solicitud->detalle->id_moneda == DOLARES )
 									{{ round( $detalle->monto_aprobado * $detalle->tcc , 2 , PHP_ROUND_HALF_DOWN ) }}
-								@elseif ( $solicitud->detalle->idmoneda == SOLES )
-									{{ $detalle->monto_aprobado }}
+								@elseif ( $solicitud->detalle->id_moneda == SOLES )
+									{{ json_decode( $detalle->detalle )->monto_aprobado }}
+								@else
+									100
 								@endif
 							</td>
-							<td class="leyenda">{{$lv}}</td>
+							<td class="leyenda">{{ $lv }}</td>
 						</tr>
 						<tr>
 							<td class="name_account">{{ $solicitud->detalle->deposit->bagoAccount->ctanombrecta }}</td>

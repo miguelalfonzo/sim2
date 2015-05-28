@@ -20,21 +20,10 @@ use \BagoUser;
 use \Exception;
 use \Session;
 use \Dmkt\Account;
+use \Validator;
 
 class ExpenseController extends BaseController
 {
-
-/*	private function getDayAll(){
-		$lastDay = date('j/m/Y');
-		$now=date('Y/m/j');
-		$nuevafecha = strtotime('-2 month', strtotime($now));
-		$toDay = date ('j/m/Y' , $nuevafecha);
-		$date = array(
-			'toDay'		=> $toDay,
-			'lastDay'	=> $lastDay
-		);
-		return $date;
-	}*/
 
 	private function objectToArray($object)
     {
@@ -45,33 +34,73 @@ class ExpenseController extends BaseController
         return $array;
     }
 
+    private function validateInputExpense( $inputs )
+    {
+        $rules = array( 'token'    		 => 'required|string|size:40|exists:solicitud,token' ,
+                        'proof_type'     => 'required|integer|min:1|exists:tipo_comprobante,id' ,
+                        'date_movement'  => 'required|date_format:"d/m/Y"|after:'.date("Y-m-d"),
+                        'desc_expense'   => 'required|string|min:1',
+                        'tipo_gasto'	 => 'required|array|min:1|each:integer|each:min,1|each:exists,tipo_gasto,id',
+                        'quantity'		 => 'required|array|min:1|each:integer|each:min,1',
+                        'description'	 => 'required|array|min:1|each:string|each:min,1',
+                        'total_item'	 => 'required|array|min:1|each:numeric|each:min,1',
+                        'total_expense'  => 'required|numeric|min:1' );  
+
+        $validator = Validator::make( $inputs, $rules );
+        if ( $validator->fails() ) 
+            return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
+        else
+        {
+        	$proofType = ProofType::find( $inputs['proof_type'] );
+        	$validator->sometimes( [ 'number_prefix' , 'number_serie' ] , 'required|numeric|min:1' , function( $input ) use( $proofType )
+            {
+                return $proofType->marca != 'N';
+            });
+            $validator->sometimes( 'ruc' , 'required|numeric|digits:11' , function( $input ) use( $proofType )
+            {
+                return $proofType->marca != 'N';
+            });
+            $validator->sometimes( 'razon' , 'required|string|min:1' , function( $input ) use( $proofType )
+            {
+                return $proofType->marca != 'N';
+            });
+            $validator->sometimes( 'imp_service' , 'numeric|min:0' , function( $input ) use( $proofType )
+            {
+                return $proofType->igv == 1 ;
+            });
+            $validator->sometimes( 'igv' , 'numeric|min:0' , function( $input ) use( $proofType )
+            {
+                return $proofType->igv == 1 ;
+            });
+            if ( $validator->fails() ) 
+        	    return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
+        	else
+	    	    return $this->setRpta();
+        } 
+    }
+
 	public function registerExpense()
 	{
 		try
 		{
-			DB::beginTransaction();
-			$result = array(); 
+			//$result = array(); 
 			$inputs = Input::all();
-	        $solicitude = Solicitud::where( 'token' , $inputs['token'] )->first();
- 
-	    	$resultCode = null;
-	    	$proof = ProofType::find( $inputs['proof_type']);
+			$middleRpta = $this->validateInputExpense( $inputs );
+			if ( $middleRpta[ status ] === ok )
+	        {
+		        $solicitud = Solicitud::where( 'token' , $inputs['token'] )->first();
+	 
+		    	$proof = ProofType::find( $inputs['proof_type']);
 
-	    	if ( $proof->code != 'N' )
-		    	if($inputs['ruc'] != null && $inputs['number_prefix'] != null && $inputs['number_serie'] != null )
-		    	{
-		    		$row_expense    = Expense::where('ruc',$inputs['ruc'])->where('num_prefijo',$inputs['number_prefix'])->where('num_serie',$inputs['number_serie'])->get();	
-					if(count($row_expense)>0)
-						$resultCode = -1;
-				}
-			if($resultCode == -1)
-				return array(
-					'code' 	=> $resultCode,
-					'error' => '',
-					'msg'	=> ''
-				);
-			else
-			{
+		    	if ( $proof->code != 'N' )
+			    	if( !is_null( $inputs['ruc'] ) && ! is_null( $inputs['number_prefix'] ) && $inputs['number_serie'] != null )
+			    	{
+			    		$row_expense    = Expense::where( 'ruc' , $inputs['ruc'] )->where( 'num_prefijo' ,$inputs[ 'number_prefix' ] )->where( 'num_serie' ,$inputs['number_serie'])->get();	
+						if( $row_expense->count() > 0 )
+							return $this->warningException( 'Ya existe un gasto registrado con Ruc: '.$inputs['ruc'] . ' numero: '.$inputs['number_prefix'].'-'.$inputs['num_serie'] , __FUNCTION__ , __LINE__ , __FILE__ );
+					}
+
+				DB::beginTransaction();
 				$expense = new Expense;
 				
 				$expense->num_prefijo = $inputs['number_prefix'];
@@ -79,6 +108,7 @@ class ExpenseController extends BaseController
 				$expense->ruc = $inputs['ruc'];
 				$expense->razon = $inputs['razon'];
 				$expense->monto = $inputs['total_expense'];
+	            
 	            if( $proof->igv == 1 )
 				{
 					$expense->igv = $inputs['igv'];
@@ -86,62 +116,41 @@ class ExpenseController extends BaseController
 					$expense->sub_tot = $inputs['sub_total_expense'];
 					$expense->idigv = $expense->lastIdIgv() + 1;
 				}
-				else
-				{
-					$expense->igv = null;
-					$expense->imp_serv = null;
-					$expense->sub_tot = null;	
-					$expense->idigv = null;
-				}
+
 				$date = $inputs['date_movement'];
 		        list($d, $m, $y) = explode('/', $date);
 		        $d = mktime(11, 14, 54, $m, $d, $y);
-		        $date = date("Y/m/d", $d);
+		        
 		        $expense->descripcion = $inputs['desc_expense'];
-		        $expense->fecha_movimiento = $date;
+		        $expense->fecha_movimiento = date("Y/m/d", $d);
 		        $expense->idcomprobante = $inputs['proof_type'];
-		 		$expense->idsolicitud = $solicitude->id;
+		 		$expense->id_solicitud = $solicitud->id;
 				$expense->id = $expense->lastId() + 1;
-				//Detail Expense
-				$quantity = $inputs['quantity'];
-				$description = $inputs['description'];
-				$total_item = $inputs['total_item'];
 				if( isset( $inputs['rep'] ) )
 					$expense->reparo = $inputs['rep'];
-				
-				$result_save = $expense->save();
-				
-				if($result_save)
+				$expense->save();
+
+				//Detail Expense
+			
+				for($i=0;$i<count( $inputs['quantity'] );$i++)
 				{
-					for($i=0;$i<count($quantity);$i++)
-					{
-						$expense_detail = new ExpenseItem;
-						$expense_detail->id = $expense_detail->lastId() + 1 ;
-						$expense_detail->idgasto = $expense->id;
-						$expense_detail->cantidad = $quantity[$i];
-						$expense_detail->descripcion = $description[$i];
-						$expense_detail->tipo_gasto = $inputs['tipo_gasto'][$i];
-						$expense_detail->importe = $total_item[$i];
-						if ( !$expense_detail->save() )
-						{
-							DB::rollback();
-							return array(
-								'code'	=> 0,
-								'error'	=> '',
-								'msg' 	=> '',
-							);
-						}				
-					}
-					DB::commit();
-					return array(
-						'code'		=> 1,
-						'gastoId'	=> $expense->idgasto
-					);
+					$expense_detail = new ExpenseItem;
+					$expense_detail->id = $expense_detail->lastId() + 1 ;
+					$expense_detail->id_gasto = $expense->id;
+					$expense_detail->cantidad = $inputs['quantity'][$i];
+					$expense_detail->descripcion = $inputs['description'][$i];
+					$expense_detail->tipo_gasto = $inputs['tipo_gasto'][$i];
+					$expense_detail->importe = $inputs['total_item'][$i];
+					$expense_detail->save();				
 				}
-			}
+				DB::commit();
+				return $this->setRpta();
+			} 
+			return $middleRpta;
 		}
 		catch ( Exception $e )
 		{
+			DB::rollback();
 			return $this->internalException( $e , __FUNCTION__ );
 		}
 	}
@@ -287,26 +296,20 @@ class ExpenseController extends BaseController
 		{
 			DB::beginTransaction();
 			$inputs = Input::all();
-			$token = $inputs['token'];
-			$solicitud  = Solicitud::where('token',$token)->first();
-			if( count($solicitud) == 0 )
-				return $this->warninException( __FUNCTION__ , 'No se encontro la solicitud');
-			else
+			$solicitud  = Solicitud::where('token', $inputs['token'] )->first();
+			if( is_null( $solicitud ) )
+				return $this->warninException( 'No se encontro la solicitud con token: '.$inputs['token'] , __FUNCTION__ , __LINE__ , __FILE__ );
+			
+			$oldIdEstado = $solicitud->id_estado;
+			$solicitud->id_estado = REGISTRADO;
+			$solicitud->save();
+
+			$rpta = $this->setStatus( $oldIdEstado, REGISTRADO, Auth::user()->id, USER_CONTABILIDAD , $solicitud->id );
+			if ( $rpta[status] == ok )
 			{
-				$oldIdEstado = $solicitud->id_estado;
-				$solicitud->id_estado = REGISTRADO;
-				if ( !$solicitud->save() )
-					return $this->warninException( __FUNCTION__ , 'No se pudo procesar la solicitud');
-				else
-				{
-					$rpta = $this->setStatus( $oldIdEstado, REGISTRADO, Auth::user()->id, USER_CONTABILIDAD, $solicitud->id );
-					if ( $rpta[status] == ok )
-					{
-						Session::put( 'state' , R_GASTO );
-						DB::commit();
-						return $rpta;
-					}
-				}	
+				Session::put( 'state' , R_GASTO );
+				DB::commit();
+				return $rpta;
 			}
 			DB::rollback();
 			return $rpta;
@@ -318,11 +321,12 @@ class ExpenseController extends BaseController
 		}
 	}
 
-	public function viewExpense($token){
-		$solicitude = Solicitud::where('token',$token)->firstOrFail();
-		if(count($solicitude)>0)
+	public function viewExpense($token)
+	{
+		$solicitud = Solicitud::where('token',$token)->firstOrFail();
+		if(count($solicitud)>0)
 		{
-			$expenses = Expense::where('idsolicitud',$solicitude->idsolicitud)->get();
+			$expenses = Expense::where('idsolicitud',$solicitud->idsolicitud)->get();
 		}
 		$gasto_total = 0;
 		foreach ($expenses as $expense)
@@ -331,7 +335,7 @@ class ExpenseController extends BaseController
 		}
 
 		$data = [
-			'solicitude' => $solicitude,
+			'solicitude' => $solicitud,
 			'expenses'    => $expenses,
 			'total'      => $gasto_total
 		];
@@ -411,7 +415,7 @@ class ExpenseController extends BaseController
         $cmps = implode(',',$cmps);
 		if($solicitud->createdBy->type == REP_MED )
 			$created_by = $solicitud->rm->full_name;
-		else if ($solicitude->createdBy->type == SUP )
+		else if ($solicitud->createdBy->type == SUP )
 			$created_by = $solicitud->sup->full_name;
 		else
 			$created_by = 'Usuario no Autorizado';
@@ -452,7 +456,6 @@ class ExpenseController extends BaseController
 			'detalle'	 => $jDetalle,
 			'clientes'	 => $clientes,
 			'cmps'		 => $cmps,
-			//'date'       => $this->getDay(),
 			'date'		 => array( 'toDay' => $solicitud->created_at , 'lastDay' => $jDetalle->fecha_entrega ),
 			'name'       => $name_aproved,
 			'dni' 		 => $dni,
@@ -515,10 +518,9 @@ class ExpenseController extends BaseController
 		{
 			$inputs = Input::all();
 			$solicitud = Solicitud::find( $inputs['idsolicitud']);
-			$data = array(
-				'solicitud' => $solicitud,
-				'expense'   => $solicitud->expenses
-			);
+			if ( is_null( $solicitud ) )
+				return $this->warningException( 'No se encontro la solicitud con id: '.$inputs['idsolicitud'] , __FUNCTION__ , __LINE__ , __FILE__ ); 
+			$data = array( 'solicitud' => $solicitud , 'expense'   => $solicitud->expenses );
 			return $this->setRpta( View::make('Dmkt.Solicitud.Section.gasto-table')->with( $data )->render() );
 		}
 		catch ( Exception $e )

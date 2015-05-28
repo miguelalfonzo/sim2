@@ -14,8 +14,23 @@ class ValidatorController extends \Illuminate\Validation\Validator
 
         foreach ( $value as $arrayKey => $arrayValue )
             $this->validate($attribute.'.'.$arrayKey, $rule);
-
         // Always return true, since the errors occur for individual elements.
+        return true;
+    }
+
+    public function validateSumequal( $attribute , $value , $parameters )
+    {
+        $total = 0;
+        
+        foreach ( $value as $arrayKey => $arrayValue )
+            $total += $arrayValue;
+        
+        $rule = 'same:'.$parameters[0];
+
+        $newAttribute = $attribute.'_total';
+
+        $this->data[ $newAttribute ] = $total;
+        $this->validate( $newAttribute , 'same:monto' );
         return true;
     }
 

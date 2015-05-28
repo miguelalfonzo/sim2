@@ -8,9 +8,8 @@
                 @foreach( $solicitud->products as $product )
                     <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12"  style="padding: 0">
                         <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-                            <input id="textinput" name="textinput" type="text"
-                            value="{{$product->marca->descripcion}}" readonly
-                            class="form-control input-md">
+                            <input type="text" class="form-control input-md"
+                            value="{{$product->marca->descripcion}}" readonly>
                         </div>
                         <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" style="padding: 0">
                             <div class="input-group">
@@ -20,18 +19,18 @@
                                 @if ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) )
                                     && in_array( $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario , array( Auth::user()->type , Auth::user()->tempType() ) )
                                     && ( array_intersect ( array( Auth::user()->id , Auth::user()->tempId() ) , $solicitud->managerEdit->lists( 'id_gerprod' ) ) ) )
-                                    <input name="amount_assigned[]" type="text"
+                                    <input name="monto_producto[]" type="text"
                                     class="form-control input-md amount_families"
                                     value="{{ isset( $product->monto_asignado ) ? $product->monto_asignado : 
                                     round( $detalle->monto_actual / count( $solicitud->products ) , 2 ) }}">
                                 @else
-                                    <input disabled name="amount_assigned[]" type="text"
+                                    <input disabled name="monto_producto[]" type="text"
                                     class="form-control input-md amount_families"
                                     value="{{ isset( $product->monto_asignado ) ? $product->monto_asignado :
                                     round( $detalle->monto_actual / count( $solicitud->products ) , 2 ) }}">
                                 @endif
                             </div>
-                            <input type="hidden" name="idfamily[]" value="{{ $product->id }}">
+                            <input type="hidden" name="producto[]" value="{{ $product->id }}">
                         </div>
                     </div>
                 @endforeach

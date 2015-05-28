@@ -43,36 +43,9 @@ class BaseController extends Controller
 		}
 	}
 
-    protected function validateInput($data,$keys)
-    {
-        $rpta = array();
-        $rpta[description] = "";
-        $i = 0;
-        $akeys = explode(',',$keys);
-        foreach($akeys as $key)
-        {
-            if (!isset($data[$key]))
-            {
-                $rpta[status] = warning;
-                $rpta[description] = $rpta[description].$key.", ";
-                $i++;
-            }
-        }
-        if ($i > 0)
-        {
-            $rpta[description] = substr($rpta[description],0,-1);
-            $rpta[description] = $i.' Missing(s) Input(s): '.$rpta[description];
-        }
-        else
-        {
-            $rpta = [];
-            $rpta[status] = ok;
-        }
-        return $rpta;
-    }
-
     protected function warningException( $description , $function , $line , $file )
     {
+        Log::error( $description );
         Mail::send( 'soporte' , array( 'description' => $description , 'function' => $function , 'line' => $line , 'file' => $file ) , 
         function( $message ) use( $function )
         {
@@ -174,19 +147,24 @@ class BaseController extends Controller
 
         // POSTMAN: send email
         $rpta = $this->postman( $idSolicitud , $statusNameFrom , $statusNameTo , $toUser );
+
+        $toUser = array_unique( $toUser->lists('type') );
+        if ( count( $toUser ) > 1 )
+            return $this->warningException( 'No se puede enviar la solicitud a mas de un tipo de usuario: '.explode(',' , $toUser ) , __FUNCTION__ , __LINE__ , __FILE__ );
+
         if ( $rpta[status] == ok  )
-            return $this->updateStatusSolicitude( $status_from , $status_to , $fromUser , $idSolicitud , 1 );
+            return $this->updateStatusSolicitude( $status_from , $status_to , $fromUser , $toUser[0] , $idSolicitud , 1 );
         else if ( $rpta[status] == warning )
-            return $this->updateStatusSolicitude( $status_from , $status_to , $fromUser , $idSolicitud , 0 );
+            return $this->updateStatusSolicitude( $status_from , $status_to , $fromUser , $toUser[0] , $idSolicitud , 0 );
         else
             return $rpta;
     }
 
-    public function updateStatusSolicitude( $status_from , $status_to , $user_from , $idSolicitud , $notified )
+    protected function updateStatusSolicitude( $status_from , $status_to , $user_from , $user_to , $idSolicitud , $notified )
     {   
             $fData = array( 'status_to'    => $status_to ,
                             'id_solicitud' => $idSolicitud ,
-                            'user_to'      => Session::pull( 'usertype' ) );
+                            'user_to'      => $user_to );
 
             $statusSolicitude = SolicitudHistory::firstOrNew($fData);
             if ( ! isset( $statusSolicitude->rn ) )
@@ -198,7 +176,10 @@ class BaseController extends Controller
             $statusSolicitude->user_from    = $user_from->type;
             $statusSolicitude->notified     = $notified;
             $statusSolicitude->updated_at   = Carbon\Carbon::now();
-            $statusSolicitude->save();
+            if ( is_null( $statusSolicitude->user_to ) )
+                return $this->warningException( 'No se determinado el tipo de usuario para enviar la solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
+            else
+                $statusSolicitude->save();
             return $this->setRpta();
     }
 
@@ -216,8 +197,7 @@ class BaseController extends Controller
             {
                 $query->where( function ( $query )
                 {
-                    $query->where( 'created_by' , '<>' , Auth::user()->id )
-                    ->where( function ( $query )
+                    $query->where( 'created_by' , '<>' , Auth::user()->id )->where( function ( $query )
                     {
                         $query->where( 'id_user_assign' , '<>' , Auth::user()->id )->orWhereNull( 'id_user_assign' );
                     })->whereHas( 'gerente' , function( $query )
@@ -261,8 +241,7 @@ class BaseController extends Controller
             });    
         }
         
-        $solicituds = $solicituds->orderBy('id', 'ASC')->get();
-        
+        $solicituds = $solicituds->orderBy('id', 'ASC')->get();     
         return $this->setRpta($solicituds);
     }
 

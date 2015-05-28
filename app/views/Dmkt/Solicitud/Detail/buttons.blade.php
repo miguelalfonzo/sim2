@@ -12,19 +12,12 @@
             </a>
         @endif
 
-        @if( Auth::user()->type == REP_MED )
-            @if ( $solicitud->id_estado == GASTO_HABILITADO && $solicitud->iduserasigned == Auth::user()->id )
-                <a id="finish-expense" class="btn btn-success">
-                    Terminar
-                </a>
-            @endif
-        @elseif ( Auth::user()->type == ASIS_GER )
-            @if ( $solicitud->id_estado == GASTO_HABILITADO && $solicitud->iduserasigned == Auth::user()->id )
-                <a id="finish-expense" class="btn btn-success">
-                    Terminar
-                </a>
-            @endif
-        @elseif ( Auth::user()->type == CONT )
+        @if ( $solicitud->id_user_assign == Auth::user()->id &&  $solicitud->id_estado == GASTO_HABILITADO )
+            <a id="finish-expense" class="btn btn-success">
+                Terminar
+            </a>
+        @endif
+        @if ( Auth::user()->type == CONT )
             @if( $solicitud->idtiposolicitud == SOL_REP )
                 @if($solicitud->id_estado == APROBADO )
                     <a id="enable-deposit" class="btn btn-success">Confirmar</a>

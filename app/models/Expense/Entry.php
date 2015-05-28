@@ -10,10 +10,10 @@ class Entry extends Eloquent
     protected $primaryKey = 'id';
     protected $dates = ['fec_origen'] ;
     
-    public function searchId()
+    public function lastId()
     {
         $lastId = Entry::orderBy('id', 'DESC')->first();
-        if($lastId == null)
+        if( is_null( $lastId ) )
             return 0;
         else
             return $lastId->id;
@@ -23,10 +23,4 @@ class Entry extends Eloquent
     {
         return $this->hasOne( 'Dmkt\Account' , 'num_cuenta' , 'num_cuenta');
     }
-
-    /*public function setFecOrigenAttribute($value)
-    {
-        $this->attributes['fec_origen'] = \Carbon\Carbon::createFromFormat( 'd/m/Y', $value );
-    }*/
-
 }

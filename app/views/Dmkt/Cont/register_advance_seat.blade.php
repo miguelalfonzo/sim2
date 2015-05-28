@@ -98,7 +98,7 @@
 												<th class="number_account">{{$solicitude->subtype->cuenta_mkt}}</th>
 												<th class="date_ini">{{$date['toDay']}}</th>
 												<th class="dc">D</th>
-												<th class="total">{{$solicitude->monto}}</th>
+												<th class="total">3000</th>
 												<th class="leyenda">
 													@if($solicitude->aproved->type == SUP)
 														{{$solicitude->aproved->sup->nombres.' '.$solicitude->aproved->sup->apellidos.' - '.ucwords($solicitude->titulo).' - '.$clientes}}
@@ -112,7 +112,7 @@
 												<th class="number_account">{{$bancos->num_cuenta}}</th>
 												<th class="date_ini">{{$date['toDay']}}</th>
 												<th class="dc">C</th>
-												<th class="total">{{ $solicitude->retencion ? $solicitude->monto - $solicitude->retencion : $solicitude->monto }}</th>
+												<th class="total">{{ $solicitude }}</th>
 												<th class="leyenda">
 													@if($solicitude->aproved->type == SUP)
 														{{$solicitude->aproved->sup->nombres.' '.$solicitude->aproved->sup->apellidos.' - '.ucwords($solicitude->titulo).' - '.$clientes}}
@@ -121,22 +121,6 @@
 													@endif
 												</th>
 											</tr>
-											@if(!is_null($solicitude->detalle->idretencion))
-												<tr>
-													<th class="name_account">{{mb_convert_case($solicitude->typeRetention->descripcion,MB_CASE_TITLE,'UTF-8')}}</th>
-													<th class="number_account">{{$solicitude->typeRetention->cta_contable}}</th>
-													<th class="date_ini">{{$date['toDay']}}</th>
-													<th class="dc">C</th>
-													<th class="total">{{$solicitude->retencion}}</th>
-													<th class="leyenda">
-														@if($solicitude->aproved->type == SUP)
-															{{$solicitude->aproved->sup->nombres.' '.$solicitude->aproved->sup->apellidos.' - '.ucwords($solicitude->titulo).' - '.$clientes}}
-														@else
-															{{$solicitude->aproved->gerprod->descripcion.' - '.ucwords($solicitude->titulo).' - '.$clientes}}
-														@endif
-													</th>
-												</tr>
-											@endif
 										
 									</tbody>
 								</table>

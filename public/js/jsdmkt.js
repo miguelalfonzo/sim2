@@ -32,7 +32,7 @@ function newSolicitude() {
 
     var cancel_solicitude = '.cancel-solicitude';
 
-    var id_solicitud = $( 'input[name=idsolicitude]' );
+    var id_solicitud = $( 'input[name=idsolicitud]' );
     var _token       = $( 'input[name=_token]' );
 
     var idState = $("#idState");
@@ -521,12 +521,12 @@ function newSolicitude() {
         });
     }
 
-    $('#derived').click( function()
+    /*$('#derived').click( function()
     {
         var pdata = 
         {
             _token : $('input[name=_token]').val() ,
-            idsolicitud : $('input[name=idsolicitude]').val()
+            idsolicitud : id_solicitud.val()
         };
         $.ajax({
             url  : server + 'buscar-gerprod',
@@ -582,7 +582,7 @@ function newSolicitude() {
                 });
             }
         });      
-    });
+    });*/
 
 
     // -------------------------------------  REPRESENTANTE MEDICO -----------------------------
@@ -1018,7 +1018,7 @@ function newSolicitude() {
                 data: 
                 {
                     idfondo: $("#sub_type_activity").val(),
-                    idsolicitude : $("input[name=idsolicitude]").val(),
+                    idsolicitud : id_solicitud.val(),
                     _token: $("input[name=_token]").val()
                 }
             }).fail( function ( statusCode, errorThrown)
@@ -1065,7 +1065,8 @@ function newSolicitude() {
     function acceptedSolicitude(idresp)
     {
         var formData = new FormData(form_acepted_solicitude[0]);
-        formData.append("idresponsable",idresp);
+        if ( idresp !== undefined ) 
+            formData.append("idresponsable",idresp);
         $.ajax(
         {
             type: 'POST',
@@ -1113,7 +1114,7 @@ function newSolicitude() {
                     var url = server + 'endfondos/' + date;
                     $.get(url).done(function(data)
                     {
-                        $('input[name=idsolicitud]').val('');
+                        id_solicitud.val('');
                         if (data.Status == 'Ok')
                         {
                             bootbox.alert('<h4 class="green">Fondos Terminados</h4>' , function()
@@ -1164,7 +1165,7 @@ function newSolicitude() {
                 fondo_total.val(data.monto);
                 date_reg_fondo.val( data.periodo.substr(4,6) + '-' + data.periodo.substr(0,4) );
                 fondo_cuenta.val(data.rep_cuenta).attr('disabled',true).parent().addClass('has-success');
-                $('input[name=idsolicitud]').val(idsolicitud);
+                id_solicitud.val(idsolicitud);
                 $('select[name=idfondo]').val(data.idfondo);
                 $('select[name=etiqueta]').val(data.idetiqueta);
             }
@@ -1179,7 +1180,7 @@ function newSolicitude() {
         var aux = this;
         var dato = 
         {
-            'idsolicitud'   : $('input[name=idsolicitud]').val(),
+            'idsolicitud'   : id_solicitud.val(),
             'institucion'   : fondo_institucion.val(),
             'idetiqueta'    : $('select[name=etiqueta]').val(),
             'repmed'        : fondo_repmed.val(),
@@ -1216,7 +1217,7 @@ function newSolicitude() {
                 fondo_cuenta.val('');
 
                 removeinput($('#edit-rep'));
-                $('input[name=idsolicitud]').val('');
+                id_solicitud.val('');
                 bootbox.alert('<h4 class="green">Fondo Actualizado</h4>' , function()
                 {
                     searchFondos( date_reg_fondo.val() );
@@ -1250,7 +1251,7 @@ function newSolicitude() {
         removeinput($('#edit-rep'));
         fondo_institucion.val('');
         fondo_total.val('');
-        $('input[name=idsolicitud]').val('');
+        id_solicitud.val('');
         $('#table_solicitude_fondos > tbody > tr').css('background-color','');
     });
 
@@ -2027,7 +2028,7 @@ function newSolicitude() {
             if(type != "estado-cuenta")
             {
                 $('.date_month').val( date );
-                if ( !$('input[name=idsolicitud]').val() )
+                if ( !id_solicitud.val() )
                     searchFondos(date);
             }
             else
@@ -2175,7 +2176,7 @@ function newSolicitude() {
             var rute = form.attr('action');
             var message1 = 'Registrando';
             var message2 = '<strong style="color: green">Solicitud Registrada</strong>';
-            if ( $( 'input[name=idsolicitud]' ) ) 
+            if ( id_solicitud ) 
             {
                 message1 = 'Actualizando';
                 message2 = '<strong style="color: green">Solicitud Actualizada</strong>';

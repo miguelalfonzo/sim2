@@ -26,7 +26,7 @@ class MoveController extends BaseController
     {
     	$date = Input::get('date');
         if ( empty( $date ) )
-            return $this->warningException('El campo fecha se encuentra vacio',__FUNCTION__,'Empty Date');
+            return $this->warningException('El campo fecha se encuentra vacio' ,__FUNCTION__ , __LINE__ , __FILE__ );
         else            
         {
             $dates = $this->setDates( $date );
@@ -107,7 +107,7 @@ class MoveController extends BaseController
             $rules = array( 'date_start' => 'required|date_format:"d/m/Y"' , 'date_end' => 'required|date_format:"d/m/Y"' );
             $validator = Validator::make( $inputs , $rules );
             if ( $validator->fails() ) 
-                return $this->warningException( __FUNCTION__ , substr($this->msgValidator($validator), 0 , -1 ) );
+                return $this->warningException( substr($this->msgValidator($validator), 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
             else
             {
                 $middleRpta = $this->getDocs( $inputs['idProof'] , $inputs['date_start'] , $inputs['date_end'] , $inputs['val'] );

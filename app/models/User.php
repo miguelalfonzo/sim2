@@ -87,29 +87,32 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
         return $username;
     }
 
-    protected function tempUser()
+    protected function assignTempUser()
+    {
+        return $this->hasOne( 'Users\TemporalUser' , 'id_user_temp' );
+    }
+
+    protected function assignedTempUser()
     {
         return $this->hasOne( 'Users\TemporalUser' , 'id_user' );
-    }
+    } 
 
     public function tempId()
     {
-        $tempUser = $this->tempUser;
+        $tempUser = $this->assignedTempUser;
         if ( is_null( $tempUser) )
             return 0;
         else
-            return $tempUser->id_temp;
+            return $tempUser->id_user_temp;
     }
 
     public function tempType()
     {
-        $tempUser = $this->tempUser;
+        $tempUser = $this->assignedTempUser;
         if ( is_null( $tempUser) )
             return '';
         else
-        {
             return $tempUser->user->type;
-        }
     }
 
 }

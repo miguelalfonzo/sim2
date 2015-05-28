@@ -165,7 +165,7 @@ Route::group(array('before' => 'sys_user'), function ()
     Route::get('show_user', 'Dmkt\SolicitudeController@showUser');
     Route::get('ver-solicitud/{token}', 'Dmkt\SolicitudeController@viewSolicitude');
     Route::get('show-fondo/{token}','Expense\ExpenseController@showFondo');
-    Route::post('cancelar-solicitud', 'Dmkt\SolicitudeController@cancelSolicitude');
+    Route::post('cancelar-solicitud', 'Dmkt\SolicitudeController@cancelSolicitud');
     
 });
 

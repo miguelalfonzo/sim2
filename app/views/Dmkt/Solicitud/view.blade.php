@@ -8,7 +8,7 @@
             @elseif ( Auth::user()->type == SUP )
                 <strong>Usuario : {{Auth::user()->sup->full_name}}</strong>
             @elseif ( Auth::user()->type == GER_PROD )
-                 <strong>Usuario : {{Auth::user()->Gerprod->descripcion}}</strong>
+                 <strong>Usuario : {{Auth::user()->gerProd->full_name}}</strong>
             @else
                 <strong>Usuario : {{Auth::user()->person->full_name}}</strong>
             @endif
@@ -20,7 +20,7 @@
                     Solicitud
                 </a>
             </li>
-            @if ( ( $solicitud->iduserasigned == Auth::user()->id  && $solicitud->id_estado == GASTO_HABILITADO ) || ( Auth::user()->type == CONT && $solicitud->id_estado == REGISTRADO )  )
+            @if ( ( $solicitud->id_user_assign == Auth::user()->id  && ! is_null( $solicitud->expenseHistory ) ) || ( Auth::user()->type == CONT && $solicitud->id_estado == REGISTRADO )  )
                 <li>
                     <a href="#document" role="tab" data-toggle="tab">
                         <icon class="fa fa-home"></icon>
@@ -36,7 +36,7 @@
                 @endif
                 <form id="form_make_activity" method="post">
                     {{Form::token()}}
-                    <input name="idsolicitude" type="hidden" value="{{$solicitud->id}}">
+                    <input name="idsolicitud" type="hidden" value="{{$solicitud->id}}">
                     <input name="token" type="hidden" value="{{$solicitud->token}}">
                     <!-- DETALLE DE LA SOLICITUD -->
                     @if ( $solicitud->idtiposolicitud == SOL_REP )

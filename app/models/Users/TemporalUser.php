@@ -29,7 +29,9 @@ class TemporalUser extends Eloquent
 
     protected function user()
     {
-    	return $this->hasOne( 'User' , 'id' , 'id_temp' );
+    	return $this->hasOne( 'User' , 'id' , 'id_user' );
     }
+
+    
 
 }

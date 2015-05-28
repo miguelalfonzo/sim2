@@ -133,13 +133,10 @@ class TableController extends BaseController
 
 			foreach ( $val[data] as $key => $data )
 				$accountsMark->$key = $data;
-			if ( !$accountsMark->save() )
-				return $this->warningException( __FUNCTION__ , 'No se pudo procesar la Relacion');
-			else
-			{
-				DB::commit();
-				return $this->setRpta();
-			}
+			$accountsMark->save();
+			
+			DB::commit();
+			return $this->setRpta();
 		}
 		catch ( Exception $e )
 		{
@@ -157,13 +154,9 @@ class TableController extends BaseController
 
 			foreach ( $val[data] as $key => $data )
 				$fondo->$key = $data ;
-			if ( !$fondo->save() )
-				return $this->warningException( __FUNCTION__ , 'No se pudo actualizar el fondo' );
-			else
-			{
-				DB::commit();
-				return $this->setRpta();
-			}
+			$fondo->save();
+			DB::commit();
+			return $this->setRpta();
 		}
 		catch ( Exception $e )
 		{
@@ -203,20 +196,17 @@ class TableController extends BaseController
 							$accountsMark->where( $key , $data );
 						$accountsMark->get();
 						if ( $accountsMark->count() == 1 )
-							return $this->warningException( __FUNCTION__ , 'La Relacion ya existe');
+							return $this->warningException( 'La Relacion ya existe' , __FUNCTION__ , __LINE__ , __FILE__ );
 						elseif ( $accountsMark->count() == 0 )
 						{
 							$accountsMark = new MarkProofAccounts;
 							$accountsMark->id = $accountsMark->lastId() + 1 ;
 							foreach ( $val[data] as $key => $data )
 								$accountsMark->$key = $data;
-							if ( !$accountsMark->save() )
-								return $this->warningException( __FUNCTION__ , 'No se pudo procesar la nueva tabla');
-							else
-							{
-								DB::commit();
-								return $this->setRpta();
-							}
+							$accountsMark->save();
+							DB::commit();
+							return $this->setRpta();
+							
 						}
 					}
 				}
@@ -248,10 +238,9 @@ class TableController extends BaseController
 					$mark->idtipomarca == 1;
 				elseif ( substr( $val , 0 , 1) == 6 )
 					$mark->idtipomarca == 2;
-				if ( !$mark->save() )
-					return $this->warningException( __FUNCTION__ , 'No se pudo procesar la marca');
-				else
-					return $this->setRpta();
+				$mark->save();
+				
+				return $this->setRpta();
 			}
 		}
 		catch ( Exception $e )
@@ -266,17 +255,15 @@ class TableController extends BaseController
 		{
 			$fondo = Fondo::where( 'idcuenta' , $idcuenta )->get();
 			if ( $fondo->count() >= 1 )
-				return $this->warningException( __FUNCTION__ , 'No se puede asignar la misma cuenta a mas de 1 Fondo' );
+				return $this->warningException( 'No se puede asignar la misma cuenta a mas de 1 Fondo' , __FUNCTION__ , __LINE__ , __FILE__ );
 			else
 			{
 				$fondo = Fondo::find($idfondo);
 				if ( is_null( $fondo->idcuenta) )
 				{
 					$fondo->idcuenta = $idcuenta;
-					if ( !$fondo->save() )
-						return $this->warningException( __FUNCTION__  , 'No se pudo actualizar el fondo');
-					else
-						return $this->setRpta();
+					$fondo->save();
+					return $this->setRpta();
 				}
 				else
 					return $this->setRpta();
@@ -298,8 +285,8 @@ class TableController extends BaseController
 			elseif ( $account->count() == 0 )
 			{
 				$bagoAccount = PlanCta::find( $val );
-				if ( $bagoAccount->count() == 0 )
-					return $this->warningException( __FUNCTION__ , 'La cuenta N°: '.$val.' no existe');
+				if ( is_null( $bagoAccount ) )
+					return $this->warningException( 'La cuenta N°: '.$val.' no existe' , __FUNCTION__ , __LINE__ , __FILE__ );
 				else
 				{
 					$account = new Account;
@@ -307,10 +294,8 @@ class TableController extends BaseController
 					$account->num_cuenta = $bagoAccount->ctactaextern;
 					$account->idtipocuenta = $tipocuenta;
 
-					if ( !$account->save() )
-						return $this->warningException( __FUNCTION__ , 'No se pudo procesar la cuenta N°: '.$val );
-					else
-						return $this->setRpta();
+					$account->save();
+					return $this->setRpta();
 				}
 			}	
 		}
@@ -329,13 +314,11 @@ class TableController extends BaseController
 			$fondo->id = $fondo->lastId() + 1 ;
 			foreach ( $val[data] as $key => $data )
 				$fondo->$key = $data;
-			if ( !$fondo->save() )
-				return $this->warningException( __FUNCTION__ , 'No se pudo registrar el fondo');
-			else
-			{
-				DB::commit();
-				return $this->setRpta();
-			}
+			$fondo->save();
+			
+			DB::commit();
+			return $this->setRpta();
+			
 		}
 		catch ( Exception $e )
 		{

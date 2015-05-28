@@ -5,11 +5,10 @@
                 <th>#</th>
                 <th>Solicitud</th>
                 <th>Solicitado por</th>
+                <th>Fecha de Solicitud</th>
                 <th>Aprobado por</th>
-                <th>Monto Depositado</th>
+                <th>Fecha de Aprobación</th>
                 <th>Saldo</th>
-                <th>Fecha Creación</th>
-                <th>Fecha de Culminación</th>
             </tr>
         </thead>
         <tbody>
@@ -30,26 +29,36 @@
                                 {{$cuenta->createdBy->rm->full_name}}
                             @elseif ( $cuenta->createdBy->type == SUP )
                                 {{$cuenta->createdBy->sup->full_name}}
-                            @elseif ( $cuenta->createdBy->type == ASIS_GER )
-                                {{$cuenta->createdBy->person->full_name}}
+                            @elseif ( $cuenta->createdBy->type == GER_PROD )
+                                {{ $cuenta->createdBy->gerProd->full_name }}
+                            @elseif ( ! is_null( $cuenta->createdBy->simApp ) )
+                                {{ $cuenta->createdBy->person->full_name }}
+                            @else
+                                No registrado
                             @endif
                         </td>
+                        <td class="text-center">{{$cuenta->created_at}}</td>
                         <td class="text-center">
                         @if ( $cuenta->idtiposolicitud == SOL_INST )
                             {{$cuenta->createdBy->person->full_name}}
                         @elseif ( $cuenta->idtiposolicitud == SOL_REP )
-                            @if ($cuenta->acceptHist->user->type == SUP)
-                                {{$cuenta->acceptHist->user->sup->full_name}}
-                            @else ($cuenta->acceptHist->user->type == GER_PROD)
-                                {{$cuenta->acceptHist->user->gerProd->full_name}}
+                            @if ($cuenta->approvedHistory->user->type == SUP )
+                                {{ $cuenta->approvedHistory->user->sup->full_name }}
+                            @elseif ( $cuenta->approvedHistory->user->type == GER_PROD )
+                                {{$cuenta->approvedHistory->user->gerProd->full_name}}
+                            @elseif ( $cuenta->approvedHistory->user->type == RM )
+                                {{$cuenta->approvedHistory->user->rm->full_name}}
+                            @elseif ( ! is_null( $cuenta->approvedHistory->user->simApp ) )
+                                {{ $cuenta->approvedHistory->user->person->full_name }}
+                            @else
+                                No Registrado
                             @endif
                         @endif
+                        <td class="text-center">{{$cuenta->updated_at}}</td>
                         <td class="text-center">
                             {{$cuenta->detalle->deposit->account->typeMoney->simbolo.' '.$cuenta->detalle->deposit->total}}
                         </td>
                         <td>{{$cuenta->saldo}}</td>
-                        <td class="text-center">{{$cuenta->created_at}}</td>
-                        <td class="text-center">{{$cuenta->updated_at}}</td>
                     </tr>
                 @endforeach
             @endif
