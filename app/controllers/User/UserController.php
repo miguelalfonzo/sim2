@@ -15,7 +15,6 @@ class UserController extends BaseController
 	public function assignTemporalUser()
 	{
 		$inputs = Input::all();
-		Log::error( $inputs );
 		$tempUser = TemporalUser::getAssignment( Auth::user()->id );
 		if ( is_null( $tempUser ) )
 		{

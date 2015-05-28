@@ -23,7 +23,6 @@ class TableController extends BaseController
 	public function getMaintenanceCellData()
 	{
 		$inputs = Input::all();
-		Log::error($inputs);
 		switch( $inputs['type'] )
 		{
 			case 'idusertype':
@@ -97,7 +96,6 @@ class TableController extends BaseController
 	public function updateMaintenanceData()
 	{
 		$inputs = Input::all();
-		Log::error( $inputs );
 		switch( $inputs['type'] )
 		{
 			case 'fondo':

@@ -557,8 +557,7 @@ class SolicitudeController extends BaseController
                 $rpta = $this->setStatus( $oldIdEstado , $solicitud->id_estado , Auth::user()->id , $solicitud->created_by , $solicitud->id );
                 if ( $rpta[status] === ok )
                 {
-                    dd( $rpta );
-                    //DB::commit();
+                    DB::commit();
                     $rpta['Type'] = $solicitud->idtiposolicitud;
                     if ( $solicitud->id_estado == RECHAZADO )
                         $rpta['Type'] = 3;
