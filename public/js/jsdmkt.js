@@ -961,15 +961,13 @@ function newSolicitude() {
             var periodo = $(this).parent().parent().parent().find(".date_month").val();
             var dato = 
             {
+                '_token'      : $('input[name=_token]').val(),
                 'institucion' : fondo_institucion.val(),
-                'idetiqueta'  : $("select[name=etiqueta]").val(),
-                'repmed'      : fondo_repmed.val(),
+                'actividad'   : activity.val(),
                 'codrepmed'   : fondo_repmed.attr('data-cod'),
-                'supervisor'  : fondo_supervisor.val(),
                 'codsup'      : fondo_supervisor.attr('data-cod'),
                 'total'       : fondo_total.val(),
                 'cuenta'      : fondo_cuenta.val(),
-                '_token'      : $('input[name=_token]').val(),
                 'idfondo'     : $("#sub_type_activity option:selected").val(),
                 'mes'         : periodo
             };
@@ -1182,10 +1180,9 @@ function newSolicitude() {
         {
             'idsolicitud'   : id_solicitud.val(),
             'institucion'   : fondo_institucion.val(),
-            'idetiqueta'    : $('select[name=etiqueta]').val(),
+            'actividad'     : activity.val(),
             'repmed'        : fondo_repmed.val(),
             'codrepmed'     : fondo_repmed.attr('data-cod'),
-            'supervisor'    : fondo_supervisor.val(),
             'codsup'        : fondo_supervisor.attr('data-cod'),
             'total'         : fondo_total.val(),
             'cuenta'        : fondo_cuenta.val(),

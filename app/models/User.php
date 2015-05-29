@@ -112,7 +112,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
         if ( is_null( $tempUser) )
             return '';
         else
-            return $tempUser->user->type;
+            return $tempUser->userTemp->type;
     }
 
 }

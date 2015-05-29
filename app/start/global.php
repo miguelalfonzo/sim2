@@ -65,7 +65,9 @@ Log::useDailyFiles(storage_path().'/logs/log.txt');
 App::error( function( Exception $exception, $code)
 {
 	Log::error( $exception );
-	return View::make( 'soporte' )->with( 'exception' , $exception );
+	$rpta = array( status => error , description => $code. ': ' . $exception->getMessage() );
+	$rpta[ data ] = View::make( 'soporte' )->with( 'exception' , $exception );
+	return $rpta;
 });
 
 

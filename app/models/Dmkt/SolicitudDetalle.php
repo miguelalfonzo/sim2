@@ -19,6 +19,12 @@ class SolicitudDetalle extends Eloquent
         return json_decode( $this->detalle )->tcv;
     }
 
+    protected function getSupervisorAttribute()
+    {
+        $idSup = json_decode( $this->detalle )->supervisor;
+        return \Users\Sup::where( 'iduser' , $idSup )->first()->full_name;
+    }    
+
     protected function getMontoActualAttribute()
     {
         $jDetalle = json_decode( $this->detalle );
@@ -77,7 +83,7 @@ class SolicitudDetalle extends Eloquent
 
     public function periodo()
     {
-        return $this->hasOne( 'Dmkt\Solicitud\Periodo' , 'id' , 'id_periodo' );
+        return $this->hasOne( 'Dmkt\Periodo' , 'id' , 'id_periodo' );
     }
 
     protected function reason()

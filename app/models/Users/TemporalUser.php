@@ -24,7 +24,7 @@ class TemporalUser extends Eloquent
 
     protected static function getAssignment( $iduser )
     {
-    	return TemporalUser::where( 'id_temp' , $iduser )->first();
+    	return TemporalUser::where( 'id_user_temp' , $iduser )->first();
     }
 
     protected function user()
@@ -32,6 +32,9 @@ class TemporalUser extends Eloquent
     	return $this->hasOne( 'User' , 'id' , 'id_user' );
     }
 
-    
+    protected function userTemp()
+    {
+        return $this->hasOne( 'User' , 'id' , 'id_user_temp' );        
+    }
 
 }

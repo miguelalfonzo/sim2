@@ -16,9 +16,7 @@
                                 <span class="input-group-addon">
                                     {{ $detalle->typemoney->simbolo }}
                                 </span>
-                                @if ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) )
-                                    && in_array( $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario , array( Auth::user()->type , Auth::user()->tempType() ) )
-                                    && ( array_intersect ( array( Auth::user()->id , Auth::user()->tempId() ) , $solicitud->managerEdit->lists( 'id_gerprod' ) ) ) )
+                                @if ( $politicStatus )
                                     <input name="monto_producto[]" type="text"
                                     class="form-control input-md amount_families"
                                     value="{{ isset( $product->monto_asignado ) ? $product->monto_asignado : 

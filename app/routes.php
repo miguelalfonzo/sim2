@@ -25,7 +25,7 @@ Route::post( 'update-maintenance-info' , 'Maintenance\TableController@updateMain
 Route::post( 'save-maintenance-info' , 'Maintenance\TableController@saveMaintenanceData' );
 Route::post( 'add-maintenance-info' , 'Maintenance\TableController@addMaintenanceData' );
 Route::post( 'get-table-maintenance-info' , 'Maintenance\TableController@getMaintenanceTableData');
-
+Route::get( 'test-query' , 'TestController@testQuery' );
 /*
 |--------------------------------------------------------------------------
 | LOGIN

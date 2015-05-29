@@ -22,17 +22,24 @@ class TableController extends BaseController
 
 	public function getMaintenanceCellData()
 	{
-		$inputs = Input::all();
-		switch( $inputs['type'] )
+		try
 		{
-			case 'idusertype':
-				return $this->maintenanceGetTipoUsuario( $inputs['val'] );
-			case 'idfondo':
-				return $this->maintenanceGetFondo( $inputs['val'] );
-			case 'iddocumento':
-				return $this->maintenanceGetTipoDocumento( $inputs['val'] );
-			case 'idtipomoneda':
-				return $this->maintenanceGetTipoMoneda( $inputs['val'] );
+			$inputs = Input::all();
+			switch( $inputs['type'] )
+			{
+				case 'idusertype':
+					return $this->maintenanceGetTipoUsuario( $inputs['val'] );
+				case 'idfondo':
+					return $this->maintenanceGetFondo( $inputs['val'] );
+				case 'iddocumento':
+					return $this->maintenanceGetTipoDocumento( $inputs['val'] );
+				case 'idtipomoneda':
+					return $this->maintenanceGetTipoMoneda( $inputs['val'] );
+			}
+		}
+		catch( Exception $e )
+		{
+			return $this->internalException( $e , __FUNCTION__ );
 		}
 	}
 
@@ -51,7 +58,7 @@ class TableController extends BaseController
 	private function maintenanceGetTipoUsuario( $val )
 	{
 		$data = array( 'datos' => TypeUser::dmkt() , 'val' => $val , 'key' => 'descripcion' );
-		return $this->setRpta( View::make( 'Maintenance.td')->with( $data )->render() );
+		return $this->setRpta( View::make( 'Maintenance.Fondo.usertype')->with( $data )->render() );
 	}
 
 	private function maintenanceGetFondo( $val )
@@ -62,16 +69,22 @@ class TableController extends BaseController
 
 	public function getMaintenanceTableData()
 	{
-		$inputs = Input::all();
-
-		switch( $inputs['type'] )
+		try
 		{
-			case 'cuentas-marca':
-				return $this->getDailySeatRelation();
-			case 'fondo':
-				return $this->getFondos();
-			case 'fondo-cuenta':
-				return $this->getFondoAccount();
+			$inputs = Input::all();
+			switch( $inputs['type'] )
+			{
+				case 'cuentas-marca':
+					return $this->getDailySeatRelation();
+				case 'fondo':
+					return $this->getFondos();
+				case 'fondo-cuenta':
+					return $this->getFondoAccount();
+			}
+		}
+		catch( Exception $e )
+		{
+			return $this->internalException( $e , __FUNCTION__ );
 		}
 	}
 
@@ -149,7 +162,6 @@ class TableController extends BaseController
 		{
 			DB::beginTransaction();
 			$fondo = Fondo::find( $val['id'] );
-
 			foreach ( $val[data] as $key => $data )
 				$fondo->$key = $data ;
 			$fondo->save();

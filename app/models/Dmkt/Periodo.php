@@ -8,10 +8,10 @@ class Periodo extends Eloquent
     protected $table = 'PERIODO';
     protected $primaryKey = 'id';
 
-    public function searchId()
+    public function lastId()
     {
         $lastId = Periodo::orderBy('id', 'DESC')->first();
-        if( $lastId == null )
+        if( is_null( $lastId ) )
             return 0;
         else
             return $lastId->id;

@@ -2,8 +2,8 @@
 
 namespace Source;
 
-use Dmkt\Solicitude;
-use Dmkt\Rm;
+use Dmkt\Solicitud;
+use Users\Rm;
 use Dmkt\Account;
 use \BaseController;
 use \Input;

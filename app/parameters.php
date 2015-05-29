@@ -12,6 +12,7 @@ const error = 'Error';
 const desc_error = 'Hubo un error al procesar la informacion';
 const status = 'Status';
 const description = 'Description';
+const DB = 'Base de Datos';
 //const DOCUMENTO_NO_SUSTENTABLE_ID = 7;
 
 const SOLES = 1 ;

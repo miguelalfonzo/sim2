@@ -39,7 +39,7 @@
                             <input type="hidden" value="{{$solicitud->assign->rm->full_name}}" class="benef">
                         @elseif( $solicitud->assign->type == SUP )
                             <input type="hidden" value="{{$solicitud->assign->sup->full_name}}" class="benef">
-                        @elseif ( $solicitudd->assign->type == GER_COM )
+                        @elseif ( $solicitud->assign->type == GER_COM )
                             <input type="hidden" value="{{ $solicitud->assign->gerProd->full_name}}" class="benef">
                         @elseif ( !is_null( $solicitud->assign->simApp ) )
                             <input type="hidden" value="{{ $solicitud->assign->person->full_name}}" class="benef">
@@ -102,8 +102,8 @@
                 @if ( Auth::user()->type == GER_COM )
                     <td class="text-center">
                         @if ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) )
-                              && $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario === Auth::user()->type
-                              && in_array( Auth::user()->id , $solicitud->managerEdit->lists( 'id_gerprod' ) ) )
+                        && $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario === Auth::user()->type
+                        && in_array( Auth::user()->id , $solicitud->managerEdit( $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario )->lists( 'id_gerprod' ) ) )
                             <input type="checkbox" name="mass-aprov">
                         @else
                             <input type="checkbox" name="mass-aprov" disabled>

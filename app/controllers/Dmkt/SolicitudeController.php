@@ -118,21 +118,29 @@ class SolicitudeController extends BaseController
         try
         {
             $solicitud = Solicitud::where('token', $token)->first();
+            $politicStatus = FALSE;
             $user = Auth::user();
             if ( is_null( $solicitud ) )
                 return $this->warningException( 'No se encontro la Solicitud con Token: ' . $token , __FUNCTION__ , __LINE__ , __FILE__ );
             else
             {
                 $detalle = $solicitud->detalle;
+                $politicType = $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario;
                 $data = array( 'solicitud' => $solicitud , 'detalle' => $detalle );
                 if ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) )
-                    && in_array( Auth::user()->type , array( Auth::user()->type , Auth::user()->tempType() ) )
-                    && ( array_intersect ( array( Auth::user()->id , Auth::user()->tempId() ) , $solicitud->managerEdit->lists( 'id_gerprod' ) ) ) )
+                    && in_array( $politicType , array( Auth::user()->type , Auth::user()->tempType() ) )
+                    && ( array_intersect ( array( Auth::user()->id , Auth::user()->tempId() ) , $solicitud->managerEdit( $politicType )->lists( 'id_gerprod' ) ) ) )
                 {
+                    $politicStatus = TRUE;
                     $typeUser = $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario;
                     $solicitud->status = BLOCKED;
                     $solicitud->save();
                     $data[ 'fondos' ] = Fondo::getFunds( $typeUser );
+                    if ( ! is_null( $solicitud->detalle->fondo ) )
+                    {
+                        $data[ 'fondos' ]->push( $solicitud->detalle->fondo );
+                        $data['fondos'] = $data[ 'fondos' ]->unique();
+                    }
                     $data['solicitud']->status = 1;
                 }
                 elseif ( Auth::user()->type == TESORERIA && $solicitud->id_estado == DEPOSITO_HABILITADO )
@@ -160,6 +168,7 @@ class SolicitudeController extends BaseController
                     $data['igv'] = Table::getIGV();
                 }
                 Session::put( 'state' , $data[ 'solicitud' ]->state->id_estado );
+                $data[ 'politicStatus' ] = $politicStatus;
                 return View::make('Dmkt.Solicitud.view', $data);
             }
         }
@@ -202,29 +211,26 @@ class SolicitudeController extends BaseController
         $validator = Validator::make( $inputs, $rules );
         if ( $validator->fails() ) 
             return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
-        else
+        
+        $activity = Activity::find( $inputs[ 'actividad' ] );
+        
+        $validator->sometimes( 'factura' , 'required|image|max:900' , function( $input ) use( $activity )
         {
-            $activity = Activity::find( $inputs[ 'actividad' ] );
-            
-            $validator->sometimes( 'factura' , 'required|image|max:900' , function( $input ) use( $activity )
-            {
-                return ( ( trim( $input->idsolicitud ) === '' && $activity->imagen == 1 ) || ( trim( $input->idsolicitud ) !== '' &&  $activity->imagen == 1 && $input->factura ) );
-            });
+            return ( ( trim( $input->idsolicitud ) === '' && $activity->imagen == 1 ) || ( trim( $input->idsolicitud ) !== '' &&  $activity->imagen == 1 && $input->factura ) );
+        });
 
-            $validator->sometimes( 'monto_factura' , 'required|numeric|min:1' , function( $input ) use( $activity )
-            {
-                return $activity->imagen == 1;
-            });
+        $validator->sometimes( 'monto_factura' , 'required|numeric|min:1' , function( $input ) use( $activity )
+        {
+            return $activity->imagen == 1;
+        });
 
-            $validator->sometimes( 'ruc' , 'required|numeric|digits:11' , function( $input )
-            {
-                return $input->pago == PAGO_CHEQUE;
-            });
-            if ( $validator->fails() ) 
-                return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
-            else
-                return $this->setRpta( $activity );
-        }
+        $validator->sometimes( 'ruc' , 'required|numeric|digits:11' , function( $input )
+        {
+            return $input->pago == PAGO_CHEQUE;
+        });
+        if ( $validator->fails() ) 
+            return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
+        return $this->setRpta( $activity );
     }
 
     private function setPago( &$jDetalle , $paymentType , $ruc )
@@ -414,7 +420,7 @@ class SolicitudeController extends BaseController
         catch ( \yajra\Pdo\Oci8\Exceptions\Oci8Exception $e )
         {
             DB::rollback();
-            return $this->internalException( $e , __FUNCTION__ , 'Base de Datos' );
+            return $this->internalException( $e , __FUNCTION__ , DB );
         }
         catch ( Exception $e)
         {
@@ -623,9 +629,9 @@ class SolicitudeController extends BaseController
                 $uniqueIdsGerProd = array_unique( $idsGerProd );
                 $repeatIds = array_count_values( $idsGerProd );
                 $maxNumberRepeat = max( $repeatIds );
-                Session::put( 'maxRepeatIdsGerProd'  , array_keys( $repeatIds , $maxNumberRepeat ) );
+                Session::put( 'maxRepeatIdsGerProd'  , Manager::whereIn( 'id' , array_keys( $repeatIds , $maxNumberRepeat )->lists( 'iduser' ) ) );
                 $notRegisterGerProdName = Manager::getGerProdNotRegisteredName( $uniqueIdsGerProd );
-                if ( count( $notRegisterGerProdName ) == 0 )
+                if ( count( $notRegisterGerProdName ) === 0 )
                     $idsUser = Manager::whereIn( 'id' , $uniqueIdsGerProd )->lists( 'iduser' );
                 else
                     return $this->warningException( 'Los siguientes Gerentes no estan registrados en el sistema: ' . implode( ' , ' , $notRegisterGerProdName ) , __FUNCTION__ , __LINE__ , __FILE__ );
@@ -695,15 +701,14 @@ class SolicitudeController extends BaseController
         $rules = array( 'idsolicitud'    => 'required|integer|min:1|exists:solicitud,id' ,
                         'monto'          => 'required|numeric|min:1' ,
                         'idfondo'        => 'sometimes|integer|min:1|exists:fondo,id' ,
-                        'anotacion'      => 'sometimes|string|min:10' ,
+                        'anotacion'      => 'sometimes|string|min:5' ,
                         'producto'       => 'required|array|min:1|each:integer|each:min,1|each:exists,solicitud_producto,id',
                         'monto_producto' => 'required|array|min:1|each:numeric|each:min,1|sumequal:monto',
                         'idresponsable'  => 'sometimes|integer|min:1|exists:outdvp.users,id' );
         $validator = Validator::make( $inputs, $rules );
         if ( $validator->fails() ) 
             return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
-        else
-            return $this->setRpta();
+        return $this->setRpta();
     }
 
 
@@ -782,8 +787,15 @@ class SolicitudeController extends BaseController
 
     public function acceptedSolicitude()
     {
-        $inputs = Input::all();   
-        return $this->acceptedSolicitudeTransaction( $inputs[ 'idsolicitud' ] , $inputs );
+        try
+        {
+            $inputs = Input::all();   
+            return $this->acceptedSolicitudeTransaction( $inputs[ 'idsolicitud' ] , $inputs );
+        }
+        catch( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
     }
 
     public function checkSolicitud()

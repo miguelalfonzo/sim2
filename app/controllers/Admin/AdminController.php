@@ -9,7 +9,7 @@
 namespace Admin;
 
 use \BaseController;
-use Dmkt\Rm;
+use Users\Rm;
 use Dmkt\Sup;
 use Dmkt\Manager;
 use Symfony\Component\Console\Input\Input;

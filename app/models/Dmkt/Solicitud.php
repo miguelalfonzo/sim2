@@ -36,7 +36,7 @@ class Solicitud extends Eloquent
             {
                 $t->where('periodo',$periodo);
             });
-        })->where( 'idestado' , '<>' , CANCELADO )->get();
+        })->where( 'id_estado' , '<>' , CANCELADO )->get();
     }
 
     /* PUBLIC RELATIONSHIPS */
@@ -110,7 +110,7 @@ class Solicitud extends Eloquent
         return $this->hasMany( 'Dmkt\SolicitudClient' , 'id_solicitud' , 'id' );
     }
 
-    protected function createdBy()
+    public function createdBy()
     {
         return $this->belongsTo( 'User' , 'created_by' );
     }
@@ -120,9 +120,9 @@ class Solicitud extends Eloquent
         return $this->hasMany( 'Dmkt\SolicitudGer' , 'id_solicitud' , 'id' );
     }
 
-    protected function managerEdit()
+    public function managerEdit( $userType )
     {
-        return $this->hasMany( 'Dmkt\SolicitudGer' , 'id_solicitud'  , 'id' )->where( 'permiso' , 1 );
+        return $this->hasMany( 'Dmkt\SolicitudGer' , 'id_solicitud'  , 'id' )->where( 'permiso' , 1 )->where( 'tipo_usuario' , $userType );
     }
 
     protected function assign()
@@ -178,5 +178,10 @@ class Solicitud extends Eloquent
     public function orderProducts()
     {
         return $this->hasMany( 'Dmkt\SolicitudProduct' , 'id_solicitud' )->orderBy( 'updated_at' , 'DESC' );
+    }
+
+    protected function getAllData()
+    {
+        return Solicitud::with( array( 'createdBy' => 'usuario' ) )->get();
     }
 }

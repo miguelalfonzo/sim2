@@ -177,9 +177,9 @@ class BaseController extends Controller
             $statusSolicitude->notified     = $notified;
             $statusSolicitude->updated_at   = Carbon\Carbon::now();
             if ( is_null( $statusSolicitude->user_to ) )
-                return $this->warningException( 'No se determinado el tipo de usuario para enviar la solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
-            else
-                $statusSolicitude->save();
+                return $this->warningException( 'No se determinado el tipo de usuario para enviar la solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );    
+            $statusSolicitude->save();
+            Log::error( $statusSolicitude );
             return $this->setRpta();
     }
 
@@ -223,7 +223,7 @@ class BaseController extends Controller
             {
                 $solicituds->whereHas( 'detalle' , function ($q)
                 {
-                    $q->whereNotNull('iddeposito');
+                    $q->whereNotNull('id_deposito');
                 });
             }
         }

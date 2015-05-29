@@ -18,8 +18,8 @@
                 <tr>
                     <td>{{$solicitud->id}}</td>
                     <td style="text-align:center">
-                        <span class="label label-info" style="margin-right:1em;background-color:{{$solicitud->etiqueta->color}}">
-                                {{$solicitud->etiqueta->nombre}}
+                        <span class="label label-info" style="margin-right:1em;background-color:{{$solicitud->activity->color}}">
+                                {{$solicitud->activity->nombre}}
                         </span>
                         {{$solicitud->titulo}}
                     </td>
@@ -28,7 +28,7 @@
                         {{json_decode($solicitud->detalle->detalle)->num_cuenta}}
                     </td>
                     <td style="text-align:center">{{$solicitud->detalle->fondo->typeMoney->simbolo.' '.json_decode($solicitud->detalle->detalle)->monto_aprobado}}</td>
-                    <td style="text-align:center">{{json_decode($solicitud->detalle->detalle)->supervisor}}</td>
+                    <td style="text-align:center">{{$solicitud->detalle->supervisor}}</td>
                     @if ( isset( $state ) )
                         <td style="text-align:center">
                             @if ( $state == ACTIVE )
