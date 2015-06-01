@@ -19,6 +19,11 @@ class SolicitudDetalle extends Eloquent
         return json_decode( $this->detalle )->tcv;
     }
 
+    protected function getNumCuentaAttribute()
+    {
+        return json_decode( $this->detalle )->num_cuenta;
+    }
+
     protected function getSupervisorAttribute()
     {
         $idSup = json_decode( $this->detalle )->supervisor;
@@ -32,12 +37,10 @@ class SolicitudDetalle extends Eloquent
             return $jDetalle->monto_aprobado;
         else if ( isset( $jDetalle->monto_aceptado ) )
             return $jDetalle->monto_aceptado;
-        else if ( isset( $jDetalle->monto_validado ) )
-            return $jDetalle->monto_validado;
         else if ( isset( $jDetalle->monto_solicitado ) )
             return $jDetalle->monto_solicitado;
         else
-            return 0;
+            return null;
     }
 
     protected function getFechaEntregaAttribute()
@@ -109,5 +112,10 @@ class SolicitudDetalle extends Eloquent
     public function fondo()
     {
         return $this->hasOne('Common\Fondo','id','id_fondo');
+    }
+
+    protected function sup()
+    {
+        return $this->hasOne( 'Users\Sup' , 'iduser' , 'supervisor' );
     }
 }

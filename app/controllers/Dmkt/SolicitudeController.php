@@ -126,23 +126,25 @@ class SolicitudeController extends BaseController
             else
             {
                 $detalle = $solicitud->detalle;
-                $politicType = $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario;
                 $data = array( 'solicitud' => $solicitud , 'detalle' => $detalle );
-                if ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) )
-                    && in_array( $politicType , array( Auth::user()->type , Auth::user()->tempType() ) )
-                    && ( array_intersect ( array( Auth::user()->id , Auth::user()->tempId() ) , $solicitud->managerEdit( $politicType )->lists( 'id_gerprod' ) ) ) )
+                if ( $solicitud->idtiposolicitud != SOL_INST && in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) ) )
                 {
-                    $politicStatus = TRUE;
-                    $typeUser = $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario;
-                    $solicitud->status = BLOCKED;
-                    $solicitud->save();
-                    $data[ 'fondos' ] = Fondo::getFunds( $typeUser );
-                    if ( ! is_null( $solicitud->detalle->id_fondo ) )
+                    $politicType = $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario;
+                    if ( in_array( $politicType , array( Auth::user()->type , Auth::user()->tempType() ) )
+                        && ( array_intersect ( array( Auth::user()->id , Auth::user()->tempId() ) , $solicitud->managerEdit( $politicType )->lists( 'id_gerprod' ) ) ) )
                     {
-                        $data[ 'fondos' ]->push( $solicitud->detalle->fondo );
-                        $data['fondos'] = $data[ 'fondos' ]->unique();
+                        $politicStatus = TRUE;
+                        $typeUser = $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario;
+                        $solicitud->status = BLOCKED;
+                        $solicitud->save();
+                        $data[ 'fondos' ] = Fondo::getFunds( $typeUser );
+                        if ( ! is_null( $solicitud->detalle->id_fondo ) )
+                        {
+                            $data[ 'fondos' ]->push( $solicitud->detalle->fondo );
+                            $data['fondos'] = $data[ 'fondos' ]->unique();
+                        }
+                        $data['solicitud']->status = 1;
                     }
-                    $data['solicitud']->status = 1;
                 }
                 elseif ( Auth::user()->type == TESORERIA && $solicitud->id_estado == DEPOSITO_HABILITADO )
                 {
@@ -165,7 +167,7 @@ class SolicitudeController extends BaseController
                 }
                 elseif ( ! is_null( $solicitud->expenseHistory ) && $user->id == $solicitud->id_user_assign )
                 {
-                    $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_aprobado ) );
+                    $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_actual ) );
                     $data['igv'] = Table::getIGV();
                 }
                 Session::put( 'state' , $data[ 'solicitud' ]->state->id_estado );
@@ -544,9 +546,9 @@ class SolicitudeController extends BaseController
             {
                 $periodo = $solicitud->detalle->periodo;
                 if ( $periodo->status == BLOCKED )
-                    return $this->warningException( 'No se puede eliminar las solicitudes del periodo: '.$periodo->periodo , __FUNCTION__ , __LINE__ , __FILE__ );
-                if ( count ( Solicitud::solInst( $periodo->periodo ) ) == 1 )
-                    Periodo::inhabilitar( $periodo->periodo ); 
+                    return $this->warningException( 'No se puede eliminar las solicitudes del periodo: '.$periodo->aniomes , __FUNCTION__ , __LINE__ , __FILE__ );
+                if ( count ( Solicitud::solInst( $periodo->aniomes ) ) == 1 )
+                    Periodo::inhabilitar( $periodo->aniomes ); 
             }
             elseif ( $solicitud->idtiposolicitud == SOL_REP )
             {
@@ -808,7 +810,7 @@ class SolicitudeController extends BaseController
                 if ( $middleRpta[ status ] == ok )
                 {
                     Session::put( 'state' , $solicitud->state->rangeState->id );
-                    //DB::commit();
+                    DB::commit();
                     return $middleRpta ;
                 }
             }

@@ -15,7 +15,7 @@
                 <td style="text-align:center">{{$fondo->id}}</td>
                 <td class="nombre" style="text-align:center">{{$fondo->nombre}}</td>
                 <td class="idusertype" editable=1 style="text-align:center">{{$fondo->userType->descripcion}}</td>
-                <td class="moneda" style="text-align:center">S/.</td>
+                <td class="id_moneda" editable=1 style="text-align:center">{{ $fondo->typeMoney->simbolo }}</td>
                 <td class="saldo" editable=3 style="text-align:center">{{$fondo->saldo}}</td>
                 <td editable=2 style="text-align:center">
                     <a class="maintenance-edit">

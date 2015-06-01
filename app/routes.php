@@ -107,8 +107,7 @@ Route::group(array('before' => 'tes'), function()
 
 Route::group( array('before' => 'ager') , function()
 {
-    Route::post('registrar-fondo','Dmkt\FondoController@postRegister');
-    Route::post('update-fondo','Dmkt\FondoController@updateSolInst');
+    Route::post('registrar-fondo','Dmkt\FondoController@registerInstitutionalApplication');
     Route::get('exportfondos/{date}','Dmkt\FondoController@exportExcelFondos');
     Route::get('endfondos/{date}','Dmkt\FondoController@endfondos');
     Route::post('search-rep', 'Source\Seeker@repSource');

@@ -11,7 +11,7 @@ class TestController extends BaseController
 	{
 		try
 		{
-			$a = "fgsssssssssssssssssssssssssssssssssssssssssss";
+			/*$a = "fgsssssssssssssssssssssssssssssssssssssssssss";
 			$query = 'SELECT a.titulo , a.CREATED_AT , b.type as "USUARIO" , d.DESCRIPCION as "PRODUCTO" 
 					, f.ID_CLIENTE , g.DESCRIPCION as "TIPO_CLIENTE" , h.NOMBRE as "RUBRO"
 					FROM SOLICITUD a 
@@ -23,15 +23,15 @@ class TestController extends BaseController
 					LEFT JOIN TIPO_ACTIVIDAD h on h.id = a.ID_ACTIVIDAD
 					where idtiposolicitud = 1';
 
-			$query = DB::select( DB::raw( $query ) );
+			$query = DB::select( DB::raw( $query ) ); */
 			$frecuency = 'N';
 
 			$fromDate = '2015/05/18';
 			$toDate = '2015/05/30';
 
-
-			$q = "SELECT " . ($frecuency == 'M' ? "('SEMANA ' || to_char(z.the_date,'IW'))" : "to_char(". ($frecuency == 'S' ? "z.the_date" : "a.created_at" ) .", 'YYYY/MM/DD')" ) ." as FECHA, a.titulo , b.type as USUARIO , d.DESCRIPCION as PRODUCTO 
-							, f.ID_CLIENTE , g.DESCRIPCION as TIPO_CLIENTE , h.NOMBRE as RUBRO ,
+			 $q = 'Select ' . ( $frecuency == 'M' ? "('SEMANA ' || to_char( z.the_date , 'IW' ) )" : 'TO_CHAR( ' . 
+				( $frecuency == 'S' ? 'z.the_date' : 'a.created_at' ) . " , 'YYYY/MM/DD' )" ) ." as FECHA, a.titulo , b.type as USUARIO , d.DESCRIPCION as PRODUCTO 
+							, f.ID_CLIENTE , g.DESCRIPCION as TIPO_CLIENTE , h.NOMBRE as RUBRO , ROUND( a.updated_at - a.created_at , 2 )  DIAS , c.MONTO_ASIGNADO , q.detalle DETALLE ,
 							CASE 
 							WHEN g.DESCRIPCION = 'MEDICO' THEN i.pefnombres || ' ' || i.pefpaterno || ' ' || i.pefmaterno
 							WHEN g.DESCRIPCION = 'FARMACIA' THEN j.pejrazon
@@ -46,12 +46,13 @@ class TestController extends BaseController
 							ELSE 'No Identificado'END as USUARIO
 							FROM ". ($frecuency == 'S' || $frecuency == 'M' ? " ( 
 							SELECT to_date('$fromDate','YYYY/MM/DD')+level-1 as the_date 
-							FROM dual connect by level <= to_date('$toDate','YYYY/MM/DD') - to_date('$fromDate','YYYY/MM/DD') + 1) z LEFT JOIN SOLICITUD a ON TO_DATE ( TO_CHAR( a.created_at , 'YYYY/MM/DD' ) , 'YYYY/MM/DD' )  = z.the_date " : "SOLICITUD a") ." 
+							FROM dual connect by level <= to_date('$toDate','YYYY/MM/DD') - to_date('$fromDate','YYYY/MM/DD') + 1) z LEFT JOIN SOLICITUD a ON TO_DATE ( to_char( a.created_at , 'YYYY/MM/DD' ) , 'YYYY/MM/DD' )  = z.the_date " : "SOLICITUD a") ." 
 							LEFT JOIN OUTDVP.USERS b on a.CREATED_BY = b.id
 							LEFT JOIN OUTDVP.DMKT_RG_RM m on b.id = m.IDUSER
 							LEFT JOIN OUTDVP.DMKT_RG_SUPERVISOR n ON b.id = n.IDUSER
 							LEFT JOIn OUTDVP.GERENTES o ON b.id= o.IDUSER
 							LEFT JOIN OUTDVP.PERSONAS p ON b.id = p.IDUSER
+							LEFT JOIN SOLICITUD_DETALLE q on a.id_detalle = q.id
 							LEFT JOIN SOLICITUD_PRODUCTO c on c.ID_SOLICITUD = a.id
 							LEFT JOIN OUTDVP.MARCAS d on d.id = c.ID_PRODUCTO
 							LEFT JOIN SOLICITUD_CLIENTE f on f.ID_SOLICITUD = a.id
@@ -63,14 +64,31 @@ class TestController extends BaseController
 							LEFT JOIN VTADIS.CLIENTES l on l.CLCODIGO = f.ID_CLIENTE ". 
 							($frecuency == 'S' ? "" : "WHERE a.created_at between to_date('".$fromDate."','yyyy/mm/dd') and to_date('".$toDate."','yyyy/mm/dd') ") . " " . ($frecuency == 'S' || $frecuency == 'M' ? 
 							"ORDER BY z.the_date" : "")."";
-			eval('$qu = ' . $q . ';');
-			return DB::select( DB::raw( $q ) );
+			
+			//return $q;
+
+			$results = DB::select( DB::raw( $q ) );
+			foreach ( $results as $result )
+			{
+				$jDetalle = json_decode( $result->detalle );
+				if ( isset( $jDetalle->monto_aprobado ) )
+					$result->monto_aprobado = $jDetalle->monto_aprobado;
+				else
+					$result->monto_aprobado = 0;
+				if ( isset( $jDetalle->monto_solicitado ) )
+					$result->monto_solicitado = $jDetalle->monto_solicitado;
+				else
+					$result->monto_solicitado = 0;
+				unset( $result->detalle );
+			}
+			return $results;
 			$sol = Solicitud::getAllData();
 			return $sol;
 			return $query;
 		}
 		catch( Exception $e )
 		{
+			Log::error( $e );
 			return $e;
 		}
 	}

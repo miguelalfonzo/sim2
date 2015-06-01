@@ -33,7 +33,7 @@ class TableController extends BaseController
 					return $this->maintenanceGetFondo( $inputs['val'] );
 				case 'iddocumento':
 					return $this->maintenanceGetTipoDocumento( $inputs['val'] );
-				case 'idtipomoneda':
+				case 'id_moneda':
 					return $this->maintenanceGetTipoMoneda( $inputs['val'] );
 			}
 		}
@@ -108,15 +108,22 @@ class TableController extends BaseController
 
 	public function updateMaintenanceData()
 	{
-		$inputs = Input::all();
-		switch( $inputs['type'] )
+		try
 		{
-			case 'fondo':
-				return $this->maintenanceUpdateFondo( $inputs );
-			case 'cuentas-marca':
-				return $this->maintenanceUpdateCuentasMarca( $inputs );
-			case 'fondo-cuenta':
-				return $this->maintenanceUpdateFondo( $inputs);
+			$inputs = Input::all();
+			switch( $inputs['type'] )
+			{
+				case 'fondo':
+					return $this->maintenanceUpdateFondo( $inputs );
+				case 'cuentas-marca':
+					return $this->maintenanceUpdateCuentasMarca( $inputs );
+				case 'fondo-cuenta':
+					return $this->maintenanceUpdateFondo( $inputs);
+			}
+		}
+		catch ( Exception $e )
+		{
+			return $this->internalException( $e , __FUNCTION__ );
 		}
 	}
 
@@ -134,45 +141,27 @@ class TableController extends BaseController
 
 	private function maintenanceUpdateCuentasMarca( $val )
 	{
-		try
-		{
-			DB::beginTransaction();
-			$accountsMark = MarkProofAccounts::find($val['id'] );
-			$val[data]['idcuentafondo'] = $this->getAccount( $val[data]['idcuentafondo'] )[data];
-			$val[data]['idcuentagasto'] = $this->getAccount( $val[data]['idcuentagasto'] )[data];
-			$val[data]['idmarca'] = $this->getMark( $val[data]['idmarca'] )[data];
+		$accountsMark = MarkProofAccounts::find($val['id'] );
+		$val[data]['idcuentafondo'] = $this->getAccount( $val[data]['idcuentafondo'] )[data];
+		$val[data]['idcuentagasto'] = $this->getAccount( $val[data]['idcuentagasto'] )[data];
+		$val[data]['idmarca'] = $this->getMark( $val[data]['idmarca'] )[data];
 
-			foreach ( $val[data] as $key => $data )
-				$accountsMark->$key = $data;
-			$accountsMark->save();
-			
-			DB::commit();
-			return $this->setRpta();
-		}
-		catch ( Exception $e )
-		{
-			DB::rollback();
-			return $this->setRpta();
-		}
+		foreach ( $val[data] as $key => $data )
+			$accountsMark->$key = $data;
+		$accountsMark->save();
+		
+		return $this->setRpta();
 	}
 
 	private function maintenanceUpdateFondo( $val )
 	{
-		try
-		{
-			DB::beginTransaction();
-			$fondo = Fondo::find( $val['id'] );
-			foreach ( $val[data] as $key => $data )
-				$fondo->$key = $data ;
-			$fondo->save();
-			DB::commit();
-			return $this->setRpta();
-		}
-		catch ( Exception $e )
-		{
-			DB::rollback();
-			return $this->internalException( $e , __FUNCTION__ );
-		}
+		$fondo = Fondo::find( $val['id'] );
+		Log::error( $val );
+		foreach ( $val[data] as $key => $data )
+			$fondo->$key = $data ;
+		Log::error( $fondo );
+		$fondo->save();
+		return $this->setRpta();
 	}
 
 	public function saveMaintenanceData()

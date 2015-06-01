@@ -34,7 +34,7 @@ class Solicitud extends Eloquent
         {
             $q->whereHas('periodo' , function ( $t ) use ( $periodo )
             {
-                $t->where('periodo',$periodo);
+                $t->where( 'aniomes' , $periodo );
             });
         })->where( 'id_estado' , '<>' , CANCELADO )->get();
     }
@@ -62,7 +62,7 @@ class Solicitud extends Eloquent
     }
 
 
-    protected function approvedHistory()
+    public function approvedHistory()
     {
         return $this->hasOne( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->where( 'status_to' , APROBADO );
     }
@@ -147,7 +147,7 @@ class Solicitud extends Eloquent
 
     protected function expenses()
     {
-        return $this->hasMany( '\Expense\Expense' , 'id_solicitud' , 'id' )->orderBy( 'updated_at' , 'desc');
+        return $this->hasMany( 'Expense\Expense' , 'id_solicitud' , 'id' )->orderBy( 'updated_at' , 'desc');
     }
 
     protected function baseEntry()

@@ -16,12 +16,13 @@ use \Expense\ProofType;
 use \Exception;
 use \Users\Rm;
 use \Users\Sup;
-use Common\TypeMoney;
+use \Common\TypeMoney;
+use \yajra\Pdo\Oci8\Exceptions\Oci8Exception;
 
 class FondoController extends BaseController
 {
 
-    private function period($date)
+    private function period( $date )
     {
         $period = explode('-', $date);
         return $period[1].str_pad($period[0], 2, '0', STR_PAD_LEFT);
@@ -40,18 +41,16 @@ class FondoController extends BaseController
             $detalle = $solInst->detalle;
             $jDetalle = json_decode($detalle->detalle);
             $rm = $solInst->asignedTo->rm;
-            $data = array(
-                'titulo'    => $solInst->titulo,
-                'idactividad'  => $solInst->idactividad,
-                'rm'            => $rm->nombres.' '.$rm->apellidos ,
-                'idrm'          => $rm->idrm ,
-                'supervisor'    => $jDetalle->supervisor ,
-                'codsup'        => $jDetalle->codsup ,
-                'monto'         => $jDetalle->monto_aprobado ,
-                'periodo'       => $detalle->periodo->periodo ,
-                'rep_cuenta'    => $jDetalle->num_cuenta ,
-                'idfondo'       => $detalle->idfondo
-            );
+            $data = array( 'titulo'      => $solInst->titulo,
+                           'idactividad' => $solInst->id_actividad,
+                           'rm'          => $rm->nombres.' '.$rm->apellidos ,
+                           'idrm'        => $rm->idrm ,
+                           'supervisor'  => $detalle->supervisor ,
+                           'codsup'      => $jDetalle->codsup ,
+                           'monto'       => $jDetalle->monto_aprobado ,
+                           'periodo'     => $detalle->periodo->aniomes ,
+                           'rep_cuenta'  => $jDetalle->num_cuenta ,
+                           'idfondo'     => $detalle->id_fondo );
             return $this->setRpta( $data );
         }
         catch ( Exception $e )
@@ -89,7 +88,7 @@ class FondoController extends BaseController
         try
         {
             $periodo = $this->period($start);
-            $periodos = Periodo::where('periodo', $periodo )->first();
+            $periodos = Periodo::where('aniomes', $periodo )->first();
             if ( count ( $periodos ) == 0 )
                 return $this->setRpta( View::make('Dmkt.AsisGer.list_fondos')->with( 'total' , '' )->render() );
             else
@@ -116,56 +115,56 @@ class FondoController extends BaseController
 
     private function endSolicituds( $solicituds )
     {
+        $montos = array();
         foreach( $solicituds as $solicitud )
         {
+            $detalle = $solicitud->detalle;
+            $fondo = $detalle->fondo;
+            if ( isset( $montos[ $fondo->id ] ) )
+                $montos[ $fondo->id ] += $detalle->monto_actual;
+            else
+                $montos[ $fondo->id] = $detalle->monto_actual;
+
+            if ( $montos[ $fondo->id ] > $fondo->saldo )
+                return $this->warningException( 'El fondo ' . $fondo->nombre . ' no cuenta con saldo suficinete' , __FUNCTION__ , __LINE__ , __FILE__ );
+
             $oldIdestado = $solicitud->id_estado;
             $solicitud->id_estado = DEPOSITO_HABILITADO;
-            if ( !$solicitud->save() )
-                return $this->warningException( 'No se pudo actualizar la solicitud: '.$solicitud->id , __FUNCTION__ , __LINE__ , __FILE__ );
-            else
-            {
-                $middleRpta = $this->setStatus( $oldIdestado , DEPOSITO_HABILITADO , Auth::user()->id , USER_TESORERIA , $solicitud->id );
-                if ( $middleRpta[status] != ok )
-                    return $middleRpta;
-            }
+            $solicitud->save();
+
+
+            
+            $middleRpta = $this->setStatus( $oldIdestado , DEPOSITO_HABILITADO , Auth::user()->id , USER_TESORERIA , $solicitud->id );
+            if ( $middleRpta[status] != ok )
+                return $middleRpta;
         }
         return $this->setRpta();
     }
-
 
     public function endFondos( $start )
     {
         try
         {
             DB::beginTransaction();
-            $periodo = $this->period($start);
-            $periodos = Periodo::where( 'periodo' , $periodo )->first();
-            if ( count( $periodos ) == 0 )
+            $periodo = $this->period( $start );
+            $periodos = Periodo::where( 'aniomes' , $periodo )->first();
+            if ( is_null( $periodos ) )
                 return $this->warningException( 'El periodo seleccionado no ha sido activado: '.$periodo , __FUNCTION__ , __LINE__ , __FILE__ );
             elseif ( $periodos->status == BLOCKED )
                 return $this->warningException( 'El periodo ya se encuentra Terminado' , __FUNCTION__ , __LINE__ , __FILE__ );
-            else
+            
+            $solicituds = Solicitud::solInst( $periodo );
+            if ( $solicituds->count() === 0 )
+                return $this->warningException( 'No se encontro solicitudes para el periodo especificado: ' .$periodo , __FUNCTION__ , __LINE__ , __FILE__);
+        
+            $middleRpta = $this->endSolicituds( $solicituds );
+            if ( $middleRpta[status] == ok )
             {
-                $solicituds = Solicitud::solInst( $periodo );
-                if ( count( $solicituds ) == 0 )
-                    return $this->warningException( 'No se encontro solicitudes para el periodo especificado: ' .$periodo , __FUNCTION__ , __LINE__ , __FILE__);
-                else
-                {
-                    $middleRpta = $this->endSolicituds( $solicituds );
-                    if ( $middleRpta[status] == ok )
-                    {
-                        $periodos->status = BLOCKED ;
-                        if ( !$periodos->save() )
-                        {
-                            DB::rollback();
-                            return $this->warningException( 'No se pudo terminar el periodo' , __FUNCTION__ , __LINE__ , __FILE__ );
-                        }
-                        else
-                            DB::commit();
-                    }
-                }
+                $periodos->status = BLOCKED ;
+                $periodos->save();
+                DB::commit();
             }
-            return $middleRpta;   
+            return $middleRpta;
         }
         catch (Exception $e)
         {
@@ -186,15 +185,14 @@ class FondoController extends BaseController
         $rpta = array();
         foreach ( $solicituds as $solicitud )
         {
-            $data     = array();
             $detalle  = $solicitud->detalle;
-            $jDetalle = json_decode( $detalle->detalle );
+            $data     = array();
             $data[]   = $solicitud->titulo;
-            $data[]   = $solicitud->asignedTo->rm->nombres.' '.$solicitud->asignedTo->rm->apellidos;
-            $data[]   = $jDetalle->num_cuenta;
-            $data[]   = $jDetalle->supervisor;
+            $data[]   = $solicitud->asignedTo->rm->full_name;
+            $data[]   = $detalle->num_cuenta;
+            $data[]   = $detalle->supervisor;
             $data[]   = $detalle->fondo->typeMoney->simbolo;
-            $data[]   = $jDetalle->monto_aprobado;
+            $data[]   = $detalle->monto_actual;
             $rpta[]   = $data ;
         }
         return $rpta;
@@ -204,7 +202,6 @@ class FondoController extends BaseController
     {
         $solicituds = Solicitud::solInst( $this->period( $start ) );
         $data = $this->solicitudToArray( $solicituds );
-        //$dato = $data->toArray();
         $sum  = $this->sumSolicitudInst( $solicituds );
         $mes  = array(
             '01' => 'enero',
@@ -301,7 +298,7 @@ class FondoController extends BaseController
         {
             $newPeriodo = new Periodo;
             $newPeriodo->id = $newPeriodo->lastId() + 1 ;
-            $newPeriodo->periodo = $periodo ;
+            $newPeriodo->aniomes = $periodo ;
             $newPeriodo->status  = ACTIVE ;
             $newPeriodo->idtiposolicitud = SOL_INST ;
             $newPeriodo->save();
@@ -325,16 +322,15 @@ class FondoController extends BaseController
 
     private function validateInputSolInst( $inputs )
     {
-        $rules = array( 'idsolicitud' => 'sometimes|integer|min:1|exists:solicitud,id,idtiposolicitud,'.SOL_INST ,
-            'institucion' => 'required|string|min:3',
-            'codrepmed'   => 'required|integer|min:1|exists:ficpe.visitador,visvisitador',
-            'codsup'      => 'required|integer|min:1|exists:ficpe.supervisor,supsupervisor',
-            'actividad'   => 'required|integer|min:1|exists:tipo_actividad,id',
-            'total'       => 'required|numeric|min:1',
-            'cuenta'      => 'required|alpha_dash|min:1',
-            'idfondo'     => 'required|integer|min:1|exists:fondo,id,idusertype,AG',
-            'mes'         => 'required|string|date_format:m-Y|after:'.date("Y-m")         
-        );
+        $rules = array( 'idsolicitud' => 'sometimes|integer|min:1|exists:solicitud,id,id_estado,1,idtiposolicitud,'.SOL_INST ,
+                        'institucion' => 'required|string|min:3',
+                        'codrepmed'   => 'required|integer|min:1|exists:ficpe.visitador,visvisitador',
+                        'codsup'      => 'required|integer|min:1|exists:ficpe.supervisor,supsupervisor',
+                        'actividad'   => 'required|integer|min:1|exists:tipo_actividad,id',
+                        'total'       => 'required|numeric|min:1',
+                        'cuenta'      => 'required|alpha_dash|min:1',
+                        'idfondo'     => 'required|integer|min:1|exists:fondo,id,idusertype,AG',
+                        'mes'         => 'required|string|date_format:m-Y|after:'.date("Y-m") );
         $validator = Validator::make($inputs, $rules);
         if ($validator->fails()) 
             return $this->warningException( substr($this->msgValidator($validator), 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
@@ -344,22 +340,20 @@ class FondoController extends BaseController
 
     private function setDetalleInst( $detalle , $inputs , $idPeriodo )
     {
-        $jDetalle = array( 'supervisor'     => $inputs['supervisor'] ,
-                           'codsup'         => $inputs['codsup'] ,
-                           'num_cuenta'     => $inputs['cuenta'] ,
-                           'monto_aprobado' => $inputs['total'] ,
-                           'idmoneda'       => 1 );
-        $detalle->id_fondo   = $inputs['idfondo'] ;
+        $jDetalle = array( 'supervisor'      => $inputs[ 'supervisor' ] ,
+                           'codsup'          => $inputs[ 'codsup' ] ,
+                           'num_cuenta'      => $inputs[ 'cuenta' ] ,
+                           'monto_aprobado'  => $inputs[ 'total' ] ,
+                           'monto_solicitado'=> $inputs[ 'total' ] );
+        $detalle->id_fondo   = $inputs[ 'idfondo' ] ;
         $detalle->id_periodo = $idPeriodo;
         $detalle->id_moneda  = SOLES;
         $detalle->detalle = json_encode($jDetalle);
-        if ( !$detalle->save() )
-            return $this->warningException( 'No se pudo procesar los detalles de la Solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
-        else
-            return $this->setRpta();                            
+        $detalle->save();
+        return $this->setRpta();                            
     }
 
-    public function postRegister()
+    public function registerInstitutionalApplication()
     {
         try
         {
@@ -374,23 +368,32 @@ class FondoController extends BaseController
                 {
                     $idPeriodo = $middleRpta[data];
                     $middleRpta = $this->validateRm( $inputs['codrepmed'] , $inputs['codsup'] );
-                    if ( $middleRpta[status] == ok )
+
+                    if( $middleRpta[status] == ok )
                     {
+                        if ( isset( $inputs[ 'idsolicitud' ] ) )
+                        {
+                            $solicitud = Solicitud::find( $inputs['idsolicitud'] );
+                            $detalle = $solicitud->detalle;
+                        }
+                        else
+                        {
+                            $solicitud             = new Solicitud;
+                            $solicitud->id         = $solicitud->lastId() + 1;
+                            $solicitud->token      = sha1( md5( uniqid( $solicitud->id , true ) ) );
+                            $detalle               = new SolicitudDetalle;
+                            $detalle->id           = $detalle->lastId() + 1;
+                            $solicitud->id_detalle = $detalle->id;
+                        
+                        }
                         $inputs['supervisor']       = $middleRpta[ data ]['sup'];
-                        $solicitud                  = new Solicitud;
-                        $solicitud->id              = $solicitud->lastId() + 1;
                         $solicitud->titulo          = $inputs['institucion'];
                         $solicitud->id_estado       = PENDIENTE;
                         $solicitud->id_actividad    = $inputs['actividad'];
                         $solicitud->idtiposolicitud = SOL_INST;
                         $solicitud->id_user_assign  = $middleRpta[data]['rm'];
-                        $solicitud->token           = sha1(md5(uniqid($solicitud->id, true)));
-                        $detalle                    = new SolicitudDetalle;
-                        $detalle->id                = $detalle->lastId() + 1;
-                        $solicitud->id_detalle      = $detalle->id;
                         $solicitud->save();
-
-                        $middleRpta = $this->setDetalleInst( $detalle , $inputs , $idPeriodo );
+                        $middleRpta   = $this->setDetalleInst( $detalle , $inputs , $idPeriodo );
                         if ( $middleRpta[status] == ok )
                         {
                             $userid = Auth::user()->id;
@@ -407,77 +410,15 @@ class FondoController extends BaseController
             DB::rollback();
             return $middleRpta;
         }
-        catch (Exception $e)
+        catch( Oci8Exception $e )
         {
             DB::rollback();
-            return $this->internalException($e,__FUNCTION__);
+            return $this->internalException( $e , __FUNCTION__ , DB );
         }
-    }
-
-    public function updateSolInst()
-    {
-        try
-        {
-            DB::beginTransaction();
-            $inputs  = Input::all();
-            $middleRpta = $this->validateInputSolInst( $inputs );
-            if ( $middleRpta[status] == ok )
-            {   
-                $periodo = $this->period($inputs['mes']);
-                $middleRpta = $this->verifyPeriodo( $periodo );
-                if( $middleRpta[status] == ok )
-                {
-                    $idPeriodo = $middleRpta[data];
-                    $solInst = Solicitud::find( $inputs['idsolicitud'] );
-                    if ( is_null( $solInst ) )
-                        return $this->warningException( 'No se encontro la solicitud: #'.$inputs['idsolicitud'] , __FUNCTION__ , __LINE__ , __FILE__ );
-                    
-                    if ( $solInst->idtiposolicitud != SOL_INST )
-                        if ( is_null( $solInst->idtiposolicitud ) )
-                            return $this->warningException( 'La solicitud no tiene Id de Tipo: #'.$inputs['idsolicitud'] , __FUNCTION__ , __LINE__ , __FILE__ );
-                        else
-                            return $this->warningException( 'La solicitud no es Institucional: #'.$inputs['idsolicitud'].'-'.$solInst->typeSolicitude->nombre , __FUNCTION__ , __LINE__ , __FILE__ );
-                    elseif ( $solInst->id_estado != PENDIENTE )
-                        return $this->warningException( 'Esta solicitud ya ha sido procesada: #'.$inputs['idsolicitud'].'-'.$solInst->state->nombre , __FUNCTION__ , __LINE__ , __FILE__ );
-                    
-                    $middleRpta = $this->validateRm( $inputs['codrepmed'] , $inputs['codsup'] );
-                    if ( $middleRpta[status] == ok )
-                    {
-                        $inputs['supervisor'] = $middleRpta[data]['sup'];
-                        $solInst->titulo     = $inputs['institucion'];
-                        $solInst->id_actividad = $inputs['actividad'];
-                        $solInst->id_user_assign = $middleRpta[data]['rm'];
-                        $solInst->save();
-                        
-                        $detalle      = $solInst->detalle;
-                        $middleRpta   = $this->setDetalleInst( $detalle , $inputs , $idPeriodo );
-                        if ( $middleRpta[status] == ok )
-                        {
-                            $userid = Auth::user()->id;
-                            $middleRpta = $this->setStatus( PENDIENTE , PENDIENTE , $userid , $userid, $solInst->id );
-                            if ($middleRpta[status] == ok)
-                            {
-                                DB::commit();
-                                return $middleRpta;
-                            }
-                        }
-                    }
-                }
-            }
-            DB::rollback();
-            return $middleRpta;
-        }
-        catch (Exception $e)
+        catch( Exception $e )
         {
             DB::rollback();
-            return $this->internalException($e,__FUNCTION__);
-        }
-    }   
-
-
-
-    function getLastDayOfMonth($month, $year)
-    {
-        return date('d', mktime(0, 0, 0, $month + 1, 1, $year) - 1);
+            return $this->internalException( $e , __FUNCTION__ );
+        }        
     }
 }

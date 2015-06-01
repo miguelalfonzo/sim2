@@ -628,8 +628,6 @@ function newSolicitude() {
         }
     });
 
-    
-
     $(document).on('click' , '.delete-fondo' , function (e)
     {
         e.preventDefault();
@@ -638,7 +636,7 @@ function newSolicitude() {
             idsolicitud: $( this ).parent().parent().parent().children().first().text().trim() ,
             _token: $('input[name=_token]').val()
         };
-        cancelDialog( data );
+        cancelDialog( data , '¿Esta seguro de anular el registro del fondo?' );
     });
 
    
@@ -1143,11 +1141,11 @@ function newSolicitude() {
         .fail( function ( statusCode , errorThrown ) 
         {
             ajaxError( statusCode , errorThrown );
-        }).done( function( data )
+        }).done( function( response )
         {
-            if ( data.Status == 'Ok' )
+            if ( response.Status == 'Ok' )
             {
-                data = data.Data ;
+                data = response.Data ;
                 tr.css('background-color','#59A1F4');
                 $('.btn_cancel_fondo').show();
                 $('.btn_edit_fondo').show();
@@ -1165,7 +1163,7 @@ function newSolicitude() {
                 fondo_cuenta.val(data.rep_cuenta).attr('disabled',true).parent().addClass('has-success');
                 id_solicitud.val(idsolicitud);
                 $('select[name=idfondo]').val(data.idfondo);
-                $('select[name=etiqueta]').val(data.idetiqueta);
+                activity.val(data.idactividad );
             }
             else
                 bootbox.alert('<h4 class=""red>' + data.Status + ': ' + data.Description + '</h4>');
@@ -1193,7 +1191,7 @@ function newSolicitude() {
         var l = Ladda.create(aux);
         l.start();
 
-        $.post( server + 'update-fondo' , dato )
+        $.post( server + 'registrar-fondo' , dato )
         .fail( function( statusCode , errorThrown )
         {
             l.stop();
@@ -1591,7 +1589,7 @@ function newSolicitude() {
                 listMaintenanceTable( aData.type );
             }
             else
-                bootbox.alert('<h4 class="red">' + Data.Status + ': ' + Data.Description + '</h4>');            
+                bootbox.alert('<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');            
         });
     });
 

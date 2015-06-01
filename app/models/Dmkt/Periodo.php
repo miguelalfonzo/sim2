@@ -2,6 +2,7 @@
 
 namespace Dmkt;
 use \Eloquent;
+use \Log;
 
 class Periodo extends Eloquent
 {
@@ -17,15 +18,18 @@ class Periodo extends Eloquent
             return $lastId->id;
     }
 
+    protected function getPeriodoAttribute()
+    {
+        return substr( $this->aniomes , 0 , 4 ) . '-' . substr( $this->aniomes , 4 , 2 );
+    }
+
     protected static function inhabilitar( $periodo )
     {
-        Periodo::where('periodo' , $periodo )->where('status',ACTIVE)->where( 'idtiposolicitud' , SOL_INST )->update( array( 'status' => 3) );
+        Periodo::where( 'aniomes' , $periodo )->where( 'status' , ACTIVE )->where( 'idtiposolicitud' , SOL_INST )->update( array( 'status' => 3) );
     }
 
     protected static function periodoInst( $periodo )
     {
-        return Periodo::where( 'periodo' , $periodo )->where( 'idtiposolicitud' , SOL_INST )->first();    
+        return Periodo::where( 'aniomes' , $periodo )->where( 'idtiposolicitud' , SOL_INST )->first();    
     }
-
 }
-    

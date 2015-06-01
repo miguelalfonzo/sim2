@@ -24,11 +24,12 @@ class MoveController extends BaseController
 
     public function searchMove()
     {
-    	$date = Input::get('date');
-        if ( empty( $date ) )
-            return $this->warningException('El campo fecha se encuentra vacio' ,__FUNCTION__ , __LINE__ , __FILE__ );
-        else            
+        try
         {
+        	$date = Input::get('date');
+            if ( empty( $date ) )
+                return $this->warningException('El campo fecha se encuentra vacio' ,__FUNCTION__ , __LINE__ , __FILE__ );
+        
             $dates = $this->setDates( $date );
             $middleRpta = $this->userType();
             if ($middleRpta[status] == ok)
@@ -88,6 +89,10 @@ class MoveController extends BaseController
             }
             return $middleRpta;
         }
+        catch ( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
     }
 
     private function setDates($date)
@@ -108,14 +113,12 @@ class MoveController extends BaseController
             $validator = Validator::make( $inputs , $rules );
             if ( $validator->fails() ) 
                 return $this->warningException( substr($this->msgValidator($validator), 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
+            
+            $middleRpta = $this->getDocs( $inputs['idProof'] , $inputs['date_start'] , $inputs['date_end'] , $inputs['val'] );
+            if ( $middleRpta[status] == ok )
+                return $this->setRpta( View::make('Dmkt.Cont.list_documents')->with( 'proofs' , $middleRpta[data] )->render() );
             else
-            {
-                $middleRpta = $this->getDocs( $inputs['idProof'] , $inputs['date_start'] , $inputs['date_end'] , $inputs['val'] );
-                if ( $middleRpta[status] == ok )
-                    return $this->setRpta( View::make('Dmkt.Cont.list_documents')->with( 'proofs' , $middleRpta[data] )->render() );
-                else
-                    return $middleRpta;
-            }
+                return $middleRpta;    
         }
         catch( Exception $e )
         {
@@ -125,24 +128,18 @@ class MoveController extends BaseController
 
     private function getDocs( $idProof , $start , $end , $val )
     {
-        try
-        {
-            $documents = Expense::orderBy( 'updated_at' , 'desc');
-            $documents->where( 'idcomprobante' , $idProof );
+        $documents = Expense::orderBy( 'updated_at' , 'desc');
+        $documents->where( 'idcomprobante' , $idProof );
 
-            if ( is_numeric( $val) )
-                $documents->where( function ( $q ) use ( $val )
-                {
+        if ( ! empty( trim( $val ) ) )
+            $documents->where( function ( $q ) use ( $val )
+            {
+                if ( is_numeric( $val) )
                     $q->where( 'num_prefijo' , $val )->orWhere( 'num_serie' , $val )->orWhere( 'RUC' , $val )->orWhere( 'UPPER( razon )' , 'like' , '%strtoupper( $val )%' );
-                });
-            else
-                $documents->where( 'UPPER( razon )' , 'like' , '%'.strtoupper( $val ).'%' );
-            $documents->whereRaw( "fecha_movimiento between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')");
-            return $this->setRpta( $documents->get() );
-        }
-        catch ( Exception $e )
-        {
-            return $this->internalException( $e , __FUNCTION__ );
-        }
+                $q->orWhere( 'UPPER( razon )' , 'like' , '%'.strtoupper( $val ).'%' );
+            });
+            
+        $documents->whereRaw( "fecha_movimiento between to_date('$start','DD/MM/YYYY') and to_date('$end','DD/MM/YYYY') + 1 ");
+        return $this->setRpta( $documents->get() );
     }
 }

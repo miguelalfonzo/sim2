@@ -52,7 +52,11 @@ class ExpenseController extends BaseController
         else
         {
         	$proofType = ProofType::find( $inputs['proof_type'] );
-        	$validator->sometimes( [ 'number_prefix' , 'number_serie' ] , 'required|numeric|min:1' , function( $input ) use( $proofType )
+        	$validator->sometimes( 'number_prefix' , 'required|numeric|min:0|digits_between:1,5' , function( $input ) use( $proofType )
+            {
+                return $proofType->marca != 'N';
+            });
+            $validator->sometimes( 'number_serie' , 'required|numeric|min:1|digits_between:1,20' , function( $input ) use( $proofType )
             {
                 return $proofType->marca != 'N';
             });
@@ -317,7 +321,7 @@ class ExpenseController extends BaseController
 		catch (Exception $e)
 		{
 			DB::rollback();
-			return $this->internalException($e,__FUNCTION__);
+			return $this->internalException( $e , __FUNCTION__ );
 		}
 	}
 

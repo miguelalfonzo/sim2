@@ -13,7 +13,7 @@
             <tr row-id="{{$fondo->id}}" type="fondo-cuenta">
                 <td style="text-align:center">{{$fondo->id}}</td>
                 <td class="nombre" style="text-align:center">{{$fondo->nombre}}</td>
-                <td class="idtipomoneda" editable=1 style="text-align:center">{{$fondo->typeMoney->simbolo}}</td>
+                <td class="id_moneda" editable=1 style="text-align:center">{{$fondo->typeMoney->simbolo}}</td>
                 <td class="num_cuenta" editable=3 style="text-align:center">{{$fondo->num_cuenta}}</td>
                 <td editable=2 style="text-align:center">
                     <a class="maintenance-edit">

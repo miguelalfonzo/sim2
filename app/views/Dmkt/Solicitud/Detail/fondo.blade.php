@@ -4,6 +4,7 @@
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             @if ( isset( $fondos ) )
                 <select id="sub_type_activity" name="idfondo" class="form-control">
+                    <option value=''>Seleccione el Fondo</option>
                     @foreach($fondos as $sub)
                         @if ( isset( $solicitud ) && ! is_null( $solicitud->detalle->id_fondo ) && ( $solicitud->detalle->id_fondo == $sub->id ) )
                             <option selected value="{{$sub->id}}" style="background-color:gold">
