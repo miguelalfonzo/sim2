@@ -5,7 +5,7 @@
             @if ( isset( $fondos ) )
                 <select id="sub_type_activity" name="idfondo" class="form-control">
                     @foreach($fondos as $sub)
-                        @if ( isset( $solicitud ) && ! is_null( $solicitud->detalle->fondo) && ( $solicitud->detalle->id_fondo == $sub->id ) )
+                        @if ( isset( $solicitud ) && ! is_null( $solicitud->detalle->id_fondo ) && ( $solicitud->detalle->id_fondo == $sub->id ) )
                             <option selected value="{{$sub->id}}" style="background-color:gold">
                                 {{$sub->nombre}} {{$sub->typeMoney->simbolo.' '.$sub->saldo}}
                             </option>                          

@@ -50,17 +50,19 @@ class UserController extends BaseController
 			if ( is_null( $tempUser ) )
 				return $this->warningException( 'No tiene asignacion para eliminar' , __FUNCTION__ , __LINE__ , __FILE__ );
 			else
+			{
 				$tempUser->delete();
 				return $this->setRpta();
+			}
 		}
 		catch ( Oci8Exception $e )
 		{
-			Log::error( oci_error() );
-			return $this->internalException( $e , __FUNCTION__ , DB )
+			Log::error( 'Oci_error' . oci_error() );
+			return $this->internalException( $e , __FUNCTION__ , DB );
 		}
 		catch ( Exception $e )
 		{
-
+			return $this->internalException( $e , __FUNCTION__ );
 		}
 	}
 }
