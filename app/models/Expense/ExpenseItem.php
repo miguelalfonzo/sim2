@@ -12,7 +12,7 @@ class ExpenseItem extends Eloquent{
     public function lastId()
     {
     	$lastId = ExpenseItem::orderBy('id','desc')->first();
-		if( $lastId == null )
+		if( is_null( $lastId ) )
             return 0;
         else
             return $lastId->id;
@@ -22,5 +22,4 @@ class ExpenseItem extends Eloquent{
     {
 		return $this->hasOne('ExpenseType','idtipogasto','tipo_gasto');
 	}
-
 }

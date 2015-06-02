@@ -21,7 +21,7 @@ class Expense extends Eloquent {
 
     protected function items()
     {
-        return $this->hasMany('Expense\ExpenseItem','idgasto','id');
+        return $this->hasMany('Expense\ExpenseItem','id_gasto','id');
     }
 
     protected function solicitud()

@@ -369,7 +369,7 @@ $(function()
             });
         });
         //Generate Seat Expense
-        $("#seat-expense").on("click",function(e){
+        /*$("#seat-expense").on("click",function(e){
             e.preventDefault();
             var idsolicitude = $("#idsolicitud").val();
             bootbox.confirm("¿Esta seguro que desea Generar el Asiento Contable?", function(result) {
@@ -390,7 +390,7 @@ $(function()
                     });
                 }
             });
-        });
+        });*/
         //Enable deposit
         $("#enable-deposit").on("click",function(e){
             e.preventDefault();
@@ -595,11 +595,10 @@ $(function()
             $(".message-expense").text('').hide();
             $("#table-items tbody tr").remove();
             $("#save-expense ").html("Actualizar");
-            //data = {"ruc":ruc,"voucher_number":voucher_number};
-            var ruta = 'edit-expense';
+            
             $.ajax({
                 type : 'post' ,
-                url  : server + ruta ,
+                url  : server + 'edit-expense' ,
                 data : 
                 {
                     _token  : $('input[name=_token]').val(),
@@ -616,83 +615,88 @@ $(function()
                 }
             }).done( function ( response )
             {
-                setTimeout(function()
-                {
-                    responseUI('Editar Gasto','green');
-                    $("html, body").animate({scrollTop:200},'500','swing');
-                    data_response = JSON.parse(JSON.stringify(response));
-                    $('input[name=idgasto]').val(data_response.expense.id)
-                    $("#proof-type").val(data_response.expense.idcomprobante).attr("disabled",true);
-                    $("#ruc").val(data_response.expense.ruc).attr("disabled",true);
-                    $("#ruc-hide").val(data_response.expense.ruc);
-                    $("#razon").text(data_response.expense.razon).css("color","#5c5c5c");
-                    $("#razon").attr("data-edit",1);
-                    $("#number-prefix").val(data_response.expense.num_prefijo).attr("disabled",true);
-                    $("#number-serie").val(data_response.expense.num_serie).attr("disabled",true);
-                    
-                    if ( $("#regimen").length == 1 )
+                if ( response.Status == 'Ok' )
+                    setTimeout(function()
                     {
-                        if ( data_response.expense.idtipotributo === null )
+                        responseUI('Editar Gasto','green');
+                        $("html, body").animate({scrollTop:200},'500','swing');
+                        data = JSON.parse( JSON.stringify( response.Data ) );
+                        $('input[name=idgasto]').val( data.expense.id)
+                        $("#proof-type").val(data.expense.idcomprobante).attr("disabled",true);
+                        $("#ruc").val(data.expense.ruc).attr("disabled",true);
+                        $("#ruc-hide").val(data.expense.ruc);
+                        $("#razon").text(data.expense.razon).css("color","#5c5c5c");
+                        $("#razon").attr("data-edit",1);
+                        $("#number-prefix").val(data.expense.num_prefijo).attr("disabled",true);
+                        $("#number-serie").val(data.expense.num_serie).attr("disabled",true);
+                        
+                        if ( $("#regimen").length == 1 )
                         {
-                            $("#regimen").val(0);
-                            $("#monto-regimen").val('').parent().parent().css("visibility" , "hidden" ); 
+                            if ( data.expense.idtipotributo === null )
+                            {
+                                $("#regimen").val(0);
+                                $("#monto-regimen").val('').parent().parent().css("visibility" , "hidden" ); 
+                            }
+                            else
+                            {
+                                $("#regimen").val(data.expense.idtipotributo);
+                                if ( data.expense.idtipotributo >= 1 )
+                                    $("#monto-regimen").val(data.expense.monto_tributo).parent().parent().css("visibility" , "show" ); 
+                            }
+                            $("#monto-regimen").numeric({negative:false});
+                        }
+
+    					if ( !$('#dreparo').find('input[name=reparo]').length == 0)
+    						if ( data.expense.reparo == true )          
+    							$('#dreparo').find('input[name=reparo]')[0].checked = true;
+    						else
+    							$('#dreparo').find('input[name=reparo]')[1].checked = true;
+
+                        $('#igv').val( data.expense.igv );
+                        
+                        date = data.expense.fecha_movimiento.split('-');
+                        date = date[2].substring(0,2)+'/'+date[1]+'/'+date[0];
+                        $("#date").val( date );
+                        $("#desc-expense").val(data.expense.descripcion);
+                        $.each( data.expenseItems , function( index , value )
+                        {
+                            console.log( index + value );
+                            var row_add = row_item_first.clone();
+                            row_add.find('.quantity input').val(value.cantidad);
+                            row_add.find('.description input').val(value.descripcion);
+                            row_add.find('.type-expense').val(value.tipo_gasto);
+                            row_add.find('.total-item input').val(value.importe);
+                            $("#table-items tbody").append(row_add);
+                            $(".total-item input").numeric({negative:false});
+                            $(".quantity input").numeric({negative:false});
+                        });
+                        if(data.expense.idcomprobante == 1 || data.expense.idcomprobante == 4 )
+                        {
+                            $(".tot-document").show();
+                            $("#sub-tot").val(data.expense.sub_tot);
+                            $("#imp-ser").val(data.expense.imp_serv);
+                            $("#igv").val(data.expense.igv);
+                            $('#dreparo').show();
                         }
                         else
                         {
-                            $("#regimen").val(data_response.expense.idtipotributo);
-                            if ( data_response.expense.idtipotributo >= 1 )
-                                $("#monto-regimen").val(data_response.expense.monto_tributo).parent().parent().css("visibility" , "show" ); 
+                            $(".tot-document").hide();
+                            $("#sub-tot").val(0);
+                            $("#imp-ser").val(0);
+                            $("#igv").val(0);
+                            $('#dreparo').hide();
                         }
-                        $("#monto-regimen").numeric({negative:false});
-                    }
-
-					if ( !$('#dreparo').find('input[name=reparo]').length == 0)
-						if ( data_response.expense.reparo == true )          
-							$('#dreparo').find('input[name=reparo]')[0].checked = true;
-						else
-							$('#dreparo').find('input[name=reparo]')[1].checked = true;
-
-                    $('#igv').val( data_response.expense.igv );
-                    
-                    date = data_response.expense.fecha_movimiento.split('-');
-                    //date = data_response.date.split('-');
-                    date = date[2].substring(0,2)+'/'+date[1]+'/'+date[0];
-                    $("#date").val(date);
-                    $("#desc-expense").val(data_response.expense.descripcion);
-                    $.each(data_response.data,function(index,value)
-                    {
-                        console.log( index + value );
-                        var row_add = row_item_first.clone();
-                        row_add.find('.quantity input').val(value.cantidad);
-                        row_add.find('.description input').val(value.descripcion);
-                        row_add.find('.type-expense').val(value.tipo_gasto);
-                        row_add.find('.total-item input').val(value.importe);
-                        $("#table-items tbody").append(row_add);
-                        $(".total-item input").numeric({negative:false});
-                        $(".quantity input").numeric({negative:false});
-                    });
-                    if(data_response.expense.idcomprobante == 1 || data_response.expense.idcomprobante == 4 )
-                    {
-                        $(".tot-document").show();
-                        $("#sub-tot").val(data_response.expense.sub_tot);
-                        $("#imp-ser").val(data_response.expense.imp_serv);
-                        $("#igv").val(data_response.expense.igv);
-                        $('#dreparo').show();
-                    }
-                    else
-                    {
-                        $(".tot-document").hide();
-                        $("#sub-tot").val(0);
-                        $("#imp-ser").val(0);
-                        $("#igv").val(0);
-                        $('#dreparo').hide();
-                    }
-                    var row_expenses = $(".total").parent();
-                    tot_expenses = calculateTot(row_expenses,'.total_expense');
-                    balance = deposit - tot_expenses;
-                    $("#balance").val(balance.toFixed(2));
-                    $(".detail-expense").show();
-                },1000);
+                        var row_expenses = $(".total").parent();
+                        tot_expenses = calculateTot(row_expenses,'.total_expense');
+                        balance = deposit - tot_expenses;
+                        $("#balance").val(balance.toFixed(2));
+                        $(".detail-expense").show();
+                    },1000);
+                else
+                {
+                    responseUI('Error' , 'red');
+                    bootbox.alert('<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+                }
             });
         });
         //Validation spending record button
@@ -794,6 +798,7 @@ $(function()
             }
             else
             {
+                var data = {};
                 data._token        = $('input[name=_token]').val();
                 data.token         = $('input[name=token]').val();
                 data.proof_type    = $("#proof-type").val();
@@ -945,27 +950,31 @@ $(function()
                                 }
                                 else
                                 {
-                                    var rows = $(".total").parent();
+                                    console.log( 'Actualizacion de Gasto');
+                                    var rows = $( ".total" ).parent();
                                     $.each(rows,function(index)
                                     {
-                                        if($(this).find(".voucher_number").html()===voucher_number && $(this).find(".ruc").html()===ruc)
+                                        if( $( this ).find( '.voucher_number' ).html() === voucher_number && $( this ).find( ".ruc" ).html() === ruc )
                                         {
                                             data.idgasto = $('input[name=idgasto]').val();
-                                            $.ajax({
-                                                type: 'post',
-                                                url: server + route_update,
-                                                data: data,
-                                                beforeSend: function(){
-                                                    loadingUI('Actualizando ...');
-                                                },
-                                                error: function(){
-                                                    console.log("error al Actualizar el gasto");
-                                                }
-                                            }).done( function (result) 
+                                            $.ajax(
                                             {
-                                                if(result > 0)
+                                                type: 'post' ,
+                                                url: server + 'register-expense' ,
+                                                data: data,
+                                                beforeSend: function()
+                                                {
+                                                    loadingUI('Actualizando ...');
+                                                }
+                                            }).fail( function ( statusCode , errorThrown )
+                                            {
+                                                ajaxError( statusCode , errorThrown );
+                                            }).done( function ( response ) 
+                                            {
+                                                if( response.Status == 'Ok' )
                                                 {
                                                     responseUI("Gasto Actualizado","green");
+                                                    $( 'input[name=idgasto]' ).val('');
                                                     rechargeExpense().done( function ( data ) 
                                                     {
                                                         if ( data.Status == 'Ok' )
@@ -985,9 +994,8 @@ $(function()
                                                 }
                                                 else
                                                 {
-                                                    console.log(result);
-                                                    responseUI("No se ha actualizado el gasto","red");
-                                                    $(".message-expense").text("No se ha podido actualizar el detalle de gastos");
+                                                    responseUI( 'Error' , 'red' );
+                                                    bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description );
                                                 }
                                             });
                                         }
@@ -1133,11 +1141,11 @@ $(function()
         //Delete Items
         function deleteItems()
         {
-            //$("#table-items tbody tr").remove();
+            $("#table-items tbody tr").remove();
             row_item_first.find('.quantity input').val('');
             row_item_first.find('.description input').val('');
             row_item_first.find('.total-item input').val('');
-            //$("#table-items tbody").append(row_item_first);
+            $("#table-items tbody").append(row_item_first);
         }
         //Delete data
         function deleteExpense()
@@ -1293,56 +1301,6 @@ $(function()
                 return data;
             }
         }
-
-        //Validation inputs retention for discount background
-        /*function validateRet()
-        {
-            var arrayRet = [];
-            var j        = 0;
-            for(var i=0; i<=2; i++)
-            {
-                if($.isNumeric($("#ret"+i).val()))
-                {
-                    if(parseFloat($("#ret"+i).val()) === 0)
-                    {
-                        $("#ret"+i).addClass('error-incomplete');
-                        $("#ret"+i).val('');
-                        $("#ret"+i).attr('placeholder','Número mayor a 0.');
-                        return false;
-                    }
-                    else
-                    {
-                        arrayRet[j] = [i,parseFloat($("#ret"+i).val())];
-                        j++;
-                    }
-                }
-            }
-            if(arrayRet.length > 1)
-            {
-                for(var i=0; i<arrayRet.length; i++)
-                {
-                    $.each(arrayRet[i],function(index,value){
-                        if(index === 0)
-                        {
-                            $("#ret"+value).addClass('error-incomplete').attr('placeholder','Escoger solo una retención.').val('');
-                        }
-                    });
-                }
-                return false;
-            }
-            else
-            {
-                if(arrayRet.length == 1)
-                {
-                    if(parseInt($("#idamount").val(),10) < parseInt(arrayRet[0][1],10))
-                    {
-                        $("#ret"+arrayRet[0][0]).addClass('error-incomplete').attr('placeholder','Retención menor al monto depositado.').val('');
-                        return false;
-                    }    
-                }
-                return true;
-            }
-        }*/
         
         $( document ).off( 'click' , '#saveSeatExpense' );
         $( document ).on( 'click' , '#saveSeatExpense' , function()
@@ -1355,7 +1313,7 @@ $(function()
             $.ajax(
             {
                 type: 'post',
-                url: server+"guardar-asiento-gasto",
+                url: server + 'guardar-asiento-gasto',
                 data: data
             }).fail( function( statusCode , errorThrown)
             {
@@ -1377,7 +1335,8 @@ $(function()
 
         // EDIT SEAT CONT
         $(document).off("click", ".edit-seat-save");
-        $(document).on("click", ".edit-seat-save", function(e){
+        $(document).on("click", ".edit-seat-save", function(e)
+        {
             e.preventDefault(this);
             trElement = $(this).parent().parent();
             trElement.find(".editable").each(function(i,data){
@@ -1452,8 +1411,8 @@ $(function()
                             a = result;
                             $(result).each(function(i,option)
                             {
-                                var tempOption = $('<option value="'+ option.account_expense.num_cuenta +'">'+ option.account_fondo.nombre +' | '+ option.account_expense.num_cuenta +' | '+ option.bago_account_expense.ctanombrecta +'</option>');
-                                tempOption.attr('data-marca', option.mark.codigo + option.document.codigo);
+                                var tempOption = $('<option value="'+ option.account_expense.num_cuenta +'">'+ option.fondo.nombre +' | '+ option.account_expense.num_cuenta +' | '+ option.bago_account_expense.ctanombrecta + ' | ' + option.mark.codigo + '</option>');
+                                tempOption.attr('data-marca', option.mark.codigo );
                                 console.log( tempOption);
                                 select_temp.append(tempOption);
                             });

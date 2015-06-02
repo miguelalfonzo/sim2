@@ -25,17 +25,17 @@ class MarkProofAccounts extends Eloquent
 
 	protected static function listData( $num_cuenta )
 	{
-		return MarkProofAccounts::where( 'num_cuenta_fondo' , $num_cuenta )->with( 'accountFondo' , 'accountExpense' , 'mark' , 'document' , 'bagoAccountExpense' )->get();
+		return MarkProofAccounts::where( 'num_cuenta_fondo' , $num_cuenta )->with( 'fondo' , 'accountExpense' , 'mark' , 'bagoAccountExpense' )->distinct()->select( 'num_cuenta_fondo , num_cuenta_gasto , marca_codigo' )->get();
 	}
 
 	public function accountExpense()
 	{
-		return $this->hasOne( 'Dmkt\Account' , 'id' , 'idcuentagasto' );
+		return $this->hasOne( 'Dmkt\Account' , 'num_cuenta' , 'num_cuenta_gasto' );
 	}
 
 	public function mark()
 	{
-		return $this->hasOne( 'Expense\Mark' , 'id' , 'idmarca' );
+		return $this->hasOne( 'Expense\Mark' , 'codigo' , 'marca_codigo' );
 	}
 
 	public function document()
@@ -43,9 +43,14 @@ class MarkProofAccounts extends Eloquent
 		return $this->hasOne( 'Expense\Proof' , 'id' , 'iddocumento' );
 	}
 
-	public function accountFondo()
+	public function fondo()
 	{
 		return $this->hasOne( 'Common\Fondo' , 'num_cuenta' , 'num_cuenta_fondo' );
+	}
+
+	public function accountFondo()
+	{
+		return $this->hasOne( 'Dmkt\Account' , 'num_cuenta' , 'num_cuenta_fondo');
 	}
 
 	protected function bagoAccountFondo()

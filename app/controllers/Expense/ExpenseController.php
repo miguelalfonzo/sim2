@@ -21,6 +21,7 @@ use \Exception;
 use \Session;
 use \Dmkt\Account;
 use \Validator;
+use \yajra\Pdo\Oci8\Exceptions\Oci8Exception;
 
 class ExpenseController extends BaseController
 {
@@ -87,56 +88,51 @@ class ExpenseController extends BaseController
 	{
 		try
 		{
-			//$result = array(); 
+			DB::beginTransaction();
 			$inputs = Input::all();
 			$middleRpta = $this->validateInputExpense( $inputs );
 			if ( $middleRpta[ status ] === ok )
-	        {
-		        $solicitud = Solicitud::where( 'token' , $inputs['token'] )->first();
-	 
-		    	$proof = ProofType::find( $inputs['proof_type']);
-
-		    	if ( $proof->code != 'N' )
-			    	if( !is_null( $inputs['ruc'] ) && ! is_null( $inputs['number_prefix'] ) && $inputs['number_serie'] != null )
-			    	{
-			    		$row_expense    = Expense::where( 'ruc' , $inputs['ruc'] )->where( 'num_prefijo' ,$inputs[ 'number_prefix' ] )->where( 'num_serie' ,$inputs['number_serie'])->get();	
-						if( $row_expense->count() > 0 )
-							return $this->warningException( 'Ya existe un gasto registrado con Ruc: '.$inputs['ruc'] . ' numero: '.$inputs['number_prefix'].'-'.$inputs['num_serie'] , __FUNCTION__ , __LINE__ , __FILE__ );
-					}
-
-				DB::beginTransaction();
-				$expense = new Expense;
-				
-				$expense->num_prefijo = $inputs['number_prefix'];
-				$expense->num_serie = $inputs['number_serie'];
-				$expense->ruc = $inputs['ruc'];
-				$expense->razon = $inputs['razon'];
-				$expense->monto = $inputs['total_expense'];
-	            
-	            if( $proof->igv == 1 )
+			{
+				if ( isset( $inputs[ 'idgasto' ] ) )
+					$expense = Expense::find( $inputs[ 'idgasto' ] );
+				else
 				{
-					$expense->igv = $inputs['igv'];
+					$expense = new Expense;
+					$expense->id = $expense->lastId() + 1;
+		        }
+		        
+			    $proof = ProofType::find( $inputs[ 'proof_type' ] );
+		    	if ( $proof->code != 'N' && !isset( $inputs[ 'idgasto' ] ) )
+			    	if( ! is_null( $inputs[ 'ruc' ] ) && ! is_null( $inputs[ 'number_prefix' ] ) && ! is_null( $inputs[ 'number_serie' ] ) )
+			    	{
+			    		$row_expense = Expense::where( 'ruc' , $inputs[ 'ruc' ] )->where( 'num_prefijo' ,$inputs[ 'number_prefix' ] )->where( 'num_serie' , $inputs[ 'number_serie' ] )->get();	
+						if( $row_expense->count() > 0 )
+							return $this->warningException( 'Ya existe un gasto registrado con Ruc: ' . $inputs[ 'ruc' ] . ' numero: '.$inputs[ 'number_prefix' ] . '-' . $inputs[ 'num_serie' ] , __FUNCTION__ , __LINE__ , __FILE__ );
+					}
+				if( $proof->igv == 1 )
+				{
+					$expense->igv      = $inputs['igv'];
 					$expense->imp_serv = $inputs['imp_service'];
-					$expense->sub_tot = $inputs['sub_total_expense'];
-					$expense->idigv = $expense->lastIdIgv() + 1;
-				}
-
-				$date = $inputs['date_movement'];
+					$expense->sub_tot  = $inputs['sub_total_expense'];
+					$expense->idigv    = $expense->lastIdIgv() + 1;
+				}	
+	            else
+	            {
+	                $expense->igv      = null;
+	                $expense->imp_serv = null;
+	                $expense->sub_tot  = null;
+	            }
+		        $date = $inputs['date_movement'];
 		        list($d, $m, $y) = explode('/', $date);
 		        $d = mktime(11, 14, 54, $m, $d, $y);
-		        
-		        $expense->descripcion = $inputs['desc_expense'];
-		        $expense->fecha_movimiento = date("Y/m/d", $d);
-		        $expense->idcomprobante = $inputs['proof_type'];
-		 		$expense->id_solicitud = $solicitud->id;
-				$expense->id = $expense->lastId() + 1;
-				if( isset( $inputs['rep'] ) )
-					$expense->reparo = $inputs['rep'];
-				$expense->save();
+				$inputs[ 'date' ] = date("Y/m/d", $d );
+				$solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
+				$inputs[ 'id_solicitud' ] = $solicitud->id;
+				$this->setExpense( $expense , $inputs );
 
 				//Detail Expense
-			
-				for($i=0;$i<count( $inputs['quantity'] );$i++)
+				ExpenseItem::where( 'id_gasto' , $expense->id )->delete();
+				for( $i = 0 ; $i < count( $inputs[ 'quantity' ] ) ; $i++ )
 				{
 					$expense_detail = new ExpenseItem;
 					$expense_detail->id = $expense_detail->lastId() + 1 ;
@@ -149,36 +145,68 @@ class ExpenseController extends BaseController
 				}
 				DB::commit();
 				return $this->setRpta();
-			} 
+			}
+			DB::rollback();
 			return $middleRpta;
 		}
-		catch ( Exception $e )
+		catch( Oci8Exception $e )
+		{
+			DB::rollback();
+			return $this->internalException( $e , __FUNCTION__ , DB );
+		}
+		catch( Exception $e )
 		{
 			DB::rollback();
 			return $this->internalException( $e , __FUNCTION__ );
 		}
 	}
 
+	private function setExpense( $expense , $inputs )
+	{
+		//Log::error( $inputs );
+		$expense->idcomprobante    = $inputs['proof_type'];
+		$expense->num_prefijo      = $inputs['number_prefix'];
+		$expense->num_serie 	   = $inputs['number_serie'];
+		$expense->ruc 			   = $inputs['ruc'];
+		$expense->razon 		   = $inputs['razon'];
+		$expense->monto 		   = $inputs['total_expense'];
+		$expense->descripcion 	   = $inputs['desc_expense'];
+        $expense->fecha_movimiento = $inputs[ 'date' ];
+        $expense->idcomprobante    = $inputs['proof_type'];
+ 		$expense->id_solicitud 	   = $inputs[ 'id_solicitud'];
+ 		$expense->sub_tot 		   = $inputs['total_expense'];
+ 		if ( isset( $inputs[ 'rep' ] ) )
+			$expense->reparo = $inputs['rep'];
+
+ 		if ( isset( $inputs[ 'idregimen' ] ) )
+            if ( $inputs['idregimen'] == 0 )
+            {
+            	$expense->idtipotributo = 0;
+            	$expense->monto_tributo = 0;
+            }
+            else
+            {
+        		$expense->idtipotributo = $inputs['idregimen'];
+            	$expense->monto_tributo = $inputs['monto_regimen'];    	
+            }
+		$expense->save();
+		Log::error( json_encode( $expense ) );
+	}
+	
+
 	public function deleteExpense()
 	{
 		try
 		{
 			DB::beginTransaction();
-			$inputs 	= Input::all();
+			$inputs = Input::all();
 			$expense = Expense::find( $inputs['gastoId'] );
-			if ( count( $expense ) == 0 )
-				return $this->warninException( __FUNCTION__ , 'Gasto no encontrado con Id: '.$inputs['gastoId'] );
-			else
-				if ( !$expense->delete() )
-				{
-					DB::rollback();
-					return $this->warninException( __FUNCTION__ , 'No se pudo eliminar el gasto' );
-				}
-				else
-				{
-					DB::commit();
-					return $this->setRpta();
-				} 
+			if ( is_null( $expense ) )
+				return $this->warninException( 'No se encontro el registro del gasto con Id: '.$inputs['gastoId'] , __FUNCTION__ , __LINE__ , __FILE__ );
+			ExpenseItem::where( 'id_gasto' , $inputs[ 'gastoId' ] )->delete();
+			$expense->delete();
+			DB::commit();
+			return $this->setRpta();
 		}
 		catch( Exception $e )
 		{
@@ -191,104 +219,17 @@ class ExpenseController extends BaseController
 	{
 		try
 		{
-			$inputs = Input::all();
-			$idExpense      = Expense::find( $inputs['idgasto']);
-			$data           = $idExpense->items;
-			$response = ['data'=>$data, 'expense'=>$idExpense, 'date'=>$idExpense->fecha_movimiento];
+			$inputs 	  = Input::all();
+			$expense      = Expense::find( $inputs[ 'idgasto' ] );
+			if ( is_null( $expense ) )
+				return $this->warninException( 'No existe registro del gasto con Id: ' . $inputs[ 'idgasto' ] , __FUNCTION__ , __LINE__ , __FILE__ );
+			$expenseItems = $expense->items;
+			return $this->setRpta( array( 'expense' => $expense , 'expenseItems' => $expenseItems ) );
+			$response 	  = array( 'data' => $data , 'expense' => $expense , 'date' => $expense->fecha_movimiento );
 			return $response;
 		}
 		catch ( Exception $e )
 		{
-			return $this->internalException( $e , __FUNCTION__ );
-		}
-	}
-
-	public function updateExpense()
-	{
-		try
-		{
-			DB::beginTransaction();
-			$inputs = Input::all();
-			$expenseEdit  = Expense::find($inputs['idgasto']);
-			if( count( $expenseEdit ) > 0 )
-			{
-				$expenseEdit->num_prefijo   = $inputs['number_prefix'];
-				$expenseEdit->num_serie 	= $inputs['number_serie'];
-				$expenseEdit->ruc			= $inputs['ruc'];
-				$expenseEdit->razon 		= $inputs['razon'];
-				$expenseEdit->monto 		= $inputs['total_expense'];
-
-				$proof_type = ProofType::find( $inputs['proof_type'] );
-	            if ( $proof_type->igv == 1 )
-	                if ( isset( $inputs['igv'] ) && isset( $inputs['imp_service'] ) )
-	                {
-	                    $expenseEdit->igv = $inputs['igv'];
-	                    $expenseEdit->imp_serv = $inputs['imp_service'];
-	                    $expenseEdit->sub_tot = $inputs['sub_total_expense'];
-	                }
-	                else
-	                    $expenseEdit->sub_tot = $inputs['total_expense'];
-	            else
-	            {
-	                $expenseEdit->igv      = null;
-	                $expenseEdit->imp_serv = null;
-	                $expenseEdit->sub_tot  = null;
-	            }
-
-	            if ( isset( $inputs['idregimen']))
-		            if ( $inputs['idregimen'] == 0 )
-		            {
-		            	$expenseEdit->idtipotributo = null;
-		            	$expenseEdit->monto_tributo = null;
-		            }
-		            elseif ( $inputs['idregimen'] >= 1 )
-		            {
-	            		$expenseEdit->idtipotributo = $inputs['idregimen'];
-		            	$expenseEdit->monto_tributo = $inputs['monto_regimen'];    	
-		            }
-
-				$expenseEdit->idcomprobante = $inputs['proof_type'];
-				$date = $inputs['date_movement'];
-		        list($d, $m, $y) = explode('/', $date);
-		        $d = mktime(11, 14, 54, $m, $d, $y);
-		        $date = date("Y/m/d", $d);
-		        $expenseEdit->fecha_movimiento = $date;
-		        $expenseEdit->descripcion = $inputs['desc_expense'];
-		        
-		        if( isset( $inputs['rep'] ) )
-					$expenseEdit->reparo = $inputs['rep'];
-				
-		        $quantity = $inputs['quantity'];
-				$description = $inputs['description'];
-				
-				$total_item = $inputs['total_item'];
-
-				if( $expenseEdit->save() )
-				{
-					ExpenseItem::where( 'idgasto' , $expenseEdit->id )->delete();
-					for($i=0;$i<count($quantity);$i++)
-					{
-						$expense_detail = new ExpenseItem;
-						$expense_detail->id = $expense_detail->lastId() + 1;
-						$expense_detail->tipo_gasto = $inputs['tipo_gasto'][$i];
-						$expense_detail->idgasto = $expenseEdit->id;
-						$expense_detail->cantidad = $quantity[$i];
-						$expense_detail->descripcion = $description[$i];
-						$expense_detail->importe = $total_item[$i];
-						if ( !$expense_detail->save() )
-						{
-							DB::rollback();	
-							return 0;	
-						}
-					}
-					DB::commit();
-					return 1;
-				}
-			}
-		}
-		catch ( Exception $e )
-		{
-			DB::rollback();
 			return $this->internalException( $e , __FUNCTION__ );
 		}
 	}

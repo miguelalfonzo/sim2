@@ -75,7 +75,7 @@ Route::group(array('before' => 'cont'), function ()
     Route::get('revisar-asiento-gasto/{token}', 'Dmkt\SolicitudeController@viewSeatExpense');
     Route::get('generar-asiento-gasto/{token}', 'Dmkt\SolicitudeController@viewGenerateSeatExpense');
     Route::post('guardar-asiento-gasto', 'Dmkt\SolicitudeController@saveSeatExpense');
-    Route::post('generate-seat-expense', 'Dmkt\SolicitudeController@generateSeatExpense');
+    //Route::post('generate-seat-expense', 'Dmkt\SolicitudeController@generateSeatExpense');
     Route::post('get-account', 'Dmkt\SolicitudeController@getCuentaContHandler');
     Route::get('list-documents-type', 'Dmkt\FondoController@listDocuments');
     Route::post('list-documents', 'Movements\MoveController@searchDocs');
@@ -131,7 +131,6 @@ Route::group(array('before' => 'rm_cont_ager'), function ()
     Route::post('edit-expense', 'Expense\ExpenseController@editExpense');
     Route::post('delete-expense', 'Expense\ExpenseController@deleteExpense');
     Route::post('register-expense', 'Expense\ExpenseController@registerExpense');
-    Route::post('update-expense', 'Expense\ExpenseController@updateExpense');
     Route::get('a/{token}', 'Expense\ExpenseController@reportExpense');
     Route::get('report-fondo/{token}','Expense\ExpenseController@reportExpenseFondo');
 });

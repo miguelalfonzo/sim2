@@ -19,7 +19,6 @@ use \Exception;
 
 class TableController extends BaseController
 {
-
 	public function getMaintenanceCellData()
 	{
 		try
@@ -142,14 +141,14 @@ class TableController extends BaseController
 	private function maintenanceUpdateCuentasMarca( $val )
 	{
 		$accountsMark = MarkProofAccounts::find($val['id'] );
-		$val[data]['idcuentafondo'] = $this->getAccount( $val[data]['idcuentafondo'] )[data];
+		Log::error( $val );
+		/*$val[data]['idcuentafondo'] = $this->getAccount( $val[data]['idcuentafondo'] )[data];
 		$val[data]['idcuentagasto'] = $this->getAccount( $val[data]['idcuentagasto'] )[data];
 		$val[data]['idmarca'] = $this->getMark( $val[data]['idmarca'] )[data];
-
+*/
 		foreach ( $val[data] as $key => $data )
 			$accountsMark->$key = $data;
 		$accountsMark->save();
-		
 		return $this->setRpta();
 	}
 

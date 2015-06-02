@@ -34,6 +34,11 @@ const ERROR_NOT_FOUND_MARCA					  	= 'No se encontro Marca';
 const MESSAGE_NOT_FOUND_MARCA				  	= 'Verificar relación entre las Cuentas de Contabilidad y las Marcas';
 const CUENTA_REPARO_COMPRAS						= '6411000';//debe
 const CUENTA_REPARO_GOBIERNO					= '4011100';//haber
+const CUENTA_RETENCION_DEBE						= 1681000;
+const CUENTA_RETENCION_HABER				 	= 4011400;
+const CUENTA_DETRACCION_HABER					= 4212300;
+const CUENTA_RENTA_4TA_HABER					= 4017200;
+const CUENTA_DETRACCION_REEMBOLSO				= 4699700;
 const ERROR_INVALID_ACCOUNT_MKT					= 'Error de Cuenta';
 const MSG_INVALID_ACCOUNT_MKT					= 'Verificar campo de cuenta';
 
