@@ -52,11 +52,9 @@
 	                               class="form-control">
 	                        @else
 	                        	<span class="input-group-addon">AG</span>
-	                        <input id="textinput" name="titulo" type="text" placeholder=""
-	                               value="{{$solicitud->createdBy->person->full_name}}" disabled
-	                               class="form-control">
-	                        
-
+		                        <input id="textinput" name="titulo" type="text" placeholder=""
+	                            value="{{$solicitud->createdBy->person->full_name}}" disabled
+	                            class="form-control">
 	                        @endif
 	                    </div>							
 					</div>
@@ -66,19 +64,23 @@
 						<label>Autorizado por</label>
 						<div class="input-group">
 							@if ( $solicitud->createdBy->type == ASIS_GER )
-	                        <span class="input-group-addon">AG</span>
-	                        <input id="textinput" name="titulo" type="text" placeholder=""
-	                               value="{{$solicitud->createdBy->person->full_name}}" disabled class="form-control">
+		                        <span class="input-group-addon">AG</span>
+		                        <input id="textinput" name="titulo" type="text" placeholder=""
+		                        value="{{$solicitud->createdBy->person->full_name}}" disabled class="form-control">   
+	                        @elseif($solicitud->approvedHistory->user->type == SUP )
+		                        <span class="input-group-addon">S</span>
+		                        <input id="textinput" name="titulo" type="text" placeholder=""
+	                            value="{{ $solicitud->approvedHistory->updatedBy->sup->full_name}}" disabled
+	                            class="form-control">
+	                        @elseif ( $solicitud->approvedHistory->user->type == GER_PROD )
+		                        <span class="input-group-addon">G</span>
+		                        <input id="textinput" name="titulo" type="text" placeholder=""
+		                        value="{{ $solicitud->approvedHistory->updatedBy->gerprod->full_name }}" disabled class="form-control">
+	                        @elseif ( !is_null( $solicitud->approvedHistory->user->simApp ) )
+		                        <span class="input-group-addon">G</span>
+		                        <input id="textinput" name="titulo" type="text" placeholder=""
+		                        value="{{ $solicitud->approvedHistory->updatedBy->person->full_name }}" disabled class="form-control">
 	                        
-	                        @elseif($solicitud->acceptHist->updatedBy->type == SUP )
-	                        <span class="input-group-addon">S</span>
-	                        <input id="textinput" name="titulo" type="text" placeholder=""
-	                               value="{{mb_convert_case($solicitud->acceptHist->updatedBy->sup->nombres.' '.$solicitud->acceptHist->updatedBy->sup->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled
-	                               class="form-control">
-	                        @elseif ( $solicitud->acceptHist->updatedBy->type == GER_PROD )
-	                        <span class="input-group-addon">G</span>
-	                        <input id="textinput" name="titulo" type="text" placeholder=""
-	                               value="{{mb_convert_case($solicitud->acceptHist->updatedBy->gerprod->descripcion,MB_CASE_TITLE,'UTF-8')}}" disabled class="form-control">
 	                        @endif
 	                    </div>							
 					</div>

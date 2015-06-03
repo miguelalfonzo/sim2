@@ -1,4 +1,4 @@
-<div class="panel-body table-solicituds">
+<div class="panel-body table_solicitudes">
     <div class="col-md-12" style="padding: 0">
         {{Form::token()}}
         <div class="form-group col-sm-2 col-md-2" style="padding: 0">

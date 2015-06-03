@@ -10,14 +10,6 @@
                 </a>
             </li>
             @include('template.User.li_estado_cuenta')
-            <!-- if ( in_array( Auth::user()->type , array( REP_MED , SUP ) ) )
-                <li>
-                    <a href="#new-sol" role="tab" data-toggle="tab">
-                        <icon class="fa fa-home"></icon>
-                        Registrar Fondos
-                    </a>
-                </li>
-             -->
             @if ( Auth::user()->type == ASIS_GER )
                 <li>
                     <a href="#fondos" role="tab" data-toggle="tab">
@@ -51,10 +43,17 @@
                     </a>
                 </li>
             @elseif ( Auth::user()->type == GER_PROD )
-                <li>
+                <!-- <li>
                     <a href="#rentabilidad" role="tab" data-toggle="tab">
                         <i class="fa fa-user"></i>
                         Reporte de Rentabilidad
+                    </a>
+                </li> -->
+            @elseif ( Auth::user()->type == GER_COM )
+                <li>
+                    <a href="#reporte-fondo" role="tab" data-toggle="tab">
+                        <i class="fa fa-user"></i>
+                        Reporte de Fondos
                     </a>
                 </li>
             @elseif ( Auth::user()->type == TESORERIA )
@@ -77,12 +76,6 @@
                 </div>
             </div>
             @include('template.tb_estado_cuenta')
-            <!-- if ( in_array( Auth::user()->type , array( REP_MED , SUP ) ) )
-                <div class="tab-pane fade" id="new-sol">
-                    <div class="panel panel-default">
-                        include('Dmkt.Solicitud.Representante.detail')
-                    </div>
-                </div> -->
             @if (Auth::user()->type == CONT)
                 <!-- Busqueda de Documentos -->
                 <div class="tab-pane fade" id="documentos">
@@ -122,12 +115,19 @@
                     </div>
                 </div>
             @elseif ( Auth::user()->type == GER_PROD )
-                <!-- Mantenimiento de los Fondos de las Solicitudes -->
-                <div class="tab-pane fade" id="rentabilidad">
+                <!-- Reporte de Rentabilidad -->
+                <!-- <div class="tab-pane fade" id="rentabilidad">
                     <div class="panel panel-default">
                         <div class="panel-body panel-default table_rentabilidad"></div>
                     </div>
-                </div>
+                </div> -->
+            @elseif ( Auth::user()->type == GER_COM )
+                <!-- Reporte de Fondos -->
+                <div class="tab-pane fade" id="reporte-fondo">
+                    <div class="panel panel-default">
+                        <div class="panel-body panel-default table_estado-fondos"></div>
+                    </div>
+                </div>        
             @elseif ( Auth::user()->type == TESORERIA )
                 <!-- Mantenimiento de los Fondos de las Solicitudes -->
                 <div class="tab-pane fade" id="sol-fondo">

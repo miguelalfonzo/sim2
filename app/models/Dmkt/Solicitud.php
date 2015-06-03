@@ -67,6 +67,11 @@ class Solicitud extends Eloquent
         return $this->hasOne( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->where( 'status_to' , APROBADO );
     }
 
+    public function toDepositHistory()
+    {
+        return $this->hasOne( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->where( 'status_to' , DEPOSITO_HABILITADO );
+    }
+
     public function acceptHist()
     {
         return $this->hasOne('System\SolicitudHistory','id_solicitud','id')->where( 'status_to' , ACEPTADO )->orderBy( 'updated_at' , 'DESC' );

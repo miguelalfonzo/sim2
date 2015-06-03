@@ -24,9 +24,9 @@ class Expense extends Eloquent {
         return $this->hasMany('Expense\ExpenseItem','id_gasto','id');
     }
 
-    protected function solicitud()
+    public function solicitud()
     {
-    	return $this->hasOne( 'Dmkt\Solicitude' , 'id' , 'idsolicitud' );
+    	return $this->hasOne( 'Dmkt\Solicitud' , 'id' , 'id_solicitud' );
     }
 
     public function lastId()

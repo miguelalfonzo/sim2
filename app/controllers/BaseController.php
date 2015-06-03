@@ -188,63 +188,6 @@ class BaseController extends Controller
         return array( status => ok , 'Data' => $data );
     }
 
-    protected function searchSolicituds($estado,$idUser,$start,$end)
-    {
-        $solicituds = Solicitud::whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
-        if ( in_array( Auth::user()->type , array ( REP_MED , SUP , GER_PROD , GER_PROM ) ) )
-        {
-            $solicituds->where( function ( $query )
-            {
-                $query->where( function ( $query )
-                {
-                    $query->where( 'created_by' , '<>' , Auth::user()->id )->where( function ( $query )
-                    {
-                        $query->where( 'id_user_assign' , '<>' , Auth::user()->id )->orWhereNull( 'id_user_assign' );
-                    })->whereHas( 'gerente' , function( $query )
-                    {
-                        $query->where( 'id_gerprod' , Auth::user()->id )->orWhere( 'id_gerprod' , Auth::user()->tempId() );
-                    });
-                })->orWhere( function ( $query )
-                {
-                    $query->where( 'created_by' , Auth::user()->id )->orWhere( function ( $query )
-                    {
-                        $query->where( 'created_by' , '<>' , Auth::user()->id )->where( 'id_user_assign' , Auth::user()->id );
-                    });
-                });
-            });
-        }
-        if ( Auth::user()->type == TESORERIA ) 
-        {
-            if ($estado != R_FINALIZADO)
-            {
-                $solicituds->whereIn( 'id_estado' , array( DEPOSITO_HABILITADO , DEPOSITADO ) );
-            }
-            else
-            {
-                $solicituds->whereHas( 'detalle' , function ($q)
-                {
-                    $q->whereNotNull('id_deposito');
-                });
-            }
-        }
-        else if ( Auth::user()->type == CONT )
-            $solicituds->where( 'id_estado' , '<>' , ACEPTADO );
-
-        if ( $estado != R_TODOS)
-        { 
-            $solicituds->whereHas( 'state' , function ( $q ) use( $estado )
-            {
-                $q->whereHas( 'rangeState' , function ( $t ) use( $estado )
-                {
-                    $t->where( 'id' , $estado );
-                });
-            });    
-        }
-        
-        $solicituds = $solicituds->orderBy('id', 'ASC')->get();     
-        return $this->setRpta($solicituds);
-    }
-
     protected function userType()
     {
         try

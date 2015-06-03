@@ -1,4 +1,4 @@
-<table class="table table-hover table-bordered table-condensed dataTable" id="table_solicitude_fondos" style="width: 100%">
+<table class="table table-hover table-bordered table-condensed dataTable" id="table_reporte_institucional" style="width: 100%">
     <thead>
         <tr>
             <th>#</th>

@@ -1,4 +1,4 @@
-<div class="panel-body table-documents">
+<div class="panel-body table_documents">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
         <div class="form-group col-xs-8 col-sm-4 col-md-2 col-lg-2">
             <div>

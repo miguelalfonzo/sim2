@@ -85,6 +85,12 @@ class SolicitudeController extends BaseController
             $data['proofTypes'] = ProofType::order();
             $data['regimenes'] = Regimen::all();      
         }
+        if ( Session::has( 'id_solicitud') )
+        {
+            $solicitud = Solicitud::find( Session::pull( 'id_solicitud' ) );
+            $solicitud->status = ACTIVE ;
+            $solicitud->save();
+        }
         return View::make('template.User.show',$data);   
     }
 
@@ -136,6 +142,7 @@ class SolicitudeController extends BaseController
                         $politicStatus = TRUE;
                         $typeUser = $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario;
                         $solicitud->status = BLOCKED;
+                        Session::put( 'id_solicitud' , $solicitud->id );
                         $solicitud->save();
                         $data[ 'fondos' ] = Fondo::getFunds( $typeUser );
                         if ( ! is_null( $solicitud->detalle->id_fondo ) )
@@ -355,6 +362,7 @@ class SolicitudeController extends BaseController
             $middleRpta = $this->validateInputSolRep( $inputs );
             if ( $middleRpta[status] == ok )
             {
+                $newImage = 0;
                 if ( isset( $inputs[ 'idsolicitud' ] ) )
                 {
                     $solicitud = Solicitud::find( $inputs[ 'idsolicitud' ] );
@@ -457,47 +465,6 @@ class SolicitudeController extends BaseController
         $detalle->id_motivo     = $inputs['motivo'];
         $detalle->id_pago       = $inputs['pago'];
     }                  
-
-    public function searchDmkt()
-    {
-        try
-        {
-            $inputs = Input::all();
-            $today = getdate();
-            $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];      
-            if ( Input::has('idstate'))
-                $estado = $inputs['idstate'];
-            else
-                $estado = R_TODOS;
-            if ( Input::has('date_start'))
-                $start = $inputs['date_start'];
-            else
-                $start = date('01-m-Y', strtotime($m));
-            if (Input::has('date_end'))
-                $end = $inputs['date_end'];
-            else
-                $end = date('t-m-Y', strtotime($m));
-            $rpta = $this->userType();
-            if ( $rpta[status] == ok )
-                $middleRpta = $this->searchSolicituds( $estado , $rpta[data] , $start , $end );
-                if ( $middleRpta[status] == ok )
-                {
-                    $data = array( 'solicituds' => $middleRpta[data] );
-                    if ( Auth::user()->type == TESORERIA )
-                        $data['tc'] = ChangeRate::getTc();
-                    return $this->setRpta( View::make('template.List.solicituds')->with( $data )->render() );
-                }
-                return $middleRpta;
-        }
-        catch ( Oci8Exception $e )
-        {
-            return $this->internalException( $e , __FUNCTION__ , DB );
-        }
-        catch (Exception $e)
-        {
-            return $this->internalException($e,__FUNCTION__);
-        }
-    }
 
     private function textLv( $solicitud )
     {

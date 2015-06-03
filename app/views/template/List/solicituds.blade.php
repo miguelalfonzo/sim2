@@ -1,4 +1,4 @@
-<table class="table table-striped table-bordered dataTable" id="table_solicitude" style="width: 100%">
+<table class="table table-striped table-bordered dataTable" id="table_solicitudes">
     <thead>
         <tr>
             <th>#</th>
@@ -102,7 +102,7 @@
                 @if ( Auth::user()->type == GER_COM )
                     <td class="text-center">
                         @if ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) )
-                        && $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario === Auth::user()->type
+                        && isset( $solicitud->id_inversion ) && $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario === Auth::user()->type
                         && in_array( Auth::user()->id , $solicitud->managerEdit( $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario )->lists( 'id_gerprod' ) ) )
                             <input type="checkbox" name="mass-aprov">
                         @else

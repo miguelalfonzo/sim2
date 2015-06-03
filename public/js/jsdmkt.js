@@ -355,87 +355,14 @@ function newSolicitude() {
         }).done(function ( response ) 
         {
             if ( response.Status == 'Ok' )
-            {
-                $('#table_' + type + '_wrapper').remove();
-                $('.table_' + type ).append(response.Data);
-                $('#table_' + type ).dataTable(
-                {
-                    "order": [ [ 0, "desc" ] ],
-                    "bLengthChange": false,
-                    'iDisplayLength': 7,
-                    "oLanguage": 
-                    {
-                        "sSearch": "Buscar: ",
-                        "sZeroRecords": "No hay Informacion",
-                        "sInfoEmpty": "No hay Informacion",
-                        "sInfo": 'Mostrando _END_ de _TOTAL_',
-                        "oPaginate": 
-                        {
-                            "sPrevious": "Anterior",
-                            "sNext" : "Siguiente"
-                        }
-                    }
-                });
-            }
+                dataTable( 'table_' + type , response.Data , 'registros' );
             else
                 bootbox.alert('<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
         });
     }
 
     //Function list Solicitude
-    function listSolicitude()
-    {
-        state = $('#idState').val();
-        var l = Ladda.create($("#search-solicitude")[0]);
-        l.start();
-        $.ajax(
-        {
-            url: server + 'buscar-solicitudes',
-            type: 'POST',
-            data:
-            { 
-                idstate: state,
-                date_start: date_start.val(), 
-                date_end: date_end.val(),
-                _token : $('input[name=_token]').val() 
-            }
-        }).fail( function ( statusCode , errorThrown )
-        {
-            l.stop();
-            ajaxError( statusCode , errorThrown );
-        }).done(function (data) 
-        {
-            l.stop();
-            if (data.Status == 'Ok' )
-            {
-                $('#table_solicitude_wrapper').remove();
-                $('.table-solicituds').append(data.Data);
-                $('#table_solicitude').dataTable(
-                {
-                    "order": 
-                    [
-                        [ 3, "desc" ] //order date
-                    ],
-                    "bLengthChange": false,
-                    'iDisplayLength': 7,
-                    "oLanguage": 
-                    {
-                        "sSearch": "Buscar: ",
-                        "sZeroRecords": "No hay solicitudes",
-                        "sInfoEmpty": "No hay solicitudes",
-                        "sInfo": 'Mostrando _END_ de _TOTAL_',
-                        "oPaginate": 
-                        {
-                            "sPrevious": "Anterior",
-                            "sNext" : "Siguiente"
-                        }
-                    }
-                });
-            }
-            else
-                responseUI(data.Status + ': ' + data.Description,'red');
-        });
-    }
+    
 
     function listDocuments()
     {
@@ -461,134 +388,139 @@ function newSolicitude() {
         {
             l.stop();
             if ( data.Status == 'Ok' )
-            {
-                $("#table_documents_wrapper").remove();
-                $('.table-documents').append(data.Data);
-                $('#table_documents').dataTable(
-                {
-                    "order": [ [ 0, "desc" ] ],
-                    "bLengthChange": false,
-                    'iDisplayLength': 7,
-                    "oLanguage": 
-                    {
-                        "sSearch": "Buscar: ",
-                        "sZeroRecords": "No hay fondos",
-                        "sInfoEmpty": "No hay fondos",
-                        "sInfo": 'Mostrando _END_ de _TOTAL_',
-                        "oPaginate": 
-                        {
-                            "sPrevious": "Anterior",
-                            "sNext" : "Siguiente"
-                        }
-                    }
-                });
-            }
+                dataTable( 'table_documents' , data.Data );
             else
                 bootbox.alert( '<h4 class=red>' + data.Status + ': ' + data.Description + '</h4>');
         });
     }
 
+
     function listDocumentsType()
     {
-        $.ajax({
+        $.ajax(
+        {
             url: server + 'list-documents-type',
             type: 'GET',
             dataType: 'html'
         }).fail( function ( statusCode , errorThrown)
         {
             ajaxError( statusCode , errorThrown );
-        }).done(function (data) {
-            $("#table_document_contabilidad_wrapper").remove();
-            $('.table_document_contabilidad').append(data);
-            $('#table_document_contabilidad').dataTable(
-            {
-                "order": [ [ 0, "desc" ] ],
-                "bLengthChange": false,
-                'iDisplayLength': 7,
-                "oLanguage": 
-                {
-                    "sSearch": "Buscar: ",
-                    "sZeroRecords": "No hay fondos",
-                    "sInfoEmpty": "No hay fondos",
-                    "sInfo": 'Mostrando _END_ de _TOTAL_',
-                    "oPaginate": 
-                    {
-                        "sPrevious": "Anterior",
-                        "sNext" : "Siguiente"
-                    }
-                }
-            });
+        }).done(function (data) 
+        {
+            dataTable( 'table_document_contabilidad' , data , 'documentos' );
         });
     }
 
-    /*$('#derived').click( function()
+    function searchFondos( datefondo , aux ) 
     {
-        var pdata = 
+        var url = server + 'list-fondos/' + datefondo;
+        $('#loading-fondo').attr('class','show');
+        $('.table-solicituds-fondos > .fondo_r').remove();
+        $('.fondo_r').remove();
+        $.get(url)
+        .done(function (data) 
         {
-            _token : $('input[name=_token]').val() ,
-            idsolicitud : id_solicitud.val()
-        };
-        $.ajax({
-            url  : server + 'buscar-gerprod',
-            type : 'POST',
-            data : pdata
-        }).fail( function ( statusCode , errorThrown )
-        {
-            ajaxError( statusCode , errorThrown );
-        }).done( function ( data ) 
-        {
-            if ( data.Status != 'Ok' )
-                bootbox.alert('<h4 class="red">' + data.Status + ' ' + data.Description + '</h4>');
-            else
+            if ( data.Status == 'Ok' )
             {
-                var list='';
-                data.Data.forEach(function(entry)
+                $('#loading-fondo').attr('class','hide');
+                $('.table_solicituds_fondos > .fondo_r').remove();
+                $('#table_solicitude_fondos_wrapper').remove();
+                $('.table-solicituds-fondos').append(data.Data.View);
+                $('#export-fondo').attr('href', server + 'exportfondos/' + datefondo);
+                $('#table_solicitude_fondos').dataTable(
                 {
-                    list = list + '<li><input type="radio" name="responsables"  value="' + entry.iduser + '"> ' + entry.descripcion + '</li>';    
-                });
-                bootbox.confirm("<h4 id='validate'>Seleccione al Responsable</h4><ul>" + list + "</ul>", function (result) 
-                {
-                    if (result) 
+                    "order": 
+                    [
+                        [3, "desc"]
+                    ],
+                    "bLengthChange": false,
+                    'iDisplayLength': 7,
+                    "oLanguage": 
                     {
-                        var resp = $("input[name=responsables]:checked");
-                        if (resp.length == 0 )
+                        "sSearch": "Buscar: ",
+                        "sZeroRecords": "No hay fondos",
+                        "sInfoEmpty": " ",
+                        "sInfo": 'Mostrando _END_ de _TOTAL_',
+                        "oPaginate": 
                         {
-                            $("#validate").css("color","red");
-                            return false; 
+                            "sPrevious": "Anterior",
+                            "sNext": "Siguiente"
                         }
-                        
-                        pdata.gerente = resp.val();
-                        
-                        $.ajax({
-                        url: server + 'derivar-solicitud',
-                        type: 'POST',
-                        data : pdata
-                        }).fail( function ( statusCode , errorThrown )
-                        {
-                            ajaxError( statusCode , errorThrown );
-                        }).done( function ( data ) 
-                        {
-                            if ( data.Status != 'Ok' )
-                                bootbox.alert('<h4 class="red">' + data.Status + ' ' + data.Description + '</h4>');
-                            else
-                            {
-                                bootbox.alert('<h4 class="green">Solicitud Derivada</h4>' , function() 
-                                {
-                                    window.location.href = server +"show_user";
-                                });  
-                            }
-                        });
                     }
                 });
             }
-        });      
-    });*/
+            else
+                bootbox.alert('<h4 class="red">' + data.Status + ': ' + data.Description + '</h4>');
+        });
+    }
 
+    function listTable( type , date )
+    {
+        date = typeof date !== 'undefined' ? date : null;
+        var l = Ladda.create($("#search-solicitude")[0]);
+        l.start();
+        $.ajax({
+            url: server + 'list-table',
+            type: 'POST',
+            data:
+            {
+                _token     : _token.val() ,
+                type       : type ,
+                date       : date ,
+                idstate    : $('#idState').val() ,
+                date_start : date_start.val(), 
+                date_end   : date_end.val()
+            }
+        }).fail( function ( statusCode , errorThrown)
+        {
+            l.stop();
+            ajaxError( statusCode , errorThrown );
+        }).done(function ( response ) 
+        {
+            l.stop();
+            if ( response.Status == 'Ok' )
+            {
+                dataTable( 'table_' + type , response.Data.View , type );
+                if ( response.Data.Total !== undefined )
+                {
+                    $( '.estado-cuenta-deposito' ).first().val( response.Data.Total.Soles);
+                    $( '.estado-cuenta-deposito' ).last().val( response.Data.Total.Dolares);
+                }
+                $('#export-fondo').attr('href', server + 'exportfondos/' + date);
+            }
+            else
+                bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+        });
+    }
+
+    function dataTable( element , html , message )
+    {
+        $( '#' + element + '_wrapper').remove();
+        $( '.' + element ).append( html );
+        $( '#' + element ).dataTable(
+        {
+            order          : [ [ 0, 'desc' ] ] ,
+            bLengthChange  : false ,
+            iDisplayLength : 7 ,
+            oLanguage      :
+            {
+                sSearch      : 'Buscar     :',
+                sZeroRecords : 'No hay ' + message ,
+                sInfoEmpty   : 'Mostrando 0 de 0 ' + message ,
+                sInfo        : 'Mostrando _END_ de _TOTAL_ ' + message ,
+                oPaginate    : 
+                {
+                    sPrevious : 'Anterior',
+                    sNext     : 'Siguiente'
+                }
+            }
+        });
+    }
 
     // -------------------------------------  REPRESENTANTE MEDICO -----------------------------
     
     if ( $("#idState").length === 1 )
-        listSolicitude();
+        listTable( 'solicitudes' );
 
     //Register Deposit
     $(document).off( "click" , ".register-deposit" );
@@ -619,7 +551,7 @@ function newSolicitude() {
                         if ($("tbody").length == 0)
                             window.location.href = server +"show_user";
                         else
-                            listSolicitude();
+                            listTable( 'solicitudes' );
                     });
                 }
                 else
@@ -638,8 +570,6 @@ function newSolicitude() {
         };
         cancelDialog( data , '¿Esta seguro de anular el registro del fondo?' );
     });
-
-   
 
     /**------------------------------------------------ SUPERVISOR ---------------------------------------------------*/
 
@@ -685,11 +615,6 @@ function newSolicitude() {
             amount_error_families.text('Ingresar el monto de la familia').css('color', 'red');
             idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
         }
-        /*else if ( type == 1 && parseFloat( $( element ).val() ) === 0 ) 
-        {
-            amount_error_families.text('El monto de la familia no debe ser igual a 0').css('color', 'red');
-            idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
-        }*/
         else if ( type == 1 && parseFloat( $( element ).val() ) < 0 ) 
         {
             amount_error_families.text('El monto de la familia no debe ser menora 0').css('color', 'red');
@@ -748,7 +673,6 @@ function newSolicitude() {
     $(document).off( 'click' , cancel_solicitude );
     $(document).on( 'click' , cancel_solicitude, function () 
     {
-        //e.preventDefault();
         elem = $( this );
         var data = 
         {
@@ -766,32 +690,6 @@ function newSolicitude() {
             _token      : _token.val()   
         }
         cancelDialog( data , '¿Esta seguro que desea rechazar esta solicitud?' );
-        /*if ( $(".sol-obs").val() == "" )
-        {
-            $(".sol-obs").attr("placeholder","Ingresar Observación").parent().parent().addClass("has-error").focus();
-        }
-        */
-        /*else
-        {
-            bootbox.confirm('¿Esta seguro que desea rechazar esta solicitud?', function (result) 
-            {
-                if (result) 
-                {
-                    $.post(server + 'rechazar-solicitud', form_acepted_solicitude.serialize()).done(function(data)
-                    {
-                        if(data.Status === 'Ok')
-                        {
-                            bootbox.alert('<h4 style="color: green">Solicitud Rechazada</h4>' , function()
-                            {
-                                window.location.href = server + 'show_user';
-                            });
-                        }
-                        else
-                            bootbox.alert('<h4 style="color: red">' + data.Status + ': '+ data.Description + '</h4>');
-                    });
-                }
-            });
-        }*/
     });
 
     function cancelDialog  ( data , message )
@@ -844,7 +742,7 @@ function newSolicitude() {
                                             if ( data.Type == 1 )
                                             {
                                                 idState.val(6);
-                                                listSolicitude();
+                                                listTable( 'solicitudes' );
                                             }
                                             else if ( data.Type == 2 )
                                                 searchFondos( $('.date_month').first().val() );
@@ -872,8 +770,10 @@ function newSolicitude() {
         {
             listMaintenanceTable( $(this).attr("case") );
         });
-        if( userType === 'C')
-            listDocumentsType();          
+        if( userType === CONT )
+            listDocumentsType();
+        if( userType === GER_COM )
+            listTable( 'estado-fondos' );        
     }
 
     /** --------------------------------------------- ASISTENCIA DE GERENCIA ------------------------------------------------- **/
@@ -1250,48 +1150,7 @@ function newSolicitude() {
         $('#table_solicitude_fondos > tbody > tr').css('background-color','');
     });
 
-    function searchFondos( datefondo , aux ) 
-    {
-        var url = server + 'list-fondos/' + datefondo;
-        $('#loading-fondo').attr('class','show');
-        $('.table-solicituds-fondos > .fondo_r').remove();
-        $('.fondo_r').remove();
-        $.get(url)
-        .done(function (data) 
-        {
-            if ( data.Status == 'Ok' )
-            {
-                $('#loading-fondo').attr('class','hide');
-                $('.table_solicituds_fondos > .fondo_r').remove();
-                $('#table_solicitude_fondos_wrapper').remove();
-                $('.table-solicituds-fondos').append(data.Data);
-                $('#export-fondo').attr('href', server + 'exportfondos/' + datefondo);
-                $('#table_solicitude_fondos').dataTable(
-                {
-                    "order": 
-                    [
-                        [3, "desc"]
-                    ],
-                    "bLengthChange": false,
-                    'iDisplayLength': 7,
-                    "oLanguage": 
-                    {
-                        "sSearch": "Buscar: ",
-                        "sZeroRecords": "No hay fondos",
-                        "sInfoEmpty": " ",
-                        "sInfo": 'Mostrando _END_ de _TOTAL_',
-                        "oPaginate": 
-                        {
-                            "sPrevious": "Anterior",
-                            "sNext": "Siguiente"
-                        }
-                    }
-                });
-            }
-            else
-                bootbox.alert('<h4 class="red">' + data.Status + ': ' + data.Description + '</h4>');
-        });
-    }
+    
 
     function addImage(e) 
     {
@@ -1348,71 +1207,6 @@ function newSolicitude() {
         allWells.hide();
         var target = $(this).attr('data-target-id');
         $('#' + target).show();
-    });
-
-    $(document).off('click', '#register-deposit-fondo');
-    $(document).on('click', '#register-deposit-fondo', function(e){
-        e.preventDefault();
-        var data = {};
-        $("#op_number").val('');
-        $("#message-op-number").text('');
-        var op_number  = $("#op-number2").val();
-        var type_deposit = $(this).attr('data-deposit');
-        var date_fondo = $('#datefondo').val();
-        if(type_deposit ==='fondo'){
-            url = 'deposit-fondo'
-            data.idfondo = $('#idfondo').val();
-            data.op_number = op_number;
-            data._token = $("input[name=_token]").val();
-            data.date_fondo = date_fondo;
-            data.idcuenta   = $("#bank_account").val();
-        }else if(type_deposit === 'solicitude'){
-            url = 'deposit-solicitude';
-            data.op_number = op_number;
-            data.token     = $("#token").val();
-            data._token    = $("input[name=_token]").val();
-            data.date_fondo = date_fondo;
-            data.idcuenta   = $("#bank_account").val();
-        }
-        if(!op_number)
-            $("#message-op-number").text("Ingrese el número de Operación");
-        if(date_fondo == '')
-            $("#message-op-number").text("Debe escoger la fecha del depósito");
-        else
-        {
-            $.post(server + url, data)
-            .done(function (data)
-            {
-                if(data === 'error')
-                    $("#message-op-number").text("No se ha podido registrar el depósito.");  
-                else
-                {
-                    $('#myModal').modal('hide');
-                    bootbox.alert("<p class='green'>Se registro el asiento contable correctamente.</p>", function()
-                    {
-                        $('#table_solicitude_fondos-tesoreria_wrapper').remove();
-                        $('.table_solicitude_fondos-tesoreria').append(data);
-                        $('#table_solicitude_fondos-tesoreria').dataTable({
-                            "order": [
-                                [ 3, "desc" ] //order date
-                            ],
-                            "bLengthChange": false,
-                            'iDisplayLength': 7,
-                            "oLanguage": {
-                                "sSearch": "Buscar: ",
-                                "sZeroRecords": "No hay fondos",
-                                "sInfoEmpty": "No hay fondos",
-                                "sInfo": 'Mostrando _END_ de _TOTAL_',
-                                "oPaginate": {
-                                    "sPrevious": "Anterior",
-                                    "sNext" : "Siguiente"
-                                }
-                            }
-                        });
-                    });
-                }
-            });
-        }
     });
 
     $(document).off('show.bs.modal', '#myModal');
@@ -1962,78 +1756,25 @@ function newSolicitude() {
             bootbox.alert('<h4 class="red">Error del Sistema</h4>');  
     }
 
-    function listAccountState(date)
-    {
-        date = typeof date !== 'undefined' ? date : null;
-        $.ajax(
-        {
-            type: 'post',
-            url: server+'list-account-state',
-            data:
-            {
-                "_token": $("input[name=_token]").val(),
-                "date": date
-            },
-            error: function(statusCode,errorThrown)
-            {
-                ajaxError(statusCode,errorThrown);   
-            }
-        }).done( function (data)
-        {
-            if ( data.Status == 'Ok' )
-            {
-                $('#table_estado_cuenta_wrapper').remove();
-                $('.table_estado_cuenta').append(data.Data.View);
-                $('#table_estado_cuenta').dataTable(
-                {
-                    "order": [
-                        [ 0, "desc" ]
-                    ],
-                    "bLengthChange": false,
-                    'iDisplabuscyLength': 7,
-                    "oLanguage": 
-                    {
-                        "sSearch": "Buscar: ",
-                        "sZeroRecords": "No hay Solicitudes Finalizadas",
-                        "sInfoEmpty": "",
-                        "sInfo": 'Mostrando _END_ de _TOTAL_',
-                        "oPaginate": 
-                        {
-                            "sPrevious": "Anterior",
-                            "sNext" : "Siguiente"
-                        }
-                    }
-                });
-                if ( data.Data.Total !== undefined )
-                {
-                    $('.estado-cuenta-deposito').first().val(data.Data.Total.Soles);
-                    $('.estado-cuenta-deposito').last().val(data.Data.Total.Dolares);
-                }
-            }
-            else
-                responseUI('Error del Sistema','red');
-        });   
-    }
-
     $(".date_month").datepicker(date_options2).on('changeDate', function (e) {
         var date = $(this).val();
         var type = $(this).attr('data-type');
 
         if(date!='')
-            if(type != "estado-cuenta")
+            if( type != 'estado-cuenta' )
             {
-                $('.date_month').val( date );
-                if ( !id_solicitud.val() )
+                $( '.date_month' ).val( date );
+                if ( ! id_solicitud.val() )
                     searchFondos(date);
             }
             else
-                listAccountState(date);
+                listTable( 'movimientos' , date);
     });
     
     /* Filter all solicitude by date */
     $('#search-solicitude').on('click', function()
     { 
-        listSolicitude();
+        listTable( 'solicitudes' );
     });
 
     $('#search-documents').on('click', function()
@@ -2270,7 +2011,7 @@ function newSolicitude() {
                             var color = '';
                         bootbox.alert("<h4 style='color:" + color + "'>" + data.Description + "</h4>", function()
                         {
-                                listSolicitude();
+                                listTable( 'solicitudes' );
                                 colorTr(data.token);
                         });
                     });

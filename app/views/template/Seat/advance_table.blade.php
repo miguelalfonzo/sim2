@@ -16,16 +16,16 @@
 					</thead>
 					<tbody>
 						<tr>
-							<td class="name_account">{{$solicitud->detalle->fondo->bagoAccount->ctanombrecta}}</td>
+							<td class="name_account">{{$solicitud->detalle->fondo->nombre}}</td>
 							<td class="number_account">{{$solicitud->detalle->fondo->num_cuenta}}</td>
 							<td class="date_ini">{{ $solicitud->detalle->deposit->updated_at }}</td>
 							<td class="dc">D</td>
 							<td>S/.</td>
 							<td class="total">
 								@if ( $solicitud->detalle->id_moneda == DOLARES )
-									{{ round( $detalle->monto_aprobado * $detalle->tcc , 2 , PHP_ROUND_HALF_DOWN ) }}
+									{{ round( $detalle->monto_actual * $detalle->tcc , 2 , PHP_ROUND_HALF_DOWN ) }}
 								@elseif ( $solicitud->detalle->id_moneda == SOLES )
-									{{ json_decode( $detalle->detalle )->monto_aprobado }}
+									{{ $detalle->monto_actual }}
 								@else
 									100
 								@endif

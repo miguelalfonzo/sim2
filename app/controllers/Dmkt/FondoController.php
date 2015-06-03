@@ -83,36 +83,6 @@ class FondoController extends BaseController
         return substr( $rpta , 0 , -2 );
     }
 
-    public function listSolInst($start, $export = 0)
-    {
-        try
-        {
-            $periodo = $this->period($start);
-            $periodos = Periodo::where('aniomes', $periodo )->first();
-            if ( count ( $periodos ) == 0 )
-                return $this->setRpta( View::make('Dmkt.AsisGer.list_fondos')->with( 'total' , '' )->render() );
-            else
-            {
-                $solicitud = Solicitud::solInst( $periodo );
-                $middleRpta = $this->sumSolicitudInst( $solicitud );
-                if ( $middleRpta[status] == ok )
-                {   
-                    $data = array( 
-                        'solicituds' => $solicitud ,
-                        'state'      => $periodos->status , 
-                        'total'      => $this->getStringTotal( $middleRpta[data] )
-                    );
-                   return $this->setRpta( View::make('Dmkt.AsisGer.list_fondos')->with( $data )->render() );
-                }
-            }
-            return $middleRpta;
-        }
-        catch ( Exception $e )
-        {
-            return $this->internalException( $e , __FUNCTION__ );
-        }
-    }
-
     private function endSolicituds( $solicituds )
     {
         $montos = array();
@@ -420,5 +390,31 @@ class FondoController extends BaseController
             DB::rollback();
             return $this->internalException( $e , __FUNCTION__ );
         }        
+    }
+
+    public function listInstitutionalSolicitud( $start )
+    {
+        try
+        {
+            $periodo = $this->period($start);
+            $periodos = Periodo::where('aniomes', $periodo )->first();
+            if ( is_null( $periodos ) )
+                return $this->setRpta( View::make('Tables.solicitud_institucional')->with( 'total' , '' )->render() );
+            
+            $solicitud = Solicitud::solInst( $periodo );
+            $middleRpta = $this->sumSolicitudInst( $solicitud );
+            if ( $middleRpta[status] == ok )
+            {   
+                $data = array( 'solicituds' => $solicitud ,
+                               'state'      => $periodos->status , 
+                               'total'      => $this->getStringTotal( $middleRpta[data] ) );
+               return $this->setRpta( array( 'View' => View::make('Tables.solicitud_institucional' )->with( $data )->render() ) );
+            }
+            return $middleRpta;
+        }
+        catch( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
     }
 }

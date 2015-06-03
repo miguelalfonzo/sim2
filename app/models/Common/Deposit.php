@@ -3,7 +3,7 @@
 namespace Common;
 
 use \Eloquent;
-use \Dmkt\Solicitude;
+use \Dmkt\Solicitud;
 use \Carbon\Carbon;
 
 class Deposit extends Eloquent{
@@ -18,7 +18,7 @@ class Deposit extends Eloquent{
 
 	public function iddeposit()
 	{
-		return $this->hasOne('Dmkt\Solicitude','idsolicitud','idsolicitud');
+		return $this->hasOne('Dmkt\Solicitud','idsolicitud','idsolicitud');
 	}
 
 	public function lastId(){
