@@ -31,12 +31,6 @@
     <!-- MONTO SOLICITADO -->
     @include('Dmkt.Register.Detail.amount')
     
-    <!-- MONTO DE LA FACTURA -->
-    @include('Dmkt.Register.Detail.invoice_amount')
-    
-    <!-- Factura Imagen -->
-    @include('Dmkt.Register.Detail.image')
-    
     <!-- TIPO DE PAGO -->
     @include('Dmkt.Register.Detail.payment')
 
@@ -60,8 +54,6 @@
             </div>
         </div>
     </div>
-    <!-- Ver Comprobante -->
-    @include('Dmkt.Register.Detail.comprobante')
     
     <div style="clear:both">
     <!-- PRODUCTOS -->

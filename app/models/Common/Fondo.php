@@ -22,6 +22,11 @@ class Fondo extends Eloquent {
         	return $lastId->id;
  	}
 
+    protected static function order()
+    {
+        return Fondo::orderBy( 'updated_at' , 'desc' )->get();
+    }
+
     public function bagoAccount()
     {
         return $this->hasOne( 'Expense\PlanCta' , 'ctactaextern' , 'num_cuenta' );

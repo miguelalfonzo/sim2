@@ -62,7 +62,7 @@ class TableController extends BaseController
 
 	private function maintenanceGetFondo( $val )
 	{
-		$data = array( 'datos' => Fondo::all() , 'val' => $val , 'key' => 'nombre' );
+		$data = array( 'datos' => Fondo::order() , 'val' => $val , 'key' => 'nombre' );
 		return $this->setRpta( View::make( 'Maintenance.td')->with( $data)->render() );
 	}
 
@@ -89,7 +89,7 @@ class TableController extends BaseController
 
 	private function getFondos()
     {
-        $fondos = Fondo::all();
+        $fondos = Fondo::order();
         return $this->setRpta( View::make('Maintenance.Fondo.table')->with('fondos' , $fondos)->render() );
     }
 
@@ -101,7 +101,7 @@ class TableController extends BaseController
 
 	private function getFondoAccount()
 	{
-		$fondos = Fondo::all();
+		$fondos = Fondo::order();
 		return $this->setRpta( View::make( 'Maintenance.FondoCuenta.table' )->with( 'fondos' , $fondos )->render() );
 	}
 

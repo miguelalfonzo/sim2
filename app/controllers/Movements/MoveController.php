@@ -222,4 +222,19 @@ class MoveController extends BaseController
         $fondoHistories = FondoHistory::orderBy( 'updated_at' , 'desc' )->get();
         return $this->setRpta( array( 'View' => View::make( 'Tables.fondo')->with( 'fondoHistories' , $fondoHistories )->render() ) );
     }
+
+    public function getSolicitudDetail()
+    {
+        try
+        {
+            $inputs = Input::all();
+            $solicitud = Solicitud::find( $inputs[ 'id_solicitud'] );
+            $data = array( 'colspan' => $inputs[ 'colspan'] , 'solicitud' => $solicitud );
+            return $this->setRpta( array( 'View' => View::make( 'test.detail_solicitud')->with( $data )->render() ) );
+        }
+        catch( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
+    }
 }

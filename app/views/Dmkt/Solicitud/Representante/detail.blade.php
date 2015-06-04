@@ -32,22 +32,6 @@
         </div>
     @endif
 
-    <!-- MONTO FACTURA -->
-    @if( $solicitud->activity->image == 1 )
-        <div class="form-group col-sm-6 col-md-4 col-lg-4">
-            <label class="col-sm-8 col-md-8 col-lg-8 control-label">
-                Monto Factura
-            </label>
-            <div class="col-sm-12 col-md-12 col-lg-12">
-                <div class="input-group">
-                    <span class="input-group-addon">{{$detalle->typeMoney->simbolo}}</span>
-                    <input class="form-control input-md" type="text" readonly
-                    value="{{ $detalle->monto_factura }}">
-                </div>
-            </div>
-        </div>
-    @endif
-
     <!-- FECHA DE ENTREGA -->
     <div class="form-group col-sm-6 col-md-4 col-lg-4">
         <label class="col-sm-8 col-md-8 col-lg-8 control-label">Fecha de Entrega</label>
@@ -95,51 +79,6 @@
 
     <!-- Observation-->
     @include('Dmkt.Solicitud.Detail.anotation')
-
-
-    @if( $solicitud->activity->imagen == 1 )
-        <div class="form-group col-sm-6 col-md-4 col-lg-4">
-            <label class="col-sm-8 col-md-8 col-lg-8 control-label">&nbsp;</label>
-            <div class="col-sm-12 col-md-12 col-lg-12">
-                <a class="btn btn-primary btn-md" data-toggle="modal" data-target="#myFac">
-                    Ver Comprobante
-                </a>
-            </div>
-        </div>
-        <div class="modal fade" id="myFac" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">
-                            <span aria-hidden="true">&times;</span>
-                            <span>Close</span>
-                        </button>
-                        <h4 class="modal-title" id="myModalLabel">Comprobante</h4>
-                    </div>
-                    <div class="modal-body">
-                        @if (empty($detalle->image))
-                            <h3>No se ingreso una imagen</h3>
-                        @elseif (!file_exists(public_path().'/'.IMAGE_PATH.$detalle->image))
-                            <h3>No se encontro la imagen en el sistema</h3>
-                        @else
-                            <img class="img-responsive" src="{{asset(IMAGE_PATH.$detalle->image)}}">
-                        @endif
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="demoLightbox" class="lightbox hide fade"  tabindex="-1" role="dialog" aria-hidden="true">
-            <div class='lightbox-content'>
-                <img src="{{URL::to('/')}}/img/reembolso/{{$detalle->image}}">
-                <div class="lightbox-caption">
-                    <p>Your caption here</p>
-                </div>
-            </div>
-        </div>
-    @endif
 
 
     <!-- Modal Deposito -->

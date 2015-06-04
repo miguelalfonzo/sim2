@@ -1,6 +1,7 @@
-<table class="table table-striped table-bordered dataTable" id="table_solicitudes">
+<table class="table table-striped table-bordered" id="table_solicitudes" width="100%">
     <thead>
         <tr>
+            <th></th>
             <th>#</th>
             <th>Solicitud</th>
             <th>Solicitado por</th>
@@ -25,6 +26,9 @@
     <tbody>
         @foreach( $solicituds as $solicitud )
             <tr>
+                <td class="text-center open-details" data-id="{{$solicitud->id}}">
+                    <span class="glyphicon glyphicon-plus green"></span>
+                </td>
                 @if($solicitud->id_estado == ACEPTADO || $solicitud->id_estado == APROBADO || $solicitud->id_estado == DEPOSITADO || $solicitud->id_estado == REGISTRADO || $solicitud->id_estado == ENTREGADO || $solicitud->id_estado == GENERADO || $solicitud->id_estado == GASTO_HABILITADO || $solicitud->id_estado == DEPOSITO_HABILITADO)
                     <input type="hidden" id="timeLineStatus" value="{{$solicitud->id_estado}}" data-accept="$solicitud->acceptHist->user_from">
                 @elseif($solicitud->id_estado == RECHAZADO)
@@ -48,7 +52,7 @@
                         @endif
                     @endif
                 @endif
-                <td class="text-center id_solicitud">{{$solicitud->id}}</td>
+                <td class="text-center id_solicitud detail-control">{{$solicitud->id}}</td>
                 <td class="text-left sol_titulo">
                     @if (! is_null( $solicitud->id_actividad ) )
                         <span class="label" style="margin-right:1em;background-color:{{$solicitud->activity->color}}">

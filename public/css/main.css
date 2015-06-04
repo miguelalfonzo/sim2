@@ -270,3 +270,13 @@ table thead th, table th
   line-height: 1.33;
   border-radius: 6px;
 }
+
+table tbody tr td.open-details 
+{
+	cursor: pointer;
+}
+
+table tbody tr td.close-details 
+{
+	cursor: pointer;
+}

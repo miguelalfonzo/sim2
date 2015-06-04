@@ -127,60 +127,60 @@ class SolicitudeController extends BaseController
             $solicitud = Solicitud::where('token', $token)->first();
             $politicStatus = FALSE;
             $user = Auth::user();
+            
             if ( is_null( $solicitud ) )
                 return $this->warningException( 'No se encontro la Solicitud con Token: ' . $token , __FUNCTION__ , __LINE__ , __FILE__ );
-            else
+            
+            $detalle = $solicitud->detalle;
+            $data = array( 'solicitud' => $solicitud , 'detalle' => $detalle );
+        
+            if ( $solicitud->idtiposolicitud != SOL_INST && in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) ) )
             {
-                $detalle = $solicitud->detalle;
-                $data = array( 'solicitud' => $solicitud , 'detalle' => $detalle );
-                if ( $solicitud->idtiposolicitud != SOL_INST && in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) ) )
+                $politicType = $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario;
+                if ( in_array( $politicType , array( Auth::user()->type , Auth::user()->tempType() ) )
+                    && ( array_intersect ( array( Auth::user()->id , Auth::user()->tempId() ) , $solicitud->managerEdit( $politicType )->lists( 'id_gerprod' ) ) ) )
                 {
-                    $politicType = $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario;
-                    if ( in_array( $politicType , array( Auth::user()->type , Auth::user()->tempType() ) )
-                        && ( array_intersect ( array( Auth::user()->id , Auth::user()->tempId() ) , $solicitud->managerEdit( $politicType )->lists( 'id_gerprod' ) ) ) )
+                    $politicStatus = TRUE;
+                    $typeUser = $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario;
+                    $solicitud->status = BLOCKED;
+                    Session::put( 'id_solicitud' , $solicitud->id );
+                    $solicitud->save();
+                    $data[ 'fondos' ] = Fondo::getFunds( $typeUser );
+                    if ( ! is_null( $solicitud->detalle->id_fondo ) )
                     {
-                        $politicStatus = TRUE;
-                        $typeUser = $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario;
-                        $solicitud->status = BLOCKED;
-                        Session::put( 'id_solicitud' , $solicitud->id );
-                        $solicitud->save();
-                        $data[ 'fondos' ] = Fondo::getFunds( $typeUser );
-                        if ( ! is_null( $solicitud->detalle->id_fondo ) )
-                        {
-                            $data[ 'fondos' ]->push( $solicitud->detalle->fondo );
-                            $data['fondos'] = $data[ 'fondos' ]->unique();
-                        }
-                        $data['solicitud']->status = 1;
+                        $data[ 'fondos' ]->push( $solicitud->detalle->fondo );
+                        $data['fondos'] = $data[ 'fondos' ]->unique();
                     }
+                    $data['solicitud']->status = 1;
                 }
-                elseif ( Auth::user()->type == TESORERIA && $solicitud->id_estado == DEPOSITO_HABILITADO )
+            }
+            elseif ( Auth::user()->type == TESORERIA && $solicitud->id_estado == DEPOSITO_HABILITADO )
+            {
+                $data['banks'] = Account::banks();
+                $data['deposito'] = $detalle->monto_aprobado;
+            }
+            elseif ( Auth::user()->type == CONT )
+            {
+                if ( $solicitud->id_estado == DEPOSITADO )
                 {
-                    $data['banks'] = Account::banks();
-                    $data['deposito'] = $detalle->monto_aprobado;
+                    $data['date'] = $this->getDay();
+                    $data['lv'] = $this->textLv( $solicitud );
                 }
-                elseif ( Auth::user()->type == CONT )
-                {
-                    if ( $solicitud->id_estado == DEPOSITADO )
-                    {
-                        $data['date'] = $this->getDay();
-                        $data['lv'] = $this->textLv( $solicitud );
-                    }
-                    elseif ( count( $solicitud->registerHist ) == 1 )
-                    {
-                        $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_actual ) );
-                        $data['igv'] = Table::getIGV();
-                        $data['regimenes'] = Regimen::all();
-                    }
-                }
-                elseif ( ! is_null( $solicitud->expenseHistory ) && $user->id == $solicitud->id_user_assign )
+                elseif ( count( $solicitud->registerHist ) == 1 )
                 {
                     $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_actual ) );
                     $data['igv'] = Table::getIGV();
+                    $data['regimenes'] = Regimen::all();
                 }
-                Session::put( 'state' , $data[ 'solicitud' ]->state->id_estado );
-                $data[ 'politicStatus' ] = $politicStatus;
-                return View::make( 'Dmkt.Solicitud.view' , $data );
             }
+            elseif ( ! is_null( $solicitud->expenseHistory ) && $user->id == $solicitud->id_user_assign )
+            {
+                $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_actual ) );
+                $data['igv'] = Table::getIGV();
+            }
+            Session::put( 'state' , $data[ 'solicitud' ]->state->id_estado );
+            $data[ 'politicStatus' ] = $politicStatus;
+            return View::make( 'Dmkt.Solicitud.view' , $data );
         }
         catch ( Exception $e )
         {
@@ -222,18 +222,6 @@ class SolicitudeController extends BaseController
         if ( $validator->fails() ) 
             return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
         
-        $activity = Activity::find( $inputs[ 'actividad' ] );
-        
-        $validator->sometimes( 'factura' , 'required|image|max:900' , function( $input ) use( $activity )
-        {
-            return ( ( trim( $input->idsolicitud ) === '' && $activity->imagen == 1 ) || ( trim( $input->idsolicitud ) !== '' &&  $activity->imagen == 1 && $input->factura ) );
-        });
-
-        $validator->sometimes( 'monto_factura' , 'required|numeric|min:1' , function( $input ) use( $activity )
-        {
-            return $activity->imagen == 1;
-        });
-
         $validator->sometimes( 'ruc' , 'required|numeric|digits:11' , function( $input )
         {
             return $input->pago == PAGO_CHEQUE;
@@ -325,25 +313,6 @@ class SolicitudeController extends BaseController
         return $this->setRpta();
     }
 
-    private function setInvoice( $jDetalle , $inputs )
-    {
-        $actividad = Activity::find( $inputs[ 'actividad' ] );
-        if ( $actividad->imagen == 1 )
-            $this->setImage( $jDetalle , $inputs[ 'factura' ] , $inputs[ 'monto_factura'] );
-    }
-
-    private function setImage( &$jDetalle , $image , $monto )
-    {
-        if ( is_object( $image ) )
-        {
-            $filename = uniqid() . '.' . $image->getClientOriginalExtension();
-            $path = public_path( 'img/reembolso/' . $filename);
-            Image::make( $image->getRealPath() )->resize( WIDTH , HEIGHT )->save( $path );
-            $jDetalle->image = $filename;
-        }
-        $jDetalle->monto_factura = round( $monto , 2 , PHP_ROUND_HALF_DOWN );
-    }
-
     private function unsetRelations( $solicitud )
     {
         $detalle = $solicitud->detalle;
@@ -362,21 +331,11 @@ class SolicitudeController extends BaseController
             $middleRpta = $this->validateInputSolRep( $inputs );
             if ( $middleRpta[status] == ok )
             {
-                $newImage = 0;
                 if ( isset( $inputs[ 'idsolicitud' ] ) )
                 {
                     $solicitud = Solicitud::find( $inputs[ 'idsolicitud' ] );
                     $detalle   = $solicitud->detalle;
                     $actividad = $middleRpta[ data ];
-                    if ( ( $actividad->imagen == 1 && $solicitud->activity->imagen == 1 ) )
-                        if ( is_object( $inputs[ 'factura'] ) ) 
-                            $imagePath = public_path( 'img/reembolso/' . $detalle->image );
-                        else
-                            $jImage = $detalle->image;
-                    else if ( $actividad->imagen == 1 )
-                        $newImage = 1;        
-                    else if ( $solicitud->activity->imagen == 1 )
-                        $imagePath = public_path( 'img/reembolso/' . $detalle->image );
                     $this->unsetRelations( $solicitud );   
                 }
                 else
@@ -391,8 +350,6 @@ class SolicitudeController extends BaseController
                 $this->setSolicitud( $solicitud , $inputs );
                 $solicitud->save();
                 $jDetalle = new stdClass();
-                if ( isset( $jImage) )
-                    $jDetalle->image = $jImage;
                 $this->setJsonDetalle( $jDetalle , $inputs );
                 $detalle->detalle      = json_encode( $jDetalle );
                 $this->setDetalle( $detalle , $inputs );
@@ -414,16 +371,12 @@ class SolicitudeController extends BaseController
                                 {
                                     Session::put( 'state' , R_PENDIENTE );
                                     DB::commit();
-                                    if ( isset( $imagePath ) )
-                                        @unlink( $imagePath );
                                     return $middleRpta;
                                 }
                             }
                         }
                     }
                 }
-                if ( ( $solicitud->activity->imagen == 1 && ! isset( $jImage ) ) || $newImage === 1 )
-                    @unlink( public_path( 'img/reembolso/' . $detalle->image ) );
             }
             DB::rollback();
             return $middleRpta;
@@ -444,7 +397,6 @@ class SolicitudeController extends BaseController
     {
         $jDetalle->monto_solicitado  =  round( $inputs['monto'] , 2 , PHP_ROUND_HALF_DOWN );
         $jDetalle->fecha_entrega     =  $inputs['fecha'];            
-        $this->setInvoice( $jDetalle , $inputs );                    
         $this->setPago( $jDetalle , $inputs['pago'] , $inputs['ruc'] );    
     }
 

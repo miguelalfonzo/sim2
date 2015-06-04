@@ -23,6 +23,8 @@ function newSolicitude() {
     var comprobante_img = $( '.img-responsive' );
     var ruc             = $('input[name=ruc]');
     
+    var fondo = $('select[name="idfondo"]');
+
     var search_cliente = $('.cliente-seeker');
 
     var idamount = $('#amount');
@@ -74,6 +76,7 @@ function newSolicitude() {
     var CONT      = 'C';
     var TESORERIA = 'T';
     var ASIS_GER  = 'AG';
+    var GER_PROM  = 'GP';
 
     var date_options2 = 
     {
@@ -88,7 +91,8 @@ function newSolicitude() {
     $('.btn_edit_fondo').hide();
 
     $(document).off("click", ".timeLine");
-    $(document).on("click", ".timeLine", function(e){
+    $(document).on("click", ".timeLine", function(e)
+    {
         e.preventDefault();
         var state = parseInt($(this).parent().parent().parent().find('#timeLineStatus').val(), 10);
         var accept = $(this).parent().parent().parent().find('#timeLineStatus').data('accept');
@@ -227,26 +231,12 @@ function newSolicitude() {
     invoice_amount.numeric({negative:false});
     ruc.numeric({negative:false,decimal:false});
     
-    if ( $('select[name=actividad] option:selected').attr('image') != 1 ) 
-    {
-        invoice_amount.parent().parent().hide();
-        invoice_img.parent().parent().parent().parent().parent().hide();
-    }
-    else if ( $('select[name=actividad] option:selected').attr('image') == 1 )
-    {
-        invoice_amount.parent().parent().show();
-        invoice_img.parent().parent().parent().parent().parent().show();        
-    }
 
     investment.on( 'change' , function()
     {
         inversionChange( $(this).val() );
     });
 
-    activity.on( 'change' , function() 
-    {
-        activityChange();
-    });
 
     function inversionChange( id_inversion )
     {
@@ -256,7 +246,7 @@ function newSolicitude() {
             type: 'POST' ,
             data:
             {
-                _token : $('input[name=_token]').val() ,
+                _token : _token.val() ,
                 id_inversion : id_inversion ,
                 tipo_cliente : clients.children().first().attr('tipo_cliente')
             }
@@ -269,27 +259,10 @@ function newSolicitude() {
             {
                 activity.val('');
                 filterSelect( activity , response.Data , 'inversion' );
-                activityChange();
             }
             else
                 bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
         });
-    }
-
-    function activityChange()
-    {
-        if ( $('select[name=actividad] option:selected').attr('image') != 1 ) 
-        {
-            invoice_amount.parent().parent().hide();
-            invoice_img.parent().parent().parent().parent().parent().hide();
-            $('a[data-target=#myFac]').parent().parent().hide();
-        }
-        else if ( $('select[name=actividad] option:selected').attr('image') == 1 )
-        {
-            invoice_amount.parent().parent().show();
-            invoice_img.parent().parent().parent().parent().parent().show();        
-            $('a[data-target=#myFac]').parent().parent().show();
-        }
     }
 
 
@@ -346,7 +319,7 @@ function newSolicitude() {
             type: 'POST' ,
             data:
             {
-                _token : $('input[name=_token]').val(),
+                _token : _token.val(),
                 type   : type
             }
         }).fail( function ( statusCode , errorThrown )
@@ -378,7 +351,7 @@ function newSolicitude() {
                 date_start   : doc_start.val() ,
                 date_end     : doc_end.val() ,
                 val          : $('#doc-search-key').val() ,
-                _token       : $('input[name=_token]').val()
+                _token       : _token.val()
             }
         }).fail( function ( statusCode , errorThrown)
         {
@@ -499,21 +472,28 @@ function newSolicitude() {
         $( '.' + element ).append( html );
         $( '#' + element ).dataTable(
         {
-            order          : [ [ 0, 'desc' ] ] ,
-            bLengthChange  : false ,
-            iDisplayLength : 7 ,
-            oLanguage      :
+            // processing     : true,
+            // serverside     : true,
+            // ajax           : server + 'dt' ,
+            dom: '<f<t>ip<r>>',
+            stateSave: true,
+            order          : [] ,
+            iDisplayLength : 5 ,
+            language      :
             {
-                sSearch      : 'Buscar     :',
-                sZeroRecords : 'No hay ' + message ,
-                sInfoEmpty   : 'Mostrando 0 de 0 ' + message ,
-                sInfo        : 'Mostrando _END_ de _TOTAL_ ' + message ,
-                oPaginate    : 
+                search      : 'Buscar     :',
+                zeroRecords : 'No hay ' + message ,
+                infoEmpty   : 'Mostrando 0 de 0 ' + message ,
+                info        : 'Mostrando _END_ de _TOTAL_ ' + message ,
+                paginate    : 
                 {
                     sPrevious : 'Anterior',
                     sNext     : 'Siguiente'
                 }
-            }
+            },
+            /*columns : [
+            { class          : "details-control"} ,
+            null , null , null]*/
         });
     }
 
@@ -531,7 +511,7 @@ function newSolicitude() {
         var data = {};
         data.op_number      = $("#op-number").val();
         data.token          = $("input[name=token]").val();
-        data._token         = $("input[name=_token]").val();
+        data._token         = _token.val();
         data.num_cuenta     = $("#bank_account").val();
 
         if ($("#op-number").val().trim() === "")
@@ -566,7 +546,7 @@ function newSolicitude() {
         var data = 
         {
             idsolicitud: $( this ).parent().parent().parent().children().first().text().trim() ,
-            _token: $('input[name=_token]').val()
+            _token: _token.val()
         };
         cancelDialog( data , '¿Esta seguro de anular el registro del fondo?' );
     });
@@ -859,14 +839,14 @@ function newSolicitude() {
             var periodo = $(this).parent().parent().parent().find(".date_month").val();
             var dato = 
             {
-                '_token'      : $('input[name=_token]').val(),
+                '_token'      : _token.val(),
                 'institucion' : fondo_institucion.val(),
                 'actividad'   : activity.val(),
                 'codrepmed'   : fondo_repmed.attr('data-cod'),
                 'codsup'      : fondo_supervisor.attr('data-cod'),
                 'total'       : fondo_total.val(),
                 'cuenta'      : fondo_cuenta.val(),
-                'idfondo'     : $("#sub_type_activity option:selected").val(),
+                'idfondo'     : fondo.val(),
                 'mes'         : periodo
             };
             date_reg_fondo.last().val(date_reg_fondo.val());
@@ -915,7 +895,7 @@ function newSolicitude() {
                 {
                     idfondo: $("#sub_type_activity").val(),
                     idsolicitud : id_solicitud.val(),
-                    _token: $("input[name=_token]").val()
+                    _token: _token.val()
                 }
             }).fail( function ( statusCode, errorThrown)
             {
@@ -1035,7 +1015,7 @@ function newSolicitude() {
         data = 
         {
             'idsolicitud' : idsolicitud,
-            '_token'      : $('input[name=_token]').val()
+            '_token'      : _token.val()
         };
         $.post( server + 'get-sol-inst' , data )
         .fail( function ( statusCode , errorThrown ) 
@@ -1084,7 +1064,7 @@ function newSolicitude() {
             'codsup'        : fondo_supervisor.attr('data-cod'),
             'total'         : fondo_total.val(),
             'cuenta'        : fondo_cuenta.val(),
-            '_token'        : $('input[name=_token]').val(),
+            '_token'        : _token.val(),
             'idfondo'       : $('select[name=idfondo]').val(),
             'mes'           : date_reg_fondo.val()
         };
@@ -1252,7 +1232,7 @@ function newSolicitude() {
             url :  server + 'add-maintenance-info' ,
             data:
             {
-                _token : $('input[name=_token]').val() ,
+                _token : _token.val() ,
                 type   : button.attr("case")
             }
         }).fail( function( statusCode , errorThrown )
@@ -1321,7 +1301,7 @@ function newSolicitude() {
     {
         var trElement = $(this).parent().parent();
         var aData = {};
-        aData._token = $('input[name=_token]').val();
+        aData._token = _token.val();
         aData.type   = trElement.attr('type');
         aData.Data   = {};
         trElement.children().each( function( i , data )
@@ -1357,7 +1337,7 @@ function newSolicitude() {
     {
         var trElement = $(this).parent().parent();
         var aData = {};
-        aData._token = $('input[name=_token]').val();
+        aData._token = _token.val();
         aData.id     = trElement.attr('row-id');
         aData.type   = trElement.attr('type');
         aData.Data   = {};
@@ -1398,7 +1378,7 @@ function newSolicitude() {
             {
                 type   : td[0].className ,
                 val    : td.html(),
-                _token : $('input[name=_token]').val()
+                _token : _token.val()
             }
         }).fail( function( statusCode , errorThrown )
         {
@@ -1434,7 +1414,7 @@ function newSolicitude() {
     {
         var data_json = {} ;
         data_json.type = 'Update';
-        data_json._token = $('input[name=_token]').val();
+        data_json._token = _token.val();
         var aux = false;
         trElement     = $(this).parent().parent();
         var z=trElement.children().first();
@@ -1553,8 +1533,8 @@ function newSolicitude() {
                         url: server + url ,
                         data:
                         {
-                            "_token": $("input[name=_token]").val(),
-                            "sVal": request
+                            _token : _token.val(),
+                            sVal   : request
                         },
                         error: function()
                         {
@@ -1587,8 +1567,8 @@ function newSolicitude() {
                         url: server + 'get-client-view' ,
                         data:
                         {
-                            "_token": $("input[name=_token]").val(),
-                            "data": suggestion
+                            _token : _token.val(),
+                            data   : suggestion
                         },
                     }).fail( function( statusCode , errorThrown )
                     {
@@ -1615,7 +1595,6 @@ function newSolicitude() {
                                 clients.append( data.Data.View );
                             filterSelect( investment , data.Data.id_inversion , 'cliente' );
                             filterSelect( activity , data.Data.id_actividad , 'cliente' );
-                            activityChange();
                         }
                     });
                     input.typeahead( 'val' , '' );
@@ -1679,8 +1658,8 @@ function newSolicitude() {
             url: server+'info-rep',
             data:
             {
-                "_token": $("input[name=_token]").val(),
-                "rm": rm
+                _token : _token.val(),
+                rm     : rm
             },
             error: function(statusCode,errorThrown)
             {
@@ -1698,8 +1677,8 @@ function newSolicitude() {
             url: server + 'filtro_cliente' ,
             data:
             {
-                "_token": $("input[name=_token]").val(),
-                "tipo_cliente": tipo_cliente
+                _token       : _token.val(),
+                tipo_cliente : tipo_cliente
             }
         }).fail( function ( statusCode , errorThrown )
         {
@@ -1710,7 +1689,6 @@ function newSolicitude() {
             {
                 filterSelect( activity , response.Data.id_actividad , tipo_filtro );
                 filterSelect( investment , response.Data.id_inversion , tipo_filtro );
-                activityChange();
             }
             else
                 bootbox.alert( '<h4 class="red">' + data.Status + ': ' + data.Description + '</h4>');
@@ -1814,33 +1792,6 @@ function newSolicitude() {
             search_cliente.parent().parent().addClass('has-error');
             clients.parent().parent().addClass('has-error');
             aux = 1;
-        }
-        if( $('select[name=actividad] option:selected').attr('image') == 1 )
-        {
-            if ( ! invoice_amount.val() ) 
-            {
-                invoice_amount.parent().addClass('has-error');
-                invoice_amount.attr('placeholder', 'Ingrese Monto de la Factura');
-                invoice_amount.addClass('input-placeholder-error');
-                aux = 1;
-            }
-            if ( ( invoice_img.length === 0 || invoice_img.val().trim() === '' ) && ( comprobante_img.length === 0 || comprobante_img.attr('src').trim() === '' ) )
-            {
-                console.log('error img');
-                aux = 1;
-                if ( invoice_img.length !== 0 )
-                {
-                    console.log('img 1');
-                    invoice_img.parent().parent().parent().parent().parent().addClass('has-error');
-                    invoice_img.parent().parent().parent().children('input').attr('placeholder', 'Ingrese Imagen').addClass('input-placeholder-error');
-                }
-                else if ( comprobante_img.length !== 0 )
-                {
-                    console.log('img 2');
-                    comprobante_img.parent().parent().parent().addClass('has-error');
-                    comprobante_img.attr('placeholder', 'Ingrese Imagen').addClass('input-placeholder-error');
-                }
-            }
         }
         if ( payment.val() == 2 )
         {
@@ -1971,7 +1922,7 @@ function newSolicitude() {
                 {
                     var data = {};
                     var trs = $('#table_solicitude tbody tr');
-                    data._token = $('input[name=_token]').val();
+                    data._token = _token.val();
                     data.sols = [];
                     trs.each(function( index)
                     {
@@ -2074,4 +2025,61 @@ function newSolicitude() {
         },1000);
     }
 
+    function addTr( data , tr )
+    {
+        console.log( tr );
+        var tr = $( tr );
+        tr.a
+    }
+
+    $( document ).on( 'click' , '.close-details' , function()
+    {
+        var td = $( this );
+        var span = td.find( 'span' );
+        td.removeClass( 'close-details' ).addClass( 'open-details' );
+        td.find( 'span' ).removeClass( 'glyphicon-minus red' ).addClass( 'glyphicon-add green');
+        td.parent().next().remove();
+    });
+
+    $( document ).on( 'click' , '.open-details' , function()
+    {
+        var td = $( this );
+        var tr = td.parent();
+        var colspan = tr.children().length;
+        var span = td.find( 'span' );
+        $.ajax(
+        {
+            url: server + 'detail-solicitud',
+            type: 'POST',
+            data: 
+            {
+                _token       : _token.val(),
+                id_solicitud : td.attr( 'data-id' ),
+                colspan      : colspan
+            }
+        }).fail( function( statusCode , errorThrown )
+        {
+            ajaxError( statusCode , errorThrown );
+        }).done( function( response )
+        {
+            if ( response.Status == 'Ok' )
+            {
+                addTr( td , response.Data.View );
+            }
+            else
+                bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>')
+        });
+
+
+    });
+
+    function addTr( td  , tr )
+    {
+        var td = $( td );
+        var span = td.find( 'span' );
+        td.removeClass( 'open-details' ).addClass( 'close-details' );
+        span.removeClass( 'glyphicon-add green' ).addClass( 'glyphicon-minus red' );
+        td.parent().after( tr );
+    }
 }
+

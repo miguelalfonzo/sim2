@@ -7,6 +7,40 @@ use \Exception;
 
 class TestController extends BaseController 
 {
+	public function dt()
+	{
+		//return Rm::all()->toArray();
+		return '{
+  
+  "data": [
+    [
+      "Airi",
+      "Satou",
+      "Accountant",
+      "Tokyo",
+      "28th Nov 08",
+      "$162,700",
+      "Tokyo",
+      "28th Nov 08",
+      "Accountant",
+      "$162,700"
+    ],
+    [
+      "Angelica",
+      "Ramos",
+      "Chief Executive Officer (CEO)",
+      "London",
+      "9th Oct 09",
+      "$1,200,000",
+      "Tokyo",
+      "28th Nov 08",
+      "Accountant",
+      "$162,700"
+    ]
+  ]
+}';
+	}
+
 	public function testQuery()
 	{
 		try

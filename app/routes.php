@@ -5,6 +5,7 @@
     | TESTING
     |--------------------------------------------------------------------------
     */
+    Route::get('dt' , 'TestController@dt');
     Route::get('test', array('uses' => 'Dmkt\LoginController@test'));
     Route::get('set_status', array('uses' => 'BaseController@setStatus'));
     Route::get('sendmail', array('uses' => 'BaseController@postman'));
@@ -164,6 +165,7 @@
         Route::get('show-fondo/{token}','Expense\ExpenseController@showFondo');
         Route::post('cancelar-solicitud', 'Dmkt\SolicitudeController@cancelSolicitud');
         Route::post( 'list-table' , 'Movements\MoveController@getTable');
+        Route::post( 'detail-solicitud' , 'Movements\MoveController@getSolicitudDetail');
     });
 
     App::missing(function ($exception) 

@@ -10,12 +10,12 @@
             @foreach( $activities as $activity )
                 @if ( isset( $solicitud ) )
                     @if ( $solicitud->id_actividad == $activity->id )
-                        <option selected value="{{ $activity->id }}" image="{{ $activity->imagen }}">{{ $activity->nombre }}</option>
+                        <option selected value="{{ $activity->id }}" >{{ $activity->nombre }}</option>
                     @else
-                        <option value="{{ $activity->id }}" image="{{ $activity->imagen }}" style="display:none">{{ $activity->nombre }}</option>
+                        <option value="{{ $activity->id }}" style="display:none">{{ $activity->nombre }}</option>
                     @endif
                 @else
-                    <option value="{{ $activity->id }}" image="{{ $activity->imagen }}">{{ $activity->nombre }}</option>
+                    <option value="{{ $activity->id }}">{{ $activity->nombre }}</option>
                 @endif
             @endforeach
         </select>
