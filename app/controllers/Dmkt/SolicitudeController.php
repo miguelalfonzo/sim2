@@ -35,6 +35,7 @@ use \Users\Sup;
 use \Users\Rm;
 use \Client\ClientType;
 use \yajra\Pdo\Oci8\Exceptions\Oci8Exception;
+use \System\FondoHistory;
 
 class SolicitudeController extends BaseController
 {
@@ -1135,6 +1136,8 @@ class SolicitudeController extends BaseController
             if ( $fondo->saldo <= 0 )
                 return $this->warningException( 'El fondo '. $fondo->nombre . 'solo cuenta con ' . $fondo->saldo . ' el cual es insuficiente para registrar la operacion' , __FUNCTION__ , __LINE__ , __FILE__ );
             $fondo->save();
+
+            $fondoHistory = new FondoHistory;
             
             $middleRpta = $this->setStatus( $oldIdEstado, GENERADO , $user->id , $user->id , $solicitud->id );
             if ( $middleRpta[status] == ok )
@@ -1265,48 +1268,4 @@ class SolicitudeController extends BaseController
             return $this->internalException($e,__FUNCTION__);
         }
     }
-
-    // IDKC: CHANGE STATUS => GENERADO
-    /*public function generateSeatExpense()
-    {
-        try
-        {
-            DB::beginTransaction();
-            $inputs = Input::all();
-            $solicitud = Solicitud::find($inputs[ 'idsolicitud' ]);
-            if ( is_null( $solicitud ) )
-                return $this->warningException( 'No se encontro el registro de la Solicitud #: ' . $inputs[ 'idsolicitud'] , __FUNCTION__ , __LINE__ , __FILE__ );
-            $oldIdEstado = $solicitud->id_estado;
-            $solicitud->id_estado = GENERADO;
-            $solicitud->save();
-            
-            $detalle = $solicitud->detalle;
-            $fondo = $detalle->fondo;
-            if ( $fondo->id_moneda = $detalle->id_moneda )
-                $fondo->saldo -= $detalle->monto_actual;
-            else
-            {
-                $tc = ChangeRate::getTc();
-                if ( $detalle->id_moneda == SOLES )
-                    $fondo->saldo -= ( $detalle->monto_actual / $tc->venta );
-                elseif ( $detalle->id_moneda == DOLARES )
-                    $fondo->saldo -= ( $detalle->monto_actual * $tc->compra );
-                else
-                    return $this->warningException( 'No existe el registro de la Moneda #: ' . $detalle->id_moneda , __FUNCTION__ , __LINE__ , __FILE__ );
-            }
-            $fondo->save();
-
-            $middleRpta = $this->setStatus( $oldIdestado , GENERADO , Auth::user()->id , USER_CONTABILIDAD , $solicitud->id );    
-            if ( $middleRpta[status] == ok )
-                DB::commit();
-            else
-                DB::rollback();    
-            return $middleRpta;
-        }
-        catch ( Exception $e )
-        {
-            DB::rollback();
-            return $this->internalException($e,__FUNCTION__);
-        }
-    } */
 }
