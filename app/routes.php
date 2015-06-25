@@ -56,7 +56,7 @@
     |--------------------------------------------------------------------------
     */
 
-    Route::group(array('before' => 'gercom'), function () 
+    Route::group( array('before' => 'gercom') , function () 
     {
         Route::post('aprobar-solicitud', 'Dmkt\SolicitudeController@approvedSolicitude');
         Route::post('gercom-mass-approv','Dmkt\SolicitudeController@massApprovedSolicitudes');
@@ -68,7 +68,7 @@
     |--------------------------------------------------------------------------
     */
     
-    Route::group(array('before' => 'cont'), function () 
+    Route::group( array('before' => 'cont'), function () 
     {
         Route::post('revisar-solicitud', 'Dmkt\SolicitudeController@checkSolicitud');
         Route::get('revisar-asiento-solicitud/{token}', 'Dmkt\SolicitudeController@viewSeatSolicitude');

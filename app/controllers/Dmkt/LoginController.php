@@ -34,23 +34,22 @@ class LoginController extends BaseController{
                 ->withErrors( $validator ) // send back all errors to the login form
                 ->withInput( Input::except('password') ); // send back the input (not the password) so that we can repopulate the form
         } 
-        else 
+        
+        // create our user data for the authentication
+        $userdata = array(
+            'username' 	=> Input::get('username'),
+            'password' 	=> Input::get('password')
+        );
+        if ( Auth::attempt( $userdata ) && Auth::user()->active == 1 )
         {
-            // create our user data for the authentication
-            $userdata = array(
-                'username' 	=> Input::get('username'),
-                'password' 	=> Input::get('password')
-            );
-            if ( Auth::attempt( $userdata ) && Auth::user()->active == 1 )
-            {
-                if ( is_null( Auth::user()->simApp ) )
-                    return View::make( 'Dmkt.login' )->with( array( 'message' => 'Usuario no autorizado' ) );
-                else
-                    return Redirect::to( 'show_user' );
-            }
+            if ( is_null( Auth::user()->simApp ) || ! in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD , GER_COM , ASIS_GER , GER_PROM , CONT , TESORERIA ) ) )
+                return View::make( 'Dmkt.login' )->with( array( 'message' => 'Usuario no autorizado' ) );
             else
-                return Redirect::to( 'login' )->with( 'error_login' , true );
+                return Redirect::to( 'show_user' );
         }
+        else
+            return Redirect::to( 'login' )->with( 'error_login' , true );
+        
     }
 
     public function doLogout()
