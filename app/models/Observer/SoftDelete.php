@@ -4,7 +4,6 @@ namespace Observer;
 
 use \Eloquent;
 use \Auth;
-use \Log;
 
 class SoftDelete 
 {
