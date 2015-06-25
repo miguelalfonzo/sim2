@@ -62,7 +62,6 @@
             <input id="typeUser" type="hidden" value="AG">
         @endif
     @endif
-
 </header>
 <section>
     @yield('content')
@@ -70,13 +69,9 @@
 <section>
     @yield('solicitude')
 </section>
-
 <div id="loading" style="display: none">
     <img src="{{URL::to('/')}}/img/spiffygif.gif">
 </div>
-<!-- <section>
-     @yield('actividad')
- </section>-->
 {{ HTML::script('js/jquery.blockUI.js') }}
 {{ HTML::script('js/jquery.numeric.js') }}
 {{ HTML::script('js/bootstrap.min.js') }}
