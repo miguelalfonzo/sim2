@@ -1,5 +1,5 @@
 @extends('template.main')
-@section('content')
+@section('solicitude')
 <div class="content">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
         <small style="float: right; margin-top: 10px; padding-right: 20px;">

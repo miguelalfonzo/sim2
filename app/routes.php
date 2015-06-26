@@ -171,3 +171,26 @@
     App::missing(function ($exception) 
     {
     });
+
+
+/*
+|--------------------------------------------------------------------------
+| idkc: REPORT
+|--------------------------------------------------------------------------
+*/
+    // REPORT MAIN PAGE
+    Route::get('reports', 'Report\ReportController@mainHandler');
+    // GENERATE REPORT TABLE VIEW
+    Route::get('reports/generate_html/{id_reporte}/{fromDate}/{toDate}', 'Report\ReportController@reportViewHandler'); 
+    // CREATE EXCEL
+    Route::post('reports/export/generate','Report\ReportController@reportExcelHandler');
+    // LIST DATASET
+    Route::get('reports/getQuerys', 'Report\ReportController@listDatasetHandler');
+    // LIST COLUMNS OF DATASET
+    Route::get('reports/getColumnsDataSet/{queryId}', 'Report\ReportController@listColumnsDatasetHandler');
+    // SAVE NEW REPORT
+    Route::post('reports/save', 'Report\ReportController@saveReportHandler');
+    // LIST REPORTS OF USERS
+    Route::get('reports/getUserReports', 'Report\ReportController@listReportsUserHandler');
+    // SEND MAIL
+    Route::post('mail_send','PostMan@sendEmailHandler');
