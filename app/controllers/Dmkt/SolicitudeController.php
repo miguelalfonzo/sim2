@@ -36,6 +36,7 @@ use \Users\Rm;
 use \Client\ClientType;
 use \yajra\Pdo\Oci8\Exceptions\Oci8Exception;
 use \System\FondoHistory;
+use \Alert\AlertController;
 
 class SolicitudeController extends BaseController
 {
@@ -92,6 +93,8 @@ class SolicitudeController extends BaseController
             $solicitud->status = ACTIVE ;
             $solicitud->save();
         }
+        $alert = new AlertController;
+        $data[ 'alert' ] = $alert->expenseAlert();
         return View::make('template.User.show',$data);   
     }
 
@@ -128,7 +131,6 @@ class SolicitudeController extends BaseController
             $solicitud = Solicitud::where('token', $token)->first();
             $politicStatus = FALSE;
             $user = Auth::user();
-            
             if ( is_null( $solicitud ) )
                 return $this->warningException( 'No se encontro la Solicitud con Token: ' . $token , __FUNCTION__ , __LINE__ , __FILE__ );
             
@@ -181,6 +183,9 @@ class SolicitudeController extends BaseController
             }
             Session::put( 'state' , $data[ 'solicitud' ]->state->id_estado );
             $data[ 'politicStatus' ] = $politicStatus;
+            $alert = new AlertController;
+            if ( is_null( $data[ 'solicitud' ]->registerHistory ) && !in_array( $data['solicitud']->id_estado , array( CANCELADO , RECHAZADO ) ) ) 
+                $data[ 'alert' ] = $alert->timeAlert( $data[ 'solicitud'] , 'diffInMonths' );
             return View::make( 'Dmkt.Solicitud.view' , $data );
         }
         catch ( Exception $e )

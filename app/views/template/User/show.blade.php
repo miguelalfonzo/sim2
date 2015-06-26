@@ -149,13 +149,15 @@
     </div>
 </div>
 @include('template.leyenda')
-@if(isset($warnings[status]))
-    @if ($warnings[status] == ok )
-        <script type="text/javascript">
-            $(document).ready(function() {
-                bootbox.alert('<h4>' + {{$warnings[data]}} + '</h4>');
-            });
-        </script>
-    @endif
-@endif
+<script type="text/javascript">
+    $(document).ready(function() 
+    {
+        @if ( isset( $alert ) && $alert[ 'msg' ] != '' )
+            bootbox.alert( '<h3 class="text-center" style="color:{{ $alert['color'] }} ; padding-left:10px; margin-top:20px; margin-bottom:20px">{{ $alert[ 'msg' ] }}</h3>');
+        @endif
+        @if ( isset( $warning[status] ) && $warnings[status] == ok )
+            bootbox.alert('<h4>' + {{$warnings[data]}} + '</h4>');
+        @endif
+    });
+</script>
 @stop

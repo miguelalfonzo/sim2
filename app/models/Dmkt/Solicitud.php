@@ -39,8 +39,6 @@ class Solicitud extends Eloquent
         })->where( 'id_estado' , '<>' , CANCELADO )->get();
     }
 
-    /* PUBLIC RELATIONSHIPS */
-
     public function state()
     {
         return $this->hasOne( 'Common\State' , 'id' , 'id_estado' );
@@ -51,16 +49,20 @@ class Solicitud extends Eloquent
         return $this->hasOne('User','id','id_user_assign');
     }
 
-    protected function advanceSeatHist()
+    /*protected function advanceSeatHist()
     {
         return $this->hasMany( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->where( 'status_to' , GASTO_HABILITADO );
-    }
+    }*/
 
     protected function expenseHistory()
     {
         return $this->hasOne( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->where( 'status_to' , GASTO_HABILITADO );
     }
 
+    protected function registerHistory()
+    {
+        return $this->hasOne( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->where( 'status_to' , REGISTRADO );
+    }
 
     public function approvedHistory()
     {

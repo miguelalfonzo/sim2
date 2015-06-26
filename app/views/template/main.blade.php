@@ -67,6 +67,7 @@
         @endif
     @endif
 </header>
+
 <div class="container-fluid" style="max-height: 100vh; padding-left: 0; padding-right: 0;">
         <nav class="navbar navbar-default navbar-static-top" role="navigation" style="/*margin-bottom: 0*/">
             <div class="container-fluid">
@@ -120,10 +121,10 @@
         </div>
     </div>
 
-
 <div id="loading" style="display: none">
     {{ HTML::image('img/spiffygif.gif') }}
 </div>
+
 <!-- <section>
      @yield('actividad')
  </section>-->
