@@ -4,6 +4,7 @@ use Dmkt\Solicitud;
 use Users\Rm;
 use Dmkt\Account;
 use \Exception;
+use \Illuminate\Database\Eloquent\Collection;
 
 class TestController extends BaseController 
 {
@@ -242,6 +243,73 @@ class TestController extends BaseController
 	    	$rpta = $this->internalException($e,__FUNCTION__);
     	}
     	return $rpta;
+    }
+
+    private function intersectRecords( $rs1 , $rs2 )
+    {
+    	$intersect = new Collection;
+    	foreach( $rs1 as $r1 )
+    	{
+    		foreach( $rs2 as $r2 )
+    		{
+    			if ( $r2->id_cliente == $r1->id_cliente && $r2->id_tipo_cliente == $r1->id_tipo_cliente )
+    			{
+    				$intersect->add( $r2 );
+    				break;
+    			}
+    		}
+    	}
+    	return $intersect;
+    }
+
+    public function testalert()
+    {
+    	$tipo_cliente_requerido = array( MEDICO , INSTITUCION );
+		$solicituds = Solicitud::all();
+		\Log::error( $solicituds->count() );
+		foreach ( $solicituds as $key => $solicitud )
+		{
+			$clients = $solicitud->clients;
+			$solicitud_tipo_cliente = array_unique( $clients->lists( 'id_tipo_cliente') );
+			if ( count( array_intersect( $solicitud_tipo_cliente, $tipo_cliente_requerido ) ) <= 1 )
+				unset( $solicituds[ $key ] );
+		}
+		\Log::error( $solicituds->count() );
+		$clientList = array();
+		foreach( $solicituds as $solicitud_inicial )
+		{
+			$clients_inicial = $solicitud_inicial->clients()->select( 'id_cliente' , 'id_tipo_cliente' )->get();
+			foreach ( $solicituds as $solicitud_secundaria )
+			{
+				if ( $solicitud_inicial->id != $solicitud_secundaria->id )
+				{
+					$clients_secundaria = $solicitud_secundaria->clients()->select( 'id_cliente' , 'id_tipo_cliente' )->get();
+					//return $clients_inicial->toJson() . '        ' . $clients_secundaria->toJson();
+					//return array_intersect( $clients_inicial->toArray() , $clients_secundaria->toArray() );
+					//return $clients_inicial->intersect( $clients_secundaria );
+					$cliente_inicial = $this->intersectRecords( $clients_inicial , $clients_secundaria );
+					//return $cliente_inicial;
+					$solicitud_tipo_cliente = array_unique( $clients_inicial->lists( 'id_tipo_cliente' ) );
+					if ( count( array_intersect( $solicitud_tipo_cliente, $tipo_cliente_requerido ) ) >= 2 )
+					{
+						$cliente = '';
+						foreach ( $clients_inicial as $client_inicial )
+						{
+							$cliente .= $client_inicial->{$client_inicial->clientType->relacion}->full_name . '. ' ; 
+						}
+						return 'La solicitud ' . $solicitud_inicial->id . ' y la solicitud ' . $solicitud_secundaria->id . ' tienen por lo menos un cliente medico e institucion iguales: ' .$cliente;
+						
+					}
+					/*foreach ( $solicituds as $solicitud_final )
+					{
+						if ( $solicitud_inicial->id != $solicitud_final->id || $solicitud_secundaria != $solicitud_final->id )
+						{
+
+						}
+					}*/
+				}
+			}
+		}
     }
 
 }

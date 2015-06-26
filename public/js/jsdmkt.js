@@ -1293,6 +1293,11 @@ function newSolicitude() {
                 td.html('<input type="text" maxlength=7 value="' + val + '">');
                 td.children().numeric();
             }
+            else if ( td.attr('editable') == 4 )
+            {
+                var val = td.html();
+                td.html('<input type="text" value="' + val + '">');
+            }
         });
     });
 
@@ -1344,8 +1349,8 @@ function newSolicitude() {
         trElement.children().each( function( i , data )
         {
             var td = $(data);
-            if ( td.attr('editable') == 1  || td.attr('editable') == 3 )
-                aData.Data[td[0].className] = td.children().val()
+            if ( td.attr('editable') == 1  || td.attr('editable') == 3 || td.attr('editable') == 4 )
+                aData.Data[td[0].classList[0]] = td.children().val()
         });
         $.ajax(
         {

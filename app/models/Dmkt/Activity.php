@@ -17,4 +17,9 @@ class Activity extends Eloquent
     {
     	return $this->hasMany('Dmkt\InvestmentActivity' , 'id_actividad' , 'id' );
     }
+
+    protected function client()
+    {
+        return $this->hasOne( 'Client\ClientType' , 'id' , 'tipo_cliente' );
+    }
 }

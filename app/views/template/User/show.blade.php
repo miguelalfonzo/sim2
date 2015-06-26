@@ -43,12 +43,24 @@
                     </a>
                 </li>
             @elseif ( Auth::user()->type == GER_PROD )
-                <!-- <li>
-                    <a href="#rentabilidad" role="tab" data-toggle="tab">
+                <li>
+                    <a href="#tab-inversion" role="tab" data-toggle="tab">
                         <i class="fa fa-user"></i>
-                        Reporte de Rentabilidad
+                        Maestro de Inversiones
                     </a>
-                </li> -->
+                </li>
+                <li>
+                    <a href="#tab-actividad" role="tab" data-toggle="tab">
+                        <i class="fa fa-user"></i>
+                        Maestro de Actividades
+                    </a>
+                </li>
+                <li>
+                    <a href="#tab-inversion-actividad" role="tab" data-toggle="tab">
+                        <i class="fa fa-user"></i>
+                        Maestro de Inversion-Actividad
+                    </a>
+                </li>
             @elseif ( Auth::user()->type == GER_COM )
                 <li>
                     <a href="#reporte-fondo" role="tab" data-toggle="tab">
@@ -115,12 +127,33 @@
                     </div>
                 </div>
             @elseif ( Auth::user()->type == GER_PROD )
-                <!-- Reporte de Rentabilidad -->
-                <!-- <div class="tab-pane fade" id="rentabilidad">
+                <!-- Maestro de Inversiones -->
+                <div class="tab-pane fade" id="tab-inversion">
                     <div class="panel panel-default">
-                        <div class="panel-body panel-default table_rentabilidad"></div>
+                        <div class="panel-body panel-default table_inversion"></div>
                     </div>
-                </div> -->
+                    <div>
+                       <input class="btn btn-primary maintenance-add" type="button" case="inversion" value="Agregar">
+                    </div>
+                </div>
+                <!-- Maestro de Actividades -->
+                <div class="tab-pane fade" id="tab-actividad">
+                    <div class="panel panel-default">
+                        <div class="panel-body panel-default table_actividad"></div>
+                    </div>
+                    <div>
+                       <input class="btn btn-primary maintenance-add" type="button" case="actividad" value="Agregar">
+                    </div>
+                </div>
+                <!-- Maestro de Inversion - Actividad -->
+                <div class="tab-pane fade" id="tab-inversion-actividad">
+                    <div class="panel panel-default">
+                        <div class="panel-body panel-default table_inversionactividad"></div>
+                    </div>
+                    <div>
+                       <input class="btn btn-primary maintenance-add" type="button" case="inversionactividad" value="Agregar">
+                    </div>
+                </div>
             @elseif ( Auth::user()->type == GER_COM )
                 <!-- Reporte de Fondos -->
                 <div class="tab-pane fade" id="reporte-fondo">

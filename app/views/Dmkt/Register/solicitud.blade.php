@@ -1,5 +1,5 @@
 @extends('template.main')
-@section('content')
+@section('solicitude')
 <div class="content">
     <input type="hidden" id="state_view" value="{{isset($state) ? $state : PENDIENTE}}">
     <div class="panel panel-default">

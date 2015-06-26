@@ -1,5 +1,5 @@
 @extends('template.main')
-@section('content')
+@section('solicitude')
 
 <section class="container-fluid" >
         <div class="panel panel-default">

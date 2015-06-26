@@ -16,6 +16,10 @@ use \Common\TypeMoney;
 use \DB;
 use \Log;
 use \Exception;
+use \Dmkt\InvestmentType;
+use \Dmkt\InvestmentActivity;
+use \Dmkt\Activity;
+use \Client\ClientType;
 
 class TableController extends BaseController
 {
@@ -34,12 +38,37 @@ class TableController extends BaseController
 					return $this->maintenanceGetTipoDocumento( $inputs['val'] );
 				case 'id_moneda':
 					return $this->maintenanceGetTipoMoneda( $inputs['val'] );
+				case 'tipo_cliente':
+					return $this->maintenanceGetClient( $inputs[ 'val' ] );
+				case 'id_inversion':
+					return $this->maintenanceGetInversion( $inputs[ 'val' ] );
+				case 'id_actividad':
+					return $this->maintenanceGetActividad( $inputs[ 'val' ] );
 			}
 		}
 		catch( Exception $e )
 		{
 			return $this->internalException( $e , __FUNCTION__ );
 		}
+	}
+
+	private function maintenanceGetInversion( $val )
+	{
+		$data = array( 'datos' => InvestmentType::all() , 'val' => $val , 'key' => 'nombre' );
+		return $this->setRpta( View::make( 'Maintenance.td')->with( $data)->render() );
+	
+	}
+
+	private function maintenanceGetActividad( $val )
+	{
+		$data = array( 'datos' => Activity::all() , 'val' => $val , 'key' => 'nombre' );
+		return $this->setRpta( View::make( 'Maintenance.td')->with( $data)->render() );	
+	}
+
+	private function maintenanceGetClient( $val )
+	{
+		$data = array( 'datos' => ClientType::all() , 'val' => $val , 'key' => 'descripcion' );
+		return $this->setRpta( View::make( 'Maintenance.td')->with( $data)->render() );
 	}
 
 	private function maintenanceGetTipoMoneda( $val )
@@ -79,6 +108,12 @@ class TableController extends BaseController
 					return $this->getFondos();
 				case 'fondo-cuenta':
 					return $this->getFondoAccount();
+				case 'inversion':
+					return $this->getInversion();
+				case 'actividad':
+					return $this->getActividad();
+				case 'inversionactividad':
+					return $this->getInvestmentActivity();
 			}
 		}
 		catch( Exception $e )
@@ -87,30 +122,45 @@ class TableController extends BaseController
 		}
 	}
 
-	private function getFondos()
-    {
-        $fondos = Fondo::order();
-        return $this->setRpta( View::make('Maintenance.Fondo.table')->with('fondos' , $fondos)->render() );
-    }
-
 	private function getDailySeatRelation()
 	{
 		$iAccounts = MarkProofAccounts::all();
 		return $this->setRpta( View::make( 'Maintenance.CuentasMarca.table' )->with( 'iAccounts' , $iAccounts )->render() );
 	}
-
+	private function getFondos()
+    {
+        $fondos = Fondo::order();
+        return $this->setRpta( View::make('Maintenance.Fondo.table')->with('fondos' , $fondos)->render() );
+    }
 	private function getFondoAccount()
 	{
 		$fondos = Fondo::order();
 		return $this->setRpta( View::make( 'Maintenance.FondoCuenta.table' )->with( 'fondos' , $fondos )->render() );
 	}
+	private function getInversion()
+	{
+		$inversion = InvestmentType::order();
+		return $this->setRpta( View::make( 'Maintenance.Investment.table')->with( 'inversion' , $inversion )->render() );
+	}
+	private function getActividad()
+	{
+		$actividad = Activity::order();
+		return $this->setRpta( View::make( 'Maintenance.Activity.table' )->with( 'actividad' , $actividad )->render() );
+	}
+	private function getInvestmentActivity()
+	{
+		$inversionActividad = InvestmentActivity::order();
+		return $this->setRpta( View::make( 'Maintenance.InvestmentActivity.table')->with( 'inversion_actividad' , $inversionActividad )->render() );
+	}
+
 
 	public function updateMaintenanceData()
 	{
 		try
 		{
 			$inputs = Input::all();
-			switch( $inputs['type'] )
+			$method = 'maintenanceUpdate'. $inputs['type'];
+			switch( $inputs['type'] )			
 			{
 				case 'fondo':
 					return $this->maintenanceUpdateFondo( $inputs );
@@ -119,11 +169,39 @@ class TableController extends BaseController
 				case 'fondo-cuenta':
 					return $this->maintenanceUpdateFondo( $inputs);
 			}
+			return $this->$method( $inputs );
 		}
 		catch ( Exception $e )
 		{
 			return $this->internalException( $e , __FUNCTION__ );
 		}
+	}
+
+	private function maintenanceUpdateinversion( $val )
+	{
+		$inversion = InvestmentType::find( $val['id'] );
+		foreach ( $val[data] as $key => $data )
+			$inversion->$key = $data;
+		$inversion->save();
+		return $this->setRpta();
+	}
+
+	private function maintenanceUpdateactividad( $val )
+	{
+		$actividad = Activity::find( $val['id'] );
+		foreach ( $val[data] as $key => $data )
+			$actividad->$key = $data;
+		$actividad->save();
+		return $this->setRpta();
+	}
+
+	private function maintenanceUpdateinversionactividad( $val )
+	{
+		$investmentActivity = InvestmentActivity::find( $val['id'] );
+		foreach ( $val[data] as $key => $data )
+			$investmentActivity->$key = $data;
+		$investmentActivity->save();
+		return $this->setRpta();
 	}
 
 	private function getAccount( $val )
@@ -141,11 +219,6 @@ class TableController extends BaseController
 	private function maintenanceUpdateCuentasMarca( $val )
 	{
 		$accountsMark = MarkProofAccounts::find($val['id'] );
-		Log::error( $val );
-		/*$val[data]['idcuentafondo'] = $this->getAccount( $val[data]['idcuentafondo'] )[data];
-		$val[data]['idcuentagasto'] = $this->getAccount( $val[data]['idcuentagasto'] )[data];
-		$val[data]['idmarca'] = $this->getMark( $val[data]['idmarca'] )[data];
-*/
 		foreach ( $val[data] as $key => $data )
 			$accountsMark->$key = $data;
 		$accountsMark->save();

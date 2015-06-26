@@ -10,7 +10,7 @@ class InvestmentActivity extends Eloquent
 
     protected static function order()
     {
-    	return Investment_Activity::orderBy('id','asc')->get();
+    	return InvestmentActivity::orderBy('id','asc')->get();
     }
 
     protected function activity()

@@ -94,8 +94,7 @@ class SolicitudeController extends BaseController
             $solicitud->save();
         }
         $alert = new AlertController;
-        $data[ 'alert' ] = $alert->expenseAlert();
-        $alert->clientAlert();
+        $data[ 'alert' ] = $alert->alertConsole();
         return View::make('template.User.show',$data);   
     }
 

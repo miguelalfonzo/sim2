@@ -21,6 +21,9 @@ use \Expense\Mark;
 use \Expense\MarkProofAccounts;
 use \Common\FileStorage;
 use \Users\TemporalUser;
+use \Dmkt\InvestmentType;
+use \Dmkt\Activity;
+use \Dmkt\InvestmentActivity;
 	
 	Solicitud::observe(			new Transaction());
 	SolicitudDetalle::observe(	new Transaction());
@@ -40,4 +43,7 @@ use \Users\TemporalUser;
 	MarkProofAccounts::observe( new Transaction());
 	FileStorage::observe(		new Transaction());
 	//TemporalUser::observe(      new Transaction());
-	TemporalUser::observe(      new SoftDelete() );
+	TemporalUser::observe(      new SoftDelete());
+	InvestmentType::observe(    new Transaction());
+	Activity::observe(          new Transaction());
+	InvestmentActivity::observe(new Transaction());	
