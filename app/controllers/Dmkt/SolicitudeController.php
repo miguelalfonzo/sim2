@@ -95,32 +95,35 @@ class SolicitudeController extends BaseController
         }
         $alert = new AlertController;
         $data[ 'alert' ] = $alert->expenseAlert();
+        $alert->clientAlert();
         return View::make('template.User.show',$data);   
     }
 
     public function newSolicitude()
     {
+        $alert = new AlertController;
         $data = array( 'reasons'     => Reason::all() ,
                        'activities'  => Activity::order(),
                        'payments'    => TypePayment::all(),
                        'currencies'  => TypeMoney::all(),
                        'families'    => Marca::orderBy('descripcion', 'ASC')->get(),
-                       'investments' => InvestmentType::order() );
-
+                       'investments' => InvestmentType::order() ,
+                       'alert'       => $alert->expenseAlert() ); 
         return View::make('Dmkt.Register.solicitud', $data);
     }    
 
     public function editSolicitude($token)
     {
+        $alert = new AlertController;
         $data = array( 'solicitud'   => Solicitud::where('token', $token)->firstOrFail(),
                        'reasons'     => Reason::all(),
                        'activities'  => Activity::order(),
                        'payments'    => TypePayment::all(),
                        'currencies'  => TypeMoney::all(),
                        'families'    => Marca::orderBy('descripcion', 'ASC')->get(),
-                       'investments' => InvestmentType::order() );
-
-        $data[ 'detalle' ] = $data['solicitud']->detalle ;
+                       'investments' => InvestmentType::order() ,
+                       'alert'       => $alert->expenseAlert() );
+        $data[ 'detalle' ] = $data['solicitud']->detalle;
         return View::make('Dmkt.Register.solicitud', $data);
     }
 
@@ -185,7 +188,7 @@ class SolicitudeController extends BaseController
             $data[ 'politicStatus' ] = $politicStatus;
             $alert = new AlertController;
             if ( is_null( $data[ 'solicitud' ]->registerHistory ) && !in_array( $data['solicitud']->id_estado , array( CANCELADO , RECHAZADO ) ) ) 
-                $data[ 'alert' ] = $alert->timeAlert( $data[ 'solicitud'] , 'diffInMonths' );
+                $data[ 'alert' ] = $alert->compareTime( $data[ 'solicitud'] , 'diffInMonths' );
             return View::make( 'Dmkt.Solicitud.view' , $data );
         }
         catch ( Exception $e )

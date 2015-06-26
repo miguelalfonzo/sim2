@@ -34,9 +34,6 @@
                 @if ( $solicitud->status == BLOCKED )
                     <h4 style="color:darkred; padding-left:10px; margin-top:20px; margin-bottom:20px">LA SOLICITUD ESTA SIENDO EVALUADA</h4>
                 @endif
-                @if ( isset( $alert['color'] ) )
-                    <h1 class="text-center" style="color:{{ $alert['color'] }} ; padding-left:10px; margin-top:20px; margin-bottom:20px">{{ $alert[ 'msg' ] }}</h1>
-                @endif
                 <form id="form_make_activity" method="post">
                     {{Form::token()}}
                     <input name="idsolicitud" type="hidden" value="{{$solicitud->id}}">

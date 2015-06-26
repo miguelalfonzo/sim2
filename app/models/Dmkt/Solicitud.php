@@ -95,8 +95,6 @@ class Solicitud extends Eloquent
     {
         return $this->hasOne( 'Dmkt\SolicitudDetalle' , 'id' , 'id_detalle' );
     }
-
-
     /* PROTECTED RELATIOSNSHIPS */
 
     protected function registerHist()
@@ -106,10 +104,11 @@ class Solicitud extends Eloquent
 
     protected function typeSolicitude()
     {
-        return $this->hasOne('Dmkt\SolicitudType','id','idtiposolicitud');
+        return $this->hasOne( 'Dmkt\SolicitudType' , 'id' , 'idtiposolicitud' );
     }
 
-    public function products(){
+    public function products()
+    {
         return $this->hasMany( 'Dmkt\SolicitudProduct' , 'id_solicitud' , 'id' );
     }
 
@@ -155,6 +154,11 @@ class Solicitud extends Eloquent
     protected function expenses()
     {
         return $this->hasMany( 'Expense\Expense' , 'id_solicitud' , 'id' )->orderBy( 'updated_at' , 'desc');
+    }
+
+    protected function lastExpense()
+    {
+        return $this->hasOne( 'Expense\Expense' , 'id_solicitud' , 'id' )->orderBy( 'updated_at' , 'desc' );
     }
 
     protected function baseEntry()

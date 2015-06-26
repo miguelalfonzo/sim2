@@ -86,4 +86,12 @@
 {{ HTML::script('js/typeahead.js') }}
 {{ HTML::script('js/jquery.form.js') }}
 </body>
+<script>
+    $(document).ready( function() 
+    {
+        @if ( isset( $alert ) && $alert[ 'msg' ] != '' )
+            bootbox.alert( '<h3 class="text-center" style="color:{{ $alert['color'] }} ; padding-left:10px; margin-top:20px; margin-bottom:20px">{{ $alert[ 'msg' ] }}</h3>');
+        @endif
+    });
+</script>
 </html>

@@ -123,3 +123,4 @@ const SISTEMA_SIM = 2;
 
 //TIPO DE CLIENTE
 const MEDICO = 1;
+const INSTITUCION = 3;
