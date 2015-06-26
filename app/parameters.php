@@ -139,3 +139,7 @@ const REPORT_MESSAGE_EXCEPTION              = 'Oops! Hubo un inconveniente al pr
 const REPORT_MESSAGE_CREATE                 = 'Oops! No se encontro información de reporte para registrar.';
 const REPORT_MESSAGE_EXPORT_GENERATE        = 'Oops! Hubo un inconveniente al procesar la informacion. Por Favor genera el reporte nuevamente';
 const REPORT_MESSAGE_USER_REPORT_DATA_NOT_FOUND = 'No tiene reportes asignados';
+
+const MSG_EXPENSE_ALERT = 'esta pendiente de registrar gastos por mas de 1 semana desde que se registro el ultimo documento.';
+const MSG_MONTH_ALERT = 'No se ha registrado los gastos de la solicitud por mas de 1 mes desde que se creo la solicitud.';
+const MSG_CLIENT_ALERT = 'tienen por lo menos un cliente medico e institucion iguales:';

@@ -2,7 +2,7 @@
     <thead>
         <tr>
             @foreach( $columns as $column )
-                <th>$column->name</th>
+                <th>{{$column->name}}</th>
             @endforeach
             <th>Edición</th>
         </tr>
@@ -11,7 +11,13 @@
         @foreach ( $records as $record )
             <tr row-id="{{$record->id}}" type="{{$type}}">
                 @foreach( $columns as $column )
-                    <td class="{{$column->key}}" editable="{{$column->editable}}" save="{{$column->save}}">{{$record->{column->key} }}</td>
+                    <td class="{{$column->key}}" editable="{{$column->editable}}">
+                        @if( isset( $column->relation ) )
+                            {{$record->{$column->relation}->{$column->key} }}
+                        @else
+                            {{$record->{$column->key} }}
+                        @endif
+                    </td>
                 @endforeach
                 <td editable=2 style="text-align:center">
                     <a class="maintenance-edit" href="#">

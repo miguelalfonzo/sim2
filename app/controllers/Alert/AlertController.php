@@ -72,7 +72,7 @@ class AlertController extends BaseController
 								foreach ( $cliente_inicial as $client_inicial )
 									$cliente .= '<li>' . $client_inicial->{$client_inicial->clientType->relacion}->full_name . '.</li>' ; 
 								$cliente .= '</ul>';
-								$msg .= '<br>Las solicitudes ' . $solicitud_inicial->id . ' , ' . $solicitud_secundaria->id . ' , ' . $solicitud_final->id . ' tienen por lo menos un cliente medico e institucion iguales: ' . $cliente . '</br>';
+								$msg .= '<br>Las solicitudes ' . $solicitud_inicial->id . ' , ' . $solicitud_secundaria->id . ' , ' . $solicitud_final->id . MSG_CLIENT_ALERT . ' ' . $cliente . '</br>';
 								$solicituds_compare_id[] = $solicitud_inicial->id;
 								$solicituds_compare_id[] = $solicitud_secundaria->id;
 							}
@@ -95,9 +95,9 @@ class AlertController extends BaseController
 			$lastExpense = $solicitud->lastExpense;
 			\Log::error( json_encode( $lastExpense ) );
 			if ( is_null( $lastExpense ) && $this->timeAlert( $expenseHistory , 'diffInWeeks' , 'updated_at' ) >= 1 )
-				$msg .= '<br>No se ha rendido cuenta de la solicitud N° ' .  $solicitud->id . ' por mas de 1 semana desde que se habilito el registro de gastos.</br>';
+				$msg .= '<br>La solicitud N° ' .  $solicitud->id . MSG_EXPENSE_ALERT . '</br>';
 			else if ( $this->timeAlert( $lastExpense , 'diffInWeeks' , 'updated_at' ) >= 1 )
-				$msg .= '<br>No se ha rendido cuenta de la solicitud N° ' .  $solicitud->id . ' por mas de 1 semana desde que se registro el ultimo documento.</br>';	
+				$msg .= '<br>La solicitud N° ' .  $solicitud->id . MSG_EXPENSE_ALERT . '</br>';	
 		}
 		return array( 'color' => 'darkred' , 'msg' => $msg );
 	}
@@ -113,7 +113,7 @@ class AlertController extends BaseController
 	public function compareTime( $record , $method )
 	{
 		if ( $this->timeAlert( $record , $method , 'created_at' ) >= 1 )
-			return array( 'color' => 'darkred' , 'msg' => 'No se ha registrado los gastos de la solicitud por mas de 1 mes desde que se creo la solicitud.' );
+			return array( 'color' => 'darkred' , 'msg' => MSG_MONTH_ALERT );
 		else
 			return array();
 	}
