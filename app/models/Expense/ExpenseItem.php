@@ -6,7 +6,7 @@ use \Eloquent;
 
 class ExpenseItem extends Eloquent{
 
-    protected $table= 'GASTO_ITEM';
+    protected $table= 'SIM_GASTO_ITEM';
     protected $primaryKey = 'id';
     
     public function lastId()

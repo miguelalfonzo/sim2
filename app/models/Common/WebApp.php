@@ -11,7 +11,7 @@ use \Eloquent;
 
 class WebApp extends Eloquent {
 
-    protected $table = 'APPS';
+    protected $table = 'SIM_APPS';
     protected $primaryKey = 'idapp';
 
 

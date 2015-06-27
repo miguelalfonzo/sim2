@@ -6,7 +6,7 @@ use Eloquent;
 
 class SolicitudDetalle extends Eloquent
 {
-	protected $table = 'SOLICITUD_DETALLE';
+	protected $table = 'SIM_SOLICITUD_DETALLE';
     protected $primaryKey = 'id';    
  
     protected function getTccAttribute()

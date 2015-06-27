@@ -6,7 +6,7 @@ use \Log;
 
 class Periodo extends Eloquent
 {
-    protected $table = 'PERIODO';
+    protected $table = 'SIM_PERIODO';
     protected $primaryKey = 'id';
 
     public function lastId()

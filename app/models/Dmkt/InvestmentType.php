@@ -5,7 +5,7 @@ use \Eloquent;
 
 class InvestmentType extends Eloquent
 {
-    protected $table = 'TIPO_INVERSION';
+    protected $table = 'SIM_TIPO_INVERSION';
     protected $primaryKey = 'id';
 
     protected static function order()

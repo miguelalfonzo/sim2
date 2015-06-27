@@ -7,7 +7,7 @@ use \Eloquent;
 class Manager extends Eloquent
 {
 
-    protected $table = 'OUTDVP.GERENTES';
+    protected $table = 'OUTDVP_GERENTES';
     protected $primaryKey = 'id';
 
     protected function getFullNameAttribute()

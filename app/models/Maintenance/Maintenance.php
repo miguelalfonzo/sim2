@@ -6,7 +6,7 @@ use \Eloquent;
 
 class Maintenance extends Eloquent
 {
-    protected $table= 'Mantenimiento';
+    protected $table= 'SIM_Mantenimiento';
     protected $primaryKey = 'id';
    
 }

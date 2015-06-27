@@ -6,7 +6,7 @@ use \Eloquent;
 
 class AprovalPolicy extends Eloquent 
 {
-    protected $table = 'POLITICA_APROBACION';
+    protected $table = 'SIM_POLITICA_APROBACION';
     protected $primaryKey = 'id';
 
     protected static function getToUser( $investment , $order )

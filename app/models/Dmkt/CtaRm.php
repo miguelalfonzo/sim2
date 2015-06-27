@@ -6,7 +6,7 @@ use \Eloquent;
 
 class CtaRm extends Eloquent 
 {
-    protected $table = 'VAR.BENEFICIARIOS_CTA_BANC';
+    protected $table = 'VAR_BENEFICIARIOS_CTA_BANC';
     protected $primaryKey = 'cl_codigo';
 
     public function cuenta($dni)

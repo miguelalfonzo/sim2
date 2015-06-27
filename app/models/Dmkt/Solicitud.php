@@ -6,7 +6,7 @@ use \Eloquent;
 
 class Solicitud extends Eloquent
 {
-    protected $table = 'SOLICITUD';
+    protected $table = 'SIM_SOLICITUD';
     protected $primaryKey = 'id';
 
     protected function getFecOriginAttribute()

@@ -6,7 +6,7 @@ use \Eloquent;
 
 class Entry extends Eloquent
 {
-    protected $table= 'ASIENTO';
+    protected $table= 'SIM_ASIENTO';
     protected $primaryKey = 'id';
     protected $dates = ['fec_origen'] ;
     

@@ -6,7 +6,7 @@ use \Eloquent;
 
 class SolicitudGer extends Eloquent
 {
-    protected $table = 'SOLICITUD_GERENTE';
+    protected $table = 'SIM_SOLICITUD_GERENTE';
     protected $primaryKey = 'id';
 
     public function lastId()

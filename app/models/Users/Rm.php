@@ -7,7 +7,7 @@ use \Eloquent;
 class Rm extends Eloquent
 {
 
-    protected $table = 'OUTDVP.DMKT_RG_RM';
+    protected $table = 'OUTDVP_DMKT_RG_RM';
     protected $primaryKey = 'idrm';
 
     function lastId()

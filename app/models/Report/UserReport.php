@@ -6,7 +6,7 @@ use \Eloquent;
 
 class UserReport extends Eloquent {
 
-	protected $table      = 'REPORTE_USUARIO';
+	protected $table      = 'SIM_REPORTE_USUARIO';
 	protected $primaryKey = 'id';
 	public $incrementing  = false;
 	protected $fillable   = array('id', 'id_reporte', 'id_usuario', 'created_at', 'updated_at');

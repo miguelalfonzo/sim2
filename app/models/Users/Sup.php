@@ -8,7 +8,7 @@ class Sup extends Eloquent
 {
 
 
-    protected $table = 'OUTDVP.DMKT_RG_SUPERVISOR';
+    protected $table = 'OUTDVP_DMKT_RG_SUPERVISOR';
     protected $primaryKey = 'idsup';
 
     protected function getFullNameAttribute()

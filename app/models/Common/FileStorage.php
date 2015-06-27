@@ -6,7 +6,7 @@ use \Eloquent;
 
 class FileStorage extends Eloquent{
 
-    protected $table = 'FILE_STORAGE';
+    protected $table = 'SIM_FILE_STORAGE';
     protected $primaryKey = 'id';
 
 }

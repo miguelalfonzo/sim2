@@ -6,7 +6,7 @@ use \Eloquent;
 
 class ChangeRate extends Eloquent
 {
-    protected $table= 'B3O.CXP_TC';
+    protected $table= 'B3O_CXP_TC';
     
     protected function getFechaAttribute($value)
     {

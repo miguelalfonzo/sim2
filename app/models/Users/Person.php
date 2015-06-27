@@ -7,7 +7,7 @@ use \Eloquent;
 class Person extends Eloquent
 {
 
-    protected $table = 'OUTDVP.PERSONAS';
+    protected $table = 'OUTDVP_PERSONAS';
     protected $primaryKey = 'idpersona';
 
     protected function getFullNameAttribute()
