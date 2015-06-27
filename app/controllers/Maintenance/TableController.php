@@ -127,11 +127,7 @@ class TableController extends BaseController
 		$records = MarkProofAccounts::all();
 		$columns = Maintenance::find(1);
 		$columns = json_decode( $columns->formula );
-		\Log::error( $columns );
 		return $this->setRpta( View::make( 'Maintenance.table' )->with( array( 'records' => $records , 'columns' => $columns , 'type' => 'cuentas-marca' ) )->render() );
-		
-		$iAccounts = MarkProofAccounts::all();
-		return $this->setRpta( View::make( 'Maintenance.CuentasMarca.table' )->with( 'iAccounts' , $iAccounts )->render() );
 	}
 	private function getFondos()
     {

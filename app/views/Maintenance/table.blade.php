@@ -11,7 +11,7 @@
         @foreach ( $records as $record )
             <tr row-id="{{$record->id}}" type="{{$type}}">
                 @foreach( $columns as $column )
-                    <td class="{{$column->key}}" editable="{{$column->editable}}">
+                    <td class="{{{ isset( $column->class ) ? $column->class : $column->key }}}" editable="{{$column->editable}}">
                         @if( isset( $column->relation ) )
                             {{$record->{$column->relation}->{$column->key} }}
                         @else
