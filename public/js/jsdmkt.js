@@ -1313,9 +1313,9 @@ function newSolicitude() {
         {
             var td = $(data);
             if ( td.attr('save') == 1 )
-                aData.Data[td[0].className] = td.children().val() ;
+                aData.Data[td[0].classList[0]] = td.children().val() ;
             else if ( td.attr('save') == 2 )
-                aData[td[0].className] = td.children().val() ;
+                aData[td[0].classList[0]] = td.children().val() ;
         });
         $.ajax(
         {
@@ -1365,6 +1365,62 @@ function newSolicitude() {
             if ( response.Status == 'Ok')
             {
                 bootbox.alert('<h4 class="green">Relaciones Actualizadas</h4>');
+                listMaintenanceTable( aData.type );
+            }
+            else
+                bootbox.alert('<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');            
+        });
+    });
+
+    $(document).off('click' , '.maintenance-disable');
+    $(document).on('click' , '.maintenance-disable' , function()
+    {
+        var trElement = $(this).parent().parent();
+        var aData = {};
+        aData._token = _token.val();
+        aData.id     = trElement.attr('row-id');
+        aData.type   = trElement.attr('type');
+        $.ajax(
+        {
+            type: 'post' ,
+            url :  server + 'maintenance-disable' ,
+            data: aData
+        }).fail( function( statusCode , errorThrown )
+        {
+            ajaxError( statusCode , errorThrown );
+        }).done( function( response )
+        {
+            if ( response.Status == 'Ok' )
+            {
+                bootbox.alert('<h4 class="green">Registro deshabilitado</h4>');
+                listMaintenanceTable( aData.type );
+            }
+            else
+                bootbox.alert('<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');            
+        });
+    });
+
+    $(document).off('click' , '.maintenance-enable');
+    $(document).on('click' , '.maintenance-enable' , function()
+    {
+        var trElement = $(this).parent().parent();
+        var aData = {};
+        aData._token = _token.val();
+        aData.id     = trElement.attr('row-id');
+        aData.type   = trElement.attr('type');
+        $.ajax(
+        {
+            type: 'post' ,
+            url :  server + 'maintenance-enable' ,
+            data: aData
+        }).fail( function( statusCode , errorThrown )
+        {
+            ajaxError( statusCode , errorThrown );
+        }).done( function( response )
+        {
+            if ( response.Status == 'Ok' )
+            {
+                bootbox.alert('<h4 class="green">Registro habilitado</h4>');
                 listMaintenanceTable( aData.type );
             }
             else

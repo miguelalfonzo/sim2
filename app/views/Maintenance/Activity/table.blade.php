@@ -17,6 +17,15 @@
                     <a class="maintenance-edit" href="#">
                         <span class="glyphicon glyphicon-pencil"></span>
                     </a>
+                    @if ( is_null( $activity->deleted_at ) )
+                        <a class="maintenance-disable" href="#">
+                            <span class="glyphicon glyphicon-remove red"></span>
+                        </a>
+                    @else
+                        <a class="maintenance-enable" href="#">
+                            <span class="glyphicon glyphicon-ok green"></span>
+                        </a>
+                    @endif
                 </td>
             </tr>
         @endforeach

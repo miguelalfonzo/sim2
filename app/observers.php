@@ -45,5 +45,5 @@ use \Dmkt\InvestmentActivity;
 	//TemporalUser::observe(      new Transaction());
 	TemporalUser::observe(      new SoftDelete());
 	InvestmentType::observe(    new Transaction());
-	Activity::observe(          new Transaction());
+	Activity::observe(          new SoftDelete());
 	InvestmentActivity::observe(new Transaction());	

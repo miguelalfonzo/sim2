@@ -70,7 +70,7 @@ class AlertController extends BaseController
 							{
 								$cliente = '<ul>';
 								foreach ( $cliente_inicial as $client_inicial )
-									$cliente .= '<li>' . $client_inicial->{$client_inicial->clientType->relacion}->full_name . '.</li>' ; 
+									$cliente .= '<li>' . /*$client_inicial->{$client_inicial->clientType->relacion}->full_name . */ '.</li>' ; 
 								$cliente .= '</ul>';
 								$msg .= '<br>Las solicitudes ' . $solicitud_inicial->id . ' , ' . $solicitud_secundaria->id . ' , ' . $solicitud_final->id . MSG_CLIENT_ALERT . ' ' . $cliente . '</br>';
 								$solicituds_compare_id[] = $solicitud_inicial->id;
@@ -94,9 +94,9 @@ class AlertController extends BaseController
 			$expenseHistory = $solicitud->expenseHistory;
 			$lastExpense = $solicitud->lastExpense;
 			\Log::error( json_encode( $lastExpense ) );
-			if ( is_null( $lastExpense ) && $this->timeAlert( $expenseHistory , 'diffInWeeks' , 'updated_at' ) >= 1 )
+			if ( is_null( $lastExpense ) && ! is_null( $expenseHistory ) && $this->timeAlert( $expenseHistory , 'diffInWeeks' , 'updated_at' ) >= 1 )
 				$msg .= '<br>La solicitud N° ' .  $solicitud->id . MSG_EXPENSE_ALERT . '</br>';
-			else if ( $this->timeAlert( $lastExpense , 'diffInWeeks' , 'updated_at' ) >= 1 )
+			else if ( ( ! is_null( $lastExpense ) ) && $this->timeAlert( $lastExpense , 'diffInWeeks' , 'updated_at' ) >= 1 )
 				$msg .= '<br>La solicitud N° ' .  $solicitud->id . MSG_EXPENSE_ALERT . '</br>';	
 		}
 		return array( 'color' => 'darkred' , 'msg' => $msg );
@@ -105,6 +105,7 @@ class AlertController extends BaseController
 	public function timeAlert( $record , $method , $date )
 	{
 		\Log::error( json_encode( $record ) );
+		\Log::error( $date );
 		$now = Carbon::now();
 		$updated = new Carbon( $record->$date );
 		return $updated->$method( $now );

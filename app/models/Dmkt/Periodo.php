@@ -2,7 +2,6 @@
 
 namespace Dmkt;
 use \Eloquent;
-use \Log;
 
 class Periodo extends Eloquent
 {

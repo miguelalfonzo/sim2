@@ -5,6 +5,8 @@ use Users\Rm;
 use Dmkt\Account;
 use \Exception;
 use \Illuminate\Database\Eloquent\Collection;
+use \Common\StateRange;
+use \Alert\AlertController;
 
 class TestController extends BaseController 
 {
@@ -310,6 +312,58 @@ class TestController extends BaseController
 				}
 			}
 		}
+    }
+
+    public function passLogin()
+    {
+    	$user = User::find(41);
+    	Auth::login($user);
+    	if ( Session::has('state') )
+            $state = Session::get('state');
+        else
+        {
+            if ( Auth::user()->type == CONT )
+                $state = R_APROBADO ;
+            else if ( in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD , GER_PROM , GER_COM , ASIS_GER ) ) )
+                $state = R_PENDIENTE;
+            elseif ( Auth::user()->type == TESORERIA )
+                $state = R_REVISADO ;
+        }
+        $mWarning = array();
+        if ( Session::has('warnings') )
+        {
+            $warnings = Session::pull('warnings');
+            $mWarning[status] = ok ;
+            if (!is_null($warnings))
+                foreach ($warnings as $key => $warning)
+                     $mWarning[data] = $warning[0].' ';
+            $mWarning[data] = substr($mWarning[data],0,-1);
+        }
+        $data = array( 'state'  => $state , 'states' => StateRange::order() , 'warnings' => $mWarning );
+        if ( Auth::user()->type == TESORERIA )
+        {
+            $data['tc'] = ChangeRate::getTc();    
+            $data['banks'] = Account::banks();
+        }
+        elseif ( Auth::user()->type == ASIS_GER )
+        {
+            $data['fondos']  = Fondo::asisGerFondos();                
+            $data['activities'] = Activity::order();
+        }
+        elseif ( Auth::user()->type == CONT )
+        {
+            $data['proofTypes'] = ProofType::order();
+            $data['regimenes'] = Regimen::all();      
+        }
+        if ( Session::has( 'id_solicitud') )
+        {
+            $solicitud = Solicitud::find( Session::pull( 'id_solicitud' ) );
+            $solicitud->status = ACTIVE ;
+            $solicitud->save();
+        }
+        $alert = new AlertController;
+        $data[ 'alert' ] = $alert->alertConsole();
+        return View::make('template.User.show',$data);   
     }
 
 }

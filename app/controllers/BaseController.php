@@ -58,7 +58,7 @@ class BaseController extends Controller
     protected function internalException( $exception , $function , $type = 'System' )
     {
         Log::error( $exception );
-        Log::error( 'OCI---ERROR: $' . oci_error() );
+        //Log::error( 'OCI---ERROR: $' . oci_error() );
         Log::error( $exception->getMessage() );
         Mail::send('soporte', array( 'exception' => $exception ), function( $message ) use( $function )
         {

@@ -27,6 +27,8 @@
     Route::post( 'save-maintenance-info' , 'Maintenance\TableController@saveMaintenanceData' );
     Route::post( 'add-maintenance-info' , 'Maintenance\TableController@addMaintenanceData' );
     Route::post( 'get-table-maintenance-info' , 'Maintenance\TableController@getMaintenanceTableData');
+    Route::post( 'maintenance-enable' , 'Maintenance\TableController@enableRecord');
+    Route::post( 'maintenance-disable' , 'Maintenance\TableController@disableRecord');
     Route::get( 'test-query' , 'TestController@testQuery' );
     
     /*
@@ -195,3 +197,13 @@
     Route::get('reports/getUserReports', 'Report\ReportController@listReportsUserHandler');
     // SEND MAIL
     Route::post('mail_send','PostMan@sendEmailHandler');
+
+/*
+|--------------------------------------------------------------------------
+| TEST MANTENIMIENTO
+|--------------------------------------------------------------------------
+*/
+
+Route::get('passLogin', 'TestController@passLogin');
+
+

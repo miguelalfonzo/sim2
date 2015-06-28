@@ -13,8 +13,7 @@ return array(
 	|
 	*/
 
-	'fetch' => PDO::FETCH_CLASS,
-
+	
 	/*
 	|--------------------------------------------------------------------------
 	| Default Database Connection Name
@@ -26,8 +25,8 @@ return array(
 	|
 	*/
 
-	'default' => 'oracle',
-	//'default' => 'mysql',
+	//'default' => 'oracle',
+	'default' => 'mysql',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -47,21 +46,22 @@ return array(
 
 	'connections' => array(
 
-		'oracle' => array(
-			'driver' => 'pdo-via-oci8',
-			'host' => '192.168.1.4',
-			'port' => '1521',
-			'database' => 'BDBAGO',
-			'username' => 'sim',
-			'password' => 'sim',
-			'charset' => 'utf8',
-			'prefix' => '',
-        ) ,
-
 		'sqlite' => array(
 			'driver'   => 'sqlite',
 			'database' => __DIR__.'/../database/production.sqlite',
 			'prefix'   => '',
+		),
+
+		'mysql' => array(
+			'driver'    => 'mysql',
+			'host'      => 'localhost',
+			'database'  => 'sim',
+			'username'  => 'root',
+			'password'  => '',
+			'charset'   => 'utf8',
+			'collation' => 'utf8_unicode_ci',
+			'prefix'    => '',
+			'options'	=> array( PDO::ATTR_CASE => PDO::CASE_LOWER )
 		),
 
 		'pgsql' => array(
