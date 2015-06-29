@@ -1,6 +1,6 @@
 <?php
 
-namespace Expense;
+namespace Parameter;
 
 use \Eloquent;
 

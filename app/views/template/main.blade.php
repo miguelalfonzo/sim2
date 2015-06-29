@@ -131,6 +131,18 @@
 
 <script type="text/javascript">
     URL_BASE = '{{ asset('/') }}';
+    $(document).ready( function() 
+    {
+        @if ( isset( $alert[ 'msg' ] ) && $alert[ 'msg' ] != '' )
+            $('header').after( 
+                $('<div class="alert alert-{{ $alert[ 'type' ] }} alert-dismissible" role="alert">' + 
+                    '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                        '<span aria-hidden="true">&times;</span>' +
+                    '</button>' +
+                    '<strong>Warning!</strong>{{ $alert[ 'msg' ] }}' +
+                '</div>') );
+        @endif
+    });
 </script>
 
 {{ HTML::script('js/jquery-ui.min.js') }}
@@ -163,11 +175,6 @@
     </script>
 </body>
 <script>
-    $(document).ready( function() 
-    {
-        @if ( isset( $alert[ 'msg' ] ) && $alert[ 'msg' ] != '' )
-            bootbox.alert( '<h5 class="text-center" style="color:{{ $alert['color'] }} ; padding-left:10px; margin-top:20px; margin-bottom:20px">{{ $alert[ 'msg' ] }}</h5>');
-        @endif
-    });
+    $
 </script>
 </html>

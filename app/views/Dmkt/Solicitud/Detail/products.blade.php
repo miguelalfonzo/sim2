@@ -9,7 +9,7 @@
                     <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12"  style="padding: 0">
                         <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
                             <input type="text" class="form-control input-md"
-                            value="{{$product->marca->descripcion}}" readonly>
+                            value="{{{ is_null( $product->marca ) ? '' : $product->marca->descripcion}}}" readonly>
                         </div>
                         <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" style="padding: 0">
                             <div class="input-group">

@@ -496,10 +496,13 @@ class TableController extends BaseController
 			{
 				case 'actividad':
 					$this->enableActividad( $inputs['id'] );
+					break;
 				case 'inversion':
 					$this->enableInversion( $inputs['id'] );
+					break;
 				case 'inversionactividad':
 					$this->enableInvestmentActivity( $inputs['id'] );
+					break;
 			}
 			return $this->setRpta();
 		}
@@ -511,6 +514,7 @@ class TableController extends BaseController
 
 	private function enableActividad( $id )
 	{
+		\Log::error( 'enable');
 		Activity::withTrashed()->find( $id )->restore();
 	}
 
@@ -533,10 +537,13 @@ class TableController extends BaseController
 			{
 				case 'actividad':
 					$this->disableActividad( $inputs['id'] );
+					break;
 				case 'inversion':
 					$this->disableInversion( $inputs['id'] );
+					break;
 				case 'inversionactividad':
 					$this->disableInvestmentActivity( $inputs['id'] );
+					break;
 			}
 			return $this->setRpta();
 		}

@@ -143,3 +143,6 @@ const REPORT_MESSAGE_USER_REPORT_DATA_NOT_FOUND = 'No tiene reportes asignados';
 const MSG_EXPENSE_ALERT = 'esta pendiente de registrar gastos por mas de 1 semana desde que se registro el ultimo documento.';
 const MSG_MONTH_ALERT = 'No se ha registrado los gastos de la solicitud por mas de 1 mes desde que se creo la solicitud.';
 const MSG_CLIENT_ALERT = 'tienen por lo menos un cliente medico e institucion iguales:';
+
+const ALERTA_TIEMPO_ESPERA_POR_DOCUMENTO = 1;
+const ALERTA_TIEMPO_REGISTRO_GASTO = 2;

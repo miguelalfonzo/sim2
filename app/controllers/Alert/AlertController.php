@@ -8,6 +8,7 @@ use \Carbon\Carbon;
 use \Dmkt\Solicitud;
 use \Auth;
 use \Illuminate\Database\Eloquent\Collection;
+use \Parameter\Parameter;
 
 class AlertController extends BaseController
 {
@@ -33,7 +34,7 @@ class AlertController extends BaseController
     {
     	$clientAlert = $this->clientAlert();
     	$expenseAlert = $this->expenseAlert();
-    	return array( 'color' => 'darkred' , 'msg' => $clientAlert[ 'msg' ] . $expenseAlert[ 'msg' ] );
+    	return array( 'type' => 'warning' , 'msg' => $clientAlert[ 'msg' ] . $expenseAlert[ 'msg' ] );
     }
 
     public function clientalert()
@@ -70,7 +71,7 @@ class AlertController extends BaseController
 							{
 								$cliente = '<ul>';
 								foreach ( $cliente_inicial as $client_inicial )
-									$cliente .= '<li>' . /*$client_inicial->{$client_inicial->clientType->relacion}->full_name . */ '.</li>' ; 
+									$cliente .= '<li>' . $client_inicial->{$client_inicial->clientType->relacion}->full_name .  '.</li>' ; 
 								$cliente .= '</ul>';
 								$msg .= '<br>Las solicitudes ' . $solicitud_inicial->id . ' , ' . $solicitud_secundaria->id . ' , ' . $solicitud_final->id . MSG_CLIENT_ALERT . ' ' . $cliente . '</br>';
 								$solicituds_compare_id[] = $solicitud_inicial->id;
@@ -81,31 +82,29 @@ class AlertController extends BaseController
 				}
 			}
 		}
-		return array( 'color' => 'darkred' , 'msg' => $msg );
+		return array( 'type' => 'warning' , 'msg' => $msg );
     }
 
 	public function expenseAlert()
 	{
 		$solicituds = Solicitud::where( 'id_user_assign' , Auth::user()->id )->where( 'id_estado' , GASTO_HABILITADO )->get();
 		$msg = '';
-		\Log::error( json_encode( $solicituds ) );
+		$tiempo = Parameter::find( ALERTA_TIEMPO_ESPERA_POR_DOCUMENTO )->valor;
 		foreach ( $solicituds as $solicitud )
 		{
 			$expenseHistory = $solicitud->expenseHistory;
 			$lastExpense = $solicitud->lastExpense;
 			\Log::error( json_encode( $lastExpense ) );
-			if ( is_null( $lastExpense ) && ! is_null( $expenseHistory ) && $this->timeAlert( $expenseHistory , 'diffInWeeks' , 'updated_at' ) >= 1 )
+			if ( is_null( $lastExpense ) && ! is_null( $expenseHistory ) && $this->timeAlert( $expenseHistory , 'diffInDays' , 'updated_at' ) >= $tiempo )
 				$msg .= '<br>La solicitud N° ' .  $solicitud->id . MSG_EXPENSE_ALERT . '</br>';
-			else if ( ( ! is_null( $lastExpense ) ) && $this->timeAlert( $lastExpense , 'diffInWeeks' , 'updated_at' ) >= 1 )
+			else if ( ( ! is_null( $lastExpense ) ) && $this->timeAlert( $lastExpense , 'diffInDays' , 'updated_at' ) >= $tiempo )
 				$msg .= '<br>La solicitud N° ' .  $solicitud->id . MSG_EXPENSE_ALERT . '</br>';	
 		}
-		return array( 'color' => 'darkred' , 'msg' => $msg );
+		return array( 'type' => 'warning' , 'msg' => $msg );
 	}
 
 	public function timeAlert( $record , $method , $date )
 	{
-		\Log::error( json_encode( $record ) );
-		\Log::error( $date );
 		$now = Carbon::now();
 		$updated = new Carbon( $record->$date );
 		return $updated->$method( $now );
@@ -113,8 +112,9 @@ class AlertController extends BaseController
 
 	public function compareTime( $record , $method )
 	{
-		if ( $this->timeAlert( $record , $method , 'created_at' ) >= 1 )
-			return array( 'color' => 'darkred' , 'msg' => MSG_MONTH_ALERT );
+		$tiempo = Parameter::find( ALERTA_TIEMPO_REGISTRO_GASTO )->valor;
+		if ( $this->timeAlert( $record , 'diffInDays' , 'created_at' ) >= $tiempo->valor )
+			return array( 'type' => 'warning' , 'msg' => MSG_MONTH_ALERT );
 		else
 			return array();
 	}

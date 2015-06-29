@@ -7,6 +7,12 @@ use \Exception;
 use \Illuminate\Database\Eloquent\Collection;
 use \Common\StateRange;
 use \Alert\AlertController;
+use \Dmkt\Reason;
+use \Dmkt\Activity;
+use \Common\TypePayment;
+use \Common\TypeMoney;
+use \Dmkt\InvestmentType;
+use \Dmkt\Marca;
 
 class TestController extends BaseController 
 {
@@ -365,5 +371,19 @@ class TestController extends BaseController
         $data[ 'alert' ] = $alert->alertConsole();
         return View::make('template.User.show',$data);   
     }
+
+    public function passNewSolicitud()
+    {
+        //$alert = new AlertController;
+        $data = array( 'reasons'     => Reason::all() ,
+                       'activities'  => Activity::order(),
+                       'payments'    => TypePayment::all(),
+                       'currencies'  => TypeMoney::all(),
+                       'families'    => Marca::orderBy('descripcion', 'ASC')->get(),
+                       'investments' => InvestmentType::order() 
+                       //'alert'       => $alert->expenseAlert() 
+                       ); 
+        return View::make( 'Dmkt.Register.solicitud' , $data );
+    }   
 
 }

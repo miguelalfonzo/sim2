@@ -43,8 +43,14 @@ class SolicitudDetalle extends Eloquent
             return null;
     }
 
+    protected function getMontoSolicitadoAttribute()
+    {
+        return json_decode( $this->detalle )->monto_solicitado;
+    }
+
     protected function getFechaEntregaAttribute()
     {
+        \Log::error(  $this->detalle);
         return json_decode( $this->detalle )->fecha_entrega;
     }
 

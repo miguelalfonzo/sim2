@@ -27,7 +27,7 @@ class InvestmentActivity extends Eloquent
     	return InvestmentActivity::orderBy('id','asc')->get();
     }
 
-    protected function activity()
+    public function activity()
     {
     	return $this->hasOne( 'Dmkt\Activity' , 'id' , 'id_actividad' );
     }

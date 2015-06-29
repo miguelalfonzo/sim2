@@ -1375,6 +1375,7 @@ function newSolicitude() {
     $(document).off('click' , '.maintenance-disable');
     $(document).on('click' , '.maintenance-disable' , function()
     {
+        console.log( 'mainte-disable');
         var trElement = $(this).parent().parent();
         var aData = {};
         aData._token = _token.val();
@@ -1689,6 +1690,10 @@ function newSolicitude() {
     function filterSelect( element , ids , type )
     {
         var select = $(element);
+        console.log( clients );
+        console.log( type );
+        console.log( ids );
+        console.log( $(element) );
         if ( ( type === 'cliente' && clients.children().length == 1 ) || ( type === 'eliminacion' && clients.children().length >= 1 ) ) 
         {
             select.val('').children().show();
@@ -1702,10 +1707,16 @@ function newSolicitude() {
         else if ( type === 'inversion' )
         {
             select.val('');
-            select.children().filter( '[type=' + type + ']').show();
-            select.children().filter( function( index ) 
+            select.children().filter( function() 
             {
-                return $.inArray( $(this).val() ,  ids ) == -1;
+                return $(this).attr('type') == type;
+            }).show();
+            select.children().filter( function() 
+            {
+                console.log( $(this).val() );
+                console.log( ids );
+                console.log( $.inArray( parseInt( $(this).val() ) ,  ids ) );
+                return $.inArray( parseInt( $(this).val() ) ,  ids ) == -1;
             }).attr( 'type' , type ).hide();   
         }
     }

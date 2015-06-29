@@ -205,5 +205,6 @@
 */
 
 Route::get('passLogin', 'TestController@passLogin');
+Route::get('passNewSolicitud' , 'TestController@passNewSolicitud');
 
 
