@@ -14,7 +14,7 @@ class Person extends Eloquent
     {
         return substr( $this->attributes[ 'nombres' ] , 0 , 1 ) . '. ' . $this->attributes[ 'apellidos' ];
     }
-
+    
     function lastId()
     {
         $lastId = Person::orderBy( 'idpersona' , 'DESC' )->first();
