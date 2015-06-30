@@ -4,7 +4,7 @@ function newSolicitude() {
     /* Declare Variables */
     //MENU
     var date_start = $('.date_start').first();
-    var date_end = $('.date_end').first();
+    var date_end   = $('.date_end').first();
 
     //NEW SOLICITUD
     var reason        = $('select[name=motivo]');

@@ -85,7 +85,7 @@ class TestController extends BaseController
 							WHEN b.type = 'R' THEN m.nombres
 							WHEN b.type = 'S' THEN n.nombres
 							WHEN b.type = 'P' THEN o.descripcion
-							WHEN b.type != '' THEN p.nombres
+							WHEN b.type IN ( 'GC' , 'GP' , 'T' , 'C' , 'AG' )  THEN p.nombres
 							ELSE 'No Identificado'END as USUARIO
 							FROM ". ($frecuency == 'S' || $frecuency == 'M' ? " ( 
 							SELECT to_date('$fromDate','YYYY/MM/DD')+level-1 as the_date 
