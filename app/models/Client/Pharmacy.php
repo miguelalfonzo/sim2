@@ -6,7 +6,7 @@ use \Eloquent;
 class Pharmacy extends Eloquent
 {
 
-    protected $table = 'FICPEF_PERSONAJUR';
+    protected $table = 'FICPEF.PERSONAJUR';
     protected $primaryKey = 'pejcodpers';
 
     protected function getFullNameAttribute()

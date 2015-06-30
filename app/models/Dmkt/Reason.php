@@ -5,6 +5,6 @@ use \Eloquent;
 
 class Reason extends Eloquent
 {
-    protected $table = 'SIM_MOTIVO';
+    protected $table = 'MOTIVO';
     protected $primaryKey = 'id';
 }

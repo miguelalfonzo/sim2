@@ -6,7 +6,7 @@ use \Eloquent;
 use \Log;
 class MarkProofAccounts extends Eloquent
 {
-    protected $table= 'SIM_CUENTA_GASTO_MARCA';
+    protected $table= 'CUENTA_GASTO_MARCA';
     protected $primaryKey = 'id';
  
     public function lastId()

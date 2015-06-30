@@ -6,6 +6,6 @@ use \Eloquent;
 
 class Parameter extends Eloquent
 {
-    protected $table= 'SIM_PARAMETRO';
+    protected $table= 'PARAMETRO';
     protected $primaryKey = 'id';
 }

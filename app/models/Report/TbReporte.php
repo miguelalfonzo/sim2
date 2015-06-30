@@ -6,7 +6,7 @@ use \Eloquent;
 
 class TbReporte extends Eloquent {
 
-	protected $table      = 'SIM_REPORTE_FORMULA';
+	protected $table      = 'REPORTE_FORMULA';
 	protected $primaryKey = 'id_reporte';
 	public $incrementing  = false;
 	protected $fillable   = array('id_reporte','descripcion','formula','query_id', 'created_at', 'updated_at');

@@ -6,7 +6,7 @@ use \Eloquent;
 
 class Event extends Eloquent 
 {
-    protected $table = 'SIM_EVENT';
+    protected $table = 'EVENT';
     protected $primaryKey = 'ID';
 
     function searchId()

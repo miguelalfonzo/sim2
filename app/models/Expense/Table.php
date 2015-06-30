@@ -6,7 +6,7 @@ use \Eloquent;
 
 class Table extends Eloquent{
 
-	protected $table     = 'VTA_TABLAS';
+	protected $table     = 'VTA.TABLAS';
 	
 	protected static function getIGV()
 	{

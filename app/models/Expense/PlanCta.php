@@ -6,7 +6,7 @@ use \Eloquent;
 
 class PlanCta extends Eloquent
 {
-    protected $table= 'B3O_PLANCTA';
+    protected $table= 'B3O.PLANCTA';
     protected $primaryKey = 'ctactaextern';
  
     protected function account()

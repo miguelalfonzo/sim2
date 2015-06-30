@@ -4,7 +4,7 @@ namespace Dmkt;
 use \Eloquent;
 class Account extends Eloquent
 {
-    protected $table = 'SIM_CUENTA';
+    protected $table = 'CUENTA';
     protected $primaryKey = 'id';
     
     public function lastId()

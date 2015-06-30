@@ -10,7 +10,7 @@ class InvestmentType extends Eloquent
 
     use SoftDeletingTrait;
 
-    protected $table = 'SIM_TIPO_INVERSION';
+    protected $table = 'TIPO_INVERSION';
     protected $primaryKey = 'id';
 
     public function nextId()

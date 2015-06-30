@@ -1716,7 +1716,7 @@ function newSolicitude() {
                 console.log( $(this).val() );
                 console.log( ids );
                 console.log( $.inArray( parseInt( $(this).val() ) ,  ids ) );
-                return $.inArray( parseInt( $(this).val() ) ,  ids ) == -1;
+                return $.inArray( $(this).val() ,  ids ) == -1;
             }).attr( 'type' , type ).hide();   
         }
     }

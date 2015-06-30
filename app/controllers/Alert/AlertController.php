@@ -69,11 +69,11 @@ class AlertController extends BaseController
 							$solicitud_tipo_cliente = array_unique( $clients_inicial->lists( 'id_tipo_cliente' ) );
 							if ( count( array_intersect( $solicitud_tipo_cliente, $tipo_cliente_requerido ) ) >= 2 )
 							{
-								$cliente = '<ul>';
+								$cliente = '<ul class="list-group">';
 								foreach ( $cliente_inicial as $client_inicial )
-									$cliente .= '<li>' . $client_inicial->{$client_inicial->clientType->relacion}->full_name .  '.</li>' ; 
+									$cliente .= '<li class="list-group-item">' . $client_inicial->{$client_inicial->clientType->relacion}->full_name .  '.</li>' ; 
 								$cliente .= '</ul>';
-								$msg .= '<br>Las solicitudes ' . $solicitud_inicial->id . ' , ' . $solicitud_secundaria->id . ' , ' . $solicitud_final->id . MSG_CLIENT_ALERT . ' ' . $cliente . '</br>';
+								$msg .= '<h5>Las solicitudes ' . $solicitud_inicial->id . ' , ' . $solicitud_secundaria->id . ' , ' . $solicitud_final->id . ' ' . MSG_CLIENT_ALERT . ' ' . $cliente . '</h5>';
 								$solicituds_compare_id[] = $solicitud_inicial->id;
 								$solicituds_compare_id[] = $solicitud_secundaria->id;
 							}
@@ -94,11 +94,10 @@ class AlertController extends BaseController
 		{
 			$expenseHistory = $solicitud->expenseHistory;
 			$lastExpense = $solicitud->lastExpense;
-			\Log::error( json_encode( $lastExpense ) );
 			if ( is_null( $lastExpense ) && ! is_null( $expenseHistory ) && $this->timeAlert( $expenseHistory , 'diffInDays' , 'updated_at' ) >= $tiempo )
-				$msg .= '<br>La solicitud N° ' .  $solicitud->id . MSG_EXPENSE_ALERT . '</br>';
+				$msg .= '<h5>La solicitud N° ' .  $solicitud->id . MSG_EXPENSE_ALERT . '</h5>';
 			else if ( ( ! is_null( $lastExpense ) ) && $this->timeAlert( $lastExpense , 'diffInDays' , 'updated_at' ) >= $tiempo )
-				$msg .= '<br>La solicitud N° ' .  $solicitud->id . MSG_EXPENSE_ALERT . '</br>';	
+				$msg .= '<h5>La solicitud N° ' .  $solicitud->id . ' ' .  MSG_EXPENSE_ALERT . '</h5>';	
 		}
 		return array( 'type' => 'warning' , 'msg' => $msg );
 	}

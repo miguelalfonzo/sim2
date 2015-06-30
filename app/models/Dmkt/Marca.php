@@ -4,7 +4,7 @@ namespace Dmkt;
 
 class Marca extends \Eloquent 
 {
-	protected $table = 'OUTDVP_MARCAS';
+	protected $table = 'OUTDVP.MARCAS';
     public $timestamps = false;
     protected $primaryKey = 'id';
 

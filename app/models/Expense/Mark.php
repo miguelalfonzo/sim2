@@ -6,7 +6,7 @@ use \Eloquent;
 
 class Mark extends Eloquent
 {
-    protected $table= 'SIM_MARCA';
+    protected $table= 'MARCA';
     protected $primaryKey = 'id';
    
    	protected static function lastId()

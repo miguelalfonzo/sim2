@@ -6,6 +6,6 @@ use \Eloquent;
 
 class Proof extends Eloquent
 {
-    protected $table= 'SIM_DOCUMENTO';
+    protected $table= 'DOCUMENTO';
     protected $primaryKey = 'id';   
 }

@@ -6,7 +6,7 @@ use \Eloquent;
 
 class Supervisor extends Eloquent 
 {
-    protected $table = 'FICPE_SUPERVISOR';
+    protected $table = 'FICPE.SUPERVISOR';
     protected $primaryKey = 'SUPSUPERVISOR';
 
     protected function reps()

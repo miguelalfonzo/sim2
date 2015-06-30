@@ -62,12 +62,12 @@
                     </a>
                 </li>
             @elseif ( Auth::user()->type == GER_COM )
-                <li>
+                <!-- <li>
                     <a href="#reporte-fondo" role="tab" data-toggle="tab">
                         <i class="fa fa-user"></i>
                         Reporte de Fondos
                     </a>
-                </li>
+                </li> -->
             @elseif ( Auth::user()->type == TESORERIA )
                 <li>
                     <a href="#sol-fondo" role="tab" data-toggle="tab">
@@ -156,11 +156,11 @@
                 </div>
             @elseif ( Auth::user()->type == GER_COM )
                 <!-- Reporte de Fondos -->
-                <div class="tab-pane fade" id="reporte-fondo">
+                <!-- <div class="tab-pane fade" id="reporte-fondo">
                     <div class="panel panel-default">
                         <div class="panel-body panel-default table_estado-fondos"></div>
                     </div>
-                </div>        
+                </div>    -->     
             @elseif ( Auth::user()->type == TESORERIA )
                 <!-- Mantenimiento de los Fondos de las Solicitudes -->
                 <div class="tab-pane fade" id="sol-fondo">

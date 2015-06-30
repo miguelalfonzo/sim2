@@ -6,7 +6,7 @@ use \Eloquent;
 
 class FondoHistory extends Eloquent{
 	
-    protected $table = 'SIM_FONDO_HISTORIA';
+    protected $table = 'FONDO_HISTORIA';
     protected $primaryKey = 'id';
     
     protected function getUpdatedAtAttribute( $attr )

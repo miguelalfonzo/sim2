@@ -5,7 +5,7 @@ use \Eloquent;
 
 class Doctor extends Eloquent
 {
-    protected $table = 'FICPE_PERSONAFIS';
+    protected $table = 'FICPE.PERSONAFIS';
     protected $primaryKey = 'pefcodpers';
 
     protected function getFullNameAttribute()

@@ -11,7 +11,7 @@ use \Eloquent;
 
 class TypePayment extends Eloquent{
 
-    protected $table = 'SIM_TIPO_PAGO';
+    protected $table = 'TIPO_PAGO';
     protected $primaryKey = 'id';
 
 

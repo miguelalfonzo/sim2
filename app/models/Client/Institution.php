@@ -6,7 +6,7 @@ use \Eloquent;
 class Institution extends Eloquent
 {
 
-    protected $table = 'FICPE_PERSONAJUR';
+    protected $table = 'FICPE.PERSONAJUR';
     protected $primaryKey = 'pejcodpers';
 
     protected function getFullNameAttribute()

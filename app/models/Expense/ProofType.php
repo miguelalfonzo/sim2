@@ -5,7 +5,7 @@ namespace Expense;
 use \Eloquent;
 
 class ProofType extends Eloquent{
-	protected $table = 'SIM_TIPO_COMPROBANTE';
+	protected $table = 'TIPO_COMPROBANTE';
 	protected $primaryKey = 'id';
 
 	public function lastId()

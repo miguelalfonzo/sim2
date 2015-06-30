@@ -6,7 +6,7 @@ use \Eloquent;
 
 class Expense extends Eloquent {
 
-	protected $table= 'SIM_GASTO';
+	protected $table= 'GASTO';
 	protected $primaryKey = 'id';
 
 	protected function getFechaMovimientoAttribute( $attr )
