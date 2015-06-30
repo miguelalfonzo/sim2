@@ -3,17 +3,31 @@
 namespace Dmkt;
 use \Eloquent;
 
+use Illuminate\Database\Eloquent\SoftDeletingTrait;
+
 class InvestmentActivity extends Eloquent
 {
+
+    use SoftDeletingTrait;
+
     protected $table = 'INVERSION_ACTIVIDAD';
     protected $primaryKey = 'id';
 
-    protected static function order()
+    public function nextId()
     {
-    	return Investment_Activity::orderBy('id','asc')->get();
+        $nextId = InvestmentActivity::withTrashed()->select('id')->orderBy( 'id' , 'desc' )->first();
+        if ( is_null( $nextId ) )
+            return 1;
+        else
+            return $nextId->id + 1;
     }
 
-    protected function activity()
+    protected static function order()
+    {
+    	return InvestmentActivity::orderBy('id','asc')->get();
+    }
+
+    public function activity()
     {
     	return $this->hasOne( 'Dmkt\Activity' , 'id' , 'id_actividad' );
     }

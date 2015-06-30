@@ -46,6 +46,7 @@
     
 </head>
 <body>
+<div id="alert-console" class="container-fluid" style="z-index: 99999999; margin-top: 10px;"></div>
 <header>
     @if (Auth::user()->type == ASIS_GER)
         {{ HTML::link('/registrar-fondo', '', array('id' => 'logo', 'title' => 'Bagó Perú', 'alt' => 'Bagó Perú')) }}
@@ -85,7 +86,7 @@
 </header>
 
 <div class="container-fluid" style="max-height: 100vh; padding-left: 0; padding-right: 0;">
-        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="/*margin-bottom: 0*/ z-index: 1;">
+        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="/*margin-bottom: 0*/; z-index: 10;">
             <div class="container-fluid">
                 <div class="navbar-header relative">
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
@@ -98,6 +99,19 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Solicitud <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            @if ( in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD ) ) )
+                            <li><a href="{{URL::to('nueva-solicitud')}}">
+                                <span class="glyphicon glyphicon-plus" aria-hidden="true" ></span>
+                                    <span class="glyphicon-class"> Nuevo</span></a></li>
+                            <li role="separator" class="divider"></li>
+                            @endif
+                            <li><a href="{{ URL::to('show_user') }}">Listado de Solicitudes</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="{{ URL::to('solicitude/statement')}}">Movimientos</a></li>
+                    <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Reportes <span class="caret"></span></a>
                         <ul id="menu-report" class="dropdown-menu" role="menu">
                             <li class="report_menubar_option">
@@ -109,6 +123,17 @@
                             <li class="divider"></li>
                         </ul>
                     </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Configuración <span class="caret"></span></a>
+                        <ul id="menu-report" class="dropdown-menu" role="menu">
+                            <li><a data-toggle="modal" data-target="#modal-temporal-user">
+                                <span class="glyphicon glyphicon-plus" aria-hidden="true" ></span>
+                                    <span class="glyphicon-class"> Derivación de Usuario</span></a>
+                            </li>
+                            
+                        </ul>
+                    </li>
+                    
                     <li class="report_menubar_option btn_extra" style="display:none;">
                         <a href="#" rel="export">
                             <span class="glyphicon glyphicon-save" aria-hidden="true"></span>
@@ -146,20 +171,32 @@
 
 <script type="text/javascript">
     URL_BASE = '{{ asset('/') }}';
+    $(document).ready( function() 
+    {
+        @if ( isset( $alert[ 'msg' ] ) && $alert[ 'msg' ] != '' )
+            $('#alert-console').prepend( 
+                $('<div class="alert alert-{{ $alert[ 'type' ] }} fade in alert-dismissible" role="alert" style="position:relative;z-index:10">' + 
+                    '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                        '<span aria-hidden="true">&times;</span>' +
+                    '</button>' +
+                    '<strong>Warning!</strong>{{ $alert[ 'msg' ] }}' +
+                '</div>') );
+        @endif
+    });
 </script>
 
-{{ HTML::script('js/jquery-ui.min.js') }}
-{{ HTML::script('js/jquery.blockUI.js') }}
-{{ HTML::script('js/jquery.form.js') }}
-{{ HTML::script('js/jquery.numeric.js') }}
 {{ HTML::script('js/bootstrap.min.js') }}
+{{ HTML::script('js/jquery.blockUI.js') }}
+{{ HTML::script('js/jquery.numeric.js') }}
+{{ HTML::script('js/jquery-ui.min.js') }}
+{{ HTML::script('js/jquery.form.js') }}
 {{ HTML::script('js/bootstrap-datepicker.js') }}
-{{ HTML::script('js/locales/bootstrap-datepicker.es.min.js') }}
+{{ HTML::script('js/locales/bootstrap-datepicker.es.js') }}
+{{ HTML::script('js/bootbox.min.js') }}
 {{ HTML::script('js/jquery.dataTables.min.js') }}
 {{ HTML::script('js/dataTables.bootstrap.js') }}
 {{ HTML::script('js/spin.min.js') }}
 {{ HTML::script('js/ladda.min.js') }}
-{{ HTML::script('js/bootbox.min.js') }}
 {{ HTML::script('js/bootstrap-lightbox.js') }}
 {{ HTML::script('js/typeahead.js') }}
 {{ HTML::script('js/js.js') }}
@@ -177,4 +214,7 @@
 <script>
     </script>
 </body>
+<script>
+    $
+</script>
 </html>

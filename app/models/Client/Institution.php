@@ -11,6 +11,6 @@ class Institution extends Eloquent
 
     protected function getFullNameAttribute()
     {
-        return $this->pejrazon;
+        return 'INSTITUCION: ' . $this->pejrazon;
     }
 }

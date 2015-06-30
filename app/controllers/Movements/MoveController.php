@@ -237,4 +237,8 @@ class MoveController extends BaseController
             return $this->internalException( $e , __FUNCTION__ );
         }
     }
+
+    public function getStatement(){
+        return View::make('template.tb_estado_cuenta');
+    }
 }

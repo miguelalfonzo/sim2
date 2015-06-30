@@ -32,32 +32,8 @@
         </div>
     @endif
 
-    <!-- FECHA DE ENTREGA -->
-    <div class="form-group col-sm-6 col-md-4 col-lg-4">
-        <label class="col-sm-8 col-md-8 col-lg-8 control-label">Fecha de Entrega</label>
-        <div class="col-sm-12 col-md-12 col-lg-12">
-            <div class="input-group date">
-                <span class="input-group-addon">
-                    <i class="glyphicon glyphicon-calendar"></i>
-                </span>
-                <input type="text" class="form-control" maxlength="10" disabled
-                value="{{$detalle->fecha_entrega}}">
-            </div>
-        </div>
-    </div>
-
-    <!-- FECHA CREACION -->
-    <div class="form-group col-sm-6 col-md-4 col-lg-4">
-        <label class="col-sm-8 col-md-8 col-lg-8 control-label">Fecha de Creación</label>
-        <div class="col-sm-12 col-md-12 col-lg-12">
-            <div class="input-group">
-                <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-                <input type="text" class="form-control" maxlength="10" disabled
-                value="{{ date_format( date_create( $solicitud->created_at ) , 'd/m/Y' ) }}">
-
-            </div>
-        </div>
-    </div>
+    <!-- FECHA DE CREACION / FECHA DE ENTREGA -->
+    @include('Dmkt.Solicitud.Detail.fecha')
 
     <!-- Solicitante -->
     @include('Dmkt.Solicitud.Detail.solicitante')
@@ -79,7 +55,6 @@
 
     <!-- Observation-->
     @include('Dmkt.Solicitud.Detail.anotation')
-
 
     <!-- Modal Deposito -->
     @include('template.Modals.deposit-min')

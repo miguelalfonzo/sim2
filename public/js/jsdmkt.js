@@ -1,4 +1,3 @@
-
 /* Declare Variables */
 //MENU
 var date_start = $('.date_start').first();
@@ -33,7 +32,8 @@ var doc_end = $('.date_end').last();
 var cancel_solicitude = '.cancel-solicitude';
 
 var id_solicitud = $( 'input[name=idsolicitud]' );
-var _token       = $( 'input[name=_token]' );
+// var _token       = $( 'input[name=_token]' );
+
 
 var idState = $("#idState");
 
@@ -82,50 +82,12 @@ var date_options2 =
     startDate: '-1y',
     minViewMode: 1,
     language: "es",
+    orientation: "bottom auto",
     autoclose: true
 };
 
 $('.btn_cancel_fondo').hide();
 $('.btn_edit_fondo').hide();
-
-function listTable( type , date )
-{
-    date = typeof date !== 'undefined' ? date : null;
-    var l = Ladda.create($("#search-solicitude")[0]);
-    l.start();
-    $.ajax({
-        url: server + 'list-table',
-        type: 'POST',
-        data:
-        {
-            _token     : _token.val() ,
-            type       : type ,
-            date       : date ,
-            idstate    : $('#idState').val() ,
-            date_start : $('#drp_menubar').data('daterangepicker').startDate.format("L"), 
-            date_end   : $('#drp_menubar').data('daterangepicker').endDate.format("L")
-        }
-    }).fail( function ( statusCode , errorThrown)
-    {
-        l.stop();
-        ajaxError( statusCode , errorThrown );
-    }).done(function ( response ) 
-    {
-        l.stop();
-        if ( response.Status == 'Ok' )
-        {
-            dataTable( 'table_' + type , response.Data.View , type );
-            if ( response.Data.Total !== undefined )
-            {
-                $( '.estado-cuenta-deposito' ).first().val( response.Data.Total.Soles);
-                $( '.estado-cuenta-deposito' ).last().val( response.Data.Total.Dolares);
-            }
-            $('#export-fondo').attr('href', server + 'exportfondos/' + date);
-        }
-        else
-            bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
-    });
-}
 
 $(document).off("click", ".timeLine");
 $(document).on("click", ".timeLine", function(e)
@@ -283,7 +245,7 @@ function inversionChange( id_inversion )
         type: 'POST' ,
         data:
         {
-            _token : _token.val() ,
+            _token : GBREPORTS.token,
             id_inversion : id_inversion ,
             tipo_cliente : clients.children().first().attr('tipo_cliente')
         }
@@ -356,7 +318,7 @@ function listMaintenanceTable( type )
         type: 'POST' ,
         data:
         {
-            _token : _token.val(),
+            _token : GBREPORTS.token,
             type   : type
         }
     }).fail( function ( statusCode , errorThrown )
@@ -377,7 +339,7 @@ function listMaintenanceTable( type )
 function listDocuments()
 {
     var l = Ladda.create( $("#search-documents")[0] );
-    l.start();
+    // l.start();
     
     $.ajax({
         url: server + 'list-documents',
@@ -388,15 +350,15 @@ function listDocuments()
             date_start   : doc_start.val() ,
             date_end     : doc_end.val() ,
             val          : $('#doc-search-key').val() ,
-            _token       : _token.val()
+            _token       : _token
         }
     }).fail( function ( statusCode , errorThrown)
     {
-        l.stop();
+        // l.stop();
         ajaxError( statusCode , errorThrown );
     }).done(function (data)
     {
-        l.stop();
+        // l.stop();
         if ( data.Status == 'Ok' )
             dataTable( 'table_documents' , data.Data );
         else
@@ -464,7 +426,44 @@ function searchFondos( datefondo , aux )
     });
 }
 
-
+function listTable( type , date )
+{
+    date = typeof date !== 'undefined' ? date : null;
+    var l = Ladda.create($("#search-solicitude")[0]);
+    // l.start();
+    $.ajax({
+        url: server + 'list-table',
+        type: 'POST',
+        data:
+        {
+            _token    : GBREPORTS.token,
+            type      : type ,
+            date      : date ,
+            idstate   : $('#idState').val() ,
+            date_start: $('#drp_menubar').data('daterangepicker').startDate.format("L"),
+            date_end  : $('#drp_menubar').data('daterangepicker').endDate.format("L")
+        }
+    }).fail( function ( statusCode , errorThrown)
+    {
+        // l.stop();
+        ajaxError( statusCode , errorThrown );
+    }).done(function ( response ) 
+    {
+        // l.stop();
+        if ( response.Status == 'Ok' )
+        {
+            dataTable( 'table_' + type , response.Data.View , type );
+            if ( response.Data.Total !== undefined )
+            {
+                $( '.estado-cuenta-deposito' ).first().val( response.Data.Total.Soles);
+                $( '.estado-cuenta-deposito' ).last().val( response.Data.Total.Dolares);
+            }
+            $('#export-fondo').attr('href', server + 'exportfondos/' + date);
+        }
+        else
+            bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+    });
+}
 
 function dataTable( element , html , message )
 {
@@ -499,8 +498,6 @@ function dataTable( element , html , message )
 
 // -------------------------------------  REPRESENTANTE MEDICO -----------------------------
 
-
-
 //Register Deposit
 $(document).off( "click" , ".register-deposit" );
 $(document).on( "click" , ".register-deposit" , function( e )
@@ -510,7 +507,7 @@ $(document).on( "click" , ".register-deposit" , function( e )
     var data = {};
     data.op_number      = $("#op-number").val();
     data.token          = $("input[name=token]").val();
-    data._token         = _token.val();
+    data._token         = _token;
     data.num_cuenta     = $("#bank_account").val();
 
     if ($("#op-number").val().trim() === "")
@@ -545,7 +542,7 @@ $(document).on('click' , '.delete-fondo' , function (e)
     var data = 
     {
         idsolicitud: $( this ).parent().parent().parent().children().first().text().trim() ,
-        _token: _token.val()
+        _token: _token
     };
     cancelDialog( data , '¿Esta seguro de anular el registro del fondo?' );
 });
@@ -666,7 +663,7 @@ $('#deny_solicitude').on('click', function (e)
     var data =
     {
         idsolicitud : id_solicitud.val() ,
-        _token      : _token.val()   
+        _token      : _token   
     }
     cancelDialog( data , '¿Esta seguro que desea rechazar esta solicitud?' );
 });
@@ -838,7 +835,7 @@ $(document).on( 'click' , '.register_fondo' , function()
         var periodo = $(this).parent().parent().parent().find(".date_month").val();
         var dato = 
         {
-            '_token'      : _token.val(),
+            '_token'      : GBREPORTS.token,
             'institucion' : fondo_institucion.val(),
             'actividad'   : activity.val(),
             'codrepmed'   : fondo_repmed.attr('data-cod'),
@@ -850,11 +847,11 @@ $(document).on( 'click' , '.register_fondo' , function()
         };
         date_reg_fondo.last().val(date_reg_fondo.val());
         var l = Ladda.create(aux);
-        l.start();
+        // l.start();
         $.post(server + 'registrar-fondo', dato )
         .fail( function ( statusCode , errorThrown )
         {
-            l.stop();
+            // l.stop();
             ajaxError( statusCode , errorThrown );
         }).done(function(data)
         {
@@ -874,7 +871,7 @@ $(document).on( 'click' , '.register_fondo' , function()
             }
             else
                 bootbox.alert("<h4 style='color:red'>No se pudo registrar el fondo: " + data.Description + "</h4>");
-            l.stop();
+            // l.stop();
         });
     }
 });
@@ -894,7 +891,7 @@ $("#search_responsable").on('click', function(e)
             {
                 idfondo: $("#sub_type_activity").val(),
                 idsolicitud : id_solicitud.val(),
-                _token: _token.val()
+                _token: _token
             }
         }).fail( function ( statusCode, errorThrown)
         {
@@ -1014,7 +1011,7 @@ $(document).on('click','.edit-fondo' , function(e)
     data = 
     {
         'idsolicitud' : idsolicitud,
-        '_token'      : _token.val()
+        '_token'      : _token
     };
     $.post( server + 'get-sol-inst' , data )
     .fail( function ( statusCode , errorThrown ) 
@@ -1063,17 +1060,17 @@ $(document).on('click','.btn_edit_fondo',function(e)
         'codsup'        : fondo_supervisor.attr('data-cod'),
         'total'         : fondo_total.val(),
         'cuenta'        : fondo_cuenta.val(),
-        '_token'        : _token.val(),
+        '_token'        : GBREPORTS.token,
         'idfondo'       : $('select[name=idfondo]').val(),
         'mes'           : date_reg_fondo.val()
     };
     var l = Ladda.create(aux);
-    l.start();
+    // l.start();
 
     $.post( server + 'registrar-fondo' , dato )
     .fail( function( statusCode , errorThrown )
     {
-        l.stop();
+        // l.stop();
         ajaxError( statusCode , errorThrown );
     }).done( function( data )
     {
@@ -1099,7 +1096,7 @@ $(document).on('click','.btn_edit_fondo',function(e)
         }
         else
             bootbox.alert("<h4 style='color:red'>No se pudo editar la solicitud - " + data.Description + "</h4>");
-        l.stop();
+        // l.stop();
     });
 });
 
@@ -1231,7 +1228,7 @@ $(document).on( 'click' , '.maintenance-add' , function()
         url :  server + 'add-maintenance-info' ,
         data:
         {
-            _token : _token.val() ,
+            _token : GBREPORTS.token,
             type   : button.attr("case")
         }
     }).fail( function( statusCode , errorThrown )
@@ -1292,6 +1289,11 @@ $(document).on('click' , '.maintenance-edit' , function()
             td.html('<input type="text" maxlength=7 value="' + val + '">');
             td.children().numeric();
         }
+        else if ( td.attr('editable') == 4 )
+        {
+            var val = td.html();
+            td.html('<input type="text" value="' + val + '">');
+        }
     });
 });
 
@@ -1300,16 +1302,16 @@ $(document).on( 'click' , '.maintenance-save' , function()
 {
     var trElement = $(this).parent().parent();
     var aData = {};
-    aData._token = _token.val();
+    aData._token = _token;
     aData.type   = trElement.attr('type');
     aData.Data   = {};
     trElement.children().each( function( i , data )
     {
         var td = $(data);
         if ( td.attr('save') == 1 )
-            aData.Data[td[0].className] = td.children().val() ;
+            aData.Data[td[0].classList[0]] = td.children().val() ;
         else if ( td.attr('save') == 2 )
-            aData[td[0].className] = td.children().val() ;
+            aData[td[0].classList[0]] = td.children().val() ;
     });
     $.ajax(
     {
@@ -1336,15 +1338,15 @@ $(document).on('click' , '.maintenance-update' , function()
 {
     var trElement = $(this).parent().parent();
     var aData = {};
-    aData._token = _token.val();
+    aData._token = _token;
     aData.id     = trElement.attr('row-id');
     aData.type   = trElement.attr('type');
     aData.Data   = {};
     trElement.children().each( function( i , data )
     {
         var td = $(data);
-        if ( td.attr('editable') == 1  || td.attr('editable') == 3 )
-            aData.Data[td[0].className] = td.children().val()
+        if ( td.attr('editable') == 1  || td.attr('editable') == 3 || td.attr('editable') == 4 )
+            aData.Data[td[0].classList[0]] = td.children().val()
     });
     $.ajax(
     {
@@ -1366,6 +1368,63 @@ $(document).on('click' , '.maintenance-update' , function()
     });
 });
 
+$(document).off('click' , '.maintenance-disable');
+$(document).on('click' , '.maintenance-disable' , function()
+{
+    console.log( 'mainte-disable');
+    var trElement = $(this).parent().parent();
+    var aData = {};
+    aData._token = _token;
+    aData.id     = trElement.attr('row-id');
+    aData.type   = trElement.attr('type');
+    $.ajax(
+    {
+        type: 'post' ,
+        url :  server + 'maintenance-disable' ,
+        data: aData
+    }).fail( function( statusCode , errorThrown )
+    {
+        ajaxError( statusCode , errorThrown );
+    }).done( function( response )
+    {
+        if ( response.Status == 'Ok' )
+        {
+            bootbox.alert('<h4 class="green">Registro deshabilitado</h4>');
+            listMaintenanceTable( aData.type );
+        }
+        else
+            bootbox.alert('<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');            
+    });
+});
+
+$(document).off('click' , '.maintenance-enable');
+$(document).on('click' , '.maintenance-enable' , function()
+{
+    var trElement = $(this).parent().parent();
+    var aData = {};
+    aData._token = _token;
+    aData.id     = trElement.attr('row-id');
+    aData.type   = trElement.attr('type');
+    $.ajax(
+    {
+        type: 'post' ,
+        url :  server + 'maintenance-enable' ,
+        data: aData
+    }).fail( function( statusCode , errorThrown )
+    {
+        ajaxError( statusCode , errorThrown );
+    }).done( function( response )
+    {
+        if ( response.Status == 'Ok' )
+        {
+            bootbox.alert('<h4 class="green">Registro habilitado</h4>');
+            listMaintenanceTable( aData.type );
+        }
+        else
+            bootbox.alert('<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');            
+    });
+});
+
 function enableTd( data )
 {
     var td = $(data);
@@ -1377,7 +1436,7 @@ function enableTd( data )
         {
             type   : td[0].className ,
             val    : td.html(),
-            _token : _token.val()
+            _token : _token
         }
     }).fail( function( statusCode , errorThrown )
     {
@@ -1413,7 +1472,7 @@ $(document).on("click", ".elementSave", function()
 {
     var data_json = {} ;
     data_json.type = 'Update';
-    data_json._token = _token.val();
+    data_json._token = _token;
     var aux = false;
     trElement     = $(this).parent().parent();
     var z=trElement.children().first();
@@ -1532,7 +1591,7 @@ function seeker( element , name , url )
                     url: server + url ,
                     data:
                     {
-                        _token : _token.val(),
+                        _token : GBREPORTS.token,
                         sVal   : request
                     },
                     error: function()
@@ -1566,7 +1625,7 @@ function seeker( element , name , url )
                     url: server + 'get-client-view' ,
                     data:
                     {
-                        _token : _token.val(),
+                        _token : GBREPORTS.token,
                         data   : suggestion
                     },
                 }).fail( function( statusCode , errorThrown )
@@ -1627,6 +1686,10 @@ function seeker( element , name , url )
 function filterSelect( element , ids , type )
 {
     var select = $(element);
+    console.log( clients );
+    console.log( type );
+    console.log( ids );
+    console.log( $(element) );
     if ( ( type === 'cliente' && clients.children().length == 1 ) || ( type === 'eliminacion' && clients.children().length >= 1 ) ) 
     {
         select.val('').children().show();
@@ -1640,9 +1703,15 @@ function filterSelect( element , ids , type )
     else if ( type === 'inversion' )
     {
         select.val('');
-        select.children().filter( '[type=' + type + ']').show();
-        select.children().filter( function( index ) 
+        select.children().filter( function() 
         {
+            return $(this).attr('type') == type;
+        }).show();
+        select.children().filter( function() 
+        {
+            console.log( $(this).val() );
+            console.log( ids );
+            console.log( $.inArray( parseInt( $(this).val() ) ,  ids ) );
             return $.inArray( $(this).val() ,  ids ) == -1;
         }).attr( 'type' , type ).hide();   
     }
@@ -1657,7 +1726,7 @@ function repInfo(rm)
         url: server+'info-rep',
         data:
         {
-            _token : _token.val(),
+            _token : GBREPORTS.token,
             rm     : rm
         },
         error: function(statusCode,errorThrown)
@@ -1676,7 +1745,7 @@ function clientFilter( tipo_cliente , tipo_filtro )
         url: server + 'filtro_cliente' ,
         data:
         {
-            _token       : _token.val(),
+            _token       : GBREPORTS.token,
             tipo_cliente : tipo_cliente
         }
     }).fail( function ( statusCode , errorThrown )
@@ -1717,16 +1786,6 @@ $(document).on( 'click' , '.btn-delete-client' , function ()
     }
 });
 
-$( document ).ready(function() 
-{
-    seeker( $( '.cliente-seeker' ) , 'clients' , 'search-client' );
-    seeker( $( '.rep-seeker' ) , 'reps' , 'search-rep' );
-    seeker( $( '#user-seeker' ) , 'users' , 'search-users' );
-    
-
-    if ( $("#idState").length === 1 )
-        listTable( 'solicitudes' );
-});
 
 function ajaxError(statusCode,errorThrown)
 {
@@ -1924,7 +1983,7 @@ $("#btn-mass-approve").click( function()
             {
                 var data = {};
                 var trs = $('#table_solicitude tbody tr');
-                data._token = _token.val();
+                data._token = _token;
                 data.sols = [];
                 trs.each(function( index)
                 {
@@ -2055,7 +2114,7 @@ $( document ).on( 'click' , '.open-details' , function()
         type: 'POST',
         data: 
         {
-            _token       : _token.val(),
+            _token       : GBREPORTS.token,
             id_solicitud : td.attr( 'data-id' ),
             colspan      : colspan
         }
@@ -2083,3 +2142,15 @@ function addTr( td  , tr )
     span.removeClass( 'glyphicon-add green' ).addClass( 'glyphicon-minus red' );
     td.parent().after( tr );
 }
+
+$( document ).ready(function() 
+{
+    seeker( $( '.cliente-seeker' ) , 'clients' , 'search-client' );
+    seeker( $( '.rep-seeker' ) , 'reps' , 'search-rep' );
+    seeker( $( '#user-seeker' ) , 'users' , 'search-users' );
+
+    if ( $("#idState").length === 1 )
+        listTable( 'solicitudes' );
+
+    _token       =  GBREPORTS.token;
+});

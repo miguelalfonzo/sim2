@@ -5,6 +5,7 @@
     | TESTING
     |--------------------------------------------------------------------------
     */
+    Route::get( 'testalert' , 'TestController@testalert');
     Route::get('dt' , 'TestController@dt');
     Route::get('test', array('uses' => 'Dmkt\LoginController@test'));
     Route::get('set_status', array('uses' => 'BaseController@setStatus'));
@@ -26,6 +27,8 @@
     Route::post( 'save-maintenance-info' , 'Maintenance\TableController@saveMaintenanceData' );
     Route::post( 'add-maintenance-info' , 'Maintenance\TableController@addMaintenanceData' );
     Route::post( 'get-table-maintenance-info' , 'Maintenance\TableController@getMaintenanceTableData');
+    Route::post( 'maintenance-enable' , 'Maintenance\TableController@enableRecord');
+    Route::post( 'maintenance-disable' , 'Maintenance\TableController@disableRecord');
     Route::get( 'test-query' , 'TestController@testQuery' );
     
     /*
@@ -194,5 +197,16 @@
     Route::get('reports/getUserReports', 'Report\ReportController@listReportsUserHandler');
     // SEND MAIL
     Route::post('mail_send','PostMan@sendEmailHandler');
+
     // DOWNLOAD REPORT EXCEL
     Route::get('reports/export/download/{userId}/{reportId}/{fromDate}/{toDate}', 'Report\ReportController@downloadReportExcelHandler');
+
+
+Route::get('solicitude/statement', 'Movements\MoveController@getStatement');
+/*
+|--------------------------------------------------------------------------
+| TEST MANTENIMIENTO
+|--------------------------------------------------------------------------
+*/
+    // Route::get('passLogin', 'TestController@passLogin');
+    // Route::get('passNewSolicitud' , 'TestController@passNewSolicitud');

@@ -4,6 +4,15 @@ use Dmkt\Solicitud;
 use Users\Rm;
 use Dmkt\Account;
 use \Exception;
+use \Illuminate\Database\Eloquent\Collection;
+use \Common\StateRange;
+use \Alert\AlertController;
+use \Dmkt\Reason;
+use \Dmkt\Activity;
+use \Common\TypePayment;
+use \Common\TypeMoney;
+use \Dmkt\InvestmentType;
+use \Dmkt\Marca;
 
 class TestController extends BaseController 
 {
@@ -243,5 +252,138 @@ class TestController extends BaseController
     	}
     	return $rpta;
     }
+
+    private function intersectRecords( $rs1 , $rs2 )
+    {
+    	$intersect = new Collection;
+    	foreach( $rs1 as $r1 )
+    	{
+    		foreach( $rs2 as $r2 )
+    		{
+    			if ( $r2->id_cliente == $r1->id_cliente && $r2->id_tipo_cliente == $r1->id_tipo_cliente )
+    			{
+    				$intersect->add( $r2 );
+    				break;
+    			}
+    		}
+    	}
+    	return $intersect;
+    }
+
+    public function testalert()
+    {
+    	$tipo_cliente_requerido = array( MEDICO , INSTITUCION );
+		$solicituds = Solicitud::all();
+		\Log::error( $solicituds->count() );
+		foreach ( $solicituds as $key => $solicitud )
+		{
+			$clients = $solicitud->clients;
+			$solicitud_tipo_cliente = array_unique( $clients->lists( 'id_tipo_cliente') );
+			if ( count( array_intersect( $solicitud_tipo_cliente, $tipo_cliente_requerido ) ) <= 1 )
+				unset( $solicituds[ $key ] );
+		}
+		\Log::error( $solicituds->count() );
+		$clientList = array();
+		foreach( $solicituds as $solicitud_inicial )
+		{
+			$clients_inicial = $solicitud_inicial->clients()->select( 'id_cliente' , 'id_tipo_cliente' )->get();
+			foreach ( $solicituds as $solicitud_secundaria )
+			{
+				if ( $solicitud_inicial->id != $solicitud_secundaria->id )
+				{
+					$clients_secundaria = $solicitud_secundaria->clients()->select( 'id_cliente' , 'id_tipo_cliente' )->get();
+					//return $clients_inicial->toJson() . '        ' . $clients_secundaria->toJson();
+					//return array_intersect( $clients_inicial->toArray() , $clients_secundaria->toArray() );
+					//return $clients_inicial->intersect( $clients_secundaria );
+					$cliente_inicial = $this->intersectRecords( $clients_inicial , $clients_secundaria );
+					//return $cliente_inicial;
+					$solicitud_tipo_cliente = array_unique( $clients_inicial->lists( 'id_tipo_cliente' ) );
+					if ( count( array_intersect( $solicitud_tipo_cliente, $tipo_cliente_requerido ) ) >= 2 )
+					{
+						$cliente = '';
+						foreach ( $clients_inicial as $client_inicial )
+						{
+							$cliente .= $client_inicial->{$client_inicial->clientType->relacion}->full_name . '. ' ; 
+						}
+						return 'La solicitud ' . $solicitud_inicial->id . ' y la solicitud ' . $solicitud_secundaria->id . ' tienen por lo menos un cliente medico e institucion iguales: ' .$cliente;
+						
+					}
+					/*foreach ( $solicituds as $solicitud_final )
+					{
+						if ( $solicitud_inicial->id != $solicitud_final->id || $solicitud_secundaria != $solicitud_final->id )
+						{
+
+						}
+					}*/
+				}
+			}
+		}
+    }
+
+    public function passLogin()
+    {
+    	$user = User::find(41);
+    	Auth::login($user);
+    	if ( Session::has('state') )
+            $state = Session::get('state');
+        else
+        {
+            if ( Auth::user()->type == CONT )
+                $state = R_APROBADO ;
+            else if ( in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD , GER_PROM , GER_COM , ASIS_GER ) ) )
+                $state = R_PENDIENTE;
+            elseif ( Auth::user()->type == TESORERIA )
+                $state = R_REVISADO ;
+        }
+        $mWarning = array();
+        if ( Session::has('warnings') )
+        {
+            $warnings = Session::pull('warnings');
+            $mWarning[status] = ok ;
+            if (!is_null($warnings))
+                foreach ($warnings as $key => $warning)
+                     $mWarning[data] = $warning[0].' ';
+            $mWarning[data] = substr($mWarning[data],0,-1);
+        }
+        $data = array( 'state'  => $state , 'states' => StateRange::order() , 'warnings' => $mWarning );
+        if ( Auth::user()->type == TESORERIA )
+        {
+            $data['tc'] = ChangeRate::getTc();    
+            $data['banks'] = Account::banks();
+        }
+        elseif ( Auth::user()->type == ASIS_GER )
+        {
+            $data['fondos']  = Fondo::asisGerFondos();                
+            $data['activities'] = Activity::order();
+        }
+        elseif ( Auth::user()->type == CONT )
+        {
+            $data['proofTypes'] = ProofType::order();
+            $data['regimenes'] = Regimen::all();      
+        }
+        if ( Session::has( 'id_solicitud') )
+        {
+            $solicitud = Solicitud::find( Session::pull( 'id_solicitud' ) );
+            $solicitud->status = ACTIVE ;
+            $solicitud->save();
+        }
+        $alert = new AlertController;
+        $data[ 'alert' ] = $alert->alertConsole();
+        return View::make('template.User.show',$data);   
+    }
+
+    public function passNewSolicitud()
+    {
+        //$alert = new AlertController;
+        $data = array( 'reasons'     => Reason::all() ,
+                       'activities'  => Activity::order(),
+                       'payments'    => TypePayment::all(),
+                       'currencies'  => TypeMoney::all(),
+                       'families'    => Marca::orderBy('descripcion', 'ASC')->get(),
+                       'investments' => InvestmentType::order() 
+                       //'alert'       => $alert->expenseAlert() 
+                       ); 
+        return View::make( 'Dmkt.Register.solicitud' , $data );
+    }   
 
 }

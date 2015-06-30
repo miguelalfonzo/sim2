@@ -9,7 +9,7 @@
                     Solicitudes
                 </a>
             </li>
-            @include('template.User.li_estado_cuenta')
+
             @if ( Auth::user()->type == ASIS_GER )
                 <li>
                     <a href="#fondos" role="tab" data-toggle="tab">
@@ -43,19 +43,31 @@
                     </a>
                 </li>
             @elseif ( Auth::user()->type == GER_PROD )
-                <!-- <li>
-                    <a href="#rentabilidad" role="tab" data-toggle="tab">
-                        <i class="fa fa-user"></i>
-                        Reporte de Rentabilidad
-                    </a>
-                </li> -->
-            @elseif ( Auth::user()->type == GER_COM )
                 <li>
+                    <a href="#tab-inversion" role="tab" data-toggle="tab">
+                        <i class="fa fa-user"></i>
+                        Maestro de Inversiones
+                    </a>
+                </li>
+                <li>
+                    <a href="#tab-actividad" role="tab" data-toggle="tab">
+                        <i class="fa fa-user"></i>
+                        Maestro de Actividades
+                    </a>
+                </li>
+                <li>
+                    <a href="#tab-inversion-actividad" role="tab" data-toggle="tab">
+                        <i class="fa fa-user"></i>
+                        Maestro de Inversion-Actividad
+                    </a>
+                </li>
+            @elseif ( Auth::user()->type == GER_COM )
+                <!-- <li>
                     <a href="#reporte-fondo" role="tab" data-toggle="tab">
                         <i class="fa fa-user"></i>
                         Reporte de Fondos
                     </a>
-                </li>
+                </li> -->
             @elseif ( Auth::user()->type == TESORERIA )
                 <li>
                     <a href="#sol-fondo" role="tab" data-toggle="tab">
@@ -75,7 +87,6 @@
                     @endif
                 </div>
             </div>
-            @include('template.tb_estado_cuenta')
             @if (Auth::user()->type == CONT)
                 <!-- Busqueda de Documentos -->
                 <div class="tab-pane fade" id="documentos">
@@ -115,19 +126,40 @@
                     </div>
                 </div>
             @elseif ( Auth::user()->type == GER_PROD )
-                <!-- Reporte de Rentabilidad -->
-                <!-- <div class="tab-pane fade" id="rentabilidad">
+                <!-- Maestro de Inversiones -->
+                <div class="tab-pane fade" id="tab-inversion">
                     <div class="panel panel-default">
-                        <div class="panel-body panel-default table_rentabilidad"></div>
+                        <div class="panel-body panel-default table_inversion"></div>
                     </div>
-                </div> -->
+                    <div>
+                       <input class="btn btn-primary maintenance-add" type="button" case="inversion" value="Agregar">
+                    </div>
+                </div>
+                <!-- Maestro de Actividades -->
+                <div class="tab-pane fade" id="tab-actividad">
+                    <div class="panel panel-default">
+                        <div class="panel-body panel-default table_actividad"></div>
+                    </div>
+                    <div>
+                       <input class="btn btn-primary maintenance-add" type="button" case="actividad" value="Agregar">
+                    </div>
+                </div>
+                <!-- Maestro de Inversion - Actividad -->
+                <div class="tab-pane fade" id="tab-inversion-actividad">
+                    <div class="panel panel-default">
+                        <div class="panel-body panel-default table_inversionactividad"></div>
+                    </div>
+                    <div>
+                       <input class="btn btn-primary maintenance-add" type="button" case="inversionactividad" value="Agregar">
+                    </div>
+                </div>
             @elseif ( Auth::user()->type == GER_COM )
                 <!-- Reporte de Fondos -->
-                <div class="tab-pane fade" id="reporte-fondo">
+                <!-- <div class="tab-pane fade" id="reporte-fondo">
                     <div class="panel panel-default">
                         <div class="panel-body panel-default table_estado-fondos"></div>
                     </div>
-                </div>        
+                </div>    -->     
             @elseif ( Auth::user()->type == TESORERIA )
                 <!-- Mantenimiento de los Fondos de las Solicitudes -->
                 <div class="tab-pane fade" id="sol-fondo">
@@ -149,15 +181,4 @@
     </div>
 </div>
 @include('template.leyenda')
-<script type="text/javascript">
-    $(document).ready(function() 
-    {
-        @if ( isset( $alert ) && $alert[ 'msg' ] != '' )
-            bootbox.alert( '<h3 class="text-center" style="color:{{ $alert['color'] }} ; padding-left:10px; margin-top:20px; margin-bottom:20px">{{ $alert[ 'msg' ] }}</h3>');
-        @endif
-        @if ( isset( $warning[status] ) && $warnings[status] == ok )
-            bootbox.alert('<h4>' + {{$warnings[data]}} + '</h4>');
-        @endif
-    });
-</script>
 @stop

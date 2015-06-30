@@ -26,11 +26,11 @@
                     @endif
                 </td>
                 <td class="num_cuenta_fondo" editable=3 style="text-align:center">{{$iAccount->num_cuenta_fondo}}</td>
-                <td class="fondo-cuenta-nombre" style="text-align:center">{{$iAccount->bagoAccountFondo->ctanombrecta}}</td>
-                <td class="fondo-cuenta-type" style="text-align:center">{{$iAccount->bagoAccountFondo->ctatipocta}}</td>
+                <td style="text-align:center">{{$iAccount->bagoAccountFondo->ctanombrecta}}</td>
+                <td style="text-align:center">{{$iAccount->bagoAccountFondo->ctatipocta}}</td>
                 <td class="num_cuenta_gasto" editable=3 style="text-align:center">{{$iAccount->num_cuenta_gasto}}</td>
-                <td class="ecuenta-nombre" style="text-align:center">{{$iAccount->bagoAccountExpense->ctanombrecta}}</td>
-                <td class="ecuenta-type" style="text-align:center">{{$iAccount->bagoAccountExpense->ctatipocta}}</td>
+                <td style="text-align:center">{{$iAccount->bagoAccountExpense->ctanombrecta}}</td>
+                <td style="text-align:center">{{$iAccount->bagoAccountExpense->ctatipocta}}</td>
                 <td class="marca_codigo" editable=3 style="text-align:center">{{$iAccount->marca_codigo}}</td>
                 <td class="iddocumento" editable=1 style="text-align:center">{{$iAccount->document->codigo}}</td>
                 <td editable=2 style="text-align:center">

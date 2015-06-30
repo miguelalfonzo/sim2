@@ -123,12 +123,14 @@ const SISTEMA_SIM = 2;
 
 //TIPO DE CLIENTE
 const MEDICO = 1;
+const INSTITUCION = 3;
 
 /*
 |--------------------------------------------------------------------------
 | REPORT
 |--------------------------------------------------------------------------
 */
+
 const REPORT_TIME_LIMIT                         = 0; // idkc : 0 = ilimitado | 5*60 = 5 minutos
 const REPORT_EXPORT_DIRECTORY                   = '/files/';
 
@@ -139,4 +141,12 @@ const REPORT_MESSAGE_CREATE                     = 'Oops! No se encontro informac
 const REPORT_MESSAGE_EXPORT_GENERATE            = 'Oops! Hubo un inconveniente al procesar la informacion. Por Favor genera el reporte nuevamente';
 const REPORT_MESSAGE_USER_REPORT_DATA_NOT_FOUND = 'No tiene reportes asignados';
 const REPORT_DATA_NOT_FOUND                     = 'Lo sentimos, no se encontro información disponible';
-?>
+
+/*
+|--------------------------------------------------------------------------
+| TABLA PARAMETRO -> ID
+|--------------------------------------------------------------------------
+*/
+const ALERTA_TIEMPO_ESPERA_POR_DOCUMENTO = 1;
+const ALERTA_TIEMPO_REGISTRO_GASTO 		 = 2;
+const ALERTA_INSTITUCION_CLIENTE		 = 3;
