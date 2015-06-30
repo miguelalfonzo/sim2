@@ -1,3 +1,8 @@
+@extends('template.main')
+@section('solicitude')
+<div class="page-header">
+  <h3>Mantenimiento de Tipo de Documentos</h3>
+</div>
 <table class="table table-hover table-bordered table-condensed dataTable" id="table_document_contabilidad" style="width: 100%">
     <thead>
         <tr>
@@ -28,3 +33,4 @@
         @endforeach
     </tbody>
 </table>
+@stop

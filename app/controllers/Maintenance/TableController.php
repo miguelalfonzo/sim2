@@ -122,6 +122,43 @@ class TableController extends BaseController
 		}
 	}
 
+	public function getMaintenanceTableDailySeatRelation()
+	{
+		$records = MarkProofAccounts::all();
+		$columns = Maintenance::find(1);
+		$columns = json_decode( $columns->formula );
+		return View::make( 'Maintenance.table' )->with( array( 'records' => $records , 'columns' => $columns , 'type' => 'cuentas-marca' ) );
+
+	}
+	public function getMaintenanceTableDataFondos()
+	{
+		$fondos = Fondo::order();
+        return View::make('Maintenance.Fondo.table')->with('fondos' , $fondos);
+
+	}
+	public function getMaintenanceTableFondoAccount()
+	{
+		$fondos = Fondo::order();
+		return View::make( 'Maintenance.FondoCuenta.table' )->with( 'fondos' , $fondos );
+
+	}
+	public function getMaintenanceTableDataInversion()
+	{
+		$inversion = InvestmentType::withTrashed()->orderBy( 'deleted_at' ,'desc' , 'updated_at' , 'desc')->get();
+		return View::make( 'Maintenance.Investment.table')->with( 'inversion' , $inversion );
+	}
+	public function getMaintenanceTableDataActivity()
+	{
+		$actividad = Activity::withTrashed()->orderBy( 'deleted_at' ,'desc' , 'updated_at' , 'desc')->get();
+		return View::make( 'Maintenance.Activity.table' )->with( 'actividad' , $actividad );
+
+	}
+	public function getMaintenanceTableDataInvestmentActivity()
+	{
+		$inversionActividad = InvestmentActivity::withTrashed()->orderBy( 'deleted_at' ,'desc' , 'updated_at' , 'desc')->get();
+		return View::make( 'Maintenance.InvestmentActivity.table')->with( 'inversion_actividad' , $inversionActividad );
+	}
+
 	private function getDailySeatRelation()
 	{
 		$records = MarkProofAccounts::all();
@@ -154,7 +191,6 @@ class TableController extends BaseController
 		$inversionActividad = InvestmentActivity::withTrashed()->orderBy( 'deleted_at' ,'desc' , 'updated_at' , 'desc')->get();
 		return $this->setRpta( View::make( 'Maintenance.InvestmentActivity.table')->with( 'inversion_actividad' , $inversionActividad )->render() );
 	}
-
 
 	public function updateMaintenanceData()
 	{

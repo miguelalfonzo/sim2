@@ -1,5 +1,5 @@
-@if ( Auth::user()->type == ASIS_GER )
-    <div class="tab-pane fade" id="fondos" data-url="fondos">
+@extends('template.main')
+@section('solicitude')
         <div class="panel panel-default " style="margin-top: 10px">
             <div class="panel-heading">
                 <h3 class="panel-title" style="height: 15px"></h3>
@@ -100,5 +100,5 @@
             </div>
             <div class="panel-body table-solicituds-fondos" style="position: relative"></div>
         </div>
-    </div>
-@endif
+    
+@stop

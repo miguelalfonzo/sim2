@@ -1,5 +1,5 @@
-<div class="panel-body">
-    <div class="col-md-12" style="padding: 0">
+<div class="row">
+    
         {{Form::token()}}
         <div class="form-group col-sm-2 col-md-2" style="padding: 0">
             <div>
@@ -48,15 +48,6 @@
                 </div>
             </div>
         @endif
-        @if ( Auth::user()->type == SUP )
-            <div class="form-group col-xs-6 col-sm-2 col-md-1 col-lg-1" style="text-align: left; padding: 0">
-                <div>
-                    <a class="btn btn-primary" data-toggle="modal" data-target="#modal-temporal-user">
-                        Derivacion de Usuario
-                    </a>
-                </div>
-            </div>    
-        @endif
 
         @if (Auth::user()->type == TESORERIA)
             <div class="form-group col-sm-3 col-md-3 pull-right" >
@@ -65,7 +56,7 @@
                 </span>
             </div>
         @endif
-    </div>
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 table_solicitudes" style="overflow:scrollable">
+    
+    <div class="container-fluid table_solicitudes" >
     </div>
 </div>

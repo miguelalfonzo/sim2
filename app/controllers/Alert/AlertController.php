@@ -76,7 +76,7 @@ class AlertController extends BaseController
 									$cliente .= $client_inicial->{$client_inicial->clientType->relacion}->full_name .  ' , ' ; 
 								$cliente = rtrim( $cliente , ', ' );
 								$cliente .= ' ).';
-								$msg .= '<h5>Las solicitudes ' . $solicitud_inicial->id . ' , ' . $solicitud_secundaria->id . ' , ' . $solicitud_final->id . ' ' . $tiempo->mensaje . ' ' . $cliente . '</h5>';
+								$msg .= 'Las solicitudes ' . $solicitud_inicial->id . ' , ' . $solicitud_secundaria->id . ' , ' . $solicitud_final->id . ' ' . $tiempo->mensaje . ' ' . $cliente;
 								$solicituds_compare_id[] = $solicitud_inicial->id;
 								$solicituds_compare_id[] = $solicitud_secundaria->id;
 							}
@@ -98,9 +98,9 @@ class AlertController extends BaseController
 			$expenseHistory = $solicitud->expenseHistory;
 			$lastExpense = $solicitud->lastExpense;
 			if ( is_null( $lastExpense ) && ! is_null( $expenseHistory ) && $this->timeAlert( $expenseHistory , 'diffInDays' , 'updated_at' ) >= $tiempo->valor )
-				$msg .= '<h5>La solicitud N° ' .  $solicitud->id . $tiempo->mensaje . '</h5>';
+				$msg .= 'La solicitud N° ' .  $solicitud->id . $tiempo->mensaje;
 			else if ( ( ! is_null( $lastExpense ) ) && $this->timeAlert( $lastExpense , 'diffInDays' , 'updated_at' ) >= $tiempo->valor )
-				$msg .= '<h5>La solicitud N° ' .  $solicitud->id . ' ' .  $tiempo->mensaje . '</h5>';	
+				$msg .= 'La solicitud N° ' .  $solicitud->id . ' ' .  $tiempo->mensaje;	
 		}
 		return array( 'type' => 'warning' , 'msg' => $msg );
 	}

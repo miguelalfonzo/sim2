@@ -347,8 +347,8 @@ function listDocuments()
         data:
         {
             idProof      : $('#idProof').val() ,
-            date_start   : doc_start.val() ,
-            date_end     : doc_end.val() ,
+            date_start: $('#drp_menubar').data('daterangepicker').startDate.format("L"),
+            date_end  : $('#drp_menubar').data('daterangepicker').endDate.format("L"),
             val          : $('#doc-search-key').val() ,
             _token       : _token
         }
@@ -360,7 +360,7 @@ function listDocuments()
     {
         // l.stop();
         if ( data.Status == 'Ok' )
-            dataTable( 'table_documents' , data.Data );
+            dataTable( 'table_documents' , data.Data, 'registros' );
         else
             bootbox.alert( '<h4 class=red>' + data.Status + ': ' + data.Description + '</h4>');
     });
@@ -464,20 +464,24 @@ function listTable( type , date )
             bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
     });
 }
-
+var calcDataTableHeight = function() {
+    return $(window).height()*50/100;
+};
 function dataTable( element , html , message )
 {
     $( '#' + element + '_wrapper').remove();
-    $( '.' + element ).append( html );
-    $( '#' + element ).dataTable(
+    if(html != null)
+        $( '.' + element ).append( html );
+    $( '#' + element ).DataTable(
     {
         // processing     : true,
         // serverside     : true,
         // ajax           : server + 'dt' ,
-        dom: '<f<t>ip<r>>',
-        stateSave: true,
-        order          : [] ,
-        iDisplayLength : 5 ,
+        // dom: '<f<t>ip<r>>',
+        stateSave     : true,
+        autoWidth     : true,
+        scrollY       : calcDataTableHeight(),
+        iDisplayLength: 10 ,
         language      :
         {
             search      : 'Buscar     :',
@@ -737,20 +741,7 @@ function cancelDialog  ( data , message )
     });
 }
 
-/** --------------------------------------------- CONTABILIDAD ------------------------------------------------- **/
 
-if ( $("#search-solicitude").length == 1 )
-{
-    var section = $('.maintenance-add');
-    section.each( function()
-    {
-        listMaintenanceTable( $(this).attr("case") );
-    });
-    if( userType === CONT )
-        listDocumentsType();
-    if( userType === GER_COM )
-        listTable( 'estado-fondos' );        
-}
 
 /** --------------------------------------------- ASISTENCIA DE GERENCIA ------------------------------------------------- **/
 
@@ -1264,8 +1255,9 @@ $(document).on("click", "#add-doc", function()
 $(document).off( 'click' , '.maintenance-cancel');
 $(document).on( 'click' , '.maintenance-cancel' , function()
 {
-    var tr = $(this).parent().parent();
-    listMaintenanceTable( tr.attr('type')  );
+    window.location.reload(true);
+    // var tr = $(this).parent().parent();
+    // listMaintenanceTable( tr.attr('type')  );
 });
 
 $(document).off('click' , '.maintenance-edit');
@@ -1325,11 +1317,12 @@ $(document).on( 'click' , '.maintenance-save' , function()
     {
         if ( response.Status == 'Ok')
         {
-            bootbox.alert('<h4 class="green">Tabla Actualizada</h4>');
-            listMaintenanceTable( aData.type );
+            bootbox.alert('<h4 class="text-success">Tabla Actualizada</h4>');
+            // listMaintenanceTable( aData.type );
+            window.location.reload(true);
         }
         else
-            bootbox.alert('<h4 class="red">' + Data.Status + ': ' + Data.Description + '</h4>');            
+            bootbox.alert('<h4 class="text-danger">' + Data.Status + ': ' + Data.Description + '</h4>');            
     });
 });
 
@@ -1360,11 +1353,12 @@ $(document).on('click' , '.maintenance-update' , function()
     {
         if ( response.Status == 'Ok')
         {
-            bootbox.alert('<h4 class="green">Relaciones Actualizadas</h4>');
-            listMaintenanceTable( aData.type );
+            bootbox.alert('<h4 class="text-success">Relaciones Actualizadas</h4>');
+            // listMaintenanceTable( aData.type );
+            window.location.reload(true);
         }
         else
-            bootbox.alert('<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');            
+            bootbox.alert('<h4 class="text-danger">' + response.Status + ': ' + response.Description + '</h4>');            
     });
 });
 
@@ -2153,4 +2147,19 @@ $( document ).ready(function()
         listTable( 'solicitudes' );
 
     _token       =  GBREPORTS.token;
+
+    /** --------------------------------------------- CONTABILIDAD ------------------------------------------------- **/
+
+
+    // var section = $('.maintenance-add');
+    // if(section){
+    //     section.each( function()
+    //     {
+    //         listMaintenanceTable( $(this).attr("case") );
+    //     });
+    //     if( userType === CONT )
+    //         listDocumentsType();
+    //     if( userType === GER_COM )
+    //         listTable( 'estado-fondos' );
+    // }
 });
