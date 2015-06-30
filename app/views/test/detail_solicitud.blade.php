@@ -53,6 +53,7 @@
 			    						  <li class="list-group-item">{{ $product->marca->descripcion }}</li>
 									@endforeach
 		    					</ul>
+		    				</td>
 		    				<td>
 		    					<h4><span class="label label-info">Clientes</span></h4>&nbsp;
 		    					<ul class="list-group">

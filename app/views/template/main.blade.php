@@ -67,8 +67,7 @@
         @endif
     @endif
 </header>
-
-<div class="container-fluid" style="max-height: 100vh; padding-left: 0; padding-right: 0;">
+<div class="container-fluid" style="max-height: 100vh; padding-left: 0; padding-right: 0; position:relative; z-index:1">
         <nav class="navbar navbar-default navbar-static-top" role="navigation" style="/*margin-bottom: 0*/">
             <div class="container-fluid">
                 <div class="navbar-header relative">
@@ -116,6 +115,7 @@
             </div>
           </div>
         </nav>
+        <div id="alert-console" class="container-fluid"></div>
         <div id="dataTable" class="container-fluid" style="font-size: 10pt; ">
             @yield('solicitude')
         </div>
@@ -134,8 +134,8 @@
     $(document).ready( function() 
     {
         @if ( isset( $alert[ 'msg' ] ) && $alert[ 'msg' ] != '' )
-            $('header').after( 
-                $('<div class="alert alert-{{ $alert[ 'type' ] }} alert-dismissible" role="alert">' + 
+            $('#alert-console').prepend( 
+                $('<div class="alert alert-{{ $alert[ 'type' ] }} fade in alert-dismissible" role="alert" style="position:relative;z-index:10">' + 
                     '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
                         '<span aria-hidden="true">&times;</span>' +
                     '</button>' +

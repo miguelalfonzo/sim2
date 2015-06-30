@@ -297,3 +297,10 @@ table tbody tr td.close-details
   border-left: 0px;
 }
 /* idkc: DATERANGEPICKER */
+
+#alert-console
+{
+	position: fixed; 
+	width: 100%; /*margin-left: 40%;*/ 
+	/*top: 5px;*/
+}

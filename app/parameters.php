@@ -130,19 +130,17 @@ const INSTITUCION = 3;
 | REPORT
 |--------------------------------------------------------------------------
 */
-const REPORT_TIME_LIMIT                     = 0; // idkc : 0 = ilimitado | 5*60 = 5 minutos
-const REPORT_EXPORT_DIRECTORY               = '/files/';
+const REPORT_TIME_LIMIT                     	= 0; // idkc : 0 = ilimitado | 5*60 = 5 minutos
+const REPORT_EXPORT_DIRECTORY               	= '/files/';
 
-const REPORT_MESSAGE_DATASET_NOT_FOUND      = 'Lo sentimos. No se encontro DataSet configurados para generar reportes.';
-const REPORT_MESSAGE_DATASET_NOT_FOUND_DATA = 'Lo Sentimos. No se encuentra informacion del DataSet.';
-const REPORT_MESSAGE_EXCEPTION              = 'Oops! Hubo un inconveniente al procesar la información.';
-const REPORT_MESSAGE_CREATE                 = 'Oops! No se encontro información de reporte para registrar.';
-const REPORT_MESSAGE_EXPORT_GENERATE        = 'Oops! Hubo un inconveniente al procesar la informacion. Por Favor genera el reporte nuevamente';
+const REPORT_MESSAGE_DATASET_NOT_FOUND      	= 'Lo sentimos. No se encontro DataSet configurados para generar reportes.';
+const REPORT_MESSAGE_DATASET_NOT_FOUND_DATA 	= 'Lo Sentimos. No se encuentra informacion del DataSet.';
+const REPORT_MESSAGE_EXCEPTION              	= 'Oops! Hubo un inconveniente al procesar la información.';
+const REPORT_MESSAGE_CREATE                 	= 'Oops! No se encontro información de reporte para registrar.';
+const REPORT_MESSAGE_EXPORT_GENERATE            = 'Oops! Hubo un inconveniente al procesar la informacion. Por Favor genera el reporte nuevamente';
 const REPORT_MESSAGE_USER_REPORT_DATA_NOT_FOUND = 'No tiene reportes asignados';
 
-const MSG_EXPENSE_ALERT = 'esta pendiente de registrar gastos por mas de 1 semana desde que se registro el ultimo documento.';
-const MSG_MONTH_ALERT = 'No se ha registrado los gastos de la solicitud por mas de 1 mes desde que se creo la solicitud.';
-const MSG_CLIENT_ALERT = 'tienen por lo menos un cliente medico e institucion iguales:';
-
+//TABLA PARAMETRO -> ID
 const ALERTA_TIEMPO_ESPERA_POR_DOCUMENTO = 1;
-const ALERTA_TIEMPO_REGISTRO_GASTO = 2;
+const ALERTA_TIEMPO_REGISTRO_GASTO 		 = 2;
+const ALERTA_INSTITUCION_CLIENTE		 = 3;

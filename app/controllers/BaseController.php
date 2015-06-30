@@ -272,6 +272,5 @@ class BaseController extends Controller
                 'fileList'  => $resultFileList
             ));
         }
- 
     }
 }

@@ -41,6 +41,7 @@ class AlertController extends BaseController
     {
     	$msg = '';
     	$tipo_cliente_requerido = array( MEDICO , INSTITUCION );
+    	$tiempo = Parameter::find( ALERTA_INSTITUCION_CLIENTE );
 		$solicituds = Solicitud::all();
 		foreach ( $solicituds as $key => $solicitud )
 		{
@@ -56,24 +57,26 @@ class AlertController extends BaseController
 			$clients_inicial = $solicitud_inicial->clients()->select( 'id_cliente' , 'id_tipo_cliente' )->get();
 			foreach ( $solicituds as $solicitud_secundaria )
 			{
-				if ( $solicitud_inicial->id != $solicitud_secundaria->id && ! in_array( $solicitud_secundaria->id , $solicituds_compare_id ) )
+				if ( $solicitud_inicial->id != $solicitud_secundaria->id && ! in_array( $solicitud_secundaria->id , $solicituds_compare_id ) && ( $this->diffCreatedAt( $solicitud_inicial , $solicitud_secundaria ) <= $tiempo->valor ) )
 				{
 					$clients_secundaria = $solicitud_secundaria->clients()->select( 'id_cliente' , 'id_tipo_cliente' )->get();
 					$cliente_inicial = $this->intersectRecords( $clients_inicial , $clients_secundaria );
 					foreach( $solicituds as $solicitud_final )
 					{
-						if ( $solicitud_inicial->id != $solicitud_final->id && $solicitud_final->id != $solicitud_secundaria->id && ! in_array( $solicitud_final->id , $solicituds_compare_id ) )
+						$this->diffCreatedAt( $solicitud_inicial , $solicitud_final);
+						if ( $solicitud_inicial->id != $solicitud_final->id && $solicitud_final->id != $solicitud_secundaria->id && ! in_array( $solicitud_final->id , $solicituds_compare_id ) && ( $this->diffCreatedAt( $solicitud_inicial , $solicitud_secundaria ) <= $tiempo->valor ) )
 						{
 							$clients_final = $solicitud_final->clients()->select( 'id_cliente' , 'id_tipo_cliente' )->get();
 							$cliente_inicial = $this->intersectRecords( $clients_inicial , $clients_final );
 							$solicitud_tipo_cliente = array_unique( $clients_inicial->lists( 'id_tipo_cliente' ) );
 							if ( count( array_intersect( $solicitud_tipo_cliente, $tipo_cliente_requerido ) ) >= 2 )
 							{
-								$cliente = '<ul class="list-group">';
+								$cliente = '( ';
 								foreach ( $cliente_inicial as $client_inicial )
-									$cliente .= '<li class="list-group-item">' . $client_inicial->{$client_inicial->clientType->relacion}->full_name .  '.</li>' ; 
-								$cliente .= '</ul>';
-								$msg .= '<h5>Las solicitudes ' . $solicitud_inicial->id . ' , ' . $solicitud_secundaria->id . ' , ' . $solicitud_final->id . ' ' . MSG_CLIENT_ALERT . ' ' . $cliente . '</h5>';
+									$cliente .= $client_inicial->{$client_inicial->clientType->relacion}->full_name .  ' , ' ; 
+								$cliente = rtrim( $cliente , ', ' );
+								$cliente .= ' ).';
+								$msg .= '<h5>Las solicitudes ' . $solicitud_inicial->id . ' , ' . $solicitud_secundaria->id . ' , ' . $solicitud_final->id . ' ' . $tiempo->mensaje . ' ' . $cliente . '</h5>';
 								$solicituds_compare_id[] = $solicitud_inicial->id;
 								$solicituds_compare_id[] = $solicitud_secundaria->id;
 							}
@@ -89,15 +92,15 @@ class AlertController extends BaseController
 	{
 		$solicituds = Solicitud::where( 'id_user_assign' , Auth::user()->id )->where( 'id_estado' , GASTO_HABILITADO )->get();
 		$msg = '';
-		$tiempo = Parameter::find( ALERTA_TIEMPO_ESPERA_POR_DOCUMENTO )->valor;
+		$tiempo = Parameter::find( ALERTA_TIEMPO_ESPERA_POR_DOCUMENTO );
 		foreach ( $solicituds as $solicitud )
 		{
 			$expenseHistory = $solicitud->expenseHistory;
 			$lastExpense = $solicitud->lastExpense;
-			if ( is_null( $lastExpense ) && ! is_null( $expenseHistory ) && $this->timeAlert( $expenseHistory , 'diffInDays' , 'updated_at' ) >= $tiempo )
-				$msg .= '<h5>La solicitud N° ' .  $solicitud->id . MSG_EXPENSE_ALERT . '</h5>';
-			else if ( ( ! is_null( $lastExpense ) ) && $this->timeAlert( $lastExpense , 'diffInDays' , 'updated_at' ) >= $tiempo )
-				$msg .= '<h5>La solicitud N° ' .  $solicitud->id . ' ' .  MSG_EXPENSE_ALERT . '</h5>';	
+			if ( is_null( $lastExpense ) && ! is_null( $expenseHistory ) && $this->timeAlert( $expenseHistory , 'diffInDays' , 'updated_at' ) >= $tiempo->valor )
+				$msg .= '<h5>La solicitud N° ' .  $solicitud->id . $tiempo->mensaje . '</h5>';
+			else if ( ( ! is_null( $lastExpense ) ) && $this->timeAlert( $lastExpense , 'diffInDays' , 'updated_at' ) >= $tiempo->valor )
+				$msg .= '<h5>La solicitud N° ' .  $solicitud->id . ' ' .  $tiempo->mensaje . '</h5>';	
 		}
 		return array( 'type' => 'warning' , 'msg' => $msg );
 	}
@@ -109,11 +112,21 @@ class AlertController extends BaseController
 		return $updated->$method( $now );
 	}
 
+	private function diffCreatedAt( $record1 , $record2 )
+	{
+		$date1 = new Carbon( $record1->created_at );
+		$date2 = new Carbon( $record2->created_at );
+		$rpta = $date1->diffInDays( $date2 );
+		$rpta2 = $date2->diffInDays( $date1 );
+		\Log::error( 'Inicial - Record: ' . $record1->created_at . ' ' . $record2->created_at . ' ' . $rpta . ' Record - Inicial : ' . $rpta2 );
+		return $rpta;
+	}
+
 	public function compareTime( $record , $method )
 	{
-		$tiempo = Parameter::find( ALERTA_TIEMPO_REGISTRO_GASTO )->valor;
+		$tiempo = Parameter::find( ALERTA_TIEMPO_REGISTRO_GASTO );
 		if ( $this->timeAlert( $record , 'diffInDays' , 'created_at' ) >= $tiempo->valor )
-			return array( 'type' => 'warning' , 'msg' => MSG_MONTH_ALERT );
+			return array( 'type' => 'warning' , 'msg' => $tiempo->mensaje );
 		else
 			return array();
 	}
