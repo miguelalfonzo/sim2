@@ -1,13 +1,14 @@
 !function($) {
 	var ajaxGE = null;
     var gbReports = function() {
-		this.version         = "0.1";
+		this.version         = "1.1";
 		this.lastReport      ={};
 		this.reportDate      = null;
 		this.contentTypeAjax = false; // idkc: old = "text/plain; charset=UTF-8";
 		this.token           = $('meta[name="csrf-token"]').attr('content');
+		this.drp             = $('#drp_menubar');
 		this.drpSpan         = $('#drp_menubar span');
-		var gbReportsObject = this;
+		var gbReportsObject  = this;
 		this.dateRangePickerCallback = function(start, end, label) {
 			console.log(start.toISOString(), end.toISOString(), label);
 			console.log(start.format('LL') + ' ' + end.format('LL'));
@@ -195,7 +196,7 @@
 			$('body').append(this.templateNewReport);
 			this.reportDate = moment().startOf('month').format("YYYY/MM/DD") + " - " + moment().format("YYYY/MM/DD");
 			this.drpSpan.html(moment().startOf('month').format('LL') + ' - ' + moment().format('LL'));
-			$('#drp_menubar').daterangepicker(this.dateRangePickerOption, this.dateRangePickerCallback);
+			this.drp.daterangepicker(this.dateRangePickerOption, this.dateRangePickerCallback);
 			// GBREPORTS.setAutoResize();
 			this.getReports();
         },
@@ -506,13 +507,13 @@
 		},
 		getDateRangePickerOption: function(option){
 			return {
-				locale     : typeof(option.locale) != 'undefined' ? option.locale : this.dateRangePickerLocaleDefault,
-				ranges     : typeof(option.ranges) != 'undefined' ? option.ranges : this.dateRangePickerRangesDefault,
-				startDate  : typeof(option.startDate) != 'undefined' ? option.startDate : this.dateRangePickerStartDate,
-				endDate    : typeof(option.endDate) != 'undefined' ? option.endDate : this.dateRangePickerEndDate,
-				format     : typeof(option.format) != 'undefined' ? option.format : this.dateRangePickerFormat,
-				applyClass : typeof(option.applyClass) != 'undefined' ? option.applyClass : this.dateRangePickerApplyClass,
-				cancelClass: typeof(option.cancelClass) != 'undefined' ? option.cancelClass : this.dateRangePickerCacnelClass
+				locale     : typeof(option.locale) == 'undefined' ? this.dateRangePickerLocaleDefault : option.locale,
+				ranges     : typeof(option.ranges) == 'undefined' ? this.dateRangePickerRangesDefault : option.ranges,
+				startDate  : typeof(option.startDate) == 'undefined' ? this.dateRangePickerStartDate : option.startDate,
+				endDate    : typeof(option.endDate) == 'undefined' ? this.dateRangePickerEndDate : option.endDate,
+				format     : typeof(option.format) == 'undefined' ? this.dateRangePickerFormat : option.format,
+				applyClass : typeof(option.applyClass) == 'undefined' ? this.dateRangePickerApplyClass : option.applyClass,
+				cancelClass: typeof(option.cancelClass) == 'undefined' ? this.dateRangePickerCacnelClass : option.cancelClass
 			};
 		},
 		changeDateRange: function(frec)
@@ -524,20 +525,19 @@
 				for (i=8; i>=1; i--)
 				{
 					mom = moment().subtract('month', 8).add('month',i);
-					range[mom.format('YYYY') + " " + mom.format('MMM')] =  [mom.startOf('month'), mom.endOf('month')];
+					option.ranges[mom.format('YYYY') + " " + mom.format('MMM')] =  [mom.startOf('month'), mom.endOf('month')];
 				}		
 			}		
 			else if(frec == 'S'){
 				for(i=8; i>=1; i--)
 				{
 					mom = moment().endOf('isoweek').subtract('days',56).add('days',7*i);
-					range[mom.format('MMM') + " " + mom.format('YYYY') + "| Semana " + mom.format('WW')] =[mom.startOf('isoweek'), mom.endOf('isoweek')]; 
+					option.ranges[mom.format('MMM') + " " + mom.format('YYYY') + "| Semana " + mom.format('WW')] =[mom.startOf('isoweek'), mom.endOf('isoweek')]; 
 				}
 			}else{
 				option.ranges = this.dateRangePickerRangesDefault;
 			}
-			
-			$('#drp_fecha').daterangepicker(option);
+			this.drp.data('daterangepicker').setOptions(this.getDateRangePickerOption(option));
 		},
 		generateReport: function(){
 			var url = URL_BASE + "reports/export/generate"; 

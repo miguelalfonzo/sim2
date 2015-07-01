@@ -304,7 +304,7 @@ class ReportController extends BaseController
                     $theadList   = array_merge($theadList, $columns);
                     $theadList[] = 'Total';
                     
-                    Log::error("xxx");
+                    
 
                     // idkc : tbody - generacion de datos de tabla
                     Log::error(json_encode($newData['body']));
