@@ -118,6 +118,6 @@
         @endforeach
     </tbody>
 </table>
-@if( Auth::user()->type == REP_MED)
-    @include('template.Modals.timeLine')
-@endif
+<!-- if( Auth::user()->type == REP_MED) -->
+    <!-- include('template.Modals.timeLine') -->
+<!-- endif -->

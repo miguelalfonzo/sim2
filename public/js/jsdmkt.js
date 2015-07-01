@@ -96,13 +96,23 @@ $(document).on("click", ".timeLine", function(e)
     var state = parseInt($(this).parent().parent().parent().find('#timeLineStatus').val(), 10);
     var accept = $(this).parent().parent().parent().find('#timeLineStatus').data('accept');
     var rejected = $(this).parent().parent().parent().find('#timeLineStatus').data('rejected');
-    var html  = $('.timeLineModal').clone();
+    
+    //var html  = $('.timeLineModal').clone();
+    $.get( server + 'timeline-modal/' + $(this).attr('data-id') ).done( function( response ) { console.log( response ) ; html = response; } );
+    console.log( '1');
+    console.log( html );
+    html = $(html);
+    console.log( 2 );
+    console.log( html );
     html.find('.container-fluid').removeClass('hide');
+    console.log( 3 );
     if(state == DERIVADO){
         for (var i = 0 ; i < 2; i++) {
             html.find('.stage').eq(i).addClass('success');
             html.find('.stage .stage-header').eq(i).addClass('stage-success');
         }
+        console.log( 4 );
+    
         html.find('.stage').eq(2).addClass('pending');
         html.find('.stage .stage-header').eq(2).addClass('stage-pending');
     }else if(state == POR_DEPOSITAR){
@@ -115,6 +125,7 @@ $(document).on("click", ".timeLine", function(e)
                 html.find('.stage .stage-header').eq(i).addClass('stage-success');
             }
         }
+        console.log( 5 );    
         html.find('.stage').eq(4).addClass('pending');
         html.find('.stage .stage-header').eq(4).addClass('stage-pending');
     }else if(state == POR_REGISTRAR){
@@ -127,6 +138,7 @@ $(document).on("click", ".timeLine", function(e)
                 html.find('.stage .stage-header').eq(i).addClass('stage-success');
             }
         }
+        console.log( 6 );
         html.find('.stage').eq(6).addClass('pending');
         html.find('.stage .stage-header').eq(6).addClass('stage-pending');
     }else if(state == REGISTRADO){
@@ -171,7 +183,12 @@ $(document).on("click", ".timeLine", function(e)
         html.find('.stage').eq(pos).addClass('rejected');
         html.find('.stage .stage-header').eq(pos).addClass('stage-rejected');
     }
-    var h     = $(html).html();
+    console.log( 99 );
+    zzz = html;
+    console.log( html );
+    var h     = html;
+    console.log( 991 );
+    
     bootbox.dialog({
         message: h,
         title: "Línea del Tiempo",
@@ -183,6 +200,8 @@ $(document).on("click", ".timeLine", function(e)
         },
         size: "large"
     });
+    console.log( 992 );
+    
 });
 
 //NEW OR EDIT SOLICITUDE BY RM OR SUP CLIENTES

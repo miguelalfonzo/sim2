@@ -1308,4 +1308,10 @@ class SolicitudeController extends BaseController
         $data[ 'alert' ] = $alert->alertConsole();
         return View::make('template.User.institucion', $data);
     }
+
+    public function getTimeLine( $id )
+    {
+        $solicitud = Solicitud::find( $id );
+        return View::make( 'template.Modals.timeLine')->with( array( $solicitud ) )->render();
+    }
 }

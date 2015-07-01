@@ -30,6 +30,10 @@
     Route::post( 'maintenance-enable' , 'Maintenance\TableController@enableRecord');
     Route::post( 'maintenance-disable' , 'Maintenance\TableController@disableRecord');
     Route::get( 'test-query' , 'TestController@testQuery' );
+
+    //--- TIME LINE --
+
+    Route::get( 'timeline-modal/{id}' , 'Dmkt\SolicitudeController@getTimeLine');
     
     /*
     |--------------------------------------------------------------------------

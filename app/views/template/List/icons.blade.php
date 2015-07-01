@@ -4,11 +4,14 @@
         <a class="btn btn-default" href="{{URL::to('ver-solicitud/'.$solicitud->token)}}">
             <span  class="glyphicon glyphicon-eye-open"></span>
         </a>    
+        <a class="btn btn-default timeLine" data-id="{{$solicitud->id}}">
+            <span  class="glyphicon glyphicon-flag"></span>
+        </a>        
         @if ( $solicitud->idtiposolicitud == SOL_REP )
             @if( Auth::user()->type == REP_MED)
-                <a class="btn btn-default timeLine">
+                <!-- <a class="btn btn-default timeLine">
                     <span  class="glyphicon glyphicon-flag"></span>
-                </a>
+                </a> -->        
                 @if($solicitud->id_estado == REGISTRADO && Auth::user()->id == $solicitud->iduserasigned )
                     <a class="btn btn-default" target="_blank" href="{{URL::to('a'.'/'.$solicitud->token)}}">
                         <span  class="glyphicon glyphicon-print"></span>
@@ -63,9 +66,9 @@
             @endif
         @elseif ( $solicitud->idtiposolicitud == SOL_INST )
             @if ( Auth::user()->type == REP_MED )
-                <a class="btn btn-default timeLine">
+                <!-- <a class="btn btn-default timeLine">
                     <span  class="glyphicon glyphicon-flag"></span>
-                </a>
+                </a> -->
                 @if($solicitud->id_estado == REGISTRADO && Auth::user()->id == $solicitud->iduserasigned )   
                     <a class="btn btn-default" href="{{URL::to('report-fondo')}}/{{$solicitud->token}}">
                         <span class="glyphicon glyphicon-print" ></span>

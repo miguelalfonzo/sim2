@@ -40,10 +40,11 @@
     {{ HTML::style('css/daterangepicker-bs3.css') }}
     {{ HTML::style('css/bago.report.css') }}
     {{ HTML::style('css/gsdk-base.css') }}
+    <!-- TIME LINE -->
+    {{ HTML::style('css/timeline.css') }}
     <!-- idkc : Report CSS Library -->
-    
     {{ HTML::script('js/jquery_2.1.0.min.js') }}
-    
+
 </head>
 <body>
 <div id="alert-console" class="container-fluid" style="z-index: 99999999; margin-top: 10px;"></div>
