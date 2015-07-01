@@ -1,8 +1,7 @@
 @extends('template.main')
 @section('solicitude')
 <div class="content">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-        <small style="float: right; margin-top: 10px; padding-right: 20px;">
+        <!-- <small style="float: right; margin-top: 10px; padding-right: 20px;">
             @if ( Auth::user()->type == REP_MED )
                 <strong>Usuario : {{Auth::user()->rm->full_name}}</strong>
             @elseif ( Auth::user()->type == SUP )
@@ -12,7 +11,7 @@
             @else
                 <strong>Usuario : {{Auth::user()->person->full_name}}</strong>
             @endif
-        </small>
+        </small> -->
         <ul class="nav nav-tabs" role="tablist">
             <li class="active">
                 <a href="#solicitud" role="tab" data-toggle="tab">
@@ -56,6 +55,6 @@
             <!-- Button (Double) -->
             @include('Dmkt.Solicitud.Detail.buttons')
         </div>
-    </div>
+    
 </div>
 @stop

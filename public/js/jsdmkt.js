@@ -192,9 +192,27 @@ $(document).on("click", ".timeLine", function(e)
 */
 //LEYENDA
 $('#show_leyenda').on('click',function(){
-    $('#leyenda').show();
-    $(this).hide();
-    $('#hide_leyenda').show()
+    // $('#leyenda').show();
+    // $(this).hide();
+    // $('#hide_leyenda').show()
+    var url = URL_BASE + "getleyenda";
+    $.ajax({
+        url: url,
+        ContentType: GBREPORTS.contentTypeAjax,
+        cache: false
+    }).done(function(dataResult) {
+        console.log(dataResult);
+        bootbox.dialog({
+            message: dataResult,
+            title: "Leyenda de Estados",
+            buttons: {
+                success: {
+                  label: "Regresar",
+                  className: "btn-primary",
+                }
+            }
+        });
+    });
 });
 
 $('#hide_leyenda').on('click',function(){
@@ -400,7 +418,7 @@ function searchFondos( datefondo , aux )
             $('#table_solicitude_fondos_wrapper').remove();
             $('.table-solicituds-fondos').append(data.Data.View);
             $('#export-fondo').attr('href', server + 'exportfondos/' + datefondo);
-            $('#table_solicitude_fondos').dataTable(
+            $('#table_solicitude_fondos').DataTable(
             {
                 "order": 
                 [
@@ -478,7 +496,7 @@ function dataTable( element , html , message )
         // processing     : true,
         // serverside     : true,
         // ajax           : server + 'dt' ,
-        // dom: '<f<t>ip<r>>',
+        dom: '<f<t>ip<r>>',
         stateSave      : true,
         autoWidth      : true,
         scrollY        : calcDataTableHeight(),
@@ -487,10 +505,13 @@ function dataTable( element , html , message )
         iDisplayLength : 10 ,
         language       :
         {
-            search      : 'Buscar     :',
+            search      : 'Buscar',
             zeroRecords : 'No hay ' + message ,
-            infoEmpty   : 'Mostrando 0 de 0 ' + message ,
+            infoEmpty   : 'No ha encontrado ' + message +'disponible',
             info        : 'Mostrando _END_ de _TOTAL_ ' + message ,
+            lengthMenu  : "Mostrando _MENU_ registros por página",
+            infoEmpty   : "No ha encontrado informacion disponible",
+            infoFiltered: "(filtrado de _MAX_ regitros en total)",
             paginate    : 
             {
                 sPrevious : 'Anterior',

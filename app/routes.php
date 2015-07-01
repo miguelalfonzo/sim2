@@ -205,6 +205,8 @@
 Route::get('solicitude/statement', 'Movements\MoveController@getStatement');
 
 Route::get('solicitude/institution', 'Dmkt\SolicitudeController@showSolicitudeInstitution');
+
+Route::get('getleyenda', 'BaseController@getLeyenda');
 /*
 |--------------------------------------------------------------------------
 | MANTENIMIENTO
