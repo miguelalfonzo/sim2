@@ -217,7 +217,7 @@ class SolicitudeController extends BaseController
                         'motivo'        => 'required|integer|min:1|exists:motivo,id' ,
                         'inversion'     => 'required|integer|min:1|exists:tipo_inversion,id' ,
                         'actividad'     => 'required|integer|min:1|exists:tipo_actividad,id' ,
-                        'titulo'        => 'required|string|min:1|max:20',
+                        'titulo'        => 'required|string|min:1|max:50',
                         'moneda'        => 'required|integer|min:1|exists:tipo_moneda,id',
                         'monto'         => 'required|numeric|min:1',
                         'pago'          => 'required|integer|min:1|exists:tipo_pago,id',
@@ -236,7 +236,7 @@ class SolicitudeController extends BaseController
         });
         if ( $validator->fails() ) 
             return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
-        return $this->setRpta( $activity );
+        return $this->setRpta();
     }
 
     private function setPago( &$jDetalle , $paymentType , $ruc )
@@ -343,7 +343,6 @@ class SolicitudeController extends BaseController
                 {
                     $solicitud = Solicitud::find( $inputs[ 'idsolicitud' ] );
                     $detalle   = $solicitud->detalle;
-                    $actividad = $middleRpta[ data ];
                     $this->unsetRelations( $solicitud );   
                 }
                 else

@@ -198,13 +198,15 @@
     // SEND MAIL
     Route::post('mail_send','PostMan@sendEmailHandler');
 
+    // DOWNLOAD REPORT EXCEL
+    Route::get('reports/export/download/{userId}/{reportId}/{fromDate}/{toDate}', 'Report\ReportController@downloadReportExcelHandler');
+
+
+Route::get('solicitude/statement', 'Movements\MoveController@getStatement');
 /*
 |--------------------------------------------------------------------------
 | TEST MANTENIMIENTO
 |--------------------------------------------------------------------------
 */
-
-Route::get('passLogin', 'TestController@passLogin');
-Route::get('passNewSolicitud' , 'TestController@passNewSolicitud');
-
-
+    // Route::get('passLogin', 'TestController@passLogin');
+    // Route::get('passNewSolicitud' , 'TestController@passNewSolicitud');

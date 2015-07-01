@@ -1,16 +1,19 @@
 !function($) {
 	var ajaxGE = null;
     var gbReports = function() {
-        this.version = "0.1";
-		this.lastReport={};
-		this.reportDate = null;
+		this.version         = "0.1";
+		this.lastReport      ={};
+		this.reportDate      = null;
 		this.contentTypeAjax = false; // idkc: old = "text/plain; charset=UTF-8";
-		this.token = $('meta[name="csrf-token"]').attr('content');
+		this.token           = $('meta[name="csrf-token"]').attr('content');
+		this.drpSpan         = $('#drp_menubar span');
 		var gbReportsObject = this;
 		this.dateRangePickerCallback = function(start, end, label) {
 			console.log(start.toISOString(), end.toISOString(), label);
+			console.log(start.format('LL') + ' ' + end.format('LL'));
 			gbReportsObject.reportDate = start.format("YYYY/MM/DD") + " - " + end.format("YYYY/MM/DD");
-			$('#reportrange span').html(start.format('LL') + ' - ' + end.format('LL'));
+			gbReportsObject.drpSpan.html(start.format('LL') + ' - ' + end.format('LL'));
+
 		};
 		this.dateRangePickerLocaleDefault = {
 			applyLabel      : 'Aplicar',
@@ -19,6 +22,8 @@
 			toLabel         : 'Hasta',
 			weekLabel       : 'W',
 			customRangeLabel: 'Personalizado',
+            daysOfWeek: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi','Sa'],
+            monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Setiembre', 'Octubre', 'Noviembre', 'Diciembre'],
 		};
 		this.dateRangePickerRangesDefault = {
 			'Hoy'           : [moment(), moment()],
@@ -35,6 +40,7 @@
 		this.dateRangePickerOption = {
 			locale     : this.dateRangePickerLocaleDefault,
 			ranges     : this.dateRangePickerRangesDefault,
+			opens      : 'left',
 			startDate  : this.dateRangePickerStartDate,
 			endDate    : this.dateRangePickerEndDate,
 			format     : this.dateRangePickerFormat,
@@ -188,7 +194,7 @@
         initGBReports: function(){
 			$('body').append(this.templateNewReport);
 			this.reportDate = moment().startOf('month').format("YYYY/MM/DD") + " - " + moment().format("YYYY/MM/DD");
-			$('#drp_menubar span').html(moment().startOf('month').format('LL') + ' - ' + moment().format('LL'));
+			this.drpSpan.html(moment().startOf('month').format('LL') + ' - ' + moment().format('LL'));
 			$('#drp_menubar').daterangepicker(this.dateRangePickerOption, this.dateRangePickerCallback);
 			// GBREPORTS.setAutoResize();
 			this.getReports();
@@ -216,7 +222,7 @@
                 ContentType: gbReportsObject.contentTypeAjax,
                 cache: false
             }).done(function(dataResult) {
-            	console.log(dataResult);
+				console.log(dataResult);
 				if(dataResult.status == 'OK'){
 					if(typeof(dataResult.data) != 'undefined')
 						gbReportsObject.setMenuBarReports(dataResult.data);
@@ -254,7 +260,7 @@
                 ContentType: gbReportsObject.contentTypeAjax,
                 cache: false,
 				async: false,
-            }).done(function(dataResult) {				
+            }).done(function(dataResult) {
 				if(dataResult.status == 'OK'){
 					$("#dataHeaders").html("");
 					$("#rows").html("");
@@ -273,12 +279,6 @@
 		getReportExcel: function(selector, name){
 			gbReportGlobals = this;
 			gbReportGlobals.generateReport();
-			// fromDate      = this.reportDate.split(" - ")[0].split("/");			
-			// toDate        = this.reportDate.split(" - ")[1].split("/");			
-			// var url       = 'reports/export/download/'+gbReportGlobals.lastReport.id_reporte+'/'+fromDate[0]+fromDate[1]+fromDate[2]+"/"+toDate[0]+toDate[1]+toDate[2];
-			// location.href = url;
-			// $("#loading").hide("slow");
-		
 		},
 		openReport: function(id){
 			$("#loading").show("slow");
@@ -337,8 +337,8 @@
 			var url = URL_BASE + "reports/generate_html/"+dataString.id_reporte+"/"+fromDate[0]+fromDate[1]+fromDate[2]+"/"+toDate[0]+toDate[1]+toDate[2];
 
 			var calcDataTableHeight = function() {
-		        return $(window).height()*50/100;
-		    };
+			    return $(window).height()*50/100;
+			};
 			
 			var gbReportsObject = this;
 			
@@ -347,169 +347,151 @@
                 url: url,
                 cache: false,
             }).done(function(data) {
-            		formula = JSON.parse(GBREPORTS.lastReport.formula);
-            		if (data.status == 'OK')
-            		{
-            			GBREPORTS.valores = data.valores;
-						$("#dataTable").html('<table id="dt_report" class="table table-striped table-bordered" cellspacing="0" width="100%"></table>');
-						var thead = '<thead><tr>';
-						$(data.theadList).each(function(i, data){
-							thead += '<td>' + data + '</td>';
-						});
-						thead += '</tr></thead>';
+				formula = JSON.parse(GBREPORTS.lastReport.formula);
+				if (data.status == 'OK')
+				{
+					if(typeof(data.message) == 'undefined'){
+							GBREPORTS.valores = data.valores;
+							$("#dataTable").html('<table cellpadding="0" cellspacing="0" border="0" style="width:100%" id="dt_report" class="table table-striped table-hover table-bordered"></table>');
 
-						var tfoot = '<tfoot><tr>';
-						$(data.tfootList[0]).each(function(i, data){
-							tfoot += '<td>' + data + '</td>';
-						});
-						tfoot += '</tr></tfoot>';
+							var tfoot = '<tfoot><tr>';
+							$(data.tfootList[0]).each(function(i, data){
+								tfoot += '<td>' + data + '</td>';
+							});
+							tfoot += '</tr></tfoot>';
 
-						$("#dt_report").append(thead);
-						$("#dt_report").append(tfoot);
-						var totalRow = data.tfootList[0];
-						report = $("#dt_report").DataTable({
-							"data" : data.tbodyList,
-							"sDom"          : "<'container-fluid'<'page-header'><<'col-6 pull-right'f><'col-6 pull-left'l>r>>t<<'col-6 pull-left'i><'col-6 pull-right'p>>",
-							"pagingType"    : "bootstrap",
-							"sScrollY"      : calcDataTableHeight(),
-							"sScrollX"      : "100%",
-							"scrollCollapse": true,
-							"autoWidth"     : true,
-							"lengthMenu": [[-1, 10, 25, 50], ["All", 10, 25, 50]],
-							"oLanguage": {
-								'sInfoEmpty'   : 'No hay registros disponibles',
-								'sLengthMenu'  : 'Mostrar _MENU_ registros por página',
-								'sPrevious'    : 'Anterior',
-								'sNext'        : 'Siguiente',
-								'sSearch'      : 'Buscar',
-								'sZeroRecords' : 'No se encontro Información',
-								'sInfo'        : 'Mostrando _END_ de _TOTAL_',
-								'sInfoFiltered': '(Filtrado de _MAX_ registros en Total)'
-							},
-							"fnDrawCallback" : function(oSettings) {
-								console.log("Search callbacks");
-								var rowNum = data.rows.length-1;
-								console.log("rownum = "+ rowNum);
-								z = oSettings;
-								filterData = oSettings.aiDisplay;
-								GBREPORTS.filter = filterData;
-								var allData =oSettings.aoData;
-								if(allData.length != 0){
-									head = allData[0]._aData;
+							// $("#dt_report").append(thead);
+							$("#dt_report").append(tfoot);
+							var totalRow = data.tfootList[0];
+							report = $("#dt_report").DataTable({
+								"data" : data.tbodyList,
+								"autoWidth"     : true,
+								"scrollY"      : calcDataTableHeight(),
+								"lengthMenu"     : [[-1, 25, 50], ["All", 25, 50]],
+								"language": {
+									"lengthMenu": "Mostrando _MENU_ registros por página",
+									"zeroRecords": "No he encontrado informacion",
+									"info": "Mostrando página _PAGE_ de _PAGES_",
+									"infoEmpty": "No ha encontrado informacion disponible",
+									"infoFiltered": "(filtrado de _MAX_ regitros en total)",
+									"search"      : "Buscar",
+									"paginate": {
+										"previous"    : "Anterior",
+										"next"        : "Siguiente",
+									},            
+								},
+								"columns" : data.columns,
+								"fnDrawCallback" : function(oSettings) {
+									var rowNum = data.rows.length-1;
+									filterData = oSettings.aiDisplay;
+									GBREPORTS.filter = filterData;
+									var allData =oSettings.aoData;
+									if(allData.length != 0){
+										head = allData[0]._aData;
 
-									totalArray = [];
+										totalArray = [];
 
-									// $(GBREPORTS.valores).each(function(i,data){
-									// 	totalArray[i] = [];
-									// });
+										if(filterData.length > 0){
+											$(filterData).each(function(j,numData){
 
-									if(filterData.length > 0){
-										$(filterData).each(function(j,numData){
-
-											var posTotalArray = $.inArray(allData[numData]._aData[rowNum+1], GBREPORTS.valores);
-											// var posTotalArray = null;
-											// $(GBREPORTS.valores).each(function(v,data){
-
-											// 	posTotalArray = $.inArray(data, allData[numData]._aData);
-											// 	if(posTotalArray != -1){
-											// 		posTotalArray = v;
-											// 		return false;
-											// 	}
-											// });
-											if(posTotalArray == -1)
-												posTotalArray = 0;
-											console.log("PostTotalArray "+posTotalArray);
-											totalArray[posTotalArray] = typeof(totalArray[posTotalArray]) == 'undefined' ? [] : totalArray[posTotalArray];
-											$(head).each(function(i,headColumn){
-												totalArray[posTotalArray][i] = typeof(totalArray[posTotalArray][i]) == 'undefined' ? 0 : totalArray[posTotalArray][i];
-												if(totalArray[posTotalArray]){
-													if(typeof(totalArray[posTotalArray][i]) == 'undefined')
-														totalArray[posTotalArray][i] = 0;
-													
-													var number = GBREPORTS.intVal(allData[numData]._aData[i]);
-													if(rowNum <= i){
-														if(!isNaN(number)){
-															if(GBREPORTS.valores.length >= 2){
-																
-																if(totalArray[posTotalArray][i-1] == null){
-																	totalArray[posTotalArray][i-2] = 'Total';
-																	totalArray[posTotalArray][i-1] = allData[numData]._aData[i-1];
+												var posTotalArray = $.inArray(allData[numData]._aData[rowNum+1], GBREPORTS.valores);
+												
+												if(posTotalArray == -1)
+													posTotalArray = 0;
+												console.log("PostTotalArray "+posTotalArray);
+												totalArray[posTotalArray] = typeof(totalArray[posTotalArray]) == 'undefined' ? [] : totalArray[posTotalArray];
+												$(head).each(function(i,headColumn){
+													totalArray[posTotalArray][i] = typeof(totalArray[posTotalArray][i]) == 'undefined' ? 0 : totalArray[posTotalArray][i];
+													if(totalArray[posTotalArray]){
+														if(typeof(totalArray[posTotalArray][i]) == 'undefined')
+															totalArray[posTotalArray][i] = 0;
+														
+														var number = GBREPORTS.intVal(allData[numData]._aData[i]);
+														if(rowNum <= i){
+															if(!isNaN(number)){
+																if(GBREPORTS.valores.length >= 2){
+																	
+																	if(totalArray[posTotalArray][i-1] == null){
+																		totalArray[posTotalArray][i-2] = 'Total';
+																		totalArray[posTotalArray][i-1] = allData[numData]._aData[i-1];
+																	}
+																}else{
+																	if(totalArray[posTotalArray][i-1] == null){
+																		totalArray[posTotalArray][i-1] = 'Total';
+																	}
 																}
+																totalArray[posTotalArray][i] = totalArray[posTotalArray][i] + number;
 															}else{
-																if(totalArray[posTotalArray][i-1] == null){
-																	totalArray[posTotalArray][i-1] = 'Total';
-																}
+																totalArray[posTotalArray][i] = null;
 															}
-															totalArray[posTotalArray][i] = totalArray[posTotalArray][i] + number;
 														}else{
 															totalArray[posTotalArray][i] = null;
 														}
-													}else{
-														totalArray[posTotalArray][i] = null;
+													}
+												});
+											});
+										}else{
+											$(head).each(function(i,headColumn){
+
+												var number = GBREPORTS.intVal(headColumn);
+												if(!isNaN(number)){
+													if(rowNum <= i){
+														$(GBREPORTS.valores).each(function(v,data){
+															if(GBREPORTS.valores.length >= 2){
+																
+																if(totalArray[v][i-1] == null){
+																	totalArray[v][i-2] = 'Total';
+																	totalArray[v][i-1] = allData[numData]._aData[i-1];
+																}
+															}else{
+																if(totalArray[v][i-1] == null){
+																	totalArray[v][i-1] = 'Total';
+																}
+															}
+															totalArray[v][i] = 0;
+														});
 													}
 												}
-											});
-										});
-									}else{
-										$(head).each(function(i,headColumn){
-
-											var number = GBREPORTS.intVal(headColumn);
-											if(!isNaN(number)){
-												if(rowNum <= i){
+												else{
 													$(GBREPORTS.valores).each(function(v,data){
-														if(GBREPORTS.valores.length >= 2){
-															
-															if(totalArray[v][i-1] == null){
-																totalArray[v][i-2] = 'Total';
-																totalArray[v][i-1] = allData[numData]._aData[i-1];
-															}
-														}else{
-															if(totalArray[v][i-1] == null){
-																totalArray[v][i-1] = 'Total';
-															}
-														}
-														totalArray[v][i] = 0;
+														totalArray[v][i] = null;
 													});
 												}
-											}
-											else{
-												$(GBREPORTS.valores).each(function(v,data){
-													totalArray[v][i] = null;
-												});
-											}
+											});
+										}
+											var footerElement = $(".dataTables_scrollFoot table tfoot");
+											console.log("set footer");
+										$(totalArray).each(function(i,row){
+
+											rowFaltantes = GBREPORTS.valores.length - footerElement.children().length;
+											for(var numElem = rowFaltantes - 1; numElem >= 0; numElem--) {
+												footerElement.append(footerElement.children().eq(0).clone());
+											};
+
+											$(row).each(function(c, column){
+												footerElement.children().eq(i).children().eq(c).html(column);
+											});
+
 										});
 									}
-									q = totalArray;
-									console.log(totalArray);
-										var footerElement = $(".dataTables_scrollFoot table tfoot");
-										console.log("set footer");
-									$(totalArray).each(function(i,row){
-
-										rowFaltantes = GBREPORTS.valores.length - footerElement.children().length;
-										for(var numElem = rowFaltantes - 1; numElem >= 0; numElem--) {
-											footerElement.append(footerElement.children().eq(0).clone());
-										};
-
-										$(row).each(function(c, column){
-											footerElement.children().eq(i).children().eq(c).html(column);
-										});
-
-									});
-									// $(totalArray[0]).each(function(i,data){
-									// 	$(".dataTables_scrollFoot table tfoot tr").children().eq(i).html(data);
-									// });
 								}
-							}
-						});
-						$("div.page-header").html('<h4 style="margin-top: 0;">'+ data.title +'</h4>');
-						$("div.page-header").css('padding-bottom', 0);
-						$("div.page-header").css('margin', '0 0 11px');
-						$("#fm-grid-view").css('height','100vh');
-						$('html, body').animate({scrollTop: $('#dataTable').offset().top -10 }, 'slow');
-						// $(".fm-sheet-data-canvas").tablesorter();
-						// gbReportsObject.generateExcel();
-						$('#btn_extra').show('slow');
-						gbReportsObject.changeDateRange(formula.frecuency);
+							});
+							$(".dataTables_scrollHeadInner").css('padding-left', 0);
+							$(".dataTables_scrollFootInner").css('padding-left', 0);
+							// $("div.page-header").html('<h4 style="margin-top: 0;">'+ data.title +'</h4>');
+							// $("div.page-header").css('padding-bottom', 0);
+							// $("div.page-header").css('margin', '0 0 11px');
+							$("#fm-grid-view").css('height','100vh');
+							$('html, body').animate({scrollTop: $('#dataTable').offset().top -10 }, 'slow');
+							// $(".fm-sheet-data-canvas").tablesorter();
+							// gbReportsObject.generateExcel();
+							$('.btn_extra').show('slow');
+							// $("#dt_report").parent().css('margin-left', '19px');
+							// $("#dt_report").css('margin-left', '19px');
+							gbReportsObject.changeDateRange(formula.frecuency);
+						}else{
+							bootbox.alert(data.message);
+						}
 					}
 					else
 					{
@@ -563,22 +545,23 @@
 			dataString.filter    = gbReportsObject.filter;
 			dataString.reporteId = gbReportsObject.lastReport.id_reporte;
 			dataString.fromDate  = this.reportDate.split(" - ")[0].split("/");			
-			dataString.toDate    = this.reportDate.split(" - ")[1].split("/");			
+			dataString.toDate    = this.reportDate.split(" - ")[1].split("/");	
+			dataString._token    = gbReportsObject.token;		
 
 			ajaxGE = $.ajax({
 				type: "POST",
                 url: url,
                 cache: false,
                 async: true,
-                data: JSON.stringify(dataString)
+                data: dataString
             }).done(function(result) {
-            	if(result.status == 'OK')
-            	{
-            		$("#loading").hide("slow");
-            		location.href = result.url;
-            	}else{
-            		bootbox.alert(result.message);
-            	}
+				if(result.status == 'OK')
+				{
+					$("#loading").hide("slow");
+					location.href = result.url;
+				}else{
+					bootbox.alert(result.message);
+				}
 
             });
 		},

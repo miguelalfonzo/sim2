@@ -374,7 +374,7 @@ h1 .subtitle{
 }
 
 /*           Labels & Progress-bar              */
-.label{
+/*.label{
     padding: 0.2em 0.6em 0.2em;
     border: 1px solid #999999;
     border-radius: 3px;
@@ -424,7 +424,7 @@ h1 .subtitle{
 }
 .label-default.label-fill{
    background-color: #999999;
-}
+}*/
 
 .progress {
     background-color: #E5E5E5;

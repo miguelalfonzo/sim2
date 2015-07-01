@@ -34,7 +34,7 @@
                       '<input class="input-mini" type="text" name="daterangepicker_end" value="" readonly="readonly" />' +
                     '</div>' +
 					'<div class="btn-group " role="group" aria-label="Basic example" style="width: 100%;">'+
-						'<button class="applyBtn" style="width: 49%;" disabled="disabled"></button>&nbsp;' +
+						'<button class="applyBtn" style="width: 49%;" disabled="disabled"></button>' +
 						'<button class="cancelBtn" style="width: 49%;"></button>' +
 					'</div>' +
                   '</div>' +
@@ -588,8 +588,6 @@
             } else if (this.element.is('input')) {
                 this.element.val(this.startDate.format(this.format));
             }
-            $('#btn_extra').hide();
-			GBREPORTS.openReport();
         },
 
         clickRange: function (e) {

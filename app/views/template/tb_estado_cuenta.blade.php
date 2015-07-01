@@ -1,4 +1,6 @@
-<div class="tab-pane fade" id="estado-cuenta">
+@extends('template.main')
+@section('solicitude')
+
     <div class="panel panel-default" style="margin-top: 10px">
         <div class="panel-body table_movimientos">
         	<div class="form-group col-xs-6 col-sm-3 col-md-3">
@@ -19,4 +21,5 @@
             </div>
         @endif
     </div>  
-</div>
+
+@stop

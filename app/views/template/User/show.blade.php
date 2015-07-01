@@ -9,7 +9,7 @@
                     Solicitudes
                 </a>
             </li>
-            @include('template.User.li_estado_cuenta')
+
             @if ( Auth::user()->type == ASIS_GER )
                 <li>
                     <a href="#fondos" role="tab" data-toggle="tab">
@@ -87,7 +87,6 @@
                     @endif
                 </div>
             </div>
-            @include('template.tb_estado_cuenta')
             @if (Auth::user()->type == CONT)
                 <!-- Busqueda de Documentos -->
                 <div class="tab-pane fade" id="documentos">
