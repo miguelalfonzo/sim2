@@ -2,13 +2,11 @@
 @section('solicitude')
 <div class="content">
     <input type="hidden" id="state_view" value="{{isset($state) ? $state : PENDIENTE}}">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">Nueva Solicitud</h3>
-            @if(isset($solicitude) && $solicitude->blocked == 1)
-                <h4 class="" style="color: darkred">LA SOLICITUD ESTA SIENDO EVALUADA</h4>
-            @endif
-            <small style="float: right; margin-top: -10px">
+    <div class="page-header" style="margin-top: 0;">
+        <h3>Nueva Solicitud @if(isset($solicitude) && $solicitude->blocked == 1)<small>LA SOLICITUD ESTA SIENDO EVALUADA</small>@endif</h3>
+    </div>
+    
+            <!-- <small style="float: right; margin-top: -10px">
                 <strong>Usuario : 
                 @if ( Auth::user()->type == REP_MED ) 
                     {{Auth::user()->rm->full_name}}
@@ -18,11 +16,11 @@
                     {{Auth::user()->gerProd->full_name}} 
                 @endif
                 </strong>
-            </small>
-        </div>
-        <div class="panel-body">
-            @include('Dmkt.Register.detail')
-        </div>
+            </small> -->
+        <!-- </div>
+        <div class="panel-body"> -->
+    @include('Dmkt.Register.detail')
+        <!-- </div> -->
     </div>
 </div>
 @stop

@@ -478,11 +478,13 @@ function dataTable( element , html , message )
         // serverside     : true,
         // ajax           : server + 'dt' ,
         // dom: '<f<t>ip<r>>',
-        stateSave     : true,
-        autoWidth     : true,
-        scrollY       : calcDataTableHeight(),
-        iDisplayLength: 10 ,
-        language      :
+        stateSave      : true,
+        autoWidth      : true,
+        scrollY        : calcDataTableHeight(),
+        sScrollX       : "100%",
+        bScrollCollapse: true,
+        iDisplayLength : 10 ,
+        language       :
         {
             search      : 'Buscar     :',
             zeroRecords : 'No hay ' + message ,

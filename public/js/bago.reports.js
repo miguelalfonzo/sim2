@@ -364,24 +364,26 @@
 							$("#dt_report").append(tfoot);
 							var totalRow = data.tfootList[0];
 							report = $("#dt_report").DataTable({
-								"data" : data.tbodyList,
-								"autoWidth"     : true,
-								"scrollY"      : calcDataTableHeight(),
-								"lengthMenu"     : [[-1, 25, 50], ["All", 25, 50]],
-								"language": {
-									"lengthMenu": "Mostrando _MENU_ registros por página",
-									"zeroRecords": "No he encontrado informacion",
-									"info": "Mostrando página _PAGE_ de _PAGES_",
-									"infoEmpty": "No ha encontrado informacion disponible",
-									"infoFiltered": "(filtrado de _MAX_ regitros en total)",
-									"search"      : "Buscar",
-									"paginate": {
-										"previous"    : "Anterior",
-										"next"        : "Siguiente",
+								data           : data.tbodyList,
+								autoWidth      : true,
+								scrollY        : calcDataTableHeight(),
+								sScrollX       : "100%",
+								bScrollCollapse: true,
+								lengthMenu     : [[-1, 25, 50], ["All", 25, 50]],
+								columns        : data.columns,
+								language       : {
+									lengthMenu  : "Mostrando _MENU_ registros por página",
+									zeroRecords : "No he encontrado informacion",
+									info        : "Mostrando página _PAGE_ de _PAGES_",
+									infoEmpty   : "No ha encontrado informacion disponible",
+									infoFiltered: "(filtrado de _MAX_ regitros en total)",
+									search      : "Buscar",
+									paginate    : {
+										previous: "Anterior",
+										next    : "Siguiente",
 									},            
 								},
-								"columns" : data.columns,
-								"fnDrawCallback" : function(oSettings) {
+								fnDrawCallback : function(oSettings) {
 									var rowNum = data.rows.length-1;
 									filterData = oSettings.aiDisplay;
 									GBREPORTS.filter = filterData;
@@ -476,8 +478,8 @@
 									}
 								}
 							});
-							$(".dataTables_scrollHeadInner").css('padding-left', 0);
-							$(".dataTables_scrollFootInner").css('padding-left', 0);
+							// $(".dataTables_scrollHeadInner").css('padding-left', 0);
+							// $(".dataTables_scrollFootInner").css('padding-left', 0);
 							// $("div.page-header").html('<h4 style="margin-top: 0;">'+ data.title +'</h4>');
 							// $("div.page-header").css('padding-bottom', 0);
 							// $("div.page-header").css('margin', '0 0 11px');
