@@ -1,4 +1,4 @@
-<table class="table table-striped table-bordered" id="table_solicitudes" width="100%">
+<table class="table table-striped table-bordered" id="table_solicitudes" width="100%" cellpadding="0" cellspacing="0" border="0" >
     <thead>
         <tr>
             <th></th>
