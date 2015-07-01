@@ -84,7 +84,7 @@
         Route::get('list-documents-type', 'Dmkt\FondoController@listDocuments');
         Route::post('list-documents', 'Movements\MoveController@searchDocs');
         
-        Route::post('cont-document-manage' , 'Expense\ExpenseController@manageDocument');
+        Route::post('maintenance/cont-document-manage' , 'Expense\ExpenseController@manageDocument');
         Route::post('consultarRucCont', 'Expense\RucController@show');
         Route::get('edit-expense-cont', 'Expense\ExpenseController@editExpense');
         Route::post('get-document-detail' , 'Expense\ExpenseController@getDocument');

@@ -33,4 +33,7 @@
         @endforeach
     </tbody>
 </table>
+<div>
+   <input class="btn btn-primary" id="add-doc" type="button" value="Agregar">
+</div>
 @stop

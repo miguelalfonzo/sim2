@@ -17,7 +17,7 @@
             <tr row-id="{{$record->id}}" type="{{$type}}">
                 @foreach( $columns as $column )
                     <td class="{{{ isset( $column->class ) ? $column->class : $column->key }}}" editable="{{$column->editable}}">
-                        @if( isset( $column->relation ) )
+                        @if( isset( $column->relation ) && ! is_null( $record->{ $column->relation } ) )
                             {{$record->{$column->relation}->{$column->key} }}
                         @else
                             {{$record->{$column->key} }}
@@ -33,6 +33,9 @@
         @endforeach
     </tbody>
 </table>
+<div>
+   <input class="btn btn-primary maintenance-add" type="button" case="{{$type}}" value="Agregar">
+</div>
 <script>
     $(document).on('ready', function(){
         dataTable('table_{{$type}}', null, 'registros')

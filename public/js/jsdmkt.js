@@ -366,10 +366,11 @@ function listDocuments()
     });
 }
 
-
 function listDocumentsType()
 {
-    $.ajax(
+    window.location.reload(true);
+    //window.location.href = server + 'maintenance/documenttype' ;
+    /*$.ajax(
     {
         url: server + 'list-documents-type',
         type: 'GET',
@@ -380,7 +381,7 @@ function listDocumentsType()
     }).done(function (data) 
     {
         dataTable( 'table_document_contabilidad' , data , 'documentos' );
-    });
+    });*/
 }
 
 function searchFondos( datefondo , aux ) 
@@ -1241,7 +1242,7 @@ $(document).on("click", "#add-doc", function()
 {
     var style = 'style="text-align: center"';
     $(this).hide();
-    $(".fondo_d tbody").append('<tr class="new">'
+    $("#table_document_contabilidad tbody").append('<tr class="new">'
         + '<td id="pk" ' +style + ' disabled></td>'
         + '<td id="desc" ' +style + '> <input style="width: 100%;" type="text"> </td>'
         + '<td id="sunat" ' +style + '> <input style="width: 100%;" type="text"></td>'
@@ -1252,6 +1253,7 @@ $(document).on("click", "#add-doc", function()
         + '<a class="elementBack" href="#"><span class="glyphicon glyphicon-remove"></span></a>'
         + '</td>'
         + '</tr>')
+    $('tr.new td#sunat input').numeric({negative:false,decimal:false});
 });
 
 $(document).off( 'click' , '.maintenance-cancel');
@@ -1324,7 +1326,7 @@ $(document).on( 'click' , '.maintenance-save' , function()
             window.location.reload(true);
         }
         else
-            bootbox.alert('<h4 class="text-danger">' + Data.Status + ': ' + Data.Description + '</h4>');            
+            bootbox.alert('<h4 class="text-danger">' + response.Status + ': ' + response.Description + '</h4>');            
     });
 });
 
@@ -1550,7 +1552,7 @@ $(document).on("click", ".elementSave", function()
 $(document).off("click", ".elementBack");
 $(document).on("click", ".elementBack", function()
 {
-    $(".fondo_d tbody tr").last().remove();
+    $("#table_document_contabilidad tbody tr").last().remove();
     $("#add-doc").show();
 });
 
