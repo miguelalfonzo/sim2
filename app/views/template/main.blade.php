@@ -55,7 +55,7 @@
         {{ HTML::link('/show_user', '', array('id' => 'logo', 'title' => 'Bagó Perú', 'alt' => 'Bagó Perú')) }}
     @endif
     <a id="logout" href="{{URL::to('logout')}}" title="Cerrar Sesión" alt="Cerrar Sesión">
-        <bdi>{{ Auth::user()->getFirstName() }}  | 
+        <bdi style="font-size: 11pt;">{{ Auth::user()->getFirstName() }}  | 
             <span class="closed-session">Cerrar sesión</span>
             <span class="off"></span>
         </bdi>
@@ -132,9 +132,7 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Configuración <span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
                             @if ( in_array(Auth::user()->type, array(SUP, GER_PROD, GER_PROM, GER_COM)) )
-                            <li><a data-toggle="modal" data-target="#modal-temporal-user">
-                                <span class="glyphicon glyphicon-plus" aria-hidden="true" ></span>
-                                    <span class="glyphicon-class"> Derivación de Usuario</span></a>
+                            <li><a data-toggle="modal" data-target="#modal-temporal-user">Derivación de Usuario</a>
                             </li>
                             @endif
                             @if ( in_array(Auth::user()->type, array(CONT, GER_COM, TESORERIA)) )
