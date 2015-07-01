@@ -7,13 +7,18 @@
             <span class="input-group-addon">
                 {{$solicitud->detalle->typeMoney->simbolo}}
             </span>
-            <input class="form-control input-md"
-            value="{{$detalle->monto_solicitado}}" name="monto" type="text">
+            <input class="form-control input-md" name="monto" type="text"
+            value="{{$detalle->monto_solicitado}}" readonly>
             <span class="input-group-addon" id="type-money">
                 {{$solicitud->detalle->typeMoney->simbolo}}
             </span>
-            <input id="amount" value="{{$detalle->monto_actual}}"
-            class="form-control input-md" name="monto" type="text" readonly>
+            @if ( $politicStatus )
+                <input id="amount" value="{{$detalle->monto_actual}}"
+                class="form-control input-md" name="monto" type="text">
+            @else
+                <input value="{{$detalle->monto_actual}}"
+                class="form-control input-md" name="monto" type="text" readonly>
+            @endif    
         </div>
     </div>
 </div>

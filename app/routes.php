@@ -218,6 +218,7 @@ Route::get('maintenance/activity' , 'Maintenance\TableController@getMaintenanceT
 Route::get('maintenance/investmentactivity' , 'Maintenance\TableController@getMaintenanceTableDataInvestmentActivity');
 Route::get('maintenance/finddocument', 'Dmkt\SolicitudeController@findDocument');
 Route::get('maintenance/documenttype', 'Dmkt\FondoController@listDocuments');
+Route::get('maintenance/parameters', 'Maintenance\TableController@getMaintenanceTableParameter');
 /*
 |--------------------------------------------------------------------------
 | TEST MANTENIMIENTO

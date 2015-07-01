@@ -145,6 +145,8 @@
                             <li><a href="{{ URL::to('maintenance/inversion') }}">Mantenimiento de Inversion</a></li>
                             <li><a href="{{ URL::to('maintenance/activity') }}">Mantenimiento de Actividades</a></li>
                             <li><a href="{{ URL::to('maintenance/investmentactivity') }}">Mantenimiento de Inversion-Actividad</a></li>
+                            <li><a href="{{ URL::to('maintenance/parameters') }}">Mantenimiento de Parametros</a></li>
+
                             @endif
                             @if ( in_array(Auth::user()->type, array(CONT)) )
                             <li><a href="{{ URL::to('maintenance/finddocument') }}">Mantenimiento de Documentos</a></li>

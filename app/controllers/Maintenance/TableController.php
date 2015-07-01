@@ -20,6 +20,7 @@ use \Dmkt\InvestmentType;
 use \Dmkt\InvestmentActivity;
 use \Dmkt\Activity;
 use \Client\ClientType;
+use \Parameter\Parameter;
 
 class TableController extends BaseController
 {
@@ -127,9 +128,17 @@ class TableController extends BaseController
 		$records = MarkProofAccounts::all();
 		$columns = Maintenance::find(1);
 		$columns = json_decode( $columns->formula );
-		return View::make( 'Maintenance.table' )->with( array( 'records' => $records , 'columns' => $columns , 'type' => 'cuentas-marca' ) );
-
+		return View::make( 'Maintenance.table' )->with( array( 'records' => $records , 'columns' => $columns , 'type' => 'cuentas-marca' , 'titulo' => 'Mantenimiento de Cuentas-Marcas' ) );
 	}
+
+	public function getMaintenanceTableParameter()
+	{
+		$records = Parameter::all();
+		$columns = Maintenance::find(2);
+		$columns = json_decode( $columns->formula );
+		return View::make( 'Maintenance.table' )->with( array( 'records' => $records , 'columns' => $columns , 'type' => 'parametro' , 'titulo' => 'Mantenimiento de Parametros' ) );
+	}
+
 	public function getMaintenanceTableDataFondos()
 	{
 		$fondos = Fondo::order();

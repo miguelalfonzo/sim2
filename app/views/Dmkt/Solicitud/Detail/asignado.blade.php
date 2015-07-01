@@ -4,7 +4,7 @@
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <div class="input-group">
                 <span class="input-group-addon">
-                    {{ $solicitud->asignedTo->userType->descripcion }}
+                    {{ $solicitud->asignedTo->type }}
                 </span>    
                 @if( $solicitud->asignedTo->type == REP_MED )
                     <input type="text" class="form-control input-md" disabled

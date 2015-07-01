@@ -6,7 +6,7 @@
         <div class="col-sm-12 col-md-12 col-lg-12">
             <div class="input-group">
                 <span class="input-group-addon">
-                    {{ $solicitud->approvedHistory->user->userType->descripcion }}
+                    {{ $solicitud->approvedHistory->user->type }}
                 </span>  
                 @if ( $solicitud->approvedHistory->user->type == SUP )
                     <input type="text" class="form-control input-md"  readonly
