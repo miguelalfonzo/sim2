@@ -67,12 +67,12 @@ class TestController extends BaseController
 					where idtiposolicitud = 1';
 
 			$query = DB::select( DB::raw( $query ) ); */
-			$frecuency = 'N';
+			$frecuency = 'M';
 
-			$fromDate = '2015/05/18';
-			$toDate = '2015/05/30';
+			$fromDate = '2015/04/18';
+			$toDate = '2015/06/30';
 
-			 $q = 'Select ' . ( $frecuency == 'M' ? "('SEMANA ' || to_char( z.the_date , 'IW' ) )" : 'TO_CHAR( ' . 
+			/* $q = 'Select ' . ( $frecuency == 'M' ? "('SEMANA ' || to_char( z.the_date , 'IW' ) )" : 'TO_CHAR( ' . 
 				( $frecuency == 'S' ? 'z.the_date' : 'a.created_at' ) . " , 'YYYY/MM/DD' )" ) ." as FECHA, a.titulo , b.type as USUARIO , d.DESCRIPCION as PRODUCTO 
 							, f.ID_CLIENTE , g.DESCRIPCION as TIPO_CLIENTE , h.NOMBRE as RUBRO , ROUND( a.updated_at - a.created_at , 2 )  DIAS , c.MONTO_ASIGNADO , q.detalle DETALLE ,
 							CASE 
@@ -106,12 +106,13 @@ class TestController extends BaseController
 							LEFT JOIN FICPE.PERSONAJUR k on k.PEJCODPERS = f.ID_CLIENTE
 							LEFT JOIN VTADIS.CLIENTES l on l.CLCODIGO = f.ID_CLIENTE ". 
 							($frecuency == 'S' ? "" : "WHERE a.created_at between to_date('".$fromDate."','yyyy/mm/dd') and to_date('".$toDate."','yyyy/mm/dd') ") . " " . ($frecuency == 'S' || $frecuency == 'M' ? 
-							"ORDER BY z.the_date" : "")."";
-			
+							"ORDER BY z.the_date" : "")."";*/
+
+			$q = 'SELECT ' . ( $frecuency == 'M' ? "( 'SEMANA ' || to_char( zzz.the_date , 'IW' ) )" : 'TO_CHAR( ' . ( $frecuency == 'S' ? 'zzz.the_date' : 'a.created_at' ) . " , 'YYYY/MM/DD' )" ) . "  FECHA , a.TITULO , n.NOMBRE TIPO_SOLICITUD , u.NOMBRE INVERSION , h.NOMBRE RUBRO ,   CASE     WHEN b.TYPE = 'R' THEN o.nombres || ' ' || o.apellidos 		WHEN b.TYPE = 'S' THEN p.nombres || ' ' || p.apellidos 		WHEN b.TYPE = 'P' THEN q.descripcion 		WHEN b.TYPE IN ( 'GC' , 'GP' , 'T' , 'C' , 'AG' ) THEN r.nombres || ' ' || r.apellidos     ELSE b.TYPE   END CREADO_POR ,   m.DESCRIPCION  TIPO_USUARIO , d.DESCRIPCION PRODUCTO ,  e.DESCRIPCION LINEA_PRODUCTO ,   CASE 		WHEN g.DESCRIPCION = 'MEDICO' THEN i.PEFNOMBRES || ' ' || i.PEFPATERNO || ' ' || i.PEFMATERNO 		WHEN g.DESCRIPCION = 'FARMACIA' THEN j.PEJRAZON 		WHEN g.DESCRIPCION = 'INSTITUCION' THEN k.PEJRAZON 		WHEN g.DESCRIPCION = 'DISTRIBUIDOR' OR g.DESCRIPCION = 'BODEGA' THEN l.CLNOMBRE 		ELSE 'No Identificado'   END CLIENTE ,   g.DESCRIPCION TIPO_CLIENTE , ROUND( a.updated_at - a.created_at , 2 ) DIAS_DURACION , c.MONTO_ASIGNADO MONTO_PRODUCTO,   ltrim( regexp_substr( s.DETALLE , '\"monto_solicitado\":(\s*)(\"*)(\s*)[[:digit:]]*' , 1 , 1 , 'i' ) , '\"monto_solicitado\":' ) MONTO_SOLICITADO ,   ltrim( regexp_substr( s.DETALLE , '\"monto_aprobado\":(\s*)(\"*)(\s*)[[:digit:]]*' , 1 , 1 , 'i' ) , '\"monto_aprobado\":' ) MONTO_APROBADO , bz.N1GDESCRIPCION PAIS , cz.N2GDESCRIPCION AREA , dz.N3GDESCRIPCION ZONA , ez.N4GDESCRIPCION DISTRITO  FROM ". ($frecuency == 'S' || $frecuency == 'M' ? " (  SELECT to_date('$fromDate','YYYY/MM/DD')+level-1 as the_date FROM dual connect by level <= to_date('$toDate','YYYY/MM/DD') - to_date('$fromDate','YYYY/MM/DD') + 1) zzz LEFT JOIN SOLICITUD a ON TO_DATE ( to_char( a.created_at , 'YYYY/MM/DD' ) , 'YYYY/MM/DD' )  = zzz.the_date " : "SOLICITUD a ") ." LEFT JOIN OUTDVP.USERS b on a.CREATED_BY = b.id LEFT JOIN SOLICITUD_PRODUCTO c ON c.ID_SOLICITUD = a.ID LEFT JOIN OUTDVP.MARCAS d ON d.ID = c.ID_PRODUCTO LEFT JOIN OUTDVP.LINEAS e ON d.LINEA_ID = e.ID LEFT JOIN SOLICITUD_CLIENTE f ON f.ID_SOLICITUD = a.ID LEFT JOIN TIPO_CLIENTE g ON g.ID = f.ID_TIPO_CLIENTE LEFT JOIN TIPO_ACTIVIDAD h ON h.ID = a.ID_ACTIVIDAD LEFT JOIN FICPE.PERSONAFIS i ON i.PEFCODPERS = f.ID_CLIENTE  LEFT JOIN FICPEF.PERSONAJUR j ON j.PEJCODPERS = f.ID_CLIENTE LEFT JOIN FICPE.PERSONAJUR k ON k.PEJCODPERS = f.ID_CLIENTE LEFT JOIN VTADIS.CLIENTES l ON l.CLCODIGO = f.ID_CLIENTE LEFT JOIN OUTDVP.TIPO_USUARIO m ON m.CODIGO = b.TYPE LEFT JOIN SOLICITUD_TIPO n ON n.ID = a.IDTIPOSOLICITUD LEFT JOIN OUTDVP.DMKT_RG_RM o on b.ID = o.IDUSER LEFT JOIN OUTDVP.DMKT_RG_SUPERVISOR p ON b.ID = p.IDUSER lEFT JOIN OUTDVP.GERENTES q ON b.ID = q.IDUSER LEFT JOIN OUTDVP.PERSONAS r ON b.ID = r.IDUSER LEFT JOIN SOLICITUD_DETALLE s ON a.ID_DETALLE = s.ID LEFT JOIN TIPO_INVERSION u ON a.ID_INVERSION = u.ID LEFT JOIN SOLICITUD_GERENTE v ON v.ID_SOLICITUD = a.ID AND v.ID_GERPROD =  " . Auth::user()->id . "  LEFT JOIN OUTDVP.GERENTES w ON w.ID = d.GERENTE_ID LEFT JOIN OUTDVP.DMKT_RG_SUPERVISOR x ON x.IDSUP = o.IDSUP LEFT JOIN OUTDVP.DMKT_RG_RM y ON y.IDUSER = a.ID_USER_ASSIGN LEFT JOIN OUTDVP.DMKT_RG_SUPERVISOR z ON z.IDSUP = y.IDSUP LEFT JOIN FICPE.VISITADOR az ON o.IDRM = az.VISVISITADOR LEFT JOIN FICPE.NIVEL1GEOG bz on bz.N1GNIVEL1GEOG = az.VISNIVEL1GEOG LEFT JOIN FICPE.NIVEL2GEOG cz on cz.N2GNIVEL2GEOG = az.VISNIVEL2GEOG LEFT JOIN FICPE.NIVEL3GEOG dz on dz.N3GNIVEL3GEOG =  az.VISNIVEL3GEOG LEFT JOIN FICPE.NIVEL4GEOG ez on ez.N4GNIVEL4GEOG = az.VISNIVEL4GEOG WHERE   ( a.CREATED_BY =  " . Auth::user()->id . "  OR a.ID_USER_ASSIGN =  " . Auth::user()->id . "   OR v.ID_GERPROD =  " . Auth::user()->id . "   OR q.IDUSER =  " . Auth::user()->id . "  OR p.IDUSER =  " . Auth::user()->id . "  OR z.IDUSER =  " . Auth::user()->id . "  )  AND a.ID_ESTADO = 7 " . ( $frecuency == 'S' ? "" : "AND a.created_at between to_date('" .$fromDate . "','yyyy/mm/dd') and to_date('".$toDate."','yyyy/mm/dd') ") . " " . ($frecuency == 'S' || $frecuency == 'M' ? "ORDER BY zzz.the_date" : "" ). "";
 			//return $q;
 
 			$results = DB::select( DB::raw( $q ) );
-			foreach ( $results as $result )
+			/*foreach ( $results as $result )
 			{
 				$jDetalle = json_decode( $result->detalle );
 				if ( isset( $jDetalle->monto_aprobado ) )
@@ -123,7 +124,7 @@ class TestController extends BaseController
 				else
 					$result->monto_solicitado = 0;
 				unset( $result->detalle );
-			}
+			}*/
 			return $results;
 			$sol = Solicitud::getAllData();
 			return $sol;
