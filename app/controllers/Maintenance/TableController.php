@@ -386,7 +386,6 @@ class TableController extends BaseController
 				return $this->setRpta();
 			elseif ( $mark->count() == 0 )
 			{
-
 				$mark = new Mark;
 				$mark->id = $mark->lastId() + 1;
 				$mark->codigo = $val;
@@ -463,24 +462,15 @@ class TableController extends BaseController
 
 	private function maintenanceSaveFondo( $val )
 	{
-		try
-		{
-			DB::beginTransaction();
-			$fondo = new Fondo;
-			$fondo->id = $fondo->lastId() + 1 ;
-			foreach ( $val[data] as $key => $data )
-				$fondo->$key = $data;
-			$fondo->save();
-			
-			DB::commit();
-			return $this->setRpta();
-			
-		}
-		catch ( Exception $e )
-		{
-			DB::rollback();
-			return $this->internalException( $e , __FUNCTION__ );
-		}
+		\Log::error( $val );
+		$fondo = new Fondo;
+		$fondo->id = $fondo->lastId() + 1 ;
+		foreach ( $val[data] as $key => $data )
+			$fondo->$key = $data;
+		$fondo->save();
+		\Log::error( json_encode( $fondo ) );
+		DB::commit();
+		return $this->setRpta();
 	}
 
 	public function addMaintenanceData()
@@ -515,7 +505,7 @@ class TableController extends BaseController
 
 	private function maintenanceAddFondo()
 	{
-		$data = array( 'userTypes' => TypeUser::dmkt() );
+		$data = array( 'datos' => TypeUser::dmkt() );
 		return $this->setRpta( View::make( 'Maintenance.Fondo.tr')->with( $data )->render() );
 	}
 

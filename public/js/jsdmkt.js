@@ -1271,7 +1271,13 @@ $(document).on( 'click' , '.maintenance-add' , function()
     }).done( function( response )
     {
         if ( response.Status == 'Ok')
+        {
             button.parent().parent().find('tbody').append( response.Data );
+            var table = '#table_' + button.attr( 'case' );
+            console.log( table );
+            var scroll = $( table ).parent();
+            scroll.scrollTop( scroll[0].scrollHeight );
+        }
         else
             bootbox.alert('<h4 class="red">' + Data.Status + ': ' + Data.Description + '</h4>');            
     });

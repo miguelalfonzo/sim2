@@ -9,7 +9,7 @@ class Mark extends Eloquent
     protected $table= 'MARCA';
     protected $primaryKey = 'id';
    
-   	protected static function lastId()
+   	public static function lastId()
    	{
    		$mark = Mark::orderBy('id' , 'desc' )->first();
    		if ( $mark == null )
