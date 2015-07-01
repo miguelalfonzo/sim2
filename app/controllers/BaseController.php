@@ -2,6 +2,7 @@
 
 use \Dmkt\Solicitud;
 use \Common\State;
+use \Common\StateRange;
 use \System\SolicitudHistory;
 
 class BaseController extends Controller 
@@ -272,5 +273,9 @@ class BaseController extends Controller
                 'fileList'  => $resultFileList
             ));
         }
+    }
+    public function getLeyenda(){
+        $data = array('states' => StateRange::order());
+        return View::make('template.leyenda', $data);
     }
 }

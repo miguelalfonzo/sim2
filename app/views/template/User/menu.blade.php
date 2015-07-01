@@ -1,7 +1,7 @@
 <div class="row">
     
         {{Form::token()}}
-        <div class="form-group col-sm-2 col-md-2" style="padding: 0">
+        <div class="form-group col-sm-2 col-md-2"">
             <div>
                 <select id="idState" name="idstate" class="form-control selectestatesolicitude">
                     @foreach( $states as $estado )

@@ -3,15 +3,12 @@
     
                 
     @include('template.User.menu')
+    <!-- <div class="clearfix"></div> -->
+    <!-- <div class="container-fluid table_solicitudes" > -->
+    </div>
     @include('template.Modals.temporal_user')
     @if( Auth::user()->type == TESORERIA )
         @include('template.Modals.deposit')
     @endif
-
-    <div>
-        <a id="show_leyenda" style="margin-left: 15px" href="#">Ver leyenda</a>
-        <a id="hide_leyenda" style="margin-left: 15px;display: none" href="#">Ocultar leyenda</a>
-    </div>
-
-@include('template.leyenda')
+	<button id="show_leyenda" type="button" class="btn btn-link">Ver leyenda</button>
 @stop
