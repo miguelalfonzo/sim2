@@ -1,3 +1,8 @@
+<!-- @extends('template.main')
+@section('solicitude')
+<div class="page-header">
+  <h1>Mantenimiento de Cuentas-Marcas</h1>
+</div>
 <table class="table table-hover table-bordered table-condensed dataTable" id="table_cuentas-marca" style="width: 100%">
     <thead>
         <tr>
@@ -42,3 +47,9 @@
         @endforeach
     </tbody>
 </table>
+<script>
+    $(document).on('ready', function(){
+        dataTable('table_cuentas-marca', null, 'registros')
+    })
+</script>
+@stop -->

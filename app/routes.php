@@ -203,6 +203,21 @@
 
 
 Route::get('solicitude/statement', 'Movements\MoveController@getStatement');
+
+Route::get('solicitude/institution', 'Dmkt\SolicitudeController@showSolicitudeInstitution');
+/*
+|--------------------------------------------------------------------------
+| MANTENIMIENTO
+|--------------------------------------------------------------------------
+*/
+Route::get('maintenance/dailyseatrelation' , 'Maintenance\TableController@getMaintenanceTableDailySeatRelation');
+Route::get('maintenance/fondos' , 'Maintenance\TableController@getMaintenanceTableDataFondos');
+Route::get('maintenance/fondoaccount' , 'Maintenance\TableController@getMaintenanceTableFondoAccount');
+Route::get('maintenance/inversion' , 'Maintenance\TableController@getMaintenanceTableDataInversion');
+Route::get('maintenance/activity' , 'Maintenance\TableController@getMaintenanceTableDataActivity');
+Route::get('maintenance/investmentactivity' , 'Maintenance\TableController@getMaintenanceTableDataInvestmentActivity');
+Route::get('maintenance/finddocument', 'Dmkt\SolicitudeController@findDocument');
+Route::get('maintenance/documenttype', 'Dmkt\FondoController@listDocuments');
 /*
 |--------------------------------------------------------------------------
 | TEST MANTENIMIENTO

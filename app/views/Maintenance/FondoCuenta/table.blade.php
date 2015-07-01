@@ -1,3 +1,8 @@
+@extends('template.main')
+@section('solicitude')
+<div class="page-header">
+  <h3>Mantenimiento de Fondo-Cuenta</h3>
+</div>
 <table class="table table-hover table-bordered table-condensed dataTable" id="table_fondo-cuenta" style="width: 100%">
     <thead>
         <tr>
@@ -25,3 +30,9 @@
         @endforeach
     </tbody>
 </table>
+<script>
+    $(document).on('ready', function(){
+        dataTable('table_fondo-cuenta', null, 'registros')
+    })
+</script>
+@stop

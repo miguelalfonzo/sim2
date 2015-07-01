@@ -108,6 +108,9 @@
                             <li role="separator" class="divider"></li>
                             @endif
                             <li><a href="{{ URL::to('show_user') }}">Listado de Solicitudes</a></li>
+                            @if ( Auth::user()->type == ASIS_GER )
+                            <li><a href="{{ URL::to('solicitude/institution') }}">Solicitudes Institucionales</a></li>
+                            @endif
                         </ul>
                     </li>
                     <li><a href="{{ URL::to('solicitude/statement')}}">Movimientos</a></li>
@@ -123,17 +126,33 @@
                             <li class="divider"></li>
                         </ul>
                     </li>
+                    @if ( in_array(Auth::user()->type, array(SUP, GER_PROD, GER_PROM, GER_COM, CONT)) )
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Configuración <span class="caret"></span></a>
-                        <ul id="menu-report" class="dropdown-menu" role="menu">
+                        <ul class="dropdown-menu" role="menu">
+                            @if ( in_array(Auth::user()->type, array(SUP, GER_PROD, GER_PROM, GER_COM)) )
                             <li><a data-toggle="modal" data-target="#modal-temporal-user">
                                 <span class="glyphicon glyphicon-plus" aria-hidden="true" ></span>
                                     <span class="glyphicon-class"> Derivación de Usuario</span></a>
                             </li>
-                            
+                            @endif
+                            @if ( in_array(Auth::user()->type, array(CONT, GER_COM, TESORERIA)) )
+                            <li><a href="{{ URL::to('maintenance/fondos') }}">Mantenimiento de Fondos</a></li>
+                            @endif
+                            @if ( in_array(Auth::user()->type, array(CONT, GER_COM)) )
+                            <li><a href="{{ URL::to('maintenance/dailyseatrelation') }}">Mantenimiento de Cuentas - Marcas</a></li>
+                            <li><a href="{{ URL::to('maintenance/fondoaccount') }}">Mantenimiento de Cuentas de Fondos</a></li>
+                            <li><a href="{{ URL::to('maintenance/inversion') }}">Mantenimiento de Inversion</a></li>
+                            <li><a href="{{ URL::to('maintenance/activity') }}">Mantenimiento de Actividades</a></li>
+                            <li><a href="{{ URL::to('maintenance/investmentactivity') }}">Mantenimiento de Inversion-Actividad</a></li>
+                            @endif
+                            @if ( in_array(Auth::user()->type, array(CONT)) )
+                            <li><a href="{{ URL::to('maintenance/finddocument') }}">Mantenimiento de Documentos</a></li>
+                            <li><a href="{{ URL::to('maintenance/documenttype') }}">Mantenimiento de Tipo de Documentos</a></li>
+                            @endif
                         </ul>
                     </li>
-                    
+                    @endif                    
                     <li class="report_menubar_option btn_extra" style="display:none;">
                         <a href="#" rel="export">
                             <span class="glyphicon glyphicon-save" aria-hidden="true"></span>
@@ -175,13 +194,18 @@
     {
         @if ( isset( $alert[ 'msg' ] ) && $alert[ 'msg' ] != '' )
             $('#alert-console').prepend( 
-                $('<div class="alert alert-{{ $alert[ 'type' ] }} fade in alert-dismissible" role="alert" style="position:relative;z-index:10">' + 
+                $('<div class="alert alert-{{ $alert[ 'type' ] }}" role="alert">' + 
                     '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
                         '<span aria-hidden="true">&times;</span>' +
                     '</button>' +
-                    '<strong>Warning!</strong>{{ $alert[ 'msg' ] }}' +
+                    '<strong>Warning!</strong> {{ $alert[ 'msg' ] }}' +
                 '</div>') );
         @endif
+        window.setTimeout(function() {
+            $(".alert").fadeTo(1500, 0).slideUp(500, function(){
+                $(this).remove(); 
+            });
+        }, 5000);
     });
 </script>
 
@@ -211,10 +235,5 @@
 {{ HTML::script('js/jquery.bootstrap.wizard.js') }}
 {{ HTML::script('js/wizard.js') }}
 <!-- idkc: Report Library -->
-<script>
-    </script>
 </body>
-<script>
-    $
-</script>
 </html>

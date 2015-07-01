@@ -1,3 +1,8 @@
+@extends('template.main')
+@section('solicitude')
+<div class="page-header">
+  <h3>Mantenimiento de Documentos</h3>
+</div>
 <div class="panel-body table_documents">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
         <div class="form-group col-xs-8 col-sm-4 col-md-2 col-lg-2">
@@ -10,7 +15,6 @@
             </div>
         </div>
         
-        @include('Dmkt.User.date_picker')
         
         <div class="form-group col-xs-12 col-sm-6 col-md-3 col-lg-3">
             <div>
@@ -27,3 +31,5 @@
         </div>
     </div>
 </div>
+@include('template.Modals.documents')
+@stop

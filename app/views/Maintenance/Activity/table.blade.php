@@ -1,3 +1,8 @@
+@extends('template.main')
+@section('solicitude')
+<div class="page-header">
+  <h3>Mantenimiento de Actividad</h3>
+</div>
 <table class="table table-hover table-bordered table-condensed dataTable" id="table_actividad" style="width: 100%">
     <thead>
         <tr>
@@ -31,3 +36,9 @@
         @endforeach
     </tbody>
 </table>
+<script>
+    $(document).on('ready', function(){
+        dataTable('table_actividad', null, 'registros')
+    })
+</script>
+@stop

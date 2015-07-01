@@ -1,4 +1,4 @@
-@if( Auth::user()->type == SUP )
+<!-- if( Auth::user()->type == SUP ) -->
     @if ( is_null( Auth::user()->assignTempUser ) )
         <div class="modal fade" id="modal-temporal-user" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -47,4 +47,4 @@
             </div>
         </div>
     @endif
-@endif
+<!-- endif -->
