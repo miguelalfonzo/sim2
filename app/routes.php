@@ -230,5 +230,6 @@ Route::get('maintenance/parameters', 'Maintenance\TableController@getMaintenance
 | TEST MANTENIMIENTO
 |--------------------------------------------------------------------------
 */
+Route::get('maintenance/newFondos', 'Maintenance\MaintenanceController@fondoView');
     // Route::get('passLogin', 'TestController@passLogin');
     // Route::get('passNewSolicitud' , 'TestController@passNewSolicitud');
