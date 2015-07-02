@@ -29,10 +29,10 @@
                 <td class="text-center open-details" data-id="{{$solicitud->id}}">
                     <span class="glyphicon glyphicon-plus green"></span>
                 </td>
-                @if($solicitud->id_estado == ACEPTADO || $solicitud->id_estado == APROBADO || $solicitud->id_estado == DEPOSITADO || $solicitud->id_estado == REGISTRADO || $solicitud->id_estado == ENTREGADO || $solicitud->id_estado == GENERADO || $solicitud->id_estado == GASTO_HABILITADO || $solicitud->id_estado == DEPOSITO_HABILITADO)
-                    <input type="hidden" id="timeLineStatus" value="{{$solicitud->id_estado}}" data-accept="$solicitud->acceptHist->user_from">
-                @elseif($solicitud->id_estado == RECHAZADO)
+                @if($solicitud->state->id_estado == R_NO_AUTORIZADO )
                     <input type="hidden" id="timeLineStatus" value="{{$solicitud->id_estado}}" data-rejected="{{$solicitud->rejectedHist->user_from}}">
+                @elseif( ! is_null( $solicitud->state ) && $solicitud->id_estado != TODOS )
+                    <input type="hidden" id="timeLineStatus" value="{{$solicitud->id_estado}}" data-accept="$solicitud->acceptHist->user_from">
                 @else
                     <input type="hidden" id="timeLineStatus" value="{{$solicitud->id_estado}}">
                 @endif
@@ -118,6 +118,6 @@
         @endforeach
     </tbody>
 </table>
-@if( Auth::user()->type == REP_MED)
-    @include('template.Modals.timeLine')
-@endif
+<!-- if( Auth::user()->type == REP_MED) -->
+    <!-- include('template.Modals.timeLine') -->
+<!-- endif -->

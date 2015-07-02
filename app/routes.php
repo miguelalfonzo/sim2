@@ -30,6 +30,10 @@
     Route::post( 'maintenance-enable' , 'Maintenance\TableController@enableRecord');
     Route::post( 'maintenance-disable' , 'Maintenance\TableController@disableRecord');
     Route::get( 'test-query' , 'TestController@testQuery' );
+
+    //--- TIME LINE --
+
+    Route::get( 'timeline-modal/{id}' , 'Dmkt\SolicitudeController@getTimeLine');
     
     /*
     |--------------------------------------------------------------------------
@@ -84,7 +88,7 @@
         Route::get('list-documents-type', 'Dmkt\FondoController@listDocuments');
         Route::post('list-documents', 'Movements\MoveController@searchDocs');
         
-        Route::post('cont-document-manage' , 'Expense\ExpenseController@manageDocument');
+        Route::post('maintenance/cont-document-manage' , 'Expense\ExpenseController@manageDocument');
         Route::post('consultarRucCont', 'Expense\RucController@show');
         Route::get('edit-expense-cont', 'Expense\ExpenseController@editExpense');
         Route::post('get-document-detail' , 'Expense\ExpenseController@getDocument');
@@ -220,6 +224,7 @@ Route::get('maintenance/activity' , 'Maintenance\TableController@getMaintenanceT
 Route::get('maintenance/investmentactivity' , 'Maintenance\TableController@getMaintenanceTableDataInvestmentActivity');
 Route::get('maintenance/finddocument', 'Dmkt\SolicitudeController@findDocument');
 Route::get('maintenance/documenttype', 'Dmkt\FondoController@listDocuments');
+Route::get('maintenance/parameters', 'Maintenance\TableController@getMaintenanceTableParameter');
 /*
 |--------------------------------------------------------------------------
 | TEST MANTENIMIENTO

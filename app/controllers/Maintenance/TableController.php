@@ -20,6 +20,7 @@ use \Dmkt\InvestmentType;
 use \Dmkt\InvestmentActivity;
 use \Dmkt\Activity;
 use \Client\ClientType;
+use \Parameter\Parameter;
 
 class TableController extends BaseController
 {
@@ -127,9 +128,17 @@ class TableController extends BaseController
 		$records = MarkProofAccounts::all();
 		$columns = Maintenance::find(1);
 		$columns = json_decode( $columns->formula );
-		return View::make( 'Maintenance.table' )->with( array( 'records' => $records , 'columns' => $columns , 'type' => 'cuentas-marca' ) );
-
+		return View::make( 'Maintenance.table' )->with( array( 'records' => $records , 'columns' => $columns , 'type' => 'cuentas-marca' , 'titulo' => 'Mantenimiento de Cuentas-Marcas' ) );
 	}
+
+	public function getMaintenanceTableParameter()
+	{
+		$records = Parameter::all();
+		$columns = Maintenance::find(2);
+		$columns = json_decode( $columns->formula );
+		return View::make( 'Maintenance.table' )->with( array( 'records' => $records , 'columns' => $columns , 'type' => 'parametro' , 'titulo' => 'Mantenimiento de Parametros' ) );
+	}
+
 	public function getMaintenanceTableDataFondos()
 	{
 		$fondos = Fondo::order();
@@ -377,7 +386,6 @@ class TableController extends BaseController
 				return $this->setRpta();
 			elseif ( $mark->count() == 0 )
 			{
-
 				$mark = new Mark;
 				$mark->id = $mark->lastId() + 1;
 				$mark->codigo = $val;
@@ -454,24 +462,15 @@ class TableController extends BaseController
 
 	private function maintenanceSaveFondo( $val )
 	{
-		try
-		{
-			DB::beginTransaction();
-			$fondo = new Fondo;
-			$fondo->id = $fondo->lastId() + 1 ;
-			foreach ( $val[data] as $key => $data )
-				$fondo->$key = $data;
-			$fondo->save();
-			
-			DB::commit();
-			return $this->setRpta();
-			
-		}
-		catch ( Exception $e )
-		{
-			DB::rollback();
-			return $this->internalException( $e , __FUNCTION__ );
-		}
+		\Log::error( $val );
+		$fondo = new Fondo;
+		$fondo->id = $fondo->lastId() + 1 ;
+		foreach ( $val[data] as $key => $data )
+			$fondo->$key = $data;
+		$fondo->save();
+		\Log::error( json_encode( $fondo ) );
+		DB::commit();
+		return $this->setRpta();
 	}
 
 	public function addMaintenanceData()
@@ -506,7 +505,7 @@ class TableController extends BaseController
 
 	private function maintenanceAddFondo()
 	{
-		$data = array( 'userTypes' => TypeUser::dmkt() );
+		$data = array( 'datos' => TypeUser::dmkt() );
 		return $this->setRpta( View::make( 'Maintenance.Fondo.tr')->with( $data )->render() );
 	}
 

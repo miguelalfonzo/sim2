@@ -96,13 +96,23 @@ $(document).on("click", ".timeLine", function(e)
     var state = parseInt($(this).parent().parent().parent().find('#timeLineStatus').val(), 10);
     var accept = $(this).parent().parent().parent().find('#timeLineStatus').data('accept');
     var rejected = $(this).parent().parent().parent().find('#timeLineStatus').data('rejected');
-    var html  = $('.timeLineModal').clone();
+    
+    //var html  = $('.timeLineModal').clone();
+    $.get( server + 'timeline-modal/' + $(this).attr('data-id') ).done( function( response ) { console.log( response ) ; html = response; } );
+    console.log( '1');
+    console.log( html );
+    html = $(html);
+    console.log( 2 );
+    console.log( html );
     html.find('.container-fluid').removeClass('hide');
+    console.log( 3 );
     if(state == DERIVADO){
         for (var i = 0 ; i < 2; i++) {
             html.find('.stage').eq(i).addClass('success');
             html.find('.stage .stage-header').eq(i).addClass('stage-success');
         }
+        console.log( 4 );
+    
         html.find('.stage').eq(2).addClass('pending');
         html.find('.stage .stage-header').eq(2).addClass('stage-pending');
     }else if(state == POR_DEPOSITAR){
@@ -115,6 +125,7 @@ $(document).on("click", ".timeLine", function(e)
                 html.find('.stage .stage-header').eq(i).addClass('stage-success');
             }
         }
+        console.log( 5 );    
         html.find('.stage').eq(4).addClass('pending');
         html.find('.stage .stage-header').eq(4).addClass('stage-pending');
     }else if(state == POR_REGISTRAR){
@@ -127,6 +138,7 @@ $(document).on("click", ".timeLine", function(e)
                 html.find('.stage .stage-header').eq(i).addClass('stage-success');
             }
         }
+        console.log( 6 );
         html.find('.stage').eq(6).addClass('pending');
         html.find('.stage .stage-header').eq(6).addClass('stage-pending');
     }else if(state == REGISTRADO){
@@ -171,7 +183,12 @@ $(document).on("click", ".timeLine", function(e)
         html.find('.stage').eq(pos).addClass('rejected');
         html.find('.stage .stage-header').eq(pos).addClass('stage-rejected');
     }
-    var h     = $(html).html();
+    console.log( 99 );
+    zzz = html;
+    console.log( html );
+    var h     = html;
+    console.log( 991 );
+    
     bootbox.dialog({
         message: h,
         title: "Línea del Tiempo",
@@ -183,6 +200,8 @@ $(document).on("click", ".timeLine", function(e)
         },
         size: "large"
     });
+    console.log( 992 );
+    
 });
 
 //NEW OR EDIT SOLICITUDE BY RM OR SUP CLIENTES
@@ -384,10 +403,11 @@ function listDocuments()
     });
 }
 
-
 function listDocumentsType()
 {
-    $.ajax(
+    window.location.reload(true);
+    //window.location.href = server + 'maintenance/documenttype' ;
+    /*$.ajax(
     {
         url: server + 'list-documents-type',
         type: 'GET',
@@ -398,7 +418,7 @@ function listDocumentsType()
     }).done(function (data) 
     {
         dataTable( 'table_document_contabilidad' , data , 'documentos' );
-    });
+    });*/
 }
 
 function searchFondos( datefondo , aux ) 
@@ -1251,7 +1271,13 @@ $(document).on( 'click' , '.maintenance-add' , function()
     }).done( function( response )
     {
         if ( response.Status == 'Ok')
+        {
             button.parent().parent().find('tbody').append( response.Data );
+            var table = '#table_' + button.attr( 'case' );
+            console.log( table );
+            var scroll = $( table ).parent();
+            scroll.scrollTop( scroll[0].scrollHeight );
+        }
         else
             bootbox.alert('<h4 class="red">' + Data.Status + ': ' + Data.Description + '</h4>');            
     });
@@ -1262,7 +1288,7 @@ $(document).on("click", "#add-doc", function()
 {
     var style = 'style="text-align: center"';
     $(this).hide();
-    $(".fondo_d tbody").append('<tr class="new">'
+    $("#table_document_contabilidad tbody").append('<tr class="new">'
         + '<td id="pk" ' +style + ' disabled></td>'
         + '<td id="desc" ' +style + '> <input style="width: 100%;" type="text"> </td>'
         + '<td id="sunat" ' +style + '> <input style="width: 100%;" type="text"></td>'
@@ -1273,6 +1299,7 @@ $(document).on("click", "#add-doc", function()
         + '<a class="elementBack" href="#"><span class="glyphicon glyphicon-remove"></span></a>'
         + '</td>'
         + '</tr>')
+    $('tr.new td#sunat input').numeric({negative:false,decimal:false});
 });
 
 $(document).off( 'click' , '.maintenance-cancel');
@@ -1301,13 +1328,13 @@ $(document).on('click' , '.maintenance-edit' , function()
         else if ( td.attr('editable') == 3 )
         {
             var val = td.html();
-            td.html('<input type="text" maxlength=7 value="' + val + '">');
+            td.html('<input type="text" maxlength=7 style="width:100%" value="' + val.trim() + '">');
             td.children().numeric();
         }
         else if ( td.attr('editable') == 4 )
         {
             var val = td.html();
-            td.html('<input type="text" value="' + val + '">');
+            td.html('<input type="text" style="width:100%" value="' + val.trim() + '">');
         }
     });
 });
@@ -1345,7 +1372,7 @@ $(document).on( 'click' , '.maintenance-save' , function()
             window.location.reload(true);
         }
         else
-            bootbox.alert('<h4 class="text-danger">' + Data.Status + ': ' + Data.Description + '</h4>');            
+            bootbox.alert('<h4 class="text-danger">' + response.Status + ': ' + response.Description + '</h4>');            
     });
 });
 
@@ -1571,7 +1598,7 @@ $(document).on("click", ".elementSave", function()
 $(document).off("click", ".elementBack");
 $(document).on("click", ".elementBack", function()
 {
-    $(".fondo_d tbody tr").last().remove();
+    $("#table_document_contabilidad tbody tr").last().remove();
     $("#add-doc").show();
 });
 
@@ -2168,7 +2195,6 @@ $( document ).ready(function()
 
     if ( $("#idState").length === 1 )
         listTable( 'solicitudes' );
-
     _token       =  GBREPORTS.token;
 
     /** --------------------------------------------- CONTABILIDAD ------------------------------------------------- **/

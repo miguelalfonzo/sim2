@@ -1,4 +1,4 @@
-<li class="list-group-item" tipo_cliente="{{$id_tipo_cliente}}" pk="{{$value}}" style="overflow:hidden">
+<li class="list-group-item" tipo_cliente="{{$id_tipo_cliente}}" pk="{{$value}}">
 	<b>{{$label}}</b>
     <button type='button' class='btn-delete-client' style="z-index:2">
         <span class="glyphicon glyphicon-remove red" style="margin-left:20px ; float:right;"></span>

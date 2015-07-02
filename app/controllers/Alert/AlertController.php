@@ -57,14 +57,13 @@ class AlertController extends BaseController
 			$clients_inicial = $solicitud_inicial->clients()->select( 'id_cliente' , 'id_tipo_cliente' )->get();
 			foreach ( $solicituds as $solicitud_secundaria )
 			{
-				if ( $solicitud_inicial->id != $solicitud_secundaria->id && ! in_array( $solicitud_secundaria->id , $solicituds_compare_id ) && ( $this->diffCreatedAt( $solicitud_inicial , $solicitud_secundaria ) <= $tiempo->valor ) )
+				if ( $solicitud_inicial->id != $solicitud_secundaria->id && ! in_array( $solicitud_secundaria->id , $solicituds_compare_id ) )
 				{
 					$clients_secundaria = $solicitud_secundaria->clients()->select( 'id_cliente' , 'id_tipo_cliente' )->get();
 					$cliente_inicial = $this->intersectRecords( $clients_inicial , $clients_secundaria );
 					foreach( $solicituds as $solicitud_final )
 					{
-						$this->diffCreatedAt( $solicitud_inicial , $solicitud_final);
-						if ( $solicitud_inicial->id != $solicitud_final->id && $solicitud_final->id != $solicitud_secundaria->id && ! in_array( $solicitud_final->id , $solicituds_compare_id ) && ( $this->diffCreatedAt( $solicitud_inicial , $solicitud_secundaria ) <= $tiempo->valor ) )
+						if ( $solicitud_inicial->id != $solicitud_final->id && $solicitud_final->id != $solicitud_secundaria->id && ! in_array( $solicitud_final->id , $solicituds_compare_id ) && ( $this->diffCreatedAt( $solicitud_inicial , $solicitud_secundaria , $solicitud_final ) <= $tiempo->valor ) )
 						{
 							$clients_final = $solicitud_final->clients()->select( 'id_cliente' , 'id_tipo_cliente' )->get();
 							$cliente_inicial = $this->intersectRecords( $clients_inicial , $clients_final );
@@ -86,6 +85,11 @@ class AlertController extends BaseController
 			}
 		}
 		return array( 'type' => 'warning' , 'msg' => $msg );
+    }
+
+    private function solMsg( $record1 , $record2 , $record3 )
+    {
+    	return $record1->id . /*' ' . $record1->created_at .*/ ' , ' . $record2->id . ' ' . /*$record2->created_at . ' ' .*/ $record3->id . ' ' /*. $record3->created_at*/ ; 
     }
 
 	public function expenseAlert()
@@ -112,13 +116,14 @@ class AlertController extends BaseController
 		return $updated->$method( $now );
 	}
 
-	private function diffCreatedAt( $record1 , $record2 )
+	private function diffCreatedAt( $record1 , $record2 , $record3 )
 	{
 		$date1 = new Carbon( $record1->created_at );
 		$date2 = new Carbon( $record2->created_at );
-		$rpta = $date1->diffInDays( $date2 );
-		$rpta2 = $date2->diffInDays( $date1 );
-		\Log::error( 'Inicial - Record: ' . $record1->created_at . ' ' . $record2->created_at . ' ' . $rpta . ' Record - Inicial : ' . $rpta2 );
+		$date3 = new Carbon( $record3->created_at );
+		$min = $date1->min( $date2 , $date3 );
+		$max = $date1->max( $date2 , $date3 );
+		$rpta = $max->diffInDays( $min );
 		return $rpta;
 	}
 

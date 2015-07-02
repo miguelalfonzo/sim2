@@ -80,7 +80,7 @@ class Solicitud extends Eloquent
     }
 
     public function rejectedHist(){
-        return $this->hasOne('System\SolicitudHistory','id_solicitud','id')->where( 'status_to' , RECHAZADO );
+        return $this->hasOne('System\SolicitudHistory','id_solicitud','id')->where( 'status_to' , RECHAZADO )->orWhere( 'status_to' , CANCELADO );
     }
 
     public function histories(){

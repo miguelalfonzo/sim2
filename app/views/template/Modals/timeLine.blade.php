@@ -1,5 +1,3 @@
-<link rel="stylesheet" type="text/css" href="{{asset('css/timeline.css')}}">
-
 <!-- Large modal -->
 <div class="timeLineModal">
 	<div class="container-fluid hide">

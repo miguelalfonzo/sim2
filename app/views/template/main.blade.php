@@ -40,10 +40,11 @@
     {{ HTML::style('css/daterangepicker-bs3.css') }}
     {{ HTML::style('css/bago.report.css') }}
     {{ HTML::style('css/gsdk-base.css') }}
+    <!-- TIME LINE -->
+    {{ HTML::style('css/timeline.css') }}
     <!-- idkc : Report CSS Library -->
-    
     {{ HTML::script('js/jquery_2.1.0.min.js') }}
-    
+
 </head>
 <body>
 <div id="alert-console" class="container-fluid" style="z-index: 99999999; margin-top: 10px;"></div>
@@ -143,6 +144,8 @@
                             <li><a href="{{ URL::to('maintenance/inversion') }}">Mantenimiento de Inversion</a></li>
                             <li><a href="{{ URL::to('maintenance/activity') }}">Mantenimiento de Actividades</a></li>
                             <li><a href="{{ URL::to('maintenance/investmentactivity') }}">Mantenimiento de Inversion-Actividad</a></li>
+                            <li><a href="{{ URL::to('maintenance/parameters') }}">Mantenimiento de Parametros</a></li>
+
                             @endif
                             @if ( in_array(Auth::user()->type, array(CONT)) )
                             <li><a href="{{ URL::to('maintenance/finddocument') }}">Mantenimiento de Documentos</a></li>
