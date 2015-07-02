@@ -39,4 +39,9 @@ class Deposit extends Eloquent{
 	{
 		return $this->hasOne('Expense\PlanCta' , 'ctactaextern' , 'num_cuenta' );
 	}
+
+	protected function createdBy()
+	{
+		return $this->hasOne( 'User' , 'id' , 'created_by');
+	}
 }

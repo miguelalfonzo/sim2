@@ -74,9 +74,24 @@ class Solicitud extends Eloquent
         return $this->hasOne( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->where( 'status_to' , DEPOSITO_HABILITADO );
     }
 
+    public function toAdvanceSeatHistory()
+    {
+        return $this->hasOne( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->where( 'status_to' , DEPOSITADO );
+    }
+
+    public function toGenerateHistory()
+    {
+        return $this->hasOne( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->where( 'status_to' , GENERADO );
+    }        
+
     public function acceptHist()
     {
         return $this->hasOne('System\SolicitudHistory','id_solicitud','id')->where( 'status_to' , ACEPTADO )->orderBy( 'updated_at' , 'DESC' );
+    }
+
+    public function fromUserHistory( $userFrom )
+    {
+        return $this->hasOne( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->where( 'user_from' , $userFrom )->first();
     }
 
     public function rejectedHist(){
@@ -171,7 +186,7 @@ class Solicitud extends Eloquent
         return $this->hasMany( 'Expense\Entry' , 'id_solicitud' )->where( 'd_c' , ASIENTO_GASTO_DEPOSITO );
     }
 
-    protected function policies()
+    public function policies()
     {
         return $this->hasMany( 'Policy\AprovalPolicy' , 'id_inversion' , 'id_inversion');
     }

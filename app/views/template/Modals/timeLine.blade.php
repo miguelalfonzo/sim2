@@ -3,82 +3,90 @@
 	<div class="container-fluid hide">
 		<div class="thumbnail">
 			<div class="stage-container">
-				<div class="stage col-md-3 col-sm-3">
-					<div class="stage-header"></div>
-					<div class="stage-content">
-						<h3 class="stage-title">Reg. Solicitud</h3>
-						<div class="stage-info">
-							Información Registrada por el Representante Médico
-						</div> 
-					</div>
-				</div>
-				<div class="stage col-md-3 col-sm-3">
-					<div class="stage-header"></div>
-					<div class="stage-content">
-						<h3 class="stage-title">Eval. Solicitud</h3>
-						<div class="stage-info">
-							Evaluación de la Solicitud por el Supervisor
+				@if ( $solicitud->idtiposolicitud == SOL_REP )
+					@if ( $solicitud->id_estado == CANCELADO )
+						<div class="stage col-md-3 col-sm-3 rejected">
+							<div class="stage-header stage-rejected"></div>
+					@elseif ( $solicitud->id_estado == PENDIENTE )
+						<div class="stage col-md-3 col-sm-3">
+							<div class="stage-header"></div>
+					@else
+						<div class="stage col-md-3 col-sm-3 success">
+							<div class="stage-header stage-success"></div>
+					@endif
+						<div class="stage-content">
+							<h3 class="stage-title">Inicio Solicitud</h3>
+							<div class="stage-info" style="white-space:nowrap">
+								{{$solicitud->createdBy->type}} : 
+								@if( $solicitud->createdBy->type == REP_MED )
+									{{$solicitud->createdBy->rm->full_name}}
+								@elseif( $solicitud->createdBy->type == SUP )
+									{{$solicitud->createdBy->sup->full_name}}
+								@elseif( $solicitud->createdBy->type == GER_PROD )
+									{{$solicitud->createdBy->gerProd->full_name}}
+								@else
+									{{$solicitud->createdBy->person->full_name}}
+								@endif
+							</div>
 						</div>
 					</div>
-				</div>
-				<div class="stage col-md-3 col-sm-3">
-					<div class="stage-header"></div>
-					<div class="stage-content">
-						<h3 class="stage-title">Eval. Solicitud</h3>
-						<div class="stage-info">
-							Evaluación de la Solicitud por el Gerente de Producto
+					@include('template.Modals.policyTimeLine')
+					@if ( is_null( $solicitud->toDepositHistory ) )
+						@if ( is_null( $solicitud->approvedHistory ) )
+							<div class="stage col-md-3 col-sm-3">
+								<div class="stage-header"></div>	
+						@else
+							<div class="stage col-md-3 col-sm-3 pending">
+								<div class="stage-header stage-pending"></div>
+						@endif
+					@else
+						<div class="stage col-md-3 col-sm-3 success">
+							<div class="stage-header stage-success"></div>
+					@endif
+						<div class="stage-content">
+							<h3 class="stage-title">Validación</h3>
+							<div class="stage-info" style="white-space:nowrap">
+								@if ( is_null( $solicitud->toDepositHistory ) )
+									Contabilidad
+								@else
+									{{$solicitud->toDepositHistory->createdBy->person->full_name}}
+								@endif
+							</div>
 						</div>
-
 					</div>
-				</div>
-				<div class="stage col-md-3 col-sm-3">
-					<div class="stage-header"></div>
-					<div class="stage-content">
-						<h3 class="stage-title">Aprob. Solicitud</h3>
-						<div class="stage-info">
-							Aprobación de la Solicitud por el Gerente Comercial
-						</div> 
+				@if ( $solicitud->detalle->id_motivo != REEMBOLSO )
+						@include( 'template.Modals.depSeatTimeLine' )
+					@endif
+				@elseif( $solicitud->idtiposolicitud == SOL_INST )
+					<div class="stage col-md-3 col-sm-3">
+						<div class="stage-header"></div>
+						<div class="stage-content">
+							<h3 class="stage-title">Reg. del F. Institucional</h3>
+							<div class="stage-info">
+								Informacion Registrada por el Asistente de Gerencia
+							</div>
+							<div class="stage-info">
+								{{$solicitud->createdBy->person->full_name}}
+							</div>	
+						</div>
 					</div>
-				</div>
-			</div>
-			<div class="clearfix"></div>
-			<div class="stage-container" style="margin-top:2em;">
-				<div class="stage col-md-3 col-sm-3">
-					<div class="stage-header"></div>
-					<div class="stage-content">
-						<h3 class="stage-title">Dep. Solicitud</h3>
-						<div class="stage-info">
-							Solicitud depositada por Tesorería
-						</div> 
+					<div class="stage col-md-3 col-sm-3">
+						<div class="stage-header"></div>
+						<div class="stage-content">
+							<h3 class="stage-title">Habilitacion del Dep.</h3>
+							<div class="stage-info">
+								Habilitacion del Fondo por Asis. Gerencia
+							</div>
+							@if ( ! is_null( $solicitud->toDepositHistory ) )
+								<div class="stage-info">
+									{{$solicitud->toDepositHistory->createdBy->person->full_name}}
+								</div>
+							@endif
+						</div>
 					</div>
-				</div>
-				<div class="stage col-md-3 col-sm-3">
-					<div class="stage-header"></div>
-					<div class="stage-content">
-						<h3 class="stage-title">Asiento Solicitud</h3>
-						<div class="stage-info">
-							Reg. Asiento Contable Solicitud
-						</div> 
-					</div>
-				</div>
-				<div class="stage col-md-3 col-sm-3">
-					<div class="stage-header"></div>
-					<div class="stage-content">
-						<h3 class="stage-title">Reg. de Gastos</h3>
-						<div class="stage-info">
-							Reg. Gastos por el Rep. Médico
-						</div> 
-					</div>
-				</div>
-				<div class="stage col-md-3 col-sm-3">
-					<div class="stage-header"></div>
-					<div class="stage-content">
-						<h3 class="stage-title">Asiento Gasto</h3>
-						<div class="stage-info">
-							Solicitud depositada por Tesorería
-						</div> 
-					</div>
-				</div>
+					@include( 'template.Modals.depSeatTimeLine' )
+				@endif
+				@include( 'template.Modals.registroGasto')
 			</div>
 			<div class="clearfix"></div>
 			<br>

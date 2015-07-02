@@ -98,110 +98,35 @@ $(document).on("click", ".timeLine", function(e)
     var rejected = $(this).parent().parent().parent().find('#timeLineStatus').data('rejected');
     
     //var html  = $('.timeLineModal').clone();
-    $.get( server + 'timeline-modal/' + $(this).attr('data-id') ).done( function( response ) { console.log( response ) ; html = response; } );
-    console.log( '1');
-    console.log( html );
-    html = $(html);
-    console.log( 2 );
-    console.log( html );
-    html.find('.container-fluid').removeClass('hide');
-    console.log( 3 );
-    if(state == DERIVADO){
-        for (var i = 0 ; i < 2; i++) {
-            html.find('.stage').eq(i).addClass('success');
-            html.find('.stage .stage-header').eq(i).addClass('stage-success');
-        }
-        console.log( 4 );
-    
-        html.find('.stage').eq(2).addClass('pending');
-        html.find('.stage .stage-header').eq(2).addClass('stage-pending');
-    }else if(state == POR_DEPOSITAR){
-        for (var i = 0 ; i <= 3; i++) {
-            if(accept == 'S' && i != 2){
-                html.find('.stage').eq(i).addClass('success');
-                html.find('.stage .stage-header').eq(i).addClass('stage-success');
-            }else if(accept == 'P'){
-                html.find('.stage').eq(i).addClass('success');
-                html.find('.stage .stage-header').eq(i).addClass('stage-success');
-            }
-        }
-        console.log( 5 );    
-        html.find('.stage').eq(4).addClass('pending');
-        html.find('.stage .stage-header').eq(4).addClass('stage-pending');
-    }else if(state == POR_REGISTRAR){
-        for (var i = 0 ; i <= 5; i++) {
-            if(accept == 'S' && i != 2){
-                html.find('.stage').eq(i).addClass('success');
-                html.find('.stage .stage-header').eq(i).addClass('stage-success');
-            }else if(accept == 'P'){
-                html.find('.stage').eq(i).addClass('success');
-                html.find('.stage .stage-header').eq(i).addClass('stage-success');
-            }
-        }
-        console.log( 6 );
-        html.find('.stage').eq(6).addClass('pending');
-        html.find('.stage .stage-header').eq(6).addClass('stage-pending');
-    }else if(state == REGISTRADO){
-        for (var i = 0 ; i <= 6; i++) {
-            if(accept == 'S' && i != 2){
-                html.find('.stage').eq(i).addClass('success');
-                html.find('.stage .stage-header').eq(i).addClass('stage-success');
-            }else if(accept == 'P'){
-                html.find('.stage').eq(i).addClass('success');
-                html.find('.stage .stage-header').eq(i).addClass('stage-success');
-            }
-        }
-        html.find('.stage').eq(7).addClass('pending');
-        html.find('.stage .stage-header').eq(7).addClass('stage-pending');
-    }else if(state == ACEPTADO || state == APROBADO || state == DEPOSITADO){
-        for (var i = 0 ; i <= state; i++) {
-            if(accept == 'S' && i != 2){
-                html.find('.stage').eq(i).addClass('success');
-                html.find('.stage .stage-header').eq(i).addClass('stage-success');
-            }else if(accept == 'P'){
-                html.find('.stage').eq(i).addClass('success');
-                html.find('.stage .stage-header').eq(i).addClass('stage-success');
-            }
-        }
-        html.find('.stage').eq(state+1).addClass('pending');
-        html.find('.stage .stage-header').eq(state+1).addClass('stage-pending');
-    }else if(state == CANCELADO){
-        html.find('.stage').eq(0).addClass('rejected');
-        html.find('.stage .stage-header').eq(0).addClass('stage-rejected');
-    }else if(state == RECHAZADO){
-        if(rejected == 'S'){
-            var pos = 1;
-        }else if(rejected == 'P'){
-            var pos = 2;
-        }else if(rejected == 'G'){
-            var pos = 3;
-        }
-        for (var i = 0 ; i < pos; i++) {
-            html.find('.stage').eq(i).addClass('success');
-            html.find('.stage .stage-header').eq(i).addClass('stage-success');
-        }
-        html.find('.stage').eq(pos).addClass('rejected');
-        html.find('.stage .stage-header').eq(pos).addClass('stage-rejected');
-    }
-    console.log( 99 );
-    zzz = html;
-    console.log( html );
-    var h     = html;
-    console.log( 991 );
-    
-    bootbox.dialog({
-        message: h,
-        title: "Línea del Tiempo",
-        buttons: {
-            danger: {
-                label: "Cancelar",
-                className: "btn-default"
-            }
-        },
-        size: "large"
-    });
-    console.log( 992 );
-    
+    $.get( server + 'timeline-modal/' + $(this).attr('data-id') ).done( function( response ) 
+    { 
+        console.log( state );
+        var html = response; 
+        console.log( '1' );
+        var html = $(html);
+        console.log( 2 );
+        html.find('.container-fluid').removeClass('hide');
+        console.log( 99 );
+        zzz = html;
+        var h     = html;
+        console.log( 991 );
+        
+        bootbox.dialog(
+        {
+            message: h,
+            title: "Línea del Tiempo",
+            buttons: 
+            {
+                danger: 
+                {
+                    label: "Cancelar",
+                    className: "btn-default"
+                }
+            },
+            size: "large"
+        });
+        console.log( 992 );
+    });  
 });
 
 //NEW OR EDIT SOLICITUDE BY RM OR SUP CLIENTES

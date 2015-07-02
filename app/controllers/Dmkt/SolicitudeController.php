@@ -1312,6 +1312,6 @@ class SolicitudeController extends BaseController
     public function getTimeLine( $id )
     {
         $solicitud = Solicitud::find( $id );
-        return View::make( 'template.Modals.timeLine')->with( array( $solicitud ) )->render();
+        return View::make( 'template.Modals.timeLine')->with( array( 'solicitud' => $solicitud ) )->render();
     }
 }

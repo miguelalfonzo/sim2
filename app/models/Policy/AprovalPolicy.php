@@ -18,4 +18,9 @@ class AprovalPolicy extends Eloquent
     {
     	return AprovalPolicy::where( 'id_inversion' , $investment )->whereIn( 'tipo_usuario' , $userType )->where( 'orden' , $order )->first();
     }
+
+    protected function userType()
+    {
+        return $this->hasOne( 'Common\TypeUser' , 'codigo' , 'tipo_usuario' );
+    }
 }
