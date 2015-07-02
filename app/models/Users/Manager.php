@@ -13,7 +13,7 @@ class Manager extends Eloquent
     protected function getFullNameAttribute()
     {
         $name = explode( ' ' , trim( $this->attributes['descripcion'] ) );
-        if ( count( $name ) == 2 )
+        if ( count( $name ) >= 2 )
             return ucwords( strtolower( substr( $name[ 0 ] , 0 , 1 ) . '. ' . $name[1] ) );
         else
             return ucwords( strtolower( $name[ 0 ] ) );
