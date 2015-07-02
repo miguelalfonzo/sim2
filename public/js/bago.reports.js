@@ -10,8 +10,9 @@
 		this.drpSpan         = $('#drp_menubar span');
 		var gbReportsObject  = this;
 		this.dateRangePickerCallback = function(start, end, label) {
-			console.log(start.toISOString(), end.toISOString(), label);
-			console.log(start.format('LL') + ' ' + end.format('LL'));
+			// console.log("label: "+label);
+			// console.log(start.toISOString(), end.toISOString(), label);
+			// console.log(start.format('LL') + ' ' + end.format('LL'));
 			gbReportsObject.reportDate = start.format("YYYY/MM/DD") + " - " + end.format("YYYY/MM/DD");
 			gbReportsObject.drpSpan.html(start.format('LL') + ' - ' + end.format('LL'));
 
@@ -219,14 +220,16 @@
 			var url = URL_BASE + "reports/getUserReports";
             var gbReportsObject = this;
             $.ajax({
-                url: url,
-                ContentType: gbReportsObject.contentTypeAjax,
-                cache: false
+				url        : url,
+				ContentType: gbReportsObject.contentTypeAjax,
+				cache      : false
             }).done(function(dataResult) {
 				console.log(dataResult);
 				if(dataResult.status == 'OK'){
-					if(typeof(dataResult.data) != 'undefined')
+					if(typeof(dataResult.data) != 'undefined'){
+						$(".report_menubar_option").not(".new").remove();
 						gbReportsObject.setMenuBarReports(dataResult.data);
+					}
 				}
 				else{
 					bootbox.alert(dataResult.message);
@@ -317,9 +320,8 @@
             }).done(function(dataResult) {
 				if(dataResult.status == 'OK'){
 					bootbox.alert('Reporte Guardado Satisfactoriamente.');
+					gbReportsObject.cleanWizard(true);
 					gbReportsObject.getReports();
-					$(".bs-example-modal-lg").modal('hide');
-					gbReportsObject.cleanWizard();
 				}else{
 					bootbox.alert(dataResult.message);
 				}
@@ -349,7 +351,7 @@
                 cache: false,
             }).done(function(data) {
 				formula = JSON.parse(GBREPORTS.lastReport.formula);
-				if (data.status == 'OK')
+				if (data.status == 'OK' && typeof(data.tfootList) != 'undefined' && typeof(data.tbodyList) != 'undefined')
 				{
 					if(typeof(data.message) == 'undefined'){
 							GBREPORTS.valores = data.valores;
@@ -492,21 +494,27 @@
 							// $("#dt_report").parent().css('margin-left', '19px');
 							// $("#dt_report").css('margin-left', '19px');
 							gbReportsObject.changeDateRange(formula.frecuency);
-						}else{
-							bootbox.alert(data.message);
 						}
-					}
-					else
+					}else
 					{
+						console.log("hola");
+							var msg = '';
+							if(typeof(data.message) != 'undefined')
+								msg = data.message;
+							else
+								msg = 'Hubo un problema con la formula al generar el reporte';
+							bootbox.alert(msg);
+						console.log("chau");
 						$("#dataTable").empty();
-						bootbox.alert(data.Status + ': ' + data.message);
-						gbReportsObject.changeDateRange(formula.frecuency);
+						// bootbox.alert(data.Status + ': ' + data.message);
+						// gbReportsObject.changeDateRange(formula.frecuency);
 					}
 					$("#loading").hide("slow");
             });
 		},
 		getDateRangePickerOption: function(option){
 			return {
+				opens      : 'left',
 				locale     : typeof(option.locale) == 'undefined' ? this.dateRangePickerLocaleDefault : option.locale,
 				ranges     : typeof(option.ranges) == 'undefined' ? this.dateRangePickerRangesDefault : option.ranges,
 				startDate  : typeof(option.startDate) == 'undefined' ? this.dateRangePickerStartDate : option.startDate,
@@ -522,22 +530,20 @@
 			option.ranges = {};
 			if(frec == 'M')
 			{
-				for (i=8; i>=1; i--)
+				for (i=5; i>=1; i--)
 				{
-					mom = moment().subtract('month', 8).add('month',i);
-					option.ranges[mom.format('YYYY') + " " + mom.format('MMM')] =  [mom.startOf('month'), mom.endOf('month')];
+					option.ranges[moment().subtract('month', 5).add('month',i).format('YYYY MMM')] =  [moment().subtract('month', 5).add('month',i).startOf('month'), moment().subtract('month', 5).add('month',i).endOf('month')];
 				}		
 			}		
 			else if(frec == 'S'){
-				for(i=8; i>=1; i--)
+				for(i=5; i>=1; i--)
 				{
-					mom = moment().endOf('isoweek').subtract('days',56).add('days',7*i);
-					option.ranges[mom.format('MMM') + " " + mom.format('YYYY') + "| Semana " + mom.format('WW')] =[mom.startOf('isoweek'), mom.endOf('isoweek')]; 
+					option.ranges[moment().endOf('isoweek').subtract('days',35).add('days',7*i).format('MMM YYYY [| Semana] WW')] =[moment().endOf('isoweek').subtract('days',35).add('days',7*i).startOf('isoweek'), moment().endOf('isoweek').subtract('days',35).add('days',7*i).endOf('isoweek')]; 
 				}
 			}else{
 				option.ranges = this.dateRangePickerRangesDefault;
 			}
-			this.drp.data('daterangepicker').setOptions(this.getDateRangePickerOption(option));
+			this.drp.data('daterangepicker').setOptions(this.getDateRangePickerOption(option), this.dateRangePickerCallback);
 		},
 		generateReport: function(){
 			var url = URL_BASE + "reports/export/generate"; 
@@ -626,7 +632,8 @@
             };
             $(window).resize();
         },*/
-		cleanWizard: function (){
+		cleanWizard: function (close){
+			close = typeof(close) == 'undefined' ? false : true;
 			$("#containerDataSet").html("");
 			$("#dataHeaders").html("");
 			$("#rows").html("");
@@ -634,6 +641,9 @@
 			$("#values").html("");
 			$("#reportName").val("");
 			$('li:has([data-toggle="tab"]) a').first().tab('show');
+			$('#wizard').data('bootstrapWizard').first();
+			if(close == true)
+				$(".report_new").modal('hide');
 		}
     };
     GBREPORTS = new gbReports();

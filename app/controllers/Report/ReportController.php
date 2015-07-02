@@ -210,8 +210,9 @@ class ReportController extends BaseController
 
             if(!isset($dataReport['message'])){
                 $dataReport  = DataGroup::arrayCastRecursive((array) $dataReport);
-
-                // idkc : Validacion de inputs
+                // Log::error("DataGroup::arrayCastRecursive");
+                // Log::error($dataReport);
+                // // idkc : Validacion de inputs
                 $rules  = array(
                     'reportName' => 'required|string',
                     'formula'    => 'required',
@@ -226,7 +227,7 @@ class ReportController extends BaseController
                     
                     Log::error('['.__FUNCTION__.'] '. $error);
                 }else if(isset($dataReport['dataset'])){
-
+                    Log::error("=================> 1");
                     $data = $dataReport['dataset'];
                     // $data['formula'] = $dataReport['formula'];
                     // $formula         = DataGroup::arrayCastRecursive((array) json_decode($dataReport['formula']));
@@ -237,7 +238,7 @@ class ReportController extends BaseController
                         'rows'   => 'required|array',
                         'values' => 'required|array'
                     );
-
+                    Log::error("=================> 2");
                     $validator = Validator::make($dataReport['formula'], $rules);
                     if ($validator->fails()){
                         $error            = $validator->messages();
@@ -246,7 +247,7 @@ class ReportController extends BaseController
 
                         Log::error('['.__FUNCTION__.'] '. $error);
                     }else{
-        
+        Log::error("=================> 3");
                         $newData = array(
                             'head' => array()
                         );
@@ -260,7 +261,7 @@ class ReportController extends BaseController
                             $columns = array_unique($columns);
                         }
 
-        
+        Log::error("=================> 4");
                         // GENERATE List OF VALUES NAME
                         $values_list = array();
                         foreach ($dataReport['formula']['values'] as $key => $value) 
@@ -268,19 +269,20 @@ class ReportController extends BaseController
                             $values_array = explode(":",$value);
                             array_push($values_list, $values_array[1]);
                         }
-       
+       Log::error("=================> 5");
                         // GENERATE HEADERS WITH ROWS AND COLUMNS
                         $newData['head'][0] = array_merge(array_merge($dataReport['formula']['rows'], $columns), $values_list);
                         sort($columns, SORT_NATURAL | SORT_FLAG_CASE);
-                                           
+                        Log::error("=================> 6");                   
                         $resultAddcolumns = $this->addColumns(array(
                             'data'    => $dataReport['dataset']['body'],
                             'columns' => $columns
                         ));
-                        
+                        Log::error("=================> 7");
                         $dataReport['dataset']['body'] = $resultAddcolumns['status'] == 'OK' ? $resultAddcolumns['data'] : null;
+                        Log::error("=================> 8");
                     }
-                    
+                    Log::error("=================> 9");
                     $resultProcess = DataGroup::process(array(
                         'body'       => $dataReport['dataset']['body'], 
                         'rows'       => $dataReport['formula']['rows'], 
@@ -288,16 +290,19 @@ class ReportController extends BaseController
                         'values'     => $dataReport['formula']['values'], 
                         'keyColumns'    => $dataReport['formula']['columns']
                     ));
+                    Log::error(json_encode($resultProcess));
+                    Log::error("=================> 10");
                     $newData['body'] = $resultProcess['status'] == 'OK' ? $resultProcess['data'] : null;
-                    
+                    Log::error("=================> 11");
                     $total           =  $resultProcess['status'] == 'OK' ? $resultProcess['total'] : null;
                     // unset($newData['body'][count($newData['body']) - 1]);
                     $filter          = DataGroup::sortByFields($dataReport['formula']['rows']);
-
+Log::error("=================> 12");
+Log::error(json_encode($newData));
                     $newData['body'] = DataGroup::array_orderby($newData['body'], $filter);
                     // array_push($newData['body'], $total);
                     $dataReport['analytics']['outputs'] = count($newData['body'])-1;
-                   
+                   Log::error("=================> 13");
                     // idkc : thead - generacion de cabecera de tabla
                     $theadList   = $dataReport['formula']['rows'];
                     count($values_list) > 1 ? $theadList[] = 'Valores' : null;
@@ -305,7 +310,7 @@ class ReportController extends BaseController
                     $theadList[] = 'Total';
                     
                     
-
+Log::error("=================> 14");
                     // idkc : tbody - generacion de datos de tabla
                     Log::error(json_encode($newData['body']));
                     $tbodyList = $this->convertObjectToArray($newData['body'], array(
@@ -313,7 +318,7 @@ class ReportController extends BaseController
                         'rows'    => $dataReport['formula']['rows'],
                         'valores' => $values_list
                     ));
-
+Log::error("=================> 15");
                     // Log::error(json_encode($tbodyList));
                     // idkc : tfoot - generacion de pie de tabla
                     $tfootList = $this->convertObjectToArray(array($total), array(
@@ -323,6 +328,7 @@ class ReportController extends BaseController
                     ));
                     // Log::error(json_encode($theadList));
                     $columnDataTable = $this->convertColumnsToDataTable($theadList);
+                    Log::error("=================> 16");
                     $result = array(
                         'title'     => $this->generateTitleReport($dataReport['reportName'], $configReport['fromDate'], $configReport['toDate']),
                         'theadList' => $theadList,

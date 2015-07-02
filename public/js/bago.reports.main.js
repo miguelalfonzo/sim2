@@ -5,6 +5,7 @@ $(document).ready(function()
 		if($("#idState").length === 1){
 			listTable('solicitudes');
 		}else{
+			$(".btn_extra").hide("slow");
 			GBREPORTS.openReport();
 		}
 	});
@@ -59,5 +60,4 @@ HTMLElement.prototype.click = function() {
    evt.initMouseEvent('click', true, true, this.ownerDocument.defaultView, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
    this.dispatchEvent(evt);
 }
-GBREPORTS.cleanWizard();
 
