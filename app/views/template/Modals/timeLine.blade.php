@@ -7,9 +7,6 @@
 					@if ( $solicitud->id_estado == CANCELADO )
 						<div class="stage col-md-3 col-sm-3 rejected">
 							<div class="stage-header stage-rejected"></div>
-					@elseif ( $solicitud->id_estado == PENDIENTE )
-						<div class="stage col-md-3 col-sm-3">
-							<div class="stage-header"></div>
 					@else
 						<div class="stage col-md-3 col-sm-3 success">
 							<div class="stage-header stage-success"></div>
@@ -17,7 +14,6 @@
 						<div class="stage-content">
 							<h3 class="stage-title">Inicio Solicitud</h3>
 							<div class="stage-info" style="white-space:nowrap">
-								{{$solicitud->createdBy->type}} : 
 								@if( $solicitud->createdBy->type == REP_MED )
 									{{$solicitud->createdBy->rm->full_name}}
 								@elseif( $solicitud->createdBy->type == SUP )
@@ -44,7 +40,7 @@
 							<div class="stage-header stage-success"></div>
 					@endif
 						<div class="stage-content">
-							<h3 class="stage-title">Validación</h3>
+							<h3 class="stage-title">Validación C.</h3>
 							<div class="stage-info" style="white-space:nowrap">
 								@if ( is_null( $solicitud->toDepositHistory ) )
 									Contabilidad

@@ -1,32 +1,37 @@
 @foreach( $solicitud->policies()->orderBy( 'orden' , 'ASC')->get() as $flujo )
-	@if ( is_null( $solicitud->fromUserHistory( $flujo->tipo_usuario ) ) )
-		<div class="stage col-md-3 col-sm-3">
-			<div class="stage-header"></div>
-	@else
-		@if ( $solicitud->fromUserHistory( $flujo->tipo_usuario )->toState->id_estado == R_NO_AUTORIZADO )
+	@if( isset( $solicitud->orderHistories[ $flujo->orden ] ) && $solicitud->id_estado != CANCELADO )
+		@if ( $solicitud->orderHistories[ $flujo->orden ]->toState->id_estado == R_NO_AUTORIZADO )
 			<div class="stage col-md-3 col-sm-3 rejected">
 				<div class="stage-header stage-rejected"></div>
 		@else
 			<div class="stage col-md-3 col-sm-3 success">
 				<div class="stage-header stage-success"></div>
 		@endif
+	@else
+		@if( isset( $solicitud->orderHistories[ $flujo->orden - 1 ] ) && $solicitud->orderHistories[ $flujo->orden - 1 ]->toState->id_estado == R_NO_AUTORIZADO )
+			<div class="stage col-md-3 col-sm-3 pending">
+				<div class="stage-header stage-pending"></div>
+		@else
+			<div class="stage col-md-3 col-sm-3">
+				<div class="stage-header"></div>
+		@endif
 	@endif
 		<div class="stage-content">
 			@if( is_null( $flujo->desde ) && is_null( $flujo->hasta ) )
-				<h3 class="stage-title">Validación</h3>
+				<h3 class="stage-title">Validación {{$flujo->tipo_usuario}}.</h3>
 			@else
-				<h3 class="stage-title" style="white-space:nowrap">Aprob. desde {{{ is_null($flujo->desde) ? 'S/.0' : 'S/.' . $flujo->desde }}} {{{ is_null( $flujo->hasta ) ? '' : ' hasta S/.' . $flujo->hasta }}}</h3>
+				<h3 class="stage-title" style="white-space:nowrap">Aprob. de {{{ is_null($flujo->desde) ? 'S/.0' : 'S/.' . $flujo->desde }}} {{{ is_null( $flujo->hasta ) ? '' : ' a S/.' . $flujo->hasta }}}</h3>
 			@endif
 			<div class="stage-info" style="white-space:nowrap">
-				@if( !is_null( $solicitud->histories[ $flujo->orden ] ) )
-					@if ( $solicitud->histories[ $flujo->orden ]->user_from == REP_MED )
-						{{ $solicitud->histories[ $flujo->orden ]->createdBy->rm->full_name}}
-					@elseif ( $flujo->tipo_usuario == SUP )
-						{{ $solicitud->histories[ $flujo->orden ]->createdBy->sup->full_name}}
-					@elseif ( $flujo->tipo_usuario == GER_PROD )
-						{{ $solicitud->histories[ $flujo->orden ]->createdBy->gerProd->full_name}}
+				@if( isset( $solicitud->orderHistories[ $flujo->orden ] ) )
+					@if ( $solicitud->orderHistories[ $flujo->orden ]->user_from == REP_MED )
+						{{ $solicitud->orderHistories[ $flujo->orden ]->createdBy->rm->full_name}}
+					@elseif ( $solicitud->orderHistories[ $flujo->orden ]->user_from == SUP )
+						{{ $solicitud->orderHistories[ $flujo->orden ]->createdBy->sup->full_name}}
+					@elseif ( $solicitud->orderHistories[ $flujo->orden ]->user_from == GER_PROD )
+						{{ $solicitud->orderHistories[ $flujo->orden ]->createdBy->gerProd->full_name}}
 					@else
-						{{ $solicitud->histories[ $flujo->orden ]->createdBy->person->full_name}}
+						{{ $solicitud->orderHistories[ $flujo->orden ]->createdBy->person->full_name}}
 					@endif
 				@else
 					{{$flujo->userType->descripcion}}

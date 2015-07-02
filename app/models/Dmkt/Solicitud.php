@@ -82,6 +82,11 @@ class Solicitud extends Eloquent
     public function toGenerateHistory()
     {
         return $this->hasOne( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->where( 'status_to' , GENERADO );
+    }
+
+    public function orderHistories()
+    {
+        return $this->hasMany( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->orderBy( 'created_at' , 'ASC' );
     }        
 
     public function acceptHist()
