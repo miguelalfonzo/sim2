@@ -5,7 +5,7 @@
             @if ( !isset( $solicitud ) )
                 <li>
                     <div style="position: relative">
-                        <select id="selectfamily" name="productos[]" class="form-control selectfamily" style="margin-top:5px">
+                        <select id="selectfamily" name="productos[]" class="form-control products" style="margin-top:5px">
                             @foreach( $families as $family )
                                 <option value="{{$family->id}}">{{$family->descripcion}}</option>
                             @endforeach
@@ -19,7 +19,7 @@
                 @foreach ( $solicitud->products as $solProduct )
                     <li>
                         <div style="position: relative">
-                            <select id="selectfamily" name="productos[]" class="form-control selectfamily">
+                            <select id="selectfamily" name="productos[]" class="form-control products">
                                 @foreach( $families as $family )
                                     @if( $solProduct->id_producto == $family->id )
                                         <option value="{{$family->id}}" selected>{{$family->descripcion}}</option>

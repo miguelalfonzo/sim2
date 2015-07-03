@@ -13,6 +13,7 @@ var amount        = $('input[name=monto]');
 var payment       = $('select[name=pago]');
 var delivery_date = $('input[name=fecha]');
 var products      = $('.products');
+//var products      = $('.selectfamily');
 var clients       = $('#clientes');
 
 var invoice_amount  = $('input[name=monto_factura]');
@@ -1863,8 +1864,7 @@ $( '#registrar' ).on( 'click' , function ( e )
         d_clients.push( elem.attr("pk") );
         d_clients_type.push( elem.attr("tipo_cliente") );
     });
-    
-    var products = $('.selectfamily');
+
     products.each( function (index) 
     {
         console.log( $(this).val() );
