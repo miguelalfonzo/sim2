@@ -1,4 +1,4 @@
-<table class="table table-striped table-bordered" id="table_solicitudes" width="100%" cellpadding="0" cellspacing="0" border="0" >
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%" id="table_solicitudes" class="table table-striped table-hover table-bordered" >
     <thead>
         <tr>
             <th></th>
@@ -118,6 +118,3 @@
         @endforeach
     </tbody>
 </table>
-<!-- if( Auth::user()->type == REP_MED) -->
-    <!-- include('template.Modals.timeLine') -->
-<!-- endif -->
