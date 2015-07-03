@@ -10,4 +10,9 @@ class FondosCategorias extends Eloquent
 	protected $primaryKey = 'id';
 	public $incrementing  = false;
 	protected $fillable   = array('id','descripcion');
+
+	public function fondosSubCategorias()
+	{
+		return $this->hasMany('Maintenance\fondosSubCategorias');
+	}
 }
