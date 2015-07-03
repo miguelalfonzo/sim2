@@ -12,4 +12,8 @@ class Marca extends \Eloquent
     {
         return $this->hasOne('Dmkt\Manager','id','gerente_id');
     }
+    public function fondos()
+	{
+		return $this->hasMany('Maintenance\Fondos');
+	}
 }
