@@ -787,7 +787,7 @@ $(function()
                             });
                         }
                         else
-                            if (validateVoucher(ruc,voucher_number) === true)
+                            if ( $("#proof-type option:selected").attr('marca') == 'N' || validateVoucher(ruc,voucher_number) === true )
                             {
                                 ajaxExpense(data).done(function( response )
                                 {
