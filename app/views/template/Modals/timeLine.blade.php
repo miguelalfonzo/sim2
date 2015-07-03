@@ -27,59 +27,26 @@
 						</div>
 					</div>
 					@include('template.Modals.policyTimeLine')
-					@if ( is_null( $solicitud->toDepositHistory ) )
-						@if ( is_null( $solicitud->approvedHistory ) )
-							<div class="stage col-md-3 col-sm-3">
-								<div class="stage-header"></div>	
-						@else
-							<div class="stage col-md-3 col-sm-3 pending">
-								<div class="stage-header stage-pending"></div>
-						@endif
+					@include('template.Modals.toDepositTimeLine')
+					@if ( $solicitud->detalle->id_motivo != REEMBOLSO )
+						@include( 'template.Modals.depSeatTimeLine' )
+					@endif
+				@elseif( $solicitud->idtiposolicitud == SOL_INST )
+					@if ( $solicitud->id_estado == CANCELADO )
+						<div class="stage col-md-3 col-sm-3 rejected">
+							<div class="stage-header stage-rejected"></div>
 					@else
 						<div class="stage col-md-3 col-sm-3 success">
 							<div class="stage-header stage-success"></div>
 					@endif
 						<div class="stage-content">
-							<h3 class="stage-title">Validación C.</h3>
+							<h3 class="stage-title" style="white-space:nowrap">Inicio Fondo Institucional</h3>
 							<div class="stage-info" style="white-space:nowrap">
-								@if ( is_null( $solicitud->toDepositHistory ) )
-									Contabilidad
-								@else
-									{{$solicitud->toDepositHistory->createdBy->person->full_name}}
-								@endif
-							</div>
-						</div>
-					</div>
-				@if ( $solicitud->detalle->id_motivo != REEMBOLSO )
-						@include( 'template.Modals.depSeatTimeLine' )
-					@endif
-				@elseif( $solicitud->idtiposolicitud == SOL_INST )
-					<div class="stage col-md-3 col-sm-3">
-						<div class="stage-header"></div>
-						<div class="stage-content">
-							<h3 class="stage-title">Reg. del F. Institucional</h3>
-							<div class="stage-info">
-								Informacion Registrada por el Asistente de Gerencia
-							</div>
-							<div class="stage-info">
 								{{$solicitud->createdBy->person->full_name}}
-							</div>	
-						</div>
-					</div>
-					<div class="stage col-md-3 col-sm-3">
-						<div class="stage-header"></div>
-						<div class="stage-content">
-							<h3 class="stage-title">Habilitacion del Dep.</h3>
-							<div class="stage-info">
-								Habilitacion del Fondo por Asis. Gerencia
 							</div>
-							@if ( ! is_null( $solicitud->toDepositHistory ) )
-								<div class="stage-info">
-									{{$solicitud->toDepositHistory->createdBy->person->full_name}}
-								</div>
-							@endif
 						</div>
 					</div>
+					@include('template.Modals.toDepositTimeLine')
 					@include( 'template.Modals.depSeatTimeLine' )
 				@endif
 				@include( 'template.Modals.registroGasto')

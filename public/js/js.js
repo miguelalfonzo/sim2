@@ -76,8 +76,7 @@ $(function()
     var description;
     var total_item;
     var row_item_first = $("#table-items tbody tr:eq(0)").clone();
-    var depositado     = $('#amount');
-    var deposit        = parseFloat(depositado.val());
+    var deposit        = parseFloat($('#depositado').val());
     var row_expense_first;
     var data          = {};
     var data_response = {};
@@ -328,7 +327,6 @@ $(function()
             var igv = option.attr("igv");
             var marca = option.attr("marca");
 
-            //console.log(val);
             if( igv == 1 )//|| proof_type_sel === '6')
             {
                 $(".tot-document").show();
@@ -468,9 +466,9 @@ $(function()
             $("#ruc-hide").siblings().parent().removeClass('input-group');
             $(".search-ruc").hide();
             $(".message-expense").text('').hide();
-            row_expense    = $(this).parent().parent();
-            ruc            = $(this).parent().parent().find(".ruc").html();
-            voucher_number = $(this).parent().parent().find(".voucher_number").html();
+            var row_expense    = $(this).parent().parent();
+            var ruc            = $(this).parent().parent().find(".ruc").html();
+            var voucher_number = $(this).parent().parent().find(".voucher_number").html();
             var total_edit = parseFloat($(this).parent().parent().find(".total_expense").html());
             $("#total-expense").val(total_edit.toFixed(2));
             $("#tot-edit-hidden").val(total_edit.toFixed(2));
@@ -504,7 +502,7 @@ $(function()
                     {
                         responseUI('Editar Gasto','green');
                         $("html, body").animate({scrollTop:200},'500','swing');
-                        data = JSON.parse( JSON.stringify( response.Data ) );
+                        var data = JSON.parse( JSON.stringify( response.Data ) );
                         $('input[name=idgasto]').val( data.expense.id)
                         $("#proof-type").val(data.expense.idcomprobante).attr("disabled",true);
                         $("#ruc").val(data.expense.ruc).attr("disabled",true);
@@ -513,7 +511,6 @@ $(function()
                         $("#razon").attr("data-edit",1);
                         $("#number-prefix").val(data.expense.num_prefijo).attr("disabled",true);
                         $("#number-serie").val(data.expense.num_serie).attr("disabled",true);
-                        
                         if ( $("#regimen").length == 1 )
                         {
                             if ( data.expense.idtipotributo === null )
@@ -538,13 +535,12 @@ $(function()
 
                         $('#igv').val( data.expense.igv );
                         
-                        date = data.expense.fecha_movimiento.split('-');
+                        var date = data.expense.fecha_movimiento.split('-');
                         date = date[2].substring(0,2)+'/'+date[1]+'/'+date[0];
                         $("#date").val( date );
                         $("#desc-expense").val(data.expense.descripcion);
                         $.each( data.expenseItems , function( index , value )
                         {
-                            console.log( index + value );
                             var row_add = row_item_first.clone();
                             row_add.find('.quantity input').val(value.cantidad);
                             row_add.find('.description input').val(value.descripcion);
@@ -571,16 +567,15 @@ $(function()
                             $('#dreparo').hide();
                         }
                         var row_expenses = $(".total").parent();
-                        tot_expenses = calculateTot(row_expenses,'.total_expense');
-                        balance = deposit - tot_expenses;
+                        tot_expenses = calculateTot( row_expenses , '.total_expense' );
+                        console.log( deposit );
+                        console.log( tot_expenses );
+                        var balance = deposit - tot_expenses;
                         $("#balance").val(balance.toFixed(2));
                         $(".detail-expense").show();
                     },1000);
                 else
-                {
-                    responseUI('Error' , 'red');
                     bootbox.alert('<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
-                }
             });
         });
         //Validation spending record button
@@ -692,7 +687,8 @@ $(function()
                 data.razon         = razon;
                 data.number_prefix = number_prefix;
                 data.number_serie  = number_serie;
-                data.date_movement = date;
+                //data.date_movement = date;
+                data.fecha_movimiento = date;
                 data.desc_expense  = desc_expense;
 
                 data.tipo_gasto = [];
@@ -834,7 +830,6 @@ $(function()
                                 }
                                 else
                                 {
-                                    console.log( 'Actualizacion de Gasto');
                                     var rows = $( ".total" ).parent();
                                     $.each(rows,function(index)
                                     {
@@ -852,9 +847,11 @@ $(function()
                                                 }
                                             }).fail( function ( statusCode , errorThrown )
                                             {
+                                                $.unblockUI();
                                                 ajaxError( statusCode , errorThrown );
                                             }).done( function ( response ) 
                                             {
+                                                $.unblockUI();
                                                 if( response.Status == 'Ok' )
                                                 {
                                                     responseUI("Gasto Actualizado","green");
@@ -877,10 +874,7 @@ $(function()
                                                     });
                                                 }
                                                 else
-                                                {
-                                                    responseUI( 'Error' , 'red' );
                                                     bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description );
-                                                }
                                             });
                                         }
                                     });
@@ -1054,7 +1048,7 @@ $(function()
         function calcularBalance()
         {
             var balance;
-            var deposit = parseFloat(depositado.val());
+            //var deposit = parseFloat(depositado.val());
             var tot_expenses = calculateTot($(".total").parent(),'.total_expense');
             var btn_save = $("#save-expense").html();
             var tot_expense = parseFloat($("#total-expense").val());
@@ -1150,8 +1144,6 @@ $(function()
                 if( ruc === $(this).find(".ruc").html())
                     voucher_number_detail[index] = $(this).find(".voucher_number").html();
             });
-            console.log( voucher_number_detail);
-            console.log( voucher_number);
             var index = voucher_number_detail.indexOf(voucher_number);
             if(index>=0)
                 return false;
@@ -1280,7 +1272,6 @@ $(function()
                         async: false,
                         error: function()
                         {
-                            console.log("ERROR: No se pudo obtener cuentas.");
                         }
                     }).done( function (result) 
                     {
@@ -1314,7 +1305,6 @@ $(function()
         $(document).on( 'click' , '.modal-document' , function(e)
         {
             var tr = $(this).parent().parent().parent();
-            console.log(tr);
 
             $.ajax(
             {
@@ -1476,7 +1466,6 @@ $(function()
         $('#button-confirm-temporal-user').click( function()
         {
             var user = $( '#user-seeker' );
-            console.log( user );
             if ( user.parent().parent().hasClass( 'has-success' ) === false )
             {
                 $('#modal-temporal-user').modal('hide');
@@ -1491,7 +1480,6 @@ $(function()
                 }
                 else
                 {
-                    console.log('ajax');
                     $.ajax(
                     {
                         type : 'POST' ,
