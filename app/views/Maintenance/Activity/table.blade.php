@@ -36,6 +36,9 @@
         @endforeach
     </tbody>
 </table>
+<div>
+   <input class="btn btn-primary maintenance-add" type="button" case="actividad" value="Agregar">
+</div>
 <script>
     $(document).on('ready', function(){
         dataTable('table_actividad', null, 'registros')

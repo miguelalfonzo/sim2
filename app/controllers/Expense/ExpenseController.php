@@ -336,7 +336,9 @@ class ExpenseController extends BaseController
 		$cmps = array();
 		foreach($solicitud->clients as $client)
         {
-            if ($client->from_table == TB_DOCTOR)
+        	$clientes[] = $client->{$client->clientType->relacion}->full_name;
+        	$cmps[] = $client->{$client->clientType->relacion}->pefnrodoc1;
+            /*if ($client->from_table == TB_DOCTOR)
             {
                 $doctors = $client->doctors;
                 array_push( $clientes, $doctors->pefnombres.' '.$doctors->pefpaterno.' '.$doctors->pefmaterno );
@@ -351,10 +353,11 @@ class ExpenseController extends BaseController
             {
                 array_push ( $clientes, 'No encontrado' );
         		array_push ( $cmps, 'No encontrado' );		
-        	}
+        	}*/
         }
         $clientes = implode(',',$clientes);
         $cmps = implode(',',$cmps);
+        $cmps = trim( $cmps , ',' );
 		if($solicitud->createdBy->type == REP_MED )
 			$created_by = $solicitud->rm->full_name;
 		else if ($solicitud->createdBy->type == SUP )
@@ -368,17 +371,23 @@ class ExpenseController extends BaseController
 		else
 			$dni = '';
 		$expenses = $solicitud->expenses;
-		$aproved_user = User::where( 'id' , $solicitud->acceptHist->updated_by )->firstOrFail();
+		$aproved_user = User::where( 'id' , $solicitud->approvedHistory->updated_by )->firstOrFail();
 		if( $aproved_user->type == GER_PROD )
 		{
-			$name_aproved = $aproved_user->gerprod->descripcion;
+			$name_aproved = $aproved_user->gerprod->full_name;
 			$charge = "Gerente de Producto";
 		}
-		if( $aproved_user->type == SUP )
+		elseif( $aproved_user->type == SUP )
 		{
-			$name_aproved = $aproved_user->sup->nombres;
+			$name_aproved = $aproved_user->sup->full_name;
 			$charge = "Supervisor";
 		}
+		else
+		{
+			$name_aproved = $aproved_user->person->full_name;
+			$charge = $aproved_user->userType->descripcion;
+		}
+
 		if ( $solicitud->detalle->idmoneda == DOLARES )
 		{
 			foreach( $expenses as $expense )
@@ -417,15 +426,13 @@ class ExpenseController extends BaseController
         $detalle = $fondo->detalle;
         $jDetalle = json_decode( $detalle->detalle );
         $expense = $fondo->expenses;
-        $data = array(
-            'fondo'    => $fondo,
-            'detalle'  => $jDetalle,
-            'date'     => $this->getDay(),
-            'expense'  => $expense,
-        );
+        $data = array(  'fondo'    => $fondo,
+			            'detalle'  => $jDetalle,
+			            'date'     => $this->getDay(),
+			            'expense'  => $expense );
         $data['balance'] = $this->reportBalance( $fondo , $detalle , $jDetalle , $expense->sum('monto') );
         $html = View::make('Expense.report-fondo',$data)->render();
-        return PDF::load($html, 'A4', 'landscape')->show();
+        return PDF::load($html, 'A4', 'portrait')->show();
     }
 
     private function reportBalance( $solicitud , $detalle , $jDetalle , $mGasto )

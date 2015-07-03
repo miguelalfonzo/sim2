@@ -1125,7 +1125,7 @@ class SolicitudeController extends BaseController
             $user = Auth::user();
             $solicitud->save();
 
-            $detalle = $solicitud->detalle;
+            /*$detalle = $solicitud->detalle;
             $fondo = $detalle->fondo;
             if ( $fondo->id_moneda = $detalle->id_moneda )
                 $fondo->saldo -= $detalle->monto_actual;
@@ -1143,7 +1143,7 @@ class SolicitudeController extends BaseController
                 return $this->warningException( 'El fondo '. $fondo->nombre . 'solo cuenta con ' . $fondo->saldo . ' el cual es insuficiente para registrar la operacion' , __FUNCTION__ , __LINE__ , __FILE__ );
             $fondo->save();
 
-            $fondoHistory = new FondoHistory;
+            $fondoHistory = new FondoHistory;*/
             
             $middleRpta = $this->setStatus( $oldIdEstado, GENERADO , $user->id , $user->id , $solicitud->id );
             if ( $middleRpta[status] == ok )
@@ -1152,11 +1152,8 @@ class SolicitudeController extends BaseController
                 Session::put('state' , R_FINALIZADO );
                 return $middleRpta;
             }
-            else
-            {
-                DB::rollback();
-                return $middleRpta;
-            }
+            DB::rollback();
+            return $middleRpta;
         }   
         catch (Exception $e)
         {
@@ -1275,10 +1272,12 @@ class SolicitudeController extends BaseController
         }
     }
 
-    public function findDocument(){
-        $data['proofTypes'] = ProofType::order();
+    public function findDocument()
+    {
+        $data = array( 'proofTypes' => ProofType::order() , 'regimenes' => Regimen::all() );
         return View::make('Dmkt.Cont.documents_menu')->with($data);
     }
+
     public function showSolicitudeInstitution(){
         if ( in_array( Auth::user()->type , array(ASIS_GER ) ) )
             $state = R_PENDIENTE;

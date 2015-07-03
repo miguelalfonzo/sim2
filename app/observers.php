@@ -24,6 +24,7 @@ use \Users\TemporalUser;
 use \Dmkt\InvestmentType;
 use \Dmkt\Activity;
 use \Dmkt\InvestmentActivity;
+use \System\FondoHistory;
 	
 	Solicitud::observe(			new Transaction());
 	SolicitudDetalle::observe(	new Transaction());
@@ -42,8 +43,8 @@ use \Dmkt\InvestmentActivity;
 	Mark::observe( 				new Transaction());
 	MarkProofAccounts::observe( new Transaction());
 	FileStorage::observe(		new Transaction());
-	//TemporalUser::observe(      new Transaction());
 	TemporalUser::observe(      new SoftDelete());
 	InvestmentType::observe(    new Transaction());
 	Activity::observe(          new SoftDelete());
-	InvestmentActivity::observe(new Transaction());	
+	InvestmentActivity::observe(new Transaction());
+	FondoHistory::observe(      new Transaction());

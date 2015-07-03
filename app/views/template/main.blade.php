@@ -259,11 +259,11 @@
     });
 </script>
 
-{{ HTML::script('js/bootstrap.min.js') }}
 {{ HTML::script('js/jquery.blockUI.js') }}
 {{ HTML::script('js/jquery.numeric.js') }}
 {{ HTML::script('js/jquery-ui.min.js') }}
 {{ HTML::script('js/jquery.form.js') }}
+{{ HTML::script('js/bootstrap.min.js') }}
 {{ HTML::script('js/bootstrap-datepicker.js') }}
 {{ HTML::script('js/locales/bootstrap-datepicker.es.js') }}
 {{ HTML::script('js/bootbox.min.js') }}

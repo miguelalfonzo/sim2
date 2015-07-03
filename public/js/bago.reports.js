@@ -203,6 +203,7 @@
         },
         setMenuBarReports: function(reportsList) {
             this.reportsArray = reportsList;
+            console.log( this );
             if (this.reportsArray.length > 0) {
 				$("#menubar_reports").html('');
                 for (var z = 0; z < this.reportsArray.length; z++) {
@@ -575,6 +576,7 @@
 		},
 		getReportObject: function(id){
 			var result = null;
+			console.log( this );
 			if (this.reportsArray.length > 0) {
 				for (var z = 0; z < this.reportsArray.length; z++)
 				{

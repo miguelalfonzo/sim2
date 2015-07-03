@@ -34,6 +34,9 @@
         @endforeach
     </tbody>
 </table>
+<div>
+   <input class="btn btn-primary maintenance-add" type="button" case="inversion" value="Agregar">
+</div>
 <script>
     $(document).on('ready', function(){
         dataTable('table_inversion', null, 'registros')

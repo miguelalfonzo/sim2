@@ -15,11 +15,11 @@ use \Redirect;
 use \DB;
 use \Exception;
 use \Common\StateRange;
-use \Log;
 use \Dmkt\Account;
 use \Expense\ChangeRate;
 use \Expense\PlanCta;
 use \Validator;
+use \System\FondoHistory;
 
 class DepositController extends BaseController{
 
@@ -36,7 +36,6 @@ class DepositController extends BaseController{
     {
         $fondo = $detalle->fondo;
         $monto = $detalle->monto_actual;
-        Log::error( $monto );   
         $msg = 'El Saldo del Fondo: '.$fondo->nombre.' '.$fondo->typeMoney->simbolo.' '.$fondo->saldo.' es insuficiente para completar la operación';
         if ( $detalle->id_moneda == $fondo->id_moneda )
             if ( $monto > $fondo->saldo )
@@ -137,18 +136,21 @@ class DepositController extends BaseController{
                         $newDeposit->num_cuenta         = $inputs['num_cuenta'];
                         $newDeposit->total              = round( $middleRpta[data]['monto'] , 2 , PHP_ROUND_HALF_DOWN );
                         $newDeposit->save();
-                        Log::error( json_encode( $newDeposit ) );
                         $detalle->id_deposito = $newDeposit->id;
                         $detalle->detalle = json_encode( $middleRpta[data]['jDetalle'] );
                         $detalle->save();
-                        
                         $solicitud->id_estado = DEPOSITADO;
                         $solicitud->save();
-                        $middleRpta = $this->setStatus( $oldIdestado, DEPOSITADO , Auth::user()->id , USER_CONTABILIDAD , $solicitud->id );
+
+                        $middleRpta = $this->fondoDecrease( $detalle->fondo , $detalle );
                         if ( $middleRpta[status] == ok )
                         {
-                            DB::commit();
-                            return $middleRpta;
+                            $middleRpta = $this->setStatus( $oldIdestado, DEPOSITADO , Auth::user()->id , USER_CONTABILIDAD , $solicitud->id );
+                            if ( $middleRpta[status] == ok )
+                            {
+                                DB::commit();
+                                return $middleRpta;
+                            }
                         }      
                     }
                 }
@@ -161,6 +163,35 @@ class DepositController extends BaseController{
             DB::rollback();
             return $this->internalException( $e , __FUNCTION__ );
         }
+    }
+
+    private function fondoDecrease( $fondo , $detalle )
+    {
+        $saldo_inicial = $fondo->saldo;
+        if ( $fondo->id_moneda = $detalle->id_moneda )
+            $fondo->saldo -= $detalle->monto_actual;
+        else
+        {
+            $tc = ChangeRate::getTc();
+            if ( $detalle->id_moneda == SOLES )
+                $fondo->saldo -= ( $detalle->monto_actual / $tc->venta );
+            elseif ( $detalle->id_moneda == DOLARES )
+                $fondo->saldo -= ( $detalle->monto_actual * $tc->compra );
+            else
+                return $this->warningException( 'No existe el registro de la Moneda #: ' . $detalle->id_moneda , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
+        if ( $fondo->saldo <= 0 )
+            return $this->warningException( 'El fondo '. $fondo->nombre . 'solo cuenta con ' . $fondo->saldo . ' el cual es insuficiente para registrar la operacion' , __FUNCTION__ , __LINE__ , __FILE__ );
+        $fondo->save();
+        $fondoHistory = new FondoHistory;
+        $fondoHistory->id = $fondoHistory->nextId();
+        $fondoHistory->saldo_inicial = $saldo_inicial;
+        $fondoHistory->saldo_final = $fondo->saldo;
+        $fondoHistory->id_solicitud = $detalle->id;
+        $fondoHistory->id_fondo = $fondo->id;
+        $fondoHistory->save();
+        \Log::error( json_encode( $fondoHistory ) );
+        return $this->setRpta();
     }
     
 }

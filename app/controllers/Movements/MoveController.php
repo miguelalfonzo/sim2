@@ -229,8 +229,12 @@ class MoveController extends BaseController
         {
             $inputs = Input::all();
             $solicitud = Solicitud::find( $inputs[ 'id_solicitud'] );
-            $data = array( 'colspan' => $inputs[ 'colspan'] , 'solicitud' => $solicitud );
-            return $this->setRpta( array( 'View' => View::make( 'test.detail_solicitud')->with( $data )->render() ) );
+            $data = array( 'colspan' => $inputs[ 'colspan'] , 'solicitud' => $solicitud , 'politicStatus' => false , 'detalle' => $solicitud->detalle );
+            if ( $solicitud->idtiposolicitud == SOL_REP )
+                return $this->setRpta( array( 'View' => View::make( 'Dmkt.Solicitud.Representante.detail' )->with( $data )->render() ) );
+            else
+                return $this->setRpta( array( 'View' => View::make( 'Dmkt.Solicitud.Institucional.detail' )->with( $data )->render() ) );
+            //return $this->setRpta( array( 'View' => View::make( 'test.detail_solicitud')->with( $data )->render() ) );
         }
         catch( Exception $e )
         {

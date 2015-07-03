@@ -1,9 +1,9 @@
 @if( ! is_null( $solicitud->approvedHistory ) )    
-    <div class="form-group col-sm-6 col-md-4 col-lg-4">
-        <label class="col-sm-8 col-md-8 control-label">
+    <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+        <label class="control-label">
             Aprobado Por
         </label>
-        <div class="col-sm-12 col-md-12 col-lg-12">
+        <div>
             <div class="input-group">
                 <span class="input-group-addon">
                     {{ $solicitud->approvedHistory->user->type }}

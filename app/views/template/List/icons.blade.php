@@ -1,22 +1,29 @@
 <td style="text-align: center">
     <!-- <div class="div-icons-solicituds"> -->
-    <div class="btn-group btn-group-icon-lg" role="group" >
-        <a class="btn btn-default" href="{{URL::to('ver-solicitud/'.$solicitud->token)}}">
-            <span  class="glyphicon glyphicon-eye-open"></span>
-        </a>    
+    <div class="btn-group btn-group-icon-lg" role="group" >  
         <a class="btn btn-default timeLine" data-id="{{$solicitud->id}}">
             <span  class="glyphicon glyphicon-flag"></span>
-        </a>        
-        @if ( $solicitud->idtiposolicitud == SOL_REP )
-            @if( Auth::user()->type == REP_MED)
-                <!-- <a class="btn btn-default timeLine">
-                    <span  class="glyphicon glyphicon-flag"></span>
-                </a> -->        
-                @if($solicitud->id_estado == REGISTRADO && Auth::user()->id == $solicitud->iduserasigned )
-                    <a class="btn btn-default" target="_blank" href="{{URL::to('a'.'/'.$solicitud->token)}}">
-                        <span  class="glyphicon glyphicon-print"></span>
+        </a>
+        @if ( in_array( $solicitud->histories()->orderBy( 'updated_at' , 'DESC')->first()->user_to , array( Auth::user()->type , Auth::user()->tempType() ) ) )
+            @if( $solicitud->idtiposolicitud == SOL_REP &&  in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) ) )
+                @if( array_intersect( $solicitud->gerente()->lists( 'id_gerprod' ) , array( Auth::user()->id , Auth::user()->tempId() ) ) )
+                    <a class="btn btn-default" href="{{URL::to('ver-solicitud/'.$solicitud->token)}}">
+                        <span  class="glyphicon glyphicon glyphicon-check"></span>
                     </a>
                 @endif
+            @else
+                <a class="btn btn-default" href="{{URL::to('ver-solicitud/'.$solicitud->token)}}">
+                    <span  class="glyphicon glyphicon glyphicon-check"></span>
+                </a>
+            @endif    
+        @endif
+        @if ( $solicitud->idtiposolicitud == SOL_REP )
+             @if($solicitud->id_estado == REGISTRADO && Auth::user()->id == $solicitud->id_user_assign )
+                <a class="btn btn-default" target="_blank" href="{{URL::to('a'.'/'.$solicitud->token)}}">
+                    <span  class="glyphicon glyphicon-print"></span>
+                </a>
+            @endif
+            @if( Auth::user()->type == REP_MED)
                 @if( $solicitud->id_estado == PENDIENTE && $solicitud->created_by == Auth::user()->id )
                     @if( $solicitud->status == 1 )
                         <a class="btn btn-default" href="{{URL::to('editar-solicitud').'/'.$solicitud->token}}">
@@ -65,16 +72,12 @@
                 @endif
             @endif
         @elseif ( $solicitud->idtiposolicitud == SOL_INST )
-            @if ( Auth::user()->type == REP_MED )
-                <!-- <a class="btn btn-default timeLine">
-                    <span  class="glyphicon glyphicon-flag"></span>
-                </a> -->
-                @if($solicitud->id_estado == REGISTRADO && Auth::user()->id == $solicitud->iduserasigned )   
-                    <a class="btn btn-default" href="{{URL::to('report-fondo')}}/{{$solicitud->token}}">
-                        <span class="glyphicon glyphicon-print" ></span>
-                    </a>
-                @endif
-            @elseif ( Auth::user()->type == CONT )
+            @if($solicitud->id_estado == REGISTRADO && Auth::user()->id == $solicitud->iduserasigned )   
+                <a class="btn btn-default" href="{{URL::to('report-fondo')}}/{{$solicitud->token}}">
+                    <span class="glyphicon glyphicon-print" ></span>
+                </a>
+            @endif
+            @if ( Auth::user()->type == CONT )
                 @if( $solicitud->id_estado == REGISTRADO )
                     <a class="btn btn-default" href="{{URL::to('generar-asiento-gasto/'.$solicitud->token)}}">
                         <span  class="glyphicon glyphicon-book"></span>

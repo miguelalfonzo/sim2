@@ -14,11 +14,11 @@
         <main>
             <section style="text-align:center;margin-top:2.5em;">
                 <strong><p style="display:inline">Fecha:</strong>&nbsp;{{$date['toDay']}}</p>
-                @if ( $solicitud->acceptHist->updatedBy->type == SUP )
-                    <strong><p style="display:inline">Autorizado por:</strong>&nbsp;{{$solicitud->acceptHist->updatedBy->sup->full_name}}</p>
+                @if ( $solicitud->approvedHistory->updatedBy->type == SUP )
+                    <strong><p style="display:inline">Autorizado por:</strong>&nbsp;{{$solicitud->approvedHistory->updatedBy->sup->full_name}}</p>
                     <strong><p style="display:inline">Cargo:</strong>&nbsp;Supervisor</p>
-                @elseif ( $solicitud->acceptHist->updatedBy->type == GER_PROD )
-                    <strong><p style="display:inline">Autorizado por:</strong>&nbsp;{{$solicitud->acceptHist->updatedBy->gerProd->full_name}}</p>
+                @elseif ( $solicitud->approvedHistory->updatedBy->type == GER_PROD )
+                    <strong><p style="display:inline">Autorizado por:</strong>&nbsp;{{$solicitud->approvedHistory->updatedBy->gerProd->full_name}}</p>
                     <strong><p style="display:inline">Cargo:</strong>&nbsp;G. Producto</p>
                 @endif    
                 <strong><p style="display:inline">Fondo:</strong>&nbsp;{{mb_convert_case($solicitud->detalle->fondo->nombre,MB_CASE_TITLE,'UTF-8')}}</p>

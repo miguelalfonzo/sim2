@@ -313,8 +313,7 @@ class FondoController extends BaseController
         $jDetalle = array( 'supervisor'      => $inputs[ 'supervisor' ] ,
                            'codsup'          => $inputs[ 'codsup' ] ,
                            'num_cuenta'      => $inputs[ 'cuenta' ] ,
-                           'monto_aprobado'  => $inputs[ 'total' ] ,
-                           'monto_solicitado'=> $inputs[ 'total' ] );
+                           'monto_solicitado'=> $inputs[ 'total' ]       );
         $detalle->id_fondo   = $inputs[ 'idfondo' ] ;
         $detalle->id_periodo = $idPeriodo;
         $detalle->id_moneda  = SOLES;
@@ -354,7 +353,6 @@ class FondoController extends BaseController
                             $detalle               = new SolicitudDetalle;
                             $detalle->id           = $detalle->lastId() + 1;
                             $solicitud->id_detalle = $detalle->id;
-                        
                         }
                         $inputs['supervisor']       = $middleRpta[ data ]['sup'];
                         $solicitud->titulo          = $inputs['institucion'];

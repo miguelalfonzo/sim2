@@ -1,69 +1,71 @@
-<!-- Titulo -->
-@include('Dmkt.Solicitud.Detail.titulo')
+<section class="row" style="padding:0.3em 1em">
+	<div class="page-header">
+        <h2>{{$solicitud->titulo}} <span class="label label-default">{{$solicitud->activity->nombre}}</span></h2>
+    </div>
 
-<!-- Monto -->
-@include('Dmkt.Solicitud.Detail.monto')
+	<!-- Monto -->
+	@include('Dmkt.Solicitud.Detail.monto')
 
-<!-- Periodo -->
-<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
-	<label class="col-xs-12 col-sm-12 col-md-12 col-lg-12">Periodo</label>
-	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-		<div class="input-group">
-			<span class="input-group-addon">
-	            <i class="glyphicon glyphicon-calendar"></i>
-	        </span>
-			<input id="periodo" class="form-control date_month" type="text" value="{{$detalle->periodo->periodo}}" disabled>
-		</div>
-	</div>
-</div>
-
-<!-- Solicitante -->
-@include('Dmkt.Solicitud.Detail.solicitante')
-
-<!-- Asignado A -->
-@include('Dmkt.Solicitud.Detail.asignado')
-
-<!-- Supervisor -->
-<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
-	<label class="col-xs-12 col-sm-12 col-md-12 col-lg-12" for="sup">Supervisor</label>
-	 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-        <input type="text" class="form-control" value="{{$detalle->supervisor}}" disabled>
-	</div>
-</div>
-
-@include('Dmkt.Solicitud.Detail.fondo')
-
-@if ($solicitud->estado == DEPOSITADO)
+	<!-- Periodo -->
 	<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
-		<label class="col-xs-12 col-sm-12 col-md-12 col-lg-12">Número de Operación, Transacción, Cheque</label>
-		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-			<input type="text" class="form-control" value="{{ $detalle->num_cuenta }}" disabled>	
+		<label class="control-label">Periodo</label>
+		<div>
+			<div class="input-group">
+				<span class="input-group-addon">
+		            <i class="glyphicon glyphicon-calendar"></i>
+		        </span>
+				<input id="periodo" class="form-control date_month" type="text" value="{{$detalle->periodo->periodo}}" disabled>
+			</div>
 		</div>
 	</div>
-@endif
 
-<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
-	<label class="col-xs-12 col-sm-12 col-md-12 col-lg-12">Nº de Cuenta del Representante</label>
-	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-		<input type="text" class="form-control" value="{{$detalle->num_cuenta}}" disabled>
-	</div>
-</div>
+	<!-- Solicitante -->
+	@include('Dmkt.Solicitud.Detail.solicitante')
 
-<!-- DEPOSITADO -->
-@include('Dmkt.Solicitud.Detail.depositado')
+	<!-- Asignado A -->
+	@include('Dmkt.Solicitud.Detail.asignado')
 
-<!-- Tasa del Día del Deposito -->
-@include('Dmkt.Solicitud.Detail.tasa')
-
-@if ( ! is_null( $solicitud->observacion) )
+	<!-- Supervisor -->
 	<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
-		<label class="col-xs-12 col-sm-12 col-md-12 col-lg-12">Observación</label>
-		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-			<textarea class="form-control" disabled>{{$solicitud->observacion}}</textarea>
+		<label class="control-label" for="sup">Supervisor</label>
+		 <div>
+	        <input type="text" class="form-control" value="{{$detalle->supervisor}}" disabled>
 		</div>
 	</div>
-@endif
 
-<!-- Modal Deposito -->
-@include('template.Modals.deposit-min')
+	@include('Dmkt.Solicitud.Detail.fondo')
 
+	@if ($solicitud->estado == DEPOSITADO)
+		<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+			<label class="control-label">Número de Operación, Transacción, Cheque</label>
+			<div>
+				<input type="text" class="form-control" value="{{ $detalle->num_cuenta }}" disabled>	
+			</div>
+		</div>
+	@endif
+
+	<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+		<label class="control-label">Nº de Cuenta del Representante</label>
+		<div>
+			<input type="text" class="form-control" value="{{$detalle->num_cuenta}}" disabled>
+		</div>
+	</div>
+
+	<!-- DEPOSITADO -->
+	@include('Dmkt.Solicitud.Detail.depositado')
+
+	<!-- Tasa del Día del Deposito -->
+	@include('Dmkt.Solicitud.Detail.tasa')
+
+	@if ( ! is_null( $solicitud->observacion) )
+		<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+			<label class="control-label">Observación</label>
+			<div>
+				<textarea class="form-control" disabled>{{$solicitud->observacion}}</textarea>
+			</div>
+		</div>
+	@endif
+
+	<!-- Modal Deposito -->
+	@include('template.Modals.deposit-min')
+</section>

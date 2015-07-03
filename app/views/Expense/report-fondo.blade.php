@@ -8,8 +8,8 @@
 <body style="background: url('img/logo-marcadeagua.png') center fixed no-repeat; filter: blur(20px);">
     <div class="background">
         <header style="margin-top:-2em;">
-            <img src="img/logo-report.png" alt="" style="width:170px;margin-left:-5em;">
-            <p><strong>REPORTE DE GASTOS DE FONDOS INSTITUCIONALES</strong></p>
+            <img src="img/logo-report.png" style="width:170px;margin-left:-5em;">
+            <h1><p><strong>REPORTE DE GASTOS DE FONDOS INSTITUCIONALES</strong></p></h1>
         </header>
         <main>
             <section style="text-align:center;margin-top:2.5em;">
@@ -17,18 +17,17 @@
                 <strong><p style="display:inline">Ciudad:</strong>&nbsp;Lima</p>
                 <strong><p style="display:inline">Institucion:</strong>&nbsp;{{$fondo->titulo}}</p>
                 <strong><p style="display:inline">Código Comercial:</strong>&nbsp;{{$fondo->id}}</p>
-                <strong><p style="display:inline">N° de Depósito:</strong>&nbsp;{{$fondo->detalle->deposit->num_transferencia}}</p>
             </section>
             <section style="text-align:center;margin-top:2em;">
                 <strong><p style="display:inline">Colaborador Bagó:</strong>&nbsp;{{$fondo->asignedTo->rm->full_name}}</p>
                 <strong><p style="display:inline">Cargo:</strong>&nbsp;Representante Med.</p>
-                <strong><p style="display:inline">Fecha de Depósito:</strong>&nbsp;{{date_format(date_create($fondo->detalle->deposit->created_at), 'd/m/Y' )}}</p>
             </section>
             <section style="text-align:center;margin-top:2em;">
                 <strong><p style="display:inline">Fecha de Deposito:</strong>&nbsp;{{$fondo->detalle->deposit->updated_at}}</p>
-                @if ( isset($detalle->tcc) && isset($detalle->tcv) )
+                <strong><p style="display:inline">N° de Depósito:</strong>&nbsp;{{$fondo->detalle->deposit->num_transferencia}}</p>    
+                <!-- if ( isset($detalle->tcc) && isset($detalle->tcv) )
                     <strong><p style="display:inline">T. Cambio:</strong>&nbsp;C: {{$detalle->tcc}} V: {{$detalle->tcv}}</p>
-                @endif
+                endif -->
             </section>    
             <section style="margin-top:2em;">
                 <table class="table">

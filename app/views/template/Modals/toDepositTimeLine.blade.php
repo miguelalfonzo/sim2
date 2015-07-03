@@ -11,14 +11,14 @@
 		<div class="stage-header stage-success"></div>
 @endif
 	<div class="stage-content">
-		@if ( $solicitud->id_tipo_solicitud == SOL_REP )
+		@if ( $solicitud->idtiposolicitud == SOL_REP )
 			<h3 class="stage-title">Validación Cont.</h3>
 		@else
 			<h3 class="stage-title" style="white-space:nowrap">Habilitación Fondo Inst.</h3>
 		@endif		
 		<div class="stage-info" style="white-space:nowrap">
 			@if ( is_null( $solicitud->toDepositHistory ) )
-				@if ( $solicitud->id_tipo_solicitud == SOL_REP )
+				@if ( $solicitud->idtiposolicitud == SOL_REP )
 					Contabilidad
 				@else
 					Asistente Gerencia

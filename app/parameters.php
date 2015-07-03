@@ -150,3 +150,5 @@ const REPORT_DATA_NOT_FOUND                     = 'Lo sentimos, no se encontro i
 const ALERTA_TIEMPO_ESPERA_POR_DOCUMENTO = 1;
 const ALERTA_TIEMPO_REGISTRO_GASTO 		 = 2;
 const ALERTA_INSTITUCION_CLIENTE		 = 3;
+
+const FONDO_SUBCATEGORIA_GERPROD = NULL;

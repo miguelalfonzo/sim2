@@ -33,7 +33,7 @@ var cancel_solicitude = '.cancel-solicitude';
 
 var id_solicitud = $( 'input[name=idsolicitud]' );
 // var _token       = $( 'input[name=_token]' );
-
+var families = $('#listfamily');
 
 var idState = $("#idState");
 
@@ -42,6 +42,7 @@ var amount_error_families = $('#amount_error_families');
 
 //TIPO DE USUARIO
 var userType = $('#typeUser').val();//tipo de usuario se encuentra en main
+var amount_families = $('.amount_families');
 
 //SUB-ESTADOS
 var PENDIENTE     = 1;
@@ -240,21 +241,22 @@ payment.on('change', function()
 });
 
 title.on('focus', function () {
-    $(this).parent().removeClass('has-error');
+    $(this).parent().parent().removeClass('has-error');
 });
 amount.on('focus', function () {
-    $(this).parent().removeClass('has-error');
+    $(this).parent().parent().removeClass('has-error');
 });
 delivery_date.on('focus', function () {
-    $(this).parent().removeClass('has-error');
-});
-search_cliente.on('focus', function () {
     $(this).parent().parent().removeClass('has-error');
+});
+search_cliente.on('focus', function () 
+{
+    $(this).parent().parent().parent().removeClass('has-error');
     clients.parent().parent().removeClass('has-error');
 });
-invoice_amount.on('focus', function () {
+/*invoice_amount.on('focus', function () {
     $(this).parent().removeClass('has-error')
-});
+});*/
 products.on('click', function () {
     $(this).css('border-color', 'none')
 });
@@ -264,10 +266,10 @@ date_start.on('focus', function () {
 date_end.on('focus', function () {
     $(this).parent().removeClass('has-error');
 });
-invoice_img.on('focus', function () {
+/*invoice_img.on('focus', function () {
     $(this).parent().parent().parent().parent().parent().removeClass('has-error');
     $(this).parent().parent().parent().children('input').removeClass('input-placeholder-error');
-});
+});*/
 ruc.on('focus', function () {
     $(this).parent().parent().removeClass('has-error');
 });
@@ -522,7 +524,6 @@ $(document).on('click' , '.delete-fondo' , function (e)
 
 /**------------------------------------------------ SUPERVISOR ---------------------------------------------------*/
 
-var amount_families = $('.amount_families');
 amount_families.numeric({negative: false});
 
 idamount.keyup( function ()
@@ -537,57 +538,60 @@ amount_families.keyup( function ()
 
 function verifySum( element , type )
 {
+    amount_error_families.text('');
+    console.log("verify");
     var sum_total = 0;
     var precision = 11;
     amount_families.each(function(i,v)
     {
+        console.log( $(this).val() );
         sum_total += parseFloat( $(this).val() );
     });
     
     if( $("#amount").val().trim() === "" )
     {
         amount_error_families.text('Ingresar el monto (Vacío)').css('color', 'red');
-        idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
+        idamount.parent().parent().removeClass("has-success").addClass("has-error");
     }     
     else if ( parseFloat( $("#amount").val() ) === 0 )
     {
         amount_error_families.text('El monto especificado no debe ser igual a 0').css('color', 'red');
-        idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
+        idamount.parent().parent().removeClass("has-success").addClass("has-error");
     }
     else if ( parseFloat( $("#amount").val() ) < 0 )
     {
         amount_error_families.text('El monto especificado no debe ser menor a 0').css('color', 'red');
-        idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
+        idamount.parent().parent().removeClass("has-success").addClass("has-error");
     }
     else if ( type == 1 && $( element ).val().trim() === "" ) 
     {
         amount_error_families.text('Ingresar el monto de la familia').css('color', 'red');
-        idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
+        idamount.parent().parent().removeClass("has-success").addClass("has-error");
     }
     else if ( type == 1 && parseFloat( $( element ).val() ) < 0 ) 
     {
         amount_error_families.text('El monto de la familia no debe ser menora 0').css('color', 'red');
-        idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
+        idamount.parent().parent().removeClass("has-success").addClass("has-error");
     }
     else if ( type == 1 && ( parseFloat( $( element ).val() ) > parseFloat( idamount.val() ) ) )
     {
         amount_error_families.text('El monto de la familia supera al monto especificado').css('color', 'red');
-        idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
+        idamount.parent().parent().removeClass("has-success").addClass("has-error");
     }
     else if ( parseFloat( sum_total ) > parseFloat( idamount.val() ) )
     {
         amount_error_families.text('El monto total de las familias supera al monto especificado').css('color', 'red');
-        idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
+        idamount.parent().parent().removeClass("has-success").addClass("has-error");
     }
     else if ( parseFloat( sum_total ) < parseFloat( idamount.val() ) )
     {
         amount_error_families.text('El monto total de las familias es menor al monto especificado').css('color', 'red');
-        idamount.parent().parent().parent().removeClass("has-success").addClass("has-error");
+        idamount.parent().parent().removeClass("has-success").addClass("has-error");
     }
     else if ( parseFloat( sum_total ) == parseFloat( idamount.val() ) )
     {
         amount_error_families.text('Los montos asignados son iguales al monto especificado').css('color', 'green');    
-        idamount.parent().parent().parent().removeClass("has-error").addClass("has-success");
+        idamount.parent().parent().removeClass("has-error").addClass("has-success");
     }
 }
 
@@ -841,6 +845,13 @@ $("#search_responsable").on('click', function(e)
     var div_monto = $("label[for=amount]").parent();
     if ( div_monto.hasClass("has-error") )
         idamount.focus();
+    if ( $("#sub_type_activity").val() == 0 )
+    {
+        var fondo = $("#sub_type_activity");
+        var div = fondo.parent().parent();
+        div.addClass('has-error'); 
+        fondo.focus();
+    }
     else if( div_monto.hasClass("has-success"))
     {
         $.ajax(
@@ -1203,6 +1214,7 @@ $(document).on( 'click' , '.maintenance-add' , function()
             console.log( table );
             var scroll = $( table ).parent();
             scroll.scrollTop( scroll[0].scrollHeight );
+            button.hide();
         }
         else
             bootbox.alert('<h4 class="red">' + Data.Status + ': ' + Data.Description + '</h4>');            
@@ -1232,8 +1244,8 @@ $(document).off( 'click' , '.maintenance-cancel');
 $(document).on( 'click' , '.maintenance-cancel' , function()
 {
     window.location.reload(true);
-    // var tr = $(this).parent().parent();
-    // listMaintenanceTable( tr.attr('type')  );
+    /*var tr = $(this).parent().parent();
+    listMaintenanceTable( tr.attr('type')  );*/
 });
 
 $(document).off('click' , '.maintenance-edit');
@@ -1798,29 +1810,26 @@ function validateNewSol()
     var aux = 0;
     if ( !title.val() ) 
     {
-        title.parent().addClass('has-error');
+        title.parent().parent().addClass('has-error');
         title.attr('placeholder', 'Ingrese nombre de la solicitud');
-        title.addClass('input-placeholder-error');
         aux = 1;
     }
     if (!amount.val()) 
     {
-        amount.parent().addClass('has-error');
+        amount.parent().parent().addClass('has-error');
         amount.attr('placeholder', 'Ingrese monto');
-        amount.addClass('input-placeholder-error');
         aux = 1;
     }
     if (!delivery_date.val()) 
     {
-        delivery_date.parent().addClass('has-error');
+        delivery_date.parent().parent().addClass('has-error');
         delivery_date.attr('placeholder', 'Ingrese Fecha');
-        delivery_date.addClass('input-placeholder-error');
         aux = 1;
     }
     if ( clients.children().length == 0 )
     {
-        search_cliente.attr( 'placeholder' , 'Ingrese el Cliente' ).addClass('input-placeholder-error');
-        search_cliente.parent().parent().addClass('has-error');
+        search_cliente.attr( 'placeholder' , 'Ingrese el Cliente' );
+        search_cliente.parent().parent().parent().addClass('has-error');
         clients.parent().parent().addClass('has-error');
         aux = 1;
     }
@@ -1845,7 +1854,6 @@ $( '#registrar' ).on( 'click' , function ( e )
     var d_clients = [];
     var d_clients_type = [];
     var families_input = [];
-    
     aux = validateNewSol();
     
     //Validate fields client are correct
@@ -1856,15 +1864,16 @@ $( '#registrar' ).on( 'click' , function ( e )
         d_clients_type.push( elem.attr("tipo_cliente") );
     });
     
-    
+    var products = $('.selectfamily');
     products.each( function (index) 
     {
+        console.log( $(this).val() );
         families_input[index] = $(this).val();
     });
 
     for ( var i = 0 ; i < families_input.length ; i++ ) 
     {
-        families.each( function ( index ) 
+        products.each( function ( index ) 
         {
             if ( index != i && families_input[i] === $( this ).val() ) 
             {
@@ -2095,7 +2104,17 @@ $( document ).on( 'click' , '.open-details' , function()
     {
         if ( response.Status == 'Ok' )
         {
-            addTr( td , response.Data.View );
+            console.log( response.Data );
+            bootbox.dialog({
+                message: response.Data.View,
+                animate: true ,
+                className : 'solicitud-detail-modal',
+                backdrop  : true,
+                onEscape  : true
+            });
+
+            return true;
+            //addTr( td , response.Data.View );
         }
         else
             bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>')

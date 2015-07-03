@@ -1,6 +1,6 @@
 <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
-    <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label">Tipo de Entrega</label>
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <label class="control-label">Tipo de Entrega</label>
+    <div>
         <select name="pago" class="form-control">
             @foreach( $payments as $payment )
                 @if ( $payment->id != 3 )

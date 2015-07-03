@@ -1,9 +1,9 @@
 @if(!is_null($solicitud->detalle->id_deposito) )    
     <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
-        <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label" for="depositado">
+        <label class="control-label" for="depositado">
             Depositado
         </label>
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div>
             <div class="input-group">
                 <span class="input-group-addon">{{$solicitud->detalle->deposit->account->typeMoney->simbolo}}</span>
                 <input id="depositado" type="text" value="{{$solicitud->detalle->deposit->total}}" class="form-control input-md" readonly>

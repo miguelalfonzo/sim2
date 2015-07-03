@@ -1,28 +1,15 @@
-<div class="form-group col-sm-12 col-md-6 col-lg-6">
-    <div style="padding:0 15px" >
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Clientes</h3>
-            </div>
-            <div class="panel-body">
-                @foreach( $solicitud->clients as $client )
+<div class=" col-xs-12 col-sm-12 col-md-6 col-lg-6">
+    <div class="panel panel-default">
+        <div class="panel-heading">Clientes</div>
+        <ul class="list-group">                 
+            @foreach( $solicitud->clients as $client )
+                <li class="list-group-item">
                     @if ( is_null( $client->id_cliente) )
-                        <div class="form-group ">
-                            <div>
-                                <input class="form-control input-md" type="text"
-                                value="No hay cliente Asignado" readonly>
-                            </div>
-                        </div>
+                       No hay cliente Asignado
                     @else
-                        <div class="form-group">
-                            <div>
-                                <input class="form-control input-md" type="text"
-                                value="{{ $client->{$client->clientType->relacion}->full_name }}" readonly>
-                            </div>
-                        </div>
+                        {{ $client->{$client->clientType->relacion}->full_name }}
                     @endif
-                @endforeach
-            </div>
-        </div>
+                </li>
+            @endforeach
     </div>
 </div>

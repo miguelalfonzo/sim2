@@ -14,6 +14,15 @@ class FondoHistory extends Eloquent{
         return \Carbon\Carbon::parse( $attr )->format('Y-m-d H:i');
     }
 
+    public function nextId()
+    {
+        $nextId = FondoHistory::orderBy( 'id' , 'desc' )->first();
+        if ( is_null( $nextId ) )
+            return 1;
+        else
+            return $nextId->id + 1;
+    }
+
     protected function solicitud()
     {
         return $this->hasOne( 'Dmkt\Solicitud' , 'id' , 'id_solicitud' );
