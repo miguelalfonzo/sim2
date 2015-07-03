@@ -178,8 +178,16 @@
         </nav>
         <div id="dataTable" class="container-fluid" style="font-size: 10pt; ">
             @yield('solicitude')
+            <br>
         </div>
+<!--         <footer>
+          <div class="container-fluid">
+            <hr>
+            <p class="text-center" style="margin-top: -10px;"><small>Laboratorios Bagó del Perú | &copy; 2015<small></p>
+          </div>
+        </footer> -->
     </div>
+
 
 <div id="loading" style="display: none">
     {{ HTML::image('img/spiffygif.gif') }}
@@ -285,5 +293,6 @@
 {{ HTML::script('js/bago.reports.main.js') }}
 {{ HTML::script('js/wizard.js') }}
 <!-- idkc: Report Library -->
+
 </body>
 </html>
