@@ -12,8 +12,6 @@ var currency      = $('select[name=moneda]');
 var amount        = $('input[name=monto]');
 var payment       = $('select[name=pago]');
 var delivery_date = $('input[name=fecha]');
-var products      = $('.products');
-//var products      = $('.selectfamily');
 var clients       = $('#clientes');
 
 var invoice_amount  = $('input[name=monto_factura]');
@@ -258,8 +256,11 @@ search_cliente.on('focus', function ()
 /*invoice_amount.on('focus', function () {
     $(this).parent().removeClass('has-error')
 });*/
-products.on('click', function () {
-    $(this).css('border-color', 'none')
+$( document ).off( 'click' , '.products' );
+$( document ).on( 'click' , '.products' , function () 
+{
+    $(this).css('border-color', 'none');
+    $('.families_repeat').text('').css('color','');
 });
 date_start.on('focus', function () {
     $(this).parent().removeClass('has-error');
@@ -1864,7 +1865,7 @@ $( '#registrar' ).on( 'click' , function ( e )
         d_clients.push( elem.attr("pk") );
         d_clients_type.push( elem.attr("tipo_cliente") );
     });
-
+    var products      = $('.products');
     products.each( function (index) 
     {
         console.log( $(this).val() );

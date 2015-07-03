@@ -387,6 +387,51 @@ class TestController extends BaseController
                        //'alert'       => $alert->expenseAlert() 
                        ); 
         return View::make( 'Dmkt.Register.solicitud' , $data );
-    }   
+    }  
+
+    public function getUserSubFondos()
+    {
+    	$id = 35;
+    	$user = \User::find( $id );
+    	//$marca_id = 16;
+    	$tipo = FONDO_SUBCATEGORIA_GERPROD;
+
+    	if ( $user->type != SUP )
+			return DB::table('Fondos f')->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion" , 'f.saldo' )
+			->leftJoin( 'fondos_subcategorias fsc' , 'f.fondos_subcategoria_id' , '=' , 'fsc.id' )
+			->leftJoin( 'fondos_categorias fc' , 'fsc.fondos_categorias_id' , '=' , 'fc.id' )
+			->leftJoin( 'outdvp.marcas m' , 'f.marca_id' , '=' , 'm.id' )
+			->where( function( $query ) use( $user )
+			{
+				if ( $user->type == GER_PROD )
+					$query->where( 'm.gerente_id' , $user->gerProd->id )->where( 'tipo' , FONDO_SUBCATEGORIA_GERPROD );
+				elseif( $user->type == ASIS_GER )
+					$query->where( 'fsc.tipo' , 'I' );
+				elseif( $user->type == SUP )
+					$query->where( 'fsc.tipo' , 'S' );
+				else
+					$query->where( 'fsc.tipo' , 'NNN' );
+			})->get();
+		else
+			return DB::table('Fondos f')->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion" , 'fs.saldo' )
+			->leftJoin( 'fondos_subcategorias fsc' , 'f.fondos_subcategoria_id' , '=' , 'fsc.id' )
+			->leftJoin( 'fondos_categorias fc' , 'fsc.fondos_categorias_id' , '=' , 'fc.id' )
+			->leftJoin( 'outdvp.marcas m' , 'f.marca_id' , '=' , 'm.id' )
+			->leftJoin( 'fondos_supervisor fs' , 'fs.subcategoria_id' , '=' , 'fsc.id' )
+			->where( function( $query ) use( $user )
+			{
+				if ( $user->type == GER_PROD )
+					$query->where( 'm.gerente_id' , $user->gerProd->id )->where( 'tipo' , FONDO_SUBCATEGORIA_GERPROD );
+				elseif( $user->type == ASIS_GER )
+					$query->where( 'fsc.tipo' , 'I' );
+				elseif( $user->type == SUP )
+					$query->where( 'fsc.tipo' , 'S' )->where('fs.supervisor_id' , $user->id );
+				else
+					$query->where( 'fsc.tipo' , 'NNN' );
+			})->get();
+		//$subFondo = \Maintenance\FondosSubCategorias::getUserSubFondos( FONDO_SUBCATEGORIA_GERPROD , $user );
+    }
+
+
 
 }

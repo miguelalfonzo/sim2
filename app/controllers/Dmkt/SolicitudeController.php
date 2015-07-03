@@ -525,7 +525,7 @@ class SolicitudeController extends BaseController
         if ( is_null( $aprovalPolicy ) )
             return $this->warningException( 'No se encontro la politica de aprobacion para la inversion: '. $solicitud->id_inversion . ' y su rol: ' . Auth::user()->type , __FUNCTION__ , __LINE__ , __FILE__ );    
         if ( is_null( $aprovalPolicy->desde ) && is_null( $aprovalPolicy->hasta ) )
-            return $this->setRpta( DERIVADO );
+            return $this->setRpta( ACEPTADO ); // return $this->setRpta( DERIVADO );
         else
         {
             if ( $solicitud->detalle->id_moneda == DOLARES )

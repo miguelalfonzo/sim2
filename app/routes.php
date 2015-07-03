@@ -30,6 +30,7 @@
     Route::post( 'maintenance-enable' , 'Maintenance\TableController@enableRecord');
     Route::post( 'maintenance-disable' , 'Maintenance\TableController@disableRecord');
     Route::get( 'test-query' , 'TestController@testQuery' );
+    Route::get( 'test-fondo-query' , 'TestController@getUserSubFondos' );
 
     //--- TIME LINE --
 

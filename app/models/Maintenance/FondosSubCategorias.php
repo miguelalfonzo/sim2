@@ -6,7 +6,7 @@ use \Eloquent;
 
 class FondosSubCategorias extends Eloquent
 {
-	protected $table      = 'FONDOS_SUBCATEGORIAS';
+	protected $table      = 'FONDOS_SUBCATEGORIAS as fsc';
 	protected $primaryKey = 'id';
 	public $incrementing  = false;
 	protected $fillable   = array('id','descripcion', 'fondos_categorias_id');
@@ -18,4 +18,5 @@ class FondosSubCategorias extends Eloquent
 	{
 		return $this->hasMany('Maintenance\fondos');
 	}
+
 }
