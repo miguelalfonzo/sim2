@@ -37,15 +37,15 @@ class ExpenseController extends BaseController
 
     private function validateInputExpense( $inputs )
     {
-        $rules = array( 'token'    		 => 'required|string|size:40|exists:solicitud,token' ,
-                        'proof_type'     => 'required|integer|min:1|exists:tipo_comprobante,id' ,
-                        'date_movement'  => 'required|date_format:"d/m/Y"|after:'.date("Y-m-d"),
-                        'desc_expense'   => 'required|string|min:1',
-                        'tipo_gasto'	 => 'required|array|min:1|each:integer|each:min,1|each:exists,tipo_gasto,id',
-                        'quantity'		 => 'required|array|min:1|each:integer|each:min,1',
-                        'description'	 => 'required|array|min:1|each:string|each:min,1',
-                        'total_item'	 => 'required|array|min:1|each:numeric|each:min,1',
-                        'total_expense'  => 'required|numeric|min:1' );  
+        $rules = array( 'token'    		   => 'required|string|size:40|exists:solicitud,token' ,
+                        'proof_type'       => 'required|integer|min:1|exists:tipo_comprobante,id' ,
+                        'fecha_movimiento' => 'required|date_format:"d/m/Y"|after:'.date("Y-m-d"),
+                        'desc_expense'     => 'required|string|min:1',
+                        'tipo_gasto'	   => 'required|array|min:1|each:integer|each:min,1|each:exists,tipo_gasto,id',
+                        'quantity'		   => 'required|array|min:1|each:integer|each:min,1',
+                        'description'	   => 'required|array|min:1|each:string|each:min,1',
+                        'total_item'	   => 'required|array|min:1|each:numeric|each:min,1',
+                        'total_expense'    => 'required|numeric|min:1' );  
 
         $validator = Validator::make( $inputs, $rules );
         if ( $validator->fails() ) 
@@ -122,7 +122,7 @@ class ExpenseController extends BaseController
 	                $expense->imp_serv = null;
 	                $expense->sub_tot  = null;
 	            }
-		        $date = $inputs['date_movement'];
+		        $date = $inputs['fecha_movimiento'];
 		        list($d, $m, $y) = explode('/', $date);
 		        $d = mktime(11, 14, 54, $m, $d, $y);
 				$inputs[ 'date' ] = date("Y/m/d", $d );
@@ -223,10 +223,7 @@ class ExpenseController extends BaseController
 			$expense      = Expense::find( $inputs[ 'idgasto' ] );
 			if ( is_null( $expense ) )
 				return $this->warninException( 'No existe registro del gasto con Id: ' . $inputs[ 'idgasto' ] , __FUNCTION__ , __LINE__ , __FILE__ );
-			$expenseItems = $expense->items;
-			return $this->setRpta( array( 'expense' => $expense , 'expenseItems' => $expenseItems ) );
-			$response 	  = array( 'data' => $data , 'expense' => $expense , 'date' => $expense->fecha_movimiento );
-			return $response;
+			return $this->setRpta( array( 'expenseItems' => $expense->items , 'expense' => $expense ) );
 		}
 		catch ( Exception $e )
 		{

@@ -32,7 +32,12 @@
             <span class="input-group-addon">{{$solicitud->detalle->typeMoney->simbolo}}</span>
             <input class="form-control input-md" value="{{$detalle->monto_solicitado}}" name="monto" type="text" readonly>
             <span class="input-group-addon" id="type-money">{{$solicitud->detalle->typeMoney->simbolo}}</span>
-            <input value="{{$detalle->monto_actual}}" class="form-control input-md" name="monto" type="text" id="amount">
+            @if ( $politicStatus )
+                <input value="{{$detalle->monto_actual}}" class="form-control input-md" name="monto" type="text" id="amount">
+            @else
+                <input value="{{$detalle->monto_actual}}" class="form-control input-md" name="monto" type="text" readonly>
+            @endif   
+            
         </div>
     </div>
 
