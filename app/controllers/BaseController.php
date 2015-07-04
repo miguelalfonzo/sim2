@@ -36,6 +36,14 @@ class BaseController extends Controller
         return $rpta;
     }
 
+    protected function msg2Validator( $validator )
+    {
+        $rpta = '';
+        foreach ( $validator->messages()->all() as $msg )
+            $rpta .= $msg . ' - ' ;
+        return substr( $rpta , 0 , -1 );
+    }
+
 	protected function setupLayout()
 	{
 		if ( ! is_null($this->layout))

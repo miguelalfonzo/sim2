@@ -1962,16 +1962,16 @@ $("#btn-mass-approve").click( function()
             if (result)
             {
                 var data = {};
-                var trs = $('#table_solicitude tbody tr');
+                var trs = $('#table_solicitudes tbody tr');
                 data._token = _token;
-                data.sols = [];
+                data.solicitudes = [];
                 trs.each(function( index)
                 {
                     var sol = {};
                     if ( $(this).find('input[name=mass-aprov]:checked').length != 0 )
                     {
                         sol.token = $(this).find("#sol_token").val();
-                        data.sols.push(sol);
+                        data.solicitudes.push(sol);
                     }
                 });
                 $.ajax(
@@ -2001,10 +2001,10 @@ $("#btn-mass-approve").click( function()
                         var color = 'red';
                     else
                         var color = '';
+                    listTable( 'solicitudes' );
                     bootbox.alert("<h4 style='color:" + color + "'>" + data.Description + "</h4>", function()
                     {
-                            listTable( 'solicitudes' );
-                            colorTr(data.token);
+                        colorTr(data.token);
                     });
                 });
             }
@@ -2047,23 +2047,24 @@ approved_solicitude.on('click',function(e)
 
 function colorTr(tokens)
 {
-    setTimeout(function()
-    {
+    /*setTimeout(function()
+    {*/console.log( tokens );
+        zzz = tokens;
         var tr;
         $( document ).ready(function() 
         {
-            for (var index in tokens['Error'])
+            for (var index in tokens.Error )
             {
-                tr = $(".i-tokens[value=" + tokens['Error'][index] + "]").parent();
-                tr.css("color","red").addClass('danger');
+                tr = $(".i-tokens[value=" + tokens.Error[index] + "]").parent();
+                tr.addClass('danger');
             }
-            for (var index in tokens['Ok'])
+            for (var index in tokens.Ok )
             {
-                tr = $(".i-tokens[value=" + tokens['Ok'][index] + "]").parent();
-                tr.css("color","green").addClass('success');
+                tr = $(".i-tokens[value=" + tokens.Ok[index] + "]").parent();
+                tr.addClass('success');
             }
         });
-    },1000);
+    /*},1000);*/
 }
 
 function addTr( data , tr )

@@ -8,8 +8,8 @@
 				<div class="stage-header stage-success"></div>
 		@endif
 	@else
-		@if( isset( $solicitud->orderHistories[ $flujo->orden - 1 ] ) &&  $solicitud->orderHistories[ $flujo->orden - 1 ]->status_to != APROBADO && in_array( $solicitud->orderHistories[ $flujo->orden - 1 ]->status_to , array( PENDIENTE , DERIVADO ) ) && $solicitud->orderHistories[ $flujo->orden - 1 ]->toState->id_estado != R_NO_AUTORIZADO 
-		&& in_array( $solicitud->orderHistories[ $flujo->orden - 1 ]->user_from , array ( GER_COM , 'GG' , GER_PROM , REP_MED ) ) )
+		@if( isset( $solicitud->orderHistories[ $flujo->orden - 1 ] ) &&  $solicitud->orderHistories[ $flujo->orden - 1 ]->status_to != APROBADO && in_array( $solicitud->orderHistories[ $flujo->orden - 1 ]->status_to , array( PENDIENTE , DERIVADO , ACEPTADO ) ) && $solicitud->orderHistories[ $flujo->orden - 1 ]->toState->id_estado != R_NO_AUTORIZADO 
+		&& in_array( $solicitud->orderHistories[ $flujo->orden - 1 ]->user_from , array ( REP_MED , SUP , GER_COM , GER_PROD , GER_PROM  , 'GG' ) ) )
 			<div class="stage col-md-3 col-sm-3 pending">
 				<div class="stage-header stage-pending"></div>
 		@else

@@ -150,8 +150,10 @@ class SolicitudeController extends BaseController
                     $solicitud->status = BLOCKED;
                     Session::put( 'id_solicitud' , $solicitud->id );
                     $solicitud->save();
-                    $data[ 'fondos' ] = Fondo::getFunds( $typeUser );
-                    if ( ! is_null( $solicitud->detalle->id_fondo ) )
+                    $fondos = Fondo::getFunds( $typeUser );
+                    if ( ! $fondos->isEmpty() )    
+                        $data[ 'fondos' ] = $fondos;
+                    if ( isset( $data['fondos'] ) && ! is_null( $solicitud->detalle->id_fondo ) )
                     {
                         $data[ 'fondos' ]->push( $solicitud->detalle->fondo );
                         $data['fondos'] = $data[ 'fondos' ]->unique();
@@ -427,7 +429,10 @@ class SolicitudeController extends BaseController
 
     private function textLv( $solicitud )
     {
-        return $this->textAccepted( $solicitud ).' - '.$solicitud->titulo.' - '.$this->textClients( $solicitud );
+        if ( $solicitud->idtiposolicitud == SOL_REP ) 
+            return $this->textAccepted( $solicitud ).' - '.$solicitud->titulo.' - '.$this->textClients( $solicitud );
+        else
+            return $this->textAccepted( $solicitud ) . ' - ' . $solicitud->titulo;
     }
 
     private function textAccepted( $solicitud )
@@ -545,10 +550,13 @@ class SolicitudeController extends BaseController
     private function toUser( $investmentType , $idsProducto , $order )
     {
         $aprovalPolicy = AprovalPolicy::getToUser( $investmentType , $order );
-        $userType = $aprovalPolicy->tipo_usuario;
         if ( is_null( $aprovalPolicy ) )
             return $this->warningException( 'La inversion no  tiene politica de aprobacion' , __FUNCTION__ , __LINE__ , __FILE__ );
-           
+        $userType = $aprovalPolicy->tipo_usuario;
+        $msg= '';
+        \Log::error( json_encode( $aprovalPolicy ) );
+        if ( ! is_null( $aprovalPolicy->desde ) || ! is_null( $aprovalPolicy->hasta ) )
+            $msg .= ' para montos ' . ( is_null( $aprovalPolicy->desde ) ? '' : 'desde S/.' . $aprovalPolicy->desde . ' ' ) . ( is_null( $aprovalPolicy->hasta ) ? '' : 'hasta S/.' . $aprovalPolicy->hasta ) ; 
         if ( $userType == SUP )
         {
             if ( Auth::user()->type === REP_MED )
@@ -575,7 +583,7 @@ class SolicitudeController extends BaseController
         {
             $user = User::getUserType( $userType );
             if ( count( $user ) === 0 )
-                return $this->warningException( 'No se encuentra el usuario: ' . $userType , __FUNCTION__ , __LINE__ , __FILE__ );
+                return $this->warningException( 'Se requiere el usuario ' . $aprovalPolicy->userType->descripcion . $msg , __FUNCTION__ , __LINE__ , __FILE__ );
             else                
                 $idsUser = $user;
         }
@@ -587,14 +595,15 @@ class SolicitudeController extends BaseController
         try
         {
             $inputs = Input::all();
-            $rules = array( 'sols' => 'required' );
-            if ( Validator::make($inputs, $rules)->fails() ) 
-                $rpta = $validator->messages();
+            $rules = array( 'solicitudes' => 'required' );
+            $validator = Validator::make( $inputs , $rules );
+            if ( $validator->fails() ) 
+                return $this->warningException( $this->msg2Validator( $validator ) , __FUNCTION__ , __LINE__ , __FILE__ );
             else
             {
                 $status = array( ok => array() , error => array() );
                 $message = '';
-                foreach($inputs['sols'] as $solicitud )
+                foreach($inputs['solicitudes'] as $solicitud )
                 {
                     $solicitud = Solicitud::where( 'token' , $solicitud )->first();
                     $inputs = array( 'idsolicitud' => $solicitud->id ,
@@ -603,10 +612,10 @@ class SolicitudeController extends BaseController
                                      'anotacion'   => $solicitud->anotacion );
 
                     $solProducts = $solicitud->orderProducts();
-                    if ( $solicitud->id_estado != DERIVADO )
-                        $inputs[ 'monto_producto' ] = $solProducts->lists( 'monto_asignado' );
-                    else
+                    if ( $solicitud->id_estado == DERIVADO )
                         $inputs[ 'monto_producto' ] = array_fill( 0 , count( $solProducts->get() ) , $inputs[ 'monto' ] / count( $solProducts->get() ) );
+                    else
+                        $inputs[ 'monto_producto' ] = $solProducts->lists( 'monto_asignado' );
                     $rpta = $this->acceptedSolicitudeTransaction( $solicitud->id ,  $inputs );
                     if ( $rpta[status] != ok )
                     {

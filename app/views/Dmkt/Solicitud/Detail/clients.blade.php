@@ -9,6 +9,7 @@
                     @else
                         {{ $client->{$client->clientType->relacion}->full_name }}
                     @endif
+                    <span class="badge">{{$client->clientType->descripcion}}</span>
                 </li>
             @endforeach
     </div>

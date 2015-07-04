@@ -64,9 +64,6 @@ class Fondo extends Eloquent {
 
     protected static function getFunds( $userType )
     {
-        if ( in_array( $userType , array( SUP , GER_PROD ) ) )
-            return Fondo::where( 'trim( idusertype )' , $userType )->whereNotNull( 'num_cuenta' )->get();
-        else
-            return Fondo::whereNotNull( 'num_cuenta' )->get();
+        return Fondo::where( 'trim( idusertype )' , $userType )->whereNotNull( 'num_cuenta' )->get();
     }
 }

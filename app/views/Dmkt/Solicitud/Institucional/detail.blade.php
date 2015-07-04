@@ -28,8 +28,9 @@
 	<!-- Supervisor -->
 	<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
 		<label class="control-label" for="sup">Supervisor</label>
-		 <div>
-	        <input type="text" class="form-control" value="{{$detalle->supervisor}}" disabled>
+		 <div class="input-group">
+		 	<span class="input-group-addon">S</span>   
+	        <input type="text" class="form-control input-md" value="{{$detalle->supervisor}}" disabled>
 		</div>
 	</div>
 

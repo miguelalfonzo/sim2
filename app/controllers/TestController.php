@@ -413,11 +413,8 @@ class TestController extends BaseController
 					$query->where( 'fsc.tipo' , 'NNN' );
 			})->get();
 		else
-			return DB::table('Fondos f')->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion" , 'fs.saldo' )
-			->leftJoin( 'fondos_subcategorias fsc' , 'f.fondos_subcategoria_id' , '=' , 'fsc.id' )
+			return DB::table('fondos_supervisor fsc')->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion" , 'fs.saldo' )
 			->leftJoin( 'fondos_categorias fc' , 'fsc.fondos_categorias_id' , '=' , 'fc.id' )
-			->leftJoin( 'outdvp.marcas m' , 'f.marca_id' , '=' , 'm.id' )
-			->leftJoin( 'fondos_supervisor fs' , 'fs.subcategoria_id' , '=' , 'fsc.id' )
 			->where( function( $query ) use( $user )
 			{
 				if ( $user->type == GER_PROD )
