@@ -65,15 +65,9 @@
                         <span  class="glyphicon glyphicon-usd"></span>
                     </a>
                 @endif
-            @elseif ( Auth::user()->type == ASIS_GER )
-                @if($solicitud->id_estado == REGISTRADO)
-                    <a class="btn btn-default" target="_blank" href="{{URL::to('a'.'/'.$solicitud->token)}}">
-                        <span  class="glyphicon glyphicon-print"></span>
-                    </a>
-                @endif
             @endif
         @elseif ( $solicitud->idtiposolicitud == SOL_INST )
-            @if($solicitud->id_estado == REGISTRADO && Auth::user()->id == $solicitud->iduserasigned )   
+            @if($solicitud->id_estado == REGISTRADO && Auth::user()->id == $solicitud->id_user_assign )   
                 <a class="btn btn-default" href="{{URL::to('report-fondo')}}/{{$solicitud->token}}">
                     <span class="glyphicon glyphicon-print" ></span>
                 </a>

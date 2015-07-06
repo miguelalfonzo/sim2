@@ -1021,14 +1021,14 @@ class SolicitudeController extends BaseController
                     $seatList[] = $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', $cuentaExpense , $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_BASE, ASIENTO_GASTO_COD_PROV, $expense->razon, ASIENTO_GASTO_COD, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, $expense->monto, $marca, $description_seat_other_doc, $tipo_responsable, ''); 
                 
                     //ASIENTO IMPUESTO A LA RENTA
-                    if ( $expense->idtipotributo == 2 )
+                    if ( $expense->idtipotributo == 1 )
                     {
                         $total_percepciones += $expense->monto_tributo;
                         $seatList[] = $this->createSeatElement( $tempId++, $cuentaMkt, $solicitud->id, '' , CUENTA_RENTA_4TA_HABER , '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO, $expense->monto_tributo , $marca, $description_detraccion_reembolso , '' , 'RENTA');        
                     }
 
                     //ASIENTO IMPUESTO A LA RENTA REEMBOLSO
-                    if ( $expense->idtipotributo == 2 && $solicitud->id_motivo == REEMBOLSO )
+                    if ( $expense->idtipotributo == 1 && $solicitud->id_motivo == REEMBOLSO )
                     {
                         $total_percepciones += ( $expense->monto - $expense->monto_tributo );
                         $seatList[] = $this->createSeatElement( $tempId++, $cuentaMkt, $solicitud->id, '' , CUENTA_DETRACCION_REEMBOLSO , '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO, $expense->monto - $expense->monto_tributo , $marca, $description_seat_renta4ta_deposit , '' , 'RENTA');        

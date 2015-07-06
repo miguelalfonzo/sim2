@@ -791,6 +791,7 @@ $(function()
                         {
                             ajaxExpense(data).done(function( response )
                             {
+                                $.unblockUI();
                                 if( response.Status === 'Ok' )
                                 {
                                     responseUI("Gasto Registrado","green");
@@ -812,10 +813,7 @@ $(function()
                                     });
                                 }
                                 else
-                                {
-                                    responseUI( response.Status + ': ' + response.Description , 'red' );
-                                    $(".message-expense").text("El documento ya se encuentra registrado.").show();
-                                }
+                                    bootbox.alert('<h4 class="red">' + response.Status + ':' + response.Description + '</h4>');
                             }).fail(function( statusCode , errorThrown )
                             {
                                 ajaxError( statusCode , errorThrown );

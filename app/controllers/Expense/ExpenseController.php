@@ -107,7 +107,7 @@ class ExpenseController extends BaseController
 			    	{
 			    		$row_expense = Expense::where( 'ruc' , $inputs[ 'ruc' ] )->where( 'num_prefijo' ,$inputs[ 'number_prefix' ] )->where( 'num_serie' , $inputs[ 'number_serie' ] )->get();	
 						if( $row_expense->count() > 0 )
-							return $this->warningException( 'Ya existe un gasto registrado con Ruc: ' . $inputs[ 'ruc' ] . ' numero: '.$inputs[ 'number_prefix' ] . '-' . $inputs[ 'num_serie' ] , __FUNCTION__ , __LINE__ , __FILE__ );
+							return $this->warningException( 'Ya existe un gasto registrado con Ruc: ' . $inputs[ 'ruc' ] . ' numero: '.$inputs[ 'number_prefix' ] . '-' . $inputs[ 'number_serie' ] , __FUNCTION__ , __LINE__ , __FILE__ );
 					}
 				if( $proof->igv == 1 )
 				{
