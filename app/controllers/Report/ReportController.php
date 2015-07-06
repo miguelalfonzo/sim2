@@ -491,7 +491,7 @@ Log::error("=================> 15");
             
             
             eval('$query = '. $dataArray['query'] .';');
-
+            \Log::error( Auth::user()->type );
             $resultData  = DB::select($query);
             \Log::error($query);
             \Log::error( 'data');

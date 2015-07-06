@@ -67,9 +67,9 @@ class FondoController extends BaseController
             $totales[$moneda->simbolo] = 0 ;
         foreach ( $solicitud as $sol )
         {
-            $jDetalle = json_decode( $sol->detalle->detalle );
-            $typeMoney = $sol->detalle->fondo->typeMoney;
-            $totales[$typeMoney->simbolo] += $jDetalle->monto_aprobado ;
+            $detalle = $sol->detalle;
+            $typeMoney = $detalle->fondo->typeMoney;
+            $totales[$typeMoney->simbolo] += $detalle->monto_actual ;
         }
         return $this->setRpta( $totales );
     }
