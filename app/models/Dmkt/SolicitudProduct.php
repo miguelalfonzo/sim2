@@ -2,6 +2,8 @@
 
 namespace Dmkt;
 use \Eloquent;
+use \Auth;
+use \DB;
 
 class SolicitudProduct extends Eloquent
 {
@@ -15,6 +17,38 @@ class SolicitudProduct extends Eloquent
             return 0;
         else
             return $lastId->id;
+    }
+
+    public function getSubFondo()
+    {
+        /*if ( Auth::user()->type == SUP )
+            return $this->hasMany( 'Maintenance\FondosSupervisor' , 'marca_id' , 'id_producto' )
+            ->leftJoin( 'fondos_subcategorias fsc' , 'fsc.id' , '=' , 'fs.subcategoria_id' );
+        else
+            return $this->hasMany( 'Maintenance\Fondos' , 'marca_id' , 'id_producto');
+*/
+        $user = Auth::user();
+        if ( $user->type != SUP )
+            return DB::table('Fondos f')->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo saldo' , 'fsc.id id')
+            ->leftJoin( 'fondos_subcategorias fsc' , 'f.fondos_subcategoria_id' , '=' , 'fsc.id' )
+            ->leftJoin( 'fondos_categorias fc' , 'fsc.fondos_categorias_id' , '=' , 'fc.id' )
+            ->leftJoin( 'outdvp.marcas m' , 'f.marca_id' , '=' , 'm.id' )
+            ->where( function( $query ) use( $user )
+            {
+                if ( $user->type == GER_PROD )
+                    $query->where( 'm.gerente_id' , $user->gerProd->id )->where( 'tipo' , FONDO_SUBCATEGORIA_GERPROD );
+                elseif( $user->type == ASIS_GER )
+                    $query->where( 'fsc.tipo' , 'I' );
+                else
+                    $query->where( 'fsc.tipo' , 'NNN' );
+            })->get();
+        else
+            return DB::table('fondos_supervisor fs')
+            ->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'fs.saldo saldo' , 'fsc.id id' )
+            ->leftJoin( 'fondos_subcategorias fsc' , 'fsc.id' , '=' , 'fs.subcategoria_id' )
+            ->leftJoin( 'fondos_categorias fc' , 'fc.id' , '=' , 'fsc.fondos_categorias_id' )
+            ->leftJoin( 'outdvp.marcas m' , 'fs.marca_id' , '=' , 'm.id' )
+            ->where( 'fsc.tipo' , 'S' )->where('fs.supervisor_id' , $user->id )->where( 'fs.marca_id' , $this->id_producto )->get();
     }
 
     protected function getSolProducts( $idSolProduct )

@@ -6,10 +6,15 @@
             <li class="list-group-item">        
                     @if($politicStatus)
                         <div class="input-group">
-                            <span class="input-group-addon" style="width: 70%;">{{{ is_null( $product->marca ) ? '' : $product->marca->descripcion}}}</span>
+                            <span class="input-group-addon" style="width: 30%;">{{{ is_null( $product->marca ) ? '' : $product->marca->descripcion}}}</span>
+                            <select name="fondo-producto[]" class="selectpicker form-control">
+                                @foreach( $product->getSubFondo() as $subFondo )
+                                    <option value="{{$subFondo->id}}">{{$subFondo->descripcion}}</option>
+                                @endforeach
+                            </select>
                             <span class="input-group-addon">{{ $detalle->typemoney->simbolo }}</span>
                             <input name="monto_producto[]" type="text" class="form-control text-right amount_families" value="{{ isset( $product->monto_asignado ) ? $product->monto_asignado : 
-                            round( $detalle->monto_actual / count( $solicitud->products ) , 2 ) }}">
+                            round( $detalle->monto_actual / count( $solicitud->products ) , 2 )}}">
                         </div>
                     @else
                         {{{ is_null( $product->marca ) ? '' : $product->marca->descripcion}}}
