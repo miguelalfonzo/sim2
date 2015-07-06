@@ -61,23 +61,29 @@ class AlertController extends BaseController
 				{
 					$clients_secundaria = $solicitud_secundaria->clients()->select( 'id_cliente' , 'id_tipo_cliente' )->get();
 					$cliente_inicial = $this->intersectRecords( $clients_inicial , $clients_secundaria );
-					foreach( $solicituds as $solicitud_final )
+					if ( ! $cliente_inicial->isEmpty() )
 					{
-						if ( $solicitud_inicial->id != $solicitud_final->id && $solicitud_final->id != $solicitud_secundaria->id && ! in_array( $solicitud_final->id , $solicituds_compare_id ) && ( $this->diffCreatedAt( $solicitud_inicial , $solicitud_secundaria , $solicitud_final ) <= $tiempo->valor ) )
+						foreach( $solicituds as $solicitud_final )
 						{
-							$clients_final = $solicitud_final->clients()->select( 'id_cliente' , 'id_tipo_cliente' )->get();
-							$cliente_inicial = $this->intersectRecords( $clients_inicial , $clients_final );
-							$solicitud_tipo_cliente = array_unique( $clients_inicial->lists( 'id_tipo_cliente' ) );
-							if ( count( array_intersect( $solicitud_tipo_cliente, $tipo_cliente_requerido ) ) >= 2 )
+							if ( $solicitud_inicial->id != $solicitud_final->id && $solicitud_final->id != $solicitud_secundaria->id && ! in_array( $solicitud_final->id , $solicituds_compare_id ) && ( $this->diffCreatedAt( $solicitud_inicial , $solicitud_secundaria , $solicitud_final ) <= $tiempo->valor ) )
 							{
-								$cliente = '( ';
-								foreach ( $cliente_inicial as $client_inicial )
-									$cliente .= $client_inicial->{$client_inicial->clientType->relacion}->full_name .  ' , ' ; 
-								$cliente = rtrim( $cliente , ', ' );
-								$cliente .= ' ).';
-								$msg .= 'Las solicitudes ' . $solicitud_inicial->id . ' , ' . $solicitud_secundaria->id . ' , ' . $solicitud_final->id . ' ' . $tiempo->mensaje . ' ' . $cliente;
-								$solicituds_compare_id[] = $solicitud_inicial->id;
-								$solicituds_compare_id[] = $solicitud_secundaria->id;
+								$clients_final = $solicitud_final->clients()->select( 'id_cliente' , 'id_tipo_cliente' )->get();
+								$cliente_inicial = $this->intersectRecords( $clients_inicial , $clients_final );
+								if ( ! $cliente_inicial->isEmpty() )
+								{
+									$solicitud_tipo_cliente = array_unique( $cliente_inicial->lists( 'id_tipo_cliente' ) );
+									if ( count( array_intersect( $solicitud_tipo_cliente, $tipo_cliente_requerido ) ) >= 2 )
+									{
+										$cliente = '( ';
+										foreach ( $cliente_inicial as $client_inicial )
+											$cliente .= $client_inicial->{$client_inicial->clientType->relacion}->full_name .  ' , ' ; 
+										$cliente = rtrim( $cliente , ', ' );
+										$cliente .= ' ).';
+										$msg .= 'Las solicitudes ' . $solicitud_inicial->id . ' , ' . $solicitud_secundaria->id . ' , ' . $solicitud_final->id . ' ' . $tiempo->mensaje . ' ' . $cliente;
+										$solicituds_compare_id[] = $solicitud_inicial->id;
+										$solicituds_compare_id[] = $solicitud_secundaria->id;
+									}
+								}
 							}
 						}
 					}

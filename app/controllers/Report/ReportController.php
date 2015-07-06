@@ -492,9 +492,10 @@ Log::error("=================> 15");
             
             eval('$query = '. $dataArray['query'] .';');
 
-            Log::error($query);
             $resultData  = DB::select($query);
-            
+            \Log::error($query);
+            \Log::error( 'data');
+            \Log::error( $resultData );
             $result['data'] = $resultData;
         }catch(Exception $e)
         {
