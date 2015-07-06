@@ -737,7 +737,7 @@ class SolicitudeController extends BaseController
                     }
                 }
                 else if( is_null( $solDetalle->id_fondo ) )
-                    return $this->warningException( 'Debe asignar el fondo a la solicitud: '.$solicitud->id , __FUNCTION__ , __LINE__ , __FILE__ );
+                    return $this->warningException( 'Debe asignar el fondo para aprobar la solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
                 else
                     $toUser = USER_CONTABILIDAD;
                 

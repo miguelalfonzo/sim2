@@ -36,7 +36,17 @@
                     </div>
                     <div class="modal-body">
                         <label class="green">Usuario Asignado</label>
-                        <h3 class="green">{{Auth::user()->assignTempUser->user->gerProd->descripcion}}</h4>
+                        <h3 class="green">
+                            @if ( Auth::user()->assignTempUser->user->type == REP_MED )
+                                {{Auth::user()->assignTempUser->user->rm->full_name}}
+                            @elseif ( Auth::user()->assignTempUser->user->type == SUP )
+                                {{Auth::user()->assignTempUser->user->sup->full_name}}
+                            @elseif ( Auth::user()->assignTempUser->user->type == GER_PROD )
+                                {{Auth::user()->assignTempUser->user->gerProd->descripcion}}
+                            @else
+                                {{Auth::user()->assignTempUser->user->person->full_name}}
+                            @endif    
+                        </h3>
                         <br>
                     </div>
                     <div class="modal-footer">

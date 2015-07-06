@@ -9,7 +9,7 @@
 		@endif
 	@else
 		@if( isset( $solicitud->orderHistories[ $flujo->orden - 1 ] ) &&  $solicitud->orderHistories[ $flujo->orden - 1 ]->status_to != APROBADO && in_array( $solicitud->orderHistories[ $flujo->orden - 1 ]->status_to , array( PENDIENTE , DERIVADO , ACEPTADO ) ) && $solicitud->orderHistories[ $flujo->orden - 1 ]->toState->id_estado != R_NO_AUTORIZADO 
-		&& in_array( $solicitud->orderHistories[ $flujo->orden - 1 ]->user_from , array ( REP_MED , SUP , GER_COM , GER_PROD , GER_PROM  , 'GG' ) ) )
+		&& in_array( $solicitud->orderHistories[ $flujo->orden - 1 ]->user_from , array ( REP_MED , SUP , GER_COM , GER_PROD , GER_PROM  , 'GG' ) ) && $solicitud->id_estado != CANCELADO )
 			<div class="stage col-md-3 col-sm-3 pending">
 				<div class="stage-header stage-pending"></div>
 		@else

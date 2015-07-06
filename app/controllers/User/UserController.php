@@ -18,6 +18,8 @@ class UserController extends BaseController
 		try
 		{
 			$inputs = Input::all();
+			if ( $inputs['iduser'] == Auth::user()->id )
+				return $this->warningException( 'No puede asignarse a si mismo como usuario temporal' , __FUNCTION__ , __LINE__ , __FILE__ );
 			$tempUser = TemporalUser::getAssignment( Auth::user()->id );
 			if ( is_null( $tempUser ) )
 			{

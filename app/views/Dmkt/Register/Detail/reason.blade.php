@@ -3,12 +3,10 @@
     <div>
         <select class="form-control" name="motivo">
             @foreach( $reasons as $reason )
-                @if ( $reason->id != 2 )
-                    @if( isset( $solicitud ) && $solicitud->detalle->idmotivo == $reason->id)
-                        <option selected value="{{$reason->id}}">{{$reason->nombre}}</option>
-                    @else
-                        <option value="{{$reason->id}}">{{$reason->nombre}}</option>
-                    @endif
+                @if( isset( $solicitud ) && $solicitud->detalle->id_motivo == $reason->id)
+                    <option selected value="{{$reason->id}}">{{$reason->nombre}}</option>
+                @else
+                    <option value="{{$reason->id}}">{{$reason->nombre}}</option>
                 @endif
             @endforeach
         </select>

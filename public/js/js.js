@@ -278,7 +278,7 @@ $(function()
     //Enable deposit
     $("#enable-deposit").on("click",function(e){
         e.preventDefault();
-        bootbox.confirm("<h4>¿Esta seguro que desea habilitar el depósito?</h4>", function( result ) 
+        bootbox.confirm("<h4>Para Confirmar presione OK</h4>", function( result ) 
         {
             if(result)
             {
