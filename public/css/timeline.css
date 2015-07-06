@@ -12,7 +12,7 @@
 .stage-content {
 	margin: 0 auto;
 	max-height: 52px;
-	padding-left: 17px;
+	/*padding-left: 17px;*/
 	width: 153px;
 }
 
@@ -24,14 +24,15 @@
 	color: #a9a9a9;
 	display: inline-block;
 	font-size: 20px;
-	height: 50px;
 	position: relative;
 	text-align: center;
-	width: 50px;
+	width: 25px;
+	height: 25px;
 	z-index: 1;
 }
 
 .stage-title {
+	margin: 0;
 	color: #464646;
 	font: 400 14px 'calibriregular', sans-serif;
 	padding-left: 0px;
@@ -58,7 +59,7 @@
 	content: '';
 	height: 5px;
 	left: 0;
-	margin-top: -33px;
+	margin-top: -39px;
 	position: absolute;
 	top: 45%;
 	width: 50%;
@@ -70,7 +71,7 @@
 	border-top: 1px solid #d9d9d9;
 	content: '';
 	height: 5px;
-	margin-top: -33px;
+	margin-top: -39px;
 	position: absolute;
 	right: 0;
 	top: 45%;

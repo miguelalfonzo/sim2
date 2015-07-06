@@ -18,16 +18,18 @@
 		@else
 			<h3 class="stage-title" style="white-space:nowrap">Habilitación Fondo Inst.</h3>
 		@endif		
-		<div class="stage-info" style="white-space:nowrap">
+		<!-- <div class="stage-info" style="white-space:nowrap"> -->
+			<span class="label label-info">
 			@if ( is_null( $solicitud->toDepositHistory ) )
 				@if ( $solicitud->idtiposolicitud == SOL_REP )
-					Contabilidad
+					CONTABILIDAD
 				@else
-					Asistente Gerencia
+					ASISTENTE GERENCIA
 				@endif
 			@else
-				{{$solicitud->toDepositHistory->createdBy->person->full_name}}
+				{{ strtoupper($solicitud->toDepositHistory->createdBy->person->full_name) }}
 			@endif
-		</div>
+			</span>
+		<!-- </div> -->
 	</div>
 </div>

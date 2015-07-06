@@ -49,7 +49,7 @@ class MaintenanceController extends BaseController
 									  'M.DESCRIPCION ASC, '.
 									  'FC.POSITION ASC, '.
 									  'FSC.POSITION ASC'));
-		// dd(json_encode($result['fondos']));
+		dd(json_encode($result));
 		return View::make('Maintenance.Fondo.fondonew', $result);
 	}
 
