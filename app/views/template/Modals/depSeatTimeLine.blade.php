@@ -12,13 +12,15 @@
 @endif
 	<div class="stage-content">
 		<h3 class="stage-title">Deposito del Anticipo</h3>	
-		<div class="stage-info" style="white-space:nowrap">
+		<!-- <div class="stage-info" style="white-space:nowrap"> -->
+			<span class="label label-info">
 			@if ( is_null( $solicitud->toAdvanceSeatHistory ) )
-				Tesorería
+				TESORERÍA
 			@else
-				{{$solicitud->toAdvanceSeatHistory->createdBy->person->full_name}}
+				{{ strtoupper($solicitud->toAdvanceSeatHistory->createdBy->person->full_name) }}
 			@endif
-		</div>
+			</span>
+		<!-- </div> -->
 	</div>
 </div>
 @if ( is_null( $solicitud->expenseHistory ) )
@@ -35,12 +37,14 @@
 @endif		
 	<div class="stage-content">
 		<h3 class="stage-title">Asiento de Anticipo</h3>
-		<div class="stage-info" style="white-space:nowrap">
+		<!-- <div class="stage-info" style="white-space:nowrap"> -->
+		<span class="label label-info">
 			@if ( is_null( $solicitud->expenseHistory ) )
-				Contabilidad
+				CONTABILIDAD
 			@else
-				{{$solicitud->expenseHistory->createdBy->person->full_name}}
+				{{ strtoupper($solicitud->expenseHistory->createdBy->person->full_name) }}
 			@endif
-		</div>
+		</span>
+		<!-- </div> -->
 	</div>
 </div>

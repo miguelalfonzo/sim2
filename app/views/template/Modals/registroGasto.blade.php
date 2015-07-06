@@ -12,21 +12,23 @@
 @endif
 	<div class="stage-content">
 		<h3 class="stage-title">Reg. de Gastos</h3>
-		<div class="stage-info" style="white-space:nowrap">
+		<!-- <div class="stage-info" style="white-space:nowrap"> -->
+		<span class="label label-info">
 			@if( is_null( $solicitud->id_user_assign ) )
-				Responsable del Gasto
+				RESPONSABLE DEL GASTO
 			@else
 				@if( $solicitud->asignedTo->type == REP_MED )
-					{{$solicitud->asignedTo->rm->full_name}}
+					{{ strtoupper($solicitud->asignedTo->rm->full_name) }}
 				@elseif( $solicitud->asignedTo->type == SUP )
-					{{$solicitud->asignedTo->sup->full_name}}
+					{{ strtoupper($solicitud->asignedTo->sup->full_name) }}
 				@elseif( $solicitud->asignedTo->type == GER_PROD )
-					{{$solicitud->asignedTo->gerProd->full_name}}
+					{{ strtoupper($solicitud->asignedTo->gerProd->full_name) }}
 				@else
-					{{$solicitud->asignedTo->person->full_name}}
+					{{ strtoupper($solicitud->asignedTo->person->full_name) }}
 				@endif
 			@endif
-		</div> 
+		</span>
+		<!-- </div>  -->
 	</div>
 </div>
 @if ( is_null( $solicitud->toGenerateHistory ) )
@@ -43,12 +45,14 @@
 @endif
 	<div class="stage-content">
 		<h3 class="stage-title">Asiento de Díario</h3>
-		<div class="stage-info" style="white-space:nowrap">
+		<!-- <div class="stage-info" style="white-space:nowrap"> -->
+			<span class="label label-info">
 			@if ( is_null( $solicitud->toGenerateHistory ) )
-				Contabilidad
+				CONTABILIDAD
 			@else
-				{{$solicitud->toGenerateHistory->createdBy->person->full_name}}
+				{{ strtoupper($solicitud->toGenerateHistory->createdBy->person->full_name) }}
 			@endif
-		</div> 
+			</span>
+		<!-- </div>  -->
 	</div>
 </div>

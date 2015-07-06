@@ -1,7 +1,7 @@
 <!-- Large modal -->
 <div class="timeLineModal">
 	<div class="container-fluid hide">
-		<div class="thumbnail">
+		<!-- <div class="thumbnail"> -->
 			<div class="stage-container">
 				@if ( $solicitud->idtiposolicitud == SOL_REP )
 					@if ( $solicitud->id_estado == CANCELADO )
@@ -13,17 +13,19 @@
 					@endif
 						<div class="stage-content">
 							<h3 class="stage-title">Inicio Solicitud</h3>
-							<div class="stage-info" style="white-space:nowrap">
+							<!-- <div class="stage-info" style="white-space:nowrap"> -->
+								<span class="label label-info">
 								@if( $solicitud->createdBy->type == REP_MED )
-									{{$solicitud->createdBy->rm->full_name}}
+									{{ strtoupper($solicitud->createdBy->rm->full_name) }}
 								@elseif( $solicitud->createdBy->type == SUP )
-									{{$solicitud->createdBy->sup->full_name}}
+									{{ strtoupper($solicitud->createdBy->sup->full_name) }}
 								@elseif( $solicitud->createdBy->type == GER_PROD )
-									{{$solicitud->createdBy->gerProd->full_name}}
+									{{ strtoupper($solicitud->createdBy->gerProd->full_name) }}
 								@else
-									{{$solicitud->createdBy->person->full_name}}
+									{{ strtoupper($solicitud->createdBy->person->full_name) }}
 								@endif
-							</div>
+								</span>
+							<!-- </div> -->
 						</div>
 					</div>
 					@include('template.Modals.policyTimeLine')
@@ -41,8 +43,10 @@
 					@endif
 						<div class="stage-content">
 							<h3 class="stage-title" style="white-space:nowrap">Inicio Fondo Institucional</h3>
-							<div class="stage-info" style="white-space:nowrap">
-								{{$solicitud->createdBy->person->full_name}}
+							<!-- <div class="stage-info" style="white-space:nowrap"> -->
+								<span class="label label-info">
+								{{ strtoupper($solicitud->createdBy->person->full_name) }}
+								</span>
 							</div>
 						</div>
 					</div>
@@ -53,6 +57,6 @@
 			</div>
 			<div class="clearfix"></div>
 			<br>
-		</div>
+		<!-- </div> -->
 	</div>
 </div>

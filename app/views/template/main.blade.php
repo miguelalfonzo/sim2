@@ -34,7 +34,7 @@
     {{ HTML::style('css/stylos.css') }}
     {{ HTML::style('css/typeahead.css') }}
     {{ HTML::style('css/main.css') }}
-    {{ HTML::style('css/datepicker3.css') }}
+    {{ HTML::style('css/bootstrap-datepicker.css') }}
     <!-- idkc : Report CSS Library -->
     {{ HTML::style('css/dataTables.bootstrap.css') }}
     {{ HTML::style('css/daterangepicker-bs3.css') }}
@@ -226,7 +226,7 @@
 {{ HTML::script('js/jquery.form.js') }}
 {{ HTML::script('js/bootstrap.min.js') }}
 {{ HTML::script('js/bootstrap-datepicker.js') }}
-{{ HTML::script('js/locales/bootstrap-datepicker.es.js') }}
+{{ HTML::script('js/bootstrap-datepicker.es.min.js') }}
 {{ HTML::script('js/bootbox.min.js') }}
 {{ HTML::script('js/jquery.dataTables.min.js') }}
 {{ HTML::script('js/dataTables.bootstrap.js') }}
