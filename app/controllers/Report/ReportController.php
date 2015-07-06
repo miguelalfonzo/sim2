@@ -731,7 +731,7 @@ Log::error("=================> 15");
                 $date            = new DateTime(); 
                 
                 $toDate          = $date->format('Y/m/d');
-                $fromDate        = $date->format('m') == 1 ? $date->format('Y') - 1 : $date->format('Y') . '/' . ($date->format('m') == 1 ? 12 : $date->format('m') - 1) . '/' . $date->format('d');
+                $fromDate        = $date->format('m') == 1 ? $date->format('Y') - 1 : $date->format('Y')-1 . '/' . ($date->format('m') == 1 ? 12 : $date->format('m') - 1) . '/' . $date->format('d');
 
                 $resultQueryExec = $this->processQuery(array(
                     'query'     => $resultQuery->query,
