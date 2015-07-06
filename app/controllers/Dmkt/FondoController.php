@@ -91,19 +91,18 @@ class FondoController extends BaseController
             $detalle = $solicitud->detalle;
             $fondo = $detalle->fondo;
             if ( isset( $montos[ $fondo->id ] ) )
-                $montos[ $fondo->id ] += $detalle->monto_actual;
+                $montos[ $fondo->id ] += $detalle->monto_solicitado;
             else
-                $montos[ $fondo->id] = $detalle->monto_actual;
-
+                $montos[ $fondo->id] = $detalle->monto_solicitado;
             if ( $montos[ $fondo->id ] > $fondo->saldo )
-                return $this->warningException( 'El fondo ' . $fondo->nombre . ' no cuenta con saldo suficinete' , __FUNCTION__ , __LINE__ , __FILE__ );
-
+                return $this->warningException( 'No se cuenta con saldo en el fondo ' . $fondo->nombre . ' para terminar los Fondos Institucionales.'  , __FUNCTION__ , __LINE__ , __FILE__ );
+            $jDetalle = json_decode( $detalle->detalle );
+            $jDetalle->monto_aprobado = $jDetalle->monto_solicitado;
+            $detalle->detalle = json_encode( $jDetalle );
+            $detalle->save();
             $oldIdestado = $solicitud->id_estado;
             $solicitud->id_estado = DEPOSITO_HABILITADO;
-            $solicitud->save();
-
-
-            
+            $solicitud->save();            
             $middleRpta = $this->setStatus( $oldIdestado , DEPOSITO_HABILITADO , Auth::user()->id , USER_TESORERIA , $solicitud->id );
             if ( $middleRpta[status] != ok )
                 return $middleRpta;

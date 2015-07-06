@@ -47,6 +47,8 @@
                     @if ( Auth::user()->type == CONT && $solicitud->id_estado == DEPOSITADO )
                         @include('template.Seat.advance_table')
                     @endif
+                    <!-- Modal Deposito -->
+                    @include('template.Modals.deposit-min')
                 </form>
             </div>
             <div class="tab-pane fade" id="document" style="margin-top:20px; margin-bottom:20px">

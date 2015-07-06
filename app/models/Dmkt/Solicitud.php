@@ -30,7 +30,7 @@ class Solicitud extends Eloquent
 
     protected static function solInst( $periodo )
     {
-        return Solicitud::orderBy('id','desc')->whereHas('detalle' , function ($q ) use ( $periodo )
+        return Solicitud::orderBy('id','desc')->whereHas('detalle' , function ( $q ) use ( $periodo )
         {
             $q->whereHas('periodo' , function ( $t ) use ( $periodo )
             {

@@ -66,9 +66,6 @@
     <!-- Observation-->
     @include('Dmkt.Solicitud.Detail.anotation')
 
-    <!-- Modal Deposito -->
-    @include('template.Modals.deposit-min')
-
     <div class="clearfix"></div>
     
     <!-- PRODUCTOS -->
