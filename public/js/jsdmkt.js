@@ -2158,4 +2158,10 @@ $( document ).ready(function()
     //     if( userType === GER_COM )
     //         listTable( 'estado-fondos' );
     // }
+    $(document).off('change','#idState')
+    $(document).on('change','#idState',function(){
+        listTable( 'solicitudes' );
+    })
 });
+
+
