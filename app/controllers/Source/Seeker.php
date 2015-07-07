@@ -147,13 +147,21 @@ class Seeker extends BaseController
 		    			$tm->table = $table->name;
 		    		$array = array_merge( $tms , $array );
 		    	}
-		    	return $this->setRpta($array);
+	    		return $this->setRpta( array_filter( $array , array( $this , 'filterUserType' ) ) );
 		    }
 		    else
 		    	return $this->warningException( 'Json: Formato Incorrecto' , __FUNCTION__ , __LINE__ , __FILE__ );
 	    }
 	    else
 	    	return $this->warningException( 'Input Vacio (Post: "Json" Vacio)' , __FUNCTION__ , __LINE__ , __FILE__ );   
+	}
+
+	private function filterUserType( $var )
+	{
+		if ( \Auth::user()->type == SUP )
+			return $var->type == 'SUPERVISOR';
+		else
+			return $var->type == 'G. PRODUCTO';
 	}
 
     public function getClientView()

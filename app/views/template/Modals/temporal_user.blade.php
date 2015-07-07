@@ -37,7 +37,7 @@
                     <div class="modal-body">
                         <label class="green">Usuario Asignado</label>
                         <h3 class="green">
-                            @if ( Auth::user()->assignTempUser->user->type == REP_MED )
+                            @if( Auth::user()->assignTempUser->user->type == REP_MED )
                                 {{Auth::user()->assignTempUser->user->rm->full_name}}
                             @elseif ( Auth::user()->assignTempUser->user->type == SUP )
                                 {{Auth::user()->assignTempUser->user->sup->full_name}}

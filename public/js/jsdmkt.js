@@ -507,7 +507,7 @@ $(document).on( "click" , ".register-deposit" , function( e )
                 });
             }
             else
-                bootbox.alert("<h4 class='red'>" + data.Status + ': ' + data.Description + "'.</h4>") ;    
+                bootbox.alert("<h4 class='red'>" + data.Status + ': ' + data.Description + "</h4>") ;    
         });
     }
 });

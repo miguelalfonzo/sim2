@@ -20,6 +20,8 @@ use \Expense\ChangeRate;
 use \Expense\PlanCta;
 use \Validator;
 use \System\FondoHistory;
+use \Maintenance\Fondos;
+use \Maintenance\FondosSupervisor;
 
 class DepositController extends BaseController{
 
@@ -141,15 +143,18 @@ class DepositController extends BaseController{
                         $detalle->save();
                         $solicitud->id_estado = DEPOSITADO;
                         $solicitud->save();
-
                         $middleRpta = $this->fondoDecrease( $detalle->fondo , $detalle );
                         if ( $middleRpta[status] == ok )
                         {
-                            $middleRpta = $this->setStatus( $oldIdestado, DEPOSITADO , Auth::user()->id , USER_CONTABILIDAD , $solicitud->id );
+                            $middleRpta = $this->decreaseFondoProduct( $solicitud );
                             if ( $middleRpta[status] == ok )
                             {
-                                DB::commit();
-                                return $middleRpta;
+                                $middleRpta = $this->setStatus( $oldIdestado, DEPOSITADO , Auth::user()->id , USER_CONTABILIDAD , $solicitud->id );
+                                if ( $middleRpta[status] == ok )
+                                {
+                                    DB::commit();
+                                    return $middleRpta;
+                                }
                             }
                         }      
                     }
@@ -180,9 +185,9 @@ class DepositController extends BaseController{
             else
                 return $this->warningException( 'No existe el registro de la Moneda #: ' . $detalle->id_moneda , __FUNCTION__ , __LINE__ , __FILE__ );
         }
-        if ( $fondo->saldo <= 0 )
+        if ( $fondo->saldo < 0 )
             return $this->warningException( 'El fondo '. $fondo->nombre . 'solo cuenta con ' . $fondo->saldo . ' el cual es insuficiente para registrar la operacion' , __FUNCTION__ , __LINE__ , __FILE__ );
-        $fondo->save();
+        $fondo->save(); 
         $fondoHistory = new FondoHistory;
         $fondoHistory->id = $fondoHistory->nextId();
         $fondoHistory->saldo_inicial = $saldo_inicial;
@@ -190,8 +195,29 @@ class DepositController extends BaseController{
         $fondoHistory->id_solicitud = $detalle->id;
         $fondoHistory->id_fondo = $fondo->id;
         $fondoHistory->save();
-        \Log::error( json_encode( $fondoHistory ) );
         return $this->setRpta();
     }
-    
+
+    private function decreaseFondoProduct( $solicitud )
+    {
+        $products = $solicitud->products;
+        $detalle = $solicitud->detalle;
+        foreach( $products as $product )
+        {
+            if ( $product->user->type == SUP )
+                $subFondo = FondosSupervisor::where( 'supervisor_id' , $product->id_fondo_user )->where( 'marca_id' , $product->id_fondo_producto )->where( 'subcategoria_id' , $product->id_fondo )->first();
+            else
+                $subFondo = Fondos::where( 'fondos_subcategoria_id' , $product->id_fondo )->where( 'marca_id' , $product->id_fondo_producto )->first();
+            $tc = ChangeRate::getTc();
+            if ( $detalle->id_moneda == SOLES )
+                $subFondo->saldo -= $product->monto_asignado ;
+            elseif ( $detalle->id_moneda == DOLARES )
+                $subFondo->saldo -= ( $product->monto_asignado * $tc->compra );
+            if ( $subFondo->saldo < 0 )
+                return $this->warningException( 'El fondo ' . $subFondo->subCategoria->descripcion . ' solo cuenta con Saldo de S/.' . ( $subFondo->saldo + $product->monto_asignado ) . ' se requiere ' . $solicitud->detalle->typeMoney->simbolo .  $product->monto_asignado . ' para registrar la operacion' , __FUNCTION__ , __LINE__ , __FILE__ );    
+            $subFondo->save();
+            \Log::error( json_encode( $subFondo ) );
+        }
+        return $this->setRpta();
+    }    
 }
