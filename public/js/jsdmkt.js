@@ -316,7 +316,7 @@ function listDocuments()
             date_start: $('#drp_menubar').data('daterangepicker').startDate.format("L"),
             date_end  : $('#drp_menubar').data('daterangepicker').endDate.format("L"),
             val          : $('#doc-search-key').val() ,
-            _token       : _token
+            _token       : GBREPORTS.token,
         }
     }).fail( function ( statusCode , errorThrown)
     {

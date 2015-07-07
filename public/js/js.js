@@ -1311,7 +1311,7 @@ $(function()
             data: 
             {
                 id : tr.attr( 'row-id') ,
-                _token : $( 'input[name=_token]' ).val()
+                _token : GBREPORTS.token
             }
         }).fail( function( statusCode , errorThrown )
         {
@@ -1370,7 +1370,7 @@ $(function()
                 id : modal.find( 'input[name=idDocumento]' ).val() ,
                 idregimen : modal.find( '#regimen' ).val() ,
                 monto : modal.find( '#monto-regimen' ).val() ,
-                _token : $( 'input[name=_token]').val()
+                _token : GBREPORTS.token
             }
         }).fail( function( statusCode , errorThrown )
         {

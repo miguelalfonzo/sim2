@@ -114,7 +114,9 @@
                             @endif
                         </ul>
                     </li>
+                    @if ( in_array(Auth::user()->type, array(SUP, GER_PROD, GER_PROM, GER_COM)) )
                     <li><a href="{{ URL::to('solicitude/statement')}}">Movimientos</a></li>
+                    @endif
                     <li><a href="{{ URL::to('eventos')}}">Eventos</a></li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Reportes <span class="caret"></span></a>
@@ -136,12 +138,10 @@
                             <li><a data-toggle="modal" data-target="#modal-temporal-user">Derivación de Usuario</a>
                             </li>
                             @endif
-                            @if ( in_array(Auth::user()->type, array(CONT, GER_COM, TESORERIA)) )
+                            @if ( in_array(Auth::user()->type, array(GER_COM, TESORERIA)) )
                             <li><a href="{{ URL::to('maintenance/fondos') }}">Mantenimiento de Fondos</a></li>
                             @endif
-                            @if ( in_array(Auth::user()->type, array(CONT, GER_COM)) )
-                            <li><a href="{{ URL::to('maintenance/dailyseatrelation') }}">Mantenimiento de Cuentas - Marcas</a></li>
-                            <li><a href="{{ URL::to('maintenance/fondoaccount') }}">Mantenimiento de Cuentas de Fondos</a></li>
+                            @if ( in_array(Auth::user()->type, array(GER_COM)) )
                             <li><a href="{{ URL::to('maintenance/inversion') }}">Mantenimiento de Inversion</a></li>
                             <li><a href="{{ URL::to('maintenance/activity') }}">Mantenimiento de Actividades</a></li>
                             <li><a href="{{ URL::to('maintenance/investmentactivity') }}">Mantenimiento de Inversion-Actividad</a></li>
@@ -151,6 +151,8 @@
                             @if ( in_array(Auth::user()->type, array(CONT)) )
                             <li><a href="{{ URL::to('maintenance/finddocument') }}">Mantenimiento de Documentos</a></li>
                             <li><a href="{{ URL::to('maintenance/documenttype') }}">Mantenimiento de Tipo de Documentos</a></li>
+                            <li><a href="{{ URL::to('maintenance/fondoaccount') }}">Mantenimiento de Cuentas de Fondos</a></li>
+                            <li><a href="{{ URL::to('maintenance/dailyseatrelation') }}">Mantenimiento de Cuentas - Marcas</a></li>
                             @endif
                         </ul>
                     </li>

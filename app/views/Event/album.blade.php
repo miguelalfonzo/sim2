@@ -39,4 +39,8 @@
 		  	@endforeach
 		</div>
 	</div>
+	<script>
+		var size = $(".col-sm-6.col-md-4").css('height');
+		$(".col-sm-6.col-md-4").css('height', size);
+	</script>
 @endsection
