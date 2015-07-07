@@ -147,6 +147,7 @@ class Seeker extends BaseController
 		    			$tm->table = $table->name;
 		    		$array = array_merge( $tms , $array );
 		    	}
+		    	return $this->setRpta( $array );
 	    		return $this->setRpta( array_filter( $array , array( $this , 'filterUserType' ) ) );
 		    }
 		    else
