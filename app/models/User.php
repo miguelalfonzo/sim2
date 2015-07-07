@@ -129,5 +129,5 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
         else
             return $tempUser->userTemp->type;
     }
-
+    
 }

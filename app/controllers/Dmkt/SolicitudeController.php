@@ -143,14 +143,14 @@ class SolicitudeController extends BaseController
             {
                 $politicType = $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario;
                 if ( in_array( $politicType , array( Auth::user()->type , Auth::user()->tempType() ) )
-                    && ( array_intersect ( array( Auth::user()->id , Auth::user()->tempId() ) , $solicitud->managerEdit( $politicType )->lists( 'id_gerprod' ) ) ) )
+                && ( array_intersect ( array( Auth::user()->id , Auth::user()->tempId() ) , $solicitud->managerEdit( $politicType )->lists( 'id_gerprod' ) ) ) )
                 {
                     $politicStatus = TRUE;
-                    $typeUser = $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario;
+                    $data['tipo_usuario'] = $politicType;
                     $solicitud->status = BLOCKED;
                     Session::put( 'id_solicitud' , $solicitud->id );
                     $solicitud->save();
-                    $fondos = Fondo::getFunds( $typeUser );
+                    $fondos = Fondo::getFunds( $politicType );
                     if ( ! $fondos->isEmpty() )    
                         $data[ 'fondos' ] = $fondos;
                     if ( isset( $data['fondos'] ) && ! is_null( $solicitud->detalle->id_fondo ) )
@@ -298,18 +298,17 @@ class SolicitudeController extends BaseController
         return $this->setRpta( $idsGerProd );
     }
 
-    private function setProductsAmount( $solProductIds , $amount , $fondo )
+    private function setProductsAmount( $solProductIds , $amount , $fondo , $user_id )
     {
         foreach ( $solProductIds as $key => $solProductId ) 
         {
             $fData = explode( ',' , $fondo[ $key ] );
             $solProduct = SolicitudProduct::find( $solProductId );
             $solProduct->monto_asignado = round( $amount[ $key ] , 2 , PHP_ROUND_HALF_DOWN ) ;
-            $solProduct->id_fondo = $fData[0];
-            $solProduct->id_fondo_producto = $fData[1];
-            $solProduct->id_fondo_user = Auth::user()->id;
+            $solProduct->id_fondo = $fData[ 0 ];
+            $solProduct->id_fondo_producto = $fData[ 1 ];
+            $solProduct->id_fondo_user = ( isset( $fData[ 2 ] ) ) ? $fData[ 2 ] : $user_id ;
             $solProduct->save();
-            \Log::error( json_encode( $solProduct ) );
         }
         return $this->setRpta();
     }
@@ -559,7 +558,6 @@ class SolicitudeController extends BaseController
             return $this->warningException( 'La inversion no  tiene politica de aprobacion' , __FUNCTION__ , __LINE__ , __FILE__ );
         $userType = $aprovalPolicy->tipo_usuario;
         $msg= '';
-        \Log::error( json_encode( $aprovalPolicy ) );
         if ( ! is_null( $aprovalPolicy->desde ) || ! is_null( $aprovalPolicy->hasta ) )
             $msg .= ' para montos ' . ( is_null( $aprovalPolicy->desde ) ? '' : 'desde S/.' . $aprovalPolicy->desde . ' ' ) . ( is_null( $aprovalPolicy->hasta ) ? '' : 'hasta S/.' . $aprovalPolicy->hasta ) ; 
         if ( $userType == SUP )
@@ -687,7 +685,6 @@ class SolicitudeController extends BaseController
     private function acceptedSolicitudeTransaction( $idSolicitud , $inputs )
     {
         DB::beginTransaction();
-        \Log::error( $inputs );
         $middleRpta = $this->validateInputAcceptSolRep( $inputs );
         if ( $middleRpta[ status] === ok )
         {
@@ -729,7 +726,13 @@ class SolicitudeController extends BaseController
                         $detalle->monto_aprobado = $monto;
                     $solDetalle->detalle = json_encode( $detalle );
                     $solDetalle->save();
-                    $middleRpta = $this->setProductsAmount( $inputs[ 'producto' ] , $inputs[ 'monto_producto' ] , $inputs[ 'fondo-producto' ] );
+                    if ( $solicitud->createdBy->type == REP_MED )
+                        $user = \User::find( $solicitud->createdBy->rm->rmSup->iduser );
+                    elseif ( $solicitud->createdBy->type == SUP )
+                        $user = \User::find( $solicitud->created_by );
+                    else
+                        $user = Auth::user();
+                    $middleRpta = $this->setProductsAmount( $inputs[ 'producto' ] , $inputs[ 'monto_producto' ] , $inputs[ 'fondo-producto' ] , $user->id );
                     if ( $middleRpta[ status ] != ok )
                         return $middleRpta;
                 }

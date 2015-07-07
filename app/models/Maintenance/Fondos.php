@@ -20,4 +20,9 @@ class Fondos extends Eloquent
 	{
 		return $this->belongsTo('Dmkt\Marca', 'marca_id' );
 	}
+
+	public function subCategoria()
+	{
+		return $this->hasOne( 'Maintenance\FondosSubCategorias' , 'id' , 'fondos_subcategoria_id');
+	}
 }

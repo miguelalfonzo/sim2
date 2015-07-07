@@ -146,6 +146,11 @@ class Solicitud extends Eloquent
         return $this->belongsTo( 'User' , 'created_by' );
     }
 
+    public function updatedBy()
+    {
+        return $this->belongsTo( 'User' , 'updated_by' );
+    }
+
     public function gerente()
     {
         return $this->hasMany( 'Dmkt\SolicitudGer' , 'id_solicitud' , 'id' );
