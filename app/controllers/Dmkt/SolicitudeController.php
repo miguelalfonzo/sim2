@@ -302,12 +302,15 @@ class SolicitudeController extends BaseController
     {
         foreach ( $solProductIds as $key => $solProductId ) 
         {
-            $fData = explode( ',' , $fondo[ $key ] );
             $solProduct = SolicitudProduct::find( $solProductId );
             $solProduct->monto_asignado = round( $amount[ $key ] , 2 , PHP_ROUND_HALF_DOWN ) ;
-            $solProduct->id_fondo = $fData[ 0 ];
-            $solProduct->id_fondo_producto = $fData[ 1 ];
-            $solProduct->id_fondo_user = ( isset( $fData[ 2 ] ) ) ? $fData[ 2 ] : $user_id ;
+            if ( $fondo != 0 )
+            {
+                $fData = explode( ',' , $fondo[ $key ] );
+                $solProduct->id_fondo = $fData[ 0 ];
+                $solProduct->id_fondo_producto = $fData[ 1 ];
+                $solProduct->id_fondo_user = ( isset( $fData[ 2 ] ) ) ? $fData[ 2 ] : $user_id ;
+            }
             $solProduct->save();
         }
         return $this->setRpta();
@@ -732,7 +735,11 @@ class SolicitudeController extends BaseController
                         $user = \User::find( $solicitud->created_by );
                     else
                         $user = Auth::user();
+
+                    if ( ! isset( $inputs[ 'fondo-producto' ] ) )
+                        $inputs[ 'fondo-producto'] = 0;
                     $middleRpta = $this->setProductsAmount( $inputs[ 'producto' ] , $inputs[ 'monto_producto' ] , $inputs[ 'fondo-producto' ] , $user->id );
+                    
                     if ( $middleRpta[ status ] != ok )
                         return $middleRpta;
                 }
@@ -760,6 +767,7 @@ class SolicitudeController extends BaseController
                 {
                     Session::put( 'state' , $solicitud->state->rangeState->id );
                     DB::commit();
+                    //return array( status => warning , description => 'prueba');
                     return $middleRpta ;
                 }
             }
