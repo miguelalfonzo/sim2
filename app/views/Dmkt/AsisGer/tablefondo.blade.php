@@ -18,8 +18,8 @@
                 <tr>
                     <td>{{$solicitud->id}}</td>
                     <td style="text-align:center">
-                        <span class="label label-info" style="margin-right:1em;background-color:{{$solicitud->activity->color}}">
-                                {{$solicitud->activity->nombre}}
+                        <span class="label label-info" style="margin-right:1em;background-color:{{$solicitud->activityTrash->color}}">
+                                {{$solicitud->activityTrash->nombre}}
                         </span>
                         {{$solicitud->titulo}}
                     </td>

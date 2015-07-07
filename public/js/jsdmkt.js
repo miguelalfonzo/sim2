@@ -362,28 +362,27 @@ function searchFondos( datefondo , aux )
         if ( data.Status == 'Ok' )
         {
             $('#loading-fondo').attr('class','hide');
-            $('.table_solicituds_fondos > .fondo_r').remove();
-            $('#table_solicitude_fondos_wrapper').remove();
+            $('#table_reporte_institucional_wrapper').remove();
             $('.table-solicituds-fondos').append(data.Data.View);
             $('#export-fondo').attr('href', server + 'exportfondos/' + datefondo);
-            $('#table_solicitude_fondos').DataTable(
+            $('#table_reporte_institucional').DataTable(
             {
-                "order": 
+                order: 
                 [
                     [3, "desc"]
                 ],
-                "bLengthChange": false,
-                'iDisplayLength': 7,
-                "oLanguage": 
+                bLengthChange: false,
+                iDisplayLength: 7,
+                oLanguage: 
                 {
-                    "sSearch": "Buscar: ",
-                    "sZeroRecords": "No hay fondos",
-                    "sInfoEmpty": " ",
-                    "sInfo": 'Mostrando _END_ de _TOTAL_',
-                    "oPaginate": 
+                    sSearch: "Buscar: ",
+                    sZeroRecords: "No hay fondos",
+                    sInfoEmpty: " ",
+                    sInfo: 'Mostrando _END_ de _TOTAL_',
+                    oPaginate: 
                     {
-                        "sPrevious": "Anterior",
-                        "sNext": "Siguiente"
+                        sPrevious: "Anterior",
+                        sNext: "Siguiente"
                     }
                 }
             });
@@ -482,9 +481,9 @@ $(document).on( "click" , ".register-deposit" , function( e )
     e.preventDefault();
     var url = 'deposit-solicitude';
     var data = {};
-    data.op_number      = $("#op-number").val();
-    data.token          = $("input[name=token]").val();
     data._token         = _token;
+    data.token          = $("input[name=token]").val();
+    data.op_number      = $("#op-number").val();
     data.num_cuenta     = $("#bank_account").val();
 
     if ($("#op-number").val().trim() === "")
@@ -501,7 +500,7 @@ $(document).on( "click" , ".register-deposit" , function( e )
                 $("#op-number").val('');
                 bootbox.alert("<h4 class='green'>Se registro el codigo de deposito correctamente.</h4>", function()
                 {
-                    if ($("tbody").length == 0)
+                    if ( $('.table_solicitudes').length == 0 )
                         window.location.href = server +"show_user";
                     else
                         listTable( 'solicitudes' );

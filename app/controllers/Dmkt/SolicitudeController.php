@@ -298,13 +298,18 @@ class SolicitudeController extends BaseController
         return $this->setRpta( $idsGerProd );
     }
 
-    private function setProductsAmount( $solProductIds , $amount )
+    private function setProductsAmount( $solProductIds , $amount , $fondo )
     {
         foreach ( $solProductIds as $key => $solProductId ) 
         {
+            $fData = explode( ',' , $fondo[ $key ] );
             $solProduct = SolicitudProduct::find( $solProductId );
             $solProduct->monto_asignado = round( $amount[ $key ] , 2 , PHP_ROUND_HALF_DOWN ) ;
+            $solProduct->id_fondo = $fData[0];
+            $solProduct->id_fondo_producto = $fData[1];
+            $solProduct->id_fondo_user = Auth::user()->id;
             $solProduct->save();
+            \Log::error( json_encode( $solProduct ) );
         }
         return $this->setRpta();
     }
@@ -577,7 +582,7 @@ class SolicitudeController extends BaseController
             if ( count( $notRegisterGerProdName ) === 0 )
                 $idsUser = Manager::whereIn( 'id' , $uniqueIdsGerProd )->lists( 'iduser' );
             else
-                return $this->warningException( 'Los siguientes Gerentes no estan registrados en el sistema: ' . implode( ' , ' , $notRegisterGerProdName ) , __FUNCTION__ , __LINE__ , __FILE__ );
+                return $this->warningException( 'Los siguientes Gerentes de Producto no estan registrados en el sistema: ' . implode( ' , ' , $notRegisterGerProdName ) , __FUNCTION__ , __LINE__ , __FILE__ );
         }
         else
         {
@@ -682,6 +687,7 @@ class SolicitudeController extends BaseController
     private function acceptedSolicitudeTransaction( $idSolicitud , $inputs )
     {
         DB::beginTransaction();
+        \Log::error( $inputs );
         $middleRpta = $this->validateInputAcceptSolRep( $inputs );
         if ( $middleRpta[ status] === ok )
         {
@@ -703,10 +709,15 @@ class SolicitudeController extends BaseController
                     
                     if ( isset( $inputs[ 'idfondo'] ) )
                     {
+                        if ( in_array( Auth::user()->type , array( SUP , GER_PROD ) ) && $inputs['idfondo'] == 0 )
+                            return $this->warningException( 'No se ha especificado el Fondo' , __FUNCTION__ , __LINE__ , __FILE__ ); 
                         $middleRpta = $this->validateFondo( $inputs[ 'idfondo'] , $inputs[ 'monto' ] , $solDetalle->id_moneda );
                         if ( $middleRpta[ status ] != ok )
                             return $middleRpta;
                     }
+                    else
+                        if ( in_array( Auth::user()->type , array( SUP , GER_PROD ) ) )
+                            return $this->warningException( 'No se ha especificado el Fondo' , __FUNCTION__ , __LINE__ , __FILE__ ); 
 
                     if ( isset( $inputs[ 'idfondo' ] ) )
                         $solDetalle->id_fondo = $inputs['idfondo'];
@@ -718,7 +729,7 @@ class SolicitudeController extends BaseController
                         $detalle->monto_aprobado = $monto;
                     $solDetalle->detalle = json_encode( $detalle );
                     $solDetalle->save();
-                    $middleRpta = $this->setProductsAmount( $inputs[ 'producto' ] , $inputs[ 'monto_producto' ] );
+                    $middleRpta = $this->setProductsAmount( $inputs[ 'producto' ] , $inputs[ 'monto_producto' ] , $inputs[ 'fondo-producto' ] );
                     if ( $middleRpta[ status ] != ok )
                         return $middleRpta;
                 }

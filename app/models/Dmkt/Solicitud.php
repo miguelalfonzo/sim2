@@ -30,7 +30,7 @@ class Solicitud extends Eloquent
 
     protected static function solInst( $periodo )
     {
-        return Solicitud::orderBy('id','desc')->whereHas('detalle' , function ($q ) use ( $periodo )
+        return Solicitud::orderBy('id','desc')->whereHas('detalle' , function ( $q ) use ( $periodo )
         {
             $q->whereHas('periodo' , function ( $t ) use ( $periodo )
             {
@@ -171,9 +171,14 @@ class Solicitud extends Eloquent
         return $this->hasOne('Users\Sup','iduser','created_by')->select('nombres,apellidos,iduser,idsup');;
     }
 
-    protected function activity()
+    public function activity()
     {
         return $this->hasOne('Dmkt\Activity','id','id_actividad');
+    }
+
+    public function activityTrash()
+    {
+        return $this->hasOne( 'Dmkt\Activity' , 'id' , 'id_actividad' )->withTrashed();
     }
 
     protected function expenses()

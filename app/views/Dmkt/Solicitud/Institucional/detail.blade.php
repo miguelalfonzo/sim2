@@ -36,7 +36,7 @@
 
 	@include('Dmkt.Solicitud.Detail.fondo')
 
-	@if ($solicitud->estado == DEPOSITADO)
+	@if ( ! is_null( $solicitud->toAdvanceSeatHistory ) )
 		<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
 			<label class="control-label">Número de Operación, Transacción, Cheque</label>
 			<div>
@@ -66,7 +66,4 @@
 			</div>
 		</div>
 	@endif
-
-	<!-- Modal Deposito -->
-	@include('template.Modals.deposit-min')
 </section>

@@ -56,7 +56,7 @@
                 <td class="text-left sol_titulo">
                     @if (! is_null( $solicitud->id_actividad ) )
                         <span class="label" style="margin-right:1em;background-color:{{$solicitud->activity->color}}">
-                            {{$solicitud->activity->nombre}}
+                            {{$solicitud->activityTrash->nombre}}
                         </span>
                     @endif
                     <label>{{$solicitud->titulo}}</label>
