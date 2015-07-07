@@ -29,7 +29,7 @@ class InvestmentActivity extends Eloquent
 
     public function activity()
     {
-    	return $this->hasOne( 'Dmkt\Activity' , 'id' , 'id_actividad' );
+    	return $this->hasOne( 'Dmkt\Activity' , 'id' , 'id_actividad' )->orderBy('nombre');
     }
 
     public function investment()

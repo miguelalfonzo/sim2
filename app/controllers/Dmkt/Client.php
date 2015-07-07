@@ -29,15 +29,29 @@ class Client extends BaseController
     {
     	try
     	{
+            $result = null;
     		$inputs = Input::all();
     		if ( isset( $inputs['tipo_cliente'] ) )
     		{
-    			$act = Activity::where( 'tipo_cliente' , $inputs['tipo_cliente'] )->lists('id');
-    			$act = InvestmentActivity::where( 'id_inversion' , $inputs['id_inversion'] )->whereIn( 'id_actividad' , $act );
+                $act    = Activity::where( 'tipo_cliente' , $inputs['tipo_cliente'] )->lists('id');
+                $act    = InvestmentActivity::with('activity')
+                            ->join('TIPO_ACTIVIDAD', 'INVERSION_ACTIVIDAD.id_actividad', '=', 'TIPO_ACTIVIDAD.id')
+                            ->where( 'id_inversion' , $inputs['id_inversion'] )
+                            ->whereIn( 'id_actividad' , $act )
+                            ->orderBy('TIPO_ACTIVIDAD.nombre', 'asc')
+                            ->get();
+                $result =  $act;
     		}
-    		else
-    			$act = InvestmentActivity::where( 'id_inversion' , $inputs['id_inversion'] );
-    		return $this->setRpta( $act->lists('id_actividad') );
+    		else{
+                $act = InvestmentActivity::with('activity')
+                        ->join('TIPO_ACTIVIDAD', 'INVERSION_ACTIVIDAD.id_actividad', '=', 'TIPO_ACTIVIDAD.id')
+                        ->where( 'id_inversion' , $inputs['id_inversion'] )
+                        ->orderBy('TIPO_ACTIVIDAD.nombre', 'asc')
+                        ->get();
+                // dd(json_encode($act));
+                $result = $act;
+            }
+    		return $this->setRpta($result);
     	}
     	catch( Exception $e )
     	{

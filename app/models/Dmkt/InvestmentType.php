@@ -24,7 +24,7 @@ class InvestmentType extends Eloquent
 
     protected static function order()
     {
-    	return InvestmentType::orderBy('id','asc')->get();
+    	return InvestmentType::orderBy('nombre','asc')->get();
     }
 
     protected function investmentActivity()
