@@ -9,7 +9,11 @@
                             <span class="input-group-addon" style="width: 30%;">{{{ is_null( $product->marca ) ? '' : $product->marca->descripcion}}}</span>
                             <select name="fondo-producto[]" class="selectpicker form-control">
                                 @foreach( $product->getSubFondo() as $subFondo )
-                                    <option value="{{$subFondo->id}}">{{$subFondo->descripcion}}</option>
+                                    @if ( $subFondo->marca_id == $product->id_producto )
+                                        <option selected value="{{ $subFondo->id . ',' . $subFondo->marca_id}}" style="background-color:#00FFFF">{{$subFondo->descripcion}}</option>
+                                    @else   
+                                        <option value="{{ $subFondo->id . ',' . $subFondo->marca_id}}">{{$subFondo->descripcion}}</option>
+                                    @endif
                                 @endforeach
                             </select>
                             <span class="input-group-addon">{{ $detalle->typemoney->simbolo }}</span>
@@ -18,6 +22,7 @@
                         </div>
                     @else
                         {{{ is_null( $product->marca ) ? '' : $product->marca->descripcion}}}
+                        : {{ $product->subCatFondo->descripcion }}
                         <span class="badge">{{ $detalle->typemoney->simbolo }} 
                         {{ isset( $product->monto_asignado ) ? $product->monto_asignado :
                         round( $detalle->monto_actual / count( $solicitud->products ) , 2 ) }}

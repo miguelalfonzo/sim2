@@ -414,7 +414,7 @@ class TestController extends BaseController
 			})->get();
 		else
 			return DB::table('fondos_supervisor fs')
-			->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'fs.saldo saldo' , 'fsc.id' )
+			->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'fs.saldo saldo' , 'fsc.id' , 'fs.marca_id marca_id' )
 			->leftJoin( 'fondos_subcategorias fsc' , 'fsc.id' , '=' , 'fs.subcategoria_id' )
 			->leftJoin( 'fondos_categorias fc' , 'fc.id' , '=' , 'fsc.fondos_categorias_id' )
 			->leftJoin( 'outdvp.marcas m' , 'fs.marca_id' , '=' , 'm.id' )

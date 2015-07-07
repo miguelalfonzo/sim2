@@ -302,9 +302,12 @@ class SolicitudeController extends BaseController
     {
         foreach ( $solProductIds as $key => $solProductId ) 
         {
+            $fData = explode( ',' , $fondo[ $key ] );
             $solProduct = SolicitudProduct::find( $solProductId );
             $solProduct->monto_asignado = round( $amount[ $key ] , 2 , PHP_ROUND_HALF_DOWN ) ;
-            $solProduct->id_fondo = $fondo[ $key ];
+            $solProduct->id_fondo = $fData[0];
+            $solProduct->id_fondo_producto = $fData[1];
+            $solProduct->id_fondo_user = Auth::user()->id;
             $solProduct->save();
             \Log::error( json_encode( $solProduct ) );
         }
@@ -706,10 +709,15 @@ class SolicitudeController extends BaseController
                     
                     if ( isset( $inputs[ 'idfondo'] ) )
                     {
+                        if ( in_array( Auth::user()->type , array( SUP , GER_PROD ) ) && $inputs['idfondo'] == 0 )
+                            return $this->warningException( 'No se ha especificado el Fondo' , __FUNCTION__ , __LINE__ , __FILE__ ); 
                         $middleRpta = $this->validateFondo( $inputs[ 'idfondo'] , $inputs[ 'monto' ] , $solDetalle->id_moneda );
                         if ( $middleRpta[ status ] != ok )
                             return $middleRpta;
                     }
+                    else
+                        if ( in_array( Auth::user()->type , array( SUP , GER_PROD ) ) )
+                            return $this->warningException( 'No se ha especificado el Fondo' , __FUNCTION__ , __LINE__ , __FILE__ ); 
 
                     if ( isset( $inputs[ 'idfondo' ] ) )
                         $solDetalle->id_fondo = $inputs['idfondo'];
