@@ -382,6 +382,7 @@
 			}
 			</script>
 	@endif
+	@if(isset($event))
 	@if($event)
 		<script>
 	                 $(document).ready(function(){
@@ -424,6 +425,7 @@
 						$('.carousel').carousel();						
 	                 });
 	                </script>
+	@endif
 	@endif
 	<section class="row reg-expense" style="margin:0">
 			<div class="col-xs-12 col-sm-12 col-md-12">
