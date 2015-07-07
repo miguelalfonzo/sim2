@@ -1544,4 +1544,32 @@ $(function()
         }
         this.parentElement.childNodes[0].innerHTML = text;
     });
+    //Carrousel photo events
+    $(document).off("click", ".photosEvent");
+    $(document).on("click", ".photosEvent", function(e){
+        e.preventDefault();
+        var event_id = $(this).data('event');
+        if(event_id){
+            $.ajax({
+                type: 'post',
+                url: server + 'photos',
+                data: 
+                {
+                    _token : $('input[name=_token]').val(),
+                    event_id  : event_id
+                }
+            }).fail( function( statusCode , errorThrow )
+            {
+                bootbox.alert("error" );
+            }).done( function ( data ) 
+            {
+                bootbox.dialog({
+                    message: data,
+                    title  : "Galería de Fotos",
+                    size   : "large"
+                });
+                $('.carousel').carousel();
+            }); 
+        }
+    });
 });

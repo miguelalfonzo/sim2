@@ -115,6 +115,7 @@
                         </ul>
                     </li>
                     <li><a href="{{ URL::to('solicitude/statement')}}">Movimientos</a></li>
+                    <li><a href="{{ URL::to('eventos')}}">Eventos</a></li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Reportes <span class="caret"></span></a>
                         <ul id="menu-report" class="dropdown-menu" role="menu">

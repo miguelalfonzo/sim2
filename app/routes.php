@@ -11,8 +11,8 @@
     Route::get('set_status', array('uses' => 'BaseController@setStatus'));
     Route::get('sendmail', array('uses' => 'BaseController@postman'));
     Route::get('prueba', 'Dmkt\FondoController@test');
-    Route::get('testUploadImg', 'BaseController@viewTestUploadImg');
-    Route::post('testUploadImgSave', 'BaseController@viewTestUploadImgSave');
+    // Route::get('testUploadImg', 'BaseController@viewTestUploadImg');
+    // Route::post('testUploadImgSave', 'BaseController@viewTestUploadImgSave');
 
     Route::get('clientes-data','TestController@clientsTables');
     Route::get('hola', 'Expense\ExpenseController@test');
@@ -226,6 +226,16 @@ Route::get('maintenance/investmentactivity' , 'Maintenance\TableController@getMa
 Route::get('maintenance/finddocument', 'Dmkt\SolicitudeController@findDocument');
 Route::get('maintenance/documenttype', 'Dmkt\FondoController@listDocuments');
 Route::get('maintenance/parameters', 'Maintenance\TableController@getMaintenanceTableParameter');
+
+/*
+|--------------------------------------------------------------------------
+| EVENTOS
+|--------------------------------------------------------------------------
+*/
+Route::post('createEvent', 'Dmkt\SolicitudeController@createEventHandler');
+Route::get('eventos','Dmkt\SolicitudeController@album');
+Route::post('photos', 'Dmkt\SolicitudeController@photos');
+Route::post('testUploadImgSave', 'Dmkt\SolicitudeController@viewTestUploadImgSave');
 /*
 |--------------------------------------------------------------------------
 | TEST MANTENIMIENTO

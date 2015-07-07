@@ -37,6 +37,10 @@ use \Client\ClientType;
 use \yajra\Pdo\Oci8\Exceptions\Oci8Exception;
 use \System\FondoHistory;
 use \Alert\AlertController;
+use \Event\Event;
+use \FotoEventos;
+use \Common\FileStorage;
+use \Response;
 
 class SolicitudeController extends BaseController
 {
@@ -121,7 +125,9 @@ class SolicitudeController extends BaseController
                        'currencies'  => TypeMoney::all(),
                        'families'    => Marca::orderBy('descripcion', 'ASC')->get(),
                        'investments' => InvestmentType::order() ,
-                       'alert'       => $alert->expenseAlert() );
+                       'alert'       => $alert->expenseAlert(),
+                       'edit'        => true
+                );
         $data[ 'detalle' ] = $data['solicitud']->detalle;
         return View::make('Dmkt.Register.solicitud', $data);
     }
@@ -190,6 +196,11 @@ class SolicitudeController extends BaseController
             $alert = new AlertController;
             if ( is_null( $data[ 'solicitud' ]->registerHistory ) && !in_array( $data['solicitud']->id_estado , array( CANCELADO , RECHAZADO ) ) ) 
                 $data[ 'alert' ] = $alert->compareTime( $data[ 'solicitud'] , 'diffInMonths' );
+
+            $event = Event::where('solicitud_id', '=', $solicitud->id)->get();
+            if($event->count()!=0)
+                $data['event'] = $event[0];
+
             return View::make( 'Dmkt.Solicitud.view' , $data );
         }
         catch ( Exception $e )
@@ -1332,5 +1343,109 @@ class SolicitudeController extends BaseController
     {
         $solicitud = Solicitud::find( $id );
         return View::make( 'template.Modals.timeLine')->with( array( 'solicitud' => $solicitud ) )->render();
+    }
+    public function album(){
+        $data =array();
+        $data['events'] = Event::all();
+        return View::make('Event.album',$data);
+    }
+
+    public function photos(){
+        $event_id = Input::get('event_id');
+        $photos = FotoEventos::where('event_id', $event_id)->get();
+        $view = View::make('Event.carousel', compact('photos'))->render();
+        return $view;
+    }
+
+    public function createEventHandler(){
+        try{
+        $result = array();
+        $input  = Input::all();
+        $rules  = array(
+            'name'         => 'required|unique:event',
+            'description'  => 'required',            
+            'event_date'   => 'required',
+            'solicitud_id' => 'required',
+        );
+
+        $validator = Validator::make(Input::all(), $rules);
+        if ($validator->fails())
+        {
+            $result['status']   = 'error';
+            $result['message'] = DATOS_INVALIDOS;
+            $result['detail']   = $validator->messages();
+        }else{        
+            $newEvent = new Event();
+            $newId    = $newEvent->searchId() + 1;
+            $input    = array("id" => $newId) + $input;
+            $input['place'] = is_null($input['place']) ? null : $input['place'];
+            if($newEvent->create($input)){
+                $result['status']   = 'ok';
+                $result['message'] = CREADO_SATISFACTORIAMENTE;
+                $result['id'] = $newId;
+            }else{
+                $result['status']   = 'error';
+                $result['message'] = DB_NOT_INSERT;
+            }        
+        }
+        
+        return $result;
+        
+        }catch(Exception $e){
+            Log::error($e);
+            return $e;
+        }
+    }
+
+    public function viewTestUploadImgSave() {
+
+        $fileList = Input::file('image');
+        $event_id = Input::get('event_id');
+
+        // $input = array('image' => $file);
+        // $rules = array(
+        //     'image' => 'image'
+        // );
+
+        // $validator = Validator::make($input, $rules);
+        if ( count($fileList) == 0 )
+        {
+            return Response::json(array(
+                'success'   => false,
+                'errors'    => 'No se pudo Cargar Archivo'
+            ));
+        }
+        else {
+            $resultFileList = array();
+            
+            foreach ($fileList as $fileKey => $fileItem) {
+                
+                $destinationPath    = FILESTORAGE_DIR;
+                $fileName           = pathinfo($fileItem->getClientOriginalName(), PATHINFO_FILENAME);
+                $fileExt            = pathinfo($fileItem->getClientOriginalName(), PATHINFO_EXTENSION);
+                $fileNameMD5        = md5(uniqid(rand(), true));
+
+                $fileStorage                = new FileStorage;
+                $fileStorage->id            = $fileNameMD5;
+                $fileStorage->name          = pathinfo($fileItem->getClientOriginalName(), PATHINFO_FILENAME);
+                $fileStorage->extension     = $fileExt;
+                $fileStorage->directory     = $destinationPath;
+                $fileStorage->app           = APP_ID;
+                $fileStorage->event_id      = $event_id;
+                $fileStorage->save();
+
+                $fileItem->move($destinationPath, $fileNameMD5.'.'.$fileExt);
+                $resultFileList[] = array(
+                    'id'   => $fileNameMD5,
+                    'name'      => asset($destinationPath.$fileNameMD5.'.'.$fileExt)
+                );
+
+            }
+            return Response::json(array(
+                'success'   => true,
+                'fileList'  => $resultFileList
+            ));
+        }
+ 
     }
 }
