@@ -82,7 +82,7 @@ var date_options2 =
     startDate: '-1y',
     minViewMode: 1,
     language: "es",
-    orientation: "bottom auto",
+    orientation: "top",
     autoclose: true
 };
 
@@ -316,7 +316,7 @@ function listDocuments()
             date_start: $('#drp_menubar').data('daterangepicker').startDate.format("L"),
             date_end  : $('#drp_menubar').data('daterangepicker').endDate.format("L"),
             val          : $('#doc-search-key').val() ,
-            _token       : _token
+            _token       : GBREPORTS.token,
         }
     }).fail( function ( statusCode , errorThrown)
     {
@@ -1675,6 +1675,8 @@ function filterSelect( element , ids , type )
     console.log( $(element) );
     if ( ( type === 'cliente' && clients.children().length == 1 ) || ( type === 'eliminacion' && clients.children().length >= 1 ) ) 
     {
+        console.log("cliente y eliminacion");
+        
         select.val('').children().show();
         select.val('');
         select.children().attr( '[type=' + type + ']' );
@@ -1685,18 +1687,25 @@ function filterSelect( element , ids , type )
     }
     else if ( type === 'inversion' )
     {
-        select.val('');
-        select.children().filter( function() 
-        {
-            return $(this).attr('type') == type;
-        }).show();
-        select.children().filter( function() 
-        {
-            console.log( $(this).val() );
-            console.log( ids );
-            console.log( $.inArray( parseInt( $(this).val() ) ,  ids ) );
-            return $.inArray( $(this).val() ,  ids ) == -1;
-        }).attr( 'type' , type ).hide();   
+        select.empty();
+        if(ids.length > 0){
+            select.append("<option value disabled selected>SELECCIONE</option>")
+            $(ids).each(function(i,data){
+                select.append('<option value="'+ data.activity.id +'">'+ data.activity.nombre +'</option>');
+            });
+        }
+        // select.val('');
+        // select.children().filter( function() 
+        // {
+        //     return $(this).attr('type') == type;
+        // }).show();
+        // select.children().filter( function() 
+        // {
+        //     // console.log( $(this).val() );
+        //     // console.log( ids );
+        //     // console.log( $.inArray( parseInt( $(this).val() ) ,  ids ) );
+        //     return $.inArray( $(this).val() ,  ids ) == -1;
+        // }).attr( 'type' , type ).hide();   
     }
 }
 

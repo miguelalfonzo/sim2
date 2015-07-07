@@ -17,7 +17,7 @@
             @endif
             <th>Estado</th>
             <th>Tipo</th>
-            <th style="width:auto">Edicion</th>
+            <th class="col-sm-2">Edicion</th>
             @if (Auth::user()->type == GER_COM)
                 <th data-checkbox="true">Marcar</th>
             @endif

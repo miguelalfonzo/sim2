@@ -309,3 +309,16 @@ table tbody tr td.close-details
 {
 	width: 90%;
 }
+
+.img_idkc {
+	width     : auto;
+	height    : 75vh !important;
+	max-height: 75vh !important;
+	margin    : 0 auto;
+}
+.carouselImg{
+	width     : auto;
+	height    : 75vh !important;
+	max-height: 75vh !important;
+	margin    : 0 auto;
+}

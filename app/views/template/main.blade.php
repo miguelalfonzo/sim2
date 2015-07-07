@@ -34,7 +34,7 @@
     {{ HTML::style('css/stylos.css') }}
     {{ HTML::style('css/typeahead.css') }}
     {{ HTML::style('css/main.css') }}
-    {{ HTML::style('css/bootstrap-datepicker.css') }}
+    {{ HTML::style('css/datepicker3.css') }}
     <!-- idkc : Report CSS Library -->
     {{ HTML::style('css/dataTables.bootstrap.css') }}
     {{ HTML::style('css/daterangepicker-bs3.css') }}
@@ -114,7 +114,10 @@
                             @endif
                         </ul>
                     </li>
+                    @if ( in_array(Auth::user()->type, array(SUP, GER_PROD, GER_PROM, GER_COM)) )
                     <li><a href="{{ URL::to('solicitude/statement')}}">Movimientos</a></li>
+                    @endif
+                    <li><a href="{{ URL::to('eventos')}}">Eventos</a></li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Reportes <span class="caret"></span></a>
                         <ul id="menu-report" class="dropdown-menu" role="menu">
@@ -135,12 +138,10 @@
                             <li><a data-toggle="modal" data-target="#modal-temporal-user">Derivación de Usuario</a>
                             </li>
                             @endif
-                            @if ( in_array(Auth::user()->type, array(CONT, GER_COM, TESORERIA)) )
+                            @if ( in_array(Auth::user()->type, array(GER_COM, TESORERIA)) )
                             <li><a href="{{ URL::to('maintenance/fondos') }}">Mantenimiento de Fondos</a></li>
                             @endif
-                            @if ( in_array(Auth::user()->type, array(CONT, GER_COM)) )
-                            <li><a href="{{ URL::to('maintenance/dailyseatrelation') }}">Mantenimiento de Cuentas - Marcas</a></li>
-                            <li><a href="{{ URL::to('maintenance/fondoaccount') }}">Mantenimiento de Cuentas de Fondos</a></li>
+                            @if ( in_array(Auth::user()->type, array(GER_COM)) )
                             <li><a href="{{ URL::to('maintenance/inversion') }}">Mantenimiento de Inversion</a></li>
                             <li><a href="{{ URL::to('maintenance/activity') }}">Mantenimiento de Actividades</a></li>
                             <li><a href="{{ URL::to('maintenance/investmentactivity') }}">Mantenimiento de Inversion-Actividad</a></li>
@@ -150,6 +151,8 @@
                             @if ( in_array(Auth::user()->type, array(CONT)) )
                             <li><a href="{{ URL::to('maintenance/finddocument') }}">Mantenimiento de Documentos</a></li>
                             <li><a href="{{ URL::to('maintenance/documenttype') }}">Mantenimiento de Tipo de Documentos</a></li>
+                            <li><a href="{{ URL::to('maintenance/fondoaccount') }}">Mantenimiento de Cuentas de Fondos</a></li>
+                            <li><a href="{{ URL::to('maintenance/dailyseatrelation') }}">Mantenimiento de Cuentas - Marcas</a></li>
                             @endif
                         </ul>
                     </li>
@@ -226,7 +229,7 @@
 {{ HTML::script('js/jquery.form.js') }}
 {{ HTML::script('js/bootstrap.min.js') }}
 {{ HTML::script('js/bootstrap-datepicker.js') }}
-{{ HTML::script('js/bootstrap-datepicker.es.min.js') }}
+{{ HTML::script('js/bootstrap-datepicker.es.js') }}
 {{ HTML::script('js/bootbox.min.js') }}
 {{ HTML::script('js/jquery.dataTables.min.js') }}
 {{ HTML::script('js/dataTables.bootstrap.js') }}

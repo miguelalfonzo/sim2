@@ -109,8 +109,6 @@ const GASTO = 4;
 | TESTING
 |--------------------------------------------------------------------------
 */
-const FILESTORAGE_DIR = 'uploads/';
-const APP_ID = 2;
 
 //MOTIVO DE LA SOLICITUD
 const REEMBOLSO = 3;
@@ -152,3 +150,14 @@ const ALERTA_TIEMPO_REGISTRO_GASTO 		 = 2;
 const ALERTA_INSTITUCION_CLIENTE		 = 3;
 
 const FONDO_SUBCATEGORIA_GERPROD = NULL;
+/*
+|--------------------------------------------------------------------------
+| EVENT 
+|--------------------------------------------------------------------------
+*/
+const DATOS_INVALIDOS                         = 'Datos Invalidos: Complete todos los campos.';
+const CREADO_SATISFACTORIAMENTE               = 'Creado satisfactoriamente.';
+const DB_NOT_INSERT                           = 'Lo sentimos, Hubo un problema a la hora de guardar en la base de datos.';
+const FILESTORAGE_DIR                         = 'uploads/';
+const APP_ID                                  = 2;
+

@@ -1311,7 +1311,7 @@ $(function()
             data: 
             {
                 id : tr.attr( 'row-id') ,
-                _token : $( 'input[name=_token]' ).val()
+                _token : GBREPORTS.token
             }
         }).fail( function( statusCode , errorThrown )
         {
@@ -1370,7 +1370,7 @@ $(function()
                 id : modal.find( 'input[name=idDocumento]' ).val() ,
                 idregimen : modal.find( '#regimen' ).val() ,
                 monto : modal.find( '#monto-regimen' ).val() ,
-                _token : $( 'input[name=_token]').val()
+                _token : GBREPORTS.token
             }
         }).fail( function( statusCode , errorThrown )
         {
@@ -1543,5 +1543,33 @@ $(function()
             text = "COUNT:" + desc[1];
         }
         this.parentElement.childNodes[0].innerHTML = text;
+    });
+    //Carrousel photo events
+    $(document).off("click", ".photosEvent");
+    $(document).on("click", ".photosEvent", function(e){
+        e.preventDefault();
+        var event_id = $(this).data('event');
+        if(event_id){
+            $.ajax({
+                type: 'post',
+                url: server + 'photos',
+                data: 
+                {
+                    _token : $('input[name=_token]').val(),
+                    event_id  : event_id
+                }
+            }).fail( function( statusCode , errorThrow )
+            {
+                bootbox.alert("error" );
+            }).done( function ( data ) 
+            {
+                bootbox.dialog({
+                    message: data,
+                    title  : "Galería de Fotos",
+                    size   : "large"
+                });
+                $('.carousel').carousel();
+            }); 
+        }
     });
 });
