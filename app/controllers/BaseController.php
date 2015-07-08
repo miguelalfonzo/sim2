@@ -189,6 +189,7 @@ class BaseController extends Controller
         $statusSolicitude->updated_at   = Carbon\Carbon::now();
         if ( is_null( $statusSolicitude->user_to ) )
             return $this->warningException( 'No se pudo determinar el tipo de usuario para enviar la solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );    
+        \Log::error( json_encode( $statusSolicitude ) );
         $statusSolicitude->save();
         Log::error( $statusSolicitude );
         return $this->setRpta();

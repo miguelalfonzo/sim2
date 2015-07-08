@@ -7,7 +7,7 @@ use \Eloquent;
 class SolicitudHistory extends Eloquent{
 	
     protected $table = 'SOLICITUD_HISTORIAL';
-    protected $fillable = array( 'user_to' , 'id_solicitud' , 'status_to');
+    protected $fillable = array( 'user_from' , 'id_solicitud' , 'status_to');
 	protected $primaryKey = 'id';
     
     protected function getUpdatedAtAttribute( $attr )
