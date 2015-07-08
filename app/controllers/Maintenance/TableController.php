@@ -224,6 +224,15 @@ class TableController extends BaseController
 		}
 	}
 
+	private function maintenanceUpdateparametro( $val )
+	{
+		$parametro = Parameter::find( $val[ 'id' ] );
+		foreach( $val[ data ] as $key => $data )
+			$parametro->$key = $data;
+		$parametro->save();
+		return $this->setRpta();
+	}
+
 	private function maintenanceUpdateinversion( $val )
 	{
 		$inversion = InvestmentType::find( $val['id'] );
