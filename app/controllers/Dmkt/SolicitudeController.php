@@ -1106,7 +1106,7 @@ class SolicitudeController extends BaseController
                 else //TODOS LOS OTROS DOCUMENTOS
                 {
                     $description_seat_renta4ta_deposit   = strtoupper( 'RENTA 4TA CATEGORIA ' . $desc );
-
+            
                     //ASIENTO DOCUMENT - NO ITEM
                     $description_seat_other_doc = strtoupper( $username.' '. $expense->descripcion );
                     $seatList[] = $this->createSeatElement($tempId++, $cuentaMkt, $solicitud->id, '', $cuentaExpense , $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_BASE, ASIENTO_GASTO_COD_PROV, $expense->razon, ASIENTO_GASTO_COD, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, $expense->monto, $marca, $description_seat_other_doc, $tipo_responsable, ''); 
@@ -1115,7 +1115,7 @@ class SolicitudeController extends BaseController
                     if ( $expense->idtipotributo == 1 )
                     {
                         $total_percepciones += $expense->monto_tributo;
-                        $seatList[] = $this->createSeatElement( $tempId++, $cuentaMkt, $solicitud->id, '' , CUENTA_RENTA_4TA_HABER , '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO, $expense->monto_tributo , $marca, $description_detraccion_reembolso , '' , 'RENTA');        
+                        $seatList[] = $this->createSeatElement( $tempId++, $cuentaMkt, $solicitud->id, '' , CUENTA_RENTA_4TA_HABER , '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO, $expense->monto_tributo , $marca, $description_seat_renta4ta_deposit , '' , 'RENTA');        
                     }
 
                     //ASIENTO IMPUESTO A LA RENTA REEMBOLSO
