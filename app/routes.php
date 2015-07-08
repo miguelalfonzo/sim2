@@ -234,6 +234,7 @@ Route::get('maintenance/parameters', 'Maintenance\TableController@getMaintenance
 */
 Route::post('createEvent', 'Dmkt\SolicitudeController@createEventHandler');
 Route::get('eventos','Dmkt\SolicitudeController@album');
+Route::post('eventos/list','Dmkt\SolicitudeController@getEventList');
 Route::post('photos', 'Dmkt\SolicitudeController@photos');
 Route::post('testUploadImgSave', 'Dmkt\SolicitudeController@viewTestUploadImgSave');
 /*

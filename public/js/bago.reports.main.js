@@ -4,7 +4,10 @@ $(document).ready(function()
 		$('#btn_extra').hide();
 		if($("#idState").length === 1){
 			listTable('solicitudes');
-		}else{
+		}else if($("#container-event").length === 1){
+			getEvents();
+		}
+		else{
 			$(".btn_extra").hide("slow");
 			GBREPORTS.openReport();
 		}

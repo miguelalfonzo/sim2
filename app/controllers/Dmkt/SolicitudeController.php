@@ -1412,8 +1412,14 @@ class SolicitudeController extends BaseController
         return View::make( 'template.Modals.timeLine')->with( array( 'solicitud' => $solicitud ) )->render();
     }
     public function album(){
+        return View::make('Event.show');
+    }
+    public function getEventList(){
+        // dd(Input::all());
+        $start = Input::get("date_start");
+        $end = Input::get("date_end");
         $data =array();
-        $data['events'] = Event::all();
+        $data['events'] = Event::whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1")->get();
         return View::make('Event.album',$data);
     }
 
