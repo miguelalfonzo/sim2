@@ -4,6 +4,8 @@ namespace Dmkt;
 use \Eloquent;
 use \Auth;
 use \DB;
+use \Maintenance\Fondos;
+use \Maintenance\FondosSupervisor;
 
 class SolicitudProduct extends Eloquent
 {
@@ -59,9 +61,28 @@ class SolicitudProduct extends Eloquent
         return SolicitudProduct::whereIn( 'id' , $idSolProduct )->lists( 'id_producto' );
     }
 
+    public function thisSubFondo()
+    {
+        $user = \User::find( $this->id_fondo_user );
+        \Log::error( $user->toJson() );
+        if ( $user->type != SUP )
+            $rpta = Fondos::where( 'marca_id' , $this->id_fondo_producto )->where( 'fondos_subcategoria_id' , $this->id_fondo )->first();
+        else
+            $rpta = FondosSupervisor::where( 'marca_id' , $this->id_fondo_producto )->where( 'subcategoria_id' , $this->id_fondo )
+            ->where( 'supervisor_id' , $this->id_fondo_user )->first();
+        \Log::error( DB::getQueryLog() );
+        return $rpta;
+    }
+
+
     public function marca()
     {
         return $this->hasOne( 'Dmkt\Marca' , 'id' , 'id_producto' );
+    }
+
+    public function fondoMarca()
+    {
+        return $this->hasOne( 'Dmkt\Marca' , 'id' , 'id_fondo_producto' );
     }
 
     public function subCatFondo()

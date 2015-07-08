@@ -324,10 +324,26 @@ class SolicitudeController extends BaseController
             if ( $fondo != 0 )
             {
                 $fData = explode( ',' , $fondo[ $key ] );
-                if ( Auth::user()->type == SUP )
+                $user = \Auth::user();
+                if ( $user->type == SUP || $user->type == GER_PROD )
+                {
+                    $user = \Auth::user();
+                    if( isset( $fData[2] ) )
+                    {
+                        $user = \User::find( $fData[2] );
+                        $user_id = $user->id; 
+                    }
+                }
+                else
+                {
+                    $user_id = $solProduct->id_fondo_user;
+                    $user = \User::find( $user_id );
+                }
+                if ( $user->type == SUP )
                     $subFondo = FondosSupervisor::where( 'subcategoria_id' , $fData[ 0 ] )->where( 'marca_id' , $fData[ 1 ] )->where( 'supervisor_id' , $user_id )->first();
                 else
                     $subFondo = Fondos::where( 'fondos_subcategoria_id' , $fData[ 0 ] )->where( 'marca_id' , $fData[ 1 ] )->first();
+
                 $fondos[ $fData[ 0 ] ][ $fData[ 1 ] ] = $subFondo; 
 
                 if ( $detalle->id_moneda == DOLARES )
@@ -777,10 +793,13 @@ class SolicitudeController extends BaseController
                         $detalle->monto_aprobado = $monto;
                     $solDetalle->detalle = json_encode( $detalle );
                     $solDetalle->save();
-                    if ( $solicitud->createdBy->type == REP_MED )
-                        $user = \User::find( $solicitud->createdBy->rm->rmSup->iduser );
-                    elseif ( $solicitud->createdBy->type == SUP )
-                        $user = \User::find( $solicitud->created_by );
+                    if ( Auth::user()->type == SUP )
+                        if ( $solicitud->createdBy->type == REP_MED )
+                            $user = \User::find( $solicitud->createdBy->rm->rmSup->iduser );
+                        elseif ( $solicitud->createdBy->type == SUP )
+                            $user = \User::find( $solicitud->created_by );
+                        else
+                            $user = Auth::user();
                     else
                         $user = Auth::user();
 
@@ -814,7 +833,7 @@ class SolicitudeController extends BaseController
                 if ( $middleRpta[ status ] == ok )
                 {
                     Session::put( 'state' , $solicitud->state->rangeState->id );
-                    //DB::commit();
+                    DB::commit();
                     //return array( status => warning , description => 'prueba');
                     return $middleRpta ;
                 }
