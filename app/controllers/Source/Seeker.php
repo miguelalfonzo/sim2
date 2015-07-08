@@ -99,10 +99,10 @@ class Seeker extends BaseController
 		$json = '[{ "name": "OUTDVP.DMKT_RG_SUPERVISOR" , "wheres":{ "likes": ["( NOMBRES || \' \' || APELLIDOS )" ] , "notnull": ["IDUSER"] } , "selects" : [ "IDUSER" , "( NOMBRES || \' \' || APELLIDOS )" , "\'SUPERVISOR\'" ] } , ' . 
 				'{ "name" : "OUTDVP.GERENTES" , "wheres":{ "likes": ["DESCRIPCION"] , "notnull" : [ "IDUSER" ] } , "selects" : [ "IDUSER" , "DESCRIPCION" , "\'G. PRODUCTO\'"] } ]';
 		$cAlias = array( 'value' , 'label' , "type" );
-		return $this->searchSeeker( $inputs['sVal'] , $json , $cAlias );			
+		return $this->searchSeeker( $inputs['sVal'] , $json , $cAlias , 2 );			
 	}
 
-    private function searchSeeker($inputs,$json,$cAlias)
+    private function searchSeeker( $inputs , $json , $cAlias , $type = 1 )
     {
 		if (!empty($inputs))
     	{
@@ -147,8 +147,11 @@ class Seeker extends BaseController
 		    			$tm->table = $table->name;
 		    		$array = array_merge( $tms , $array );
 		    	}
-		    	return $this->setRpta( $array );
-	    		return $this->setRpta( array_filter( $array , array( $this , 'filterUserType' ) ) );
+		    	\Log::error( $type );
+		    	if ( $type == 1 )
+		    		return $this->setRpta( $array );
+	    		else
+	    			return $this->setRpta( array_filter( $array , array( $this , 'filterUserType' ) ) );
 		    }
 		    else
 		    	return $this->warningException( 'Json: Formato Incorrecto' , __FUNCTION__ , __LINE__ , __FILE__ );
