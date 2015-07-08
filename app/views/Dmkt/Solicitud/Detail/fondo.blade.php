@@ -18,7 +18,8 @@
                     @endforeach
                 </select>
             @else
-                <input id="sub_type_activity" name="idfondo" class="form-control" value="{{$solicitud->detalle->fondo->nombre}}" disabled>
+                <input id="sub_type_activity" class="form-control" value="{{$solicitud->detalle->fondo->nombre}}" disabled>
+                <input type="hidden" value="{{$solicitud->detalle->id_fondo}}" name="idfondo">
             @endif    
         </div>
     </div>

@@ -7,10 +7,10 @@
                         @if( $politicStatus )
                             <div class="input-group">
                                 <span class="input-group-addon" style="width: 30%;">{{{ is_null( $product->marca ) ? '' : $product->marca->descripcion}}}</span>
-                                @if ( Auth::user()->type == SUP || Auth::user()->type == GER_PROD )
+                                @if ( in_array( $tipo_usuario , array( SUP , GER_PROD ) ) )
                                     <select name="fondo-producto[]" class="selectpicker form-control">
                                         @if ( ! is_null( $product->id_fondo ) )
-                                            <option selected value="{{ $product->id_fondo . ',' . $product->id_fondo_producto . ',' . $product->id_fondo_user }}" style="background-color:gold">{{ $product->fondoMarca->descripcion . ' | ' . $product->subCatFondo->descripcion }}</option> 
+                                            <option selected value="{{ $product->id_fondo . ',' . $product->id_fondo_producto . ',' . $product->id_fondo_user }}" style="background-color:gold">{{ $product->fondoMarca->descripcion . ' | ' . $product->subCatFondo->descripcion . ' S/.' . $product->thisSubFondo()->saldo }}</option> 
                                             @foreach( $product->getSubFondo( $solicitud ) as $subFondo )
                                                 @if ( $subFondo->marca_id == $product->id_producto )
                                                     <option value="{{ $subFondo->id . ',' . $subFondo->marca_id}}" style="background-color:#00FFFF">{{$subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
