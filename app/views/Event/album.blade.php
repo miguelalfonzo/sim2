@@ -1,13 +1,4 @@
-@extends('template.main')
-@section('solicitude')
-    
-	<div class="container-fluid">
-		{{ Form::token() }}
-		<div class="page-header">
-		  <h3>Eventos</h3>
-		</div>
-		<div class="row">
-			@foreach($events as $event)
+		@foreach($events as $event)
 		  	<div class="col-sm-6 col-md-4">
 			    <div class="thumbnail">
 			    	@if($event->photos())
@@ -37,10 +28,15 @@
 			    </div>
 		  	</div>
 		  	@endforeach
-		</div>
-	</div>
+	
 	<script>
-		var size = $(".col-sm-6.col-md-4").css('height');
-		$(".col-sm-6.col-md-4").css('height', size);
+		// var size = $(".col-sm-6.col-md-4").css('height');
+		// $(".col-sm-6.col-md-4").css('height', size);
+		heights = $(".col-sm-6.col-md-4").map(function ()
+	    {
+	        return $(this).height();
+	    }).get(),
+
+	    maxHeight = Math.max.apply(null, heights);
+	    $(".col-sm-6.col-md-4").css('height', maxHeight);
 	</script>
-@endsection

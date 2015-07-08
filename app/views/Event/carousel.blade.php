@@ -18,7 +18,7 @@
 	    @else
 	       <div class="item">
 	    @endif
-			<img class="carouselImg" src="{{asset($photo->directory.$photo->id.'.'.$photo->extension)}}">
+			<img class="carouselImg img-responsive" src="{{asset($photo->directory.$photo->id.'.'.$photo->extension)}}">
 			<div class="carousel-caption">
 				{{$photo->event->name}} - {{$photo->event->description}}
 			</div>
