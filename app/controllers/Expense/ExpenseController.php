@@ -89,6 +89,7 @@ class ExpenseController extends BaseController
 		try
 		{
 			DB::beginTransaction();
+			//$a = $b;
 			$inputs = Input::all();
 			$middleRpta = $this->validateInputExpense( $inputs );
 			if ( $middleRpta[ status ] === ok )

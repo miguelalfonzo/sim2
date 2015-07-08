@@ -13,7 +13,7 @@
                                         <option selected value="{{ $product->id_fondo . ',' . $product->id_fondo_producto . ',' . $product->id_fondo_user }}" style="background-color:gold">{{ $product->subCatFondo->descripcion }}</option> 
                                         @foreach( $product->getSubFondo( $solicitud ) as $subFondo )
                                             @if ( $subFondo->marca_id == $product->id_producto )
-                                                <option value="{{ $subFondo->id . ',' . $subFondo->marca_id}}" style="background-color:#00FFFF">{{$subFondo->descripcion . 'S/.' . $subFondo->saldo }}</option>
+                                                <option value="{{ $subFondo->id . ',' . $subFondo->marca_id}}" style="background-color:#00FFFF">{{$subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
                                             @else   
                                                 <option value="{{ $subFondo->id . ',' . $subFondo->marca_id}}">{{$subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
                                             @endif
@@ -21,7 +21,7 @@
                                     @else
                                         @foreach( $product->getSubFondo( $solicitud ) as $subFondo )
                                             @if ( $subFondo->marca_id == $product->id_producto )
-                                                <option selected value="{{ $subFondo->id . ',' . $subFondo->marca_id}}" style="background-color:#00FFFF">{{$subFondo->descripcion . 'S/.' . $subFondo->saldo }}</option>
+                                                <option selected value="{{ $subFondo->id . ',' . $subFondo->marca_id}}" style="background-color:#00FFFF">{{$subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
                                             @else   
                                                 <option value="{{ $subFondo->id . ',' . $subFondo->marca_id}}">{{$subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
                                             @endif

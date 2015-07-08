@@ -41,6 +41,8 @@ use \Event\Event;
 use \FotoEventos;
 use \Common\FileStorage;
 use \Response;
+use \Maintenance\Fondos;
+use \Maintenance\FondosSupervisor;
 
 class SolicitudeController extends BaseController
 {
@@ -309,8 +311,12 @@ class SolicitudeController extends BaseController
         return $this->setRpta( $idsGerProd );
     }
 
-    private function setProductsAmount( $solProductIds , $amount , $fondo , $user_id )
+    private function setProductsAmount( $solProductIds , $amount , $fondo , $user_id , $detalle )
     {
+        $fondo_total = array();
+        $fondos = array();
+        if ( $detalle->id_moneda == DOLARES )
+            $tc = ChangeRate::getTc();
         foreach ( $solProductIds as $key => $solProductId ) 
         {
             $solProduct = SolicitudProduct::find( $solProductId );
@@ -318,12 +324,43 @@ class SolicitudeController extends BaseController
             if ( $fondo != 0 )
             {
                 $fData = explode( ',' , $fondo[ $key ] );
+                if ( Auth::user()->type == SUP )
+                    $subFondo = FondosSupervisor::where( 'subcategoria_id' , $fData[ 0 ] )->where( 'marca_id' , $fData[ 1 ] )->where( 'supervisor_id' , $user_id )->first();
+                else
+                    $subFondo = Fondos::where( 'fondos_subcategoria_id' , $fData[ 0 ] )->where( 'marca_id' , $fData[ 1 ] )->first();
+                $fondos[ $fData[ 0 ] ][ $fData[ 1 ] ] = $subFondo; 
+
+                if ( $detalle->id_moneda == DOLARES )
+                    $solProduct->monto_asignado = $solProduct->monto_asignado * $tc->compra;
+
+                if ( isset( $fondo_total[ $fData[ 0 ] ][ $fData[ 1 ] ] ) )
+                    $fondo_total[ $fData[ 0 ] ][ $fData[ 1 ] ] += $solProduct->monto_asignado;
+                else
+                    $fondo_total[ $fData[ 0 ] ][ $fData[ 1 ] ] = $solProduct->monto_asignado;
                 $solProduct->id_fondo = $fData[ 0 ];
                 $solProduct->id_fondo_producto = $fData[ 1 ];
                 $solProduct->id_fondo_user = ( isset( $fData[ 2 ] ) ) ? $fData[ 2 ] : $user_id ;
             }
             $solProduct->save();
         }
+
+        if ( $fondo != 0 )
+        {
+            \Log::error( array_keys( $fondos ) );
+            \Log::error( array_unique( array_keys( $fondos ) ) );
+            \Log::error( count( array_unique( array_keys( $fondos ) ) ) );
+            $fondoCategoria = array_unique( array_keys( $fondos ) );
+            if ( count( $fondoCategoria ) != 1 )
+                return $this->warningException( 'No es posible seleccionar Fondos de Diferentes Categorias por Solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
+            foreach( $fondos as $key1 => $fondos_categoria )
+                foreach( $fondos_categoria as $key2 => $fondo_producto )
+                {
+                    $marca = Marca::find( $key2 );
+                    if ( $fondo_producto->saldo < $fondo_total[ $key1 ][ $key2 ] )
+                        return $this->warningException( 'El Fondo asignado ' . $fondo_producto->subCategoria->descripcion . ' | ' . $marca->descripcion . ' solo cuenta con S/.' . $fondo_producto->saldo . ' el cual no es suficiente para completar el registro , se requiere un monto de S/.' . $fondo_total[ $key1 ][ $key2 ] . ' en total ' , __FUNCTION__ , __LINE__ , __FILE__ );       
+                }
+        }
+
         return $this->setRpta();
     }
 
@@ -749,7 +786,7 @@ class SolicitudeController extends BaseController
 
                     if ( ! isset( $inputs[ 'fondo-producto' ] ) )
                         $inputs[ 'fondo-producto'] = 0;
-                    $middleRpta = $this->setProductsAmount( $inputs[ 'producto' ] , $inputs[ 'monto_producto' ] , $inputs[ 'fondo-producto' ] , $user->id );
+                    $middleRpta = $this->setProductsAmount( $inputs[ 'producto' ] , $inputs[ 'monto_producto' ] , $inputs[ 'fondo-producto' ] , $user->id , $solDetalle );
                     
                     if ( $middleRpta[ status ] != ok )
                         return $middleRpta;
@@ -777,7 +814,7 @@ class SolicitudeController extends BaseController
                 if ( $middleRpta[ status ] == ok )
                 {
                     Session::put( 'state' , $solicitud->state->rangeState->id );
-                    DB::commit();
+                    //DB::commit();
                     //return array( status => warning , description => 'prueba');
                     return $middleRpta ;
                 }
