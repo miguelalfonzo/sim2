@@ -1,6 +1,6 @@
 <td style="text-align: center">
     <!-- <div class="div-icons-solicituds"> -->
-    <div class="btn-group btn-group-icon-lg" role="group" >  
+    <div class="btn-group btn-group-icon-md" role="group" >  
         <a class="btn btn-default timeLine" data-id="{{$solicitud->id}}">
             <span  class="glyphicon glyphicon-time"></span>
         </a>
