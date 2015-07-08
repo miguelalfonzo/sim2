@@ -5,10 +5,10 @@
   <h3>Alertas</h3>
 </div>
 
-
 <div class="panel panel-default">
-  <!-- List group -->
   <ul class="list-group">
+@if(!isset($alerts))
+  <!-- List group -->
   	@foreach($alerts as $alert)
 	@if($alert['typeData'] == 'clientAlert')
 		@foreach($alert['data'] as $clientAlert)
@@ -25,7 +25,10 @@
 		@endforeach
 	@endif
 @endforeach
+@else
+<li class="list-group-item">No se encontraron alertas</li>
     
+ @endif
   </ul>
 </div>
 

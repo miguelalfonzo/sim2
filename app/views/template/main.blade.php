@@ -172,7 +172,7 @@
                     
                  </ul>
                  
-                 <a class="btn btn-primary navbar-btn sim_alerta" href="{{ URL::to('alerts') }}" role="button" >Alertas <span class="badge badge-success"></span></a>
+                 <a class="btn btn-primary navbar-btn sim_alerta" href="{{ URL::to('alerts') }}" role="button">Alertas <span class="badge badge-success"></span></a>
                  
 
                  <div id="drp_menubar" class="navbar-form navbar-right btn-default navbar-btn" style="cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; margin-right: -8px;">

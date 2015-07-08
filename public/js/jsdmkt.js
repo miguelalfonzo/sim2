@@ -2201,9 +2201,11 @@ $( document ).ready(function()
         console.log(dataResult);
         if(dataResult.status == 'OK'){
             if(typeof(dataResult.alerts) != 'undefined'){
-                console.log("listo");
-                $(".sim_alerta").show("slow");
-                $(".sim_alerta").find('span').html(dataResult.alerts.length);
+                if(dataResult.alerts.length > 0){
+                    console.log("listo");
+                    $(".sim_alerta").show("slow");
+                    $(".sim_alerta").find('span').html(dataResult.alerts.length);
+                }
             }         
         }
     });
