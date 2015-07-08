@@ -2133,6 +2133,48 @@ $( document ).on( 'click' , '.open-details' , function()
 
 });
 
+$( document ).on( 'click' , '.open-details2' , function()
+{
+    var td = $( this );
+    var tr = td.parent();
+    var colspan = tr.children().length;
+    var span = td.find( 'span' );
+    $.ajax(
+    {
+        url: server + 'detail-solicitud',
+        type: 'POST',
+        data: 
+        {
+            _token       : GBREPORTS.token,
+            id_solicitud : td.attr( 'rel' ),
+            colspan      : colspan
+        }
+    }).fail( function( statusCode , errorThrown )
+    {
+        ajaxError( statusCode , errorThrown );
+    }).done( function( response )
+    {
+        if ( response.Status == 'Ok' )
+        {
+            console.log( response.Data );
+            bootbox.dialog({
+                message: response.Data.View,
+                animate: true ,
+                className : 'solicitud-detail-modal',
+                backdrop  : true,
+                onEscape  : true
+            });
+
+            return true;
+            //addTr( td , response.Data.View );
+        }
+        else
+            bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>')
+    });
+
+
+});
+
 function addTr( td  , tr )
 {
     var td = $( td );
@@ -2144,6 +2186,30 @@ function addTr( td  , tr )
 
 $( document ).ready(function() 
 {
+    $(".sim_alerta").hide();
+    function getAlerts(){
+    var url = URL_BASE + "alerts";
+    $.ajax({
+        type       : 'POST',
+        url        : url,
+        ContentType: false,
+        cache      : false,
+        data: {
+        _token     : GBREPORTS.token
+    }
+    }).done(function(dataResult) {
+        console.log(dataResult);
+        if(dataResult.status == 'OK'){
+            if(typeof(dataResult.alerts) != 'undefined'){
+                console.log("listo");
+                $(".sim_alerta").show("slow");
+                $(".sim_alerta").find('span').html(dataResult.alerts.length);
+            }         
+        }
+    });
+}
+getAlerts();
+
     seeker( $( '.cliente-seeker' ) , 'clients' , 'search-client' );
     seeker( $( '.rep-seeker' ) , 'reps' , 'search-rep' );
     seeker( $( '#user-seeker' ) , 'users' , 'search-users' );
@@ -2171,5 +2237,4 @@ $( document ).ready(function()
         listTable( 'solicitudes' );
     })
 });
-
 
