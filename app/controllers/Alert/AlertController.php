@@ -53,6 +53,7 @@ class AlertController extends BaseController
     public function alertConsole()
     {
     	$result = array();
+    	$result['alert'] = array();
     	$clientAlert = $this->clientAlert();
     	$expenseAlert = $this->expenseAlert();
     	if($clientAlert[ 'msg' ] != "" )
