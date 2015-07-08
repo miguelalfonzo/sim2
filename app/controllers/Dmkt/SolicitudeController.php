@@ -150,9 +150,11 @@ class SolicitudeController extends BaseController
             if ( $solicitud->idtiposolicitud != SOL_INST && in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) ) )
             {
                 $politicType = $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario;
+                \Log::error( $politicType );
                 if ( in_array( $politicType , array( Auth::user()->type , Auth::user()->tempType() ) )
                 && ( array_intersect ( array( Auth::user()->id , Auth::user()->tempId() ) , $solicitud->managerEdit( $politicType )->lists( 'id_gerprod' ) ) ) )
                 {
+                    \Log::error( 'politica aprobado');
                     $politicStatus = TRUE;
                     $data['tipo_usuario'] = $politicType;
                     $solicitud->status = BLOCKED;

@@ -503,6 +503,17 @@ $(function()
 						else
 							$('#dreparo').find('input[name=reparo]')[1].checked = true;
 
+                    if ( $("#proof-type option:selected").attr('marca') === 'N' )
+                    {
+                        $("#regimen").parent().parent().hide();
+                        //$("#monto-regimen").parent().parent().hide();
+                    }
+                    else
+                    {
+                        $("#regimen").parent().parent().show();
+                        //$("#monto-regimen").parent().parent().show();
+                    }    
+
                     $('#igv').val( data.expense.igv );
                     
                     var date = data.expense.fecha_movimiento.split('-');
