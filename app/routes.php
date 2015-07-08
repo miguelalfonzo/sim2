@@ -238,6 +238,13 @@ Route::post('photos', 'Dmkt\SolicitudeController@photos');
 Route::post('testUploadImgSave', 'Dmkt\SolicitudeController@viewTestUploadImgSave');
 /*
 |--------------------------------------------------------------------------
+| Alert
+|--------------------------------------------------------------------------
+*/
+Route::get('alerts', 'Alert\AlertController@show');
+Route::post('alerts', 'Alert\AlertController@showAlerts');
+/*
+|--------------------------------------------------------------------------
 | TEST MANTENIMIENTO
 |--------------------------------------------------------------------------
 */
