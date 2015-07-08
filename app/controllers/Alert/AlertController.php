@@ -9,9 +9,18 @@ use \Dmkt\Solicitud;
 use \Auth;
 use \Illuminate\Database\Eloquent\Collection;
 use \Parameter\Parameter;
+use \View;
 
 class AlertController extends BaseController
 {
+	public function show(){
+		$data = array('alerts' => $this->alertConsole2());
+		return View::make('template.User.alerts', $data);
+	}
+
+	public function showAlerts(){
+		return array('status' => 'OK', 'alerts' => $this->alertConsole());
+	}
 
 	private function intersectRecords( $rs1 , $rs2 )
     {
@@ -30,14 +39,96 @@ class AlertController extends BaseController
     	return $intersect;
     }
 
+    public function alertConsole2()
+    {
+    	$result = array();
+    	$clientAlert = $this->clientAlert2();
+    	$expenseAlert = $this->expenseAlert2();
+    	if($clientAlert[ 'msg' ] != "" )
+    		$result['alert'][] = $clientAlert;
+    	if($expenseAlert[ 'msg' ] != "")
+    		$result['alert'][] = $expenseAlert;
+    	return $result['alert'];
+    }
     public function alertConsole()
     {
+    	$result = array();
     	$clientAlert = $this->clientAlert();
     	$expenseAlert = $this->expenseAlert();
-    	return array( 'type' => 'warning' , 'msg' => $clientAlert[ 'msg' ] . $expenseAlert[ 'msg' ] );
+    	if($clientAlert[ 'msg' ] != "" )
+    		$result['alert'][] = $clientAlert;
+    	if($expenseAlert[ 'msg' ] != "")
+    		$result['alert'][] = $expenseAlert;
+    	return $result['alert'];
     }
 
-    public function clientalert()
+    public function clientalert2()
+    {
+    	$result = array();
+    	$msg = '';
+    	$tipo_cliente_requerido = array( MEDICO , INSTITUCION );
+    	$tiempo = Parameter::find( ALERTA_INSTITUCION_CLIENTE );
+		$solicituds = Solicitud::all();
+		foreach ( $solicituds as $key => $solicitud )
+		{
+			$clients = $solicitud->clients;
+			$solicitud_tipo_cliente = array_unique( $clients->lists( 'id_tipo_cliente') );
+			if ( count( array_intersect( $solicitud_tipo_cliente, $tipo_cliente_requerido ) ) <= 1 )
+				unset( $solicituds[ $key ] );
+		}
+		$clientList = array();
+		$solicituds_compare_id = array();
+		foreach( $solicituds as $solicitud_inicial )
+		{
+			$clients_inicial = $solicitud_inicial->clients()->select( 'id_cliente' , 'id_tipo_cliente' )->get();
+			foreach ( $solicituds as $solicitud_secundaria )
+			{
+				if ( $solicitud_inicial->id != $solicitud_secundaria->id && ! in_array( $solicitud_secundaria->id , $solicituds_compare_id ) )
+				{
+					$clients_secundaria = $solicitud_secundaria->clients()->select( 'id_cliente' , 'id_tipo_cliente' )->get();
+					$cliente_inicial = $this->intersectRecords( $clients_inicial , $clients_secundaria );
+					if ( ! $cliente_inicial->isEmpty() )
+					{
+						foreach( $solicituds as $solicitud_final )
+						{
+							if ( $solicitud_inicial->id != $solicitud_final->id && $solicitud_final->id != $solicitud_secundaria->id && ! in_array( $solicitud_final->id , $solicituds_compare_id ) && ( $this->diffCreatedAt( $solicitud_inicial , $solicitud_secundaria , $solicitud_final ) <= $tiempo->valor ) )
+							{
+								$clients_final = $solicitud_final->clients()->select( 'id_cliente' , 'id_tipo_cliente' )->get();
+								$cliente_inicial = $this->intersectRecords( $clients_inicial , $clients_final );
+								if ( ! $cliente_inicial->isEmpty() )
+								{
+									$solicitud_tipo_cliente = array_unique( $cliente_inicial->lists( 'id_tipo_cliente' ) );
+									if ( count( array_intersect( $solicitud_tipo_cliente, $tipo_cliente_requerido ) ) >= 2 )
+									{
+										$clienteArray=array();
+										$cliente = '( ';
+										foreach ( $cliente_inicial as $client_inicial ){
+											$clienteArray[] = $client_inicial->{$client_inicial->clientType->relacion}->full_name;
+											$cliente .= $client_inicial->{$client_inicial->clientType->relacion}->full_name .  ' , ' ;
+
+										} 
+										$cliente = rtrim( $cliente , ', ' );
+										$cliente .= ' ).';
+										$msg .= 'Las solicitudes ' . $solicitud_inicial->id . ' , ' . $solicitud_secundaria->id . ' , ' . $solicitud_final->id . ' ' . $tiempo->mensaje . ' ' . $cliente;
+										$solicituds_compare_id[] = $solicitud_inicial->id;
+										$solicituds_compare_id[] = $solicitud_secundaria->id;
+										$result[]=array(
+												'cliente'    => $clienteArray,
+												'solicitude' => array($solicitud_inicial->id, $solicitud_secundaria->id, $solicitud_final->id),
+												'msg'     => $tiempo->mensaje
+											);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return array( 'type' => 'warning' , 'msg' => $msg, 'data' => $result, 'typeData' => 'clientAlert');
+    }
+
+     public function clientalert()
     {
     	$msg = '';
     	$tipo_cliente_requerido = array( MEDICO , INSTITUCION );
@@ -97,6 +188,34 @@ class AlertController extends BaseController
     {
     	return $record1->id . /*' ' . $record1->created_at .*/ ' , ' . $record2->id . ' ' . /*$record2->created_at . ' ' .*/ $record3->id . ' ' /*. $record3->created_at*/ ; 
     }
+
+    public function expenseAlert2()
+	{
+		$result = array();
+		$solicituds = Solicitud::where( 'id_user_assign' , Auth::user()->id )->where( 'id_estado' , GASTO_HABILITADO )->get();
+		$msg = '';
+		$tiempo = Parameter::find( ALERTA_TIEMPO_ESPERA_POR_DOCUMENTO );
+		foreach ( $solicituds as $solicitud )
+		{
+			$expenseHistory = $solicitud->expenseHistory;
+			$lastExpense = $solicitud->lastExpense;
+			if ( is_null( $lastExpense ) && ! is_null( $expenseHistory ) && $this->timeAlert( $expenseHistory , 'diffInDays' , 'updated_at' ) >= $tiempo->valor ){
+				$msg .= 'La solicitud N° ' .  $solicitud->id . $tiempo->mensaje;
+				$result[] = array(
+					"solicitude" => $solicitud->id,
+					"msg" => $tiempo->mensaje,
+					);
+			}
+			else if ( ( ! is_null( $lastExpense ) ) && $this->timeAlert( $lastExpense , 'diffInDays' , 'updated_at' ) >= $tiempo->valor ){
+				$msg .= 'La solicitud N° ' .  $solicitud->id . ' ' .  $tiempo->mensaje;	
+				$result[] = array(
+					"solicitude" => $solicitud->id,
+					"msg" => $tiempo->mensaje,
+					);
+			}
+		}
+		return array( 'type' => 'warning' , 'msg' => $msg, 'typeData' => 'expenseAlert', 'data' => $result );
+	}
 
 	public function expenseAlert()
 	{

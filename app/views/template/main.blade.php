@@ -171,6 +171,9 @@
                     </li>
                     
                  </ul>
+                 
+                 <a class="btn btn-primary navbar-btn sim_alerta" href="{{ URL::to('alerts') }}" role="button" >Alertas <span class="badge badge-success"></span></a>
+                 
 
                  <div id="drp_menubar" class="navbar-form navbar-right btn-default navbar-btn" style="cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; margin-right: -8px;">
                     <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
@@ -206,20 +209,7 @@
     URL_BASE = '{{ asset('/') }}';
     $(document).ready( function() 
     {
-        @if ( isset( $alert[ 'msg' ] ) && $alert[ 'msg' ] != '' )
-            $('#alert-console').prepend( 
-                $('<div class="alert alert-{{ $alert[ 'type' ] }}" role="alert">' + 
-                    '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
-                        '<span aria-hidden="true">&times;</span>' +
-                    '</button>' +
-                    '<strong>Warning!</strong> {{ $alert[ 'msg' ] }}' +
-                '</div>') );
-        @endif
-        window.setTimeout(function() {
-            $(".alert").fadeTo(1500, 0).slideUp(500, function(){
-                $(this).remove(); 
-            });
-        }, 5000);
+        
     });
 </script>
 
