@@ -387,45 +387,15 @@ $(function()
 
         $("#table-expense tbody tr").removeClass('select-row');
         $(".message-expense").text('').hide();
-        var tot_expense    = parseFloat(elementTr.find('.total_expense').html());
-        
-        // row_expense    = $(this).parent().parent();
-        // ruc            = $(this).parent().parent().find('.ruc').html();
-        // voucher_number = $(this).parent().parent().find('.voucher_number').html();
-        
         bootbox.confirm("¿Esta seguro que desea eliminar el gasto?", function(result) 
         {
             if( result )
             {
-                // data = {"ruc":ruc,"voucher_number":voucher_number, "_token":$("input[name=_token]").val()};
                 data = {"gastoId": elementTrId, "_token":$("input[name=_token]").val()};
                 $.post(server + 'delete-expense', data)
-                .done(function (data) 
+                .done(function ( response ) 
                 {
-                    if ( data.Status == 'Ok' )
-                    {
-                        rechargeExpense().done( function ( data ) 
-                        {
-                            if ( data.Status == 'Ok' )
-                            {
-                                $('#table-expense').html(data.Data);
-                                $("#save-expense").html("Registrar");
-                                //$(".detail-expense").show();
-                                //$(".search-ruc").show();
-                                //$("#ruc-hide").siblings().parent().addClass('input-group');   
-                                tot_expenses = calculateTot($(".total").parent(),'.total_expense');
-                                balance = parseFloat(deposit - tot_expenses);
-                                balance = balance.toFixed(2);
-                                $("#balance").val(balance);
-                                deleteItems();
-                                deleteExpense();
-                            }
-                            else
-                                bootbox.alert('<h4 class="red">No se ha podido recargar los gastos registrados, recarge la pagina</h4>');
-                        });
-                    }
-                    else
-                        bootbox.alert('<h4>' + data.Status + ': ' + data.Description + '</h4>');
+                    ajaxExpenseDone( response , 'Gasto Eliminado' );
                 });
             }
         });
@@ -724,17 +694,17 @@ $(function()
                 else
                     rep = 0 ;
             }
-            (data_quantity.length>0) ? data.quantity = data_quantity : error_json = 1;
+            ( data_quantity.length > 0 ) ? data.quantity = data_quantity : error_json = 1 ;
             data.description = arr_description;
-            (data_total_item.length>0) ? data.total_item = data_total_item : error_json = 1;
+            ( data_total_item.length > 0 ) ? data.total_item = data_total_item : error_json = 1 ;
             data.rep = rep;
             
-            if(error_json === 0)
+            if( error_json === 0 )
             {
-                if( proof_type_sel.attr("igv") == 1 )
+                if( proof_type_sel.attr( 'igv' ) == 1 )
                 {
-                    var sub_total_expense = parseFloat($("#sub-tot").val());
-                    var imp_service       = parseFloat($("#imp-ser").val());
+                    var sub_total_expense = parseFloat( $("#sub-tot").val() );
+                    var imp_service       = parseFloat( $("#imp-ser").val() );
                     var igv               = $("#igv").val();
                     
                     if(isNaN(sub_total_expense)) sub_total_expense = 0;
@@ -748,179 +718,124 @@ $(function()
 
                 tot_expense = parseFloat($("#total-expense").val());
                 data.total_expense = tot_expense;
-                var tot_expenses = calculateTot( $(".total").parent(),'.total_expense' );
-                if( tot_expenses > 0 )
-                    if( validateRuc( ruc ) === true )
-                    {
-                        ajaxExpense( data )
-                        .done( function( response )
-                        {
-                            if( response.Status !== 'Ok' )
-                            {
-                                responseUI(response.Status + ': ' + response.Description , 'red' );
-                                $(".message-expense").text("El documento ya se encuentra registrado.").show();
-                            }
-                            else
-                            {
-                                responseUI("Gasto Registrado","green");
-                                rechargeExpense().done( function ( data ) 
-                                {
-                                    if ( data.Status === 'Ok' )
-                                    {
-                                        $('#table-expense').html(data.Data);
-                                        $("#save-expense").html("Registrar");
-                                        tot_expenses = calculateTot($(".total").parent(),'.total_expense');
-                                        balance = parseFloat(deposit - tot_expenses);
-                                        balance = balance.toFixed(2);
-                                        $("#balance").val(balance);
-                                        deleteItems();
-                                        deleteExpense();
-                                    }
-                                    else
-                                        bootbox.alert('<h4 class="red">No se ha podido recargar los gastos registrados, recarge la pagina</h4>');
-                                });
-                            }
-                        }).fail(function( statusCode , errorThrown )
-                        {
-                            ajaxError( statusCode , errorThrown );
-                            $(".message-expense").text("Error al momento de registrar los gastos");
-                        });
-                    }
-                    else
-                        if ( $("#proof-type option:selected").attr('marca') == 'N' || validateVoucher(ruc,voucher_number) === true )
-                        {
-                            ajaxExpense(data).done(function( response )
-                            {
-                                $.unblockUI();
-                                if( response.Status === 'Ok' )
-                                {
-                                    responseUI("Gasto Registrado","green");
-                                    rechargeExpense().done( function ( data ) 
-                                    {
-                                        if ( data.Status == 'Ok' )
-                                        {
-                                            $('#table-expense').html(data.Data);
-                                            $("#save-expense").html("Registrar");
-                                            tot_expenses = calculateTot($(".total").parent(),'.total_expense');
-                                            balance = parseFloat(deposit - tot_expenses);
-                                            balance = balance.toFixed(2);
-                                            $("#balance").val(balance);
-                                            deleteItems();
-                                            deleteExpense();
-                                        }
-                                        else
-                                            bootbox.alert('<h4 class="red">No se ha podido recargar los gastos registrados, recarge la pagina</h4>');
-                                    });
-                                }
-                                else
-                                    bootbox.alert('<h4 class="red">' + response.Status + ':' + response.Description + '</h4>');
-                            }).fail(function( statusCode , errorThrown )
-                            {
-                                ajaxError( statusCode , errorThrown );
-                                $(".message-expense").text("Ocurrió un error al momento de registrar los gastos");
-                            });
-                        }
-                        else
-                            if( btn_save === 'Registrar')
-                            {
-                                $(".message-expense").text("El documento ya se encuentra registrado.").show();
-                                return false;
-                            }
-                            else
-                            {
-                                var rows = $( ".total" ).parent();
-                                $.each(rows,function(index)
-                                {
-                                    if( $( this ).find( '.voucher_number' ).html() === voucher_number && $( this ).find( ".ruc" ).html() === ruc )
-                                    {
-                                        data.idgasto = $('input[name=idgasto]').val();
-                                        $.ajax(
-                                        {
-                                            type: 'post' ,
-                                            url: server + 'register-expense' ,
-                                            data: data,
-                                            beforeSend: function()
-                                            {
-                                                loadingUI('Actualizando ...');
-                                            }
-                                        }).fail( function ( statusCode , errorThrown )
-                                        {
-                                            $.unblockUI();
-                                            ajaxError( statusCode , errorThrown );
-                                        }).done( function ( response ) 
-                                        {
-                                            $.unblockUI();
-                                            if( response.Status == 'Ok' )
-                                            {
-                                                responseUI("Gasto Actualizado","green");
-                                                $( 'input[name=idgasto]' ).val('');
-                                                rechargeExpense().done( function ( data ) 
-                                                {
-                                                    if ( data.Status == 'Ok' )
-                                                    {
-                                                        $('#table-expense').html(data.Data);
-                                                        $("#save-expense").html("Registrar");
-                                                        tot_expenses = calculateTot($(".total").parent(),'.total_expense');
-                                                        balance = parseFloat(deposit - tot_expenses);
-                                                        balance = balance.toFixed(2);
-                                                        $("#balance").val(balance);
-                                                        deleteItems();
-                                                        deleteExpense();
-                                                    }
-                                                    else
-                                                        bootbox.alert('<h4 class="red">No se ha podido recargar los gastos registrados, recarge la pagina</h4>');
-                                                });
-                                            }
-                                            else
-                                                bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description );
-                                        });
-                                    }
-                                });
-                            }
-                else
+                if( validateRuc( ruc ) === true )
                 {
-                    ajaxExpense(data).done(function( response )
+                    ajaxExpense( data ).done( function( response )
                     {
-                        if( response.Status !== 'Ok' )
-                        {
-                            responseUI( response.Status + ': ' + response.Description ,'red' );
-                            $(".message-expense").text("El documento ya se encuentra registrado.").show();
-                        }
-                        else
-                        {
-                            responseUI("Gasto Registrado","green");
-                            rechargeExpense().done( function ( data ) 
-                            {
-                                if ( data.Status == 'Ok' )
-                                {
-                                    $('#table-expense').html(data.Data);
-                                    $("#save-expense").html("Registrar");
-                                    tot_expenses = calculateTot($(".total").parent(),'.total_expense');
-                                    balance = parseFloat(deposit - tot_expenses);
-                                    balance = balance.toFixed(2);
-                                    $("#balance").val(balance);
-                                    deleteItems();
-                                    deleteExpense();
-                                }
-                                else
-                                    bootbox.alert('<h4 class="red">No se ha podido recargar los gastos registrados, recarge la pagina</h4>');
-                            });
-                        }
+                        ajaxExpenseDone( response , 'Gasto Registrado' );
                     }).fail(function( statusCode , errorThrown )
                     {
                         ajaxError( statusCode , errorThrown );
-                        $(".message-expense").text("Ocurrió un error al momento de registrar los gastos");
                     });
                 }
+                else
+                    if ( $("#proof-type option:selected").attr('marca') == 'N' || validateVoucher(ruc,voucher_number) === true )
+                    {
+                        ajaxExpense(data).done(function( response )
+                        {
+                            ajaxExpenseDone( response , 'Gasto Registrado' );
+                        }).fail(function( statusCode , errorThrown )
+                        {
+                            ajaxError( statusCode , errorThrown );
+                        });
+                    }
+                    else
+                        if( btn_save === 'Registrar' )
+                        {
+                            $(".message-expense").text("El Tipo de documento no se encuentra registrado.").show();
+                            return false;
+                        }
+                        else
+                        {
+                            var rows = $( ".total" ).parent();
+                            $.each(rows,function(index)
+                            {
+                                if( $( this ).find( '.voucher_number' ).html() === voucher_number && $( this ).find( ".ruc" ).html() === ruc )
+                                {
+                                    data.idgasto = $('input[name=idgasto]').val();
+                                    $.ajax(
+                                    {
+                                        type: 'post' ,
+                                        url: server + 'register-expense' ,
+                                        data: data,
+                                        beforeSend: function()
+                                        {
+                                            loadingUI('Actualizando ...');
+                                        }
+                                    }).fail( function ( statusCode , errorThrown )
+                                    {
+                                        $.unblockUI();
+                                        ajaxError( statusCode , errorThrown );
+                                    }).done( function ( response ) 
+                                    {
+                                        $.unblockUI();
+                                        if( response.Status == 'Ok' )
+                                        {
+                                            responseUI("Gasto Actualizado","green");
+                                            $( 'input[ name=idgasto ]' ).val('');
+                                            rechargeExpense().done( function ( data ) 
+                                            {
+                                                if ( data.Status === 'Ok' )
+                                                    reloadExpenseView( data.Data );
+                                                else
+                                                    bootbox.alert('<h4 class="red">No se ha podido recargar la ventana, recarge la pagina (CTRL + F5)</h4>');
+                                            });
+                                        }
+                                        else
+                                            bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description );
+                                    });
+                                }
+                            });
+                        }
             }
             else
                 $("html, body").animate({scrollTop:200},'500','swing');
         }
-        if(balance === 0)
+    });
+
+    function ajaxExpenseDone( response , msg )
+    {
+        $.unblockUI();
+        if( response.Status !== 'Ok' )
+            bootbox.alert( '<h4 class="red">' + response.Status + ' : ' + response.Description + '</h4>' );
+        else
+        {
+            responseUI( msg , 'green' );
+            rechargeExpense().done( function ( data ) 
+            {
+                console.log( data );
+                if ( data.Status === 'Ok' )
+                    reloadExpenseView( data.Data );
+                else
+                    bootbox.alert('<h4 class="red">No se ha podido recargar la ventana , recarge la pagina (CTRL + F5)</h4>');
+            });
+        }
+    }
+
+    function reloadExpenseView( data )
+    {
+        console.log( 'ok' );
+        $('#table-expense').html( data );
+        $("#save-expense").html("Registrar");
+        var tot_expenses = calculateTot($(".total").parent() , '.total_expense' );
+        var balance = deposit - tot_expenses;
+        $("#balance").val(balance);
+        deleteItems();
+        deleteExpense();
+        console.log( balance );
+        rechargeViewExpense( balance );
+    } 
+
+    function rechargeViewExpense( balance )
+    {
+        console.log( balance );
+        if( balance === 0 )
             $(".detail-expense").hide();
+        else
+            $('.detail-expense').show();
         $(".search-ruc").show();
         $("#ruc-hide").siblings().parent().addClass('input-group');
-    });
+    }
 
     //Search Social Reason in SUNAT once introduced the RUC
     $(".search-ruc").on("click",function(){
@@ -1067,7 +982,7 @@ $(function()
         }
         if(balance<0)
         {
-            $(".message-expense").html('El monto ingresado supera el depositado.').css("color","red").show();
+            $(".message-expense").html('El monto ingresado supera el saldo.').css("color","red").show();
             $("#balance").css("color","red");
         }
         else
