@@ -2,7 +2,7 @@
     <!-- <div class="div-icons-solicituds"> -->
     <div class="btn-group btn-group-icon-lg" role="group" >  
         <a class="btn btn-default timeLine" data-id="{{$solicitud->id}}">
-            <span  class="glyphicon glyphicon-flag"></span>
+            <span  class="glyphicon glyphicon-time"></span>
         </a>
         @if ( in_array( $solicitud->histories()->orderBy( 'updated_at' , 'DESC' )->first()->user_to , array( Auth::user()->type , Auth::user()->tempType() ) ) 
         && $solicitud->state->id_estado != R_NO_AUTORIZADO && $solicitud->id_estado != GENERADO )

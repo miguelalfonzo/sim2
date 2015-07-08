@@ -27,7 +27,9 @@
         @foreach( $solicituds as $solicitud )
             <tr>
                 <td class="text-center open-details" data-id="{{$solicitud->id}}">
-                    <span class="glyphicon glyphicon-plus green"></span>
+                    <a class="btn btn-default">
+                        <span class="glyphicon glyphicon-eye-open"></span>
+                    </a>
                 </td>
                 @if($solicitud->state->id_estado == R_NO_AUTORIZADO )
                     <input type="hidden" id="timeLineStatus" value="{{$solicitud->id_estado}}" data-rejected="{{$solicitud->rejectedHist->user_from}}">
