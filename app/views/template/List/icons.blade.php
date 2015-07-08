@@ -9,12 +9,12 @@
             @if( $solicitud->idtiposolicitud == SOL_REP &&  in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) ) )
                 @if( array_intersect( $solicitud->gerente()->lists( 'id_gerprod' ) , array( Auth::user()->id , Auth::user()->tempId() ) ) )
                     <a class="btn btn-default" href="{{URL::to('ver-solicitud/'.$solicitud->token)}}">
-                        <span  class="glyphicon glyphicon glyphicon-check"></span>
+                        <span  class="glyphicon glyphicon glyphicon-edit"></span>
                     </a>
                 @endif
             @else
                 <a class="btn btn-default" href="{{URL::to('ver-solicitud/'.$solicitud->token)}}">
-                    <span  class="glyphicon glyphicon glyphicon-check"></span>
+                    <span  class="glyphicon glyphicon glyphicon-edit"></span>
                 </a>
             @endif    
         @endif
