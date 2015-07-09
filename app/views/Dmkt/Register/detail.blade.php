@@ -11,7 +11,7 @@
     <!-- BUSQUEDA DE CLIENTES -->
     <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
         <label class="control-label">Clientes</label>
-        <div>
+        <div class="scrollable-dropdown-menu">
             <input class="form-control input-md cliente-seeker" type="text" style="display:inline">
         </div>
     </div>

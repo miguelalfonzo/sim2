@@ -141,7 +141,7 @@ class Seeker extends BaseController
 		    			$select = $select. ' ' .$table->selects[$i]. ' as "' .$cAlias[$i]. '",';			
 		    		$select = substr($select,0,-1);
 		    		$query->select( DB::raw( $select ) );
-		    		$query->take(2);
+		    		$query->take( 50 );
 		    		$tms = $query->get();
 		    		foreach ( $tms as $tm )
 		    			$tm->table = $table->name;

@@ -349,12 +349,12 @@ class SolicitudeController extends BaseController
                 $fondos[ $fData[ 0 ] ][ $fData[ 1 ] ] = $subFondo; 
 
                 if ( $detalle->id_moneda == DOLARES )
-                    $solProduct->monto_asignado = $solProduct->monto_asignado * $tc->compra;
+                    $monto_soles = $solProduct->monto_asignado * $tc->compra;
 
                 if ( isset( $fondo_total[ $fData[ 0 ] ][ $fData[ 1 ] ] ) )
-                    $fondo_total[ $fData[ 0 ] ][ $fData[ 1 ] ] += $solProduct->monto_asignado;
+                    $fondo_total[ $fData[ 0 ] ][ $fData[ 1 ] ] += $monto_soles;
                 else
-                    $fondo_total[ $fData[ 0 ] ][ $fData[ 1 ] ] = $solProduct->monto_asignado;
+                    $fondo_total[ $fData[ 0 ] ][ $fData[ 1 ] ] = $monto_soles;
                 $solProduct->id_fondo = $fData[ 0 ];
                 $solProduct->id_fondo_producto = $fData[ 1 ];
                 $solProduct->id_fondo_user = ( isset( $fData[ 2 ] ) ) ? $fData[ 2 ] : $user_id ;

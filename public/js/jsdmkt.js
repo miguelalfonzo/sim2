@@ -173,6 +173,7 @@ $("#btn-add-family").on('click', function () {
 });
 
 //delete a family
+$( document ).off( 'click' , '.btn-delete-family' );
 $(document).on("click", ".btn-delete-family", function () 
 {
     $('#listfamily>li .porcentaje_error').css({"border": "0"});
@@ -1082,6 +1083,8 @@ function removeinput(data){
     //data.parent().find('input:hidden').val('');
     data.fadeOut();
 }
+
+$( document ).off( 'click' , '#edit-rep' );
 $(document).on("click","#edit-rep", function(e)
 {
     removeinput($(this))
@@ -1550,7 +1553,7 @@ function seeker( element , name , url )
         {
             minLength: 3,
             hightligth: true,
-            hint: false
+            hint: true
         },
         {
             name: name,
@@ -2055,24 +2058,21 @@ approved_solicitude.on('click',function(e)
 
 function colorTr(tokens)
 {
-    /*setTimeout(function()
-    {*/console.log( tokens );
-        zzz = tokens;
-        var tr;
-        $( document ).ready(function() 
+    var tr;
+    $( document ).ready(function() 
+    {
+        for (var index in tokens.Error )
         {
-            for (var index in tokens.Error )
-            {
-                tr = $(".i-tokens[value=" + tokens.Error[index] + "]").parent();
-                tr.addClass('danger');
-            }
-            for (var index in tokens.Ok )
-            {
-                tr = $(".i-tokens[value=" + tokens.Ok[index] + "]").parent();
-                tr.addClass('success');
-            }
-        });
-    /*},1000);*/
+            tr = $(".i-tokens[value=" + tokens.Error[index] + "]").parent();
+            tr.addClass('danger');
+        }
+        for (var index in tokens.Ok )
+        {
+            tr = $(".i-tokens[value=" + tokens.Ok[index] + "]").parent();
+            tr.addClass('success');
+        }
+    });
+    
 }
 
 function addTr( data , tr )
@@ -2082,18 +2082,11 @@ function addTr( data , tr )
     tr.a
 }
 
-$( document ).on( 'click' , '.close-details' , function()
-{
-    var td = $( this );
-    var span = td.find( 'span' );
-    td.removeClass( 'close-details' ).addClass( 'open-details' );
-    td.find( 'span' ).removeClass( 'glyphicon-minus red' ).addClass( 'glyphicon-add green');
-    td.parent().next().remove();
-});
-
+$( document ).off( 'click' , '.open-details' );
 $( document ).on( 'click' , '.open-details' , function()
 {
     var td = $( this );
+    td.removeClass('open-details');
     var tr = td.parent();
     var colspan = tr.children().length;
     var span = td.find( 'span' );
@@ -2109,9 +2102,11 @@ $( document ).on( 'click' , '.open-details' , function()
         }
     }).fail( function( statusCode , errorThrown )
     {
+        td.addClass('open-details');
         ajaxError( statusCode , errorThrown );
     }).done( function( response )
     {
+        td.addClass('open-details');
         if ( response.Status == 'Ok' )
         {
             console.log( response.Data );
@@ -2127,10 +2122,8 @@ $( document ).on( 'click' , '.open-details' , function()
             //addTr( td , response.Data.View );
         }
         else
-            bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>')
+            bootbox.alert( '<h4 class="red">' + response.Status + ' : ' + response.Description + '</h4>');
     });
-
-
 });
 
 $( document ).on( 'click' , '.open-details2' , function()
@@ -2166,23 +2159,12 @@ $( document ).on( 'click' , '.open-details2' , function()
             });
 
             return true;
-            //addTr( td , response.Data.View );
         }
         else
             bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>')
     });
 
-
 });
-
-function addTr( td  , tr )
-{
-    var td = $( td );
-    var span = td.find( 'span' );
-    td.removeClass( 'open-details' ).addClass( 'close-details' );
-    span.removeClass( 'glyphicon-add green' ).addClass( 'glyphicon-minus red' );
-    td.parent().after( tr );
-}
 
 $( document ).ready(function() 
 {
@@ -2222,18 +2204,6 @@ getAlerts();
 
     /** --------------------------------------------- CONTABILIDAD ------------------------------------------------- **/
 
-
-    // var section = $('.maintenance-add');
-    // if(section){
-    //     section.each( function()
-    //     {
-    //         listMaintenanceTable( $(this).attr("case") );
-    //     });
-    //     if( userType === CONT )
-    //         listDocumentsType();
-    //     if( userType === GER_COM )
-    //         listTable( 'estado-fondos' );
-    // }
     $(document).off('change','#idState')
     $(document).on('change','#idState',function(){
         listTable( 'solicitudes' );

@@ -373,4 +373,7 @@ table tbody tr td.close-details
     100% {background-color: hsl(0, 0%, 79%) !important;  color: #333 !important;}
 }*/
 
-  
+.scrollable-dropdown-menu .tt-dropdown-menu {
+  max-height: 350px;
+  overflow-y: auto;
+}
