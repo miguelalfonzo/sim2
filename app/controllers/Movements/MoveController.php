@@ -180,7 +180,7 @@ class MoveController extends BaseController
     {
         $solicituds = Solicitud::whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
         
-        if ( in_array( Auth::user()->type , array ( REP_MED , SUP , GER_PROD , GER_PROM ) ) )
+        if ( in_array( Auth::user()->type , array ( REP_MED , SUP , GER_PROD , GER_PROM , ASIS_GER ) ) )
             $solicituds->where( function ( $query )
             {
                 $query->where( function ( $query )
