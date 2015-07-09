@@ -3,7 +3,7 @@
     <div>
         <select name="moneda" class="form-control">
         	@foreach( $currencies as $currency )
-            	@if ( isset( $solicitud ) && $solicitud->detalle->id_moneda == $currency->idtipomoneda )
+            	@if ( isset( $solicitud ) && $solicitud->detalle->id_moneda == $currency->id )
             		<option value="{{$currency->id}}" selected>{{$currency->descripcion}}</option>
             	@else
             		<option value="{{$currency->id}}">{{$currency->descripcion}}</option>
