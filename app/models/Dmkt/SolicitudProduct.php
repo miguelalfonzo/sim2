@@ -37,7 +37,7 @@ class SolicitudProduct extends Eloquent
                     $query->where( 'fsc.tipo' , 'I' );
                 else
                     $query->where( 'fsc.tipo' , 'NNN' );
-            })->get();
+            })->orderBy( 'm.descripcion' , 'asc' )->get();
         else
         {
             if ( $solicitud->createdBy->type == REP_MED )
@@ -52,7 +52,7 @@ class SolicitudProduct extends Eloquent
             ->leftJoin( 'fondos_subcategorias fsc' , 'fsc.id' , '=' , 'fs.subcategoria_id' )
             ->leftJoin( 'fondos_categorias fc' , 'fc.id' , '=' , 'fsc.fondos_categorias_id' )
             ->leftJoin( 'outdvp.marcas m' , 'fs.marca_id' , '=' , 'm.id' )
-            ->where( 'fsc.tipo' , 'S' )->where('fs.supervisor_id' , $user->id )->get();
+            ->where( 'fsc.tipo' , 'S' )->where('fs.supervisor_id' , $user->id )->orderBy( 'm.descripcion' , 'asc' )->get();
         }
     }
 
