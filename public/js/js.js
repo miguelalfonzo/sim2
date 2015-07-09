@@ -503,6 +503,17 @@ $(function()
 						else
 							$('#dreparo').find('input[name=reparo]')[1].checked = true;
 
+                    if ( $("#proof-type option:selected").attr('marca') === 'N' )
+                    {
+                        $("#regimen").parent().parent().hide();
+                        //$("#monto-regimen").parent().parent().hide();
+                    }
+                    else
+                    {
+                        $("#regimen").parent().parent().show();
+                        //$("#monto-regimen").parent().parent().show();
+                    }    
+
                     $('#igv').val( data.expense.igv );
                     
                     var date = data.expense.fecha_movimiento.split('-');
@@ -1218,7 +1229,7 @@ $(function()
     $(document).on( 'click' , '.modal-document' , function(e)
     {
         var tr = $(this).parent().parent().parent();
-
+        var view_type = $(this).children().attr('data-type');
         $.ajax(
         {
             type: 'post',
@@ -1235,6 +1246,16 @@ $(function()
         {
             if ( response.Status == 'Ok' )
             {
+                if( view_type == 0 )
+                {
+                    $('#regimen').prop('disabled' , true );
+                    $('#monto-regimen').prop( 'disabled' , true );
+                }
+                else
+                {
+                    $('#regimen').prop('disabled' , false );
+                    $('#monto-regimen').prop( 'disabled' , false );        
+                }
                 var modal = $('#documents_Modal');
                 if ( response.Data.sub_tot === null )
                     modal.find('#subtotal').val('').parent().parent().hide();

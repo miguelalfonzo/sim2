@@ -21,7 +21,13 @@
                 <td class="descripcion" style="text-align:center">{{$proof->descripcion}}</td>
                 <td style="text-align:center">
                     <div>
-                        <a href="#" class="modal-document"><span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-pencil"></span></a>    
+                        <a href="#" class="modal-document">
+                            @if ( $proof->solicitud->id_estado == GENERADO )
+                                <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-eye-open" data-type="0"></span>    
+                            @else
+                                <span style="padding: 0 5px; font-size: 1.3em" class="glyphicon glyphicon-pencil" data-type="1"></span>    
+                            @endif
+                        </a>
                     </div>
                 </td>
             </tr>
