@@ -47,7 +47,7 @@ class FondoController extends BaseController
                            'idrm'        => $rm->idrm ,
                            'supervisor'  => $detalle->supervisor ,
                            'codsup'      => $jDetalle->codsup ,
-                           'monto'       => $jDetalle->monto_aprobado ,
+                           'monto'       => $jDetalle->monto_solicitado ,
                            'periodo'     => $detalle->periodo->aniomes ,
                            'rep_cuenta'  => $jDetalle->num_cuenta ,
                            'idfondo'     => $detalle->id_fondo );
