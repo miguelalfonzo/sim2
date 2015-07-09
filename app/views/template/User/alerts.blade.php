@@ -7,7 +7,7 @@
 
 <div class="panel panel-default">
   <ul class="list-group">
-@if(!isset($alerts))
+@if(count($alerts)>0)
   <!-- List group -->
   	@foreach($alerts as $alert)
 	@if($alert['typeData'] == 'clientAlert')

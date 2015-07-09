@@ -2194,7 +2194,7 @@ $( document ).ready(function()
         url        : url,
         ContentType: false,
         cache      : false,
-        data: {
+        data       : {
         _token     : GBREPORTS.token
     }
     }).done(function(dataResult) {
