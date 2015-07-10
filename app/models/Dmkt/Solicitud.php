@@ -54,6 +54,11 @@ class Solicitud extends Eloquent
         return $this->hasMany( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->where( 'status_to' , GASTO_HABILITADO );
     }*/
 
+    protected function toAcceptedApprovedHistories()
+    {
+        return $this->hasMany( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->whereIn( 'status_to' , array( ACEPTADO , APROBADO ) );
+    }
+
     protected function expenseHistory()
     {
         return $this->hasOne( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->where( 'status_to' , GASTO_HABILITADO );
@@ -214,6 +219,11 @@ class Solicitud extends Eloquent
     public function aprovalPolicy( $order )
     {
         return $this->hasMany( 'Policy\AprovalPolicy' , 'id_inversion' , 'id_inversion' )->where( 'orden' , $order )->first();            
+    }
+
+    public function userApprovalPolicy( $userType )
+    {
+        return $this->hasOne( 'Policy\AprovalPolicy' , 'id_inversion' , 'id_inversion' )->where( 'tipo_usuario' , $userType )->first();
     }
 
     protected function investment()

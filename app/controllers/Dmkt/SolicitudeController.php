@@ -15,7 +15,6 @@ use \Expense\ExpenseItem;
 use \Expense\ProofType;
 use \Image;
 use \Input;
-use \Log;
 use \Session;
 use \URL;
 use \User;
@@ -150,11 +149,9 @@ class SolicitudeController extends BaseController
             if ( $solicitud->idtiposolicitud != SOL_INST && in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) ) )
             {
                 $politicType = $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario;
-                \Log::error( $politicType );
                 if ( in_array( $politicType , array( Auth::user()->type , Auth::user()->tempType() ) )
                 && ( array_intersect ( array( Auth::user()->id , Auth::user()->tempId() ) , $solicitud->managerEdit( $politicType )->lists( 'id_gerprod' ) ) ) )
                 {
-                    \Log::error( 'politica aprobado');
                     $politicStatus = TRUE;
                     $data['tipo_usuario'] = $politicType;
                     $solicitud->status = BLOCKED;
@@ -364,9 +361,6 @@ class SolicitudeController extends BaseController
 
         if ( $fondo != 0 )
         {
-            \Log::error( array_keys( $fondos ) );
-            \Log::error( array_unique( array_keys( $fondos ) ) );
-            \Log::error( count( array_unique( array_keys( $fondos ) ) ) );
             $fondoCategoria = array_unique( array_keys( $fondos ) );
             if ( count( $fondoCategoria ) != 1 )
                 return $this->warningException( 'No es posible seleccionar Fondos de Diferentes Categorias por Solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
@@ -688,7 +682,7 @@ class SolicitudeController extends BaseController
                         $inputs[ 'monto_producto' ] = array_fill( 0 , count( $solProducts->get() ) , $inputs[ 'monto' ] / count( $solProducts->get() ) );
                     else
                         $inputs[ 'monto_producto' ] = $solProducts->lists( 'monto_asignado' );
-                    $rpta = $this->acceptedSolicitudeTransaction( $solicitud->id ,  $inputs );
+                    $rpta = $this->acceptedSolicitudTransaction( $solicitud->id ,  $inputs );
                     if ( $rpta[status] != ok )
                     {
                         $status[error][] = $solicitud['token'];
@@ -751,7 +745,7 @@ class SolicitudeController extends BaseController
     }
 
 
-    private function acceptedSolicitudeTransaction( $idSolicitud , $inputs )
+    private function acceptedSolicitudTransaction( $idSolicitud , $inputs )
     {
         DB::beginTransaction();
         $middleRpta = $this->validateInputAcceptSolRep( $inputs );
@@ -850,7 +844,7 @@ class SolicitudeController extends BaseController
         try
         {
             $inputs = Input::all();   
-            return $this->acceptedSolicitudeTransaction( $inputs[ 'idsolicitud' ] , $inputs );
+            return $this->acceptedSolicitudTransaction( $inputs[ 'idsolicitud' ] , $inputs );
         }
         catch( Exception $e )
         {
@@ -1432,74 +1426,65 @@ class SolicitudeController extends BaseController
         return $view;
     }
 
-    public function createEventHandler(){
-        try{
-        $result = array();
-        $input  = Input::all();
-        $rules  = array(
-            'name'         => 'required|unique:event',
-            'description'  => 'required',            
-            'event_date'   => 'required',
-            'solicitud_id' => 'required',
-        );
-
-        $validator = Validator::make(Input::all(), $rules);
-        if ($validator->fails())
+    public function createEventHandler()
+    {
+        try
         {
-            $result['status']   = 'error';
-            $result['message'] = DATOS_INVALIDOS;
-            $result['detail']   = $validator->messages();
-        }else{        
-            $newEvent = new Event();
-            $newId    = $newEvent->searchId() + 1;
-            $input    = array("id" => $newId) + $input;
-            $input['place'] = is_null($input['place']) ? null : $input['place'];
-            if($newEvent->create($input)){
-                $result['status']   = 'ok';
-                $result['message'] = CREADO_SATISFACTORIAMENTE;
-                $result['id'] = $newId;
-            }else{
+            $result = array();
+            $input  = Input::all();
+            $rules  = array( 'name' => 'required|unique:event',
+                             'description'  => 'required',            
+                             'event_date'   => 'required',
+                             'solicitud_id' => 'required' );
+            $validator = Validator::make(Input::all(), $rules);
+            if ($validator->fails())
+            {
                 $result['status']   = 'error';
-                $result['message'] = DB_NOT_INSERT;
-            }        
+                $result['message'] = DATOS_INVALIDOS;
+                $result['detail']   = $validator->messages();
+            }
+            else
+            {        
+                $newEvent = new Event();
+                $newId    = $newEvent->searchId() + 1;
+                $input    = array("id" => $newId) + $input;
+                $input['place'] = is_null($input['place']) ? null : $input['place'];
+                if($newEvent->create($input))
+                {
+                    $result['status']   = 'ok';
+                    $result['message'] = CREADO_SATISFACTORIAMENTE;
+                    $result['id'] = $newId;
+                }
+                else
+                {
+                    $result['status']   = 'error';
+                    $result['message'] = DB_NOT_INSERT;
+                }        
+            }
+            return $result;
         }
-        
-        return $result;
-        
-        }catch(Exception $e){
-            Log::error($e);
+        catch(Exception $e)
+        {
             return $e;
         }
     }
 
-    public function viewTestUploadImgSave() {
+    public function viewTestUploadImgSave()
+    {
 
         $fileList = Input::file('image');
         $event_id = Input::get('event_id');
-
-        // $input = array('image' => $file);
-        // $rules = array(
-        //     'image' => 'image'
-        // );
-
-        // $validator = Validator::make($input, $rules);
         if ( count($fileList) == 0 )
+            return Response::json(array( 'success'   => false , 'errors'    => 'No se pudo Cargar Archivo' ));
+        else 
         {
-            return Response::json(array(
-                'success'   => false,
-                'errors'    => 'No se pudo Cargar Archivo'
-            ));
-        }
-        else {
-            $resultFileList = array();
-            
-            foreach ($fileList as $fileKey => $fileItem) {
-                
+            $resultFileList = array();    
+            foreach ($fileList as $fileKey => $fileItem) 
+            {    
                 $destinationPath    = FILESTORAGE_DIR;
                 $fileName           = pathinfo($fileItem->getClientOriginalName(), PATHINFO_FILENAME);
                 $fileExt            = pathinfo($fileItem->getClientOriginalName(), PATHINFO_EXTENSION);
                 $fileNameMD5        = md5(uniqid(rand(), true));
-
                 $fileStorage                = new FileStorage;
                 $fileStorage->id            = $fileNameMD5;
                 $fileStorage->name          = pathinfo($fileItem->getClientOriginalName(), PATHINFO_FILENAME);
@@ -1508,19 +1493,10 @@ class SolicitudeController extends BaseController
                 $fileStorage->app           = APP_ID;
                 $fileStorage->event_id      = $event_id;
                 $fileStorage->save();
-
                 $fileItem->move($destinationPath, $fileNameMD5.'.'.$fileExt);
-                $resultFileList[] = array(
-                    'id'   => $fileNameMD5,
-                    'name'      => asset($destinationPath.$fileNameMD5.'.'.$fileExt)
-                );
-
+                $resultFileList[] = array( 'id' => $fileNameMD5 , 'name' => asset($destinationPath.$fileNameMD5 . '.' . $fileExt ) );
             }
-            return Response::json(array(
-                'success'   => true,
-                'fileList'  => $resultFileList
-            ));
+            return Response::json(array( 'success' => true , 'fileList' => $resultFileList ));
         }
- 
     }
 }

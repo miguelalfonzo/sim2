@@ -1,7 +1,9 @@
 <section class="row" style="padding:0.3em 1em">
+    <!-- TITULO -->
     <div class="page-header">
         <h2>{{$solicitud->titulo}} <span class="label label-default">{{$solicitud->activity->nombre}}</span></h2>
     </div>
+    
     <!-- MOTIVO  -->
     <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
         <label class="control-label">Motivo</label>
@@ -13,16 +15,6 @@
         <label class="control-label">Tipo de Inversión</label>
         <input type="text" class="form-control input-md" value="{{$solicitud->investment->nombre}}" readonly>
     </div>
-
-    <!--TITULO  -->
-    <!-- <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
-        <label class="control-label" for="titulo">Titulo</label>
-        <div class="input-group">
-            <span class="input-group-addon">{{$solicitud->activity->nombre}}</span>
-            <input id="titulo" class="form-control input-md" type="text"
-            value="{{$solicitud->titulo}}" readonly>
-        </div>
-    </div> -->
 
     <!-- MONTO -->
     @include('Dmkt.Solicitud.Detail.monto')

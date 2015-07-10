@@ -46,4 +46,9 @@ class SolicitudHistory extends Eloquent{
     {
         return $this->hasOne( 'Common\State' , 'id' , 'status_to' );
     }
+
+    protected function fromUserType()
+    {
+        return $this->hasOne( 'Common\TypeUser' , 'codigo' , 'user_from' );
+    }
 }
