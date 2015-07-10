@@ -156,13 +156,12 @@ $(function()
     $('.date>input[readonly]').css('background-color', "#fff");
     if(!($('.date>input:not([disabled])').length == 0))
     {
-        var toDate = "";
         $(".date").datepicker(
         {
             orientation: "auto",
             language: 'es',
-            startDate: toDate == "" ? "{{$data['date']['toDay']}}" : toDate,
-            endDate: $("#last-date").val(),
+            startDate: typeof START_DATE === 'undefined' ? '{{}}' : START_DATE ,
+            endDate: typeof END_DATE === 'undefined' ? '' : END_DATE ,
             format: 'dd/mm/yyyy'
         });
         //selected a date hide the datepicker

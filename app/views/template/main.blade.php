@@ -207,6 +207,9 @@
 
 <script type="text/javascript">
     URL_BASE = '{{ asset('/') }}';
+    @if( isset( $solicitud ) && in_array( $solicitud->id_estado , array ( GASTO_HABILITADO , REGISTRADO ) ) && isset( $date ) )
+        START_DATE = '{{ $date }}';
+    @endif
     $(document).ready( function() 
     {
         

@@ -175,13 +175,12 @@ class SolicitudeController extends BaseController
             }
             elseif ( Auth::user()->type == CONT )
             {
+                $data['date'] = $this->getDay();
                 if ( $solicitud->id_estado == DEPOSITADO )
-                {
-                    $data['date'] = $this->getDay();
                     $data['lv'] = $this->textLv( $solicitud );
-                }
                 elseif ( count( $solicitud->registerHist ) == 1 )
                 {
+                    $data['date'] = $this->getExpenseDate( $solicitud );
                     $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_actual ) );
                     $data['igv'] = Table::getIGV();
                     $data['regimenes'] = Regimen::all();
@@ -191,6 +190,7 @@ class SolicitudeController extends BaseController
             {
                 $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_actual ) );
                 $data['igv'] = Table::getIGV();
+                $data['date'] = $this->getExpenseDate( $solicitud );
             }
             Session::put( 'state' , $data[ 'solicitud' ]->state->id_estado );
             $data[ 'politicStatus' ] = $politicStatus;
@@ -201,7 +201,7 @@ class SolicitudeController extends BaseController
             $event = Event::where('solicitud_id', '=', $solicitud->id)->get();
             if($event->count()!=0)
                 $data['event'] = $event[0];
-
+            \Log::error( $data[ 'date'] );
             return View::make( 'Dmkt.Solicitud.view' , $data );
         }
         catch ( Exception $e )

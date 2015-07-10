@@ -50,7 +50,6 @@ class SolicitudDetalle extends Eloquent
 
     protected function getFechaEntregaAttribute()
     {
-        \Log::error(  $this->detalle);
         return json_decode( $this->detalle )->fecha_entrega;
     }
 

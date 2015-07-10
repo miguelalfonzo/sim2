@@ -4,12 +4,22 @@ use \Dmkt\Solicitud;
 use \Common\State;
 use \Common\StateRange;
 use \System\SolicitudHistory;
+use \Carbon\Carbon;
 
 class BaseController extends Controller 
 {
     public function __construct()
     {
         $this->beforeFilter('csrf', array('on' => array('post', 'put', 'patch', 'delete')));
+    }
+
+    protected function getExpenseDate( $solicitud )
+    {
+        $now = Carbon::now();
+        $created = new Carbon( $solicitud->created_at );
+        $expenseDate = $now->subDays( 7 )->max( $created );
+        \Log::error( $expenseDate->format('d/m/Y') );
+        return $expenseDate->format('d/m/Y');
     }
 
     protected function getDay( $type=1 )

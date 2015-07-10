@@ -64,13 +64,11 @@ class SolicitudProduct extends Eloquent
     public function thisSubFondo()
     {
         $user = \User::find( $this->id_fondo_user );
-        \Log::error( $user->toJson() );
         if ( $user->type != SUP )
             $rpta = Fondos::where( 'marca_id' , $this->id_fondo_producto )->where( 'fondos_subcategoria_id' , $this->id_fondo )->first();
         else
             $rpta = FondosSupervisor::where( 'marca_id' , $this->id_fondo_producto )->where( 'subcategoria_id' , $this->id_fondo )
             ->where( 'supervisor_id' , $this->id_fondo_user )->first();
-        \Log::error( DB::getQueryLog() );
         return $rpta;
     }
 

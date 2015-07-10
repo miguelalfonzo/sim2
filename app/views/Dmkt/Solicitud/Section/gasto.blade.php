@@ -58,7 +58,6 @@
 							<i class="glyphicon glyphicon-calendar"></i>
 						</span>
 						<input id="date" type="text" class="form-control" maxlength="10" readonly>
-						<input id="last-date" type="hidden" value="{{$date['lastDay']}}">
 					</div>
 				</div>
 			</div>
