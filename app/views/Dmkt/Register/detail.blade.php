@@ -40,7 +40,7 @@
     </div>
 
     <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
-        <label class="control-label" for="fecha">Fecha de Entrega</label>
+        <label class="control-label" for="fecha">Fecha de Entrega del Pago</label>
         <div>
             <div class="input-group date">
                 <span class="input-group-addon">
