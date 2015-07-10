@@ -93,24 +93,19 @@ $(document).off("click", ".timeLine");
 $(document).on("click", ".timeLine", function(e)
 {
     e.preventDefault();
+    var element = $(this);
+    element.removeClass( 'timeLine' );
     var state = parseInt($(this).parent().parent().parent().find('#timeLineStatus').val(), 10);
     var accept = $(this).parent().parent().parent().find('#timeLineStatus').data('accept');
     var rejected = $(this).parent().parent().parent().find('#timeLineStatus').data('rejected');
     
-    //var html  = $('.timeLineModal').clone();
     $.get( server + 'timeline-modal/' + $(this).attr('data-id') ).done( function( response ) 
-    { 
-        console.log( state );
+    {
+        element.addClass( 'timeLine' );
         var html = response; 
-        console.log( '1' );
         var html = $(html);
-        console.log( 2 );
         html.find('.container-fluid').removeClass('hide');
-        console.log( 99 );
-        zzz = html;
         var h     = html;
-        console.log( 991 );
-        
         bootbox.dialog(
         {
             message: h,
@@ -125,7 +120,6 @@ $(document).on("click", ".timeLine", function(e)
             },
             size: "large"
         });
-        console.log( 992 );
     });  
 });
 
