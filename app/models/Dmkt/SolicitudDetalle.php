@@ -50,7 +50,11 @@ class SolicitudDetalle extends Eloquent
 
     protected function getFechaEntregaAttribute()
     {
-        return json_decode( $this->detalle )->fecha_entrega;
+        $jDetalle = json_decode( $this->detalle );
+        if ( isset( $jDetalle->fecha_entrega ) )
+            return $jDetalle->fecha_entrega;
+        else
+            return $this->periodo->aniomes;
     }
 
     protected function getNumRucAttribute()

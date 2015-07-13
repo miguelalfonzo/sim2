@@ -18,8 +18,7 @@ class BaseController extends Controller
         $now = Carbon::now();
         $created = new Carbon( $solicitud->created_at );
         $expenseDate = $now->subDays( 7 )->max( $created );
-        \Log::error( $expenseDate->format('d/m/Y') );
-        return $expenseDate->format('d/m/Y');
+        return array( 'startDate' => $expenseDate->format('d/m/Y') , 'endDate' => Carbon::now()->format('d/m/Y') );
     }
 
     protected function getDay( $type=1 )

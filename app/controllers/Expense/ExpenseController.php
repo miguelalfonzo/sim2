@@ -403,19 +403,17 @@ class ExpenseController extends BaseController
 		}
 
 		$total = $expenses->sum('monto');
-		$data = array(
-			'solicitud'  => $solicitud,
-			'detalle'	 => $jDetalle,
-			'clientes'	 => $clientes,
-			'cmps'		 => $cmps,
-			'date'		 => array( 'toDay' => $solicitud->created_at , 'lastDay' => $jDetalle->fecha_entrega ),
-			'name'       => $name_aproved,
-			'dni' 		 => $dni,
-			'created_by' => $created_by,
-			'charge'     => $charge,
-			'expenses'   => $expenses,
-			'total'      => $total
-		);
+		$data = array( 'solicitud'  => $solicitud,
+					   'detalle'	=> $jDetalle,
+					   'clientes'	=> $clientes,
+					   'cmps'		=> $cmps,
+					   'date'		=> array( 'toDay' => $solicitud->created_at , 'lastDay' => $jDetalle->fecha_entrega ),
+					   'name'       => $name_aproved,
+					   'dni' 		=> $dni,
+				       'created_by' => $created_by,
+					   'charge'     => $charge,
+					   'expenses'   => $expenses,
+					   'total'      => $total );
 		$data['balance'] = $this->reportBalance( $solicitud , $detalle , $jDetalle , $total );
 		$html = View::make('Expense.report',$data)->render();
 		return PDF::load($html, 'A4', 'landscape')->show();
@@ -531,6 +529,27 @@ class ExpenseController extends BaseController
 		catch ( Exception $e ) 
 		{
 			return $this->internalException( $e , __FUNCTION__ );	
+		}
+	}
+
+	public function confirmDiscount()
+	{
+		try
+		{
+			$inputs    = Input::all();
+			$solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
+			$detalle   = $solicitud->detalle;
+			$jDetalle  = json_decode( $detalle->detalle );
+			if ( isset( $jDetalle->planilla ) )
+				return $this->warningException( 'Ya ha registro el Descuento y el N° de Planilla' , __FUNCTION__ , __LINE__ , __FILE__ );
+			$jDetalle->planilla = $inputs[ 'planilla' ];
+			$detalle->detalle   = json_encode( $jDetalle );
+			$detalle->save();
+			return $this->setRpta();
+		}
+		catch( Exception $e )
+		{
+			return $this->internalException( $e , __FUNCTION__ );
 		}
 	}
 }

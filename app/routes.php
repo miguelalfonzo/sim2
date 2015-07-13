@@ -94,6 +94,9 @@
         Route::get('edit-expense-cont', 'Expense\ExpenseController@editExpense');
         Route::post('get-document-detail' , 'Expense\ExpenseController@getDocument');
         Route::post('update-document' , 'Expense\ExpenseController@updateDocument');
+
+        Route::get( 'export/solicitudToDeposit' , 'Export\ExportController@exportSolicitudToDeposit' );
+        Route::post( 'confirm-discount' , 'Expense\ExpenseController@confirmDiscount' );
     });
 
     /*

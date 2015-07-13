@@ -49,11 +49,6 @@ class Solicitud extends Eloquent
         return $this->hasOne('User','id','id_user_assign');
     }
 
-    /*protected function advanceSeatHist()
-    {
-        return $this->hasMany( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->where( 'status_to' , GASTO_HABILITADO );
-    }*/
-
     protected function toAcceptedApprovedHistories()
     {
         return $this->hasMany( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->whereIn( 'status_to' , array( ACEPTADO , APROBADO ) );

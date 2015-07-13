@@ -1507,4 +1507,61 @@ $(function()
             }); 
         }
     });
+
+    $( '#confirm-discount' ).on( 'click' , function()
+    {
+        var element = $( this );
+        bootbox.dialog({
+            title: 'Confirmacion del Descuento',
+            message: '<div class="form-group">' +
+                     '<label class="control-label">N° de Planilla</label>' +
+                     '<div><input type="text" id="planilla" class="form-control" placeholder="Ingrese el N° de Planilla"></div>'+
+                     '</div>',
+            buttons: 
+            {
+                danger: 
+                {
+                    label:'Cancelar',
+                    className: 'btn-primary',
+                    callback: function ( result ) 
+                    {
+                        bootbox.hideAll();
+                    }
+                },
+                success: 
+                {
+                    label: 'Confirmar',
+                    className: 'btn-success',
+                    callback: function( result )
+                    {
+                        if ( $( '#planilla' ).val().trim() == '' )
+                        {
+                            $( '#planilla' ).parent().parent().addClass( 'has-error' ).focus();
+                            return false;
+                        }
+                        else
+                        {
+                            if ( result )
+                            {
+                                data._token   = GBREPORTS.token;
+                                data.planilla = $( '#planilla' ).val();
+                                data.token    = $( 'input[name=token]' ).val();
+                                $.post( server + 'confirm-discount' , data )
+                                .done(function ( data ) 
+                                {
+                                    if ( data.Status == 'Ok')
+                                        bootbox.alert( '<h4 class="green">Descuento Confirmado</h4>' , function()
+                                        {
+                                            element.hide();
+                                        });
+                                    else
+                                        bootbox.alert( '<h4 style="color:red">' + data.Status + ' : ' + data.Description + '</h4>' );
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
 });

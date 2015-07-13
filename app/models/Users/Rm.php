@@ -29,13 +29,19 @@ class Rm extends Eloquent
         return substr( $this->attributes[ 'nombres' ] , 0 , 1 ).'. '.$this->attributes[ 'apellidos' ];
     }
 
-    function rmSup()
+    public function rmSup()
     {
         return $this->belongsTo( 'Users\Sup' , 'idsup' , 'idsup' );
     }
 
-    function user(){
+    public function user()
+    {
         return $this->hasOne( 'User' , 'id' , 'iduser' );
+    }
+
+    protected function bagoVisitador()
+    {
+        return $this->hasOne( 'Users\Visitador' , 'visvisitador' , 'idrm' );
     }
 
 }

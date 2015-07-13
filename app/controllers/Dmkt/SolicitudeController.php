@@ -180,7 +180,8 @@ class SolicitudeController extends BaseController
                     $data['lv'] = $this->textLv( $solicitud );
                 elseif ( count( $solicitud->registerHist ) == 1 )
                 {
-                    $data['date'] = $this->getExpenseDate( $solicitud );
+                    \Log::error('inicio');
+                    \Log::error( $data['date']);
                     $data = array_merge( $data , $this->expenseData( $solicitud , $detalle->monto_actual ) );
                     $data['igv'] = Table::getIGV();
                     $data['regimenes'] = Regimen::all();
@@ -201,7 +202,7 @@ class SolicitudeController extends BaseController
             $event = Event::where('solicitud_id', '=', $solicitud->id)->get();
             if($event->count()!=0)
                 $data['event'] = $event[0];
-            \Log::error( $data[ 'date'] );
+            \Log::error( $data['date']);
             return View::make( 'Dmkt.Solicitud.view' , $data );
         }
         catch ( Exception $e )
@@ -214,7 +215,7 @@ class SolicitudeController extends BaseController
     {
         $data = array( 'typeProof'   => ProofType::orderBy('id','asc')->get(),
                        'typeExpense' => ExpenseType::order(),
-                       'date'        => $this->getDay() );
+                       'date'        => $this->getExpenseDate( $solicitud ) );
         $gastos = $solicitud->expenses;
         if ( count( $gastos ) > 0 )
         {

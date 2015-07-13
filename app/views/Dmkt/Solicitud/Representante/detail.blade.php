@@ -28,7 +28,7 @@
     <!-- PAGO CHEQUE : RUC -->
     @if( $solicitud->detalle->id_pago == PAGO_CHEQUE )
         <!-- Ruc -->
-        <div class="form-group col-sm-6 col-md-4">
+        <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
             <label class="control-label">Ruc</label>
             <input type="text" class="form-control input-md" value="{{ $detalle->num_ruc }}" maxlength="11" readonly>
         </div>

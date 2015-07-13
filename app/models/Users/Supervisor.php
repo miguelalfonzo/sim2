@@ -13,4 +13,10 @@ class Supervisor extends Eloquent
     {
     	return $this->belongsToMany('Users\Visitador','ficpe.linsupvis','lsvvisitador','lsvsupervisor');
     }
+
+    protected function cuenta()
+    {
+    	return $this->hasOne( 'Dmkt\CtaRm' , 'codbeneficiario' , 'suplegajo' );
+    }
+
 }
