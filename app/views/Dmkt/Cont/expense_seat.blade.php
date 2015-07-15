@@ -67,16 +67,16 @@
 		                        <span class="input-group-addon">AG</span>
 		                        <input id="textinput" name="titulo" type="text" placeholder=""
 		                        value="{{$solicitud->createdBy->person->full_name}}" disabled class="form-control">   
-	                        @elseif($solicitud->approvedHistory->user->type == SUP )
+	                        @elseif( $solicitud->approvedHistory->user->type == SUP )
 		                        <span class="input-group-addon">S</span>
 		                        <input id="textinput" name="titulo" type="text" placeholder=""
 	                            value="{{ $solicitud->approvedHistory->updatedBy->sup->full_name}}" disabled
 	                            class="form-control">
-	                        @elseif ( $solicitud->approvedHistory->user->type == GER_PROD )
+	                        @elseif( $solicitud->approvedHistory->user->type == GER_PROD )
 		                        <span class="input-group-addon">G</span>
 		                        <input id="textinput" name="titulo" type="text" placeholder=""
 		                        value="{{ $solicitud->approvedHistory->updatedBy->gerprod->full_name }}" disabled class="form-control">
-	                        @elseif ( !is_null( $solicitud->approvedHistory->user->simApp ) )
+	                        @elseif( ! is_null( $solicitud->approvedHistory->user->simApp ) )
 		                        <span class="input-group-addon">G</span>
 		                        <input id="textinput" name="titulo" type="text" placeholder=""
 		                        value="{{ $solicitud->approvedHistory->updatedBy->person->full_name }}" disabled class="form-control">
@@ -124,7 +124,7 @@
 											</tr>
 										</thead>
 										<tbody>
-											@if ( isset( $seats ) )
+										@if ( isset( $seats ) )
 											@foreach($seats as $seatItem)
 											<tr class="{{ $seatItem->type == 'IGV' ? 'info' : ($seatItem->type == 'SER' ? 'warning' : ($seatItem->type == 'REP' ? 'danger' : ($seatItem->type == 'CAN' ? 'success' : ''))) }}">
 												<td class="cuenta editable" data-cuenta_mkt="{{ $seatItem->cuentaMkt }}">{{ $seatItem->numero_cuenta }}</td>
@@ -139,17 +139,18 @@
 												<td class="prefijo">{{ $seatItem->prefijo }}</td>
 												<td class="cbte_proveedor">{{ $seatItem->cbte_proveedor }}</td>
 												<td class="dc">{{ $seatItem->dc }}</td>
-												<td class="importe">
-													{{ $seatItem->importe }}
-												</td>
+												<td class="importe">{{ $seatItem->importe }}</td>
 												<td class="leyenda">{{ $seatItem->leyenda }}</td>
 												<td class="leyenda_variable">{{ $seatItem->leyenda_variable }}</td>
 												<td class="tipo_responsable">{{ $seatItem->tipo_responsable }}</td>
-
-												<td><a class="edit-seat" href="#" {{ $seatItem->type != '' ? 'style="display:none;"' : ''  }}><span class="glyphicon glyphicon-pencil"></span></a></td>
+												<td>
+													<a class="edit-seat" href="#" {{ $seatItem->type != '' ? 'style="display:none;"' : ''  }}>
+														<span class="glyphicon glyphicon-pencil"></span>
+													</a>
+												</td>
 											</tr>
 											@endforeach
-											@endif
+										@endif
 										</tbody>
 									</table>
 								</div>
@@ -186,7 +187,7 @@
 											<tr data-id="{{ $expenseValue->id }}">
 											    @foreach($typeProof as $val)
 											    	 @if($expenseValue->idcomprobante == $val->id)
-											    <td rowspan="{{ $expenseValue->count }}" data-id="{{ $val->idcomprobante }}">{{ $val->descripcion }}</td>
+											    		<td rowspan="{{ $expenseValue->count }}" data-id="{{ $val->idcomprobante }}">{{ $val->descripcion }}</td>
 											    	@endif
 												@endforeach
 											    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->num_prefijo }}-{{ $expenseValue->num_serie }}</td>

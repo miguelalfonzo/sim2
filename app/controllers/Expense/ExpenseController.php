@@ -22,6 +22,7 @@ use \Session;
 use \Dmkt\Account;
 use \Validator;
 use \yajra\Pdo\Oci8\Exceptions\Oci8Exception;
+use \PDF2;
 
 class ExpenseController extends BaseController
 {
@@ -39,7 +40,6 @@ class ExpenseController extends BaseController
     {
         $rules = array( 'token'    		   => 'required|string|size:40|exists:solicitud,token' ,
                         'proof_type'       => 'required|integer|min:1|exists:tipo_comprobante,id' ,
-                        'fecha_movimiento' => 'required|date_format:"d/m/Y"|after:'.date("Y-m-d"),
                         'desc_expense'     => 'required|string|min:1',
                         'tipo_gasto'	   => 'required|array|min:1|each:integer|each:min,1|each:exists,tipo_gasto,id',
                         'quantity'		   => 'required|array|min:1|each:integer|each:min,1',
@@ -47,17 +47,22 @@ class ExpenseController extends BaseController
                         'total_item'	   => 'required|array|min:1|each:numeric|each:min,1',
                         'total_expense'    => 'required|numeric|min:1' );  
 
-        $validator = Validator::make( $inputs, $rules );
+        $validator = Validator::make( $inputs , $rules );
         if ( $validator->fails() ) 
             return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
         else
         {
+        	$rules 		= array();
         	$proofType = ProofType::find( $inputs['proof_type'] );
-        	$validator->sometimes( 'number_prefix' , 'required|numeric|min:0|digits_between:1,5' , function( $input ) use( $proofType )
+        	$solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
+        	$date 	   = $this->getExpenseDate( $solicitud , 1 );
+        	$rules[ 'fecha_movimiento' ] = 'required|string|date_format:"d/m/Y"|after:' . $date[ 'startDate' ] . '|before:' . $date[ 'endDate'] ;
+        	$validator = Validator::make( $inputs , $rules );
+        	$validator->sometimes( 'number_prefix' , 'required|numeric|min:1|digits_between:1,4' , function( $input ) use( $proofType )
             {
                 return $proofType->marca != 'N';
             });
-            $validator->sometimes( 'number_serie' , 'required|numeric|min:1|digits_between:1,20' , function( $input ) use( $proofType )
+            $validator->sometimes( 'number_serie' , 'required|numeric|min:1|digits_between:1,8' , function( $input ) use( $proofType )
             {
                 return $proofType->marca != 'N';
             });
@@ -89,33 +94,32 @@ class ExpenseController extends BaseController
 		try
 		{
 			DB::beginTransaction();
-			//$a = $b;
 			$inputs = Input::all();
 			$middleRpta = $this->validateInputExpense( $inputs );
+			\Log::error( $inputs );
 			if ( $middleRpta[ status ] === ok )
 			{
 				if ( isset( $inputs[ 'idgasto' ] ) )
 					$expense = Expense::find( $inputs[ 'idgasto' ] );
 				else
 				{
-					$expense = new Expense;
+					$expense 	 = new Expense;
 					$expense->id = $expense->lastId() + 1;
 		        }
 		        
 			    $proof = ProofType::find( $inputs[ 'proof_type' ] );
-		    	if ( $proof->code != 'N' && !isset( $inputs[ 'idgasto' ] ) )
-			    	if( ! is_null( $inputs[ 'ruc' ] ) && ! is_null( $inputs[ 'number_prefix' ] ) && ! is_null( $inputs[ 'number_serie' ] ) )
-			    	{
-			    		$row_expense = Expense::where( 'ruc' , $inputs[ 'ruc' ] )->where( 'num_prefijo' ,$inputs[ 'number_prefix' ] )->where( 'num_serie' , $inputs[ 'number_serie' ] )->get();	
-						if( $row_expense->count() > 0 )
-							return $this->warningException( 'Ya existe un gasto registrado con Ruc: ' . $inputs[ 'ruc' ] . ' numero: '.$inputs[ 'number_prefix' ] . '-' . $inputs[ 'number_serie' ] , __FUNCTION__ , __LINE__ , __FILE__ );
-					}
+	    		if( $proof->code != 'N' && ! isset( $inputs[ 'idgasto' ] ) && ! is_null( $inputs[ 'ruc' ] ) && ! is_null( $inputs[ 'number_prefix' ] ) && ! is_null( $inputs[ 'number_serie' ] ) )
+		    	{
+		    		$row_expense = Expense::where( 'ruc' , $inputs[ 'ruc' ] )->where( 'num_prefijo' ,$inputs[ 'number_prefix' ] )->where( 'num_serie' , $inputs[ 'number_serie' ] )->get();	
+					if( $row_expense->count() > 0 )
+						return $this->warningException( 'Ya existe un gasto registrado con Ruc: ' . $inputs[ 'ruc' ] . ' numero: '.$inputs[ 'number_prefix' ] . '-' . $inputs[ 'number_serie' ] , __FUNCTION__ , __LINE__ , __FILE__ );
+				}
+
 				if( $proof->igv == 1 )
 				{
 					$expense->igv      = $inputs['igv'];
 					$expense->imp_serv = $inputs['imp_service'];
 					$expense->sub_tot  = $inputs['sub_total_expense'];
-					$expense->idigv    = $expense->lastIdIgv() + 1;
 				}	
 	            else
 	            {
@@ -123,16 +127,21 @@ class ExpenseController extends BaseController
 	                $expense->imp_serv = null;
 	                $expense->sub_tot  = null;
 	            }
-		        $date = $inputs['fecha_movimiento'];
-		        list($d, $m, $y) = explode('/', $date);
-		        $d = mktime(11, 14, 54, $m, $d, $y);
+
+		        $date 			  = $inputs['fecha_movimiento'];
+		        list($d, $m, $y)  = explode('/', $date);
+		        $d 				  = mktime(11, 14, 54, $m, $d, $y);
 				$inputs[ 'date' ] = date("Y/m/d", $d );
-				$solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
+				$solicitud 		  = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
 				$inputs[ 'id_solicitud' ] = $solicitud->id;
 				$this->setExpense( $expense , $inputs );
 
 				//Detail Expense
 				ExpenseItem::where( 'id_gasto' , $expense->id )->delete();
+				if ( $proof->igv == 1 && array_sum( $inputs[ 'total_item' ] ) == ( $inputs[ 'total_expense' ] - $inputs[ 'imp_service' ] ) )
+					$pIGV = 1 + ( Table::getIgv()->numero / 100 );
+				else
+					$pIGV = 1;
 				for( $i = 0 ; $i < count( $inputs[ 'quantity' ] ) ; $i++ )
 				{
 					$expense_detail = new ExpenseItem;
@@ -141,7 +150,7 @@ class ExpenseController extends BaseController
 					$expense_detail->cantidad = $inputs['quantity'][$i];
 					$expense_detail->descripcion = $inputs['description'][$i];
 					$expense_detail->tipo_gasto = $inputs['tipo_gasto'][$i];
-					$expense_detail->importe = $inputs['total_item'][$i];
+					$expense_detail->importe = round( $inputs['total_item'][$i] / $pIGV , 2 , PHP_ROUND_HALF_DOWN ) ;
 					$expense_detail->save();				
 				}
 				DB::commit();
@@ -164,7 +173,6 @@ class ExpenseController extends BaseController
 
 	private function setExpense( $expense , $inputs )
 	{
-		//Log::error( $inputs );
 		$expense->idcomprobante    = $inputs['proof_type'];
 		$expense->num_prefijo      = $inputs['number_prefix'];
 		$expense->num_serie 	   = $inputs['number_serie'];
@@ -175,7 +183,6 @@ class ExpenseController extends BaseController
         $expense->fecha_movimiento = $inputs[ 'date' ];
         $expense->idcomprobante    = $inputs['proof_type'];
  		$expense->id_solicitud 	   = $inputs[ 'id_solicitud'];
- 		$expense->sub_tot 		   = $inputs['total_expense'];
  		if ( isset( $inputs[ 'rep' ] ) )
 			$expense->reparo = $inputs['rep'];
 
@@ -337,24 +344,8 @@ class ExpenseController extends BaseController
 		$cmps = array();
 		foreach($solicitud->clients as $client)
         {
-        	$clientes[] = $client->{$client->clientType->relacion}->full_name;
+        	$clientes[] = $client->clientType->descripcion . ' : ' . $client->{$client->clientType->relacion}->full_name;
         	$cmps[] = $client->{$client->clientType->relacion}->pefnrodoc1;
-            /*if ($client->from_table == TB_DOCTOR)
-            {
-                $doctors = $client->doctors;
-                array_push( $clientes, $doctors->pefnombres.' '.$doctors->pefpaterno.' '.$doctors->pefmaterno );
-            	array_push( $cmps , 'CMP: '.$doctors->pefnrodoc1);
-            }
-            elseif ($client->from_table == TB_INSTITUTE)
-            {
-                array_push( $clientes, $client->institutes->pejrazon);
-                array_push( $cmps, 'Ruc: '.$client->institutes->pejnrodoc);       
-            }
-            else
-            {
-                array_push ( $clientes, 'No encontrado' );
-        		array_push ( $cmps, 'No encontrado' );		
-        	}*/
         }
         $clientes = implode(',',$clientes);
         $cmps = implode(',',$cmps);
@@ -415,8 +406,11 @@ class ExpenseController extends BaseController
 					   'expenses'   => $expenses,
 					   'total'      => $total );
 		$data['balance'] = $this->reportBalance( $solicitud , $detalle , $jDetalle , $total );
-		$html = View::make('Expense.report',$data)->render();
-		return PDF::load($html, 'A4', 'landscape')->show();
+		$html = View::make( 'Expense.report' , $data )->render();
+		return View::make('Expense.report',$data);//->render();
+		//return $html;
+		return PDF::load( $html , 'A4' , 'landscape' )->show();
+		return PDF2::loadHTML( $html )->setPaper( 'a4' , 'landscape' )->stream();
 	}
 
 	public function reportExpenseFondo($token)
@@ -425,12 +419,22 @@ class ExpenseController extends BaseController
         $detalle = $fondo->detalle;
         $jDetalle = json_decode( $detalle->detalle );
         $expense = $fondo->expenses;
+        $dni = new BagoUser;
+		$dni = $dni->dni($fondo->createdBy->username);
+		if ($dni[status] == ok )
+			$dni = $dni[data];
+		else
+			$dni = '';
         $data = array(  'fondo'    => $fondo,
 			            'detalle'  => $jDetalle,
+			            'dni'	   => $dni,
 			            'date'     => $this->getDay(),
 			            'expense'  => $expense );
         $data['balance'] = $this->reportBalance( $fondo , $detalle , $jDetalle , $expense->sum('monto') );
+        
         $html = View::make('Expense.report-fondo',$data)->render();
+        return $html;
+        return PDF2::loadHTML( $html )->setPaper( 'a4' , 'landscape' )->stream();
         return PDF::load($html, 'A4', 'portrait')->show();
     }
 
@@ -536,20 +540,40 @@ class ExpenseController extends BaseController
 	{
 		try
 		{
-			$inputs    = Input::all();
-			$solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
-			$detalle   = $solicitud->detalle;
-			$jDetalle  = json_decode( $detalle->detalle );
-			if ( isset( $jDetalle->planilla ) )
-				return $this->warningException( 'Ya ha registro el Descuento y el N° de Planilla' , __FUNCTION__ , __LINE__ , __FILE__ );
-			$jDetalle->planilla = $inputs[ 'planilla' ];
-			$detalle->detalle   = json_encode( $jDetalle );
-			$detalle->save();
-			return $this->setRpta();
+			$inputs     = Input::all();
+			$middleRpta = $this->validateDiscount( $inputs );
+			if ( $middleRpta[ status] == ok )
+			{
+				$solicitud  = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
+				$detalle    = $solicitud->detalle;
+				$totalGasto = $solicitud->expenses->sum( 'monto' );
+				if ( $solicitud->id_estado != REGISTRADO )
+					return $this->warningException( 'La solicitud no esta habilitado para que realize el descuento. Se requiere que se culmine con el Registro de Gastos' , __FUNCTION__ , __LINE__ , __FILE__ );
+				if ( $totalGasto >= $detalle->monto_aprobado )
+					return $this->warningException( 'No existe un saldo en contra del responsable para realizar un descuento' , __FUNCTION__ , __LINE__ , __FILE__ );
+				$jDetalle   = json_decode( $detalle->detalle );
+				if ( isset( $jDetalle->descuento ) )
+					return $this->warningException( 'Ya ha registrado el Descuento' , __FUNCTION__ , __LINE__ , __FILE__ );
+				$jDetalle->descuento = $inputs[ 'periodo' ];
+				$detalle->detalle    = json_encode( $jDetalle );
+				$detalle->save();
+				return $this->setRpta();
+			}
+			return $middleRpta;
 		}
 		catch( Exception $e )
 		{
 			return $this->internalException( $e , __FUNCTION__ );
 		}
 	}
+
+	private function validateDiscount( $inputs )
+    {
+        $rules = array( 'token'   => 'required|string|size:40|exists:solicitud,token' ,
+                        'periodo' => 'required|string|size:7|date_format:"Y-m"|after:'  . date( '01-m-Y' ) );  
+        $validator = Validator::make( $inputs, $rules );
+        if ( $validator->fails() ) 
+            return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
+	    return $this->setRpta(); 
+    }
 }

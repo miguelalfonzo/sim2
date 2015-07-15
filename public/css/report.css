@@ -16,10 +16,6 @@ footer p
 {
 	display: inline;
 }
-header
-{
-	margin-left: 5em;
-}
 header p
 {
 	margin-left: 3em;
@@ -71,7 +67,7 @@ tfoot td
 }
 .background
 {
-	background: url('../img/logo-report.png');
+	background: url('img/logo-report.png') no-repeat top left;
 }
 .border
 {

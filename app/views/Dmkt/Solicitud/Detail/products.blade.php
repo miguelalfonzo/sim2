@@ -35,7 +35,7 @@
                                 </select>
                             @else
                                 <span class="input-group-addon">
-                                    {{ $product->subCatFondo->descripcion . ' | ' . $product->fondoMarca->descripcion . ' S/.' . $product->thisSubFondo()->saldo }}
+                                    {{ $product->subCatFondo->descripcion . ' | ' . $product->fondoMarca->descripcion . ' S/.' . ( floor( $product->thisSubFondo()->saldo * 100 ) / 100 ) }}
                                 </span>
                                 <input type="hidden" value="{{ $product->id_fondo . ',' . $product->id_fondo_producto . ',' . $product->id_fondo_user }}" name="fondo-producto[]">
                             @endif

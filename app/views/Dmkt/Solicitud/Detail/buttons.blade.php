@@ -24,10 +24,12 @@
             @if( $solicitud->id_estado == DEPOSITADO )
                 <a id="seat-solicitude" class="btn btn-success">Generar Asiento</a>
             @elseif( $solicitud->id_estado == REGISTRADO )
-                @if( isset( $balance ) && $balance > 0 )
-                    <a id="confirm-discount" class="btn btn-success">Confirmar Descuento</a>
-                @else
-                    <a id="confirm-discount" class="btn btn-success" style="display:none">Confirmar Descuento</a>
+                @if( $solicitud->detalle->id_motivo != REEMBOLSO && is_null( $solicitud->detalle->descuento ) )
+                    @if( ! isset( $balance ) || $balance > 0 )
+                        <a id="confirm-discount" class="btn btn-success">Confirmar Descuento</a>
+                    @else
+                        <a id="confirm-discount" class="btn btn-success" style="display:none">Confirmar Descuento</a>
+                    @endif
                 @endif
             @endif
         @elseif ( Auth::user()->type == TESORERIA && $solicitud->id_estado == DEPOSITO_HABILITADO )

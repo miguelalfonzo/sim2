@@ -377,3 +377,11 @@ table tbody tr td.close-details
   max-height: 350px;
   overflow-y: auto;
 }
+
+input[type=text].date
+{
+	background-color : white;
+	cursor			 : pointer;
+}
+
+

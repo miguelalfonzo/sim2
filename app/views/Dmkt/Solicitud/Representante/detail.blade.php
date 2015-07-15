@@ -55,6 +55,11 @@
     <!-- Tasa de Cambio del Dia del Deposito -->
     @include('Dmkt.Solicitud.Detail.tasa')
 
+    <!-- Fecha de Descuento al Responsable del Gasto -->
+    @if ( ! is_null( $detalle->descuento ) )
+        @include('Dmkt.Solicitud.Detail.discount')
+    @endif
+
     <!-- Observation-->
     @include('Dmkt.Solicitud.Detail.anotation')
 

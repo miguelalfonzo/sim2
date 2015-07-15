@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Reporte</title>
     {{ HTML::style('css/report.css') }}
 </head>
-<body style="background: url('img/logo-marcadeagua.png') center fixed no-repeat; filter: blur(20px);">
-    <div class="background">
+<body style="background: url( {{ asset( 'img/logo-marcadeagua.png' ) }} ) no-repeat center fixed">
+    <div>
         <header style="margin-top:-2em;">
-            <img src="img/logo-report.png" style="width:170px;margin-left:-5em;">
-            <h1><p><strong>REPORTE DE GASTOS PUBLICIDAD Y PROMOCIÓN SEGÚN PRESUPUESTO</strong></p><h1>
+            <img src="{{ URL::to( 'img/logo-report.png' ) }}" style="width:170px;padding-top:30px">
+            <h1><p><strong>REPORTE DE GASTOS PUBLICIDAD Y PROMOCIÓN SEGÚN PRESUPUESTO</strong></p></h1>
         </header>
         <main>
             <section style="text-align:center;margin-top:2.5em;">
@@ -144,18 +144,18 @@
                     </tbody>
                 </table>
             </section>
+            <section style="padding-top:50px">
+                <p class="firma">FIRMA DEL EMPLEADO</p>
+                    @foreach( $solicitud->toAcceptedApprovedHistories as $acceptedApprovedHistory )
+                        @if( ! ( is_null( $solicitud->userApprovalPolicy( $acceptedApprovedHistory->user_from )->desde ) 
+                        && is_null( $solicitud->userApprovalPolicy( $acceptedApprovedHistory->user_from )->hasta ) ) )
+                            <p class="firma">V°B° {{ $acceptedApprovedHistory->fromUserType->descripcion }}</p>
+                        @endif
+                    @endforeach
+                <div>DNI:&nbsp;<span class="dni">{{$dni}}</span></div>
+                <div>NOMBRE:&nbsp;<span class="dni">{{$created_by}}</span></div>
+            </section>
         </main>
-        <footer>
-            <p class="firma">FIRMA DEL EMPLEADO</p>
-            @foreach( $solicitud->toAcceptedApprovedHistories as $acceptedApprovedHistory )
-                @if( ! ( is_null( $solicitud->userApprovalPolicy( $acceptedApprovedHistory->user_from )->desde ) 
-                && is_null( $solicitud->userApprovalPolicy( $acceptedApprovedHistory->user_from )->hasta ) ) )
-                    <p class="firma">V°B° {{ $acceptedApprovedHistory->fromUserType->descripcion }}</p>
-                @endif
-            @endforeach
-            <div>DNI:&nbsp;<span class="dni">{{$dni}}</span></div>
-            <div>NOMBRE:&nbsp;<span class="dni">{{$created_by}}</span></div>
-        </footer>
     </div>
 </body>
 </html>

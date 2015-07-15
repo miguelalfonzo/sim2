@@ -125,13 +125,13 @@ $(function()
     $(".total-item input").numeric({negative:false});
     $(".quantity input").numeric({negative:false});
     $("#igv").numeric({negative:false});
-    $("#ret0").numeric({negative:false});
-    $("#ret1").numeric({negative:false});
-    $("#ret2").numeric({negative:false});
+    $("#sub-tot").numeric({negative:false});
+    $("#total-expense").numeric({negative:false});
     $("#total").numeric({negative:false});
     //Events: Datepicker, Buttons, Keyup.
     //Calcule the IGV and Balance once typed the total amount per item
-    $(document).on("keyup",".total-item input" , function()
+    $( document ).off( 'keyup' , '.total-item input' );
+    $( document).on( 'keyup' , '.total-item input' , function()
     {
         calcularIGV();
     });
@@ -167,17 +167,7 @@ $(function()
         //selected a date hide the datepicker
         $(".date").on("change",function(){
             $(this).datepicker('hide');
-        });   
-        /*$(".date").datepicker({
-            language: 'es',
-            startDate: '{{$data["date"]["toDay"]}}' ,
-            endDate:  '{{$data["date"]["lastDay"]}}' ,
-            format: 'dd/mm/yyyy'
         });
-        //selected a date hide the datepicker
-        $(".date").on("change",function(){
-            $(this).datepicker('hide');
-        });*/
     }      
 
     //Record end Solicitude
@@ -312,7 +302,8 @@ $(function()
         $("#message-op-number").text('');
     });
     //IGV, Imp. Service show if you check Factura
-    $("#proof-type").on("change",function(){
+    $( '#proof-type' ).on( 'change' , function()
+    {
         proofType( this );
     });
 
@@ -322,6 +313,8 @@ $(function()
         $("#ruc").prop('disabled', false);
         $("#number-prefix").prop('disabled', false);
         $("#number-serie").prop('disabled', false);
+        $( '#regimen' ).parent().parent().show();
+        $( '#monto-regimen' ).parent().parent().show();
         var option = $("#proof-type :selected"); 
         var igv = option.attr("igv");
         var marca = option.attr("marca");
@@ -336,7 +329,7 @@ $(function()
             $(".tot-document").hide();
             $('#dreparo').hide();
         }
-        if( marca === 'N')
+        if( marca === 'N' )
         {
             // DESHABILITA INPUTS + QUITAR MARCAR DE ERRORES ANTERIORES
             $("#ruc").prop('disabled', true);
@@ -357,6 +350,8 @@ $(function()
             $("#number-prefix").val("");
             $("#number-serie").val("");
             $("#razon").text("");
+            $( '#regimen' ).parent().parent().hide();
+            $( '#monto-regimen' ).parent().parent().hide();
         }
     }
 
@@ -472,7 +467,7 @@ $(function()
                     responseUI('Editar Gasto','green');
                     $("html, body").animate({scrollTop:200},'500','swing');
                     var data = JSON.parse( JSON.stringify( response.Data ) );
-                    $('input[name=idgasto]').val( data.expense.id)
+                    $('input[name=idgasto]').val( data.expense.id );
                     $("#proof-type").val(data.expense.idcomprobante).attr("disabled",true);
                     $("#ruc").val(data.expense.ruc).attr("disabled",true);
                     $("#ruc-hide").val(data.expense.ruc);
@@ -505,12 +500,12 @@ $(function()
                     if ( $("#proof-type option:selected").attr('marca') === 'N' )
                     {
                         $("#regimen").parent().parent().hide();
-                        //$("#monto-regimen").parent().parent().hide();
+                        $("#monto-regimen").parent().parent().hide();
                     }
                     else
                     {
                         $("#regimen").parent().parent().show();
-                        //$("#monto-regimen").parent().parent().show();
+                        $("#monto-regimen").parent().parent().show();
                     }    
 
                     $('#igv').val( data.expense.igv );
@@ -548,11 +543,10 @@ $(function()
                     }
                     var row_expenses = $(".total").parent();
                     tot_expenses = calculateTot( row_expenses , '.total_expense' );
-                    console.log( deposit );
-                    console.log( tot_expenses );
                     var balance = deposit - tot_expenses;
                     $("#balance").val(balance.toFixed(2));
                     $(".detail-expense").show();
+                    $('#cancel-expense').show();
                 },1000);
             else
                 bootbox.alert('<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
@@ -578,7 +572,6 @@ $(function()
 
         //Validación de errores de cabeceras
         var error = 0;
-        
         if( !ruc )
         {   
             if( proof_type_sel.attr("marca") !== 'N' )
@@ -592,8 +585,7 @@ $(function()
         {
             if( proof_type_sel.attr("marca") !== 'N' )
             {
-                $("#razon").addClass("error-incomplete");
-                $("#razon").html("Busque el RUC otra vez.");
+                $( '#razon' ).addClass( 'error-incomplete' ).html( 'Busque el RUC otra vez.' ).parent().parent().addClass( 'has-error' ).removeClass( 'has-success' );
                 error = 1;
             }
         }
@@ -602,7 +594,7 @@ $(function()
             if( proof_type_sel.attr("marca") !== 'N' )
             {
                 $("#razon").addClass("error-incomplete");
-                $("#razon").html("No ha buscado la Razón Social.");
+                $("#razon").html("No ha buscado la Razón Social.").parent().parent().addClass( 'has-error' ).removeClass( 'has-success' );;
                 error = 1;
             }
         }
@@ -611,7 +603,7 @@ $(function()
             if( proof_type_sel.attr("marca") !== 'N' )
             {
                 $("#razon").html("No existe el ruc consultado.");
-                $("#razon").removeClass("error-incomplete");
+                $("#razon").removeClass("error-incomplete").parent().parent().addClass( 'has-error' ).removeClass( 'has-success' );
                 error = 1;
             }
         }
@@ -648,10 +640,10 @@ $(function()
             error = 1;
         }
         //Mostrando errores de cabeceras si es que existen
-        if(error !== 0)
+        if( error !== 0 )
         {
             $("html, body").animate({
-                scrollTop: $("#proof-type").offset().top
+                scrollTop: $("#proof-type").parent().parent().offset().top
             } , 300 );
             return false;
         }
@@ -667,7 +659,6 @@ $(function()
             data.razon         = razon;
             data.number_prefix = number_prefix;
             data.number_serie  = number_serie;
-            //data.date_movement = date;
             data.fecha_movimiento = date;
             data.desc_expense  = desc_expense;
 
@@ -711,7 +702,7 @@ $(function()
             
             if( error_json === 0 )
             {
-                if( proof_type_sel.attr( 'igv' ) == 1 )
+                if( proof_type_sel.attr( 'igv' ) == 1 || validateVoucher(ruc,voucher_number) === true )
                 {
                     var sub_total_expense = parseFloat( $("#sub-tot").val() );
                     var imp_service       = parseFloat( $("#imp-ser").val() );
@@ -739,7 +730,7 @@ $(function()
                     });
                 }
                 else
-                    if ( $("#proof-type option:selected").attr('marca') == 'N' || validateVoucher(ruc,voucher_number) === true )
+                    if ( validateVoucher(ruc,voucher_number) === true || ( proof_type_sel.attr( 'marca' ) == 'N' && btn_save === 'Registrar' ) )
                     {
                         ajaxExpense(data).done(function( response )
                         {
@@ -752,7 +743,7 @@ $(function()
                     else
                         if( btn_save === 'Registrar' )
                         {
-                            $(".message-expense").text("El Tipo de documento no se encuentra registrado.").show();
+                            $(".message-expense").text( 'El Documento ya se encuentra registrado.' ).css( 'color' , 'red' ).show();
                             return false;
                         }
                         else
@@ -813,7 +804,6 @@ $(function()
             responseUI( msg , 'green' );
             rechargeExpense().done( function ( data ) 
             {
-                console.log( data );
                 if ( data.Status === 'Ok' )
                     reloadExpenseView( data.Data );
                 else
@@ -824,21 +814,17 @@ $(function()
 
     function reloadExpenseView( data )
     {
-        console.log( 'ok' );
         $('#table-expense').html( data );
+        rechargeViewExpense();
+    } 
+
+    function rechargeViewExpense()
+    {
         $("#save-expense").html("Registrar");
         var tot_expenses = calculateTot($(".total").parent() , '.total_expense' );
         var balance = deposit - tot_expenses;
         $("#balance").val(balance);
-        deleteItems();
-        deleteExpense();
-        console.log( balance );
-        rechargeViewExpense( balance );
-    } 
-
-    function rechargeViewExpense( balance )
-    {
-        console.log( balance );
+        cleanExpenseView();
         if( balance === 0 )
             $(".detail-expense").hide();
         else
@@ -862,18 +848,16 @@ $(function()
         if( ruc.length === 0 )
         {
             $("#ruc").addClass("error-incomplete");
-            $("#razon").css("color","#5c5c5c");
-            $("#razon").html("No ha ingresado el RUC.");
+            $( '#razon' ).css( 'color","#5c5c5c' ).html( 'No ha ingresado el RUC.').parent().parent().addClass( 'has-error' ).removeClass( 'has-success' );
         }
-        else if(ruc.length>0 && ruc.length<11)
+        else if( ruc.length > 0 && ruc.length < 11 )
         {
             $("#ruc").addClass("error-incomplete");
-            $("#razon").css("color","#5c5c5c");
-            $("#razon").html("El RUC ingresado no contiene 11 dígitos.");
+            $("#razon").css("color","#5c5c5c").html("El RUC ingresado no contiene 11 dígitos.").parent().parent().addClass( 'has-error' ).removeClass( 'has-success' );;
         }
         else
         {
-            var l = Ladda.create(document.getElementById('razon'));
+            var l = Ladda.create( document.getElementById( 'razon' ) );
             data._token = $("input[name=_token]").val();
             $.ajax({
                 type: 'get',
@@ -886,28 +870,26 @@ $(function()
                 },
                 error: function(){
                     l.stop();
-                    $("#razon").html("No se puede buscar el RUC.");
+                    $("#razon").html("No se puede buscar el RUC.").parent().parent().addClass( 'has-error' ).removeClass( 'has-success' );;
                     $("#ruc").attr("disabled",false);
                 }
             }).done(function (response){
                 if(response.error == undefined)
                 {
-                    $("#razon").val(2);
-                    $("#ruc-hide").val(ruc);
-                    $("#razon").html(response['razon_social']);
+                    $( '#razon' ).val( 2 ).html( response['razon_social'] ).parent().parent().addClass( 'has-success' ).removeClass( 'has-error' );;
+                    $("#ruc-hide").val( ruc );
                 }
                 else
                 {
                     if(response.code == 1)
-                        $("#razon").html("RUC menor a 11 digitos.");
+                        $("#razon").html("RUC menor a 11 digitos.").parent().parent().addClass( 'has-error' ).removeClass( 'has-success' );
                     if(response.code == 2)
                     {
                         $("#ruc").addClass("error-incomplete");
-                        $("#razon").val(1);
-                        $("#razon").html("No existe el RUC consultado.");
+                        $( '#razon' ).val( 1 ).html( 'No existe el RUC consultado.' ).parent().parent().addClass( 'has-error' ).removeClass( 'has-success' );
                     }
                     if(response.code == 4)
-                        $("#razon").html(response.error + ". "+ response.msg );
+                        $( '#razon' ).html( response.error + '. ' + response.msg ).parent().parent().addClass( 'has-error' ).removeClass( 'has-success' );
                     $("#ruc-hide").val(ruc);
                 }
                 l.stop();
@@ -939,18 +921,19 @@ $(function()
         return sum;
     }
 
-    //Delete Items
-    function deleteItems()
+    $( '#cancel-expense' ).on( 'click' , function() 
+    {
+        rechargeViewExpense();
+    });
+
+    //Clean View of Expense
+    function cleanExpenseView()
     {
         $("#table-items tbody tr").remove();
         row_item_first.find('.quantity input').val('');
         row_item_first.find('.description input').val('');
         row_item_first.find('.total-item input').val('');
         $("#table-items tbody").append(row_item_first);
-    }
-    //Delete data
-    function deleteExpense()
-    {
         $(".tot-document").show();
         $("#proof-type").val("1").attr("disabled",false);
         $("#ruc").val('').attr('disabled',false);
@@ -966,31 +949,33 @@ $(function()
         $("#total-expense").val('');
         $("#tot-edit-hidden").val('');
         $("#desc-expense").val('');
+        $( '#cancel-expense' ).hide();
     }
+
     //Calculate Balance
     function calcularBalance()
     {
         var balance;
-        //var deposit = parseFloat(depositado.val());
         var tot_expenses = calculateTot($(".total").parent(),'.total_expense');
+        console.log( tot_expenses );
         var btn_save = $("#save-expense").html();
-        var tot_expense = parseFloat($("#total-expense").val());
+        var tot_item_expense = parseFloat($("#total-expense").val());
         var imp_serv = parseFloat($("#imp-ser").val());
-        if(!$.isNumeric(imp_serv)) imp_serv = 0;
-        if(!$.isNumeric(tot_expense)) tot_expense = 0;
-    
+        if( ! $.isNumeric( imp_serv ) ) imp_serv = 0 ;
+        if( ! $.isNumeric( tot_item_expense ) ) tot_item_expense = 0 ;
+        console.log( tot_item_expense );
+        
         if(btn_save === "Registrar")
         {
-            balance = deposit - tot_expenses - tot_expense;
-            $("#balance").val(balance.toFixed(2));
+            balance = deposit - tot_expenses - tot_item_expense;
+            $("#balance").val( balance.toFixed( 2 ) );
         }
         else
         {
-
-            balance = deposit - tot_expense - tot_expenses + parseFloat($("#tot-edit-hidden").val());
-            $("#balance").val(balance.toFixed(2));
+            balance = deposit - tot_expenses - tot_item_expense + parseFloat($("#tot-edit-hidden").val());
+            $("#balance").val( balance.toFixed( 2 ) );
         }
-        if(balance<0)
+        if( balance < 0 )
         {
             $(".message-expense").html('El monto ingresado supera el saldo.').css("color","red").show();
             $("#balance").css("color","red");
@@ -1008,6 +993,7 @@ $(function()
         //Total variables Proof
         var total_item = $(".total-item input");
         var proof_type_sel = $("#proof-type :selected");
+        console.log( proof_type_sel );
         var sub_total_expense = 0;
         var imp_service = parseFloat($("#imp-ser").val());
         var igv_percent = $('#igv').attr('igv') / 100;
@@ -1018,14 +1004,13 @@ $(function()
             else
                 total_expense += parseFloat($(this).val());
         });
-        
         if ( total_expense > 0 )
         {
             if( proof_type_sel.attr("igv") == 1 )
             {
                 if(!imp_service) imp_service = 0;
-                var igv = total_expense * igv_percent;
-                sub_total_expense = total_expense - igv;
+                var igv = total_expense * igv_percent / ( 1 + igv_percent );
+                sub_total_expense = total_expense / ( 1 + igv_percent );
                 $("#sub-tot").val( sub_total_expense.toFixed(2) );
                 total_expense = sub_total_expense + igv + imp_service;
                 
@@ -1508,22 +1493,43 @@ $(function()
         }
     });
 
+    $( document ).off( 'click' , '#periodo' );
+    $( document ).on( 'click' , '#periodo' , function()
+    {
+        $( this ).parent().parent().removeClass( 'has-error' );
+    });
+
     $( '#confirm-discount' ).on( 'click' , function()
     {
         var element = $( this );
+        var html    = '<div class="form-group">' +
+                      '<label class="control-label">Periodo del Descuento</label>' +
+                      '<div>' +
+                      '<input type="text" id="periodo" class="form-control date" size=7 placeholder="Seleccione el Periodo MM-YYYY" readonly>' +
+                      '</div>'+
+                      '</div>';
+        var object  = $( html );
+        object.find( '#periodo' ).datepicker(
+        {
+            format: 'mm-yyyy',
+            startDate: '+0m',
+            endDate: '+1y',
+            minViewMode: 1,
+            language: "es",
+            orientation: "top",
+            autoclose: true
+        });
+
         bootbox.dialog({
             title: 'Confirmacion del Descuento',
-            message: '<div class="form-group">' +
-                     '<label class="control-label">N° de Planilla</label>' +
-                     '<div><input type="text" id="planilla" class="form-control" placeholder="Ingrese el N° de Planilla"></div>'+
-                     '</div>',
+            message: object ,
             buttons: 
             {
                 danger: 
                 {
                     label:'Cancelar',
                     className: 'btn-primary',
-                    callback: function ( result ) 
+                    callback: function() 
                     {
                         bootbox.hideAll();
                     }
@@ -1532,30 +1538,37 @@ $(function()
                 {
                     label: 'Confirmar',
                     className: 'btn-success',
-                    callback: function( result )
+                    callback: function( response )
                     {
-                        if ( $( '#planilla' ).val().trim() == '' )
+                        if ( $( '#periodo' ).val().trim() == '' )
                         {
-                            $( '#planilla' ).parent().parent().addClass( 'has-error' ).focus();
+                            $( '#periodo' ).parent().parent().addClass( 'has-error' ).focus();
                             return false;
                         }
                         else
                         {
-                            if ( result )
+                            var data = {};
+                            data.periodo = $( '#periodo' ).val();
+                            if ( response )
                             {
-                                data._token   = GBREPORTS.token;
-                                data.planilla = $( '#planilla' ).val();
-                                data.token    = $( 'input[name=token]' ).val();
-                                $.post( server + 'confirm-discount' , data )
-                                .done(function ( data ) 
-                                {
-                                    if ( data.Status == 'Ok')
-                                        bootbox.alert( '<h4 class="green">Descuento Confirmado</h4>' , function()
+                                bootbox.confirm( '<h4 class="text-center text-warning">¿ Esta seguro de realizar el descuento en el Periodo ' + data.periodo + ' ?</h4>', function( response ) 
+                                {    
+                                    if ( response ) 
+                                    {
+                                        data._token   = GBREPORTS.token;
+                                        data.token    = $( 'input[name=token]' ).val();
+                                        $.post( server + 'confirm-discount' , data )
+                                        .done(function ( response ) 
                                         {
-                                            element.hide();
+                                            if ( response.Status == 'Ok' )
+                                                bootbox.alert( '<h4 class="green">Descuento Confirmado</h4>' , function()
+                                                {
+                                                    element.remove();
+                                                });
+                                            else
+                                                bootbox.alert( '<h4 style="color:red">' + response.Status + ' : ' + response.Description + '</h4>' );
                                         });
-                                    else
-                                        bootbox.alert( '<h4 style="color:red">' + data.Status + ' : ' + data.Description + '</h4>' );
+                                    }    
                                 });
                             }
                         }
@@ -1564,4 +1577,4 @@ $(function()
             }
         });
     });
-});
+}); 

@@ -13,12 +13,12 @@ class BaseController extends Controller
         $this->beforeFilter('csrf', array('on' => array('post', 'put', 'patch', 'delete')));
     }
 
-    protected function getExpenseDate( $solicitud )
+    protected function getExpenseDate( $solicitud , $range = 0 )
     {
         $now = Carbon::now();
         $created = new Carbon( $solicitud->created_at );
         $expenseDate = $now->subDays( 7 )->max( $created );
-        return array( 'startDate' => $expenseDate->format('d/m/Y') , 'endDate' => Carbon::now()->format('d/m/Y') );
+        return array( 'startDate' => $expenseDate->subDays( $range )->format('d/m/Y') , 'endDate' => Carbon::now()->addDays( $range )->format('d/m/Y') );
     }
 
     protected function getDay( $type=1 )
@@ -193,9 +193,9 @@ class BaseController extends Controller
             $statusSolicitude = SolicitudHistory::find( $statusSolicitude->id );
         
         $statusSolicitude->status_from  = $status_from;
-        $statusSolicitude->user_to    = $user_to;
+        $statusSolicitude->user_to      = $user_to;
         $statusSolicitude->notified     = $notified;
-        $statusSolicitude->updated_at   = Carbon\Carbon::now();
+        $statusSolicitude->updated_at   = Carbon::now();
         if ( is_null( $statusSolicitude->user_to ) )
             return $this->warningException( 'No se pudo determinar el tipo de usuario para enviar la solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );    
         \Log::error( json_encode( $statusSolicitude ) );

@@ -5,11 +5,11 @@
     <title>Reporte</title>
     {{ HTML::style('css/report.css') }}
 </head>
-<body style="background: url('img/logo-marcadeagua.png') center fixed no-repeat; filter: blur(20px);">
-    <div class="background">
+<body style="background: url( {{ asset( 'img/logo-marcadeagua.png' ) }} ) no-repeat center fixed">
+    <div>
         <header style="margin-top:-2em;">
-            <img src="img/logo-report.png" style="width:170px;margin-left:-5em;">
-            <h1><p><strong>REPORTE DE GASTOS DE FONDOS INSTITUCIONALES</strong></p></h1>
+            <img src="{{ URL::to( 'img/logo-report.png' ) }}" style="width:170px;padding-top:30px">
+            <h1 style="text-align:center"><strong>REPORTE DE GASTOS DE FONDOS INSTITUCIONALES</strong></h1>
         </header>
         <main>
             <section style="text-align:center;margin-top:2.5em;">
@@ -25,9 +25,6 @@
             <section style="text-align:center;margin-top:2em;">
                 <strong><p style="display:inline">Fecha de Deposito:</strong>&nbsp;{{$fondo->detalle->deposit->updated_at}}</p>
                 <strong><p style="display:inline">N° de Depósito:</strong>&nbsp;{{$fondo->detalle->deposit->num_transferencia}}</p>    
-                <!-- if ( isset($detalle->tcc) && isset($detalle->tcv) )
-                    <strong><p style="display:inline">T. Cambio:</strong>&nbsp;C: {{$detalle->tcc}} V: {{$detalle->tcv}}</p>
-                endif -->
             </section>    
             <section style="margin-top:2em;">
                 <table class="table">
@@ -132,14 +129,18 @@
                     </tbody>
                 </table>
             </section>
+            <section style="padding-top:70px">
+                <p class="firma">FIRMA DEL EMPLEADO</p>
+                <p class="firma">V°B° SUPERVISOR</p>
+                <p class="firma">V°B° GERENTE COMERCIAL</p>
+                <br>
+                <p>DNI:{{$dni}}</p>
+                </p></p>
+                <br>
+                <p>NOMBRE:{{$fondo->asignedTo->rm->full_name}}</p>
+                </p></p>
+            </section>
         </main>
-        <footer>
-            <p class="firma">FIRMA DEL EMPLEADO</p>
-            <p class="firma">V°B° SUPERVISOR</p>
-            <p class="firma">V°B° GERENTE COMERCIAL</p>
-            <div>DNI:&nbsp;<span class="dni">44595954</span></div>
-            <div>NOMBRE:&nbsp;<span class="dni">{{$fondo->asignedTo->rm->full_name}}</span></div>
-        </footer>
     </div>
 </body>
 </html>

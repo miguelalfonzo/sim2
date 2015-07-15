@@ -120,12 +120,6 @@ class Solicitud extends Eloquent
     {
         return $this->hasOne( 'Dmkt\SolicitudDetalle' , 'id' , 'id_detalle' );
     }
-    /* PROTECTED RELATIOSNSHIPS */
-
-    protected function registerHist()
-    {
-        return $this->hasOne('System\SolicitudHistory','id_solicitud','id')->where('status_to' , REGISTRADO );
-    }
 
     protected function typeSolicitude()
     {

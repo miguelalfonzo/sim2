@@ -126,6 +126,7 @@ return array(
         'Intervention\Image\ImageServiceProvider',
         'Thujohn\Pdf\PdfServiceProvider',
         'Maatwebsite\Excel\ExcelServiceProvider',
+        'Barryvdh\DomPDF\ServiceProvider'
 	),
 
 	/*
@@ -191,8 +192,9 @@ return array(
 		'URL'               => 'Illuminate\Support\Facades\URL',
 		'Validator'         => 'Illuminate\Support\Facades\Validator',
 		'View'              => 'Illuminate\Support\Facades\View',
-        'Image' => 'Intervention\Image\Facades\Image',
-        'PDF' => 'Thujohn\Pdf\PdfFacade',
-        'Excel' => 'Maatwebsite\Excel\Facades\Excel',
+        'Image'             => 'Intervention\Image\Facades\Image',
+        'PDF'               => 'Thujohn\Pdf\PdfFacade',
+        'Excel'             => 'Maatwebsite\Excel\Facades\Excel',
+        'PDF2'              => 'Barryvdh\DomPDF\Facade'
 	),
 );

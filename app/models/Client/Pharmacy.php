@@ -11,7 +11,7 @@ class Pharmacy extends Eloquent
 
     protected function getFullNameAttribute()
     {
-        return 'FARMACIA: '.$this->attributes[ 'pejnrodoc' ].'-'.$this->attributes[ 'pejrazon' ];
+        return $this->attributes[ 'pejnrodoc' ].'-'.$this->attributes[ 'pejrazon' ];
     }
 
 }

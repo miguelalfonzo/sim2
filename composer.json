@@ -8,6 +8,7 @@
         "yajra/laravel-oci8": "*",
         "intervention/image": "2.*",
 		"thujohn/pdf": "dev-master",
+		"barryvdh/laravel-dompdf": "0.4.*",
         "maatwebsite/excel": "1.*"
     },
 	"autoload": {

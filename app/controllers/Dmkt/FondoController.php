@@ -124,7 +124,7 @@ class FondoController extends BaseController
             
             $solicituds = Solicitud::solInst( $periodo );
             if ( $solicituds->count() === 0 )
-                return $this->warningException( 'No se encontro solicitudes para el periodo especificado: ' .$periodo , __FUNCTION__ , __LINE__ , __FILE__);
+                return $this->warningException( 'No se encontro solicitudes para el periodo especificado: ' . $periodo , __FUNCTION__ , __LINE__ , __FILE__);
         
             $middleRpta = $this->endSolicituds( $solicituds );
             if ( $middleRpta[status] == ok )
@@ -248,15 +248,13 @@ class FondoController extends BaseController
     {
         $repmed = Rm::find( $codrepmed );
         if ( is_null( $repmed ) )
-            return $this->warningException( 'El representante Medico no esta registrado en el sistema. Codigo de Representante: '.$codrepmed , __FUNCTION__ , __LINE__ , __FILE__ );
-        
+            return $this->warningException( 'El representante Medico no esta registrado en el sistema. Codigo de Representante: ' . $codrepmed , __FUNCTION__ , __LINE__ , __FILE__ );
         $sup = Sup::find( $codsup );
         if ( is_null( $sup) )
-            return $this->warningException( 'El Supervisor no esta registrado en el sistema. Codigo de Supervisor: '.$codsup , __FUNCTION__ , __LINE__ , __FILE__ );
+            return $this->warningException( 'El Supervisor no esta registrado en el sistema. Codigo de Supervisor: ' . $codsup , __FUNCTION__ , __LINE__ , __FILE__ );
             
         if ( $repmed->idsup != $codsup )
-            return $this->warningException( 'El sistema no tiene la relacion Representate-Supervisor actualizada. Se esperaba al Supervisor : ' .$repmed->rmSup->full_name . ' con codigo:' . $codsup , __FUNCTION__ , __LINE__ , __FILE__ );
-        
+            return $this->warningException( 'El sistema no tiene la relacion Representate-Supervisor o ha sido actualizada. Se esperaba al Supervisor : ' . $repmed->rmSup->full_name . ' con codigo:' . $codsup . ' .Comuniquese con Informatica' , __FUNCTION__ , __LINE__ , __FILE__ );
         return $this->setRpta( array( 'rm' => $repmed->iduser , 'sup' => $sup->iduser ) );
     }
 

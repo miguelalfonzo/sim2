@@ -9,6 +9,17 @@ class SolicitudDetalle extends Eloquent
 	protected $table = 'SOLICITUD_DETALLE';
     protected $primaryKey = 'id';    
  
+    protected function getMontoAprobadoAttribute()
+    {
+        return json_decode( $this->detalle )->monto_aprobado;
+    }
+
+    protected function getDescuentoAttribute()
+    {
+        $jDetalle = json_decode( $this->detalle );
+        return isset( $jDetalle->descuento ) ? $jDetalle->descuento : null;
+    }
+
     protected function getTccAttribute()
     {
         return json_decode( $this->detalle )->tcc;
@@ -64,24 +75,6 @@ class SolicitudDetalle extends Eloquent
             return $jDetalle->num_ruc;
         else
             return 0;
-    }
-
-    protected function getMontoFacturaAttribute()
-    {
-        $jDetalle = json_decode( $this->detalle );
-        if ( isset( $jDetalle->monto_factura ) )
-            return $jDetalle->monto_factura;
-        else
-            return null;
-    }
-
-    protected function getImageAttribute()
-    {
-        $jDetalle = json_decode( $this->detalle );
-        if ( isset( $jDetalle->image ) )
-            return $jDetalle->image;
-        else
-            return null;
     }
 
     public function lastId()
