@@ -147,7 +147,7 @@
             <section style="padding-top:50px;bottom:0px">
                 <p class="firma">FIRMA DEL EMPLEADO</p>
                     @foreach( $solicitud->toAcceptedApprovedHistories as $acceptedApprovedHistory )
-                        @if( ! ( is_null( $solicitud->userApprovalPolicy( $acceptedApprovedHistory->user_from )->desde ) 
+                        @if( ! is_null( $solicitud->userApprovalPolicy( $acceptedApprovedHistory->user_from ) ) && ! ( is_null( $solicitud->userApprovalPolicy( $acceptedApprovedHistory->user_from )->desde ) 
                         && is_null( $solicitud->userApprovalPolicy( $acceptedApprovedHistory->user_from )->hasta ) ) )
                             <p class="firma">V°B° {{ $acceptedApprovedHistory->fromUserType->descripcion }}</p>
                         @endif
