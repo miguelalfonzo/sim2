@@ -15,11 +15,12 @@ class AlertController extends BaseController
 {
 	public function show(){
 		$data = array('alerts' => $this->alertConsole2());
+		\Log::error( $data );
 		return View::make('template.User.alerts', $data);
 	}
 
 	public function showAlerts(){
-		return array('status' => 'OK', 'alerts' => $this->alertConsole());
+		return array('status' => 'OK', 'alerts' => $this->alertConsole2());
 	}
 
 	private function intersectRecords( $rs1 , $rs2 )

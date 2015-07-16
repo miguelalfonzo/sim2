@@ -2186,7 +2186,8 @@ $( document ).ready(function()
                 if(dataResult.alerts.length > 0){
                     console.log("listo");
                     $(".sim_alerta").show("slow");
-                    $(".sim_alerta").find('span').html(dataResult.alerts.length);
+                    console.log( dataResult);
+                    $(".sim_alerta").find('span').html(dataResult.alerts[0].data.length);
                 }
             }         
         }
