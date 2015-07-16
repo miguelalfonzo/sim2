@@ -814,7 +814,7 @@ $(function()
 
     function reloadExpenseView( data )
     {
-        $('#table-expense').html( data );
+        $('#section-table-expense').html( data );
         rechargeViewExpense();
     } 
 
@@ -950,6 +950,7 @@ $(function()
         $("#tot-edit-hidden").val('');
         $("#desc-expense").val('');
         $( '#cancel-expense' ).hide();
+        $("#table-expense tbody tr").removeClass("select-row");
     }
 
     //Calculate Balance

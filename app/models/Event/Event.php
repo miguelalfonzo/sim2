@@ -26,7 +26,7 @@ class Event extends Eloquent
         if(count($photos)>0){
             return $photos;
         }
-        return null;
+        return array();
     }
     
 }

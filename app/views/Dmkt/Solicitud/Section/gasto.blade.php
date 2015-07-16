@@ -429,15 +429,11 @@
 		@endif
 	@endif
 	<section class="row reg-expense" style="margin:0">
-			<div class="col-xs-12 col-sm-12 col-md-12">
-				<div class="form-expense">
-					<div class="table-responsive">
-						<table id="table-expense" class="table table-bordered">
-							@if ( isset($expense) )
-								@include('Dmkt.Solicitud.Section.gasto-table')
-							@endif
-						</table>
-					</div>
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<div class="form-expense">
+				<div class="table-responsive" id="section-table-expense">
+					@include('Dmkt.Solicitud.Section.gasto-table')
+				</div>
 				<input id="tot-edit-hidden" type="hidden">
 			</div>
 		</div>

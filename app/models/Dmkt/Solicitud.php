@@ -190,7 +190,17 @@ class Solicitud extends Eloquent
         return $this->hasOne( 'Expense\Expense' , 'id_solicitud' , 'id' )->orderBy( 'updated_at' , 'desc' );
     }
 
-    protected function baseEntry()
+    protected function advanceCreditEntry()
+    {
+        return $this->hasOne( 'Expense\Entry' , 'id_solicitud' )->where( 'd_c' , ASIENTO_GASTO_BASE )->where( 'tipo_asiento' , 'A' );        
+    }
+
+    protected function advanceDepositEntry()
+    {
+        return $this->hasOne( 'Expense\Entry' , 'id_solicitud' )->where( 'd_c' , ASIENTO_GASTO_DEPOSITO )->where( 'tipo_asiento' , 'A' );        
+    }
+
+    /*protected function baseEntry()
     {
         return $this->hasOne( 'Expense\Entry' , 'id_solicitud' )->where( 'd_c' , ASIENTO_GASTO_BASE );
     }
@@ -198,6 +208,11 @@ class Solicitud extends Eloquent
     protected function depositEntrys()
     {
         return $this->hasMany( 'Expense\Entry' , 'id_solicitud' )->where( 'd_c' , ASIENTO_GASTO_DEPOSITO );
+    }*/
+
+    protected function dailyEntries()
+    {
+        return $this->hasMany( 'Expense\Entry' , 'id_solicitud' )->where( 'tipo_asiento' , ASIENTO_GASTO_TIPO )->orderBy( 'id' , 'ASC' );
     }
 
     public function policies()

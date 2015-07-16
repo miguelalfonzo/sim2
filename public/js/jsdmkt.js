@@ -89,8 +89,8 @@ var date_options2 =
 $('.btn_cancel_fondo').hide();
 $('.btn_edit_fondo').hide();
 
-$(document).off("click", ".timeLine");
-$(document).on("click", ".timeLine", function(e)
+$(document).off( 'click' , '.timeLine' );
+$(document).on( 'click' , '.timeLine' , function(e)
 {
     e.preventDefault();
     var element = $(this);
@@ -120,7 +120,11 @@ $(document).on("click", ".timeLine", function(e)
             },
             size: "large"
         });
-    });  
+    }).fail( function( statusCode , errorThrown )
+    {
+        element.addClass( 'timeLine' );
+        ajaxError( statusCode , errorThrown );
+    });
 });
 
 //NEW OR EDIT SOLICITUDE BY RM OR SUP CLIENTES
@@ -1370,7 +1374,8 @@ $(document).on('click' , '.maintenance-disable' , function()
         if ( response.Status == 'Ok' )
         {
             bootbox.alert('<h4 class="green">Registro deshabilitado</h4>');
-            listMaintenanceTable( aData.type );
+            //listMaintenanceTable( aData.type );
+            window.location.reload(true); 
         }
         else
             bootbox.alert('<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');            
@@ -1398,7 +1403,8 @@ $(document).on('click' , '.maintenance-enable' , function()
         if ( response.Status == 'Ok' )
         {
             bootbox.alert('<h4 class="green">Registro habilitado</h4>');
-            listMaintenanceTable( aData.type );
+            //listMaintenanceTable( aData.type );
+            window.location.reload(true);
         }
         else
             bootbox.alert('<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');            

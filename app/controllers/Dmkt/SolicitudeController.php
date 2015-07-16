@@ -42,6 +42,7 @@ use \Common\FileStorage;
 use \Response;
 use \Maintenance\Fondos;
 use \Maintenance\FondosSupervisor;
+use \Carbon\Carbon;
 
 class SolicitudeController extends BaseController
 {
@@ -215,7 +216,7 @@ class SolicitudeController extends BaseController
         $gastos = $solicitud->expenses;
         if ( count( $gastos ) > 0 )
         {
-            $data['expense'] = $gastos;
+            $data['expenses'] = $gastos;
             $balance = $gastos->sum('monto');
             $data['balance'] = $monto_aprobado - $balance;
         }
@@ -1196,7 +1197,9 @@ class SolicitudeController extends BaseController
                     $seat->id           = $seat->lastId() + 1;
                     $seat->num_cuenta   = $seatItem['numero_cuenta'];
                     $seat->cc           = $seatItem['codigo_sunat'];
-                    $seat->fec_origen   = date( 'Y-m-d' , strtotime( $seatItem[ 'fec_origen' ] ) );
+                    \Log::error( $seatItem[ 'fec_origen'] );
+                    $fecha_seat_origen = Carbon::createFromFormat( 'd/m/Y' , $seatItem['fec_origen'] );
+                    $seat->fec_origen   = $fecha_seat_origen->toDateString();
                     $seat->iva          = $seatItem['iva'];
                     $seat->cod_pro      = $seatItem['cod_prov'];
                     $seat->nom_prov     = $seatItem['nombre_proveedor'];
@@ -1209,8 +1212,9 @@ class SolicitudeController extends BaseController
                     $seat->leyenda_fj   = $seatItem['leyenda'];
                     $seat->leyenda      = $seatItem['leyenda_variable'];
                     $seat->tipo_resp    = $seatItem['tipo_responsable'];
-                    $seat->id_solicitud  = $seatItem['solicitudId'];
+                    $seat->id_solicitud = $seatItem['solicitudId'];
                     $seat->tipo_asiento = ASIENTO_GASTO_TIPO;
+                    \Log::error( json_encode( $seat ) );
                     $seat->save();
                 }
 
@@ -1248,7 +1252,7 @@ class SolicitudeController extends BaseController
             
             if ( $middleRpta[status] == ok )
             {
-                //DB::commit();
+                DB::commit();
                 if ( $solicitud->detalle->id_motivo == REEMBOLSO )
                     Session::put( 'state' , R_REVISADO );
                 else

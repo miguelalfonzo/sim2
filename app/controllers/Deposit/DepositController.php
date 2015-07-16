@@ -63,7 +63,7 @@ class DepositController extends BaseController{
     {
         $rules = array( 'token'       => 'required|exists:solicitud,token,id_estado,' . DEPOSITO_HABILITADO ,
                         'num_cuenta'  => 'required|numeric|exists:b3o.plancta,ctactaextern',
-                        'op_number'   => 'required|min:1' );
+                        'op_number'   => 'required|string|min:1' );
         $validator = Validator::make( $inputs , $rules );
         if ( $validator->fails() ) 
             return $this->warningException( substr( $this->msgValidator( $validator ), 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
@@ -141,7 +141,11 @@ class DepositController extends BaseController{
                         $detalle->id_deposito = $newDeposit->id;
                         $detalle->detalle = json_encode( $middleRpta[data]['jDetalle'] );
                         $detalle->save();
-                        $solicitud->id_estado = DEPOSITADO;
+                        if ( $detalle->id_motivo == REEMBOLSO )
+                            $solicitud->id_estado = GENERADO;
+                        else
+                            $solicitud->id_estado = DEPOSITADO;
+                        
                         $solicitud->save();
                         $middleRpta = $this->fondoDecrease( $detalle->fondo , $detalle );
                         if ( $middleRpta[status] == ok )
@@ -149,9 +153,17 @@ class DepositController extends BaseController{
                             $middleRpta = $this->decreaseFondoProduct( $solicitud );
                             if ( $middleRpta[status] == ok )
                             {
-                                $middleRpta = $this->setStatus( $oldIdestado, DEPOSITADO , Auth::user()->id , USER_CONTABILIDAD , $solicitud->id );
+                                if ( $detalle->id_motivo == REEMBOLSO )
+                                    $middleRpta = $this->setStatus( $oldIdestado, GENERADO , Auth::user()->id , USER_CONTABILIDAD , $solicitud->id );
+                                else
+                                    $middleRpta = $this->setStatus( $oldIdestado, DEPOSITADO , Auth::user()->id , USER_CONTABILIDAD , $solicitud->id );
+
                                 if ( $middleRpta[status] == ok )
                                 {
+                                    if ( $solicitud->detalle->id_motivo == REEMBOLSO )
+                                        Session::put( 'state' , R_FINALIZADO );
+                                    else
+                                        Session::put( 'state' , R_REVISADO );
                                     DB::commit();
                                     return $middleRpta;
                                 }

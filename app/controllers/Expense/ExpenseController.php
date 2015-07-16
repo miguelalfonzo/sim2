@@ -407,9 +407,9 @@ class ExpenseController extends BaseController
 					   'total'      => $total );
 		$data['balance'] = $this->reportBalance( $solicitud , $detalle , $jDetalle , $total );
 		$html = View::make( 'Expense.report' , $data )->render();
-		return View::make('Expense.report',$data);//->render();
+		//return View::make('Expense.report',$data);//->render();
 		//return $html;
-		return PDF::load( $html , 'A4' , 'landscape' )->show();
+		//return PDF::load( $html , 'A4' , 'landscape' )->show();
 		return PDF2::loadHTML( $html )->setPaper( 'a4' , 'landscape' )->stream();
 	}
 
@@ -433,8 +433,8 @@ class ExpenseController extends BaseController
         $data['balance'] = $this->reportBalance( $fondo , $detalle , $jDetalle , $expense->sum('monto') );
         
         $html = View::make('Expense.report-fondo',$data)->render();
-        return $html;
-        return PDF2::loadHTML( $html )->setPaper( 'a4' , 'landscape' )->stream();
+        //return $html;
+        //return PDF2::loadHTML( $html )->setPaper( 'a4' , 'landscape' )->stream();
         return PDF::load($html, 'A4', 'portrait')->show();
     }
 
@@ -472,7 +472,7 @@ class ExpenseController extends BaseController
 			$solicitud = Solicitud::find( $inputs['idsolicitud']);
 			if ( is_null( $solicitud ) )
 				return $this->warningException( 'No se encontro la solicitud con id: '.$inputs['idsolicitud'] , __FUNCTION__ , __LINE__ , __FILE__ ); 
-			$data = array( 'solicitud' => $solicitud , 'expense'   => $solicitud->expenses );
+			$data = array( 'solicitud' => $solicitud , 'expenses'   => $solicitud->expenses );
 			return $this->setRpta( View::make('Dmkt.Solicitud.Section.gasto-table')->with( $data )->render() );
 		}
 		catch ( Exception $e )

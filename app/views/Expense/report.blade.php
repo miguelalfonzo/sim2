@@ -9,7 +9,7 @@
     <div>
         <header style="margin-top:-2em;">
             <img src="{{ URL::to( 'img/logo-report.png' ) }}" style="width:170px;padding-top:30px">
-            <h1><p><strong>REPORTE DE GASTOS PUBLICIDAD Y PROMOCIÓN SEGÚN PRESUPUESTO</strong></p></h1>
+            <h1 style="text-align:center"><strong>REPORTE DE GASTOS PUBLICIDAD Y PROMOCIÓN SEGÚN PRESUPUESTO</strong></h1>
         </header>
         <main>
             <section style="text-align:center;margin-top:2.5em;">
@@ -144,7 +144,7 @@
                     </tbody>
                 </table>
             </section>
-            <section style="padding-top:50px">
+            <section style="padding-top:50px;bottom:0px">
                 <p class="firma">FIRMA DEL EMPLEADO</p>
                     @foreach( $solicitud->toAcceptedApprovedHistories as $acceptedApprovedHistory )
                         @if( ! ( is_null( $solicitud->userApprovalPolicy( $acceptedApprovedHistory->user_from )->desde ) 

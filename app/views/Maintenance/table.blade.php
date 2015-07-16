@@ -34,7 +34,11 @@
     </tbody>
 </table>
 <div>
-   <input class="btn btn-primary maintenance-add" type="button" case="{{$type}}" value="Agregar">
+    @if ( $titulo == 'Mantenimiento de Parametros' )
+        <input class="btn btn-primary maintenance-add" type="button" case="{{$type}}" value="Agregar" style="display:none">
+    @else
+        <input class="btn btn-primary maintenance-add" type="button" case="{{$type}}" value="Agregar">
+    @endif
 </div>
 <script>
     $(document).on('ready', function(){

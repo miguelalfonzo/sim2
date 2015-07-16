@@ -44,10 +44,14 @@
 	<div class="stage-content">
 		<h3 class="stage-title">Asiento de Diario</h3>
 		<span class="label label-info">
-		@if ( is_null( $solicitud->toGenerateHistory ) )
+		@if ( ( is_null( $solicitud->toGenerateHistory ) && $solicitud->detalle->id_motivo != REEMBOLSO ) || ( is_null( $solicitud->toDepositHistory ) && $solicitud->detalle->id_motivo == REEMBOLSO ) )
 			CONTABILIDAD
 		@else
-			{{ strtoupper($solicitud->toGenerateHistory->createdBy->person->full_name) }}
+			@if ( $solicitud->detalle->id_motivo == REEMBOLSO )
+				{{ strtoupper( $solicitud->toDepositHistory->createdBy->person->full_name ) }}
+			@else
+				{{ strtoupper( $solicitud->toGenerateHistory->createdBy->person->full_name ) }}
+			@endif
 		@endif
 		</span>
 	</div>
