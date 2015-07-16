@@ -570,7 +570,7 @@ class ExpenseController extends BaseController
 	private function validateDiscount( $inputs )
     {
         $rules = array( 'token'   => 'required|string|size:40|exists:solicitud,token' ,
-                        'periodo' => 'required|string|size:7|date_format:"Y-m"|after:'  . date( '01-m-Y' ) );  
+                        'periodo' => 'required|string|size:7|date_format:"m-Y"|after:'  . date( '01-m-Y' ) );  
         $validator = Validator::make( $inputs, $rules );
         if ( $validator->fails() ) 
             return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
