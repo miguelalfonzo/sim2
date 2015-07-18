@@ -31,6 +31,7 @@
     Route::post( 'maintenance-disable' , 'Maintenance\TableController@disableRecord');
     Route::get( 'test-query' , 'TestController@testQuery' );
     Route::get( 'test-fondo-query' , 'TestController@getUserSubFondos' );
+    Route::get( 'testcalert' , 'TestController@testcalert');
 
     //--- TIME LINE --
 
@@ -125,6 +126,7 @@
         Route::post('info-rep', 'Source\Seeker@repInfo');
         Route::get('list-fondos/{date}','Dmkt\FondoController@listInstitutionalSolicitud');
         Route::post('get-sol-inst' , 'Dmkt\FondoController@getSolInst');
+        Route::post('search-institution', 'Source\Seeker@institutionSource');
     });
 
     Route::group(array('before' => 'sup_gerprod_gerprom_gercom'), function ()

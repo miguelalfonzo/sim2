@@ -6,7 +6,7 @@
             <th>Depositar a</th>
             <th>Nº Cuenta Bagó Bco. Crédito</th>
             <th>Total a depositar</th>
-            <th>Supervisor</th>
+            <!-- <th>Supervisor</th> -->
             @if ( isset( $state ) && $state != BLOCKED )
                 <th>Edicion</th>
             @endif
@@ -18,9 +18,6 @@
                 <tr>
                     <td>{{$solicitud->id}}</td>
                     <td style="text-align:center">
-                        <span class="label label-info" style="margin-right:1em;background-color:{{$solicitud->activityTrash->color}}">
-                                {{$solicitud->activityTrash->nombre}}
-                        </span>
                         {{$solicitud->titulo}}
                     </td>
                     <td style="text-align:center">{{$solicitud->asignedTo->rm->full_name}}</td>
@@ -28,7 +25,7 @@
                         {{json_decode($solicitud->detalle->detalle)->num_cuenta}}
                     </td>
                     <td style="text-align:center">{{$solicitud->detalle->fondo->typeMoney->simbolo.' '.  $solicitud->detalle->monto_actual}}</td>
-                    <td style="text-align:center">{{$solicitud->detalle->supervisor}}</td>
+                    <!-- <td style="text-align:center">$solicitud->detalle->supervisor</td> -->
                     @if ( isset( $state ) && $state != BLOCKED )
                         <td style="text-align:center">
                             @if ( $state == ACTIVE )

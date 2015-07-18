@@ -31,11 +31,12 @@ Route::filter('auth', function ()
 {
     if ( Auth::guest() )
         if ( Request::ajax() )
-            return Response::make('Unauthorized', 401);
+            return Response::make( 'Unauthorized' , 401 );
         else
-            return Redirect::guest('login');
+            return Redirect::guest( 'login' );
 });
-Route::filter('auth.basic', function () 
+
+Route::filter( 'auth.basic' , function () 
 {
     return Auth::basic();
 });
@@ -46,24 +47,27 @@ Route::filter('active-user',function()
         return Redirect::to('login');
 });
 
-
 Route::filter('sup', function () 
 {
     if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
         return Redirect::to( 'login' );
     else     
-        if ( ! Auth::user()->type  === SUP )
+        if ( Auth::user()->type  !== SUP )
             return Redirect::to( 'show_user' );
 });
 
 
 Route::filter( 'cont' , function () 
 {
+    \Log::error( ' Filtro de Contabilidad');
+    \Log::error( Auth::user() );
     if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
         return Redirect::to( 'login' );
-    else     
-        if ( ! Auth::user()->type  === CONT )
+    else
+    {
+        if ( Auth::user()->type  !== CONT )
             return Redirect::to( 'show_user' );
+    }
 });
 
 Route::filter( 'tes' , function () 
@@ -71,7 +75,7 @@ Route::filter( 'tes' , function ()
     if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
         return Redirect::to( 'login' );
     else     
-        if ( ! Auth::user()->type  === TESORERIA )
+        if ( Auth::user()->type  !== TESORERIA )
             return Redirect::to( 'show_user' );
 });
 
@@ -80,7 +84,7 @@ Route::filter( 'gercom' , function ()
     if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
         return Redirect::to( 'login' );
     else     
-        if ( ! Auth::user()->type  === GER_COM )
+        if ( Auth::user()->type  !== GER_COM )
             return Redirect::to( 'show_user' );
 });
 
@@ -90,7 +94,7 @@ Route::filter( 'ager' , function()
     if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
         return Redirect::to( 'login' );
     else     
-        if ( ! Auth::user()->type  === ASIS_GER )
+        if ( Auth::user()->type  !== ASIS_GER )
             return Redirect::to( 'show_user' );
 });
 
@@ -121,7 +125,7 @@ Route::filter( 'sup_gerprod_gerprom_gercom' , function ()
             return Redirect::to( 'show_user' );
 });
 
-Route::filter( 'rm_ager' , function () 
+Route::filter( 'rm_ager' , function ()
 {
     if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
         return Redirect::to( 'login' );

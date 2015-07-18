@@ -26,46 +26,50 @@
                         </div>
                     </div>
 
+                    <!-- Fondos -->
+                    @include('Dmkt.Solicitud.Detail.fondo')
+                    
+                    <div class="clearfix"></div>
+
                     <!-- SISOL -->
                     <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
                         <label class="control-label">SISOL - Hospital</label>
-                        <div>  
-                            <input id="fondo_institucion" name="institucion" type="text" class="form-control input-md">
+                        <div class="scrollable-dropdown-menu">  
+                            <input id="fondo_institucion" class="form-control input-md institucion-seeker" name="institucion" type="text" style="display:inline">
+                            <a id="edit-institucion" class="edit-repr  glyphicon glyphicon-pencil" href="#" style="display:none;padding-top:5px">
+                            </a>
                         </div>
                     </div>
 
                     <!-- ETIQUETA -->
-                    @include('Dmkt.Register.Detail.activity')
-
+                    <!-- include('Dmkt.Register.Detail.activity') -->
+                    
                     <!-- REPRESENTANTE -->
                     <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
                         <label class="control-label">Depositar a</label>
                         <div>
                             <input id="fondo_repmed" name="repmed" type="text" style="display:inline"
                             data-select="false" class="form-control input-md rep-seeker">
-                            <a id="edit-rep" class="edit-repr glyphicon glyphicon-pencil" href="#" style="display:inline">
+                            <a id="edit-rep" class="edit-repr glyphicon glyphicon-pencil" href="#" style="display:none;padding-top:5px">
                             </a>
                         </div>
                     </div>
   
-                    <!-- Fondos -->
-                    @include('Dmkt.Solicitud.Detail.fondo')
-                    
                     <!-- Cuenta -->
-                    <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+                    <!-- <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
                         <label class="control-label">N° de Cuenta</label>
                         <div>
                             <input id="fondo_cuenta" name="cuenta" type="text" class="form-control input-md" maxlength="25">
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- SUPERVISOR -->
-                    <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+                    <!--<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
                         <label class="control-label">Supervisor</label>
                         <div>
                             <input id="fondo_supervisor" name="supervisor" data-cod="0" type="text" class="form-control input-md">
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- MONTO -->
                     <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
@@ -81,10 +85,10 @@
                             <button class="btn btn-primary register_fondo ladda-button" data-style="zoom-in" data-size="l">
                                 Registrar
                             </button>
-                            <button class="btn btn-primary btn_edit_fondo ladda-button" data-style="zoom-in" data-size="l">
+                            <button class="btn btn-primary btn_edit_fondo ladda-button" data-style="zoom-in" data-size="l" style="display:none">
                                 Actualizar
                             </button>
-                            <button class="btn btn-primary btn_cancel_fondo ladda-button" data-style="zoom-in" data-size="l">
+                            <button class="btn btn-primary btn_cancel_fondo ladda-button" data-style="zoom-in" data-size="l" style="display:none">
                                 Cancelar
                             </button>
                         </div>

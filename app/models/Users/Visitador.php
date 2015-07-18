@@ -11,7 +11,7 @@ class Visitador extends Eloquent
 
     protected function cuenta()
     {
-    	return $this->hasOne( 'Dmkt\CtaRm' , 'codbeneficiario' , 'vislegajo' );
+    	return $this->hasOne( 'Dmkt\CtaRm' , 'codbeneficiario' , 'vislegajo' )->where( 'tipo' , CUENTA_BAGO );
     }
 
     protected function sup()

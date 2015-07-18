@@ -144,18 +144,18 @@
                     </tbody>
                 </table>
             </section>
-            <section style="padding-top:50px;bottom:0px">
-                <p class="firma">FIRMA DEL EMPLEADO</p>
-                    @foreach( $solicitud->toAcceptedApprovedHistories as $acceptedApprovedHistory )
-                        @if( ! is_null( $solicitud->userApprovalPolicy( $acceptedApprovedHistory->user_from ) ) && ! ( is_null( $solicitud->userApprovalPolicy( $acceptedApprovedHistory->user_from )->desde ) 
-                        && is_null( $solicitud->userApprovalPolicy( $acceptedApprovedHistory->user_from )->hasta ) ) )
-                            <p class="firma">V°B° {{ $acceptedApprovedHistory->fromUserType->descripcion }}</p>
-                        @endif
-                    @endforeach
-                <div>DNI:&nbsp;<span class="dni">{{$dni}}</span></div>
-                <div>NOMBRE:&nbsp;<span class="dni">{{$created_by}}</span></div>
-            </section>
         </main>
+        <footer>
+            <p class="firma">FIRMA DEL EMPLEADO</p>
+            @foreach( $solicitud->toAcceptedApprovedHistories as $acceptedApprovedHistory )
+                @if( ! is_null( $solicitud->userApprovalPolicy( $acceptedApprovedHistory->user_from ) ) && ! ( is_null( $solicitud->userApprovalPolicy( $acceptedApprovedHistory->user_from )->desde ) 
+                && is_null( $solicitud->userApprovalPolicy( $acceptedApprovedHistory->user_from )->hasta ) ) )
+                    <p class="firma">V°B° {{ $acceptedApprovedHistory->fromUserType->descripcion }}</p>
+                @endif
+            @endforeach
+            <div>DNI:&nbsp;<span class="dni">{{$dni}}</span></div>
+            <div>NOMBRE:&nbsp;<span class="dni">{{$created_by}}</span></div>
+        </footer>
     </div>
 </body>
 </html>

@@ -293,7 +293,6 @@ class FondoController extends BaseController
                         'institucion' => 'required|string|min:3',
                         'codrepmed'   => 'required|integer|min:1|exists:ficpe.visitador,visvisitador',
                         'codsup'      => 'required|integer|min:1|exists:ficpe.supervisor,supsupervisor',
-                        'actividad'   => 'required|integer|min:1|exists:tipo_actividad,id',
                         'total'       => 'required|numeric|min:1',
                         'cuenta'      => 'required|alpha_dash|min:1',
                         'idfondo'     => 'required|integer|min:1|exists:fondo,id,idusertype,AG',
@@ -354,7 +353,6 @@ class FondoController extends BaseController
                         $inputs['supervisor']       = $middleRpta[ data ]['sup'];
                         $solicitud->titulo          = $inputs['institucion'];
                         $solicitud->id_estado       = PENDIENTE;
-                        $solicitud->id_actividad    = $inputs['actividad'];
                         $solicitud->idtiposolicitud = SOL_INST;
                         $solicitud->id_user_assign  = $middleRpta[data]['rm'];
                         $solicitud->save();

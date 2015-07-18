@@ -86,9 +86,6 @@ var date_options2 =
     autoclose: true
 };
 
-$('.btn_cancel_fondo').hide();
-$('.btn_edit_fondo').hide();
-
 $(document).off( 'click' , '.timeLine' );
 $(document).on( 'click' , '.timeLine' , function(e)
 {
@@ -720,31 +717,22 @@ function cancelDialog  ( data , message )
 
 var fondo_repmed = $('#fondo_repmed');
 var fondo_total = $('#fondo_total');
-var fondo_cuenta = $('#fondo_cuenta');
-var fondo_supervisor = $('#fondo_supervisor');
 var fondo_institucion = $('#fondo_institucion');
 var date_reg_fondo = $('.date_month[data-type=fondos]');
 
 fondo_repmed.on('focus', function () {
-    $(this).parent().removeClass('has-error');
-});
-fondo_cuenta.on('focus', function () {
-    $(this).parent().removeClass('has-error');
+    $(this).parent().parent().parent().removeClass('has-error');
 });
 fondo_total.on('focus', function () {
-    $(this).parent().removeClass('has-error');
+    $(this).parent().parent().removeClass('has-error');
 });
 date_reg_fondo.on('focus', function () {
     $(this).parent().parent().removeClass('has-error');
 });
 fondo_institucion.on('focus', function() {
-    $(this).parent().removeClass('has-error');     
-});
-fondo_supervisor.on('focus', function() {
-    $(this).parent().removeClass('has-error');     
+    $(this).parent().parent().removeClass('has-error');     
 });
 
-$('#edit-rep').hide();    
 fondo_total.numeric();
 
 $(document).on( 'click' , '.register_fondo' , function()
@@ -758,54 +746,41 @@ $(document).on( 'click' , '.register_fondo' , function()
         validate = 1;
     }
     if(!fondo_total.val()){
-        fondo_total.parent().addClass('has-error');
+        fondo_total.parent().parent().addClass('has-error');
         fondo_total.attr('placeholder', 'Ingrese Cantidad a depositar');
         fondo_total.addClass('input-placeholder-error');
         validate = 1;
     }
-    if(!fondo_cuenta.val()){
-        fondo_cuenta.parent().addClass('has-error');
-        fondo_cuenta.attr('placeholder', 'Ingrese Cuenta');
-        fondo_cuenta.addClass('input-placeholder-error');
-        validate = 1;
-    }
     if(!fondo_repmed.val()){
-        fondo_repmed.parent().addClass('has-error');
+        fondo_repmed.parent().parent().addClass('has-error');
         fondo_repmed.attr('placeholder', 'Ingrese Representante');
         fondo_repmed.addClass('input-placeholder-error');
         validate = 1;
     }
     if(fondo_repmed.attr('data-select') == 'false'){
         fondo_repmed.val('');
-        fondo_repmed.parent().addClass('has-error');
+        fondo_repmed.parent().parent().parent().addClass('has-error');
         fondo_repmed.attr('placeholder', 'Ingrese Representante');
         fondo_repmed.addClass('input-placeholder-error');
         validate = 1;
     }
     if (!fondo_institucion.val())
     {
-        fondo_institucion.parent().addClass('has-error');
+        fondo_institucion.parent().parent().addClass('has-error');
         fondo_institucion.attr('placeholder','Ingrese Institución');
-        validate = 1;
-    }
-    if (!fondo_supervisor.val())
-    {
-        fondo_supervisor.parent().addClass('has-error');
-        fondo_supervisor.attr('placeholder','Ingrese Supervisor');
         validate = 1;
     }
     if(validate == 0)
     {
-        var periodo = $(this).parent().parent().parent().find(".date_month").val();
+        var periodo = $(".date_month").val();
         var dato = 
         {
             '_token'      : GBREPORTS.token,
             'institucion' : fondo_institucion.val(),
-            'actividad'   : activity.val(),
             'codrepmed'   : fondo_repmed.attr('data-cod'),
-            'codsup'      : fondo_supervisor.attr('data-cod'),
+            'codsup'      : fondo_repmed.attr('data-cod-sup'),
             'total'       : fondo_total.val(),
-            'cuenta'      : fondo_cuenta.val(),
+            'cuenta'      : fondo_repmed.attr('data-cuenta'),
             'idfondo'     : fondo.val(),
             'mes'         : periodo
         };
@@ -823,10 +798,7 @@ $(document).on( 'click' , '.register_fondo' , function()
             {
                 fondo_institucion.val('');
                 fondo_repmed.val('');
-                fondo_supervisor.val('');
                 fondo_total.val('');
-                fondo_cuenta.val('');
-                fondo_repmed.val('');    
                 removeinput($('#edit-rep'));
                 bootbox.alert('<h4 class="green">Fondo Registrado</h4>' , function()
                 {
@@ -1002,39 +974,36 @@ $(document).on('click','.edit-fondo' , function(e)
             fondo_institucion.val(data.titulo);
             fondo_repmed.attr('disabled',true).attr('data-select',"true").parent().parent().addClass('has-success');
             fondo_repmed.val(data.rm);
-            fondo_repmed.attr('data-cod',data.idrm)
-            fondo_supervisor.val(data.supervisor).attr('disabled',true);
-            fondo_supervisor.attr('data-cod',data.codsup).parent().addClass('has-success');
+            fondo_repmed.attr('data-cod',data.idrm);
+            fondo_repmed.attr('data-cod-sup' , data.codsup );
+            fondo_repmed.attr( 'data-cuenta' , data.rep_cuenta );
+            fondo_repmed.attr( 'data-sup' , data.supervisor );
             fondo_total.val(data.monto);
             date_reg_fondo.val( data.periodo.substr(4,6) + '-' + data.periodo.substr(0,4) );
-            fondo_cuenta.val(data.rep_cuenta).attr('disabled',true).parent().addClass('has-success');
             id_solicitud.val(idsolicitud);
             $('select[name=idfondo]').val(data.idfondo);
-            activity.val(data.idactividad );
         }
         else
             bootbox.alert('<h4 class=""red>' + data.Status + ': ' + data.Description + '</h4>');
     });
 });
-
+function fondoData()
+{
+    return { _token      : GBREPORTS.token,
+             institucion : fondo_institucion.val(),
+             codrepmed   : fondo_repmed.attr('data-cod'),
+             codsup      : fondo_repmed.attr('data-cod-sup'),
+             total       : fondo_total.val(),
+             cuenta      : fondo_repmed.attr('data-cuenta'),
+             idfondo     : fondo.val(),
+             mes         : $(".date_month").val() };
+}
 $(document).on('click','.btn_edit_fondo',function(e)
 {
     e.preventDefault();
     var aux = this;
-    var dato = 
-    {
-        'idsolicitud'   : id_solicitud.val(),
-        'institucion'   : fondo_institucion.val(),
-        'actividad'     : activity.val(),
-        'repmed'        : fondo_repmed.val(),
-        'codrepmed'     : fondo_repmed.attr('data-cod'),
-        'codsup'        : fondo_supervisor.attr('data-cod'),
-        'total'         : fondo_total.val(),
-        'cuenta'        : fondo_cuenta.val(),
-        '_token'        : GBREPORTS.token,
-        'idfondo'       : $('select[name=idfondo]').val(),
-        'mes'           : date_reg_fondo.val()
-    };
+    var dato = fondoData();
+    dato.idsolicitud = id_solicitud.val(); 
     var l = Ladda.create(aux);
     // l.start();
 
@@ -1054,10 +1023,8 @@ $(document).on('click','.btn_edit_fondo',function(e)
             $('.register_fondo').show();
             fondo_institucion.val('');
             fondo_repmed.val('');
-            fondo_supervisor.val('');
             fondo_total.val('');
-            fondo_cuenta.val('');
-
+            
             removeinput($('#edit-rep'));
             id_solicitud.val('');
             bootbox.alert('<h4 class="green">Fondo Actualizado</h4>' , function()
@@ -1071,14 +1038,11 @@ $(document).on('click','.btn_edit_fondo',function(e)
     });
 });
 
-function removeinput(data){
-
+function removeinput(data)
+{
     var rep = data.parent().find('input:text');
     rep.typeahead( 'val' , '' );
-    rep.attr('disabled', false).attr('data-select',"false").focus().parent().parent().removeClass('has-success');
-    fondo_cuenta.val('').attr('disabled', false).parent().removeClass("has-success");
-    fondo_supervisor.val('').attr('disabled',false).attr('data-cod',0).parent().removeClass("has-success");
-    //data.parent().find('input:hidden').val('');
+    rep.attr('disabled', false).attr('data-select',"false").attr('data-cod','').attr('data-cod-sup' ,'' ).attr('data-cuenta','').focus().parent().parent().removeClass('has-success');
     data.fadeOut();
 }
 
@@ -1546,7 +1510,6 @@ $(document).on("click", ".elementBack", function()
 
 function seeker( element , name , url )
 {
-    console.log( element );
     if (element.length != 0)
     {
         element.typeahead(
@@ -1596,12 +1559,11 @@ function seeker( element , name , url )
         {
             var input = $(this);
             if ( dataset === 'users' )
+                $( this ).attr( 'readonly' , '' ).attr( 'data-cod' , suggestion.value ).parent().parent().addClass( 'has-success' );
+            else if ( dataset == 'institutions')
             {
                 $( this ).attr( 'readonly' , '' ).attr( 'data-cod' , suggestion.value ).parent().parent().addClass( 'has-success' );
-                
-                console.log( evento );
-                console.log( suggestion );
-                console.log( dataset );
+                $( this ).parent().parent().find('.edit-repr').fadeIn();
             }
             else if ( dataset == 'clients' )
             {
@@ -1645,24 +1607,21 @@ function seeker( element , name , url )
             }
             else if ( dataset == 'reps' )
             {
-                $(this).attr('data-select','true');
-                $(this).attr('data-cod',suggestion.value);
-                $(this).val(suggestion.label );
-                $(this).attr('disabled',true).parent().parent().addClass('has-success');
-                $('.edit-repr').fadeIn();
+                var element = $(this);
+                element.attr('data-select','true');
+                element.attr('data-cod',suggestion.value);
+                element.val(suggestion.label );
+                element.attr('disabled',true).parent().parent().addClass('has-success');
+                $( this ).parent().parent().find('.edit-repr').fadeIn();
                 repInfo( suggestion.value ).done( function (result)
                 {
                     if ( result.Data.cuenta )
-                    {
-                        fondo_cuenta.val(result.Data.cuenta);
-                        fondo_cuenta.attr('disabled',true).parent().removeClass('has-error').addClass('has-success');        
-                    }
+                        element.attr('data-cuenta', result.Data.cuenta );
                     if ( result.Data.sup )
                     {
-                        fondo_supervisor.val(result.Data.sup.nombre);
-                        fondo_supervisor.attr('data-cod',result.Data.sup.idsup);
-                        fondo_supervisor.attr('disabled',true).parent().removeClass('has-error').addClass('has-success'); 
-                    }
+                        element.attr('data-sup' , result.Data.sup.nombre );
+                        element.attr('data-cod-sup' , result.Data.sup.idsup);
+                    }   
                 });
             }
         });
@@ -2184,10 +2143,11 @@ $( document ).ready(function()
         if(dataResult.status == 'OK'){
             if(typeof(dataResult.alerts) != 'undefined'){
                 if(dataResult.alerts.length > 0){
-                    console.log("listo");
                     $(".sim_alerta").show("slow");
-                    console.log( dataResult);
-                    $(".sim_alerta").find('span').html(dataResult.alerts[0].data.length);
+                    var alerts = dataResult.alerts;
+                    $(".sim_alerta").find('span').html( ( typeof alerts[0] === 'undefined' ? 0 : alerts[0].data.length ) + 
+                                                        ( typeof alerts[1] === 'undefined' ? 0 : alerts[1].data.length ) + 
+                                                        ( typeof alerts[2] === 'undefined' ? 0 : alerts[2].data.length ) );
                 }
             }         
         }
@@ -2196,6 +2156,7 @@ $( document ).ready(function()
 getAlerts();
 
     seeker( $( '.cliente-seeker' ) , 'clients' , 'search-client' );
+    seeker( $( '.institucion-seeker' ) , 'institutions' , 'search-institution' );
     seeker( $( '.rep-seeker' ) , 'reps' , 'search-rep' );
     seeker( $( '#user-seeker' ) , 'users' , 'search-users' );
 

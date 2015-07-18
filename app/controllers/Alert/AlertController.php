@@ -46,10 +46,13 @@ class AlertController extends BaseController
     	$result['alert'] = array();
     	$clientAlert = $this->clientAlert2();
     	$expenseAlert = $this->expenseAlert2();
+    	$timeAlert = $this->compareTime2();
     	if($clientAlert[ 'msg' ] != "" )
     		$result['alert'][] = $clientAlert;
     	if($expenseAlert[ 'msg' ] != "")
     		$result['alert'][] = $expenseAlert;
+    	if($timeAlert[ 'msg' ] != "")
+    		$result['alert'][] = $timeAlert;
     	return $result['alert'];
     }
     public function alertConsole()
@@ -66,6 +69,67 @@ class AlertController extends BaseController
     }
 
     public function clientalert2()
+    {
+    	$msg = '';
+    	$tipo_cliente_requerido = array( MEDICO , INSTITUCION );
+    	$tiempo = Parameter::find( ALERTA_INSTITUCION_CLIENTE );
+		$solicituds = Solicitud::all();
+		foreach ( $solicituds as $key => $solicitud )
+		{
+			$clients = $solicitud->clients;
+			$solicitud_tipo_cliente = array_unique( $clients->lists( 'id_tipo_cliente') );
+			if ( count( array_intersect( $solicitud_tipo_cliente, $tipo_cliente_requerido ) ) <= 1 )
+				unset( $solicituds[ $key ] );
+		}
+		$clientList = array();
+		$compare_second_id = array();
+		$compare_initial_id = array();
+		foreach( $solicituds as $solicitud_inicial )
+		{
+			foreach ( $solicituds as $solicitud_secundaria )
+			{
+				if ( $solicitud_secundaria->id != $solicitud_inicial->id && ( ! in_array( $solicitud_secundaria->id , $compare_initial_id ) ) )
+				foreach( $solicituds as $solicitud_final )
+				{
+					if( $solicitud_final->id != $solicitud_secundaria->id && 
+						$solicitud_final->id != $solicitud_inicial->id && 
+						( ! in_array( $solicitud_final->id , $compare_second_id ) ) )
+					{
+						$clients_inicial = $solicitud_inicial->clients()->select( 'id_cliente' , 'id_tipo_cliente' )->get();
+						$clients_secundaria = $solicitud_secundaria->clients()->select( 'id_cliente' , 'id_tipo_cliente' )->get();
+						$clients_final = $solicitud_final->clients()->select( 'id_cliente' , 'id_tipo_cliente' )->get();
+						//echo $solicitud_inicial->id . '|' . $solicitud_secundaria->id . '|' . $solicitud_final->id . '<br>';
+						$intersect_client = $this->intersectRecords( $clients_inicial , $clients_secundaria );
+						$intersect_client = $this->intersectRecords( $intersect_client , $clients_final );
+						$solicitud_tipo_cliente = array_unique( $intersect_client->lists( 'id_tipo_cliente' ) );
+						if ( count( array_intersect( $solicitud_tipo_cliente, $tipo_cliente_requerido ) ) >= 2 )
+						{
+							$cliente = '( ';
+							foreach ( $intersect_client as $client_inicial )
+							{
+								$clienteArray[] = $client_inicial->{$client_inicial->clientType->relacion}->full_name;
+								$cliente .= $client_inicial->{$client_inicial->clientType->relacion}->full_name .  ' , ' ;
+							} 
+							$cliente = rtrim( $cliente , ', ' );
+							$cliente .= ' ).';
+							$msg .= 'Las solicitudes ' . $solicitud_inicial->id . ' , ' . $solicitud_secundaria->id . ' , ' . $solicitud_final->id . ' ' . $tiempo->mensaje . ' ' . $cliente;
+							$result[]=array(
+								'cliente'    => $clienteArray,
+								'solicitude' => array($solicitud_inicial->id, $solicitud_secundaria->id, $solicitud_final->id),
+								'msg'     => $tiempo->mensaje
+							);
+						}
+					}
+				}
+				$compare_second_id[] = $solicitud_secundaria->id;
+			}
+			$compare_second_id = array();
+			$compare_initial_id[] = $solicitud_inicial->id;
+		}
+		return array( 'type' => 'warning' , 'msg' => $msg, 'data' => $result, 'typeData' => 'clientAlert');
+	}
+
+    public function clientalert222()
     {
     	$result = array();
     	$msg = '';
@@ -89,7 +153,7 @@ class AlertController extends BaseController
 				if ( $solicitud_inicial->id != $solicitud_secundaria->id && ! in_array( $solicitud_secundaria->id , $solicituds_compare_id ) )
 				{
 					$clients_secundaria = $solicitud_secundaria->clients()->select( 'id_cliente' , 'id_tipo_cliente' )->get();
-					$cliente_inicial = $this->intersectRecords( $clients_inicial , $clients_secundaria );
+					$cliente_inicial    = $this->intersectRecords( $clients_inicial , $clients_secundaria );
 					if ( ! $cliente_inicial->isEmpty() )
 					{
 						foreach( $solicituds as $solicitud_final )
@@ -264,4 +328,23 @@ class AlertController extends BaseController
 			return array();
 	}
 
+	public function compareTime2()
+	{
+		$solicituds = Solicitud::where( 'id_user_assign' , Auth::user()->id )->where( 'id_estado' , GASTO_HABILITADO )->get();
+		$msg = '';
+		$result = array();
+		$tiempo = Parameter::find( ALERTA_TIEMPO_REGISTRO_GASTO );
+		foreach ( $solicituds as $solicitud )
+		{
+			if ( $this->timeAlert( $solicitud , 'diffInDays' , 'created_at' ) >= $tiempo->valor )
+			{
+				$msg .= 'La solicitud N° ' .  $solicitud->id . $tiempo->mensaje;
+				$result[] = array(
+					"solicitude" => $solicitud->id,
+					"msg" => $tiempo->mensaje,
+					);
+			}
+		}
+		return array( 'type' => 'warning' , 'msg' => $msg, 'typeData' => 'expenseAlert' , 'data' => $result );
+	}
 }

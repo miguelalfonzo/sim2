@@ -13,9 +13,22 @@ use \Common\TypePayment;
 use \Common\TypeMoney;
 use \Dmkt\InvestmentType;
 use \Dmkt\Marca;
+use \Parameter\Parameter;
+use \Carbon\Carbon;
 
 class TestController extends BaseController 
 {
+	private function diffCreatedAt( $record1 , $record2 , $record3 )
+	{
+		$date1 = new Carbon( $record1->created_at );
+		$date2 = new Carbon( $record2->created_at );
+		$date3 = new Carbon( $record3->created_at );
+		$min = $date1->min( $date2 , $date3 );
+		$max = $date1->max( $date2 , $date3 );
+		$rpta = $max->diffInDays( $min );
+		return $rpta;
+	}
+
 	public function dt()
 	{
 		//return Rm::all()->toArray();
@@ -425,6 +438,66 @@ class TestController extends BaseController
 		//$subFondo = \Maintenance\FondosSubCategorias::getUserSubFondos( FONDO_SUBCATEGORIA_GERPROD , $user );
     }
 
+    public function testcalert()
+    {
+    	$msg = '';
+    	$tipo_cliente_requerido = array( MEDICO , INSTITUCION );
+    	$tiempo = Parameter::find( ALERTA_INSTITUCION_CLIENTE );
+		$solicituds = Solicitud::all();
+		foreach ( $solicituds as $key => $solicitud )
+		{
+			$clients = $solicitud->clients;
+			$solicitud_tipo_cliente = array_unique( $clients->lists( 'id_tipo_cliente') );
+			if ( count( array_intersect( $solicitud_tipo_cliente, $tipo_cliente_requerido ) ) <= 1 )
+				unset( $solicituds[ $key ] );
+		}
+		$clientList = array();
+		$compare_second_id = array();
+		$compare_initial_id = array();
+		foreach( $solicituds as $solicitud_inicial )
+		{
+			foreach ( $solicituds as $solicitud_secundaria )
+			{
+				if ( $solicitud_secundaria->id != $solicitud_inicial->id && ( ! in_array( $solicitud_secundaria->id , $compare_initial_id ) ) )
+				foreach( $solicituds as $solicitud_final )
+				{
+					if( $solicitud_final->id != $solicitud_secundaria->id && 
+						$solicitud_final->id != $solicitud_inicial->id && 
+						( ! in_array( $solicitud_final->id , $compare_second_id ) ) )
+					{
+						$clients_inicial = $solicitud_inicial->clients()->select( 'id_cliente' , 'id_tipo_cliente' )->get();
+						$clients_secundaria = $solicitud_secundaria->clients()->select( 'id_cliente' , 'id_tipo_cliente' )->get();
+						$clients_final = $solicitud_final->clients()->select( 'id_cliente' , 'id_tipo_cliente' )->get();
+						//echo $solicitud_inicial->id . '|' . $solicitud_secundaria->id . '|' . $solicitud_final->id . '<br>';
+						$intersect_client = $this->intersectRecords( $clients_inicial , $clients_secundaria );
+						$intersect_client = $this->intersectRecords( $intersect_client , $clients_final );
+						$solicitud_tipo_cliente = array_unique( $intersect_client->lists( 'id_tipo_cliente' ) );
+						if ( count( array_intersect( $solicitud_tipo_cliente, $tipo_cliente_requerido ) ) >= 1 )
+						{
+							$cliente = '( ';
+							foreach ( $intersect_client as $client_inicial )
+							{
+								$clienteArray[] = $client_inicial->{$client_inicial->clientType->relacion}->full_name;
+								$cliente .= $client_inicial->{$client_inicial->clientType->relacion}->full_name .  ' , ' ;
+							} 
+							$cliente = rtrim( $cliente , ', ' );
+							$cliente .= ' ).';
+							$msg .= 'Las solicitudes ' . $solicitud_inicial->id . ' , ' . $solicitud_secundaria->id . ' , ' . $solicitud_final->id . ' ' . $tiempo->mensaje . ' ' . $cliente;
+							$result[]=array(
+								'cliente'    => $clienteArray,
+								'solicitude' => array($solicitud_inicial->id, $solicitud_secundaria->id, $solicitud_final->id),
+								'msg'     => $tiempo->mensaje
+							);
+						}
+					}
+				}
+				$compare_second_id[] = $solicitud_secundaria->id;
+			}
+			$compare_second_id = array();
+			$compare_initial_id[] = $solicitud_inicial->id;
+		}
+		return array( 'type' => 'warning' , 'msg' => $msg, 'data' => $result, 'typeData' => 'clientAlert');
+	}
 
 
 }

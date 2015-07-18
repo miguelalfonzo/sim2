@@ -23,6 +23,25 @@ use \Exception;
 class Seeker extends BaseController 
 {	
 
+	public function institutionSource()
+	{
+		try
+		{
+			$inputs = Input::all();
+			$json = ' [{"name":"FICPE.PERSONAJUR",'.
+					' "wheres":{"likes":[ "PEJRAZON" ], '.
+					' "equal":{"PEJESTADO":1 , "PEJTIPPERJ":2 }}, '.
+					' "selects":["PEJCODPERS","PEJRAZON" , "\'INSTITUCION\'" , 3 ]} '.
+					']';
+	    	$cAlias = array( 'value' , 'label' , 'type' , 'id_tipo_cliente' );
+	    	return $this->searchSeeker( $inputs['sVal'] , $json , $cAlias );
+		}
+		catch( Exception $e )
+		{
+			return $this->internalException( $e , __FUNCTION__ );
+		}
+	}
+
 	public function clientSource()
 	{
 		try
@@ -51,7 +70,7 @@ class Seeker extends BaseController
 		}
 		catch (Exception $e)
 		{
-			$rpta = $this->internalException($e,__FUNCTION__);
+			return $this->internalException($e,__FUNCTION__);
 		}
 	}
 

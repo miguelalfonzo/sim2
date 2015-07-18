@@ -5,14 +5,14 @@
     <title>Listado de Solicitudes a Depositar</title>
     {{ HTML::style('css/report.css') }}
 </head>
-<body style="background: url('img/logo-marcadeagua.png') center fixed no-repeat; filter: blur(20px);">
+<body style="background: url('img/logo-marcadeagua.png') no-repeat center fixed">
     <div class="background">
-        <header style="margin-top:-2em;">
-            <img src="img/logo-report.png" style="width:170px;margin-left:-5em;">
+        <header>
+            <img src="img/logo-report.png" style="width:170px">
             <h1 style="text-align:center"><strong>Solicitudes a Depositar</strong><h1>
         </header>
         <main>
-            <section style="text-align:center;margin-top:2.5em;height:auto">
+            <section style="text-align:center;height:auto">
                 <table class="table">
                     <thead>
                         <tr>

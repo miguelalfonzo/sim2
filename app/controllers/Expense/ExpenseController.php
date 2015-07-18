@@ -410,7 +410,7 @@ class ExpenseController extends BaseController
 		//return View::make('Expense.report',$data);//->render();
 		//return $html;
 		//return PDF::load( $html , 'A4' , 'landscape' )->show();
-		return PDF2::loadHTML( $html )->setPaper( 'a4' , 'landscape' )->stream();
+		return PDF2::loadHTML( $html )->setPaper( 'a3' , 'landscape' )->stream();
 	}
 
 	public function reportExpenseFondo($token)
