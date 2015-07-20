@@ -170,33 +170,104 @@ $(function()
         });
     }      
 
+    function endExpenseAjax( data )
+    {
+        return  $.ajax(
+                {
+                    type: 'post',
+                    url: server + 'end-expense',
+                    data: data
+                }).fail( function( statusCode , errorThrow )
+                {
+                    ajaxError( statusCode , errorThrow );
+                });
+    }
+
     //Record end Solicitude
-    $("#finish-expense").on("click",function(e){
+    $( '#finish-expense' ).on( 'click' , function(e)
+    {
         e.preventDefault();
-        var type = $(this).attr('data-type');
-        var idfondo = $(this).attr('data-idfondo');
-        var balance = parseFloat($("#balance").val());
-        if(balance >= 0)
+        var type = $(this).attr( 'data-type' );
+        var idfondo = $(this).attr( 'data-idfondo' );
+        var balance = parseFloat( $( '#balance' ).val() );
+        if( balance >= 0 )
         {
-            bootbox.confirm('¿Esta seguro que desea Finalizar el registro del gasto?', function(result) 
+            bootbox.confirm( '¿Esta seguro que desea Finalizar el registro del gasto?' , function( result ) 
             {
                 if(result)
                 {
-                    $.ajax(
+                    var data =
                     {
-                        type: 'post',
-                        url: server + 'end-expense',
-                        data: 
+                        _token : $('input[name=_token]').val(),
+                        token  : token
+                    };
+                    endExpenseAjax( data ).done( function ( response ) 
+                    {
+                        console.log( response );
+                        if ( response.Status == 'Info' )
                         {
-                            _token : $('input[name=_token]').val(),
-                            token  : token
+                            bootbox.dialog( 
+                            {
+                                title   : 'Asignacion de Inversion y Rubro',
+                                message : response.View ,
+                                locale    : 'es' ,
+                                buttons: 
+                                {
+                                    danger: 
+                                    {
+                                        label:'Cancelar',
+                                        className: 'btn-primary',
+                                        callback: function() 
+                                        {
+                                            bootbox.hideAll();
+                                        }
+                                    },
+                                    success: 
+                                    {
+                                        label: 'Confirmar',
+                                        className: 'btn-success',
+                                        callback: function( response )
+                                        {
+                                            var status = 0;
+                                            if ( $( 'select[name=inversion]' ).val() === null )
+                                            {
+                                                $( 'select[name=inversion]' ).parent().parent().addClass( 'has-error' ).focus();
+                                                status = 1;
+                                            }
+                                            if( $( 'select[name=actividad]' ).val() === null )
+                                            {
+                                                $( 'select[name=actividad]' ).parent().parent().addClass( 'has-error' ).focus();
+                                                status = 1;
+                                            }
+
+                                            if( status == 1 )
+                                                return false;
+                                            else
+                                            {
+                                                if ( response )
+                                                {
+                                                    data.inversion = $( 'select[name=inversion]' ).val();
+                                                    data.actividad = $( 'select[name=actividad]' ).val();
+                                                    endExpenseAjax( data ).done( function ( response ) 
+                                                    {
+                                                        if ( response.Status == 'Ok' )
+                                                        {
+                                                            bootbox.alert('<h4 class="green">Gasto Registrado</h4>' , function()
+                                                            {
+                                                                window.location.href = server + 'show_user';
+                                                            });
+                                                        }
+                                                        else
+                                                            bootbox.alert('<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+                                                    });
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
                         }
-                    }).fail( function( statusCode , errorThrow )
-                    {
-                        bootbox.alert(statusCode + ': ' + errorThrow );
-                    }).done( function ( data ) 
-                    {
-                        if ( data.Status == 'Ok' )
+                        else if ( response.Status == 'Ok' )
                         {
                             bootbox.alert('<h4 class="green">Gasto Registrado</h4>' , function()
                             {
@@ -204,7 +275,7 @@ $(function()
                             });
                         }
                         else
-                            bootbox.alert('<h4 class="red">' + data.Status + ': ' + data.Description + '</h4>');
+                            bootbox.alert('<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
                     });
                 }
             });

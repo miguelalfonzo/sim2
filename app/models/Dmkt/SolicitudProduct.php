@@ -25,7 +25,7 @@ class SolicitudProduct extends Eloquent
     {
         $user = Auth::user();
         if ( $user->type != SUP )
-            return DB::table('Fondos f')->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo saldo' , 'fsc.id id' , 'm.id marca_id')
+            return DB::table( 'Fondos f' )->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo saldo' , 'fsc.id id' , 'm.id marca_id')
             ->leftJoin( 'fondos_subcategorias fsc' , 'f.fondos_subcategoria_id' , '=' , 'fsc.id' )
             ->leftJoin( 'fondos_categorias fc' , 'fsc.fondos_categorias_id' , '=' , 'fc.id' )
             ->leftJoin( 'outdvp.marcas m' , 'f.marca_id' , '=' , 'm.id' )

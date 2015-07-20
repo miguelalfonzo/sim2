@@ -23,6 +23,7 @@ use \Dmkt\Account;
 use \Validator;
 use \yajra\Pdo\Oci8\Exceptions\Oci8Exception;
 use \PDF2;
+use \Dmkt\InvestmentType;
 
 class ExpenseController extends BaseController
 {
@@ -96,7 +97,6 @@ class ExpenseController extends BaseController
 			DB::beginTransaction();
 			$inputs = Input::all();
 			$middleRpta = $this->validateInputExpense( $inputs );
-			\Log::error( $inputs );
 			if ( $middleRpta[ status ] === ok )
 			{
 				if ( isset( $inputs[ 'idgasto' ] ) )
@@ -198,7 +198,6 @@ class ExpenseController extends BaseController
             	$expense->monto_tributo = $inputs['monto_regimen'];    	
             }
 		$expense->save();
-		Log::error( json_encode( $expense ) );
 	}
 	
 
@@ -249,7 +248,8 @@ class ExpenseController extends BaseController
 			$solicitud  = Solicitud::where('token', $inputs['token'] )->first();
 			if( is_null( $solicitud ) )
 				return $this->warninException( 'No se encontro la solicitud con token: '.$inputs['token'] , __FUNCTION__ , __LINE__ , __FILE__ );
-			
+			if ( $solicitud->idtiposolicitud == SOL_INST && ! isset( $inputs[ 'inversion'] ) && ! isset( $inputs[ 'actividad' ] ) )
+				return array( status => 'Info' , 'View' => View::make( 'Dmkt.Register.Institucional' , array( 'investments' => InvestmentType::order() , 'activities' => Activity::order() ) )->render() );
 			$oldIdEstado = $solicitud->id_estado;
 			$solicitud->id_estado = REGISTRADO;
 			$solicitud->save();
@@ -384,7 +384,7 @@ class ExpenseController extends BaseController
 		{
 			foreach( $expenses as $expense )
 			{
-				$eTc = ChangeRate::where('fecha' , $expense->fecha_movimiento )->first();
+				$eTc = ChangeRate::where( 'fecha' , $expense->fecha_movimiento )->first();
 				if ( is_null( $eTc ) )
 					$expense->tc = ChangeRate::getTc();
 				else	
@@ -410,7 +410,7 @@ class ExpenseController extends BaseController
 		//return View::make('Expense.report',$data);//->render();
 		//return $html;
 		//return PDF::load( $html , 'A4' , 'landscape' )->show();
-		return PDF2::loadHTML( $html )->setPaper( 'a3' , 'landscape' )->stream();
+		return PDF2::loadHTML( $html )->setPaper( 'a4' , 'portrait' )->stream();
 	}
 
 	public function reportExpenseFondo($token)
@@ -435,7 +435,7 @@ class ExpenseController extends BaseController
         $html = View::make('Expense.report-fondo',$data)->render();
         //return $html;
         //return PDF2::loadHTML( $html )->setPaper( 'a4' , 'landscape' )->stream();
-        return PDF::load($html, 'A4', 'portrait')->show();
+        return PDF2::loadHTML( $html , 'a4' , 'portrait' )->stream();
     }
 
     private function reportBalance( $solicitud , $detalle , $jDetalle , $mGasto )

@@ -162,3 +162,4 @@ const DB_NOT_INSERT                           = 'Lo sentimos, Hubo un problema a
 const FILESTORAGE_DIR                         = 'uploads/';
 const APP_ID                                  = 2;
 
+const TITULO_INSTITUCIONAL 					  = 'FONDO INSTITUCIONAL';

@@ -25,9 +25,9 @@
 		@else
 			@foreach( $solicitud->expenses as $expense )
 				<tr data-id="{{$expense->id}}">
-					<td class="proof-type text-center">{{mb_convert_case($expense->proof->descripcion,MB_CASE_TITLE,'UTF-8')}}</td>
-					<td class="ruc text-center">{{$expense->ruc}}</td>
-					<td class="razon text-center">{{$expense->razon}}</td>
+					<td class="proof-type text-center">{{ $expense->proof->descripcion }}</td>
+					<td class="ruc text-center">{{{ $expense->ruc or '-' }}}</td>
+					<td class="razon text-center">{{{ $expense->razon or '-' }}}</td>
 					<td class="voucher_number text-center">{{$expense->num_prefijo.'-'.$expense->num_serie}}</td>
 					<td class="date_movement text-center">{{date('d/m/Y',strtotime($expense->fecha_movimiento))}}</td>
 					<td class="total text-center">

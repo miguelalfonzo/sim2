@@ -59,8 +59,6 @@ Route::filter('sup', function ()
 
 Route::filter( 'cont' , function () 
 {
-    \Log::error( ' Filtro de Contabilidad');
-    \Log::error( Auth::user() );
     if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
         return Redirect::to( 'login' );
     else

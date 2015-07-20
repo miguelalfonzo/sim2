@@ -1,6 +1,6 @@
 <section class="row" style="padding:0.3em 1em">
 	<div class="page-header">
-        <h2>{{$solicitud->titulo}} <span class="label label-default">{{$solicitud->activity->nombre}}</span></h2>
+        <h2>{{$solicitud->titulo}} <span class="label label-default">{{{ $solicitud->activity->nombre or '' }}}</span></h2>
     </div>
 
 	<!-- Monto -->
@@ -71,4 +71,10 @@
 			</div>
 		</div>
 	@endif
+
+    <div class="clearfix"></div>
+    
+    <!-- CLIENTES -->
+    @include('Dmkt.Solicitud.Detail.clients')
+
 </section>

@@ -4,7 +4,7 @@
             <th>#</th>
             <th>SISOL - Hospital</th>
             <th>Depositar a</th>
-            <th>Nº Cuenta Bagó Bco. Crédito</th>
+            <th>Nº Cuenta Bagó</th>
             <th>Total a depositar</th>
             <!-- <th>Supervisor</th> -->
             @if ( isset( $state ) && $state != BLOCKED )
@@ -18,7 +18,7 @@
                 <tr>
                     <td>{{$solicitud->id}}</td>
                     <td style="text-align:center">
-                        {{$solicitud->titulo}}
+                        {{{ $solicitud->clients()->where( 'id_tipo_cliente' , 3 )->first()->institution->pejrazon  or $solicitud->titulo  }}}
                     </td>
                     <td style="text-align:center">{{$solicitud->asignedTo->rm->full_name}}</td>
                     <td style="text-align:center">

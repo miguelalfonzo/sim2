@@ -228,7 +228,6 @@ class DepositController extends BaseController{
             if ( $subFondo->saldo < 0 )
                 return $this->warningException( 'El fondo ' . $subFondo->subCategoria->descripcion . ' solo cuenta con Saldo de S/.' . ( $subFondo->saldo + $product->monto_asignado ) . ' se requiere ' . $solicitud->detalle->typeMoney->simbolo .  $product->monto_asignado . ' para registrar la operacion' , __FUNCTION__ , __LINE__ , __FILE__ );    
             $subFondo->save();
-            \Log::error( json_encode( $subFondo ) );
         }
         return $this->setRpta();
     }    

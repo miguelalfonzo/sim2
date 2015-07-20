@@ -15,6 +15,7 @@ use \Validator;
 use \Exception;
 use \System\FondoHistory;
 use \Dmkt\Solicitud;
+use \Carbon\Carbon;
 
 class MoveController extends BaseController
 {
@@ -176,9 +177,29 @@ class MoveController extends BaseController
         return $middleRpta;
     }
 
+    private function formatAnioMes( $date )
+    {
+        return Carbon::createFromFormat( 'd/m/Y' , $date )->format( 'Ym' );
+    }
+
     protected function searchSolicituds( $estado , $idUser , $start , $end )
     {
-        $solicituds = Solicitud::whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
+        $solicituds = Solicitud::where( function( $query ) use( $start , $end )
+        {
+            $query->where( function( $query ) use( $start , $end )
+            {
+                $query->where( 'idtiposolicitud' , SOL_REP )->whereRaw( "created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1" );
+            })->orWhere( function( $query ) use( $start , $end )
+            {
+                $query->where( 'idtiposolicitud' , SOL_INST )->wherehas( 'detalle' , function ( $query ) use( $start , $end )
+                {
+                    $query->whereHas( 'periodo' , function( $query ) use( $start , $end )
+                    {
+                        $query->where( 'aniomes' , '>=' , $this->formatAnioMes( $start ) )->where( 'aniomes' , '<=' , $this->formatAnioMes( $end ) );
+                    });
+                });  
+            });
+        });
         
         if ( in_array( Auth::user()->type , array ( REP_MED , SUP , GER_PROD , GER_PROM , ASIS_GER ) ) )
             $solicituds->where( function ( $query )

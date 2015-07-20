@@ -122,4 +122,9 @@ class SolicitudDetalle extends Eloquent
     {
         return $this->hasOne( 'Users\Sup' , 'iduser' , 'supervisor' );
     }
+
+    protected function solicitud()
+    {
+        return $this->belongsTo( 'Dmkt\Solicitud' , 'id_detalle' , 'id' );
+    }
 }

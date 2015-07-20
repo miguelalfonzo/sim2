@@ -20,5 +20,10 @@ class FondosSubCategorias extends Eloquent
 	{
 		return $this->hasMany('Maintenance\fondos');
 	}
+
+	public function accountFondo()
+	{
+		return $this->hasOne( 'Common\Fondo' , 'id' , 'id_fondo' );
+	}
 	
 }

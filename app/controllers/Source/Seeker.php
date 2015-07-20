@@ -166,7 +166,6 @@ class Seeker extends BaseController
 		    			$tm->table = $table->name;
 		    		$array = array_merge( $tms , $array );
 		    	}
-		    	\Log::error( $type );
 		    	if ( $type == 1 )
 		    		return $this->setRpta( $array );
 	    		else

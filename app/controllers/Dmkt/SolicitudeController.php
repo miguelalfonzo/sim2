@@ -1197,8 +1197,7 @@ class SolicitudeController extends BaseController
                     $seat->id           = $seat->lastId() + 1;
                     $seat->num_cuenta   = $seatItem['numero_cuenta'];
                     $seat->cc           = $seatItem['codigo_sunat'];
-                    \Log::error( $seatItem[ 'fec_origen'] );
-                    $fecha_seat_origen = Carbon::createFromFormat( 'd/m/Y' , $seatItem['fec_origen'] );
+                    $fecha_seat_origen  = Carbon::createFromFormat( 'd/m/Y' , $seatItem['fec_origen'] );
                     $seat->fec_origen   = $fecha_seat_origen->toDateString();
                     $seat->iva          = $seatItem['iva'];
                     $seat->cod_pro      = $seatItem['cod_prov'];
@@ -1214,7 +1213,6 @@ class SolicitudeController extends BaseController
                     $seat->tipo_resp    = $seatItem['tipo_responsable'];
                     $seat->id_solicitud = $seatItem['solicitudId'];
                     $seat->tipo_asiento = ASIENTO_GASTO_TIPO;
-                    \Log::error( json_encode( $seat ) );
                     $seat->save();
                 }
 
@@ -1316,7 +1314,7 @@ class SolicitudeController extends BaseController
                         $tbEntry = new Entry;
                         $tbEntry->id = $tbEntry->lastId()+1;
                         $tbEntry->num_cuenta = $inputs['number_account'][$i];
-                        $tbEntry->fec_origen = date( 'Y-m-d' , strtotime( (string)$solicitud->detalle->deposit->updated_at ) );
+                        $tbEntry->fec_origen = Carbon::createFromFormat( 'd/m/Y' , $solicitud->detalle->deposit->updated_at ) ;
                         $tbEntry->d_c = $inputs['dc'][$i];
                         $tbEntry->importe = $inputs['total'][$i];
                         $tbEntry->leyenda = trim($inputs['leyenda']);
@@ -1325,7 +1323,7 @@ class SolicitudeController extends BaseController
                         $tbEntry->save();
                 }
                 $middleRpta = $this->setStatus( $oldIdEstado, GASTO_HABILITADO, Auth::user()->id, $solicitud->id_user_assign , $solicitud->id );         
-                if ($middleRpta[status] === ok )
+                if( $middleRpta[status] === ok )
                 {
                     Session::put( 'state' , R_GASTO );
                     DB::commit();

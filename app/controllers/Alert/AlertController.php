@@ -13,9 +13,9 @@ use \View;
 
 class AlertController extends BaseController
 {
-	public function show(){
+	public function show()
+	{
 		$data = array('alerts' => $this->alertConsole2());
-		\Log::error( $data );
 		return View::make('template.User.alerts', $data);
 	}
 
@@ -84,6 +84,7 @@ class AlertController extends BaseController
 		$clientList = array();
 		$compare_second_id = array();
 		$compare_initial_id = array();
+		$clienteArray= array();
 		foreach( $solicituds as $solicitud_inicial )
 		{
 			foreach ( $solicituds as $solicitud_secundaria )
@@ -118,6 +119,7 @@ class AlertController extends BaseController
 								'solicitude' => array($solicitud_inicial->id, $solicitud_secundaria->id, $solicitud_final->id),
 								'msg'     => $tiempo->mensaje
 							);
+							$clienteArray = array();
 						}
 					}
 				}

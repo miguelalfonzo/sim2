@@ -16,6 +16,11 @@ class Visitador extends Eloquent
 
     protected function sup()
     {
-    	return $this->belongsToMany('Users\Supervisor','ficpe.linsupvis','lsvvisitador','lsvsupervisor','visvisitador');
+    	return $this->belongsToMany( 'Users\Supervisor','ficpe.linsupvis','lsvvisitador','lsvsupervisor','visvisitador');
+    }
+
+    protected function linsupvis()
+    {
+        return $this->hasOne( 'Users\RmSupBago' , 'lsvvisitador' , 'visvisitador' );
     }
 }

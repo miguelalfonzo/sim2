@@ -46,4 +46,9 @@ class SolicitudClient extends Eloquent
     {
         return $this->hasOne( 'Client\ClientType' , 'id' , 'id_tipo_cliente' );
     }
+
+    public function solicitud()
+    {
+        return $this->belongsTo( 'Dmkt\Solicitud' , 'id_solicitud' , 'id' );
+    }
 }

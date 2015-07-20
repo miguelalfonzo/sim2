@@ -284,10 +284,8 @@ class TableController extends BaseController
 	private function maintenanceUpdateFondo( $val )
 	{
 		$fondo = Fondo::find( $val['id'] );
-		Log::error( $val );
 		foreach ( $val[data] as $key => $data )
 			$fondo->$key = $data ;
-		Log::error( $fondo );
 		$fondo->save();
 		return $this->setRpta();
 	}
@@ -471,13 +469,11 @@ class TableController extends BaseController
 
 	private function maintenanceSaveFondo( $val )
 	{
-		\Log::error( $val );
 		$fondo = new Fondo;
 		$fondo->id = $fondo->lastId() + 1 ;
 		foreach ( $val[data] as $key => $data )
 			$fondo->$key = $data;
 		$fondo->save();
-		\Log::error( json_encode( $fondo ) );
 		DB::commit();
 		return $this->setRpta();
 	}
@@ -558,7 +554,6 @@ class TableController extends BaseController
 
 	private function enableActividad( $id )
 	{
-		\Log::error( 'enable');
 		Activity::withTrashed()->find( $id )->restore();
 	}
 

@@ -79,7 +79,6 @@ var GER_PROM  = 'GP';
 var date_options2 = 
 {
     format: 'mm-yyyy',
-    startDate: '-1y',
     minViewMode: 1,
     language: "es",
     orientation: "top",
@@ -270,6 +269,16 @@ date_end.on('focus', function () {
 });*/
 ruc.on('focus', function () {
     $(this).parent().parent().removeClass('has-error');
+});
+
+$( document ).on( 'focus' , 'select[name=inversion]' , function()
+{
+    $(this).parent().parent().removeClass( 'has-error');
+});
+
+$( document ).on( 'focus' , 'select[name=actividad]' , function()
+{
+    $(this).parent().parent().removeClass( 'has-error');
 });
 
 function listMaintenanceTable( type )
@@ -718,7 +727,7 @@ function cancelDialog  ( data , message )
 var fondo_repmed = $('#fondo_repmed');
 var fondo_total = $('#fondo_total');
 var fondo_institucion = $('#fondo_institucion');
-var date_reg_fondo = $('.date_month[data-type=fondos]');
+var date_reg_fondo = $( '.date_month[data-type=fondos]' );
 
 fondo_repmed.on('focus', function () {
     $(this).parent().parent().parent().removeClass('has-error');
@@ -730,7 +739,10 @@ date_reg_fondo.on('focus', function () {
     $(this).parent().parent().removeClass('has-error');
 });
 fondo_institucion.on('focus', function() {
-    $(this).parent().parent().removeClass('has-error');     
+    $(this).parent().parent().parent().removeClass('has-error');     
+});
+fondo.on( 'focus' , function() {
+    $( this ).parent().parent().removeClass( 'has-error' );
 });
 
 fondo_total.numeric();
@@ -739,6 +751,12 @@ $(document).on( 'click' , '.register_fondo' , function()
 {
     var validate = 0;
     var aux = this;
+
+    if( fondo.val() == 0  || fondo.val() === null )
+    {
+        fondo.parent().parent().addClass( 'has-error' );
+    }
+
     if(!date_reg_fondo.val()){
         date_reg_fondo.parent().parent().addClass('has-error');
         date_reg_fondo.attr('placeholder', 'Ingrese Mes');
@@ -752,7 +770,7 @@ $(document).on( 'click' , '.register_fondo' , function()
         validate = 1;
     }
     if(!fondo_repmed.val()){
-        fondo_repmed.parent().parent().addClass('has-error');
+        fondo_repmed.parent().parent().parent().addClass('has-error');
         fondo_repmed.attr('placeholder', 'Ingrese Representante');
         fondo_repmed.addClass('input-placeholder-error');
         validate = 1;
@@ -764,10 +782,10 @@ $(document).on( 'click' , '.register_fondo' , function()
         fondo_repmed.addClass('input-placeholder-error');
         validate = 1;
     }
-    if (!fondo_institucion.val())
+    if ( typeof fondo_institucion.attr( 'data-cod' ) === 'undefined' || fondo_institucion.attr( 'data-cod' ).trim() === '' )
     {
-        fondo_institucion.parent().parent().addClass('has-error');
-        fondo_institucion.attr('placeholder','Ingrese Institución');
+        fondo_institucion.parent().parent().parent().addClass( 'has-error' );
+        fondo_institucion.attr( 'placeholder' , 'Ingrese Institución' );
         validate = 1;
     }
     if(validate == 0)
@@ -776,11 +794,9 @@ $(document).on( 'click' , '.register_fondo' , function()
         var dato = 
         {
             '_token'      : GBREPORTS.token,
-            'institucion' : fondo_institucion.val(),
+            'institucion-cod' : fondo_institucion.attr('data-cod'),
             'codrepmed'   : fondo_repmed.attr('data-cod'),
-            'codsup'      : fondo_repmed.attr('data-cod-sup'),
             'total'       : fondo_total.val(),
-            'cuenta'      : fondo_repmed.attr('data-cuenta'),
             'idfondo'     : fondo.val(),
             'mes'         : periodo
         };
@@ -796,10 +812,9 @@ $(document).on( 'click' , '.register_fondo' , function()
         {
             if (data.Status == 'Ok')
             {
-                fondo_institucion.val('');
-                fondo_repmed.val('');
                 fondo_total.val('');
-                removeinput($('#edit-rep'));
+                fondo.val( 0 );
+                cleanFondoInstitucion();
                 bootbox.alert('<h4 class="green">Fondo Registrado</h4>' , function()
                 {
                     searchFondos( periodo );
@@ -970,15 +985,12 @@ $(document).on('click','.edit-fondo' , function(e)
             $('.btn_edit_fondo').show();
             $('.register_fondo').hide();
             $('#edit-rep').show();
-        
-            fondo_institucion.val(data.titulo);
-            fondo_repmed.attr('disabled',true).attr('data-select',"true").parent().parent().addClass('has-success');
+            $( '#edit-institucion').show();
+            fondo_repmed.attr('disabled',true).attr('data-select', true ).parent().parent().parent().addClass('has-success');
             fondo_repmed.val(data.rm);
             fondo_repmed.attr('data-cod',data.idrm);
-            fondo_repmed.attr('data-cod-sup' , data.codsup );
-            fondo_repmed.attr( 'data-cuenta' , data.rep_cuenta );
-            fondo_repmed.attr( 'data-sup' , data.supervisor );
             fondo_total.val(data.monto);
+            fondo_institucion.val( data.institucion ).attr( 'data-cod' , data[ 'institucion-cod' ] ).attr( 'disabled' , true ).attr( 'data-select' , true ).parent().parent().parent().addClass( 'has-success' );
             date_reg_fondo.val( data.periodo.substr(4,6) + '-' + data.periodo.substr(0,4) );
             id_solicitud.val(idsolicitud);
             $('select[name=idfondo]').val(data.idfondo);
@@ -989,20 +1001,22 @@ $(document).on('click','.edit-fondo' , function(e)
 });
 function fondoData()
 {
-    return { _token      : GBREPORTS.token,
-             institucion : fondo_institucion.val(),
-             codrepmed   : fondo_repmed.attr('data-cod'),
-             codsup      : fondo_repmed.attr('data-cod-sup'),
-             total       : fondo_total.val(),
-             cuenta      : fondo_repmed.attr('data-cuenta'),
-             idfondo     : fondo.val(),
-             mes         : $(".date_month").val() };
+    var data = 
+    { 
+        _token          : GBREPORTS.token,
+        codrepmed       : fondo_repmed.attr( 'data-cod' ),
+        total           : fondo_total.val(),
+        idfondo         : fondo.val(),
+        mes             : $( '.date_month' ).val() 
+    };         
+    data[ 'institucion-cod' ] = fondo_institucion.attr( 'data-cod' );
+    return data;
 }
 $(document).on('click','.btn_edit_fondo',function(e)
 {
     e.preventDefault();
-    var aux = this;
-    var dato = fondoData();
+    var aux          = this;
+    var dato         = fondoData();
     dato.idsolicitud = id_solicitud.val(); 
     var l = Ladda.create(aux);
     // l.start();
@@ -1016,16 +1030,12 @@ $(document).on('click','.btn_edit_fondo',function(e)
     {
         if (data.Status == 'Ok')
         {
-            $("#idfondo").val('');
-            $('#edit-rep').hide();
-            $('.btn_cancel_fondo').hide();
-            $('.btn_edit_fondo').hide();
-            $('.register_fondo').show();
-            fondo_institucion.val('');
-            fondo_repmed.val('');
+            $( '#idfondo' ).val('');
+            $( '.btn_cancel_fondo' ).hide();
+            $( '.btn_edit_fondo' ).hide();
+            $( '.register_fondo' ).show();
             fondo_total.val('');
-            
-            removeinput($('#edit-rep'));
+            cleanFondoInstitucion();
             id_solicitud.val('');
             bootbox.alert('<h4 class="green">Fondo Actualizado</h4>' , function()
             {
@@ -1038,11 +1048,18 @@ $(document).on('click','.btn_edit_fondo',function(e)
     });
 });
 
+function cleanFondoInstitucion()
+{
+    $('#fondo_institucion').typeahead( 'val' , '' ).attr( 'disabled' , false ).attr( 'data-cod' , '' ).parent().parent().parent().removeClass('has-success');
+    $( '#edit-institucion' ).fadeOut();
+    removeinput( $( '#edit-rep' ) );
+}
+
 function removeinput(data)
 {
     var rep = data.parent().find('input:text');
     rep.typeahead( 'val' , '' );
-    rep.attr('disabled', false).attr('data-select',"false").attr('data-cod','').attr('data-cod-sup' ,'' ).attr('data-cuenta','').focus().parent().parent().removeClass('has-success');
+    rep.attr('disabled', false).attr('data-select',"false").attr('data-cod','').attr('data-cod-sup' ,'' ).attr('data-cuenta','').focus().parent().parent().parent().removeClass('has-success');
     data.fadeOut();
 }
 
@@ -1500,6 +1517,12 @@ $(document).on("click", ".elementSave", function()
     else
         bootbox.alert("complete los datos");
 });
+$('#edit-institucion').on('click' , function()
+{
+    $(this).fadeOut();
+    $( '#fondo_institucion' ).typeahead( 'val' , '' ).attr( 'disabled' , false ).attr( 'data-cod' , '' ).parent().parent().parent().removeClass( 'has-success' );
+
+});
 
 $(document).off("click", ".elementBack");
 $(document).on("click", ".elementBack", function()
@@ -1562,7 +1585,7 @@ function seeker( element , name , url )
                 $( this ).attr( 'readonly' , '' ).attr( 'data-cod' , suggestion.value ).parent().parent().addClass( 'has-success' );
             else if ( dataset == 'institutions')
             {
-                $( this ).attr( 'readonly' , '' ).attr( 'data-cod' , suggestion.value ).parent().parent().addClass( 'has-success' );
+                $( this ).attr( 'disabled' , true ).attr( 'data-cod' , suggestion.value ).parent().parent().parent().addClass( 'has-success' );
                 $( this ).parent().parent().find('.edit-repr').fadeIn();
             }
             else if ( dataset == 'clients' )
@@ -1608,12 +1631,12 @@ function seeker( element , name , url )
             else if ( dataset == 'reps' )
             {
                 var element = $(this);
-                element.attr('data-select','true');
-                element.attr('data-cod',suggestion.value);
-                element.val(suggestion.label );
-                element.attr('disabled',true).parent().parent().addClass('has-success');
+                element.attr( 'data-select' , 'true' );
+                element.attr( 'data-cod' , suggestion.value );
+                element.val( suggestion.label );
+                element.attr( 'disabled' , true ).parent().parent().parent().addClass('has-success');
                 $( this ).parent().parent().find('.edit-repr').fadeIn();
-                repInfo( suggestion.value ).done( function (result)
+                /*repInfo( suggestion.value ).done( function (result)
                 {
                     if ( result.Data.cuenta )
                         element.attr('data-cuenta', result.Data.cuenta );
@@ -1622,7 +1645,7 @@ function seeker( element , name , url )
                         element.attr('data-sup' , result.Data.sup.nombre );
                         element.attr('data-cod-sup' , result.Data.sup.idsup);
                     }   
-                });
+                });*/
             }
         });
     }
@@ -1637,8 +1660,6 @@ function filterSelect( element , ids , type )
     console.log( $(element) );
     if ( ( type === 'cliente' && clients.children().length == 1 ) || ( type === 'eliminacion' && clients.children().length >= 1 ) ) 
     {
-        console.log("cliente y eliminacion");
-        
         select.val('').children().show();
         select.val('');
         select.children().attr( '[type=' + type + ']' );
@@ -1650,24 +1671,14 @@ function filterSelect( element , ids , type )
     else if ( type === 'inversion' )
     {
         select.empty();
-        if(ids.length > 0){
+        if( ids.length > 0 )
+        {
             select.append("<option value disabled selected>SELECCIONE</option>")
-            $(ids).each(function(i,data){
+            $(ids).each(function(i,data)
+            {
                 select.append('<option value="'+ data.activity.id +'">'+ data.activity.nombre +'</option>');
             });
         }
-        // select.val('');
-        // select.children().filter( function() 
-        // {
-        //     return $(this).attr('type') == type;
-        // }).show();
-        // select.children().filter( function() 
-        // {
-        //     // console.log( $(this).val() );
-        //     // console.log( ids );
-        //     // console.log( $.inArray( parseInt( $(this).val() ) ,  ids ) );
-        //     return $.inArray( $(this).val() ,  ids ) == -1;
-        // }).attr( 'type' , type ).hide();   
     }
 }
 
@@ -1724,7 +1735,6 @@ $(document).on( 'click' , '.btn-delete-client' , function ()
     var ul = li.parent();
     if ( li.index() == 0 && ul.children().length > 1 )
     {
-        console.log( 'cambio de cliente');
         var table = li.attr('tipo_cliente');
         li.remove();
         var old_li2 = ul.children().first();

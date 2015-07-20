@@ -5,7 +5,6 @@ namespace User;
 use \BaseController;
 use \Input;
 use \Exception;
-use \Log;
 use \Users\TemporalUser;
 use \Auth;
 use \yajra\Pdo\Oci8\Exceptions\Oci8Exception;
@@ -59,7 +58,6 @@ class UserController extends BaseController
 		}
 		catch ( Oci8Exception $e )
 		{
-			Log::error( 'Oci_error' . oci_error() );
 			return $this->internalException( $e , __FUNCTION__ , DB );
 		}
 		catch ( Exception $e )

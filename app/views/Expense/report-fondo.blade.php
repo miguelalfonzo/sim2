@@ -15,7 +15,7 @@
             <section style="text-align:center;margin-top:2.5em;">
                 <strong><p style="display:inline">Fecha:</strong>&nbsp;{{$date['toDay']}}</p>
                 <strong><p style="display:inline">Ciudad:</strong>&nbsp;Lima</p>
-                <strong><p style="display:inline">Institucion:</strong>&nbsp;{{$fondo->titulo}}</p>
+                <strong><p style="display:inline">Institucion:</strong>&nbsp;{{$fondo->clients[0]->institution->pejrazon}}</p>
                 <strong><p style="display:inline">Código Comercial:</strong>&nbsp;{{$fondo->id}}</p>
             </section>
             <section style="text-align:center;margin-top:2em;">
@@ -129,18 +129,15 @@
                     </tbody>
                 </table>
             </section>
-            <section style="padding-top:70px">
-                <p class="firma">FIRMA DEL EMPLEADO</p>
-                <p class="firma">V°B° SUPERVISOR</p>
-                <p class="firma">V°B° GERENTE COMERCIAL</p>
-                <br>
-                <p>DNI:{{$dni}}</p>
-                </p></p>
-                <br>
-                <p>NOMBRE:{{$fondo->asignedTo->rm->full_name}}</p>
-                </p></p>
-            </section>
         </main>
+        <footer style="text-align:center">
+            <p class="firma">FIRMA DEL EMPLEADO</p>
+            <p class="firma">V°B° SUPERVISOR</p>
+            <p class="firma">V°B° GERENTE COMERCIAL</p>
+            <div style="text-align:left;margin-left:21em">DNI:&nbsp;<span class="dni">{{$dni}}</span></div>
+            <div style="text-align:left;margin-left:21em">NOMBRE:&nbsp;<span class="dni">{{ $fondo->asignedTo->rm->full_name }}</span></div>
+        </footer>
+            
     </div>
 </body>
 </html>

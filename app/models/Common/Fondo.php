@@ -54,7 +54,7 @@ class Fondo extends Eloquent {
 
     protected function account()
     {
-        return $this->hasOne('Dmkt\Account','num_cuenta','num_cuenta');
+        return $this->hasOne( 'Dmkt\Account' , 'num_cuenta' , 'num_cuenta' );
     }
 
     protected function userType()
