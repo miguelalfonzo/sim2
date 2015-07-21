@@ -20,8 +20,8 @@ use \Expense\ChangeRate;
 use \Expense\PlanCta;
 use \Validator;
 use \System\FondoHistory;
-use \Maintenance\Fondos;
-use \Maintenance\FondosSupervisor;
+use \Fondo\FondoGerProd;
+use \Fondo\FondoSupervisor;
 
 class DepositController extends BaseController{
 
@@ -217,9 +217,9 @@ class DepositController extends BaseController{
         foreach( $products as $product )
         {
             if ( $product->user->type == SUP )
-                $subFondo = FondosSupervisor::where( 'supervisor_id' , $product->id_fondo_user )->where( 'marca_id' , $product->id_fondo_producto )->where( 'subcategoria_id' , $product->id_fondo )->first();
+                $subFondo = FondoSupervisor::where( 'supervisor_id' , $product->id_fondo_user )->where( 'marca_id' , $product->id_fondo_producto )->where( 'subcategoria_id' , $product->id_fondo )->first();
             else
-                $subFondo = Fondos::where( 'fondos_subcategoria_id' , $product->id_fondo )->where( 'marca_id' , $product->id_fondo_producto )->first();
+                $subFondo = FondoGerProd::where( 'fondos_subcategoria_id' , $product->id_fondo )->where( 'marca_id' , $product->id_fondo_producto )->first();
             $tc = ChangeRate::getTc();
             if ( $detalle->id_moneda == SOLES )
                 $subFondo->saldo -= $product->monto_asignado ;

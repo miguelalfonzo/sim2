@@ -11,11 +11,11 @@
                 <li class="list-group-item">        
                     @if( $politicStatus )
                         <div class="input-group">
-                            <span class="input-group-addon" style="width: 30%;">{{{ is_null( $product->marca ) ? '' : $product->marca->descripcion}}}</span>
+                            <span class="input-group-addon" style="width:15%;">{{{ is_null( $product->marca ) ? '' : $product->marca->descripcion}}}</span>
                             @if ( in_array( $tipo_usuario , array( SUP , GER_PROD ) ) )
-                                <select name="fondo-producto[]" class="selectpicker form-control">
-                                    @if ( ! is_null( $product->id_fondo ) )
-                                        <option selected value="{{ $product->id_fondo . ',' . $product->id_fondo_producto . ',' . $product->id_fondo_user }}" style="background-color:gold">{{ $product->fondoMarca->descripcion . ' | ' . $product->subCatFondo->descripcion . ' S/.' . $product->thisSubFondo()->saldo }}</option> 
+                                <select name="fondo_producto[]" class="selectpicker form-control">
+                                    @if ( is_null( $product->id_fondo_marketing ) )
+                                        <option selected disabled value="0">Seleccione el Fondo</option>
                                         @foreach( $product->getSubFondo( $solicitud ) as $subFondo )
                                             @if ( $subFondo->marca_id == $product->id_producto )
                                                 <option value="{{ $subFondo->id . ',' . $subFondo->marca_id}}" style="background-color:#00FFFF">{{$subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
@@ -25,7 +25,7 @@
                                         @endforeach
                                     @else
                                         @foreach( $product->getSubFondo( $solicitud ) as $subFondo )
-                                            @if ( $subFondo->marca_id == $product->id_producto )
+                                            @if ( $subFondo->id == $product->id_fondo_marketing )
                                                 <option selected value="{{ $subFondo->id . ',' . $subFondo->marca_id}}" style="background-color:#00FFFF">{{$subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
                                             @else   
                                                 <option value="{{ $subFondo->id . ',' . $subFondo->marca_id}}">{{$subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
@@ -37,11 +37,11 @@
                                 <span class="input-group-addon">
                                     {{ $product->subCatFondo->descripcion . ' | ' . $product->fondoMarca->descripcion . ' S/.' . ( floor( $product->thisSubFondo()->saldo * 100 ) / 100 ) }}
                                 </span>
-                                <input type="hidden" value="{{ $product->id_fondo . ',' . $product->id_fondo_producto . ',' . $product->id_fondo_user }}" name="fondo-producto[]">
+                                <input type="hidden" value="{{ $product->id_fondo . ',' . $product->id_fondo_producto . ',' . $product->id_fondo_user }}" name="fondo_producto[]">
                             @endif
                             <span class="input-group-addon">{{ $detalle->typemoney->simbolo }}</span>
                             <input name="monto_producto[]" type="text" class="form-control text-right amount_families" value="{{ isset( $product->monto_asignado ) ? $product->monto_asignado : 
-                            round( $detalle->monto_actual / count( $solicitud->products ) , 2 )}}">
+                            round( $detalle->monto_actual / count( $solicitud->products ) , 2 )}}" style="padding:0px;text-align:center">
                         </div>
                     @else
                         {{{ $product->marca->descripcion or '-' }}}

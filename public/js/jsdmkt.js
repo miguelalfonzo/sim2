@@ -827,76 +827,19 @@ $(document).on( 'click' , '.register_fondo' , function()
     }
 });
 
-$("#search_responsable").on('click', function(e)
+$( '#search_responsable' ).on('click', function(e)
 {
-    var div_monto = $("label[for=amount]").parent();
-    if ( div_monto.hasClass("has-error") )
-        idamount.focus();
-    if ( $("#sub_type_activity").val() == 0 )
-    {
-        var fondo = $("#sub_type_activity");
-        var div = fondo.parent().parent();
-        div.addClass('has-error'); 
-        fondo.focus();
-    }
-    else if( div_monto.hasClass("has-success"))
-    {
-        $.ajax(
-        {
-            type: 'POST',
-            url : server + 'buscar-responsable',
-            data: 
-            {
-                idfondo: $("#sub_type_activity").val(),
-                idsolicitud : id_solicitud.val(),
-                _token: _token
-            }
-        }).fail( function ( statusCode, errorThrown)
-        {
-            ajaxError(statusCode,errorThrown);   
-        }).done(function (data)
-        {
-            if (data.Status == 'Ok' )
-            {
-                console.log( data.Data );
-                if ( data.Data == '' )
-                    acceptedSolicitude();
-                else
-                {
-                    var list='';
-                    message = '<h5 id="validate">Para aceptar la solicitud seleccione el Responsable</h5>';
-                    data.Data.forEach(function(entry)
-                    {
-                        list = list + '<li><input type="radio" name="responsables"  value="' + entry.iduser + '"> ' + entry.nombres + ' ' + entry.apellidos + '</li>';    
-                    });
-                    bootbox.confirm( message + '<ul>' + list + '</ul>', function ( result ) 
-                    {
-                        if (result) 
-                        {
-                            var resp = $("input[name=responsables]:checked");
-                            if (resp.length == 0 )
-                            {
-                                $("#validate").css("color","red");
-                                return false; 
-                            }
-                            else
-                                acceptedSolicitude( resp.val() );
-                        }
-                    });
-                }
-            }
-            else
-                bootbox.alert("<h4 style='color:red'>" + data.Status + ": " + data.Description + "</h4>");
-        });
-    }
+    var div_monto = $("label[for=monto]").parent();
+    if ( div_monto.hasClass("has-success"))
+        acceptedSolicitude();
+    else
+        return false;
 });
 
 
-function acceptedSolicitude(idresp)
+function acceptedSolicitude()
 {
     var formData = new FormData(form_acepted_solicitude[0]);
-    if ( idresp !== undefined ) 
-        formData.append("idresponsable",idresp);
     $.ajax(
     {
         type: 'POST',

@@ -157,9 +157,9 @@
     Route::group(array('before' => 'rm_sup_gerprod'), function ()
     {    
         Route::get('nueva-solicitud', 'Dmkt\SolicitudeController@newSolicitude');
-        Route::post('registrar-solicitud', 'Dmkt\SolicitudeController@registerSolicitude');
-        Route::get('editar-solicitud/{id}', 'Dmkt\SolicitudeController@editSolicitude');
-        Route::post('editar-solicitud', 'Dmkt\SolicitudeController@formEditSolicitude');
+        Route::post('registrar-solicitud', 'Dmkt\SolicitudeController@registerSolicitud');
+        Route::get('editar-solicitud/{id}', 'Dmkt\SolicitudeController@editSolicitud');
+        //Route::post('editar-solicitud', 'Dmkt\SolicitudeController@formEditSolicitude');
         Route::post('search-client', 'Source\Seeker@clientSource');
         Route::post('get-client-view' , 'Source\Seeker@getClientView');
         Route::post('filtro_cliente' , 'Dmkt\Client@getInvestmentActivity');

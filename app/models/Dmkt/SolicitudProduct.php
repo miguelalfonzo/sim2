@@ -4,8 +4,8 @@ namespace Dmkt;
 use \Eloquent;
 use \Auth;
 use \DB;
-use \Maintenance\Fondos;
-use \Maintenance\FondosSupervisor;
+use \Fondo\FondoGerProd;
+use \Fondo\FondoSupervisor;
 
 class SolicitudProduct extends Eloquent
 {
@@ -25,9 +25,9 @@ class SolicitudProduct extends Eloquent
     {
         $user = Auth::user();
         if ( $user->type != SUP )
-            return DB::table( 'Fondos f' )->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo saldo' , 'fsc.id id' , 'm.id marca_id')
-            ->leftJoin( 'fondos_subcategorias fsc' , 'f.fondos_subcategoria_id' , '=' , 'fsc.id' )
-            ->leftJoin( 'fondos_categorias fc' , 'fsc.fondos_categorias_id' , '=' , 'fc.id' )
+            return DB::table( 'Fondo_Gerente_Producto f' )->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo saldo' , 'fsc.id id' , 'm.id marca_id')
+            ->leftJoin( 'fondo_subcategoria fsc' , 'f.subcategoria_id' , '=' , 'fsc.id' )
+            ->leftJoin( 'fondo_categoria fc' , 'fsc.id_fondo_categoria' , '=' , 'fc.id' )
             ->leftJoin( 'outdvp.marcas m' , 'f.marca_id' , '=' , 'm.id' )
             ->where( function( $query ) use( $user )
             {
@@ -47,10 +47,10 @@ class SolicitudProduct extends Eloquent
             else
                 $user = Auth::user();
         
-            return DB::table('fondos_supervisor fs')
+            return DB::table('fondo_supervisor fs')
             ->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'fs.saldo saldo' , 'fsc.id id' , 'fs.marca_id marca_id' )
-            ->leftJoin( 'fondos_subcategorias fsc' , 'fsc.id' , '=' , 'fs.subcategoria_id' )
-            ->leftJoin( 'fondos_categorias fc' , 'fc.id' , '=' , 'fsc.fondos_categorias_id' )
+            ->leftJoin( 'fondo_subcategoria fsc' , 'fsc.id' , '=' , 'fs.subcategoria_id' )
+            ->leftJoin( 'fondo_categoria fc' , 'fc.id' , '=' , 'fsc.id_fondo_categoria' )
             ->leftJoin( 'outdvp.marcas m' , 'fs.marca_id' , '=' , 'm.id' )
             ->where( 'fs.saldo' , '>' , 0 )->where( 'fsc.tipo' , 'S' )->where('fs.supervisor_id' , $user->id )->orderBy( 'm.descripcion' , 'asc' )->get();
         }
@@ -63,12 +63,10 @@ class SolicitudProduct extends Eloquent
 
     public function thisSubFondo()
     {
-        $user = \User::find( $this->id_fondo_user );
-        if ( $user->type != SUP )
-            $rpta = Fondos::where( 'marca_id' , $this->id_fondo_producto )->where( 'fondos_subcategoria_id' , $this->id_fondo )->first();
+        if ( $this->id_tipo_fondo_marketing == GER_PROD )
+            $rpta = FondoGerProd::find( $this->id_fondo_marketing );
         else
-            $rpta = FondosSupervisor::where( 'marca_id' , $this->id_fondo_producto )->where( 'subcategoria_id' , $this->id_fondo )
-            ->where( 'supervisor_id' , $this->id_fondo_user )->first();
+            $rpta = FondoSupervisor::find( $this->id_fondo_marketing );
         return $rpta;
     }
 
@@ -85,7 +83,7 @@ class SolicitudProduct extends Eloquent
 
     public function subCatFondo()
     {
-        return $this->hasOne( 'Maintenance\FondosSubCategorias' , 'id' , 'id_fondo' );
+        return $this->hasOne( 'Fondo\FondoSubCategoria' , 'id' , 'id_fondo' );
     }
 
     public function user()

@@ -1,14 +1,13 @@
 <?php
 
-namespace Maintenance;
+namespace Fondo;
 
 use \Eloquent;
 
-class Fondos extends Eloquent
+class FondoGerProd extends Eloquent
 {
-	protected $table      = 'FONDOS';
+	protected $table      = 'FONDO_GERENTE_PRODUCTO';
 	protected $primaryKey = 'id';
-	public $incrementing  = false;
 	protected $fillable   = array('id','fondos_subcategoria_id','marca_id');
 
 	public function fondosSubCategorias()
@@ -23,6 +22,6 @@ class Fondos extends Eloquent
 
 	public function subCategoria()
 	{
-		return $this->hasOne( 'Maintenance\FondosSubCategorias' , 'id' , 'fondos_subcategoria_id');
+		return $this->hasOne( 'Fondo\FondoSubCategoria' , 'id' , 'subcategoria_id' );
 	}
 }

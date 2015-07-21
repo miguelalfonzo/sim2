@@ -48,6 +48,8 @@ class SolicitudDetalle extends Eloquent
             return $jDetalle->monto_aprobado;
         else if ( isset( $jDetalle->monto_aceptado ) )
             return $jDetalle->monto_aceptado;
+        else if ( isset( $jDetalle->monto_derivado ) )
+            return $jDetalle->monto_derivado;
         else if ( isset( $jDetalle->monto_solicitado ) )
             return $jDetalle->monto_solicitado;
         else
@@ -115,7 +117,7 @@ class SolicitudDetalle extends Eloquent
     
     public function fondo()
     {
-        return $this->hasOne('Common\Fondo','id','id_fondo');
+        return $this->hasOne('Fondo\Fondo','id','id_fondo');
     }
 
     protected function sup()

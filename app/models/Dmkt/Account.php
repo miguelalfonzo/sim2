@@ -28,7 +28,7 @@ class Account extends Eloquent
 
     protected function fondo()
     {
-        return $this->belongsTo('Common\Fondo' , 'id' , 'idcuenta');
+        return $this->belongsTo('Fondo\Fondo' , 'id' , 'idcuenta');
     }
 
 

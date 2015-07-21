@@ -10,7 +10,7 @@ use \Dmkt\SolicitudProduct;
 use \Dmkt\SolicitudGer;
 use \Common\Deposit;
 use \Expense\Entry;
-use \Common\Fondo;
+use \Fondo\Fondo;
 use \Dmkt\Periodo;
 use \System\SolicitudHistory;
 use \Expense\Expense;

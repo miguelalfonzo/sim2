@@ -6,7 +6,7 @@ use \BaseController;
 use \Input;
 use \View;
 use \Common\TypeUser;
-use \Common\Fondo;
+use \Fondo\Fondo;
 use \Expense\Proof;
 use \Expense\MarkProofAccounts;
 use \Expense\Mark;

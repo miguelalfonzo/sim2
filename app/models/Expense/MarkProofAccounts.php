@@ -45,7 +45,7 @@ class MarkProofAccounts extends Eloquent
 
 	public function fondo()
 	{
-		return $this->hasOne( 'Common\Fondo' , 'num_cuenta' , 'num_cuenta_fondo' );
+		return $this->hasOne( 'Fondo\Fondo' , 'num_cuenta' , 'num_cuenta_fondo' );
 	}
 
 	public function accountFondo()

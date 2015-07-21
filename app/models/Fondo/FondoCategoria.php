@@ -1,14 +1,13 @@
 <?php
 
-namespace Maintenance;
+namespace Fondo;
 
 use \Eloquent;
 
-class FondosCategorias extends Eloquent
+class FondoCategoria extends Eloquent
 {
-	protected $table      = 'FONDOS_CATEGORIAS';
+	protected $table      = 'FONDO_CATEGORIA';
 	protected $primaryKey = 'id';
-	public $incrementing  = false;
 	protected $fillable   = array('id','descripcion');
 
 	public function fondosSubCategorias()

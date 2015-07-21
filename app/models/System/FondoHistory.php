@@ -6,7 +6,7 @@ use \Eloquent;
 
 class FondoHistory extends Eloquent{
 	
-    protected $table = 'FONDO_HISTORIA';
+    protected $table = 'FONDO_CONTABLE_HISTORIA';
     protected $primaryKey = 'id';
     
     protected function getUpdatedAtAttribute( $attr )
@@ -30,7 +30,7 @@ class FondoHistory extends Eloquent{
 
     protected function fondo()
     {
-        return $this->hasOne( 'Common\Fondo' , 'id' , 'id_fondo' );
+        return $this->hasOne( 'Fondo\Fondo' , 'id' , 'id_fondo' );
     }
 
 }

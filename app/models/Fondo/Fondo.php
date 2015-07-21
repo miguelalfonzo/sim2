@@ -1,11 +1,12 @@
 <?php
 
-namespace Common;
+namespace Fondo;
+
 use \Eloquent;
 
 class Fondo extends Eloquent {
 
-    protected $table = 'FONDO';
+    protected $table = 'FONDO_CONTABLE';
     protected $primaryKey = 'id';
 
     public function getIdusertypeAttribute($value)
@@ -57,13 +58,9 @@ class Fondo extends Eloquent {
         return $this->hasOne( 'Dmkt\Account' , 'num_cuenta' , 'num_cuenta' );
     }
 
-    protected function userType()
+    /*protected function userType()
     {
         return $this->hasOne( 'Common\TypeUser' , 'codigo' , 'idusertype' );
-    }
+    }*/
 
-    protected static function getFunds( $userType )
-    {
-        return Fondo::where( 'trim( idusertype )' , $userType )->whereNotNull( 'num_cuenta' )->get();
-    }
 }

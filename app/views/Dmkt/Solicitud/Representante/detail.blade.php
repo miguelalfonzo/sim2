@@ -46,7 +46,7 @@
     <!-- Aceptador Por -->
     @include('Dmkt.Solicitud.Detail.accepted')
 
-    <!-- Fondos -->
+    <!-- Fondo Contable -->
     @include('Dmkt.Solicitud.Detail.fondo')
 
     <!-- Depositado -->
