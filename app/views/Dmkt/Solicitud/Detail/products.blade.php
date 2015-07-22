@@ -18,26 +18,26 @@
                                         <option selected disabled value="0">Seleccione el Fondo</option>
                                         @foreach( $product->getSubFondo( $solicitud ) as $subFondo )
                                             @if ( $subFondo->marca_id == $product->id_producto )
-                                                <option value="{{ $subFondo->id . ',' . $subFondo->marca_id}}" style="background-color:#00FFFF">{{$subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
+                                                <option value="{{ $subFondo->id . ',' . $subFondo->tipo }}" style="background-color:#00FFFF">{{ $subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
                                             @else   
-                                                <option value="{{ $subFondo->id . ',' . $subFondo->marca_id}}">{{$subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
+                                                <option value="{{ $subFondo->id . ',' . $subFondo->tipo }}">{{ $subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
                                             @endif
                                         @endforeach
                                     @else
                                         @foreach( $product->getSubFondo( $solicitud ) as $subFondo )
                                             @if ( $subFondo->id == $product->id_fondo_marketing )
-                                                <option selected value="{{ $subFondo->id . ',' . $subFondo->marca_id}}" style="background-color:#00FFFF">{{$subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
+                                                <option selected value="{{ $subFondo->id . ',' . $subFondo->tipo }}" style="background-color:#00FFFF">{{$subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
                                             @else   
-                                                <option value="{{ $subFondo->id . ',' . $subFondo->marca_id}}">{{$subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
+                                                <option value="{{ $subFondo->id . ',' . $subFondo->tipo }}">{{$subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
                                             @endif
                                         @endforeach
                                     @endif
                                 </select>
                             @else
                                 <span class="input-group-addon">
-                                    {{ $product->subCatFondo->descripcion . ' | ' . $product->fondoMarca->descripcion . ' S/.' . ( floor( $product->thisSubFondo()->saldo * 100 ) / 100 ) }}
+                                    {{ $product->thisSubFondo->subCategoria->descripcion . ' | ' . $product->thisSubFondo->marca->descripcion . ' S/.' . ( floor( $product->thisSubFondo->saldo * 100 ) / 100 ) }}
                                 </span>
-                                <input type="hidden" value="{{ $product->id_fondo . ',' . $product->id_fondo_producto . ',' . $product->id_fondo_user }}" name="fondo_producto[]">
+                                <input type="hidden" value="{{ $product->id_fondo_marketing . ',' . $product->id_tipo_fondo_marketing }}" name="fondo_producto[]">
                             @endif
                             <span class="input-group-addon">{{ $detalle->typemoney->simbolo }}</span>
                             <input name="monto_producto[]" type="text" class="form-control text-right amount_families" value="{{ isset( $product->monto_asignado ) ? $product->monto_asignado : 
@@ -48,8 +48,8 @@
                         <label class="label label-primary">
                             {{ $detalle->typemoney->simbolo . ( isset( $product->monto_asignado ) ? $product->monto_asignado : round( $detalle->monto_actual / count( $solicitud->products ) , 2 ) ) }}
                         </label>
-                        @if( isset( $product->subCatFondo->descripcion ) )
-                            <span class="badge">{{ $product->fondoMarca->descripcion . ' | ' . $product->subCatFondo->descripcion }}</span>    
+                        @if( isset( $product->id_fondo_marketing ) )
+                            <span class="badge">{{ $product->thisSubFondo->subCategoria->descripcion . ' | ' . $product->thisSubFondo->marca->descripcion }}</span>    
                         @endif
                     @endif
                 <input type="hidden" name="producto[]" value="{{ $product->id }}">

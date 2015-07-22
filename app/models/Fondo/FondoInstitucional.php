@@ -7,7 +7,7 @@ use \Eloquent;
 class FondoInstitucional extends Eloquent
 {
 
-	protected $table      = 'FONDO_INSTITUCIONAL';
+	protected $table      = 'FONDO_INSTITUCION';
 	protected $primaryKey = 'id';
 	protected $fillable   = array('id','descripcion');
 

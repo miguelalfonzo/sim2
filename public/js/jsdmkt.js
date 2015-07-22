@@ -1516,16 +1516,19 @@ function seeker( element , name , url )
                     },
                 }).done( function (data)
                 {
+                    console.log( data )
                     if ( data.Status != 'Ok')
                         data.Data = '{"value":"0","label":"Error en la busqueda"}';   
-                    response( data.Data );
+                    return response( data.Data );
                 });              
             }
         }).on('typeahead:selected', function ( evento, suggestion , dataset )
         {
             var input = $(this);
             if ( dataset === 'users' )
+            {
                 $( this ).attr( 'readonly' , '' ).attr( 'data-cod' , suggestion.value ).parent().parent().addClass( 'has-success' );
+            }
             else if ( dataset == 'institutions')
             {
                 $( this ).attr( 'disabled' , true ).attr( 'data-cod' , suggestion.value ).parent().parent().parent().addClass( 'has-success' );

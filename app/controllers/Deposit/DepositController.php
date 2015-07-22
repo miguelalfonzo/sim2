@@ -34,29 +34,25 @@ class DepositController extends BaseController{
         return $array;
     }
 
-    private function validateBalance( $detalle , $tc )
+    private function validateBalance( $solicitud , $detalle , $tc )
     {
-        $fondo = $detalle->fondo;
+        if ( $solicitud->idtiposolicitud == SOL_REP )
+            $fondoMkt = $solicitud->products[0]->thisSubFondo;
+        else
+            $fondoMkt = $solicitud->detalle->thisSubFondo;
+        \Log::error( json_encode( $fondoMkt ) );
         $monto = $detalle->monto_actual;
-        $msg = 'El Saldo del Fondo: '.$fondo->nombre.' '.$fondo->typeMoney->simbolo.' '.$fondo->saldo.' es insuficiente para completar la operación';
-        if ( $detalle->id_moneda == $fondo->id_moneda )
-            if ( $monto > $fondo->saldo )
+        $msg = 'El Saldo del Fondo: '. $fondoMkt->subCategoria->descripcion . ' | ' . $fondoMkt->marca->descripcion . ' S/.' . $fondoMkt->saldo . ' es insuficiente para completar la operación';
+        if ( $detalle->id_moneda == SOLES )
+            if ( $monto > $fondoMkt->saldo )
                 return $this->warningException( $msg , __FUNCTION__ , __LINE__ , __FILE__ );
             else
-                return $this->setRpta($monto);
+                return $this->setRpta( $monto );
         else
-            if ( $detalle->id_moneda == DOLARES )
-                if ( ( $monto * $tc->compra ) > $fondo->saldo )
-                    return $this->warningException( $msg , __FUNCTION__ , __LINE__ , __FILE__ );
-                else
-                    return $this->setRpta( $monto * $tc->compra);
-            elseif ( $detalle->id_moneda == SOLES )
-                if ( ( $monto / $tc->venta ) > $fondo->saldo )
-                    return $this->warningException( $msg , __FUNCTION__ , __LINE__ , __FILE__ );
-                else
-                    return $this->setRpta( $monto / $tc->venta );
+            if ( ( $monto * $tc->compra ) > $fondoMkt->saldo )
+                return $this->warningException( $msg , __FUNCTION__ , __LINE__ , __FILE__ );
             else
-                return $this->warningException( 'Tipo de Moneda no registrada: ' . $detalle->id_moneda , __FUNCTION__ , __LINE__ , __FILE__ );
+                return $this->setRpta( $monto * $tc->compra );
     }
 
     private function validateInpustDeposit( $inputs )
@@ -122,7 +118,7 @@ class DepositController extends BaseController{
                 if ( ! is_null( $detalle->id_deposito )  )
                     return $this->warningException( 'Cancelado - El deposito ya ha sido registrado' , __FUNCTION__ , __LINE__ , __FILE__ );
                 
-                $middleRpta = $this->validateBalance( $detalle , $tc );
+                $middleRpta = $this->validateBalance( $solicitud , $detalle , $tc );
                 if ( $middleRpta[status] == ok )
                 { 
                     $bagoAccount = PlanCta::find( $inputs['num_cuenta'] );
@@ -147,9 +143,10 @@ class DepositController extends BaseController{
                             $solicitud->id_estado = DEPOSITADO;
                         
                         $solicitud->save();
-                        $middleRpta = $this->fondoDecrease( $detalle->fondo , $detalle );
-                        if ( $middleRpta[status] == ok )
-                        {
+                        //$middleRpta = $this->fondoDecrease( $solicitud );
+                        
+                        /*if ( $middleRpta[status] == ok )
+                        {*/
                             $middleRpta = $this->decreaseFondoProduct( $solicitud );
                             if ( $middleRpta[status] == ok )
                             {
@@ -168,7 +165,7 @@ class DepositController extends BaseController{
                                     return $middleRpta;
                                 }
                             }
-                        }      
+                        //}      
                     }
                 }
             }
@@ -182,7 +179,7 @@ class DepositController extends BaseController{
         }
     }
 
-    private function fondoDecrease( $fondo , $detalle )
+    private function fondoDecrease( $solicitud )
     {
         $saldo_inicial = $fondo->saldo;
         if ( $fondo->id_moneda = $detalle->id_moneda )
@@ -214,19 +211,18 @@ class DepositController extends BaseController{
     {
         $products = $solicitud->products;
         $detalle = $solicitud->detalle;
+        $tc = ChangeRate::getTc();
         foreach( $products as $product )
         {
-            if ( $product->user->type == SUP )
-                $subFondo = FondoSupervisor::where( 'supervisor_id' , $product->id_fondo_user )->where( 'marca_id' , $product->id_fondo_producto )->where( 'subcategoria_id' , $product->id_fondo )->first();
-            else
-                $subFondo = FondoGerProd::where( 'fondos_subcategoria_id' , $product->id_fondo )->where( 'marca_id' , $product->id_fondo_producto )->first();
-            $tc = ChangeRate::getTc();
+            $subFondo = $product->thisSubFondo;
+            \Log::error( $subFondo->toJson() );
             if ( $detalle->id_moneda == SOLES )
                 $subFondo->saldo -= $product->monto_asignado ;
             elseif ( $detalle->id_moneda == DOLARES )
                 $subFondo->saldo -= ( $product->monto_asignado * $tc->compra );
             if ( $subFondo->saldo < 0 )
                 return $this->warningException( 'El fondo ' . $subFondo->subCategoria->descripcion . ' solo cuenta con Saldo de S/.' . ( $subFondo->saldo + $product->monto_asignado ) . ' se requiere ' . $solicitud->detalle->typeMoney->simbolo .  $product->monto_asignado . ' para registrar la operacion' , __FUNCTION__ , __LINE__ , __FILE__ );    
+            \Log::error( $subFondo->toJson() );     
             $subFondo->save();
         }
         return $this->setRpta();

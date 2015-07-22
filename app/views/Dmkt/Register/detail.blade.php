@@ -12,7 +12,7 @@
     <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
         <label class="control-label">Clientes</label>
         <div class="scrollable-dropdown-menu">
-            <input class="form-control input-md institucion-seeker" type="text" style="display:inline">
+            <input class="form-control input-md cliente-seeker" type="text" style="display:inline">
         </div>
     </div>
 
@@ -51,6 +51,24 @@
             </div>
         </div>
     </div>
+
+    @if ( isset( $reps ) )
+        <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+            <label class="control-label" for="fecha">Asignar A</label>
+            <div>
+                <select name="responsable" class="form-control">
+                    <option value="0" selected disabled>Seleccione el Representante Responsable</option>    
+                    @foreach( $reps as $rep )
+                        @if( isset( $solicitud ) && $solicitud->id_user_assign == $rep->iduser )
+                            <option value="{{ $rep->iduser }}" selected>{{ $rep->full_name }}</option>
+                        @else
+                            <option value="{{ $rep->iduser }}">{{ $rep->full_name }}</option>
+                        @endif
+                    @endforeach
+                </select>
+            </div>
+        </div>
+    @endif    
     
     <div style="clear:both">
     <!-- PRODUCTOS -->

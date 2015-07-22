@@ -116,7 +116,8 @@ class Seeker extends BaseController
 	{
 		$inputs = Input::all();
 		$json = '[{ "name": "OUTDVP.DMKT_RG_SUPERVISOR" , "wheres":{ "likes": ["( NOMBRES || \' \' || APELLIDOS )" ] , "notnull": ["IDUSER"] } , "selects" : [ "IDUSER" , "( NOMBRES || \' \' || APELLIDOS )" , "\'SUPERVISOR\'" ] } , ' . 
-				'{ "name" : "OUTDVP.GERENTES" , "wheres":{ "likes": ["DESCRIPCION"] , "notnull" : [ "IDUSER" ] } , "selects" : [ "IDUSER" , "DESCRIPCION" , "\'G. PRODUCTO\'"] } ]';
+				'{ "name" : "OUTDVP.GERENTES" , "wheres":{ "likes": ["DESCRIPCION"] , "notnull" : [ "IDUSER" ] } , "selects" : [ "IDUSER" , "DESCRIPCION" , "\'G. PRODUCTO\'"] } , ' .
+				'{ "name" : "OUTDVP.PERSONAS a" , "joins":{ "innerjoin":[ "outdvp.users b" , "a.iduser" , "=" , "b.id" ] } , "wheres":{ "likes": [ "( a.NOMBRES || \' \' || a.APELLIDOS )" ] , "notnull" : [ "a.IDUSER" ] , "in":{ "b.TYPE":[ "GP" , "G" ] } } , "selects" : [ "a.IDUSER" , "( a.NOMBRES || \' \' || a.APELLIDOS )" , "CASE WHEN b.type = \'GP\' THEN \'G. PROMOCION\' WHEN b.type = \'G\' THEN \'G. COMERCIAL\' END" ] }]';
 		$cAlias = array( 'value' , 'label' , "type" );
 		return $this->searchSeeker( $inputs['sVal'] , $json , $cAlias , 2 );			
 	}
@@ -133,6 +134,17 @@ class Seeker extends BaseController
 		    	{
 		    		$select = '';
 		    		$query = DB::table($table->name);
+		    		if( isset( $table->joins ) )
+			    	{
+			    		foreach( $table->joins as $key => $join )
+			    		{
+			    			if( $key == 'innerjoin' )
+			    			{
+			    				$query->join( $join[ 0 ] , $join[ 1 ] , $join[ 2 ] , $join[ 3 ] );
+			    			}
+			    		}
+			    	}
+
 		    		foreach ( $table->wheres as $key => $where )
 		    		{
 		    			if ( $key == 'likes' )
@@ -166,10 +178,18 @@ class Seeker extends BaseController
 		    			$tm->table = $table->name;
 		    		$array = array_merge( $tms , $array );
 		    	}
+		    	\Log::error( DB::getQueryLog() );
+		    	\Log::error( json_encode( $tms ) );
 		    	if ( $type == 1 )
 		    		return $this->setRpta( $array );
 	    		else
-	    			return $this->setRpta( array_filter( $array , array( $this , 'filterUserType' ) ) );
+	    		{
+	    			$arrayfilter = array_filter( $array , array( $this , 'filterUserType' ) );
+	    			$rpta = array();
+	    			foreach( $arrayfilter as $array )
+	    				$rpta[] = $array;
+	    			return $this->setRpta( $rpta );
+		    	}
 		    }
 		    else
 		    	return $this->warningException( 'Json: Formato Incorrecto' , __FUNCTION__ , __LINE__ , __FILE__ );
@@ -179,11 +199,16 @@ class Seeker extends BaseController
 	}
 
 	private function filterUserType( $var )
-	{
+	{	
+		//return true;
 		if ( \Auth::user()->type == SUP )
-			return $var->type == 'SUPERVISOR';
-		else
-			return $var->type == 'G. PRODUCTO';
+			return ( $var->type == 'SUPERVISOR' || $var->type == 'G. PROMOCION' );
+		elseif ( \Auth::user()->type == GER_PROD )
+			return ( $var->type == 'G. PRODUCTO' || $var->type == 'G. COMERCIAL' );
+		elseif ( \Auth::user()->type == GER_COM )
+			return $var->type == 'G. PROMOCION';
+		elseif ( \Auth::user()->type == GER_PROM )
+			return $var->type == 'G. COMERCIAL';
 	}
 
     public function getClientView()

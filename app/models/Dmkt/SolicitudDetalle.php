@@ -117,7 +117,12 @@ class SolicitudDetalle extends Eloquent
     
     public function fondo()
     {
-        return $this->hasOne('Fondo\Fondo','id','id_fondo');
+        return $this->hasOne( 'Fondo\Fondo' , 'id' , 'id_fondo' );
+    }
+
+    protected function thisSubFondo()
+    {
+        return $this->belongsTo( 'Fondo\FondoInstitucional' , 'id_fondo' );
     }
 
     protected function sup()

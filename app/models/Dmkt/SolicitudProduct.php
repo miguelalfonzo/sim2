@@ -25,7 +25,8 @@ class SolicitudProduct extends Eloquent
     {
         $user = Auth::user();
         if ( $user->type != SUP )
-            return DB::table( 'Fondo_Gerente_Producto f' )->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo saldo' , 'fsc.id id' , 'm.id marca_id')
+            return DB::table( 'Fondo_Gerente_Producto f' )
+            ->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo saldo' , 'f.id id' , 'f.marca_id marca_id' , '\'P\' tipo' )
             ->leftJoin( 'fondo_subcategoria fsc' , 'f.subcategoria_id' , '=' , 'fsc.id' )
             ->leftJoin( 'fondo_categoria fc' , 'fsc.id_fondo_categoria' , '=' , 'fc.id' )
             ->leftJoin( 'outdvp.marcas m' , 'f.marca_id' , '=' , 'm.id' )
@@ -33,8 +34,6 @@ class SolicitudProduct extends Eloquent
             {
                 if ( $user->type == GER_PROD )
                     $query->where( 'fsc.tipo' , FONDO_SUBCATEGORIA_GERPROD );
-                elseif( $user->type == ASIS_GER )
-                    $query->where( 'fsc.tipo' , 'I' );
                 else
                     $query->where( 'fsc.tipo' , 'NNN' );
             })->where( 'f.saldo' , '>' , 0 )->orderBy( 'm.descripcion' , 'asc' )->get();
@@ -47,8 +46,8 @@ class SolicitudProduct extends Eloquent
             else
                 $user = Auth::user();
         
-            return DB::table('fondo_supervisor fs')
-            ->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'fs.saldo saldo' , 'fsc.id id' , 'fs.marca_id marca_id' )
+            return DB::table('Fondo_Supervisor fs')
+            ->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'fs.saldo saldo' , 'fs.id id' , 'fs.marca_id marca_id' , '\'S\' tipo' )
             ->leftJoin( 'fondo_subcategoria fsc' , 'fsc.id' , '=' , 'fs.subcategoria_id' )
             ->leftJoin( 'fondo_categoria fc' , 'fc.id' , '=' , 'fsc.id_fondo_categoria' )
             ->leftJoin( 'outdvp.marcas m' , 'fs.marca_id' , '=' , 'm.id' )
@@ -64,10 +63,9 @@ class SolicitudProduct extends Eloquent
     public function thisSubFondo()
     {
         if ( $this->id_tipo_fondo_marketing == GER_PROD )
-            $rpta = FondoGerProd::find( $this->id_fondo_marketing );
+            return $this->belongsTo( 'Fondo\FondoGerProd' , 'id_fondo_marketing' );
         else
-            $rpta = FondoSupervisor::find( $this->id_fondo_marketing );
-        return $rpta;
+            return $this->belongsTo( 'Fondo\FondoSupervisor' , 'id_fondo_marketing' );
     }
 
 

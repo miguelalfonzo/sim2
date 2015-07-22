@@ -3,6 +3,14 @@
         <h2>{{$solicitud->titulo}} <span class="label label-default">{{{ $solicitud->activity->nombre or '' }}}</span></h2>
     </div>
 
+    <!-- INVERSION -->
+    @if ( ! is_null( $solicitud->id_inversion ) )
+	    <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+	        <label class="control-label">Tipo de Inversión</label>
+	        <input type="text" class="form-control input-md" value="{{$solicitud->investment->nombre}}" readonly>
+	    </div>
+    @endif
+
 	<!-- Monto -->
 	@include('Dmkt.Solicitud.Detail.monto')
 
@@ -46,7 +54,7 @@
 	@endif
 
 	<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
-		<label class="control-label">Nº de Cuenta del Representante</label>
+		<label class="control-label">Nº de Cuenta Bagó del Representante</label>
 		<div>
 			<input type="text" class="form-control" value="{{$detalle->num_cuenta}}" disabled>
 		</div>
@@ -54,6 +62,16 @@
 
 	<!-- DEPOSITADO -->
 	@include('Dmkt.Solicitud.Detail.depositado')
+
+	<!-- N° de Operacion relacionada al deposito -->
+	@if( Auth::user()->type == TESORERIA && !is_null( $solicitud->id_deposito ) )
+		<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+			<label class="control-label">Nº de Operación</label>
+			<div>
+				<input type="text" class="form-control" value="{{$detalle->deposito->num_transferencia}}" disabled>
+			</div>
+		</div>
+	@endif
 
 	<!-- Tasa del Día del Deposito -->
 	@include('Dmkt.Solicitud.Detail.tasa')

@@ -250,6 +250,12 @@ class ExpenseController extends BaseController
 				return $this->warninException( 'No se encontro la solicitud con token: '.$inputs['token'] , __FUNCTION__ , __LINE__ , __FILE__ );
 			if ( $solicitud->idtiposolicitud == SOL_INST && ! isset( $inputs[ 'inversion'] ) && ! isset( $inputs[ 'actividad' ] ) )
 				return array( status => 'Info' , 'View' => View::make( 'Dmkt.Register.Institucional' , array( 'investments' => InvestmentType::order() , 'activities' => Activity::order() ) )->render() );
+			else if ( $solicitud->idtiposolicitud == SOL_INST && isset( $inputs[ 'inversion'] ) && isset( $inputs[ 'actividad' ] ) )
+			{
+				$solicitud->id_actividad = $inputs[ 'actividad' ];
+				$solicitud->id_inversion = $inputs[ 'inversion' ];
+			}
+
 			$oldIdEstado = $solicitud->id_estado;
 			$solicitud->id_estado = REGISTRADO;
 			$solicitud->save();

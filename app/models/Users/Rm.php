@@ -3,6 +3,7 @@
 namespace Users;
 
 use \Eloquent;
+use \Auth;
 
 class Rm extends Eloquent
 {
@@ -17,6 +18,14 @@ class Rm extends Eloquent
             return 0;
         else
             return $lastId->idrm;
+    }
+
+    protected static function order()
+    {
+        if ( Auth::user()->type == SUP )
+            return Rm::where( 'idsup' , Auth::user()->sup->idsup )->orderBy( 'nombres' , 'asc' )->get();
+        else
+            return Rm::orderBy( 'nombres' , 'asc' )->get();
     }
 
     protected function getSup( $idUser )
