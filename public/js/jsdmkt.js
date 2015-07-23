@@ -793,12 +793,12 @@ $(document).on( 'click' , '.register_fondo' , function()
         var periodo = $(".date_month").val();
         var dato = 
         {
-            '_token'      : GBREPORTS.token,
+            '_token'          : GBREPORTS.token,
             'institucion-cod' : fondo_institucion.attr('data-cod'),
-            'codrepmed'   : fondo_repmed.attr('data-cod'),
-            'total'       : fondo_total.val(),
-            'idfondo'     : fondo.val(),
-            'mes'         : periodo
+            'codrepmed'       : fondo_repmed.attr('data-cod'),
+            'total'           : fondo_total.val(),
+            'fondo_producto'  : $( 'select[name="fondo_producto[]"]').val(),
+            'mes'             : periodo
         };
         date_reg_fondo.last().val(date_reg_fondo.val());
         var l = Ladda.create(aux);
@@ -936,7 +936,7 @@ $(document).on('click','.edit-fondo' , function(e)
             fondo_institucion.val( data.institucion ).attr( 'data-cod' , data[ 'institucion-cod' ] ).attr( 'disabled' , true ).attr( 'data-select' , true ).parent().parent().parent().addClass( 'has-success' );
             date_reg_fondo.val( data.periodo.substr(4,6) + '-' + data.periodo.substr(0,4) );
             id_solicitud.val(idsolicitud);
-            $('select[name=idfondo]').val(data.idfondo);
+            $('select[name="fondo_producto[]"]').val( data.idfondo );
         }
         else
             bootbox.alert('<h4 class=""red>' + data.Status + ': ' + data.Description + '</h4>');
@@ -949,7 +949,7 @@ function fondoData()
         _token          : GBREPORTS.token,
         codrepmed       : fondo_repmed.attr( 'data-cod' ),
         total           : fondo_total.val(),
-        idfondo         : fondo.val(),
+        fondo_producto  : $('select[name="fondo_producto[]"]').val(),
         mes             : $( '.date_month' ).val() 
     };         
     data[ 'institucion-cod' ] = fondo_institucion.attr( 'data-cod' );

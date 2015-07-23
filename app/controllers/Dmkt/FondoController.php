@@ -80,8 +80,8 @@ class FondoController extends BaseController
         foreach ( $solicitud as $sol )
         {
             $detalle = $sol->detalle;
-            $typeMoney = $detalle->fondo->typeMoney;
-            $totales[$typeMoney->simbolo] += $detalle->monto_actual ;
+            //$typeMoney = $detalle->fondo->typeMoney;
+            $totales[ 'S/.'] += $detalle->monto_actual ;
         }
         return $this->setRpta( $totales );
     }
@@ -102,13 +102,13 @@ class FondoController extends BaseController
         foreach( $solicituds as $solicitud )
         {
             $detalle = $solicitud->detalle;
-            $fondo = $detalle->fondo;
+            $fondo = $detalle->thisSubFondo;
             if ( isset( $montos[ $fondo->id ] ) )
                 $montos[ $fondo->id ] += $detalle->monto_solicitado;
             else
                 $montos[ $fondo->id] = $detalle->monto_solicitado;
             if ( $montos[ $fondo->id ] > $fondo->saldo )
-                return $this->warningException( 'No se cuenta con saldo en el fondo ' . $fondo->nombre . ' para terminar los Fondos Institucionales.'  , __FUNCTION__ , __LINE__ , __FILE__ );
+                return $this->warningException( 'No se cuenta con saldo en el fondo ' . $fondo->subCategoria->descripcion . ' para terminar los Fondos Institucionales.'  , __FUNCTION__ , __LINE__ , __FILE__ );
             $jDetalle = json_decode( $detalle->detalle );
             $jDetalle->monto_aprobado = $jDetalle->monto_solicitado;
             $detalle->detalle = json_encode( $jDetalle );
@@ -123,7 +123,7 @@ class FondoController extends BaseController
                 'institucion-cod'   => $solicitud->clients()->where( 'id_tipo_cliente' , 3 )->first()->id_cliente ,
                 'codrepmed'         => $solicitud->asignedTo->rm->idrm,
                 'total'             => $solicitud->detalle->monto_aprobado,
-                'idfondo'           => $solicitud->detalle->id_fondo,
+                'fondo_producto'           => $solicitud->detalle->id_fondo,
                 'mes'               => $this->nextPeriod( $solicitud->detalle->periodo->aniomes ) );
             $middleRpta = $this->processsInstitutionalSolicitud( $inputs );
             if ( $middleRpta[ status ] != ok )
@@ -158,7 +158,8 @@ class FondoController extends BaseController
                 $periodos->save();
                 DB::commit();
             }
-            DB::rollback();
+            else
+                DB::rollback();
             return $middleRpta;
         }
         catch (Exception $e)
@@ -190,7 +191,7 @@ class FondoController extends BaseController
                            'codsup'          => $inputs[ 'codsup' ] ,
                            'num_cuenta'      => $inputs[ 'cuenta' ] ,
                            'monto_solicitado'=> $inputs[ 'total' ] );
-        $detalle->id_fondo   = $inputs[ 'idfondo' ] ;
+        $detalle->id_fondo   = $inputs[ 'fondo_producto' ] ;
         $detalle->id_periodo = $idPeriodo;
         $detalle->id_moneda  = SOLES;
         $detalle->detalle = json_encode($jDetalle);
@@ -219,8 +220,12 @@ class FondoController extends BaseController
             $middleRpta = $this->validateInputSolInst( $inputs );
             if ( $middleRpta[status] == ok )
             {
-                DB::commit();    
-                return $this->processsInstitutionalSolicitud( $inputs );
+                $middleRpta = $this->processsInstitutionalSolicitud( $inputs );
+                if ( $middleRpta[ status] == ok )
+                    DB::commit();
+                else
+                    DB::rollback();
+                return $middleRpta;    
             }
             DB::rollback();
             return $middleRpta;
@@ -303,7 +308,7 @@ class FondoController extends BaseController
             $data[]   = $detalle->num_cuenta;
             //$data[]   = $detalle->supervisor;
             //$data[]   = $detalle->fondo->typeMoney->simbolo;
-            $data[]   = $detalle->fondo->typeMoney->simbolo . $detalle->monto_actual;
+            $data[]   = 'S/.' . $detalle->monto_actual;
             $rpta[]   = $data ;
         }
         return $rpta;
@@ -434,7 +439,7 @@ class FondoController extends BaseController
                         'institucion-cod' => 'required|numeric|min:1',
                         'codrepmed'       => 'required|integer|min:1|exists:ficpe.visitador,visvisitador',
                         'total'           => 'required|numeric|min:1',
-                        'idfondo'         => 'required|integer|min:1|exists:fondo,id,idusertype,AG',
+                        'fondo_producto'  => 'required|string|min:1',
                         'mes'             => 'required|string|date_format:m-Y|after:'.date("Y-m") );
         $validator = Validator::make($inputs, $rules);
         if ($validator->fails()) 

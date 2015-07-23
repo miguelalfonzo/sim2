@@ -238,6 +238,65 @@ class ExpenseController extends BaseController
 		}
 	}
 
+	private function renewFondo( $solicitud , $monto_descuento )
+	{
+		$tc = ChangeRate::getTc();
+		if ( $solicitud->idtiposolicitud == SOL_REP )
+		{
+			$solicitudProducts = $solicitud->products;
+			$monto_aprobado    = $solicitud->detalle->monto_aprobado;
+ 		    foreach( $solicitudProducts as $solicitudProduct )
+		    {
+		    	$fondo 			= $solicitudProduct->thisSubFondo;
+		    	$monto_renovado = ( $monto_descuento / $monto_aprobado ) * $solicitudProduct->monto_asignado;
+		    	if ( $solicitud->detalle->id_moneda == DOLARES )
+		    		$monto_renovado = $monto_renovado * $tc->compra;
+		    	$fondo->saldo += $monto_renovado;
+		    	$fondo->save();
+		    }
+		}
+		else
+		{
+			$fondo = $solicitud->detalle->thisSubFondo;
+			$fondo->saldo += $monto_descuento;
+		}
+	}
+
+	public function confirmDiscount()
+	{
+		try
+		{
+			$inputs     = Input::all();
+			$middleRpta = $this->validateDiscount( $inputs );
+			if ( $middleRpta[ status] == ok )
+			{
+				$solicitud  = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
+				$detalle    = $solicitud->detalle;
+				$totalGasto = $solicitud->expenses->sum( 'monto' );
+				if ( $solicitud->id_estado != REGISTRADO )
+					return $this->warningException( 'La solicitud no esta habilitado para que realize el descuento. Se requiere que se culmine con el Registro de Gastos' , __FUNCTION__ , __LINE__ , __FILE__ );
+				if ( $totalGasto >= $detalle->monto_aprobado )
+					return $this->warningException( 'No existe un saldo en contra del responsable para realizar un descuento' , __FUNCTION__ , __LINE__ , __FILE__ );
+				$jDetalle   = json_decode( $detalle->detalle );
+				if ( isset( $jDetalle->descuento ) )
+					return $this->warningException( 'Ya ha registrado el Descuento' , __FUNCTION__ , __LINE__ , __FILE__ );
+				
+				$monto_descuento           = $detalle->monto_aprobado - $totalGasto;
+				$jDetalle->descuento 	   = $inputs[ 'periodo' ];
+				$jDetalle->monto_descuento = $monto_descuento;
+				$detalle->detalle    	   = json_encode( $jDetalle );
+				$detalle->save();
+				$this->renewFondo( $solicitud , $monto_descuento );
+				return $this->setRpta();
+			}
+			return $middleRpta;
+		}
+		catch( Exception $e )
+		{
+			return $this->internalException( $e , __FUNCTION__ );
+		}
+	}
+
 	// IDKC: CHANGE STATUS => REGISTRADO
 	public function finishExpense()
 	{
@@ -255,6 +314,9 @@ class ExpenseController extends BaseController
 				$solicitud->id_actividad = $inputs[ 'actividad' ];
 				$solicitud->id_inversion = $inputs[ 'inversion' ];
 			}
+
+			//$totalGasto
+
 
 			$oldIdEstado = $solicitud->id_estado;
 			$solicitud->id_estado = REGISTRADO;
@@ -539,37 +601,6 @@ class ExpenseController extends BaseController
 		catch ( Exception $e ) 
 		{
 			return $this->internalException( $e , __FUNCTION__ );	
-		}
-	}
-
-	public function confirmDiscount()
-	{
-		try
-		{
-			$inputs     = Input::all();
-			$middleRpta = $this->validateDiscount( $inputs );
-			if ( $middleRpta[ status] == ok )
-			{
-				$solicitud  = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
-				$detalle    = $solicitud->detalle;
-				$totalGasto = $solicitud->expenses->sum( 'monto' );
-				if ( $solicitud->id_estado != REGISTRADO )
-					return $this->warningException( 'La solicitud no esta habilitado para que realize el descuento. Se requiere que se culmine con el Registro de Gastos' , __FUNCTION__ , __LINE__ , __FILE__ );
-				if ( $totalGasto >= $detalle->monto_aprobado )
-					return $this->warningException( 'No existe un saldo en contra del responsable para realizar un descuento' , __FUNCTION__ , __LINE__ , __FILE__ );
-				$jDetalle   = json_decode( $detalle->detalle );
-				if ( isset( $jDetalle->descuento ) )
-					return $this->warningException( 'Ya ha registrado el Descuento' , __FUNCTION__ , __LINE__ , __FILE__ );
-				$jDetalle->descuento = $inputs[ 'periodo' ];
-				$detalle->detalle    = json_encode( $jDetalle );
-				$detalle->save();
-				return $this->setRpta();
-			}
-			return $middleRpta;
-		}
-		catch( Exception $e )
-		{
-			return $this->internalException( $e , __FUNCTION__ );
 		}
 	}
 

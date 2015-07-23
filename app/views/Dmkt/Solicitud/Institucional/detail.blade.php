@@ -22,7 +22,7 @@
 				<span class="input-group-addon">
 		            <i class="glyphicon glyphicon-calendar"></i>
 		        </span>
-				<input id="periodo" class="form-control date_month" type="text" value="{{$detalle->periodo->periodo}}" disabled>
+				<input class="form-control date_month" type="text" value="{{$detalle->periodo->periodo}}" disabled>
 			</div>
 		</div>
 	</div>
@@ -35,23 +35,14 @@
 
 	<!-- Supervisor -->
 	<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
-		<label class="control-label" for="sup">Supervisor</label>
-		 <div class="input-group">
+		<label class="control-label"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Supervisor</label>
+		<div class="input-group">
 		 	<span class="input-group-addon">S</span>   
 	        <input type="text" class="form-control input-md" value="{{$detalle->supervisor}}" disabled>
 		</div>
 	</div>
 
 	@include('Dmkt.Solicitud.Detail.fondo')
-
-	@if ( ! is_null( $solicitud->toAdvanceSeatHistory ) )
-		<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
-			<label class="control-label">Número de Operación, Transacción, Cheque</label>
-			<div>
-				<input type="text" class="form-control" value="{{ $detalle->num_cuenta }}" disabled>	
-			</div>
-		</div>
-	@endif
 
 	<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
 		<label class="control-label">Nº de Cuenta Bagó del Representante</label>
@@ -64,11 +55,11 @@
 	@include('Dmkt.Solicitud.Detail.depositado')
 
 	<!-- N° de Operacion relacionada al deposito -->
-	@if( Auth::user()->type == TESORERIA && !is_null( $solicitud->id_deposito ) )
+	@if( ( Auth::user()->type == TESORERIA || Auth::user()->type == CONT ) && !is_null( $detalle->id_deposito ) )
 		<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
 			<label class="control-label">Nº de Operación</label>
 			<div>
-				<input type="text" class="form-control" value="{{$detalle->deposito->num_transferencia}}" disabled>
+				<input type="text" class="form-control" value="{{ $detalle->deposit->num_transferencia }}" disabled>
 			</div>
 		</div>
 	@endif

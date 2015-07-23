@@ -15,14 +15,14 @@
 			<tr>
 				<td>
 					@if( $solicitud->idtiposolicitud == SOL_REP )
-						{{ $solicitud->products[ 0 ]->subCatFondo->accountFondo->nombre }}
+						{{ $solicitud->products[ 0 ]->thisSubFondo->subCategoria->accountFondo->nombre }}
 					@else
 						{{ $solicitud->detalle->fondo->nombre }}
 					@endif
 				</td>
 				<td>
 					@if( $solicitud->idtiposolicitud == SOL_REP )
-						{{ $solicitud->products[ 0 ]->subCatFondo->accountFondo->num_cuenta }}</td>
+						{{ $solicitud->products[ 0 ]->thisSubFondo->subCategoria->accountFondo->num_cuenta }}</td>
 					@else
 						{{ $solicitud->detalle->fondo->num_cuenta }}
 					@endif

@@ -21,7 +21,7 @@
                     <strong><p style="display:inline">Autorizado por:</strong>&nbsp;{{$solicitud->approvedHistory->updatedBy->gerProd->full_name}}</p>
                     <strong><p style="display:inline">Cargo:</strong>&nbsp;G. Producto</p>
                 @endif    
-                <strong><p style="display:inline">Fondo:</strong>&nbsp;{{mb_convert_case($solicitud->detalle->fondo->nombre,MB_CASE_TITLE,'UTF-8')}}</p>
+                <strong><p style="display:inline">Fondo:</strong>&nbsp;{{mb_convert_case($solicitud->products[0]->thisSubFondo->subCategoria->accountFondo->nombre,MB_CASE_TITLE,'UTF-8')}}</p>
                 <strong><p style="display:inline">Código Comercial:</strong>&nbsp;{{$solicitud->id}}</p>
             </section>
             <section style="text-align:center;margin-top:2em;">

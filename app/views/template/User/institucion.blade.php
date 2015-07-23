@@ -27,7 +27,15 @@
                     </div>
 
                     <!-- Fondos -->
-                    @include('Dmkt.Solicitud.Detail.fondo')
+                     <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+                        <label class="control-label">Fondo</label>
+                        <select name="fondo_producto[]" class="selectpicker form-control">
+                            <option selected disabled value="0">Seleccione el Fondo</option>
+                            @foreach( $subFondos as $subFondo )
+                                <option value="{{ $subFondo->id }}" style="background-color:#00FFFF">{{ $subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     
                     <div class="clearfix"></div>
 

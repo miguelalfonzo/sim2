@@ -151,6 +151,8 @@ const ALERTA_TIEMPO_REGISTRO_GASTO 		 = 2;
 const ALERTA_INSTITUCION_CLIENTE		 = 3;
 
 const FONDO_SUBCATEGORIA_GERPROD = NULL;
+const FONDO_SUBCATEGORIA_SUPERVISOR = 'S';
+const FONDO_SUBCATEGORIA_INSTITUCION = 'I';
 /*
 |--------------------------------------------------------------------------
 | EVENT 
@@ -163,3 +165,4 @@ const FILESTORAGE_DIR                         = 'uploads/';
 const APP_ID                                  = 2;
 
 const TITULO_INSTITUCIONAL 					  = 'FONDO INSTITUCIONAL';
+const MONTO_DESCUENTO_PLANILLA                = 50;

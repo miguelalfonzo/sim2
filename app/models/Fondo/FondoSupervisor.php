@@ -14,4 +14,9 @@ class FondoSupervisor extends Eloquent
 	{
 		return $this->hasOne( 'Fondo\FondoSubCategoria' , 'id' , 'subcategoria_id' );
 	}
+
+	public function marca()
+	{
+		return $this->belongsTo('Dmkt\Marca', 'marca_id' );
+	}
 }

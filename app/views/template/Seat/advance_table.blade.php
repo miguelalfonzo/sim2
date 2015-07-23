@@ -18,16 +18,16 @@
 						<tr>
 							<td class="name_account">
 								@if( $solicitud->idtiposolicitud == SOL_REP )
-									{{ $solicitud->products[ 0 ]->subCatFondo->accountFondo->nombre }}
+									{{ $solicitud->products[ 0 ]->thisSubFondo->subCategoria->accountFondo->nombre }}
 								@else
-									{{ $solicitud->detalle->fondo->nombre }}
+									{{ $solicitud->detalle->thisSubFondo->subCategoria->accountFondo->nombre }}
 								@endif
 							</td>
 							<td class="number_account">
 								@if( $solicitud->idtiposolicitud == SOL_REP )
-									{{ $solicitud->products[ 0 ]->subCatFondo->accountFondo->num_cuenta }}</td>
+									{{ $solicitud->products[ 0 ]->thisSubFondo->subCategoria->accountFondo->num_cuenta }}</td>
 								@else
-									{{ $solicitud->detalle->fondo->num_cuenta }}
+									{{ $solicitud->detalle->thisSubFondo->subCategoria->accountFondo->num_cuenta }}
 								@endif
 							<td class="date_ini">{{ $solicitud->detalle->deposit->updated_at }}</td>
 							<td class="dc">D</td>
