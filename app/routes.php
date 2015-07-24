@@ -1,11 +1,12 @@
 <?php
 
+    Route::get('getSpecialty/{cmp}', 'Expense\ExpenseController@getSpecialty');
     /*
     |--------------------------------------------------------------------------
     | TESTING
     |--------------------------------------------------------------------------
     */
-    Route::get( 'testalert' , 'TestController@testalert');
+    Route::get('testalert' , 'TestController@testalert');
     Route::get('dt' , 'TestController@dt');
     Route::get('test', array('uses' => 'Dmkt\LoginController@test'));
     Route::get('set_status', array('uses' => 'BaseController@setStatus'));

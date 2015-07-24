@@ -81,10 +81,11 @@ class AlertController extends BaseController
 			if ( count( array_intersect( $solicitud_tipo_cliente, $tipo_cliente_requerido ) ) <= 1 )
 				unset( $solicituds[ $key ] );
 		}
-		$clientList = array();
-		$compare_second_id = array();
+		$clientList         = array();
+		$compare_second_id  = array();
 		$compare_initial_id = array();
-		$clienteArray= array();
+		$clienteArray       = array();
+		$result             = array();
 		foreach( $solicituds as $solicitud_inicial )
 		{
 			foreach ( $solicituds as $solicitud_secundaria )

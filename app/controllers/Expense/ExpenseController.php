@@ -339,23 +339,44 @@ class ExpenseController extends BaseController
 		}
 	}
 
-
+	public function getSpecialty($cmp){
+		$query = "SELECT " .
+						"P.PEFCODPERS as CMP, " .
+						"P.PEFPATERNO as APELLIDO, " .
+						"E1.NOMESP AS ESPECIALIDAD1, " .
+						"E2.NOMESP AS ESPECIALIDAD2 " .
+					"FROM " .
+						"FICPE.PERSONAFIS P " .
+							"LEFT JOIN " .
+							  "FICPE.ESPECIAL E1 " .
+							  "ON TO_NUMBER(NVL(TRIM(P.PEFESPECIAL1),'0')) = E1.CODESP " .
+							"LEFT JOIN " .
+							  "FICPE.ESPECIAL E2 " .
+							  "ON TO_NUMBER(NVL(TRIM(P.PEFESPECIAL2),'0')) = E2.CODESP " .
+					"WHERE " .
+					  "P.PEFNRODOC1 = $cmp";
+		Log::error($query);					  
+		$result = DB::select($query);
+		return $result[0];
+	}
 
 	public function reportExpense($token)
 	{
 		$solicitud = Solicitud::where('token',$token)->firstOrFail();
-		$detalle = $solicitud->detalle;
-		$jDetalle = json_decode( $solicitud->detalle->detalle );
-		$clientes   = array();
-		$cmps = array();
+		$detalle   = $solicitud->detalle;
+		$jDetalle  = json_decode( $solicitud->detalle->detalle );
+		$clientes  = array();
+		$cmps      = array();
+		$getSpecialty = array();
 		foreach($solicitud->clients as $client)
         {
-        	$clientes[] = $client->clientType->descripcion . ' : ' . $client->{$client->clientType->relacion}->full_name;
-        	$cmps[] = $client->{$client->clientType->relacion}->pefnrodoc1;
+			$clientes[] = $client->clientType->descripcion . ': ' . $client->{$client->clientType->relacion}->full_name;
+			$cmps[]     = $client->{$client->clientType->relacion}->pefnrodoc1;
+			$getSpecialty
         }
-        $clientes = implode(',',$clientes);
-        $cmps = implode(',',$cmps);
-        $cmps = trim( $cmps , ',' );
+		$clientes = implode('<br>',$clientes);
+		$cmps     = implode(', ',$cmps);
+		$cmps     = trim($cmps, ', ' );
 		if($solicitud->createdBy->type == REP_MED )
 			$created_by = $solicitud->rm->full_name;
 		else if ($solicitud->createdBy->type == SUP )
@@ -413,20 +434,22 @@ class ExpenseController extends BaseController
 					   'total'      => $total );
 		$data['balance'] = $this->reportBalance( $solicitud , $detalle , $jDetalle , $total );
 		$html = View::make( 'Expense.report' , $data )->render();
+		// return View::make( 'Expense.report' , $data )->render();
 		//return View::make('Expense.report',$data);//->render();
 		//return $html;
 		//return PDF::load( $html , 'A4' , 'landscape' )->show();
-		return PDF2::loadHTML( $html )->setPaper( 'a4' , 'portrait' )->stream();
+		return PDF2::loadHTML( $html )->setPaper( 'a4' , 'landscape' )->stream();
+		// return $html;
 	}
 
 	public function reportExpenseFondo($token)
 	{
-        $fondo = Solicitud::where('token',$token)->first();
-        $detalle = $fondo->detalle;
-        $jDetalle = json_decode( $detalle->detalle );
-        $expense = $fondo->expenses;
-        $dni = new BagoUser;
-		$dni = $dni->dni($fondo->createdBy->username);
+		$fondo    = Solicitud::where('token',$token)->first();
+		$detalle  = $fondo->detalle;
+		$jDetalle = json_decode( $detalle->detalle );
+		$expense  = $fondo->expenses;
+		$dni      = new BagoUser;
+		$dni      = $dni->dni($fondo->createdBy->username);
 		if ($dni[status] == ok )
 			$dni = $dni[data];
 		else
