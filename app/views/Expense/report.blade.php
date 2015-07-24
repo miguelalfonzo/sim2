@@ -49,12 +49,22 @@
                             <td class="sin-border text-left">G. Producto</td>
                         @else
                             <th class="sin-border text-right">Autorizado por:</th>
-                            <td class="sin-border text-left"></td>
+                            <td class="sin-border text-left">
+                                @if( $solicitud->approvedHistory->createdBy->type == SUP )
+                                    
+                                @if( $solicitud->approvedHistory->createdBy->type == SUP )
+
+                                @if( $solicitud->approvedHistory->createdBy->type == SUP )
+
+                                @endif                                
+                            </td>
                             <th class="sin-border text-right">Cargo:</th>
-                            <td class="sin-border text-left"></td>
+                            <td class="sin-border text-left">
+
+                            </td>
                         @endif
                             <th class="sin-border text-right">Fondo:</th>
-                            <td class="sin-border text-left">{{mb_convert_case($solicitud->detalle->fondo->nombre,MB_CASE_TITLE,'UTF-8')}}</td>   
+                            <td class="sin-border text-left">{{mb_convert_case($solicitud->products[0]->thisSubFondo->subCategoria->descripcion ,MB_CASE_TITLE,'UTF-8')}}</td>   
                             <th class="sin-border text-right">Código Comercial:</th>
                             <td class="sin-border text-left">{{$solicitud->id}}</td>   
                         </tr>
