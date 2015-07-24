@@ -52,19 +52,16 @@
                             <td class="sin-border text-left">
                                 @if( $solicitud->approvedHistory->createdBy->type == SUP )
                                     {{ $solicitud->approvedHistory->createdBy->sup->full_name }}
-                                    <th class="sin-border text-right">Cargo:</th>
-                                    <td class="sin-border text-left">Supervisor</td>
                                 @elseif( $solicitud->approvedHistory->createdBy->type == GER_PROD )
                                     {{ $solicitud->approvedHistory->createdBy->gerProd->full_name }}  
-                                    <th class="sin-border text-right">Cargo:</th>
-                                    <td class="sin-border text-left">Gerente de Producto</td>  
                                 @elseif( ! is_null( $solicitud->approvedHistory->createdBy->simApp ) )
                                     {{ $solicitud->approvedHistory->createdBy->person->full_name }}
-                                    <th class="sin-border text-right">Cargo:</th>
-                                    <td class="sin-border text-left"></td>
                                 @endif                                
                             </td>
-                            
+                            <th class="sin-border text-right">Cargo:</th>
+                            <td class="sin-border text-left">
+                                {{ $solicitud->approvedHistory->createdBy->userType->descripcion }}  
+                            </td>
                         @endif
                             <th class="sin-border text-right">Fondo:</th>
                             <td class="sin-border text-left">{{mb_convert_case($solicitud->products[0]->thisSubFondo->subCategoria->descripcion ,MB_CASE_TITLE,'UTF-8')}}</td>   

@@ -75,12 +75,7 @@ class DepositController extends BaseController{
 
     private function decreaseBalance( $solicitud )
     {
-        if ( $solicitud->idtiposolicitud == SOL_INST )
-        {    
-            $middleRpta = $this->decreaseFondo( $solicitud );
-            return $middleRpta;
-        }
-        return $this->setRpta();
+        return $this->decreaseFondo( $solicitud );
     }
 
     private function validateInpustDeposit( $inputs )
@@ -146,9 +141,13 @@ class DepositController extends BaseController{
                 if ( ! is_null( $detalle->id_deposito )  )
                     return $this->warningException( 'Cancelado - El deposito ya ha sido registrado' , __FUNCTION__ , __LINE__ , __FILE__ );
                 
-                $middleRpta = $this->validateBalance( $solicitud , $detalle , $tc );
-                if ( $middleRpta[status] == ok )
-                { 
+                if ( $solicitud->idtiposolicitud == SOL_INST )
+                {
+                    $middleRpta = $this->validateBalance( $solicitud , $detalle , $tc );
+                    if ( $middleRpta[status] != ok )
+                        return $middleRpta;
+                }
+
                     $bagoAccount = PlanCta::find( $inputs['num_cuenta'] );
                     if ( $bagoAccount->account->idtipocuenta != BANCO )
                         return $this->warningException( 'Cancelado - La cuenta N°: '.$inputs['num_cuenta'].' no ha sido registrada en el Sistema como Cuenta de Banco' , __FUNCTION__ , __LINE__ , __FILE__ );
@@ -187,7 +186,7 @@ class DepositController extends BaseController{
                             return $middleRpta;
                         }
                         
-                    }
+                    
                 }
             }
             DB::rollback();
