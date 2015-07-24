@@ -757,13 +757,16 @@ class SolicitudeController extends BaseController
             {
                 $status = array( ok => array() , error => array() );
                 $message = '';
-                foreach($inputs['solicitudes'] as $solicitud )
+                foreach( $inputs['solicitudes'] as $solicitud )
                 {
                     $solicitud = Solicitud::where( 'token' , $solicitud )->first();
+                    $ids_fondos = $solicitud->orderProducts()->lists( 'id_fondo_marketing'  , 'id_tipo_fondo_marketing' );
+                    \Log::error( $ids_fondos );
                     $inputs = array( 'idsolicitud' => $solicitud->id ,
                                      'monto'       => $solicitud->detalle->monto_actual ,
                                      'producto'    => $solicitud->orderProducts()->lists( 'id' ),
-                                     'anotacion'   => $solicitud->anotacion );
+                                     'anotacion'   => $solicitud->anotacion ,
+                                    );// 'fondo_producto' =>);
 
                     $solProducts = $solicitud->orderProducts();
                     if ( $solicitud->id_estado == DERIVADO )

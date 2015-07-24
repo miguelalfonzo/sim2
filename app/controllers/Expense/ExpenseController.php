@@ -346,7 +346,7 @@ class ExpenseController extends BaseController
 			$jDetalle       = json_decode( $detalle->detalle );
 
 			if ( $solicitud->idtiposolicitud == SOL_REP )
-				if ( $balance > 0 )
+				if ( $balance > MONTO_DESCUENTO_PLANILLA )
 					if ( isset( $inputs[ 'numero_operacion_devolucion' ] ) && ! empty( trim( $inputs[ 'numero_operacion_devolucion'] ) ) )
 					{
 						$userTo = $this->setDevolucion( $solicitud , $detalle , $jDetalle , $inputs );
@@ -357,7 +357,7 @@ class ExpenseController extends BaseController
 				        	'View'  => View::make( 'Dmkt.Register.expense-missing-data' , array( 'devolucion' => true ) )->render() ,
 					        'Type'  => 'D' ,
 					        'Title' => 'Registro de la Operacion de Devolución' );
-				elseif ( $balance == 0 )
+				elseif ( $balance <= MONTO_DESCUENTO_PLANILLA && $balance >= 0  )
 				{
 					$solicitud->id_estado = REGISTRADO;
 					$userTo 			  = USER_CONTABILIDAD;
@@ -365,7 +365,7 @@ class ExpenseController extends BaseController
 				else
 					return $this->warningException( 'No se puede registrar los gastos si exceden al monto depositado' , __FUNCTION__ , __FILE__ , __LINE__ );
 			elseif( $solicitud->idtiposolicitud == SOL_INST )
-				if( $balance > 0 )
+				if( $balance > MONTO_DESCUENTO_PLANILLA )
 				{
 					if ( isset( $inputs[ 'inversion'] ) && isset( $inputs[ 'actividad' ] ) && isset( $inputs[ 'numero_operacion_devolucion' ] ) )
 					{
