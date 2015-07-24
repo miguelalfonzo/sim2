@@ -365,18 +365,15 @@ class SolicitudeController extends BaseController
             if ( $middleRpta[ status ] != ok )
                 return $middleRpta;
             $solProduct->save();
-            
+            $userTypeforDiscount = $solProduct->id_tipo_fondo_marketing;
             $ids_fondo_mkt[] = array( 'old'         => $old_id_fondo_mkt , 
                                       'oldUserType' => $old_cod_user_type , 
                                       'oldMonto'    => $old_ammount ,
                                       'new'         => $solProduct->id_fondo_marketing ,
                                       'newMonto'    => $solProduct->monto_asignado );   
         }
-
-        $middleRpta = $this->validateBalance( $userTypes , $fondos , $fondo_total );
-        if ( $middleRpta[ status ] == ok )
-            $this->discountBalance( $ids_fondo_mkt , $middleRpta[ data ] , $moneda , $tc );
-        return $middleRpta;
+        $this->discountBalance( $ids_fondo_mkt , $userTypeforDiscount , $moneda , $tc );    
+        return $this->validateBalance( $userTypes , $fondos , $fondo_total );
     }
 
     private function discountBalance( $ids_fondo , $userType = NULL , $moneda , $tc )
@@ -396,6 +393,7 @@ class SolicitudeController extends BaseController
                     $subFondo = FondoGerProd::find( $id_fondo[ 'old' ] );
                 $subFondo->saldo += round( $id_fondo[ 'oldMonto' ] * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN );
                 $subFondo->save();
+                \Log::error( $subFondo->toJson() );
             }
             if ( ! is_null( $userType ) )
             {
@@ -405,8 +403,10 @@ class SolicitudeController extends BaseController
                     $subFondo = FondoGerProd::find( $id_fondo[ 'new' ] );
                 $subFondo->saldo -= round( $id_fondo[ 'newMonto' ] * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN );
                 $subFondo->save();
+                \Log::error( $subFondo->toJson() );
             }
         }
+
     }
 
     private function validateBalance( $userTypes , $fondos , $fondo_total )
@@ -424,11 +424,16 @@ class SolicitudeController extends BaseController
         foreach( $fondos as $key1 => $fondoMkt )
         {
             $marca = Marca::find( $fondoMkt->marca_id );
-            if ( $fondoMkt->saldo < $fondo_total[ $key1 ] )
+            if ( in_array( SUP , $userTypes ) )
+                $fondoMktOrigin = FondoSupervisor::find( $fondoMkt->id );
+            else
+                $fondoMktOrigin = FondoGerProd::find( $fondoMkt->id );
+
+            if ( $fondoMktOrigin->saldo < 0 )
             {
                 return $this->warningException( 
-                    'El Fondo asignado ' . $fondoMkt->subCategoria->descripcion . ' | ' . $marca->descripcion .
-                    ' solo cuenta con S/.' . $fondoMkt->saldo . ' el cual no es suficiente para completar el registro , se requiere un saldo de S/.' . 
+                    'El Fondo asignado ' . $fondoMktOrigin->subCategoria->descripcion . ' | ' . $marca->descripcion .
+                    ' solo cuenta con S/.' . ( $fondoMktOrigin->saldo + $fondo_total[ $key1 ] ) . ' el cual no es suficiente para completar el registro , se requiere un saldo de S/.' . 
                     $fondo_total[ $key1 ] . ' en total ' , __FUNCTION__ , __LINE__ , __FILE__ );       
             }
         }
