@@ -19,7 +19,7 @@ class BagoUser extends Eloquent
                 $rpta['Status'] = 'Warning';
                 $rpta['Description'] = 'No se encontro el DNI del usuario en el Sistema'; 
             }
-            if(isset($dni->usutelefono))                
+            // if(isset($dni->usutelefono))                
                 $rpta['Data'] = is_null($dni->usutelefono) ? '' : $dni->usutelefono;
         }
         catch (Exception $e)

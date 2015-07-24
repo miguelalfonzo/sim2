@@ -25,6 +25,7 @@ use \yajra\Pdo\Oci8\Exceptions\Oci8Exception;
 use \PDF2;
 use \Dmkt\InvestmentType;
 use \Users\Supervisor;
+use \Users\Visitador;
 
 class ExpenseController extends BaseController
 {
