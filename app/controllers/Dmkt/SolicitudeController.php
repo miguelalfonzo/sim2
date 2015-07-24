@@ -347,6 +347,7 @@ class SolicitudeController extends BaseController
         $fondo_total = array();
         $fondos = array();
         $tc = ChangeRate::getTc();
+        $moneda = $detalle->id_moneda;
         $userTypes = array();
         $ids_fondo_mkt = array();
         foreach ( $solProductIds as $key => $solProductId ) 
@@ -374,12 +375,17 @@ class SolicitudeController extends BaseController
 
         $middleRpta = $this->validateBalance( $userTypes , $fondos , $fondo_total );
         if ( $middleRpta[ status ] == ok )
-            $this->discountBalance( $ids_fondo_mkt , $middleRpta[ data ] );
+            $this->discountBalance( $ids_fondo_mkt , $middleRpta[ data ] , $moneda , $tc );
         return $middleRpta;
     }
 
-    private function discountBalance( $ids_fondo , $userType = NULL )
+    private function discountBalance( $ids_fondo , $userType = NULL , $moneda , $tc )
     {
+        if ( $moneda == SOLES )
+            $tasaCompra = 1;
+        elseif ( $moneda == DOLARES )
+            $tasaCompra = $tc->compra;
+
         foreach( $ids_fondo as $id_fondo )
         {
             if ( ! is_null( $id_fondo[ 'old' ] ) )
@@ -388,7 +394,7 @@ class SolicitudeController extends BaseController
                     $subFondo = FondoSupervisor::find( $id_fondo[ 'old' ] );
                 else
                     $subFondo = FondoGerProd::find( $id_fondo[ 'old' ] );
-                $subFondo->saldo += $id_fondo[ 'oldMonto' ];
+                $subFondo->saldo += round( $id_fondo[ 'oldMonto' ] * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN );
                 $subFondo->save();
             }
             if ( ! is_null( $userType ) )
@@ -397,7 +403,7 @@ class SolicitudeController extends BaseController
                     $subFondo = FondoSupervisor::find( $id_fondo[ 'new' ] );
                 else
                     $subFondo = FondoGerProd::find( $id_fondo[ 'new' ] );
-                $subFondo->saldo -= $id_fondo[ 'newMonto' ];
+                $subFondo->saldo -= round( $id_fondo[ 'newMonto' ] * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN );
                 $subFondo->save();
             }
         }
