@@ -178,8 +178,6 @@ class Seeker extends BaseController
 		    			$tm->table = $table->name;
 		    		$array = array_merge( $tms , $array );
 		    	}
-		    	\Log::error( DB::getQueryLog() );
-		    	\Log::error( json_encode( $tms ) );
 		    	if ( $type == 1 )
 		    		return $this->setRpta( $array );
 	    		else

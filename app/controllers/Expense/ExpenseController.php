@@ -238,6 +238,95 @@ class ExpenseController extends BaseController
 		}
 	}
 
+	private function renewFondo( $solicitud , $monto_renovado )
+	{
+		$tc = ChangeRate::getTc();
+		if ( $solicitud->idtiposolicitud == SOL_REP )
+		{
+			$solicitudProducts = $solicitud->products;
+			$monto_aprobado    = $solicitud->detalle->monto_aprobado;
+ 		    foreach( $solicitudProducts as $solicitudProduct )
+		    {
+		    	$fondo 			= $solicitudProduct->thisSubFondo;
+		    	$monto_renovado = ( $monto_renovado / $monto_aprobado ) * $solicitudProduct->monto_asignado;
+		    	if ( $solicitud->detalle->id_moneda == DOLARES )
+		    		$monto_renovado = $monto_renovado * $tc->compra;
+		    	$fondo->saldo += $monto_renovado;
+		    	$fondo->save();
+		    }
+		}
+		else
+		{
+			$fondo = $solicitud->detalle->thisSubFondo;
+			$fondo->saldo += $monto_renovado;
+		}
+	}
+
+	public function confirmDiscount()
+	{
+		try
+		{
+			DB::beginTransaction();
+			$inputs     = Input::all();
+			$middleRpta = $this->validateDiscount( $inputs );
+			if ( $middleRpta[ status] == ok )
+			{
+				$solicitud  = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
+				$detalle    = $solicitud->detalle;
+				$totalGasto = $solicitud->expenses->sum( 'monto' );
+				if ( $solicitud->id_estado != REGISTRADO )
+					return $this->warningException( 'La solicitud no esta habilitado para que realize el descuento. Se requiere que se culmine con el Registro de Gastos' , __FUNCTION__ , __LINE__ , __FILE__ );
+				if ( $totalGasto >= $detalle->monto_aprobado )
+					return $this->warningException( 'No existe un saldo en contra del responsable para realizar un descuento' , __FUNCTION__ , __LINE__ , __FILE__ );
+				$jDetalle   = json_decode( $detalle->detalle );
+				if ( isset( $jDetalle->descuento ) )
+					return $this->warningException( 'Ya ha registrado el Descuento' , __FUNCTION__ , __LINE__ , __FILE__ );
+				
+				$monto_descuento           = $detalle->monto_aprobado - $totalGasto;
+				$jDetalle->descuento 	   = $inputs[ 'periodo' ];
+				$jDetalle->monto_descuento = $monto_descuento;
+				$detalle->detalle    	   = json_encode( $jDetalle );
+				$detalle->save();
+				$this->renewFondo( $solicitud , $monto_descuento );
+				DB::commit();
+				return $this->setRpta();
+			}
+			return $middleRpta;
+		}
+		catch( Exception $e )
+		{
+			DB::rollback();
+			return $this->internalException( $e , __FUNCTION__ );
+		}
+	}
+
+	public function expenseInstitucional()
+	{
+		try
+		{
+			return array( status => 'Info' , 'View' => View::make( 'Dmkt.Register.Institucional' , array( 'investments' => InvestmentType::order() , 'activities' => Activity::order() ) )->render() );		
+		}
+		catch( Exception $e )
+		{
+			return $this->internalException( $e , __FUNCTION__ );
+		}
+	}
+
+	private function setDevolucion( $solicitud , $detalle , $jDetalle , $inputs )
+	{
+		$solicitud->id_estado    = DEVOLUCION;
+		$jDetalle->numero_operacion_devolucion = $inputs[ 'numero_operacion_devolucion' ];
+		$detalle->detalle = json_encode( $jDetalle );
+		$detalle->save();
+		return USER_TESORERIA;
+	}
+
+	private function setDataInstitucional( $solicitud , $inputs )
+	{
+		$solicitud->id_inversion = $inputs[ 'inversion' ];
+		$solicitud->id_actividad = $inputs[ 'actividad' ];
+	}
+
 	// IDKC: CHANGE STATUS => REGISTRADO
 	public function finishExpense()
 	{
@@ -248,26 +337,83 @@ class ExpenseController extends BaseController
 			$solicitud  = Solicitud::where('token', $inputs['token'] )->first();
 			if( is_null( $solicitud ) )
 				return $this->warninException( 'No se encontro la solicitud con token: '.$inputs['token'] , __FUNCTION__ , __LINE__ , __FILE__ );
-			if ( $solicitud->idtiposolicitud == SOL_INST && ! isset( $inputs[ 'inversion'] ) && ! isset( $inputs[ 'actividad' ] ) )
-				return array( status => 'Info' , 'View' => View::make( 'Dmkt.Register.Institucional' , array( 'investments' => InvestmentType::order() , 'activities' => Activity::order() ) )->render() );
-			else if ( $solicitud->idtiposolicitud == SOL_INST && isset( $inputs[ 'inversion'] ) && isset( $inputs[ 'actividad' ] ) )
-			{
-				$solicitud->id_actividad = $inputs[ 'actividad' ];
-				$solicitud->id_inversion = $inputs[ 'inversion' ];
-			}
 
-			$oldIdEstado = $solicitud->id_estado;
-			$solicitud->id_estado = REGISTRADO;
+			$oldIdEstado    = $solicitud->id_estado;
+			$detalle 		= $solicitud->detalle;
+			$monto_aprobado = $detalle->monto_aprobado;
+			$totalGasto 	= $solicitud->expenses->sum( 'monto' );
+			$balance    	= $monto_aprobado - $totalGasto;
+			$jDetalle       = json_decode( $detalle->detalle );
+
+			if ( $solicitud->idtiposolicitud == SOL_REP )
+				if ( $balance > 0 )
+					if ( isset( $inputs[ 'numero_operacion_devolucion' ] ) && ! empty( trim( $inputs[ 'numero_operacion_devolucion'] ) ) )
+					{
+						$userTo = $this->setDevolucion( $solicitud , $detalle , $jDetalle , $inputs );
+					}
+					else
+						return array( 
+							status  => 'Info' , 
+				        	'View'  => View::make( 'Dmkt.Register.expense-missing-data' , array( 'devolucion' => true ) )->render() ,
+					        'Type'  => 'D' ,
+					        'Title' => 'Registro de la Operacion de Devolución' );
+				elseif ( $balance == 0 )
+				{
+					$solicitud->id_estado = REGISTRADO;
+					$userTo 			  = USER_CONTABILIDAD;
+				}
+				else
+					return $this->warningException( 'No se puede registrar los gastos si exceden al monto depositado' , __FUNCTION__ , __FILE__ , __LINE__ );
+			elseif( $solicitud->idtiposolicitud == SOL_INST )
+				if( $balance > 0 )
+				{
+					if ( isset( $inputs[ 'inversion'] ) && isset( $inputs[ 'actividad' ] ) && isset( $inputs[ 'numero_operacion_devolucion' ] ) )
+					{
+						$this->setDataInstitucional( $solicitud , $inputs );	
+						$userTo = $this->setDevolucion( $solicitud , $detalle , $jDetalle , $inputs );
+					}
+					else
+					{
+						return array( 
+							status => 'Info' , 
+							'View' => View::make( 'Dmkt.Register.expense-missing-data' , array( 'investments' => InvestmentType::order() , 'activities' => Activity::order() , 'devolucion' => true ) )->render() ,
+							'Type' => 'ID' ,
+							'Title' => 'Registro de la Operacion de Devolución , Inversion y Actividad' );
+					}
+				}
+				elseif ( $balance == 0 )
+					if ( isset( $inputs[ 'inversion'] ) && isset( $inputs[ 'actividad' ] ) )
+					{
+						$this->setDataInstitucional( $solicitud , $inputs );
+						$solicitud->id_estado = REGISTRADO;
+						$userTo = USER_CONTABILIDAD;
+					}
+					else
+					{
+						return array( 
+							status => 'Info' , 
+							'View' => View::make( 'Dmkt.Register.expense-missing-data' , array( 'investments' => InvestmentType::order() , 'activities' => Activity::order() ) )->render() ,
+							'Type' => 'I' ,
+							'Title' => 'Registro de la Inversion y Actividad');
+					}
+				else
+					return $this->warningException( 'No se puede registrar los gastos si exceden al monto depositado' , __FUNCTION__ , __FILE__ , __LINE__ );
+			else
+				return $this->warningException( 'No se pudo identificar el tipo de solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
+	
 			$solicitud->save();
 
-			$rpta = $this->setStatus( $oldIdEstado, REGISTRADO, Auth::user()->id, USER_CONTABILIDAD , $solicitud->id );
+			\Log::error( $solicitud->toJson() );
+			\Log::error( $detalle->toJson() );
+
+			$rpta = $this->setStatus( $oldIdEstado, $solicitud->id_estado , Auth::user()->id, $userTo , $solicitud->id );
 			if ( $rpta[status] == ok )
 			{
 				Session::put( 'state' , R_GASTO );
 				DB::commit();
-				return $rpta;
 			}
-			DB::rollback();
+			else
+				DB::rollback();
 			return $rpta;
 		}
 		catch (Exception $e)
@@ -562,37 +708,6 @@ class ExpenseController extends BaseController
 		catch ( Exception $e ) 
 		{
 			return $this->internalException( $e , __FUNCTION__ );	
-		}
-	}
-
-	public function confirmDiscount()
-	{
-		try
-		{
-			$inputs     = Input::all();
-			$middleRpta = $this->validateDiscount( $inputs );
-			if ( $middleRpta[ status] == ok )
-			{
-				$solicitud  = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
-				$detalle    = $solicitud->detalle;
-				$totalGasto = $solicitud->expenses->sum( 'monto' );
-				if ( $solicitud->id_estado != REGISTRADO )
-					return $this->warningException( 'La solicitud no esta habilitado para que realize el descuento. Se requiere que se culmine con el Registro de Gastos' , __FUNCTION__ , __LINE__ , __FILE__ );
-				if ( $totalGasto >= $detalle->monto_aprobado )
-					return $this->warningException( 'No existe un saldo en contra del responsable para realizar un descuento' , __FUNCTION__ , __LINE__ , __FILE__ );
-				$jDetalle   = json_decode( $detalle->detalle );
-				if ( isset( $jDetalle->descuento ) )
-					return $this->warningException( 'Ya ha registrado el Descuento' , __FUNCTION__ , __LINE__ , __FILE__ );
-				$jDetalle->descuento = $inputs[ 'periodo' ];
-				$detalle->detalle    = json_encode( $jDetalle );
-				$detalle->save();
-				return $this->setRpta();
-			}
-			return $middleRpta;
-		}
-		catch( Exception $e )
-		{
-			return $this->internalException( $e , __FUNCTION__ );
 		}
 	}
 

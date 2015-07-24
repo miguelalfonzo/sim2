@@ -24,7 +24,7 @@
                     <td style="text-align:center">
                         {{json_decode($solicitud->detalle->detalle)->num_cuenta}}
                     </td>
-                    <td style="text-align:center">{{$solicitud->detalle->fondo->typeMoney->simbolo.' '.  $solicitud->detalle->monto_actual}}</td>
+                    <td style="text-align:center">{{ 'S/.' . $solicitud->detalle->monto_actual}}</td>
                     <!-- <td style="text-align:center">$solicitud->detalle->supervisor</td> -->
                     @if ( isset( $state ) && $state != BLOCKED )
                         <td style="text-align:center">

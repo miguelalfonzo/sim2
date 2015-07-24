@@ -16,7 +16,7 @@
                                 <select name="fondo_producto[]" class="selectpicker form-control">
                                     @if ( is_null( $product->id_fondo_marketing ) )
                                         <option selected disabled value="0">Seleccione el Fondo</option>
-                                        @foreach( $product->getSubFondo( $solicitud ) as $subFondo )
+                                        @foreach( $product->getSubFondo( $tipo_usuario , $solicitud ) as $subFondo )
                                             @if ( $subFondo->marca_id == $product->id_producto )
                                                 <option value="{{ $subFondo->id . ',' . $subFondo->tipo }}" style="background-color:#00FFFF">{{ $subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
                                             @else   
@@ -24,7 +24,7 @@
                                             @endif
                                         @endforeach
                                     @else
-                                        @foreach( $product->getSubFondo( $solicitud ) as $subFondo )
+                                        @foreach( $product->getSubFondo( $tipo_usuario , $solicitud ) as $subFondo )
                                             @if ( $subFondo->id == $product->id_fondo_marketing )
                                                 <option selected value="{{ $subFondo->id . ',' . $subFondo->tipo }}" style="background-color:#00FFFF">{{$subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
                                             @else   

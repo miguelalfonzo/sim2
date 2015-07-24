@@ -78,7 +78,7 @@
     |--------------------------------------------------------------------------
     */
     
-    Route::group( array('before' => 'cont'), function () 
+    Route::group( array('before' => 'cont' ), function () 
     {
         Route::post('revisar-solicitud', 'Dmkt\SolicitudeController@checkSolicitud');
         Route::get('revisar-asiento-solicitud/{token}', 'Dmkt\SolicitudeController@viewSeatSolicitude');
@@ -118,7 +118,7 @@
     |--------------------------------------------------------------------------
     */
 
-    Route::group( array('before' => 'ager') , function()
+    Route::group( array('before' => 'ager' ) , function()
     {
         Route::post('registrar-fondo','Dmkt\FondoController@registerInstitutionalApplication');
         Route::get('exportfondos/{date}','Dmkt\FondoController@exportExcelFondos');
@@ -149,10 +149,13 @@
         Route::get('report-fondo/{token}','Expense\ExpenseController@reportExpenseFondo');
     });
 
-    Route::group(array('before' => 'rm_ager'), function ()
+    Route::group(array('before' => 'rm'), function ()
     {
         Route::post('end-expense', 'Expense\ExpenseController@finishExpense');
-        Route::get('ver-gasto/{token}', 'Expense\ExpenseController@viewExpense'); 
+        Route::get('ver-gasto/{token}', 'Expense\ExpenseController@viewExpense');
+        Route::get('expense-institucion', 'Expense\ExpenseController@expenseInstitucional');
+
+        
     });
 
     Route::group(array('before' => 'rm_sup_gerprod'), function ()
@@ -164,8 +167,7 @@
         Route::post('search-client', 'Source\Seeker@clientSource');
         Route::post('get-client-view' , 'Source\Seeker@getClientView');
         Route::post('filtro_cliente' , 'Dmkt\Client@getInvestmentActivity');
-        Route::post('filtro-inversion' , 'Dmkt\Client@getActivities');
-       
+        Route::post('filtro-inversion' , 'Dmkt\Client@getActivities');  
     });
 
     Route::group(array('before' => 'sys_user'), function ()

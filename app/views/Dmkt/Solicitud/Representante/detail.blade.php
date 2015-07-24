@@ -53,11 +53,11 @@
     @include('Dmkt.Solicitud.Detail.depositado')
 
     <!-- N° de Operacion relacionada al deposito -->
-    @if( Auth::user()->type == TESORERIA && !is_null( $solicitud->id_deposito ) )
+    @if( Auth::user()->type == TESORERIA && !is_null( $detalle->id_deposito ) )
         <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
             <label class="control-label">Nº de Operación</label>
             <div>
-                <input type="text" class="form-control" value="{{$detalle->deposito->num_transferencia}}" disabled>
+                <input type="text" class="form-control" value="{{$detalle->deposit->num_transferencia}}" disabled>
             </div>
         </div>
     @endif

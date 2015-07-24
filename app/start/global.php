@@ -13,6 +13,7 @@ define('TODOS', 10);
 define('DERIVADO', 11);
 define('GASTO_HABILITADO', 12);
 define('DEPOSITO_HABILITADO', 13);
+define('DEVOLUCION', 14);
 
 /*
 |--------------------------------------------------------------------------

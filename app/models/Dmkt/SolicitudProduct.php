@@ -21,38 +21,43 @@ class SolicitudProduct extends Eloquent
             return $lastId->id;
     }
 
-    public function getSubFondo( $solicitud )
+    public function getSubFondo( $userType , $solicitud )
     {
-        $user = Auth::user();
-        if ( $user->type != SUP )
-            return DB::table( 'Fondo_Gerente_Producto f' )
-            ->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo saldo' , 'f.id id' , 'f.marca_id marca_id' , '\'P\' tipo' )
-            ->leftJoin( 'fondo_subcategoria fsc' , 'f.subcategoria_id' , '=' , 'fsc.id' )
-            ->leftJoin( 'fondo_categoria fc' , 'fsc.id_fondo_categoria' , '=' , 'fc.id' )
-            ->leftJoin( 'outdvp.marcas m' , 'f.marca_id' , '=' , 'm.id' )
-            ->where( function( $query ) use( $user )
-            {
-                if ( $user->type == GER_PROD )
-                    $query->where( 'fsc.tipo' , FONDO_SUBCATEGORIA_GERPROD );
-                else
-                    $query->where( 'fsc.tipo' , 'NNN' );
-            })->where( 'f.saldo' , '>' , 0 )->orderBy( 'm.descripcion' , 'asc' )->get();
-        else
+        if ( $userType == SUP )
         {
-            if ( $solicitud->createdBy->type == REP_MED )
-                $user = \User::find( $solicitud->createdBy->rm->rmSup->iduser );
-            elseif ( $solicitud->createdBy->type == SUP )
-                $user = \User::find( $solicitud->created_by );
-            else
-                $user = Auth::user();
-        
+            $userid = $solicitud->asigned_to->rm->rmSup->iduser;
             return DB::table('Fondo_Supervisor fs')
             ->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'fs.saldo saldo' , 'fs.id id' , 'fs.marca_id marca_id' , '\'S\' tipo' )
             ->leftJoin( 'fondo_subcategoria fsc' , 'fsc.id' , '=' , 'fs.subcategoria_id' )
             ->leftJoin( 'fondo_categoria fc' , 'fc.id' , '=' , 'fsc.id_fondo_categoria' )
             ->leftJoin( 'outdvp.marcas m' , 'fs.marca_id' , '=' , 'm.id' )
-            ->where( 'fs.saldo' , '>' , 0 )->where( 'fsc.tipo' , 'S' )->where('fs.supervisor_id' , $user->id )->orderBy( 'm.descripcion' , 'asc' )->get();
+            ->where( 'fs.saldo' , '>' , 0 )->where( 'fsc.tipo' , FONDO_SUBCATEGORIA_SUPERVISOR )->where('fs.supervisor_id' , $userid )->orderBy( 'm.descripcion' , 'asc' )->get();
         }
+        else if( $userType == GER_PROD )
+        {
+            return DB::table( 'Fondo_Gerente_Producto f' )
+            ->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo saldo' , 'f.id id' , 'f.marca_id marca_id' , '\'P\' tipo' )
+            ->leftJoin( 'fondo_subcategoria fsc' , 'f.subcategoria_id' , '=' , 'fsc.id' )
+            ->leftJoin( 'fondo_categoria fc' , 'fsc.id_fondo_categoria' , '=' , 'fc.id' )
+            ->leftJoin( 'outdvp.marcas m' , 'f.marca_id' , '=' , 'm.id' )
+            ->where( function( $query ) use( $userType )
+            {
+                if ( $userType == GER_PROD )
+                    $query->where( 'fsc.tipo' , FONDO_SUBCATEGORIA_GERPROD );
+                else
+                    $query->where( 'fsc.tipo' , 'NNN' );
+            })->where( 'f.saldo' , '>' , 0 )->orderBy( 'm.descripcion' , 'asc' )->get();
+        }
+        else if( $userType == ASIS_GER )
+        {
+            return DB::table( 'Fondo_Institucion f' )
+            ->select( "fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo saldo' , 'f.id id' , '\'AG\' tipo' )
+            ->leftJoin( 'fondo_subcategoria fsc' , 'f.subcategoria_id' , '=' , 'fsc.id' )
+            ->leftJoin( 'fondo_categoria fc' , 'fsc.id_fondo_categoria' , '=' , 'fc.id' )
+            ->where( 'fsc.tipo' , FONDO_SUBCATEGORIA_INSTITUCION )->get();
+        }
+        else
+            return array();
     }
 
     protected function getSolProducts( $idSolProduct )

@@ -43,6 +43,7 @@ use \Response;
 use \Fondo\FondoGerProd;
 use \Fondo\FondoSupervisor;
 use \Carbon\Carbon;
+use \Fondo\FondoInstitucional;
 
 class SolicitudeController extends BaseController
 {
@@ -85,7 +86,6 @@ class SolicitudeController extends BaseController
         }
         elseif ( Auth::user()->type == ASIS_GER )
         {
-            $data['fondos']  = Fondo::asisGerFondos();                
             $data['activities'] = Activity::order();
         }
         elseif ( Auth::user()->type == CONT )
@@ -159,14 +159,6 @@ class SolicitudeController extends BaseController
                     $solicitud->status = BLOCKED;
                     Session::put( 'id_solicitud' , $solicitud->id );
                     $solicitud->save();
-                    /*$fondos = Fondo::getFunds( $politicType );
-                    if ( ! $fondos->isEmpty() )    
-                        $data[ 'fondos' ] = $fondos;
-                    if ( isset( $data['fondos'] ) && ! is_null( $solicitud->detalle->id_fondo ) )
-                    {
-                        $data[ 'fondos' ]->push( $solicitud->detalle->fondo );
-                        $data['fondos'] = $data[ 'fondos' ]->unique();
-                    }*/
                     $data['solicitud']->status = 1;
                 }
             }
@@ -313,82 +305,147 @@ class SolicitudeController extends BaseController
         return $this->setRpta( $idsGerProd );
     }
 
-    private function setProductsAmount( $solProductIds , $amount , $fondo , $user_id , $detalle )
+    private function setFondo( $fondo , $key , $solProduct , $detalle , $tc , &$fondo_total , &$userTypes , &$fondos )
     {
-        \Log::error( $fondo );
+        $fondoData = explode( ',' , $fondo[ $key ] );
+
+        if(  is_null( $solProduct->id_fondo_marketing ) )
+        {
+            if ( ! ( Auth::user()->type == SUP || Auth::user()->type == GER_PROD ) )
+            {
+                if( $fondoData[ 1 ] == SUP && ! in_array( Auth::user()->type , array( SUP , GER_PROM ) ) )
+                    return $this->warningException( 'Cancelado - No existe un fondo asignado y el usuario no puede asignar fondos' , __FUNCTION__ , __LINE__ , __FILE__ );
+                else if( $fondoData[ 1 ] == GER_PROD && ! in_array( Auth::user()->type , array( GER_PROD , GER_COM ) ) )
+                    return $this->warningException( 'Cancelado - No existe un fondo asignado y el usuario no puede asignar fondos' , __FUNCTION__ , __LINE__ , __FILE__ );
+            }
+        }
+
+        if ( $fondoData[ 1 ] == SUP )
+            $subFondo = FondoSupervisor::find( $fondoData[ 0 ] );
+        else
+            $subFondo = FondoGerProd::find( $fondoData[ 0 ] );
+
+        $fondos[ $fondoData[ 0 ] ] = $subFondo; 
+
+        if ( $detalle->id_moneda == DOLARES )
+            $monto_soles = round( $solProduct->monto_asignado * $tc->compra , 2 , PHP_ROUND_HALF_DOWN );
+        else
+            $monto_soles = $solProduct->monto_asignado;
+
+        if ( isset( $fondo_total[ $fondoData[ 0 ] ] ) )
+            $fondo_total[ $fondoData[ 0 ] ] += $monto_soles;
+        else
+            $fondo_total[ $fondoData[ 0 ] ] = $monto_soles;
+        $userTypes[] = $fondoData[ 1 ];
+        $solProduct->id_fondo_marketing = $fondoData[ 0 ];
+        $solProduct->id_tipo_fondo_marketing = $fondoData[ 1 ];
+        return $this->setRpta();
+    }
+
+    private function setProductsAmount( $solProductIds , $amount , $fondo , $detalle )
+    {
         $fondo_total = array();
         $fondos = array();
-        if ( $detalle->id_moneda == DOLARES )
-            $tc = ChangeRate::getTc();
+        $tc = ChangeRate::getTc();
+        $moneda = $detalle->id_moneda;
         $userTypes = array();
+        $ids_fondo_mkt = array();
         foreach ( $solProductIds as $key => $solProductId ) 
         {
             $solProduct = SolicitudProduct::find( $solProductId );
+          
+            $old_id_fondo_mkt  = $solProduct->id_fondo_marketing;
+            $old_cod_user_type = $solProduct->id_tipo_fondo_marketing;
+            $old_ammount       = $solProduct->monto_asignado;
+
             $montoAsignado = round( $amount[ $key ] , 2 , PHP_ROUND_HALF_DOWN );
             $solProduct->monto_asignado = $montoAsignado;
-            if ( $fondo != 0 )
-            {
-                $fondoData = explode( ',' , $fondo[ $key ] );
-                if(  is_null( $solProduct->id_fondo_marketing ) )
-                {
-                    if ( ! ( Auth::user()->type == SUP || Auth::user()->type == GER_PROD ) )
-                    {
-                        if( $fondoData[ 1 ] == SUP && ! in_array( Auth::user()->type , array( SUP , GER_PROM ) ) )
-                            return $this->warningException( 'Cancelado - No existe un fondo asignado y el usuario no puede asignar fondos' , __FUNCTION__ , __LINE__ , __FILE__ );
-                        else if( $fondoData[ 1 ] == GER_PROD && ! in_array( Auth::user()->type , array( GER_PROD , GER_COM ) ) )
-                            return $this->warningException( 'Cancelado - No existe un fondo asignado y el usuario no puede asignar fondos' , __FUNCTION__ , __LINE__ , __FILE__ );
-                    }
-                }
-                if ( $fondoData[ 1 ] == SUP )
-                    $subFondo = FondoSupervisor::find( $fondoData[ 0 ] );
-                else
-                    $subFondo = FondoGerProd::find( $fondoData[ 0 ] );
-
-                $fondos[ $fondoData[ 0 ] ] = $subFondo; 
-
-                if ( $detalle->id_moneda == DOLARES )
-                    $monto_soles = round( $solProduct->monto_asignado * $tc->compra , 2 , PHP_ROUND_HALF_DOWN );
-                else
-                    $monto_soles = $solProduct->monto_asignado;
-
-                if ( isset( $fondo_total[ $fondoData[ 0 ] ] ) )
-                    $fondo_total[ $fondoData[ 0 ] ] += $monto_soles;
-                else
-                    $fondo_total[ $fondoData[ 0 ] ] = $monto_soles;
-                $userTypes[] = $fondoData[ 1 ];
-                $solProduct->id_fondo_marketing = $fondoData[ 0 ];
-                $solProduct->id_tipo_fondo_marketing = $fondoData[ 1 ];
-            }
+            
+            $middleRpta = $this->setFondo( $fondo , $key , $solProduct , $detalle , $tc , $fondo_total , $userTypes , $fondos );
+            if ( $middleRpta[ status ] != ok )
+                return $middleRpta;
             $solProduct->save();
+            
+            $ids_fondo_mkt[] = array( 'old'         => $old_id_fondo_mkt , 
+                                      'oldUserType' => $old_cod_user_type , 
+                                      'oldMonto'    => $old_ammount ,
+                                      'new'         => $solProduct->id_fondo_marketing ,
+                                      'newMonto'    => $solProduct->monto_asignado );   
         }
 
-        if ( $fondo != 0 )
-        {
-            $userTypes = array_unique( $userTypes );
-            if ( count( $userTypes) != 1 )
-                return $this->warningException( 'No es posible asignar Fondos de Roles Diferentes' , __FUNCTION__ , __LINE__ , __FILE__ );
-            if ( in_array( SUP , $userTypes ) )
-                $fondoCategoria = array_unique( FondoSupervisor::whereIn( 'id' , array_keys( $fondos ) )->lists( 'subcategoria_id' ) );
-            else
-                $fondoCategoria = array_unique( FondoGerProd::whereIn( 'id' , array_keys( $fondos ) )->lists( 'subcategoria_id' ) );
+        $middleRpta = $this->validateBalance( $userTypes , $fondos , $fondo_total );
+        if ( $middleRpta[ status ] == ok )
+            $this->discountBalance( $ids_fondo_mkt , $middleRpta[ data ] , $moneda , $tc );
+        return $middleRpta;
+    }
 
-            if ( count( $fondoCategoria ) != 1 )
-                return $this->warningException( 'No es posible seleccionar Fondos de Diferentes SubCategorias por Solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
-            foreach( $fondos as $key1 => $fondoMkt )
+    private function discountBalance( $ids_fondo , $userType = NULL , $moneda , $tc )
+    {
+        if ( $moneda == SOLES )
+            $tasaCompra = 1;
+        elseif ( $moneda == DOLARES )
+            $tasaCompra = $tc->compra;
+
+        foreach( $ids_fondo as $id_fondo )
+        {
+            if ( ! is_null( $id_fondo[ 'old' ] ) )
             {
-                \Log::error( $fondoMkt->toJson() );
-                $marca = Marca::find( $fondoMkt->marca_id );
-                if ( $fondoMkt->saldo < $fondo_total[ $key1 ] )
-                {
-                    return $this->warningException( 
-                        'El Fondo asignado ' . $fondoMkt->subCategoria->descripcion . ' | ' . $marca->descripcion .
-                        ' solo cuenta con S/.' . $fondoMkt->saldo . ' el cual no es suficiente para completar el registro , se requiere un saldo de S/.' . 
-                        $fondo_total[ $key1 ] . ' en total ' , __FUNCTION__ , __LINE__ , __FILE__ );       
-                }
+                if ( $id_fondo[ 'oldUserType' ] == SUP )
+                    $subFondo = FondoSupervisor::find( $id_fondo[ 'old' ] );
+                else
+                    $subFondo = FondoGerProd::find( $id_fondo[ 'old' ] );
+                $subFondo->saldo += round( $id_fondo[ 'oldMonto' ] * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN );
+                $subFondo->save();
+            }
+            if ( ! is_null( $userType ) )
+            {
+                if ( $userType == SUP )
+                    $subFondo = FondoSupervisor::find( $id_fondo[ 'new' ] );
+                else
+                    $subFondo = FondoGerProd::find( $id_fondo[ 'new' ] );
+                $subFondo->saldo -= round( $id_fondo[ 'newMonto' ] * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN );
+                $subFondo->save();
             }
         }
+    }
 
-        return $this->setRpta();
+    private function validateBalance( $userTypes , $fondos , $fondo_total )
+    {
+        $userTypes = array_unique( $userTypes );
+        if ( count( $userTypes) != 1 )
+            return $this->warningException( 'No es posible asignar Fondos de Roles Diferentes' , __FUNCTION__ , __LINE__ , __FILE__ );
+        if ( in_array( SUP , $userTypes ) )
+            $fondoCategoria = array_unique( FondoSupervisor::whereIn( 'id' , array_keys( $fondos ) )->lists( 'subcategoria_id' ) );
+        else
+            $fondoCategoria = array_unique( FondoGerProd::whereIn( 'id' , array_keys( $fondos ) )->lists( 'subcategoria_id' ) );
+
+        if ( count( $fondoCategoria ) != 1 )
+            return $this->warningException( 'No es posible seleccionar Fondos de Diferentes SubCategorias por Solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
+        foreach( $fondos as $key1 => $fondoMkt )
+        {
+            $marca = Marca::find( $fondoMkt->marca_id );
+            if ( $fondoMkt->saldo < $fondo_total[ $key1 ] )
+            {
+                return $this->warningException( 
+                    'El Fondo asignado ' . $fondoMkt->subCategoria->descripcion . ' | ' . $marca->descripcion .
+                    ' solo cuenta con S/.' . $fondoMkt->saldo . ' el cual no es suficiente para completar el registro , se requiere un saldo de S/.' . 
+                    $fondo_total[ $key1 ] . ' en total ' , __FUNCTION__ , __LINE__ , __FILE__ );       
+            }
+        }
+        return $this->setRpta( $userTypes[ 0 ] );
+    }
+
+    private function renovateBalance( $solicitud )
+    {
+        $solicitudProducts = $solicitud->products;
+        $ids_fondo_mkt = array();
+        foreach( $solicitudProducts as $solicitudProduct )
+        {
+             $ids_fondo_mkt[] = array( 'old'         => $solicitudProduct->id_fondo_marketing , 
+                                       'oldUserType' => $solicitudProduct->id_tipo_fondo_marketing , 
+                                       'oldMonto'    => $solicitudProduct->monto_asignado );
+        }
+        $this->discountBalance( $ids_fondo_mkt );
     }
 
     private function setProducts( $idSolicitud , $idsProducto )
@@ -451,7 +508,9 @@ class SolicitudeController extends BaseController
                     $middleRpta = $this->setProducts( $solicitud->id , $inputs['productos'] );
                     if ( $middleRpta[status] == ok )
                     {
-                        $middleRpta = $this->toUser( $inputs['inversion'] , $inputs['productos'] , 1 );
+                        if ( ! isset( $inputs[ 'responsable' ] ) )
+                            $inputs[ 'responsable' ] = 0;
+                        $middleRpta = $this->toUser( $inputs['inversion'] , $inputs['productos'] , 1 , $inputs[ 'responsable' ] );
                         if ( $middleRpta[ status ] == ok )
                         {
                             $middleRpta = $this->setGerProd( $middleRpta[ data ][ 'iduser' ] , $solicitud->id , $middleRpta[ data ][ 'tipousuario'] );
@@ -577,9 +636,17 @@ class SolicitudeController extends BaseController
             
             $oldIdEstado = $solicitud->id_estado;
             if ( Auth::user()->id == $solicitud->created_by )
+            {
                 $solicitud->id_estado = CANCELADO;
+                if ( $oldIdEstado != PENDIENTE )
+                    $this->renovateBalance( $solicitud );
+            }
             else
+            {
                 $solicitud->id_estado = RECHAZADO;
+                if ( $oldIdEstado != PENDIENTE )
+                    $this->renovateBalance( $solicitud );
+            }
             $solicitud->observacion = $inputs['observacion'];
             $solicitud->status   = 1;
             $solicitud->save();
@@ -633,7 +700,7 @@ class SolicitudeController extends BaseController
         }
     }
 
-    private function toUser( $investmentType , $idsProducto , $order )
+    private function toUser( $investmentType , $idsProducto , $order , $responsable = NULL )
     {
         $aprovalPolicy = AprovalPolicy::getToUser( $investmentType , $order );
         if ( is_null( $aprovalPolicy ) )
@@ -641,15 +708,17 @@ class SolicitudeController extends BaseController
         $userType = $aprovalPolicy->tipo_usuario;
         $msg= '';
         if ( ! is_null( $aprovalPolicy->desde ) || ! is_null( $aprovalPolicy->hasta ) )
-            $msg .= ' para montos ' . ( is_null( $aprovalPolicy->desde ) ? '' : 'desde S/.' . $aprovalPolicy->desde . ' ' ) . ( is_null( $aprovalPolicy->hasta ) ? '' : 'hasta S/.' . $aprovalPolicy->hasta ) ; 
+            $msg .= ' para montos ' . ( is_null( $aprovalPolicy->desde ) ? '' : 'mayores a S/.' . $aprovalPolicy->desde . ' ' ) . ( is_null( $aprovalPolicy->hasta ) ? '' : 'hasta S/.' . $aprovalPolicy->hasta ) ; 
         if ( $userType == SUP )
         {
             if ( Auth::user()->type === REP_MED )
                 $idsUser = array( Rm::getSup( Auth::user()->id )->iduser );
             else if ( Auth::user()->type === SUP )
                 $idsUser = array( Auth::user()->id );
+            else if ( Auth::user()->type === GER_PROD )
+                $idsUser = array( Rm::getSup( $responsable )->iduser );
             else
-                $idsUser = Sup::all()->lists( 'iduser');
+                return $this->warningException( 'El rol ' . Auth::user()->type . ' no tiene permisos para crear o derivar al supervisor' , __FUNCTION__ , __LINE__ , __FILE__ );
         }
         else if ( $userType == GER_PROD )
         {
@@ -790,23 +859,8 @@ class SolicitudeController extends BaseController
                     $detalle->monto_aceptado = $monto;
                 else if ( $solicitud->id_estado == APROBADO );
                     $detalle->monto_aprobado = $monto;
-                
-                if ( Auth::user()->type == SUP )
-                {
-                    if ( $solicitud->createdBy->type == REP_MED ) //Si lo creo el representante buscar su supervisor
-                        $user = \User::find( $solicitud->createdBy->rm->rmSup->iduser );
-                    elseif ( $solicitud->createdBy->type == SUP ) //Si lo creo el supervisor buscar al mismo supervisor
-                        $user = \User::find( $solicitud->created_by );
-                    else //Si lo creo el GP se utiliza al supervisor que accede al sistema
-                        $user = Auth::user();
-                }
-                else
-                    $user = Auth::user();
                     
-                if ( ! isset( $inputs[ 'fondo_producto' ] ) )
-                    $inputs[ 'fondo_producto'] = 0;
-                
-                $middleRpta = $this->setProductsAmount( $inputs[ 'producto' ] , $inputs[ 'monto_producto' ] , $inputs[ 'fondo_producto' ] , $user->id , $solDetalle );                 
+                $middleRpta = $this->setProductsAmount( $inputs[ 'producto' ] , $inputs[ 'monto_producto' ] , $inputs[ 'fondo_producto' ] , $solDetalle );                 
                 
                 if ( $middleRpta[ status ] != ok )
                     return $middleRpta;
@@ -984,7 +1038,7 @@ class SolicitudeController extends BaseController
                 return $this->setRpta( $subFondo->accountFondo ); 
         }
         else
-            return $this->setRpta( $solicitud->detalle->fondo->subCategoria->accountFondo );
+            return $this->setRpta( $solicitud->detalle->thisSubFondo->subCategoria->accountFondo );
     }
 
     public function generateSeatExpenseData( $solicitud )
@@ -1429,7 +1483,7 @@ class SolicitudeController extends BaseController
         $data = array( 'state'  => $state , 'states' => StateRange::order() , 'warnings' => $mWarning );
         if ( Auth::user()->type == ASIS_GER )
         {
-            $data['fondos']  = Fondo::asisGerFondos();                
+            $data['subFondos']  = FondoInstitucional::getSubFondo();                
             $data['activities'] = Activity::order();
         }
         if ( Session::has( 'id_solicitud') )

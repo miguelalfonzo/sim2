@@ -19,7 +19,7 @@
             @endif    
         @endif
         @if ( $solicitud->idtiposolicitud == SOL_REP )
-             @if($solicitud->id_estado == REGISTRADO && Auth::user()->id == $solicitud->id_user_assign )
+             @if( ( $solicitud->id_estado == REGISTRADO || $solicitud->id_estado == DEVOLUCION ) && Auth::user()->id == $solicitud->id_user_assign )
                 <a class="btn btn-default" target="_blank" href="{{URL::to('a'.'/'.$solicitud->token)}}">
                     <span  class="glyphicon glyphicon-print"></span>
                 </a>
@@ -67,7 +67,7 @@
                 @endif
             @endif
         @elseif ( $solicitud->idtiposolicitud == SOL_INST )
-            @if($solicitud->id_estado == REGISTRADO && Auth::user()->id == $solicitud->id_user_assign )   
+            @if( ( $solicitud->id_estado == REGISTRADO || $solicitud->id_estado == DEVOLUCION ) && Auth::user()->id == $solicitud->id_user_assign )   
                 <a class="btn btn-default" href="{{URL::to('report-fondo')}}/{{$solicitud->token}}">
                     <span class="glyphicon glyphicon-print" ></span>
                 </a>

@@ -37,22 +37,50 @@ class DepositController extends BaseController{
     private function validateBalance( $solicitud , $detalle , $tc )
     {
         if ( $solicitud->idtiposolicitud == SOL_REP )
+        {
             $fondoMkt = $solicitud->products[0]->thisSubFondo;
+            $msg = 'El Saldo del Fondo: '. $fondoMkt->subCategoria->descripcion . ' | ' . $fondoMkt->marca->descripcion . ' S/.';
+        }
         else
+        {
             $fondoMkt = $solicitud->detalle->thisSubFondo;
-        \Log::error( json_encode( $fondoMkt ) );
+            $msg = 'El Saldo del Fondo: '. $fondoMkt->subCategoria->descripcion . ' S/.';
+        }
         $monto = $detalle->monto_actual;
-        $msg = 'El Saldo del Fondo: '. $fondoMkt->subCategoria->descripcion . ' | ' . $fondoMkt->marca->descripcion . ' S/.' . $fondoMkt->saldo . ' es insuficiente para completar la operación';
+
+        $msg = $msg . $fondoMkt->saldo . ' es insuficiente para completar la operación';
         if ( $detalle->id_moneda == SOLES )
             if ( $monto > $fondoMkt->saldo )
                 return $this->warningException( $msg , __FUNCTION__ , __LINE__ , __FILE__ );
             else
-                return $this->setRpta( $monto );
+            {
+                $middleRpta = $this->decreaseBalance( $solicitud );
+                if ( $middleRpta[ status ] == ok )
+                    return $this->setRpta( $monto );
+                else
+                    return $middleRpta;
+            }
         else
             if ( ( $monto * $tc->compra ) > $fondoMkt->saldo )
                 return $this->warningException( $msg , __FUNCTION__ , __LINE__ , __FILE__ );
             else
-                return $this->setRpta( $monto * $tc->compra );
+            {
+                $middleRpta = $this->decreaseBalance( $solicitud );
+                if ( $middleRpta[ status ] == ok )
+                    return $this->setRpta( $monto * $tc->compra );
+                else
+                    return $middleRpta;
+            }
+    }
+
+    private function decreaseBalance( $solicitud )
+    {
+        if ( $solicitud->idtiposolicitud == SOL_INST )
+        {    
+            $middleRpta = $this->decreaseFondo( $solicitud );
+            return $middleRpta;
+        }
+        return $this->setRpta();
     }
 
     private function validateInpustDeposit( $inputs )
@@ -143,29 +171,22 @@ class DepositController extends BaseController{
                             $solicitud->id_estado = DEPOSITADO;
                         
                         $solicitud->save();
-                        //$middleRpta = $this->fondoDecrease( $solicitud );
-                        
-                        /*if ( $middleRpta[status] == ok )
-                        {*/
-                            $middleRpta = $this->decreaseFondoProduct( $solicitud );
-                            if ( $middleRpta[status] == ok )
-                            {
-                                if ( $detalle->id_motivo == REEMBOLSO )
-                                    $middleRpta = $this->setStatus( $oldIdestado, GENERADO , Auth::user()->id , USER_CONTABILIDAD , $solicitud->id );
-                                else
-                                    $middleRpta = $this->setStatus( $oldIdestado, DEPOSITADO , Auth::user()->id , USER_CONTABILIDAD , $solicitud->id );
 
-                                if ( $middleRpta[status] == ok )
-                                {
-                                    if ( $solicitud->detalle->id_motivo == REEMBOLSO )
-                                        Session::put( 'state' , R_FINALIZADO );
-                                    else
-                                        Session::put( 'state' , R_REVISADO );
-                                    DB::commit();
-                                    return $middleRpta;
-                                }
-                            }
-                        //}      
+                        if ( $detalle->id_motivo == REEMBOLSO )
+                            $middleRpta = $this->setStatus( $oldIdestado, GENERADO , Auth::user()->id , USER_CONTABILIDAD , $solicitud->id );
+                        else
+                            $middleRpta = $this->setStatus( $oldIdestado, DEPOSITADO , Auth::user()->id , USER_CONTABILIDAD , $solicitud->id );
+
+                        if ( $middleRpta[status] == ok )
+                        {
+                            if ( $solicitud->detalle->id_motivo == REEMBOLSO )
+                                Session::put( 'state' , R_FINALIZADO );
+                            else
+                                Session::put( 'state' , R_REVISADO );
+                            DB::commit();
+                            return $middleRpta;
+                        }
+                        
                     }
                 }
             }
@@ -210,21 +231,29 @@ class DepositController extends BaseController{
     private function decreaseFondoProduct( $solicitud )
     {
         $products = $solicitud->products;
-        $detalle = $solicitud->detalle;
-        $tc = ChangeRate::getTc();
+        $detalle  = $solicitud->detalle;
+        $tc       = ChangeRate::getTc();
         foreach( $products as $product )
         {
             $subFondo = $product->thisSubFondo;
-            \Log::error( $subFondo->toJson() );
             if ( $detalle->id_moneda == SOLES )
                 $subFondo->saldo -= $product->monto_asignado ;
             elseif ( $detalle->id_moneda == DOLARES )
                 $subFondo->saldo -= ( $product->monto_asignado * $tc->compra );
             if ( $subFondo->saldo < 0 )
                 return $this->warningException( 'El fondo ' . $subFondo->subCategoria->descripcion . ' solo cuenta con Saldo de S/.' . ( $subFondo->saldo + $product->monto_asignado ) . ' se requiere ' . $solicitud->detalle->typeMoney->simbolo .  $product->monto_asignado . ' para registrar la operacion' , __FUNCTION__ , __LINE__ , __FILE__ );    
-            \Log::error( $subFondo->toJson() );     
             $subFondo->save();
         }
         return $this->setRpta();
-    }    
+    }
+
+    private function decreaseFondo( $solicitud )
+    {
+        $detalle = $solicitud->detalle;
+        $fondo   = $detalle->thisSubFondo;
+        $fondo->saldo -= $detalle->monto_aprobado;
+        $fondo->save();
+        return $this->setRpta();
+    }
+
 }
