@@ -51,11 +51,11 @@
                             <th class="sin-border text-right">Autorizado por:</th>
                             <td class="sin-border text-left">
                                 @if( $solicitud->approvedHistory->createdBy->type == SUP )
-                                    
-                                @if( $solicitud->approvedHistory->createdBy->type == SUP )
-
-                                @if( $solicitud->approvedHistory->createdBy->type == SUP )
-
+                                    {{ $solicitud->approvedHistory->createdBy->sup->full_name }}
+                                @elseif( $solicitud->approvedHistory->createdBy->type == GER_PROD )
+                                    {{ $solicitud->approvedHistory->createdBy->gerProd->full_name }}    
+                                @elseif( ! is_null( $solicitud->approvedHistory->createdBy->simApp ) )
+                                    {{ $solicitud->approvedHistory->createdBy->person->full_name }}
                                 @endif                                
                             </td>
                             <th class="sin-border text-right">Cargo:</th>

@@ -381,7 +381,7 @@ class ExpenseController extends BaseController
 							'Title' => 'Registro de la Operacion de Devolución , Inversion y Actividad' );
 					}
 				}
-				elseif ( $balance <= MONTO_DESCUENTO_PLANILLA && )
+				elseif ( $balance <= MONTO_DESCUENTO_PLANILLA && $balance >= 0 )
 					if ( isset( $inputs[ 'inversion'] ) && isset( $inputs[ 'actividad' ] ) )
 					{
 						$this->setDataInstitucional( $solicitud , $inputs );
@@ -518,7 +518,7 @@ class ExpenseController extends BaseController
         {
 			$clientes[] = $client->clientType->descripcion . ': ' . $client->{$client->clientType->relacion}->full_name;
 			$cmps[]     = $client->{$client->clientType->relacion}->pefnrodoc1;
-			$getSpecialty
+			//$getSpecialty
         }
 		$clientes = implode('<br>',$clientes);
 		$cmps     = implode(', ',$cmps);
