@@ -10,9 +10,7 @@
         <header style="/*margin-top:-2em;*/">
             <h3 style="text-align:center"><strong>REPORTE DE GASTOS PUBLICIDAD Y PROMOCIÓN SEGÚN PRESUPUESTO</strong></h3>
             <img src="{{ URL::to( 'img/logo-report.png' ) }}" style="position: absolute; top: 0; width:170px; padding:0px; margin: 0; margin-left: -30px">
-        </header>
-<<<<<<< HEAD
-        
+        </header>        
             <section style="text-align:center;margin-top:1em;">
                 <table style="width: 100%">
                     <tbody>
@@ -62,33 +60,6 @@
                         </tr>
                     </tbody>
                 </table>
-=======
-        <main>
-            <section style="text-align:center;margin-top:2.5em;">
-                <strong><p style="display:inline">Fecha:</strong>&nbsp;{{$date['toDay']}}</p>
-                @if ( $solicitud->approvedHistory->updatedBy->type == SUP )
-                    <strong><p style="display:inline">Autorizado por:</strong>&nbsp;{{$solicitud->approvedHistory->updatedBy->sup->full_name}}</p>
-                    <strong><p style="display:inline">Cargo:</strong>&nbsp;Supervisor</p>
-                @elseif ( $solicitud->approvedHistory->updatedBy->type == GER_PROD )
-                    <strong><p style="display:inline">Autorizado por:</strong>&nbsp;{{$solicitud->approvedHistory->updatedBy->gerProd->full_name}}</p>
-                    <strong><p style="display:inline">Cargo:</strong>&nbsp;G. Producto</p>
-                @endif    
-                <strong><p style="display:inline">Fondo:</strong>&nbsp;{{mb_convert_case($solicitud->products[0]->thisSubFondo->subCategoria->accountFondo->nombre,MB_CASE_TITLE,'UTF-8')}}</p>
-                <strong><p style="display:inline">Código Comercial:</strong>&nbsp;{{$solicitud->id}}</p>
-            </section>
-            <section style="text-align:center;margin-top:2em;">
-                @if ( $solicitud->createdBy->type == REP_MED )
-                    <strong>
-                        <p style="display:inline">Colaborador Bagó:</strong>&nbsp;{{$solicitud->createdBy->rm->full_name}}</p>
-                    <strong><p style="display:inline">Cargo:</strong>&nbsp;Representante Medico</p>
-                @else ( $solicitud->createdBy->type == SUP )
-                    <strong>
-                        <p style="display:inline">Colaborador Bagó:</strong>&nbsp;{{$solicitud->createdBy->sup->full_name}}</p>    
-                    <strong>
-                        <p style="display:inline">Cargo:</strong>&nbsp;Supervisor</p>
-                @endif
-                <strong><p style="display:inline">Ciudad:</strong>&nbsp;Lima</p>
->>>>>>> 54a6d614acfb98596d826bb937db2e7e9ae6e293
             </section>
             <section style="margin-top:1.5em;">
                 <table class="table" style="width:100%;">
