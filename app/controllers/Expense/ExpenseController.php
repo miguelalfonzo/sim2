@@ -518,7 +518,7 @@ class ExpenseController extends BaseController
         {
 			$clientes[] = $client->clientType->descripcion . ': ' . $client->{$client->clientType->relacion}->full_name;
 			$cmps[]     = $client->{$client->clientType->relacion}->pefnrodoc1;
-			$getSpecialty
+			// $getSpecialty
         }
 		$clientes = implode('<br>',$clientes);
 		$cmps     = implode(', ',$cmps);
