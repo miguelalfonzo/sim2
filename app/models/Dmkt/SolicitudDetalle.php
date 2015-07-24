@@ -20,6 +20,12 @@ class SolicitudDetalle extends Eloquent
         return isset( $jDetalle->descuento ) ? $jDetalle->descuento : null;
     }
 
+    protected function getMontoDescuentoAttribute()
+    {
+        $jDetalle = json_decode( $this->detalle );
+        return isset( $jDetalle->monto_descuento ) ? $jDetalle->monto_descuento : null;    
+    }
+
     protected function getTccAttribute()
     {
         return json_decode( $this->detalle )->tcc;

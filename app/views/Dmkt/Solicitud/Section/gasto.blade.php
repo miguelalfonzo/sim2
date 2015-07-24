@@ -75,6 +75,7 @@
 				    </div>
 				</div>
 			</div>
+
 		</section>
 
 		<section class="row reg-expense detail-expense" style="margin:0">

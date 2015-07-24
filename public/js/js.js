@@ -168,7 +168,13 @@ $(function()
         $(".date").on("change",function(){
             $(this).datepicker('hide');
         });
-    }      
+    }
+
+    $( document ).off( 'focus' , 'input[name=numero_operacion_devolucion]' );
+    $( document ).on( 'focus' , 'input[name=numero_operacion_devolucion]' , function()
+    {
+        $( this ).parent().parent().removeClass( 'has-error' );
+    });
 
     function endExpenseAjax( data )
     {
@@ -183,6 +189,143 @@ $(function()
                 });
     }
 
+    function endExpense( otherData )
+    {
+        var data =
+        {
+            _token : $('input[name=_token]').val(),
+            token  : token
+        };
+        data = $.extend( data , otherData );
+        endExpenseAjax( data ).done( function ( response ) 
+        {
+            if ( response.Status == 'Ok' )
+            {
+                bootbox.alert( '<h4 class="green">Gasto Registrado</h4>' , function()
+                {
+                    window.location.href = server + 'show_user';
+                });
+            }
+            else if( response.Status == 'Info' )
+            {
+                bootboxExpense( response.Title , response.View , response.Type );
+            }
+            else
+                bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+        });
+    }
+
+    function bootboxExpense( title , view , type )
+    {
+        bootbox.dialog( 
+        {
+            title   : title ,
+            message : view ,
+            locale  : 'es' ,
+            size    : 'large' ,
+            buttons: 
+            {
+                danger: 
+                {
+                    label:'Cancelar',
+                    className: 'btn-primary',
+                    callback: function() 
+                    {
+                        bootbox.hideAll();
+                    }
+                },
+                success: 
+                {
+                    label: 'Confirmar',
+                    className: 'btn-success',
+                    callback: function()
+                    {
+                        if( type == 'ID' )
+                        {
+                            var status = validateEndExpenseInstitucional();
+                            if ( status == 1 )
+                            {
+                                validateEndExpenseDevolucion();   
+                                return false;
+                            }
+                            else
+                            {
+                                status = validateEndExpenseDevolucion();
+                                if ( status == 1 )
+                                    return false;
+                                else
+                                {
+                                    var otherData =
+                                    {
+                                        inversion : $( 'select[name=inversion]' ).val() ,
+                                        actividad   : $( 'select[name=actividad]' ).val() ,
+                                        numero_operacion_devolucion : $( 'input[name=numero_operacion_devolucion]' ).val()
+                                    };
+                                    endExpense( otherData );
+                                }
+                            }
+                        }
+                        else if( type == 'I' )
+                        {
+                            var status = validateEndExpenseInstitucional();
+                            if ( status == 1 )
+                                return false;
+                            else
+                            {
+                                var otherData =
+                                {
+                                    inversion : $( 'select[name=inversion]' ).val() ,
+                                    actividad   : $( 'select[name=actividad]' ).val() 
+                                };
+                                endExpense( otherData );
+                            }
+                        }
+                        else if( type == 'D' )
+                        {
+                            var status = validateEndExpenseDevolucion();
+                            if ( status == 1 )
+                                return false;
+                            else
+                            {
+                                var otherData = { numero_operacion_devolucion : $( 'input[name=numero_operacion_devolucion]' ).val() };
+                                endExpense( otherData );
+                            }
+                        }
+                        else
+                            return false;
+                    }
+                }
+            }
+        });
+    }
+
+    function validateEndExpenseDevolucion()
+    {
+        var status = 0;
+        if ( $( 'input[name=numero_operacion_devolucion]' ).val().trim() === '' )
+        {
+            $( 'input[name=numero_operacion_devolucion]' ).parent().parent().addClass( 'has-error' ).focus();
+            status = 1;
+        }
+        return status;
+    }
+
+    function validateEndExpenseInstitucional()
+    {
+        var status = 0;
+        if ( $( 'select[name=inversion]' ).val() === null )
+        {
+            $( 'select[name=inversion]' ).parent().parent().addClass( 'has-error' ).focus();
+            status = 1;
+        }
+        if ( $( 'select[name=actividad]' ).val() === null )
+        {
+            $( 'select[name=actividad]' ).parent().parent().addClass( 'has-error' ).focus();
+            status = 1;
+        }
+        return status;
+    }
+
     //Record end Solicitude
     $( '#finish-expense' ).on( 'click' , function(e)
     {
@@ -190,99 +333,14 @@ $(function()
         var type = $(this).attr( 'data-type' );
         var idfondo = $(this).attr( 'data-idfondo' );
         var balance = parseFloat( $( '#balance' ).val() );
-        if( balance >= 0 )
-        {
-            bootbox.confirm( '¿Esta seguro que desea Finalizar el registro del gasto?' , function( result ) 
-            {
-                if(result)
-                {
-                    var data =
-                    {
-                        _token : $('input[name=_token]').val(),
-                        token  : token
-                    };
-                    endExpenseAjax( data ).done( function ( response ) 
-                    {
-                        console.log( response );
-                        if ( response.Status == 'Info' )
-                        {
-                            bootbox.dialog( 
-                            {
-                                title   : 'Asignacion de Inversion y Rubro',
-                                message : response.View ,
-                                locale    : 'es' ,
-                                buttons: 
-                                {
-                                    danger: 
-                                    {
-                                        label:'Cancelar',
-                                        className: 'btn-primary',
-                                        callback: function() 
-                                        {
-                                            bootbox.hideAll();
-                                        }
-                                    },
-                                    success: 
-                                    {
-                                        label: 'Confirmar',
-                                        className: 'btn-success',
-                                        callback: function( response )
-                                        {
-                                            var status = 0;
-                                            if ( $( 'select[name=inversion]' ).val() === null )
-                                            {
-                                                $( 'select[name=inversion]' ).parent().parent().addClass( 'has-error' ).focus();
-                                                status = 1;
-                                            }
-                                            if( $( 'select[name=actividad]' ).val() === null )
-                                            {
-                                                $( 'select[name=actividad]' ).parent().parent().addClass( 'has-error' ).focus();
-                                                status = 1;
-                                            }
-
-                                            if( status == 1 )
-                                                return false;
-                                            else
-                                            {
-                                                if ( response )
-                                                {
-                                                    data.inversion = $( 'select[name=inversion]' ).val();
-                                                    data.actividad = $( 'select[name=actividad]' ).val();
-                                                    endExpenseAjax( data ).done( function ( response ) 
-                                                    {
-                                                        if ( response.Status == 'Ok' )
-                                                        {
-                                                            bootbox.alert('<h4 class="green">Gasto Registrado</h4>' , function()
-                                                            {
-                                                                window.location.href = server + 'show_user';
-                                                            });
-                                                        }
-                                                        else
-                                                            bootbox.alert('<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
-                                                    });
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            });
-                        }
-                        else if ( response.Status == 'Ok' )
-                        {
-                            bootbox.alert('<h4 class="green">Gasto Registrado</h4>' , function()
-                            {
-                                window.location.href = server + 'show_user';
-                            });
-                        }
-                        else
-                            bootbox.alert('<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
-                    });
-                }
-            });
-        }
+        var idtiposolicitud = $( '#tipo-solicitud').val();
+        var otherData = {};
+        if ( balance >= 0 )
+            endExpense( otherData );
         else
             bootbox.alert("<p style='color: red'>No puede finalizar el registro del gasto, el monto registrado supera al depositado.</p>");
     });
+    
     //Generate Seat Solicitude
     $("#seat-solicitude").on("click",function(e){
         e.preventDefault();
@@ -897,9 +955,15 @@ $(function()
         $("#balance").val(balance);
         cleanExpenseView();
         if( balance === 0 )
+        {
             $(".detail-expense").hide();
+            $('#confirm-discount').hide();    
+        }
         else
+        {
             $('.detail-expense').show();
+            $('#confirm-discount').show();    
+        }
         $(".search-ruc").show();
         $("#ruc-hide").siblings().parent().addClass('input-group');
     }

@@ -26,7 +26,7 @@
 			@foreach( $solicitud->expenses as $expense )
 				<tr data-id="{{$expense->id}}">
 					<td class="proof-type text-center">{{ $expense->proof->descripcion }}</td>
-					<td class="ruc text-center">{{{ $expense->ruc or '-' }}}</td>
+					<td class="ruc text-center">{{{ $expense->ruc or '' }}}</td>
 					<td class="razon text-center">{{{ $expense->razon or '-' }}}</td>
 					<td class="voucher_number text-center">{{$expense->num_prefijo.'-'.$expense->num_serie}}</td>
 					<td class="date_movement text-center">{{date('d/m/Y',strtotime($expense->fecha_movimiento))}}</td>
