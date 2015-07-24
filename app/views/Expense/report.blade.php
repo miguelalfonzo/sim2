@@ -60,7 +60,7 @@
                             </td>
                             <th class="sin-border text-right">Cargo:</th>
                             <td class="sin-border text-left">
-
+                                {{ $solicitud->approvedHistory->createdBy->userType->descripcion }}  
                             </td>
                         @endif
                             <th class="sin-border text-right">Fondo:</th>
