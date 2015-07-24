@@ -24,6 +24,7 @@ use \Validator;
 use \yajra\Pdo\Oci8\Exceptions\Oci8Exception;
 use \PDF2;
 use \Dmkt\InvestmentType;
+use \Users\Supervisor;
 
 class ExpenseController extends BaseController
 {
@@ -485,25 +486,45 @@ class ExpenseController extends BaseController
 		}
 	}
 
-	public function getSpecialty($cmp){
-		$query = "SELECT " .
-						"P.PEFCODPERS as CMP, " .
-						"P.PEFPATERNO as APELLIDO, " .
-						"E1.NOMESP AS ESPECIALIDAD1, " .
-						"E2.NOMESP AS ESPECIALIDAD2 " .
-					"FROM " .
-						"FICPE.PERSONAFIS P " .
-							"LEFT JOIN " .
-							  "FICPE.ESPECIAL E1 " .
-							  "ON TO_NUMBER(NVL(TRIM(P.PEFESPECIAL1),'0')) = E1.CODESP " .
-							"LEFT JOIN " .
-							  "FICPE.ESPECIAL E2 " .
-							  "ON TO_NUMBER(NVL(TRIM(P.PEFESPECIAL2),'0')) = E2.CODESP " .
-					"WHERE " .
-					  "P.PEFNRODOC1 = $cmp";
-		Log::error($query);					  
-		$result = DB::select($query);
-		return $result[0];
+	public function getSpecialty($cmp = null){
+		$result = null;
+		if(!is_null($cmp)){
+			$query = "SELECT " .
+							"P.PEFCODPERS as CMP, " .
+							"P.PEFPATERNO as APELLIDO, " .
+							"E1.NOMESP AS ESPECIALIDAD1, " .
+							"E2.NOMESP AS ESPECIALIDAD2 " .
+						"FROM " .
+							"FICPE.PERSONAFIS P " .
+								"LEFT JOIN " .
+								  "FICPE.ESPECIAL E1 " .
+								  "ON TO_NUMBER(NVL(TRIM(P.PEFESPECIAL1),'0')) = E1.CODESP " .
+								"LEFT JOIN " .
+								  "FICPE.ESPECIAL E2 " .
+								  "ON TO_NUMBER(NVL(TRIM(P.PEFESPECIAL2),'0')) = E2.CODESP " .
+						"WHERE " .
+						  "P.PEFNRODOC1 = ".$cmp;
+			Log::error("=========================================================000");
+			Log::error($query);					  
+			Log::error("=========================================================000");
+			$result = DB::select($query)[0];
+		}
+		return $result;
+	}
+
+	public function getZonaRep($id){
+		$result = null;
+		$rep = Visitador::where('VISVISITADOR', '=', $id)->first();
+		if(isset($rep->visnivel4geog))
+			$result = DB::select("SELECT * FROM FICPE.NIVEL4GEOG where N4GNIVEL4GEOG=".$rep->visnivel4geog)[0]->n4gdescripcion;
+		return $result;
+	}
+	public function getZonaSup($id){
+		$result = null;
+		$sup = Supervisor::where('SUPSUPERVISOR', '=', $id)->first();
+		if(isset($rep->supnivel4geog))
+			$result = DB::select("SELECT * FROM FICPE.NIVEL4GEOG where N4GNIVEL4GEOG=".$sup->supnivel4geog)[0]->n4gdescripcion;
+		return $result;
 	}
 
 	public function reportExpense($token)
@@ -516,18 +537,29 @@ class ExpenseController extends BaseController
 		$getSpecialty = array();
 		foreach($solicitud->clients as $client)
         {
-			$clientes[] = $client->clientType->descripcion . ': ' . $client->{$client->clientType->relacion}->full_name;
-			$cmps[]     = $client->{$client->clientType->relacion}->pefnrodoc1;
-			//$getSpecialty
+			$clientes[]     = $client->clientType->descripcion . ': ' . $client->{$client->clientType->relacion}->full_name;
+			if(!is_null($client->{$client->clientType->relacion}->pefnrodoc1))
+				$cmps[]         = $client->{$client->clientType->relacion}->pefnrodoc1;
+			$getSpecialtyResult = $this->getSpecialty($client->{$client->clientType->relacion}->pefnrodoc1);
+			if(!is_null($getSpecialtyResult)){
+				$getSpecialty[] = $getSpecialtyResult->especialidad1;
+			}
         }
-		$clientes = implode('<br>',$clientes);
-		$cmps     = implode(', ',$cmps);
-		$cmps     = trim($cmps, ', ' );
-		if($solicitud->createdBy->type == REP_MED )
+		$getSpecialty = implode("<br><br>", $getSpecialty);
+		$clientes     = implode('<br><br>',$clientes);
+		$cmps         = implode('<br><br> ',$cmps);
+		$zona = null;
+		if($solicitud->createdBy->type == REP_MED ){
 			$created_by = $solicitud->rm->full_name;
-		else if ($solicitud->createdBy->type == SUP )
+			Log::error("=========================================================000");
+			Log::error($solicitud->rm->idrm);
+			Log::error("=========================================================000");
+			$zona = $this->getZonaRep($solicitud->rm->idrm);
+		}else if ($solicitud->createdBy->type == SUP ){
 			$created_by = $solicitud->sup->full_name;
-		else
+			Log::error($solicitud->sup->idsup);
+			$zona = $this->getZonaSup($solicitud->sup->idsup);
+		}else
 			$created_by = 'Usuario no Autorizado';
 		$dni = new BagoUser;
 		$dni = $dni->dni($solicitud->createdBy->username);
@@ -567,17 +599,19 @@ class ExpenseController extends BaseController
 		}
 
 		$total = $expenses->sum('monto');
-		$data = array( 'solicitud'  => $solicitud,
-					   'detalle'	=> $jDetalle,
-					   'clientes'	=> $clientes,
-					   'cmps'		=> $cmps,
-					   'date'		=> array( 'toDay' => $solicitud->created_at , 'lastDay' => $jDetalle->fecha_entrega ),
-					   'name'       => $name_aproved,
-					   'dni' 		=> $dni,
-				       'created_by' => $created_by,
-					   'charge'     => $charge,
-					   'expenses'   => $expenses,
-					   'total'      => $total );
+		$data  = array( 'solicitud'    => $solicitud,
+						'detalle'      => $jDetalle,
+						'clientes'     => $clientes,
+						'cmps'         => $cmps,
+						'getSpecialty' => $getSpecialty,
+						'date'         => array( 'toDay' => $solicitud->created_at , 'lastDay' => $jDetalle->fecha_entrega ),
+						'name'         => $name_aproved,
+						'dni'          => $dni,
+						'created_by'   => $created_by,
+						'charge'       => $charge,
+						'expenses'     => $expenses,
+						'zona'			=> $zona,
+						'total'        => $total );
 		$data['balance'] = $this->reportBalance( $solicitud , $detalle , $jDetalle , $total );
 		$html = View::make( 'Expense.report' , $data )->render();
 		// return View::make( 'Expense.report' , $data )->render();

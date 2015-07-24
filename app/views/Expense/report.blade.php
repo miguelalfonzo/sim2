@@ -32,7 +32,7 @@
                             <td class="sin-border text-left"></td>
                         @endif
                             <th class="sin-border text-right">Ciudad:</th>
-                            <td class="sin-border text-left">Lima</td>
+                            <td class="sin-border text-left">{{ $zona }}</td>
                             <th class="sin-border text-right">Fecha:</th>
                             <td class="sin-border text-left">{{$date['toDay']}}</td>
                         </tr>
@@ -52,16 +52,19 @@
                             <td class="sin-border text-left">
                                 @if( $solicitud->approvedHistory->createdBy->type == SUP )
                                     {{ $solicitud->approvedHistory->createdBy->sup->full_name }}
+                                    <th class="sin-border text-right">Cargo:</th>
+                                    <td class="sin-border text-left">Supervisor</td>
                                 @elseif( $solicitud->approvedHistory->createdBy->type == GER_PROD )
-                                    {{ $solicitud->approvedHistory->createdBy->gerProd->full_name }}    
+                                    {{ $solicitud->approvedHistory->createdBy->gerProd->full_name }}  
+                                    <th class="sin-border text-right">Cargo:</th>
+                                    <td class="sin-border text-left">Gerente de Producto</td>  
                                 @elseif( ! is_null( $solicitud->approvedHistory->createdBy->simApp ) )
                                     {{ $solicitud->approvedHistory->createdBy->person->full_name }}
+                                    <th class="sin-border text-right">Cargo:</th>
+                                    <td class="sin-border text-left"></td>
                                 @endif                                
                             </td>
-                            <th class="sin-border text-right">Cargo:</th>
-                            <td class="sin-border text-left">
-
-                            </td>
+                            
                         @endif
                             <th class="sin-border text-right">Fondo:</th>
                             <td class="sin-border text-left">{{mb_convert_case($solicitud->products[0]->thisSubFondo->subCategoria->descripcion ,MB_CASE_TITLE,'UTF-8')}}</td>   
@@ -93,8 +96,8 @@
                                 <td>{{$value->num_prefijo.'-'.$value->num_serie}}</td>
                                 <td>{{mb_convert_case($value->descripcion,MB_CASE_TITLE,'UTF-8')}}</td>
                                 @if($key == 0 )
-                                <td rowspan="{{ $size }}">{{$cmps}}</td>
-                                <td rowspan="{{ $size }}">Dermatología</td>
+                                <td rowspan="{{ $size }}">{{ $cmps }}</td>
+                                <td rowspan="{{ $size }}">{{ $getSpecialty  }}</td>
                                 <td rowspan="{{ $size }}">
                                     {{$clientes}}
                                 </td>
