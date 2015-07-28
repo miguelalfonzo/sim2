@@ -5,7 +5,7 @@
             <select id="idState" name="idstate" class="form-control selectestatesolicitude">
                 @foreach( $states as $estado )
                     @if ( Auth::user()->type == TESORERIA )
-                        @if( $estado->id == R_REVISADO )
+                        @if( in_array( $estado->id , array( R_REVISADO , R_GASTO ) ) )
                             <option value="{{$estado->id}}" selected>{{$estado->nombre}}</option>
                         @endif
                     @elseif ( Auth::user()->type == CONT )

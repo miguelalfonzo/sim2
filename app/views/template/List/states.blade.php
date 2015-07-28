@@ -16,6 +16,10 @@
             <span class="label" style="margin-left:2px ;background-color:{{$solicitud->state->rangeState->color}}">
                 {{$solicitud->state->nombre}}
             </span>
+        @else
+            <span class="label" style="margin-left:2px ;background-color:{{$solicitud->state->rangeState->color}}">
+                {{ $solicitud->state->nombre }}
+            </span>    
         @endif
     @elseif ( $solicitud->id_estado == GASTO_HABILITADO )
         <span class="label" style="margin-left:2px ;background-color:{{$solicitud->state->rangeState->color}}">

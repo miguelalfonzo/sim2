@@ -9,17 +9,17 @@
             @if( $solicitud->idtiposolicitud == SOL_REP &&  in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) ) )
                 @if( array_intersect( $solicitud->gerente()->lists( 'id_gerprod' ) , array( Auth::user()->id , Auth::user()->tempId() ) ) )
                     <a class="btn btn-default" href="{{URL::to('ver-solicitud/'.$solicitud->token)}}">
-                        <span  class="glyphicon glyphicon glyphicon-edit"></span>
+                        <span  class="glyphicon glyphicon-edit"></span>
                     </a>
                 @endif
             @else
                 <a class="btn btn-default" href="{{URL::to('ver-solicitud/'.$solicitud->token)}}">
-                    <span  class="glyphicon glyphicon glyphicon-edit"></span>
-                </a>
+                    <span  class="glyphicon glyphicon-edit"></span>
+                </a>            
             @endif    
         @endif
         @if ( $solicitud->idtiposolicitud == SOL_REP )
-             @if( ( $solicitud->id_estado == REGISTRADO || $solicitud->id_estado == DEVOLUCION ) && Auth::user()->id == $solicitud->id_user_assign )
+             @if( in_array( $solicitud->id_estado , array( REGISTRADO , DEVOLUCION ) ) && Auth::user()->id == $solicitud->id_user_assign )
                 <a class="btn btn-default" target="_blank" href="{{URL::to('a'.'/'.$solicitud->token)}}">
                     <span  class="glyphicon glyphicon-print"></span>
                 </a>

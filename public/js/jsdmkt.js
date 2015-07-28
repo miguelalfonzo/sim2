@@ -1582,16 +1582,6 @@ function seeker( element , name , url )
                 element.val( suggestion.label );
                 element.attr( 'disabled' , true ).parent().parent().parent().addClass('has-success');
                 $( this ).parent().parent().find('.edit-repr').fadeIn();
-                /*repInfo( suggestion.value ).done( function (result)
-                {
-                    if ( result.Data.cuenta )
-                        element.attr('data-cuenta', result.Data.cuenta );
-                    if ( result.Data.sup )
-                    {
-                        element.attr('data-sup' , result.Data.sup.nombre );
-                        element.attr('data-cod-sup' , result.Data.sup.idsup);
-                    }   
-                });*/
             }
         });
     }
@@ -1627,7 +1617,6 @@ function filterSelect( element , ids , type )
         }
     }
 }
-
 
 function repInfo(rm)
 {

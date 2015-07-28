@@ -222,8 +222,10 @@ class MoveController extends BaseController
                 });
             });
         elseif ( Auth::user()->type == TESORERIA ) 
-            if ( $estado != R_FINALIZADO)
+            if ( $estado == R_REVISADO )
                 $solicituds->whereIn( 'id_estado' , array( DEPOSITO_HABILITADO , DEPOSITADO ) );
+            else if( $estado == R_GASTO )
+                $solicituds->whereIn( 'id_estado' ,array( DEVOLUCION , REGISTRADO ) );
 
         if ( $estado != R_TODOS)
             $solicituds->whereHas( 'state' , function ( $q ) use( $estado )

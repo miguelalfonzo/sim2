@@ -365,6 +365,7 @@ class SolicitudeController extends BaseController
             if ( $middleRpta[ status ] != ok )
                 return $middleRpta;
             $solProduct->save();
+            \Log::error( $solProduct->toJson() );
             $userTypeforDiscount = $solProduct->id_tipo_fondo_marketing;
             $ids_fondo_mkt[] = array( 'old'         => $old_id_fondo_mkt , 
                                       'oldUserType' => $old_cod_user_type , 

@@ -24,9 +24,14 @@
                                             @endif
                                         @endforeach
                                     @else
+                                        <option value="{{ $product->id_fondo_marketing . ',' . $product->id_tipo_fondo_marketing }}" style="background-color:gold" selected>
+                                            {{ $product->thisSubFondo->subCategoria->descripcion . ' | ' . 
+                                               $product->thisSubFondo->marca->descripcion . ' S/.' . 
+                                               $product->thisSubFondo->saldo . ' ( Reservado ' . $product->monto_asignado . ' ) ' }}
+                                        </option>    
                                         @foreach( $product->getSubFondo( $tipo_usuario , $solicitud ) as $subFondo )
                                             @if ( $subFondo->id == $product->id_fondo_marketing )
-                                                <option selected value="{{ $subFondo->id . ',' . $subFondo->tipo }}" style="background-color:#00FFFF">{{$subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
+                                                <option value="{{ $subFondo->id . ',' . $subFondo->tipo }}" style="background-color:#00FFFF">{{$subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
                                             @else   
                                                 <option value="{{ $subFondo->id . ',' . $subFondo->tipo }}">{{$subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
                                             @endif
