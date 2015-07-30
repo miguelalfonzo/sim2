@@ -8,20 +8,20 @@
     */
     Route::get('testalert' , 'TestController@testalert');
     Route::get('dt' , 'TestController@dt');
-    Route::get('test', array('uses' => 'Dmkt\LoginController@test'));
+//    Route::get('test', array('uses' => 'Dmkt\LoginController@test')); MÉTODO NO EXISTE
     Route::get('set_status', array('uses' => 'BaseController@setStatus'));
     Route::get('sendmail', array('uses' => 'BaseController@postman'));
-    Route::get('prueba', 'Dmkt\FondoController@test');
+//    Route::get('prueba', 'Dmkt\FondoController@test');    MÉTODO  NO EXISTE
     // Route::get('testUploadImg', 'BaseController@viewTestUploadImg');
     // Route::post('testUploadImgSave', 'BaseController@viewTestUploadImgSave');
 
-    Route::get('clientes-data','TestController@clientsTables');
-    Route::get('hola', 'Expense\ExpenseController@test');
+//    Route::get('clientes-data','TestController@clientsTables');   MÉTODO NO EXISTE
+//    Route::get('hola', 'Expense\ExpenseController@test');     MÉTODO NO EXISTE
     Route::get('a/{token}', 'Expense\ExpenseController@reportExpense');
     Route::get('report-fondo/{token}','Expense\ExpenseController@reportExpenseFondo');
     Route::get('report', 'ExpenseController@reportExpense');
-    Route::get('tmp','TestController@tm');
-    Route::get('history','TestController@withHistory');
+//    Route::get('tmp','TestController@tm'); // ARRAY NULO
+//    Route::get('history','TestController@withHistory'); ERROR DE QUERY
 
     Route::post( 'get-cell-maintenance-info' , 'Maintenance\TableController@getMaintenanceCellData' );
     Route::post( 'update-maintenance-info' , 'Maintenance\TableController@updateMaintenanceData' );
@@ -30,9 +30,9 @@
     Route::post( 'get-table-maintenance-info' , 'Maintenance\TableController@getMaintenanceTableData');
     Route::post( 'maintenance-enable' , 'Maintenance\TableController@enableRecord');
     Route::post( 'maintenance-disable' , 'Maintenance\TableController@disableRecord');
-    Route::get( 'test-query' , 'TestController@testQuery' );
-    Route::get( 'test-fondo-query' , 'TestController@getUserSubFondos' );
-    Route::get( 'testcalert' , 'TestController@testcalert');
+//    Route::get( 'test-query' , 'TestController@testQuery' ); ARRAY NULO
+//    Route::get( 'test-fondo-query' , 'TestController@getUserSubFondos' ); ERROR TABLE OR VIEW NO EXISTS
+//    Route::get( 'testcalert' , 'TestController@testcalert');  ERROR Undefined variable--> result
 
     //--- TIME LINE --
 
