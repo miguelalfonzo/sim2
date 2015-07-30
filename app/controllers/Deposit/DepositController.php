@@ -255,4 +255,33 @@ class DepositController extends BaseController{
         return $this->setRpta();
     }
 
+    public function confirmDevolution()
+    {
+        try
+        {
+            DB::beginTransaction();
+            $inputs = Input::all();
+            $solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
+            if( $solicitud->id_estado != DEVOLUCION )
+                return $this->warningException( 'Cancelado - La solicitud no se encuentra en la etapa de confirmacion de la devolucion' , __FUNCTION__ , __LINE__ , __FILE__ );
+            elseif( $solicitud->detalle->id_motivo == REEMBOLSO )
+                return $this->warningException( 'Cancelado - Los Reembolos no estan habilitados para la confirmacion de la devolucion' , __FUNCTION__ , __LINE__ , __FILE__ );
+                
+            $oldIdestado = $solicitud->id_estado;
+            $solicitud->id_estado = REGISTRADO;
+            $solicitud->save();
+            $middleRpta = $this->setStatus( $oldIdestado, $solicitud->id_estado , Auth::user()->id , USER_CONTABILIDAD , $solicitud->id );
+            if ( $middleRpta[ status ] == ok )
+                DB::commit();
+            else
+                DB::rollback();
+            return $middleRpta;
+        }
+        catch( Exception $e )
+        {
+            DB::rollback();
+            return $this->internalException( $e , __FUNCTION__ );
+        }
+    }
+
 }

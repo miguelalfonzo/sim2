@@ -25,8 +25,8 @@ return array(
 	|
 	*/
 
-	//'default' => 'oracle',
-	'default' => 'mysql',
+	'default' => 'oracle',
+	//'default' => 'mysql',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -82,18 +82,18 @@ return array(
 			'username' => 'root',
 			'password' => '',
 			'prefix'   => '',
-		)
-		/*
-		'oracle_ms' => array(
+		),
+		
+		'oracle' => array(
 			'driver' => 'pdo-via-oci8',
-			'host' => '192.168.1.4',
+			'host' => '192.168.1.36',
 			'port' => '1521',
-			'database' => 'BDBAGO',
-			'username' => 'outdvp',
-			'password' => 'outdvp',
+			'database' => 'xe',
+			'username' => 'sim',
+			'password' => 'sim',
 			'charset' => 'utf8',
 			'prefix' => '',
-		),*/
+		)
 
 	),
 

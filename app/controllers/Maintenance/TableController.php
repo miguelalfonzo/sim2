@@ -21,6 +21,10 @@ use \Dmkt\InvestmentActivity;
 use \Dmkt\Activity;
 use \Client\ClientType;
 use \Parameter\Parameter;
+use \Fondo\FondoSupervisor;
+use \Fondo\FondoGerProd;
+use \Fondo\FondoInstitucional;
+use \System\FondoMktHistory;
 
 class TableController extends BaseController
 {
@@ -175,6 +179,34 @@ class TableController extends BaseController
 		$columns = json_decode( $columns->formula );
 		return $this->setRpta( View::make( 'Maintenance.table' )->with( array( 'records' => $records , 'columns' => $columns , 'type' => 'cuentas-marca' ) )->render() );
 	}
+
+	public function getSupFunds()
+	{
+		$records = FondoSupervisor::order();
+		$columns = Maintenance::find( 3 );
+		$columns = json_decode( $columns->formula );
+		return View::make( 'Maintenance.table' , array( 'records' => $records , 'columns' => $columns , 'type' => 'FondosSupervisor' , 
+														'titulo' => 'Fondos de Supervisor' , 'add' => false ) );	
+	}
+
+	public function getGerProdFunds()
+	{
+		$records = FondoGerProd::order();
+		$columns = Maintenance::find( 4 );
+		$columns = json_decode( $columns->formula );
+		return View::make( 'Maintenance.table' , array( 'records' => $records , 'columns' => $columns ,	'type' 	  => 'FondosGerProd',
+														'titulo'  => 'Fondos de Gerente de Producto' , 'add'     => false ) );
+	}
+
+	public function getInstitutionFunds()
+	{
+		$records = FondoInstitucional::order();
+		$columns = Maintenance::find( 5 );
+		$columns = json_decode( $columns->formula );
+		return View::make( 'Maintenance.table' , array( 'records' => $records , 'columns' => $columns ,	'type' => 'FondosInstitution',
+														'titulo' => 'Fondos de Institucion', 'add' => false ) );
+	}
+
 	private function getFondos()
     {
         $fondos = Fondo::order();
@@ -222,6 +254,63 @@ class TableController extends BaseController
 		{
 			return $this->internalException( $e , __FUNCTION__ );
 		}
+	}
+
+	private function maintenanceUpdateFondosSupervisor( $val )
+	{
+		$fondoSup = FondoSupervisor::find( $val[ 'id' ] );
+		$oldSaldo = $fondoSup->saldo;
+		foreach( $val[ data ] as $key => $data )
+			$fondoSup->$key = $data;
+		$fondoSup->save();
+
+		$fondoMktHistory = new FondoMktHistory;
+		$fondoMktHistory->id = $fondoMktHistory->nextId();
+		$fondoMktHistory->id_to_fondo = $val[ 'id' ];
+		$fondoMktHistory->to_old_saldo = $oldSaldo;
+		$fondoMktHistory->to_new_saldo = $fondoSup->saldo;
+		$fondoMktHistory->id_fondo_history_reason = FONDO_AJUSTE; 
+		$fondoMktHistory->save();
+
+		return $this->setRpta();
+	}
+
+	private function maintenanceUpdateFondosGerProd( $val )
+	{
+		$fondoGerProd = FondoGerProd::find( $val[ 'id' ] );
+		$oldSaldo = $fondoGerProd->saldo;
+		foreach( $val[ data ] as $key => $data )
+			$fondoGerProd->$key = $data;
+		$fondoGerProd->save();
+		
+		$fondoMktHistory = new FondoMktHistory;
+		$fondoMktHistory->id = $fondoMktHistory->nextId();
+		$fondoMktHistory->id_to_fondo = $val[ 'id' ];
+		$fondoMktHistory->to_old_saldo = $oldSaldo;
+		$fondoMktHistory->to_new_saldo = $fondoGerProd->saldo;
+		$fondoMktHistory->id_fondo_history_reason = FONDO_AJUSTE; 
+		$fondoMktHistory->save();
+
+		return $this->setRpta();
+	}
+
+	private function maintenanceUpdateFondosInstitution( $val )
+	{
+		$fondoInstitution = FondoInstitucional::find( $val[ 'id' ] );
+		$oldSaldo = $fondoInstitution->saldo;		
+		foreach( $val[ data ] as $key => $data )
+			$fondoInstitution->$key = $data;
+		$fondoInstitution->save();
+
+		$fondoMktHistory = new FondoMktHistory;
+		$fondoMktHistory->id = $fondoMktHistory->nextId();
+		$fondoMktHistory->id_to_fondo = $val[ 'id' ];
+		$fondoMktHistory->to_old_saldo = $oldSaldo;
+		$fondoMktHistory->to_new_saldo = $fondoInstitution->saldo;
+		$fondoMktHistory->id_fondo_history_reason = FONDO_AJUSTE; 
+		$fondoMktHistory->save();
+
+		return $this->setRpta();
 	}
 
 	private function maintenanceUpdateparametro( $val )

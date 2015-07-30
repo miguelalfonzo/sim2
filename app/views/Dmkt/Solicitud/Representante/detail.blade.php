@@ -55,16 +55,26 @@
     <!-- N° de Operacion relacionada al deposito -->
     @if( Auth::user()->type == TESORERIA && !is_null( $detalle->id_deposito ) )
         <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
-            <label class="control-label">Nº de Operación</label>
+            <label class="control-label">Deposito Nº de Operación</label>
             <div>
                 <input type="text" class="form-control" value="{{$detalle->deposit->num_transferencia}}" disabled>
             </div>
         </div>
     @endif
+
     
     <!-- Tasa de Cambio del Dia del Deposito -->
     @include('Dmkt.Solicitud.Detail.tasa')
 
+    @if( ! is_null( $detalle->numero_operacion_devolucion ) )
+        <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+            <label class="control-label">Devolucion Nº de Operación</label>
+            <div>
+                <input type="text" class="form-control" value="{{ $detalle->numero_operacion_devolucion }}" disabled>
+            </div>
+        </div>
+    @endif
+    
     <!-- Fecha de Descuento al Responsable del Gasto -->
     @if ( ! is_null( $detalle->descuento ) )
         @include('Dmkt.Solicitud.Detail.discount')

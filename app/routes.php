@@ -70,6 +70,10 @@
     {
         Route::post('aprobar-solicitud', 'Dmkt\SolicitudeController@approvedSolicitude');
         Route::post('gercom-mass-approv','Dmkt\SolicitudeController@massApprovedSolicitudes');
+        Route::get('maintenance/FondosSupervisor', 'Maintenance\TableController@getSupFunds');
+        Route::get('maintenance/FondosGerProd', 'Maintenance\TableController@getGerProdFunds');
+        Route::get('maintenance/FondosInstitution', 'Maintenance\TableController@getInstitutionFunds');
+         
     });
 
     /*
@@ -110,6 +114,7 @@
     Route::group(array('before' => 'tes'), function()
     {
         Route::post( 'deposit-solicitude', 'Deposit\DepositController@depositSolicitudeTes');
+        Route::post( 'confirm-devolution', 'Deposit\DepositController@confirmDevolution' ); 
     });
 
     /*

@@ -1,6 +1,5 @@
 <div class="form-group col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px">
-    <div class="col-sm-12 col-md-12 col-lg-12" style="text-align: center">
-        
+    <div class="col-sm-12 col-md-12 col-lg-12" style="text-align: center">  
         @if ( $politicStatus ) 
             <a class="btn btn-success" id="search_responsable">
                 Aceptar
@@ -32,8 +31,12 @@
                     @endif
                 @endif
             @endif
-        @elseif ( Auth::user()->type == TESORERIA && $solicitud->id_estado == DEPOSITO_HABILITADO )
-            <a class="btn btn-success" data-toggle="modal" data-target="#myModal" >Registrar Depósito</a>
+        @elseif ( Auth::user()->type == TESORERIA )
+            @if ( $solicitud->id_estado == DEPOSITO_HABILITADO )
+                <a class="btn btn-success" data-toggle="modal" data-target="#myModal" >Registrar Depósito</a>
+            @elseif ( $solicitud->id_estado == DEVOLUCION )
+                <a class="btn btn-success" id="confirm-devolucion">Confirmar Devolución</a>
+            @endif
         @endif
         <a href="{{URL::to('show_user')}}" class="btn btn-primary">
             Regresar

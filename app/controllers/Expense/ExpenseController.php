@@ -314,10 +314,11 @@ class ExpenseController extends BaseController
 		}
 	}
 
-	private function setDevolucion( $solicitud , $detalle , $jDetalle , $inputs )
+	private function setDevolucion( $solicitud , $detalle , $jDetalle , $inputs , $balance )
 	{
 		$solicitud->id_estado    = DEVOLUCION;
 		$jDetalle->numero_operacion_devolucion = $inputs[ 'numero_operacion_devolucion' ];
+		$jDetalle->monto_descuento             = $balance;
 		$detalle->detalle = json_encode( $jDetalle );
 		$detalle->save();
 		return USER_TESORERIA;
@@ -351,7 +352,7 @@ class ExpenseController extends BaseController
 				if ( $balance > MONTO_DESCUENTO_PLANILLA )
 					if ( isset( $inputs[ 'numero_operacion_devolucion' ] ) && ! empty( trim( $inputs[ 'numero_operacion_devolucion'] ) ) )
 					{
-						$userTo = $this->setDevolucion( $solicitud , $detalle , $jDetalle , $inputs );
+						$userTo = $this->setDevolucion( $solicitud , $detalle , $jDetalle , $inputs , $balance );
 					}
 					else
 						return array( 
@@ -372,7 +373,7 @@ class ExpenseController extends BaseController
 					if ( isset( $inputs[ 'inversion'] ) && isset( $inputs[ 'actividad' ] ) && isset( $inputs[ 'numero_operacion_devolucion' ] ) )
 					{
 						$this->setDataInstitucional( $solicitud , $inputs );	
-						$userTo = $this->setDevolucion( $solicitud , $detalle , $jDetalle , $inputs );
+						$userTo = $this->setDevolucion( $solicitud , $detalle , $jDetalle , $inputs ,$balance );
 					}
 					else
 					{
@@ -404,9 +405,6 @@ class ExpenseController extends BaseController
 				return $this->warningException( 'No se pudo identificar el tipo de solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
 	
 			$solicitud->save();
-
-			\Log::error( $solicitud->toJson() );
-			\Log::error( $detalle->toJson() );
 
 			$rpta = $this->setStatus( $oldIdEstado, $solicitud->id_estado , Auth::user()->id, $userTo , $solicitud->id );
 			if ( $rpta[status] == ok )

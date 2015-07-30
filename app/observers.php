@@ -25,6 +25,10 @@ use \Dmkt\InvestmentType;
 use \Dmkt\Activity;
 use \Dmkt\InvestmentActivity;
 use \System\FondoHistory;
+use \Fondo\FondoSupervisor;
+use \Fondo\FondoGerProd;
+use \Fondo\FondoInstitucional;
+use \System\FondoMktHistory;
 	
 	Solicitud::observe(			new Transaction());
 	SolicitudDetalle::observe(	new Transaction());
@@ -48,3 +52,7 @@ use \System\FondoHistory;
 	Activity::observe(          new SoftDelete());
 	InvestmentActivity::observe(new Transaction());
 	FondoHistory::observe(      new Transaction());
+	FondoSupervisor::observe( new Transaction());
+	FondoGerProd::observe( new Transaction());
+	FondoInstitucional::observe( new Transaction());
+	FondoMktHistory::observe( new Transaction());

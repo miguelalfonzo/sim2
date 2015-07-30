@@ -166,3 +166,5 @@ const APP_ID                                  = 2;
 
 const TITULO_INSTITUCIONAL 					  = 'FONDO INSTITUCIONAL';
 const MONTO_DESCUENTO_PLANILLA                = 50;
+
+const FONDO_AJUSTE = 1;

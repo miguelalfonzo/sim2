@@ -25,4 +25,9 @@ class FondoInstitucional extends Eloquent
             ->leftJoin( 'fondo_categoria fc' , 'fsc.id_fondo_categoria' , '=' , 'fc.id' )
             ->where( 'fsc.tipo' , FONDO_SUBCATEGORIA_INSTITUCION )->get();
     }
+
+    protected static function order()
+	{
+		return FondoInstitucional::orderBy( 'updated_at' , 'desc' )->get();
+	}
 }

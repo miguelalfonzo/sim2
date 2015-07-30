@@ -61,28 +61,8 @@
         </bdi>
         <img src="{{URL::to('/')}}/img/user.png">
     </a>
-    @if(Auth::user()!= null)
-        @if(Auth::user()->type == 'R')
-        <input id="typeUser" type="hidden" value="R">
-        @endif
-        @if(Auth::user()->type == 'S')
-        <input id="typeUser" type="hidden" value="S">
-        @endif
-        @if(Auth::user()->type == 'G')
-        <input id="typeUser" type="hidden" value="G">
-        @endif
-        @if(Auth::user()->type == 'C')
-        <input id="typeUser" type="hidden" value="C">
-        @endif
-        @if(Auth::user()->type == 'P')
-        <input id="typeUser" type="hidden" value="P">
-        @endif
-        @if(Auth::user()->type == 'T')
-        <input id="typeUser" type="hidden" value="T">
-        @endif
-        @if(Auth::user()->type == 'AG')
-            <input id="typeUser" type="hidden" value="AG">
-        @endif
+    @if( ! is_null( Auth::user() ) )
+        <input id="typeUser" type="hidden" value="{{ Auth::user()->type }}">
     @endif
 </header>
 
@@ -135,18 +115,16 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Configuración <span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
                             @if ( in_array(Auth::user()->type, array(SUP, GER_PROD, GER_PROM, GER_COM)) )
-                            <li><a data-toggle="modal" data-target="#modal-temporal-user">Derivación de Usuario</a>
-                            </li>
-                            @endif
-                            @if ( in_array(Auth::user()->type, array(GER_COM, TESORERIA)) )
-                            <li><a href="{{ URL::to('maintenance/fondos') }}">Mantenimiento de Fondos</a></li>
+                                <li><a data-toggle="modal" data-target="#modal-temporal-user">Derivación de Usuario</a></li>
                             @endif
                             @if ( in_array(Auth::user()->type, array(GER_COM)) )
-                            <li><a href="{{ URL::to('maintenance/inversion') }}">Mantenimiento de Inversion</a></li>
-                            <li><a href="{{ URL::to('maintenance/activity') }}">Mantenimiento de Actividades</a></li>
-                            <li><a href="{{ URL::to('maintenance/investmentactivity') }}">Mantenimiento de Inversion-Actividad</a></li>
-                            <li><a href="{{ URL::to('maintenance/parameters') }}">Mantenimiento de Parametros</a></li>
-
+                                <li><a href="{{ URL::to('maintenance/inversion') }}">Mantenimiento de Inversion</a></li>
+                                <li><a href="{{ URL::to('maintenance/activity') }}">Mantenimiento de Actividades</a></li>
+                                <li><a href="{{ URL::to('maintenance/investmentactivity') }}">Mantenimiento de Inversion-Actividad</a></li>
+                                <li><a href="{{ URL::to('maintenance/parameters') }}">Mantenimiento de Parametros</a></li>
+                                <li><a href="{{ URL::to('maintenance/FondosSupervisor') }}">Mantenimiento de Fondos de Supervisor</a></li>
+                                <li><a href="{{ URL::to('maintenance/FondosGerProd') }}">Mantenimiento de Fondos de G. Producto</a></li>
+                                <li><a href="{{ URL::to('maintenance/FondosInstitution') }}">Mantenimiento de Fondos Institucionales</a></li>
                             @endif
                             @if ( in_array(Auth::user()->type, array(CONT)) )
                             <li><a href="{{ URL::to('export/solicitudToDeposit') }}">Exportar Solicitudes a Depositar</a></li>

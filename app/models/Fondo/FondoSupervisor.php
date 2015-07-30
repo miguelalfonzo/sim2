@@ -17,6 +17,16 @@ class FondoSupervisor extends Eloquent
 
 	public function marca()
 	{
-		return $this->belongsTo('Dmkt\Marca', 'marca_id' );
+		return $this->belongsTo( 'Dmkt\Marca', 'marca_id' );
+	}
+
+	protected function sup()
+	{
+		return $this->hasOne( 'Users\Sup' , 'iduser' , 'supervisor_id' );
+	}
+
+	protected static function order()
+	{
+		return FondoSupervisor::orderBy( 'updated_at' , 'desc' )->get();
 	}
 }

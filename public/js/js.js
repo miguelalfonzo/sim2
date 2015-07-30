@@ -1629,6 +1629,28 @@ $(function()
         }
     });
 
+    $('#confirm-devolucion').on( 'click' , function()
+    {
+        bootbox.confirm( '<h4 class="text-center text-info">Confirme la devolucion</h4>' , function( response )
+        {
+            if( response )
+            {
+                var data = { _token : GBREPORTS.token , token : $( 'input[name=token]' ).val() };
+                $.post( server + 'confirm-devolution' , data )
+                .done(function ( response ) 
+                {
+                    if ( response.Status == 'Ok' )
+                        bootbox.alert( '<h4 class="green">Confirmacion Correcta</h4>' , function()
+                        {
+                            window.location.href = server + 'show_user';
+                        });
+                    else
+                        bootbox.alert( '<h4 style="color:red">' + response.Status + ' : ' + response.Description + '</h4>' );
+                });
+            }  
+        });
+    });
+
     $( document ).off( 'click' , '#periodo' );
     $( document ).on( 'click' , '#periodo' , function()
     {

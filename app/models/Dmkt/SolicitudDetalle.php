@@ -9,6 +9,12 @@ class SolicitudDetalle extends Eloquent
 	protected $table = 'SOLICITUD_DETALLE';
     protected $primaryKey = 'id';    
  
+    protected function getNumeroOperacionDevolucionAttribute()
+    {
+        $jDetalle = json_decode( $this->detalle );
+        return isset( $jDetalle->numero_operacion_devolucion ) ? $jDetalle->numero_operacion_devolucion : null;            
+    }
+
     protected function getMontoAprobadoAttribute()
     {
         return json_decode( $this->detalle )->monto_aprobado;

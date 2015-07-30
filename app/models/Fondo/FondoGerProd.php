@@ -24,4 +24,9 @@ class FondoGerProd extends Eloquent
 	{
 		return $this->hasOne( 'Fondo\FondoSubCategoria' , 'id' , 'subcategoria_id' );
 	}
+
+	protected static function order()
+	{
+		return FondoGerProd::orderBy( 'updated_at' , 'desc' )->get();
+	}
 }

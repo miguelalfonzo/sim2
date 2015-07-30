@@ -51,7 +51,7 @@
                                 <select id="bank_account" name="bank_account" class="form-control">
                                     @foreach ( $banks as $bank )
                                         <option value="{{$bank->num_cuenta}}">
-                                            {{$bank->typeMoney->simbolo.'-'.$bank->bagoAccount->ctanombrecta}}
+                                            {{ $bank->typeMoney->simbolo . '-' . $bank->bagoAccount->ctanombrecta}}
                                         </option>
                                     @endforeach
                                 </select>
