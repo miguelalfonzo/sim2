@@ -108,11 +108,12 @@ class SolicitudeController extends BaseController
 
     public function newSolicitude()
     {
+        include( app_path() . '\models\Query\Query.php' );
         $data = array( 'reasons'     => Reason::all() ,
                        'activities'  => Activity::order(),
                        'payments'    => TypePayment::all(),
                        'currencies'  => TypeMoney::all(),
-                       'families'    => Marca::orderBy('descripcion', 'ASC')->get(),
+                       'families'    => $qryProducts->get() ,
                        'investments' => InvestmentType::order() );
         if ( in_array( Auth::user()->type , array( SUP , GER_PROD ) ) )
             $data[ 'reps' ] = Rm::order();            
@@ -365,7 +366,6 @@ class SolicitudeController extends BaseController
             if ( $middleRpta[ status ] != ok )
                 return $middleRpta;
             $solProduct->save();
-            \Log::error( $solProduct->toJson() );
             $userTypeforDiscount = $solProduct->id_tipo_fondo_marketing;
             $ids_fondo_mkt[] = array( 'old'         => $old_id_fondo_mkt , 
                                       'oldUserType' => $old_cod_user_type , 
@@ -394,7 +394,6 @@ class SolicitudeController extends BaseController
                     $subFondo = FondoGerProd::find( $id_fondo[ 'old' ] );
                 $subFondo->saldo += round( $id_fondo[ 'oldMonto' ] * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN );
                 $subFondo->save();
-                \Log::error( $subFondo->toJson() );
             }
             if ( ! is_null( $userType ) )
             {
@@ -404,7 +403,6 @@ class SolicitudeController extends BaseController
                     $subFondo = FondoGerProd::find( $id_fondo[ 'new' ] );
                 $subFondo->saldo -= round( $id_fondo[ 'newMonto' ] * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN );
                 $subFondo->save();
-                \Log::error( $subFondo->toJson() );
             }
         }
 
@@ -526,7 +524,8 @@ class SolicitudeController extends BaseController
                                 if ( $middleRpta[status] == ok )
                                 {
                                     Session::put( 'state' , R_PENDIENTE );
-                                    DB::commit();
+                                    //DB::commit();
+                                    return false;
                                     return $middleRpta;
                                 }
                             }
@@ -728,7 +727,11 @@ class SolicitudeController extends BaseController
         }
         else if ( $userType == GER_PROD )
         {
-            $idsGerProd = Marca::whereIn( 'id' , $idsProducto )->lists( 'gerente_id' );
+            //$idsGerProd = Marca::whereIn( 'id' , $idsProducto )->lists( 'gerente_id' );
+
+            include( app_path() . '\models\Query\Query.php' );
+            $idsGerProd = $qryGerProds->lists( 'codigo' );
+
             $uniqueIdsGerProd = array_unique( $idsGerProd );
             $repeatIds = array_count_values( $idsGerProd );
             $maxNumberRepeat = max( $repeatIds );
