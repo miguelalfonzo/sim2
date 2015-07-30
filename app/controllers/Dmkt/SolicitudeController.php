@@ -524,8 +524,7 @@ class SolicitudeController extends BaseController
                                 if ( $middleRpta[status] == ok )
                                 {
                                     Session::put( 'state' , R_PENDIENTE );
-                                    //DB::commit();
-                                    return false;
+                                    DB::commit();
                                     return $middleRpta;
                                 }
                             }

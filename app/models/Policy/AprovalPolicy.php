@@ -11,7 +11,15 @@ class AprovalPolicy extends Eloquent
 
     protected static function getToUser( $investment , $order )
     {
-    	return AprovalPolicy::where( 'id_inversion ' , $investment )->where( 'orden' , $order )->select( 'tipo_usuario' ,'desde' , 'hasta' )->first();
+    	return AprovalPolicy::where( 'orden' , $order )->select( 'tipo_usuario' ,'desde' , 'hasta' )->whereHas( 'investment' , function( $query ) use ( $investment )
+        {
+            $query->where( 'id_inversion' , $investment );
+        })->first();
+    }
+
+    public function investment()
+    {
+        return $this->hasMany( 'Policy\InvestmentAprovalPolicy' , 'id_politica_aprobacion' , 'id' );
     }
 
     protected static function getUserInvestmentPolicy( $investment , $userType , $order )
