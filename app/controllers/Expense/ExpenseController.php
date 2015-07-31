@@ -377,9 +377,10 @@ class ExpenseController extends BaseController
 					}
 					else
 					{
+						$investments = InvestmentType::orderInst();
 						return array( 
 							status => 'Info' , 
-							'View' => View::make( 'Dmkt.Register.expense-missing-data' , array( 'investments' => InvestmentType::order() , 'activities' => Activity::order() , 'devolucion' => true ) )->render() ,
+							'View' => View::make( 'Dmkt.Register.expense-missing-data' , array( 'investments' => $investments , 'activities' => Activity::order() , 'devolucion' => true ) )->render() ,
 							'Type' => 'ID' ,
 							'Title' => 'Registro de la Operacion de Devolución , Inversion y Actividad' );
 					}
@@ -393,9 +394,10 @@ class ExpenseController extends BaseController
 					}
 					else
 					{
+						$investments = InvestmentType::orderInst();
 						return array( 
 							status => 'Info' , 
-							'View' => View::make( 'Dmkt.Register.expense-missing-data' , array( 'investments' => InvestmentType::order() , 'activities' => Activity::order() ) )->render() ,
+							'View' => View::make( 'Dmkt.Register.expense-missing-data' , array( 'investments' => $investments , 'activities' => Activity::order() ) )->render() ,
 							'Type' => 'I' ,
 							'Title' => 'Registro de la Inversion y Actividad');
 					}
