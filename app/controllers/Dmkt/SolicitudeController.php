@@ -44,6 +44,7 @@ use \Fondo\FondoGerProd;
 use \Fondo\FondoSupervisor;
 use \Carbon\Carbon;
 use \Fondo\FondoInstitucional;
+use \Parameter\Tablas;
 
 class SolicitudeController extends BaseController
 {
@@ -108,7 +109,7 @@ class SolicitudeController extends BaseController
 
     public function newSolicitude()
     {
-        include( app_path() . '\models\Query\Query.php' );
+        include( app_path() . '\models\Query\QueryProducts.php' );
         $data = array( 'reasons'     => Reason::all() ,
                        'activities'  => Activity::order(),
                        'payments'    => TypePayment::all(),
@@ -122,12 +123,13 @@ class SolicitudeController extends BaseController
 
     public function editSolicitud($token)
     {
+        include( app_path() . '\models\Query\QueryProducts.php' );
         $data = array( 'solicitud'   => Solicitud::where('token', $token)->firstOrFail(),
                        'reasons'     => Reason::all(),
                        'activities'  => Activity::order(),
                        'payments'    => TypePayment::all(),
                        'currencies'  => TypeMoney::all(),
-                       'families'    => Marca::orderBy('descripcion', 'ASC')->get(),
+                       'families'    => $qryProducts->get() ,
                        'investments' => InvestmentType::order() ,
                        'edit'        => true );
         $data[ 'detalle' ] = $data['solicitud']->detalle;
@@ -151,7 +153,7 @@ class SolicitudeController extends BaseController
         
             if ( $solicitud->idtiposolicitud != SOL_INST && in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) ) )
             {
-                $politicType = $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario;
+                $politicType = $solicitud->aprovalPolicy( $solicitud->histories->count() )->policy->tipo_usuario;
                 if ( in_array( $politicType , array( Auth::user()->type , Auth::user()->tempType() ) )
                 && ( array_intersect ( array( Auth::user()->id , Auth::user()->tempId() ) , $solicitud->managerEdit( $politicType )->lists( 'id_gerprod' ) ) ) )
                 {
@@ -422,7 +424,7 @@ class SolicitudeController extends BaseController
             return $this->warningException( 'No es posible seleccionar Fondos de Diferentes SubCategorias por Solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
         foreach( $fondos as $key1 => $fondoMkt )
         {
-            $marca = Marca::find( $fondoMkt->marca_id );
+            $marca = Tablas::findProduct( $fondoMkt->marca_id );
             if ( in_array( SUP , $userTypes ) )
                 $fondoMktOrigin = FondoSupervisor::find( $fondoMkt->id );
             else
@@ -431,7 +433,7 @@ class SolicitudeController extends BaseController
             if ( $fondoMktOrigin->saldo < 0 )
             {
                 return $this->warningException( 
-                    'El Fondo asignado ' . $fondoMktOrigin->subCategoria->descripcion . ' | ' . $marca->descripcion .
+                    'El Fondo asignado ' . $fondoMktOrigin->subCategoria->descripcion . ' | ' . $marca->nombre .
                     ' solo cuenta con S/.' . ( $fondoMktOrigin->saldo + $fondo_total[ $key1 ] ) . ' el cual no es suficiente para completar el registro , se requiere un saldo de S/.' . 
                     $fondo_total[ $key1 ] . ' en total ' , __FUNCTION__ , __LINE__ , __FILE__ );       
             }
@@ -728,7 +730,7 @@ class SolicitudeController extends BaseController
         {
             //$idsGerProd = Marca::whereIn( 'id' , $idsProducto )->lists( 'gerente_id' );
 
-            include( app_path() . '\models\Query\Query.php' );
+            include( app_path() . '\models\Query\QueryGerProd.php' );
             $idsGerProd = $qryGerProds->lists( 'codigo' );
 
             $uniqueIdsGerProd = array_unique( $idsGerProd );

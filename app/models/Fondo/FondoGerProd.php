@@ -16,9 +16,9 @@ class FondoGerProd extends Eloquent
 	}
 
 	public function marca()
-	{
-		return $this->belongsTo('Dmkt\Marca', 'marca_id' );
-	}
+    {
+        return $this->hasOne( 'Parameter\Tablas' , 'codigo' , 'id_producto' )->where( 'tipo' , TIPO_FAMILIA );
+    }
 
 	public function subCategoria()
 	{

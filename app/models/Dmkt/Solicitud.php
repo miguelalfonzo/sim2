@@ -220,7 +220,10 @@ class Solicitud extends Eloquent
 
     public function aprovalPolicy( $order )
     {
-        return $this->hasMany( 'Policy\AprovalPolicy' , 'id_inversion' , 'id_inversion' )->where( 'orden' , $order )->first();            
+        return $this->hasOne( 'Policy\InvestmentAprovalPolicy' , 'id_inversion' , 'id_inversion' )->with( array('policy') , function( $query ) use( $order )
+        {
+            $query->where( 'orden' , $order );
+        })->first();            
     }
 
     public function userApprovalPolicy( $userType )

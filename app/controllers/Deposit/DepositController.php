@@ -39,7 +39,7 @@ class DepositController extends BaseController{
         if ( $solicitud->idtiposolicitud == SOL_REP )
         {
             $fondoMkt = $solicitud->products[0]->thisSubFondo;
-            $msg = 'El Saldo del Fondo: '. $fondoMkt->subCategoria->descripcion . ' | ' . $fondoMkt->marca->descripcion . ' S/.';
+            $msg = 'El Saldo del Fondo: '. $fondoMkt->subCategoria->descripcion . ' | ' . $fondoMkt->marca->nombre . ' S/.';
         }
         else
         {
