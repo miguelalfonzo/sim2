@@ -31,4 +31,14 @@ class InvestmentType extends Eloquent
     {
     	return $this->hasMany('Dmkt\InvestmentActivity' , 'id_inversion' , 'id' );
     }
+
+    protected static function orderMkt()
+    {
+        return InvestmentType::orderBy('nombre','asc')->where( 'codigo_actividad' , INVERSION_MKT )->get();
+    }
+
+    protected static function orderInst()
+    {
+        return InvestmentType::orderBy('nombre','asc')->where( 'codigo_actividad' , INVERSION_INSTITUCIONAL )->get();
+    }
 }

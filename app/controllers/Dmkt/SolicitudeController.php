@@ -108,12 +108,13 @@ class SolicitudeController extends BaseController
 
     public function newSolicitude()
     {
+        include( app_path() . '\models\Query\QueryProducts.php' );
         $data = array( 'reasons'     => Reason::all() ,
                        'activities'  => Activity::order(),
                        'payments'    => TypePayment::all(),
                        'currencies'  => TypeMoney::all(),
                        'families'    => Marca::orderBy('descripcion', 'ASC')->get(),
-                       'investments' => InvestmentType::order() );
+                       'investments' => InvestmentType::orderMkt()  );
         if ( in_array( Auth::user()->type , array( SUP , GER_PROD ) ) )
             $data[ 'reps' ] = Rm::order();            
         return View::make('Dmkt.Register.solicitud', $data);
@@ -121,13 +122,14 @@ class SolicitudeController extends BaseController
 
     public function editSolicitud($token)
     {
+        include( app_path() . '\models\Query\QueryProducts.php' );
         $data = array( 'solicitud'   => Solicitud::where('token', $token)->firstOrFail(),
                        'reasons'     => Reason::all(),
                        'activities'  => Activity::order(),
                        'payments'    => TypePayment::all(),
                        'currencies'  => TypeMoney::all(),
                        'families'    => Marca::orderBy('descripcion', 'ASC')->get(),
-                       'investments' => InvestmentType::order() ,
+                       'investments' => InvestmentType::orderMkt() ,
                        'edit'        => true );
         $data[ 'detalle' ] = $data['solicitud']->detalle;
         if ( in_array( Auth::user()->type , array( SUP , GER_PROD ) ) )
@@ -150,7 +152,7 @@ class SolicitudeController extends BaseController
         
             if ( $solicitud->idtiposolicitud != SOL_INST && in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) ) )
             {
-                $politicType = $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario;
+                $politicType = $solicitud->aprovalPolicy( $solicitud->histories->count() )->policy->tipo_usuario;
                 if ( in_array( $politicType , array( Auth::user()->type , Auth::user()->tempType() ) )
                 && ( array_intersect ( array( Auth::user()->id , Auth::user()->tempId() ) , $solicitud->managerEdit( $politicType )->lists( 'id_gerprod' ) ) ) )
                 {
@@ -373,11 +375,11 @@ class SolicitudeController extends BaseController
                                       'new'         => $solProduct->id_fondo_marketing ,
                                       'newMonto'    => $solProduct->monto_asignado );   
         }
-        $this->discountBalance( $ids_fondo_mkt , $userTypeforDiscount , $moneda , $tc );    
+        $this->discountBalance( $ids_fondo_mkt , $moneda , $tc , $userTypeforDiscount );    
         return $this->validateBalance( $userTypes , $fondos , $fondo_total );
     }
 
-    private function discountBalance( $ids_fondo , $userType = NULL , $moneda , $tc )
+    private function discountBalance( $ids_fondo , $moneda , $tc , $userType = NULL )
     {
         if ( $moneda == SOLES )
             $tasaCompra = 1;
@@ -451,7 +453,7 @@ class SolicitudeController extends BaseController
                                        'oldUserType' => $solicitudProduct->id_tipo_fondo_marketing , 
                                        'oldMonto'    => $solicitudProduct->monto_asignado );
         }
-        $this->discountBalance( $ids_fondo_mkt );
+        $this->discountBalance( $ids_fondo_mkt , $solicitud->detalle->id_moneda , ChangeRate::getTc() );
     }
 
     private function setProducts( $idSolicitud , $idsProducto )
@@ -714,7 +716,7 @@ class SolicitudeController extends BaseController
         $userType = $aprovalPolicy->tipo_usuario;
         $msg= '';
         if ( ! is_null( $aprovalPolicy->desde ) || ! is_null( $aprovalPolicy->hasta ) )
-            $msg .= ' para montos ' . ( is_null( $aprovalPolicy->desde ) ? '' : 'mayores a S/.' . $aprovalPolicy->desde . ' ' ) . ( is_null( $aprovalPolicy->hasta ) ? '' : 'hasta S/.' . $aprovalPolicy->hasta ) ; 
+            $msg .= ' para la siguiente etapa del flujo , comuniquese con Informatica. El rol aprueba montos ' . ( is_null( $aprovalPolicy->desde ) ? '' : 'mayores a S/.' . $aprovalPolicy->desde . ' ' ) . ( is_null( $aprovalPolicy->hasta ) ? '' : 'hasta S/.' . $aprovalPolicy->hasta ) ; 
         if ( $userType == SUP )
         {
             if ( Auth::user()->type === REP_MED )
@@ -743,7 +745,7 @@ class SolicitudeController extends BaseController
         {
             $user = User::getUserType( $userType );
             if ( count( $user ) === 0 )
-                return $this->warningException( 'Se requiere el usuario ' . $aprovalPolicy->userType->descripcion . $msg , __FUNCTION__ , __LINE__ , __FILE__ );
+                return $this->warningException( 'No existe el usuario con el Rol de ' . $aprovalPolicy->userType->descripcion . $msg , __FUNCTION__ , __LINE__ , __FILE__ );
             else                
                 $idsUser = $user;
         }

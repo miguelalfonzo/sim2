@@ -132,7 +132,7 @@ class Solicitud extends Eloquent
     }
 
     public function clients(){
-        return $this->hasMany( 'Dmkt\SolicitudClient' , 'id_solicitud' , 'id' );
+        return $this->hasMany( 'Dmkt\SolicitudClient' , 'id_solicitud' , 'id' )->orderBy( 'updated_at' , 'ASC' );
     }
 
     public function createdBy()
@@ -207,12 +207,22 @@ class Solicitud extends Eloquent
 
     public function policies()
     {
-        return $this->hasMany( 'Policy\AprovalPolicy' , 'id_inversion' , 'id_inversion');
+        return $this->hasMany( 'Policy\InvestmentAprovalPolicy' , 'id_inversion' , 'id_inversion' );
+    }
+
+    public function investmentPolicy()
+    {
+        return $this->hasMany( 'Policy\InvestmentAprovalPolicy' , 'id_inversion' , 'id_inversion' )
+            ->leftJoin( 'POLITICA_APROBACION z' , 'z.id' , '=' , 'INVERSION_POLITICA_APROBACION.id_politica_aprobacion')
+            ->orderBy( 'z.orden' , 'ASC' )->select( 'INVERSION_POLITICA_APROBACION.*' );
     }
 
     public function aprovalPolicy( $order )
     {
-        return $this->hasMany( 'Policy\AprovalPolicy' , 'id_inversion' , 'id_inversion' )->where( 'orden' , $order )->first();            
+        return $this->hasOne( 'Policy\InvestmentAprovalPolicy' , 'id_inversion' , 'id_inversion' )->whereHas( 'policy' , function( $query ) use( $order )
+        {
+            $query->where( 'orden' , $order );
+        })->first();            
     }
 
     public function userApprovalPolicy( $userType )
