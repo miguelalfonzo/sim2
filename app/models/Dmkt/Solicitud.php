@@ -207,7 +207,15 @@ class Solicitud extends Eloquent
 
     public function policies()
     {
-        return $this->hasMany( 'Policy\AprovalPolicy' , 'id_inversion' , 'id_inversion');
+        return $this->hasMany( 'Policy\InvestmentAprovalPolicy' , 'id_inversion' , 'id_inversion' );
+    }
+
+    public function investmentPolicy()
+    {
+        return $this->hasMany( 'Policy\InvestmentAprovalPolicy' , 'id_inversion' , 'id_inversion' )->with( array('policy') , function( $query )
+        {
+            $query->orderBy( 'POLITICA_APROBACION.orden' , 'ASC' );
+        });
     }
 
     public function aprovalPolicy( $order )
