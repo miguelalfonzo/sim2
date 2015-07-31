@@ -297,14 +297,6 @@ $(function()
                 }
             }
         });
-        if( type === 'ID' || type === 'I' )
-        {
-            activity = $('input[name=actividad]')
-            $('input[name=inversion]').on( 'change' , function()
-            {
-            inversionChange( $(this).val() );
-                            });
-                            
     }
 
     function validateEndExpenseDevolucion()

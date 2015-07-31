@@ -44,7 +44,6 @@ use \Fondo\FondoGerProd;
 use \Fondo\FondoSupervisor;
 use \Carbon\Carbon;
 use \Fondo\FondoInstitucional;
-use \Parameter\Tablas;
 
 class SolicitudeController extends BaseController
 {
@@ -109,13 +108,12 @@ class SolicitudeController extends BaseController
 
     public function newSolicitude()
     {
-        include( app_path() . '\models\Query\QueryProducts.php' );
         $data = array( 'reasons'     => Reason::all() ,
                        'activities'  => Activity::order(),
                        'payments'    => TypePayment::all(),
                        'currencies'  => TypeMoney::all(),
-                       'families'    => $qryProducts->get() ,
-                       'investments' => InvestmentType::orderMkt() );
+                       'families'    => Marca::orderBy('descripcion', 'ASC')->get(),
+                       'investments' => InvestmentType::order() );
         if ( in_array( Auth::user()->type , array( SUP , GER_PROD ) ) )
             $data[ 'reps' ] = Rm::order();            
         return View::make('Dmkt.Register.solicitud', $data);
@@ -123,14 +121,13 @@ class SolicitudeController extends BaseController
 
     public function editSolicitud($token)
     {
-        include( app_path() . '\models\Query\QueryProducts.php' );
         $data = array( 'solicitud'   => Solicitud::where('token', $token)->firstOrFail(),
                        'reasons'     => Reason::all(),
                        'activities'  => Activity::order(),
                        'payments'    => TypePayment::all(),
                        'currencies'  => TypeMoney::all(),
-                       'families'    => $qryProducts->get() ,
-                       'investments' => InvestmentType::orderMkt() ,
+                       'families'    => Marca::orderBy('descripcion', 'ASC')->get(),
+                       'investments' => InvestmentType::order() ,
                        'edit'        => true );
         $data[ 'detalle' ] = $data['solicitud']->detalle;
         if ( in_array( Auth::user()->type , array( SUP , GER_PROD ) ) )
@@ -153,12 +150,7 @@ class SolicitudeController extends BaseController
         
             if ( $solicitud->idtiposolicitud != SOL_INST && in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) ) )
             {
-                \Log::error( 'inicio' );
-                \Log::error( $solicitud->aprovalPolicy( $solicitud->histories->count() ) );
-                
-                $politicType = $solicitud->aprovalPolicy( $solicitud->histories->count() )->policy->tipo_usuario;
-                \Log::error( $solicitud->histories->count() );
-                \Log::error( $politicType );
+                $politicType = $solicitud->aprovalPolicy( $solicitud->histories->count() )->tipo_usuario;
                 if ( in_array( $politicType , array( Auth::user()->type , Auth::user()->tempType() ) )
                 && ( array_intersect ( array( Auth::user()->id , Auth::user()->tempId() ) , $solicitud->managerEdit( $politicType )->lists( 'id_gerprod' ) ) ) )
                 {
@@ -373,6 +365,7 @@ class SolicitudeController extends BaseController
             if ( $middleRpta[ status ] != ok )
                 return $middleRpta;
             $solProduct->save();
+            \Log::error( $solProduct->toJson() );
             $userTypeforDiscount = $solProduct->id_tipo_fondo_marketing;
             $ids_fondo_mkt[] = array( 'old'         => $old_id_fondo_mkt , 
                                       'oldUserType' => $old_cod_user_type , 
@@ -380,11 +373,11 @@ class SolicitudeController extends BaseController
                                       'new'         => $solProduct->id_fondo_marketing ,
                                       'newMonto'    => $solProduct->monto_asignado );   
         }
-        $this->discountBalance( $ids_fondo_mkt , $moneda , $tc , $userTypeforDiscount );    
+        $this->discountBalance( $ids_fondo_mkt , $userTypeforDiscount , $moneda , $tc );    
         return $this->validateBalance( $userTypes , $fondos , $fondo_total );
     }
 
-    private function discountBalance( $ids_fondo , $moneda , $tc , $userType = NULL )
+    private function discountBalance( $ids_fondo , $userType = NULL , $moneda , $tc )
     {
         if ( $moneda == SOLES )
             $tasaCompra = 1;
@@ -401,6 +394,7 @@ class SolicitudeController extends BaseController
                     $subFondo = FondoGerProd::find( $id_fondo[ 'old' ] );
                 $subFondo->saldo += round( $id_fondo[ 'oldMonto' ] * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN );
                 $subFondo->save();
+                \Log::error( $subFondo->toJson() );
             }
             if ( ! is_null( $userType ) )
             {
@@ -410,6 +404,7 @@ class SolicitudeController extends BaseController
                     $subFondo = FondoGerProd::find( $id_fondo[ 'new' ] );
                 $subFondo->saldo -= round( $id_fondo[ 'newMonto' ] * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN );
                 $subFondo->save();
+                \Log::error( $subFondo->toJson() );
             }
         }
 
@@ -429,7 +424,7 @@ class SolicitudeController extends BaseController
             return $this->warningException( 'No es posible seleccionar Fondos de Diferentes SubCategorias por Solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
         foreach( $fondos as $key1 => $fondoMkt )
         {
-            $marca = Tablas::findProduct( $fondoMkt->marca_id );
+            $marca = Marca::find( $fondoMkt->marca_id );
             if ( in_array( SUP , $userTypes ) )
                 $fondoMktOrigin = FondoSupervisor::find( $fondoMkt->id );
             else
@@ -438,7 +433,7 @@ class SolicitudeController extends BaseController
             if ( $fondoMktOrigin->saldo < 0 )
             {
                 return $this->warningException( 
-                    'El Fondo asignado ' . $fondoMktOrigin->subCategoria->descripcion . ' | ' . $marca->nombre .
+                    'El Fondo asignado ' . $fondoMktOrigin->subCategoria->descripcion . ' | ' . $marca->descripcion .
                     ' solo cuenta con S/.' . ( $fondoMktOrigin->saldo + $fondo_total[ $key1 ] ) . ' el cual no es suficiente para completar el registro , se requiere un saldo de S/.' . 
                     $fondo_total[ $key1 ] . ' en total ' , __FUNCTION__ , __LINE__ , __FILE__ );       
             }
@@ -456,7 +451,7 @@ class SolicitudeController extends BaseController
                                        'oldUserType' => $solicitudProduct->id_tipo_fondo_marketing , 
                                        'oldMonto'    => $solicitudProduct->monto_asignado );
         }
-        $this->discountBalance( $ids_fondo_mkt , $solicitud->detalle->id_moneda , ChangeRate::getTc() );
+        $this->discountBalance( $ids_fondo_mkt );
     }
 
     private function setProducts( $idSolicitud , $idsProducto )
@@ -719,7 +714,7 @@ class SolicitudeController extends BaseController
         $userType = $aprovalPolicy->tipo_usuario;
         $msg= '';
         if ( ! is_null( $aprovalPolicy->desde ) || ! is_null( $aprovalPolicy->hasta ) )
-            $msg .= ' para la siguiente etapa del flujo , comuniquese con Informatica. El rol aprueba montos ' . ( is_null( $aprovalPolicy->desde ) ? '' : 'mayores a S/.' . $aprovalPolicy->desde . ' ' ) . ( is_null( $aprovalPolicy->hasta ) ? '' : 'hasta S/.' . $aprovalPolicy->hasta ) ; 
+            $msg .= ' para montos ' . ( is_null( $aprovalPolicy->desde ) ? '' : 'mayores a S/.' . $aprovalPolicy->desde . ' ' ) . ( is_null( $aprovalPolicy->hasta ) ? '' : 'hasta S/.' . $aprovalPolicy->hasta ) ; 
         if ( $userType == SUP )
         {
             if ( Auth::user()->type === REP_MED )
@@ -733,11 +728,7 @@ class SolicitudeController extends BaseController
         }
         else if ( $userType == GER_PROD )
         {
-            //$idsGerProd = Marca::whereIn( 'id' , $idsProducto )->lists( 'gerente_id' );
-
-            include( app_path() . '\models\Query\QueryGerProd.php' );
-            $idsGerProd = $qryGerProds->lists( 'codigo' );
-
+            $idsGerProd = Marca::whereIn( 'id' , $idsProducto )->lists( 'gerente_id' );
             $uniqueIdsGerProd = array_unique( $idsGerProd );
             $repeatIds = array_count_values( $idsGerProd );
             $maxNumberRepeat = max( $repeatIds );
@@ -752,7 +743,7 @@ class SolicitudeController extends BaseController
         {
             $user = User::getUserType( $userType );
             if ( count( $user ) === 0 )
-                return $this->warningException( 'No existe el usuario con el Rol de ' . $aprovalPolicy->userType->descripcion . $msg , __FUNCTION__ , __LINE__ , __FILE__ );
+                return $this->warningException( 'Se requiere el usuario ' . $aprovalPolicy->userType->descripcion . $msg , __FUNCTION__ , __LINE__ , __FILE__ );
             else                
                 $idsUser = $user;
         }
