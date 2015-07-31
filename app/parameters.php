@@ -171,3 +171,4 @@ const FONDO_AJUSTE = 1;
 
 const TIPO_FAMILIA = 129;
 const TIPO_GERPROD = 128;
+const INVERSION_MKT = 'M'; 

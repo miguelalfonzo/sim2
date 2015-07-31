@@ -40,7 +40,7 @@
                                 </select>
                             @else
                                 <span class="input-group-addon">
-                                    {{ $product->thisSubFondo->subCategoria->descripcion . ' | ' . $product->thisSubFondo->marca->nombre . ' S/.' . ( floor( $product->thisSubFondo->saldo * 100 ) / 100 ) }}
+                                    {{ $product->thisSubFondo->subCategoria->descripcion . ' | ' . $product->thisSubFondo->marca->nombre . ' S/.' . ( floor( $product->thisSubFondo->saldo * 100 ) / 100 ) . ' ( Reservado ' . $product->monto_asignado . ' )' }}
                                 </span>
                                 <input type="hidden" value="{{ $product->id_fondo_marketing . ',' . $product->id_tipo_fondo_marketing }}" name="fondo_producto[]">
                             @endif
@@ -53,8 +53,10 @@
                         <label class="label label-primary">
                             {{ $detalle->typemoney->simbolo . ( isset( $product->monto_asignado ) ? $product->monto_asignado : round( $detalle->monto_actual / count( $solicitud->products ) , 2 ) ) }}
                         </label>
-                        @if( isset( $product->id_fondo_marketing ) )
-                            <span class="badge">{{ $product->thisSubFondo->subCategoria->descripcion . ' | ' . $product->thisSubFondo->marca->nombre }}</span>    
+                        @if( ! is_null( $product->id_fondo_marketing ) )
+                            <span class="badge">
+                                {{ $product->thisSubFondo->subCategoria->descripcion . ' | ' . $product->thisSubFondo->marca->nombre }}
+                            </span>    
                         @endif
                     @endif
                 <input type="hidden" name="producto[]" value="{{ $product->id }}">

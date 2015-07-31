@@ -32,8 +32,8 @@ class TestController extends BaseController
 	public function dt()
 	{
 		$solicitud = Solicitud::find( 2 );
-		return $solicitud->investmentPolicy[0]->policy->userType;
-			}
+		return $solicitud->investmentPolicy;
+	}
 
 	public function testQuery()
 	{
