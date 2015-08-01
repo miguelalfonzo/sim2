@@ -19,6 +19,7 @@
 		@endif
 	@endif
 		<div class="stage-content">
+			<p>{{ $flujo->orderHisteries }}</p>
 			@if( is_null( $flujo->policy->desde ) && is_null( $flujo->policy->hasta ) )
 				<h3 class="stage-title">Validación {{$flujo->policy->tipo_usuario}}.</h3>
 			@else
