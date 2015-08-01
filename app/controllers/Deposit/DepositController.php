@@ -141,13 +141,10 @@ class DepositController extends BaseController{
                 if ( ! is_null( $detalle->id_deposito )  )
                     return $this->warningException( 'Cancelado - El deposito ya ha sido registrado' , __FUNCTION__ , __LINE__ , __FILE__ );
                 
-                if ( $solicitud->idtiposolicitud == SOL_INST )
-                {
                     $middleRpta = $this->validateBalance( $solicitud , $detalle , $tc );
                     if ( $middleRpta[status] != ok )
                         return $middleRpta;
-                }
-
+                
                     $bagoAccount = PlanCta::find( $inputs['num_cuenta'] );
                     if ( $bagoAccount->account->idtipocuenta != BANCO )
                         return $this->warningException( 'Cancelado - La cuenta N°: '.$inputs['num_cuenta'].' no ha sido registrada en el Sistema como Cuenta de Banco' , __FUNCTION__ , __LINE__ , __FILE__ );

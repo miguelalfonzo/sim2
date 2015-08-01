@@ -144,6 +144,6 @@ class SolicitudDetalle extends Eloquent
 
     protected function solicitud()
     {
-        return $this->belongsTo( 'Dmkt\Solicitud' , 'id_detalle' , 'id' );
+        return $this->belongsTo( 'Dmkt\Solicitud' , 'id' , 'id_detalle' );
     }
 }

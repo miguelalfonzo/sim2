@@ -132,7 +132,7 @@ class Solicitud extends Eloquent
     }
 
     public function clients(){
-        return $this->hasMany( 'Dmkt\SolicitudClient' , 'id_solicitud' , 'id' )->orderBy( 'updated_at' , 'ASC' );
+        return $this->hasMany( 'Dmkt\SolicitudClient' , 'id_solicitud' , 'id' )->orderBy( 'id' , 'ASC' );
     }
 
     public function createdBy()

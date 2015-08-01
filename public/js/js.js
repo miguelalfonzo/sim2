@@ -1643,7 +1643,7 @@ $(function()
 
     $('#confirm-devolucion').on( 'click' , function()
     {
-        bootbox.confirm( '<h4 class="text-center text-info">Confirme la devolucion</h4>' , function( response )
+        bootbox.confirm( '<h4 class="text-center text-info">Confirme la devolución</h4>' , function( response )
         {
             if( response )
             {

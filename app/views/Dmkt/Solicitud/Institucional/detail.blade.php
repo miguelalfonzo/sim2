@@ -67,6 +67,9 @@
 	<!-- Tasa del Día del Deposito -->
 	@include('Dmkt.Solicitud.Detail.tasa')
 
+	<!-- MONTO de DEVOLUCION -->
+	@include('Dmkt.Solicitud.Detail.devolucion')
+
 	<!-- Fecha de Descuento al Responsable del Gasto -->
 	@if ( ! is_null( $detalle->descuento ) )
         @include('Dmkt.Solicitud.Detail.discount')

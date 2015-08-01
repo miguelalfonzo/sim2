@@ -44,6 +44,7 @@ use \Fondo\FondoGerProd;
 use \Fondo\FondoSupervisor;
 use \Carbon\Carbon;
 use \Fondo\FondoInstitucional;
+use \System\FondoMktHistory;
 
 class SolicitudeController extends BaseController
 {
@@ -113,7 +114,7 @@ class SolicitudeController extends BaseController
                        'activities'  => Activity::order(),
                        'payments'    => TypePayment::all(),
                        'currencies'  => TypeMoney::all(),
-                       'families'    => Marca::orderBy('descripcion', 'ASC')->get(),
+                       'families'    => $qryProducts->get(),
                        'investments' => InvestmentType::orderMkt()  );
         if ( in_array( Auth::user()->type , array( SUP , GER_PROD ) ) )
             $data[ 'reps' ] = Rm::order();            
@@ -128,7 +129,7 @@ class SolicitudeController extends BaseController
                        'activities'  => Activity::order(),
                        'payments'    => TypePayment::all(),
                        'currencies'  => TypeMoney::all(),
-                       'families'    => Marca::orderBy('descripcion', 'ASC')->get(),
+                       'families'    => $qryProducts->get(),
                        'investments' => InvestmentType::orderMkt() ,
                        'edit'        => true );
         $data[ 'detalle' ] = $data['solicitud']->detalle;
@@ -367,7 +368,6 @@ class SolicitudeController extends BaseController
             if ( $middleRpta[ status ] != ok )
                 return $middleRpta;
             $solProduct->save();
-            \Log::error( $solProduct->toJson() );
             $userTypeforDiscount = $solProduct->id_tipo_fondo_marketing;
             $ids_fondo_mkt[] = array( 'old'         => $old_id_fondo_mkt , 
                                       'oldUserType' => $old_cod_user_type , 
@@ -375,17 +375,18 @@ class SolicitudeController extends BaseController
                                       'new'         => $solProduct->id_fondo_marketing ,
                                       'newMonto'    => $solProduct->monto_asignado );   
         }
-        $this->discountBalance( $ids_fondo_mkt , $moneda , $tc , $userTypeforDiscount );    
+        $this->discountBalance( $ids_fondo_mkt , $moneda , $tc , $detalle->solicitud->id , $userTypeforDiscount );    
         return $this->validateBalance( $userTypes , $fondos , $fondo_total );
     }
 
-    private function discountBalance( $ids_fondo , $moneda , $tc , $userType = NULL )
+    private function discountBalance( $ids_fondo , $moneda , $tc , $idSolicitud , $userType = NULL )
     {
         if ( $moneda == SOLES )
             $tasaCompra = 1;
         elseif ( $moneda == DOLARES )
             $tasaCompra = $tc->compra;
 
+        $historyFondoMkt = array();
         foreach( $ids_fondo as $id_fondo )
         {
             if ( ! is_null( $id_fondo[ 'old' ] ) )
@@ -394,9 +395,11 @@ class SolicitudeController extends BaseController
                     $subFondo = FondoSupervisor::find( $id_fondo[ 'old' ] );
                 else
                     $subFondo = FondoGerProd::find( $id_fondo[ 'old' ] );
+                $oldSaldo = $subFondo->saldo;
                 $subFondo->saldo += round( $id_fondo[ 'oldMonto' ] * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN );
                 $subFondo->save();
-                \Log::error( $subFondo->toJson() );
+                $historyFondoMkt[] = array( 'idFondo' => $subFondo->id , 'idFondoTipo' => $id_fondo[ 'oldUserType'] ,
+                                            'oldSaldo' => $oldSaldo , 'newSaldo' => $subFondo->saldo , 'reason' => FONDO_LIBERACION );
             }
             if ( ! is_null( $userType ) )
             {
@@ -404,12 +407,30 @@ class SolicitudeController extends BaseController
                     $subFondo = FondoSupervisor::find( $id_fondo[ 'new' ] );
                 else
                     $subFondo = FondoGerProd::find( $id_fondo[ 'new' ] );
+                $oldSaldo = $subFondo->saldo;
                 $subFondo->saldo -= round( $id_fondo[ 'newMonto' ] * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN );
                 $subFondo->save();
-                \Log::error( $subFondo->toJson() );
+                $historyFondoMkt[] = array( 'idFondo' => $subFondo->id , 'idFondoTipo' => $userType ,
+                                            'oldSaldo' => $oldSaldo , 'newSaldo' => $subFondo->saldo , 'reason' => FONDO_RETENCION );
             }
         }
+        $this->setFondoMktHistory( $historyFondoMkt , $idSolicitud ); 
+    }
 
+    private function setFondoMktHistory( $historiesFondoMkt , $idSolicitud )
+    {
+        foreach( $historiesFondoMkt as $historyFondoMkt )
+        {
+            $fondoMktHistory                          = new FondoMktHistory;
+            $fondoMktHistory->id                      = $fondoMktHistory->nextId();
+            $fondoMktHistory->id_solicitud            = $idSolicitud;
+            $fondoMktHistory->id_to_fondo             = $historyFondoMkt[ 'idFondo' ];
+            $fondoMktHistory->id_tipo_to_fondo        = $historyFondoMkt[ 'idFondoTipo' ];
+            $fondoMktHistory->id_fondo_history_reason = $historyFondoMkt[ 'reason' ];
+            $fondoMktHistory->to_old_saldo            = $historyFondoMkt[ 'oldSaldo' ];
+            $fondoMktHistory->to_new_saldo            = $historyFondoMkt[ 'newSaldo' ];
+            $fondoMktHistory->save();
+        }
     }
 
     private function validateBalance( $userTypes , $fondos , $fondo_total )
@@ -453,7 +474,7 @@ class SolicitudeController extends BaseController
                                        'oldUserType' => $solicitudProduct->id_tipo_fondo_marketing , 
                                        'oldMonto'    => $solicitudProduct->monto_asignado );
         }
-        $this->discountBalance( $ids_fondo_mkt , $solicitud->detalle->id_moneda , ChangeRate::getTc() );
+        $this->discountBalance( $ids_fondo_mkt , $solicitud->detalle->id_moneda , ChangeRate::getTc() , $solicitud->id );
     }
 
     private function setProducts( $idSolicitud , $idsProducto )
