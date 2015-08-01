@@ -1525,7 +1525,6 @@ class SolicitudeController extends BaseController
                 $join->on('INVERSION_POLITICA_APROBACION.ID_POLITICA_APROBACION', '=', 'POLITICA_APROBACION.ID')
                     ->where('INVERSION_POLITICA_APROBACION.ID_INVERSION', '=', $solicitud->id_inversion);
             })
-            ->orderBy('ORDER','ASC0')
             ->get();
 
 //        dd($flujo);
@@ -1537,7 +1536,7 @@ class SolicitudeController extends BaseController
 //           echo ($fl->hasta);
 //           echo ($fl->tipo_usuario);
 //        }
-        return View::make( 'template.Modals.timeLine')->with( array( 'solicitud' => $solicitud , 'solicitud_history' =>
+        return View::make( 'template.Modals.timeLine2')->with( array( 'solicitud' => $solicitud , 'solicitud_history' =>
             $solicitud_history, 'flujo' => $flujo ) )->render();
     }
     public function album(){
