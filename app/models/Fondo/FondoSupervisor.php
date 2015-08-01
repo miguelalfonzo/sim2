@@ -16,9 +16,9 @@ class FondoSupervisor extends Eloquent
 	}
 
 	public function marca()
-    {
-        return $this->hasOne( 'Parameter\Tablas' , 'codigo' , 'id_producto' )->where( 'tipo' , TIPO_FAMILIA );
-    }
+	{
+		return $this->belongsTo( 'Dmkt\Marca', 'marca_id' );
+	}
 
 	protected function sup()
 	{

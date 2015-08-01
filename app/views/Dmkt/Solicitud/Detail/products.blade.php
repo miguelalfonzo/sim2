@@ -11,7 +11,7 @@
                 <li class="list-group-item">        
                     @if( $politicStatus )
                         <div class="input-group">
-                            <span class="input-group-addon" style="width:15%;">{{{ is_null( $product->marca ) ? '' : $product->marca->nombre}}}</span>
+                            <span class="input-group-addon" style="width:15%;">{{{ is_null( $product->marca ) ? '' : $product->marca->descripcion}}}</span>
                             @if ( in_array( $tipo_usuario , array( SUP , GER_PROD ) ) )
                                 <select name="fondo_producto[]" class="selectpicker form-control">
                                     @if ( is_null( $product->id_fondo_marketing ) )
@@ -26,7 +26,7 @@
                                     @else
                                         <option value="{{ $product->id_fondo_marketing . ',' . $product->id_tipo_fondo_marketing }}" style="background-color:gold" selected>
                                             {{ $product->thisSubFondo->subCategoria->descripcion . ' | ' . 
-                                               $product->thisSubFondo->marca->nombre . ' S/.' . 
+                                               $product->thisSubFondo->marca->descripcion . ' S/.' . 
                                                $product->thisSubFondo->saldo . ' ( Reservado ' . $product->monto_asignado . ' ) ' }}
                                         </option>    
                                         @foreach( $product->getSubFondo( $tipo_usuario , $solicitud ) as $subFondo )
@@ -40,7 +40,7 @@
                                 </select>
                             @else
                                 <span class="input-group-addon">
-                                    {{ $product->thisSubFondo->subCategoria->descripcion . ' | ' . $product->thisSubFondo->marca->nombre . ' S/.' . ( floor( $product->thisSubFondo->saldo * 100 ) / 100 ) }}
+                                    {{ $product->thisSubFondo->subCategoria->descripcion . ' | ' . $product->thisSubFondo->marca->descripcion . ' S/.' . ( floor( $product->thisSubFondo->saldo * 100 ) / 100 )  . ' ( Reservado ' . $product->monto_asignado . ' )' }}
                                 </span>
                                 <input type="hidden" value="{{ $product->id_fondo_marketing . ',' . $product->id_tipo_fondo_marketing }}" name="fondo_producto[]">
                             @endif
@@ -49,12 +49,12 @@
                             round( $detalle->monto_actual / count( $solicitud->products ) , 2 )}}" style="padding:0px;text-align:center">
                         </div>
                     @else
-                        {{{ $product->marca->nombre or '-' }}}
+                        {{{ $product->marca->descripcion or '-' }}}
                         <label class="label label-primary">
                             {{ $detalle->typemoney->simbolo . ( isset( $product->monto_asignado ) ? $product->monto_asignado : round( $detalle->monto_actual / count( $solicitud->products ) , 2 ) ) }}
                         </label>
                         @if( isset( $product->id_fondo_marketing ) )
-                            <span class="badge">{{ $product->thisSubFondo->subCategoria->descripcion . ' | ' . $product->thisSubFondo->marca->nombre }}</span>    
+                            <span class="badge">{{ $product->thisSubFondo->subCategoria->descripcion . ' | ' . $product->thisSubFondo->marca->descripcion }}</span>    
                         @endif
                     @endif
                 <input type="hidden" name="producto[]" value="{{ $product->id }}">

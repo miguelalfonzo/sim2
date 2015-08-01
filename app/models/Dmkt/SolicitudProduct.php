@@ -76,7 +76,7 @@ class SolicitudProduct extends Eloquent
 
     public function marca()
     {
-        return $this->hasOne( 'Parameter\Tablas' , 'codigo' , 'id_producto' )->where( 'tipo' , TIPO_FAMILIA );
+        return $this->hasOne( 'Dmkt\Marca' , 'id' , 'id_producto' );
     }
 
     public function fondoMarca()

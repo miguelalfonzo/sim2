@@ -297,6 +297,18 @@ $(function()
                 }
             }
         });
+        console.log( type );
+        if( type === 'ID' || type === 'I' )
+        {
+            console.log( 'type');
+            activity = $('select[name=actividad]');
+            console.log( $('select[name=inversion]'));
+            $('select[name=inversion]').on( 'change' , function()
+            {
+                console.log( 'invchange');
+                inversionChange( $(this).val() );
+            });
+        }
     }
 
     function validateEndExpenseDevolucion()

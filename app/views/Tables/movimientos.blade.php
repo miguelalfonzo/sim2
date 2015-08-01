@@ -83,7 +83,7 @@
                             -
                         @else
                             @foreach( $cuenta->products as $product )
-                                <span class="label label-info">{{ $product->marca->nombre }}</span>
+                                <span class="label label-info">{{ $product->marca->descripcion }}</span>
                             @endforeach
                         @endif
                     </td>   
