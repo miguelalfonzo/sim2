@@ -18,6 +18,7 @@ use \Users\Sup;
 use \Common\TypeMoney;
 use \yajra\Pdo\Oci8\Exceptions\Oci8Exception;
 use \Client\Institution;
+use \Fondo\FondoMkt;
 
 class FondoController extends BaseController
 {
@@ -97,37 +98,46 @@ class FondoController extends BaseController
 
     private function endSolicituds( $solicituds )
     {
-        $montos = array();
+        $fondoMktController = new FondoMkt;
         $msgWarning   = '';
         foreach( $solicituds as $solicitud )
         {
-            $detalle = $solicitud->detalle;
-            $fondo = $detalle->thisSubFondo;
-            if ( isset( $montos[ $fondo->id ] ) )
-                $montos[ $fondo->id ] += $detalle->monto_solicitado;
-            else
-                $montos[ $fondo->id] = $detalle->monto_solicitado;
-            if ( $montos[ $fondo->id ] > $fondo->saldo )
+            $detalle           = $solicitud->detalle;
+            $fondo             = $detalle->thisSubFondo;
+            $fondoOldSaldo     = $fondo->saldo;
+            $fondoOldSaldoNeto = $fondo->saldo_neto; 
+            if ( $fondo->saldo_neto < $detalle->monto_solicitado )
                 return $this->warningException( 'No se cuenta con saldo en el fondo ' . $fondo->subCategoria->descripcion . ' para terminar los Fondos Institucionales.'  , __FUNCTION__ , __LINE__ , __FILE__ );
-            $jDetalle = json_decode( $detalle->detalle );
+            else
+                $fondoMktController->decreaseFondoInstitucional( $fondo->id , $detalle->monto_solicitado );
+            
+            $jDetalle                 = json_decode( $detalle->detalle );
             $jDetalle->monto_aprobado = $jDetalle->monto_solicitado;
-            $detalle->detalle = json_encode( $jDetalle );
+            $detalle->detalle         = json_encode( $jDetalle );
             $detalle->save();
-            $oldIdestado = $solicitud->id_estado;
+
+            $oldIdestado          = $solicitud->id_estado;
             $solicitud->id_estado = DEPOSITO_HABILITADO;
             $solicitud->save();            
+            
             $middleRpta = $this->setStatus( $oldIdestado , DEPOSITO_HABILITADO , Auth::user()->id , USER_TESORERIA , $solicitud->id );
             if ( $middleRpta[status] != ok )
                 return $middleRpta;
-            $inputs = array(
-                'institucion-cod'   => $solicitud->clients()->where( 'id_tipo_cliente' , 3 )->first()->id_cliente ,
-                'codrepmed'         => $solicitud->asignedTo->rm->idrm,
-                'total'             => $solicitud->detalle->monto_aprobado,
-                'fondo_producto'           => $solicitud->detalle->id_fondo,
-                'mes'               => $this->nextPeriod( $solicitud->detalle->periodo->aniomes ) );
+            
+            $inputs = array( 'institucion-cod' => $solicitud->clients()->where( 'id_tipo_cliente' , 3 )->first()->id_cliente ,
+                             'codrepmed'       => $solicitud->asignedTo->rm->idrm,
+                             'total'           => $solicitud->detalle->monto_aprobado,
+                             'fondo_producto'  => $solicitud->detalle->id_fondo,
+                             'mes'             => $this->nextPeriod( $solicitud->detalle->periodo->aniomes ) );
+            
             $middleRpta = $this->processsInstitutionalSolicitud( $inputs );
             if ( $middleRpta[ status ] != ok )
                 $msgWarning .= $middleRpta[ description ];
+
+            $fondoMktHistory = array( 'idFondo' => $fondo->id , 'idFondoTipo' => INVERSION_INSTITUCIONAL ,
+                                      'oldSaldo' => $fondoOldSaldo , 'oldSaldoNeto' => $fondoOldSaldoNeto ,
+                                      'newSaldo' => $fondo->saldo , 'newSaldoNeto' => $fondo->saldo_neto , 'reason' => FONDO_RETENCION );
+            $fondoMktController->setFondoMktHistory( $fondoMktHistory , $solicitud->id );    
         }
         if ( $msgWarning === '' )
             return $this->setRpta();

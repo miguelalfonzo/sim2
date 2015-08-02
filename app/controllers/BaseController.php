@@ -13,6 +13,16 @@ class BaseController extends Controller
         $this->beforeFilter('csrf', array('on' => array('post', 'put', 'patch', 'delete')));
     }
 
+    protected function fondoName( $fondo )
+    {
+        if ( ! is_null ( $fondo->marca ) && ! is_null( $fondo->supervisor_id ) && ! is_null( $fondo->subcategoria_id ) )
+            return $fondo->subCategoria->descripcion . ' | ' . $fondo->marca->descripcion . ' | ' . $fondo->user->sup->full_name;
+        elseif ( ! is_null( $fondo->marca ) && ! is_null( $fondo->subcategoria_id ) )
+            return $fondo->subCategoria->descripcion . ' | ' . $fondo->marca->descripcion;
+        elseif( ! is_null( $fondo->subcategoria_id ) )
+            return $fondo->subCategoria->descripcion;
+    }
+
     protected function getExpenseDate( $solicitud , $range = 0 )
     {
         $now = Carbon::now();
