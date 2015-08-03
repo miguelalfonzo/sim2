@@ -1,7 +1,7 @@
 <tr type="actividad">
     <td disabled></td>
     <td class="nombre text-center" save=1>
-        <input type="text">
+        <input type="text" style="width:100%">
     </td>
     <td class="tipo_cliente text-center" save=1>
         @include('Maintenance.Activity.tipocliente')

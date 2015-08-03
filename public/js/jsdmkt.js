@@ -1106,7 +1106,6 @@ $(document).on("click", ".elementEdit", function()
             inputcell(data,tempData);
         else if ( $(data).attr("id") == "icons" )
         {
-
             $(data).html('<a class="elementSave" data-sol="1" href="#">'
                 + '<span class="glyphicon glyphicon-floppy-disk"></span></a>'
                 + '<a class="elementCancel" href="#"><span class="glyphicon glyphicon-remove"></span></a>');
@@ -1137,7 +1136,6 @@ $(document).on( 'click' , '.maintenance-add' , function()
         {
             button.parent().parent().find('tbody').append( response.Data );
             var table = '#table_' + button.attr( 'case' );
-            console.log( table );
             var scroll = $( table ).parent();
             scroll.scrollTop( scroll[0].scrollHeight );
             button.hide();

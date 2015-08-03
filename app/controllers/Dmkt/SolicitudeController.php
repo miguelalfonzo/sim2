@@ -1117,59 +1117,6 @@ class SolicitudeController extends BaseController
         return $middleRpta;
     }
 
-    public function viewGenerateSeatExpense( $token )
-    {
-        $solicitud  = Solicitud::where( 'token' , $token)->first();
-        $expenses   = $solicitud->expenses; 
-        $clientes   = array();
-        
-        foreach( $solicitud->clients as $client )
-        {
-            if ( $client->from_table == TB_DOCTOR )
-            {
-                $doctors = $client->doctors;
-                $nom = $doctors->pefnombres.' '.$doctors->pefpaterno.' '.$doctors->pefmaterno;            
-            }
-            elseif ($client->from_table == TB_INSTITUTE)
-                $nom = $client->institutes->pejrazon;
-            else
-                $nom = 'No encontrado';
-            $clientes[] = $nom;
-        }
-        $clientes     = implode( ',' , $clientes );
-        $typeProof    = ProofType::all();
-        $date         = $this->getDay();
-        $expenseItem  = array();
-
-        foreach ( $expenses as $expense ) 
-        {
-            $expenseItems      = $expense->items;
-            $expense->itemList = $expenseItems;
-            $expense->count    = count( $expenseItems );
-        }
-
-        $solicitud->documentList = $expenses;
-        $resultSeats             = $this->generateSeatExpenseData( $solicitud );
-
-        $seatList = $resultSeats['seatList'];
-
-        $data = array(
-            'solicitud'   => $solicitud,
-            'expenseItem' => $expenses,
-            'clientes'    => $clientes,
-            'typeProof'   => $typeProof,
-            'seats'       => json_decode( json_encode( $seatList ) )
-        );
-
-        if( isset( $resultSeats['error'] ) )
-        {
-            $tempArray  = array( 'error' => $resultSeats['error'] );
-            $data       = array_merge( $data , $tempArray );
-        }
-        Session::put( 'state' , R_GASTO );   
-        return View::make( 'Dmkt.Cont.expense_seat' , $data );
-    }
-
     // IDKC: CHANGE STATUS => GENERADO
     public function saveSeatExpense()
     {
