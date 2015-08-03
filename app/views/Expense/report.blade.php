@@ -18,7 +18,7 @@
                             <th class="sin-border text-right">Colaborador Bagó:</th>
                             <td class="sin-border text-left">{{$solicitud->asignedTo->rm->full_name}}</td>  
                             <th class="sin-border text-right">Cargo:</th>
-                            <td class="sin-border text-left">{{$solicitud->asignedTo->userType->descripcion}}</td>
+                            <td class="sin-border text-left">{{ ucwords( strtolower( $solicitud->asignedTo->userType->descripcion ) ) }}</td>
                             
                             <th class="sin-border text-right">Ciudad:</th>
                             <td class="sin-border text-left">{{ $zona }}</td>

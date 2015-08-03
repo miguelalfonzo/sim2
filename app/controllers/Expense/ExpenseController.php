@@ -326,18 +326,6 @@ class ExpenseController extends BaseController
 		}
 	}
 
-	public function expenseInstitucional()
-	{
-		try
-		{
-			return array( status => 'Info' , 'View' => View::make( 'Dmkt.Register.Institucional' , array( 'investments' => InvestmentType::order() , 'activities' => Activity::order() ) )->render() );		
-		}
-		catch( Exception $e )
-		{
-			return $this->internalException( $e , __FUNCTION__ );
-		}
-	}
-
 	private function setDevolucion( $solicitud , $detalle , $jDetalle , $inputs , $balance )
 	{
 		$solicitud->id_estado    = DEVOLUCION;
