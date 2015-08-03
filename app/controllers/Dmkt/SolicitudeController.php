@@ -4,6 +4,7 @@ namespace Dmkt;
 
 use \Auth;
 use \BaseController;
+use Common\TypeUser;
 use \Fondo\Fondo;
 use \Common\State;
 use \Common\TypePayment;
@@ -1515,7 +1516,10 @@ class SolicitudeController extends BaseController
     public function getTimeLine( $id )
     {
         $solicitud = Solicitud::find($id);
-        $solicitud_history = SolicitudHistory::where('id_solicitud', '=', $id)->get();
+//        echo($solicitud->detalle->monto_actual);
+        $solicitud_history = SolicitudHistory::where('id_solicitud', '=', $id)
+            ->orderby('ID','ASC')
+            ->get();
 
 
 
@@ -1523,21 +1527,35 @@ class SolicitudeController extends BaseController
             ->join('POLITICA_APROBACION', function($join) use ($solicitud)
             {
                 $join->on('INVERSION_POLITICA_APROBACION.ID_POLITICA_APROBACION', '=', 'POLITICA_APROBACION.ID')
-                    ->where('INVERSION_POLITICA_APROBACION.ID_INVERSION', '=', $solicitud->id_inversion);
+                    ->where('INVERSION_POLITICA_APROBACION.ID_INVERSION', '=', $solicitud->id_inversion)
+                ;
             })
+            ->where('POLITICA_APROBACION.DESDE', '<',$solicitud->detalle->monto_actual )
+            ->orwhere('POLITICA_APROBACION.DESDE','=',null)
+            ->orderBy('ORDEN', 'ASC')
             ->get();
 
-//        dd($flujo);
-//        foreach ($flujo as $fl)
-//        {
-//
-//           echo ($fl->orden);
-//           echo ($fl->desde);
-//           echo ($fl->hasta);
-//           echo ($fl->tipo_usuario);
-//        }
+        $type_user = TypeUser::all();
+
+        foreach ($flujo as $fl){
+            foreach($type_user as $type) {
+                if ($fl->tipo_usuario == $type->codigo) {
+                    $fl->nombre_usuario = $type->descripcion;
+                    break;
+                }
+            }
+
+        }
+        $linehard=unserialize(TIMELINEHARD);
+        $flujo_static = array();
+            $flujo_static = array_merge($flujo_static,$linehard);
+
+
+
+//        dd($flujo_static);
+
         return View::make( 'template.Modals.timeLine2')->with( array( 'solicitud' => $solicitud , 'solicitud_history' =>
-            $solicitud_history, 'flujo' => $flujo ) )->render();
+            $solicitud_history, 'flujo' => $flujo , 'timelinehard' => unserialize(TIMELINEHARD)) )->render();
     }
     public function album(){
         return View::make('Event.show');

@@ -174,3 +174,49 @@ const TIPO_GERPROD = 128;
 
 const INVERSION_MKT = 'M';
 const INVERSION_INSTITUCIONAL = 'I';
+
+
+define("TIMELINEHARD",serialize(array(
+    'institucional'     =>  array(
+        'o' => array(
+            'title' =>  'Inicio Fondo Institucional',
+            'info'  =>  ''
+        )
+    ),
+    'toDepositTimeline' => array(
+        '1' => array(
+            'title' =>  'Validación Cont.',
+            'info'  =>  'CONTABILIDAD'
+        ),
+        '2' => array(
+            'title' =>  'Habilitación Fondo Inst.',
+            'info'  =>  'ASISTENTE GERENCIA'
+        )
+    ),
+    'depSeatTimeLine'   => array(
+        '3' => array(
+            'title' =>  'Deposito del Anticipo',
+            'info'  =>  'TESORERÍA'
+        ),
+        '4' => array(
+            'title' =>  'Asiento de Anticipo',
+            'info'  =>  'CONTABILIDAD'
+        )
+    ),
+    'registroGasto'     => array(
+        '5' => array (
+            'title' =>  'Reg. de Gastos',
+            'info'  =>  'RESPONSABLE DEL GASTO'
+        ),
+        '6' => array(
+            'title' =>  'Asiento de Diario',
+            'info'  =>  'CONTABILIDAD'
+        ),
+    ),
+    'reembolso'     =>  array(
+        '7' => array(
+            'title' =>  'Deposito del Reembolso',
+            'info'  =>  'TESORERIA'
+        )
+    )
+)));
