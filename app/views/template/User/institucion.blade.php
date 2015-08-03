@@ -32,7 +32,7 @@
                         <select name="fondo_producto[]" class="selectpicker form-control">
                             <option selected disabled value="0">Seleccione el Fondo</option>
                             @foreach( $subFondos as $subFondo )
-                                <option value="{{ $subFondo->id }}" style="background-color:#00FFFF">{{ $subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
+                                <option value="{{ $subFondo->id }}" style="background-color:#00FFFF">{{ $subFondo->descripcion . ' S/.' . $subFondo->saldo_neto }}</option>
                             @endforeach
                         </select>
                     </div>

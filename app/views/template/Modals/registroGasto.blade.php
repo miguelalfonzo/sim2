@@ -1,4 +1,4 @@
-@if ( is_null( $solicitud->registerHistory ) )
+@if ( is_null( $solicitud->registerHistory ) && is_null( $solicitud->toDevolutionHistory ) )
 	@if ( is_null( $solicitud->expenseHistory ) )
 		<div class="stage col-md-3 col-sm-3">
 			<div class="stage-header"></div>
@@ -29,6 +29,27 @@
 		</span>
 	</div>
 </div>
+@if( ! is_null( $solicitud->toDevolutionHistory ) )
+	@if( ! is_null( $solicitud->registerHistory ) )
+		<div class="stage col-md-3 col-sm-3 success">
+			<div class="stage-header stage-success"></div>
+	@else
+		<div class="stage col-md-3 col-sm-3 pending">
+			<div class="stage-header stage-pending"></div>
+	@endif
+	<div class="stage-content">
+		<h3 class="stage-title">Devolucion</h3>
+		<span class="label label-info">
+			@if( is_null( $solicitud->registerHistory ) )
+				TESORERÍA
+			@else
+				{{ strtoupper($solicitud->registerHistory->createdBy->person->full_name) }}
+			@endif
+		</span>
+	</div>
+</div>
+@endif
+
 @if ( ( is_null( $solicitud->toGenerateHistory ) && $solicitud->detalle->id_motivo != REEMBOLSO ) || ( is_null( $solicitud->toDepositHistory ) && $solicitud->detalle->id_motivo == REEMBOLSO ) )
 	@if( is_null( $solicitud->registerHistory ) )
 		<div class="stage col-md-3 col-sm-3">

@@ -69,6 +69,11 @@ class Solicitud extends Eloquent
         return $this->hasOne( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->where( 'status_to' , PENDIENTE );
     }
 
+    protected function toDevolutionHistory()
+    {
+        return $this->hasOne( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->where( 'status_to' , DEVOLUCION );
+    }
+
     public function approvedHistory()
     {
         return $this->hasOne( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->where( 'status_to' , APROBADO );
@@ -132,7 +137,7 @@ class Solicitud extends Eloquent
     }
 
     public function clients(){
-        return $this->hasMany( 'Dmkt\SolicitudClient' , 'id_solicitud' , 'id' )->orderBy( 'updated_at' , 'ASC' );
+        return $this->hasMany( 'Dmkt\SolicitudClient' , 'id_solicitud' , 'id' )->orderBy( 'id' , 'ASC' );
     }
 
     public function createdBy()
@@ -227,7 +232,10 @@ class Solicitud extends Eloquent
 
     public function userApprovalPolicy( $userType )
     {
-        return $this->hasOne( 'Policy\AprovalPolicy' , 'id_inversion' , 'id_inversion' )->where( 'tipo_usuario' , $userType )->first();
+        return $this->hasOne( 'Policy\InvestmentAprovalPolicy' , 'id_inversion' , 'id_inversion' )->wherehas( 'policy' , function( $query ) use ( $userType )
+        {
+            $query->where( 'tipo_usuario' , $userType );
+        })->first();
     }
 
     protected function investment()

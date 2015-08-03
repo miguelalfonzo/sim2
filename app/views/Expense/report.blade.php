@@ -15,22 +15,11 @@
                 <table style="width: 100%">
                     <tbody>
                         <tr>
-                        @if ( $solicitud->createdBy->type == REP_MED )
                             <th class="sin-border text-right">Colaborador Bagó:</th>
-                            <td class="sin-border text-left">{{$solicitud->createdBy->rm->full_name}}</td>  
+                            <td class="sin-border text-left">{{$solicitud->asignedTo->rm->full_name}}</td>  
                             <th class="sin-border text-right">Cargo:</th>
-                            <td class="sin-border text-left">Representante Medico</td>
-                        @elseif ( $solicitud->createdBy->type == SUP )
-                            <th class="sin-border text-right">Colaborador Bagó:</th>
-                            <td class="sin-border text-left">{{$solicitud->createdBy->sup->full_name}}</td>    
-                            <th class="sin-border text-right">Cargo:</th>
-                            <td class="sin-border text-left">Supervisor</td>
-                        @else
-                            <th class="sin-border text-right">Colaborador Bagó:</th>
-                            <td class="sin-border text-left"></td>    
-                            <th class="sin-border text-right">Cargo:</th>
-                            <td class="sin-border text-left"></td>
-                        @endif
+                            <td class="sin-border text-left">{{$solicitud->asignedTo->userType->descripcion}}</td>
+                            
                             <th class="sin-border text-right">Ciudad:</th>
                             <td class="sin-border text-left">{{ $zona }}</td>
                             <th class="sin-border text-right">Fecha:</th>
@@ -129,8 +118,9 @@
                                                         <tr>
                                                             <td style="border-top: 1px solid;">
                                                                 @foreach( $solicitud->toAcceptedApprovedHistories as $acceptedApprovedHistory )
-                                                                    @if( ! is_null( $solicitud->userApprovalPolicy( $acceptedApprovedHistory->user_from ) ) && ! ( is_null( $solicitud->userApprovalPolicy( $acceptedApprovedHistory->user_from )->desde ) 
-                                                                    && is_null( $solicitud->userApprovalPolicy( $acceptedApprovedHistory->user_from )->hasta ) ) )
+                                                                    @if( ! is_null( $solicitud->userApprovalPolicy( $acceptedApprovedHistory->user_from ) ) && 
+                                                                         ! ( is_null( $solicitud->userApprovalPolicy( $acceptedApprovedHistory->user_from )->policy->desde ) && 
+                                                                         is_null( $solicitud->userApprovalPolicy( $acceptedApprovedHistory->user_from )->policy->hasta ) ) )
                                                                         V°B° {{ $acceptedApprovedHistory->fromUserType->descripcion }}
                                                                     @endif
                                                                 @endforeach
@@ -188,13 +178,8 @@
                             <td class="border bottom">S/.{{$balance['employed']}}</td>
                         </tr>
                     </tbody>
-                    
                 </table>
-            
-        
-        <div class="clearfix"></div>
-        
-            
+        <div class="clearfix"></div>        
             <div class="clearfix"></div>
         </section>
     </div>

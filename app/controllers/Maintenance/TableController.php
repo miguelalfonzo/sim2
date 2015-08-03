@@ -269,7 +269,8 @@ class TableController extends BaseController
 		$fondoMktHistory->id_to_fondo = $val[ 'id' ];
 		$fondoMktHistory->to_old_saldo = $oldSaldo;
 		$fondoMktHistory->to_new_saldo = $fondoSup->saldo;
-		$fondoMktHistory->id_fondo_history_reason = FONDO_AJUSTE; 
+		$fondoMktHistory->id_fondo_history_reason = FONDO_AJUSTE;
+		$fondoMktHistory->id_tipo_to_fondo = SUP;
 		$fondoMktHistory->save();
 
 		return $this->setRpta();
@@ -289,6 +290,7 @@ class TableController extends BaseController
 		$fondoMktHistory->to_old_saldo = $oldSaldo;
 		$fondoMktHistory->to_new_saldo = $fondoGerProd->saldo;
 		$fondoMktHistory->id_fondo_history_reason = FONDO_AJUSTE; 
+		$fondoMktHistory->id_tipo_to_fondo = GER_PROD;
 		$fondoMktHistory->save();
 
 		return $this->setRpta();
@@ -308,6 +310,7 @@ class TableController extends BaseController
 		$fondoMktHistory->to_old_saldo = $oldSaldo;
 		$fondoMktHistory->to_new_saldo = $fondoInstitution->saldo;
 		$fondoMktHistory->id_fondo_history_reason = FONDO_AJUSTE; 
+		$fondoMktHistory->id_tipo_to_fondo = FONDO_SUBCATEGORIA_INSTITUCION;
 		$fondoMktHistory->save();
 
 		return $this->setRpta();

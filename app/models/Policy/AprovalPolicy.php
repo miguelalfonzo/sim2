@@ -29,4 +29,9 @@ class AprovalPolicy extends Eloquent
     {
         return $this->hasOne( 'Common\TypeUser' , 'codigo' , 'tipo_usuario' );
     }
+
+    public function investment()
+    {
+        return $this->hasMany( 'Policy\InvestmentAprovalPolicy' , 'id_politica_aprobacion' , 'id' );
+    }
 }

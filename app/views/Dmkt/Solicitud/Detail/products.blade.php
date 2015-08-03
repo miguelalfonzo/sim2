@@ -16,31 +16,31 @@
                                 <select name="fondo_producto[]" class="selectpicker form-control">
                                     @if ( is_null( $product->id_fondo_marketing ) )
                                         <option selected disabled value="0">Seleccione el Fondo</option>
-                                        @foreach( $product->getSubFondo( $tipo_usuario , $solicitud ) as $subFondo )
-                                            @if ( $subFondo->marca_id == $product->id_producto )
-                                                <option value="{{ $subFondo->id . ',' . $subFondo->tipo }}" style="background-color:#00FFFF">{{ $subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
+                                        @foreach( $product->getSubFondo( $tipo_usuario , $solicitud ) as $fondoMkt )
+                                            @if ( $fondoMkt->marca_id == $product->id_producto )
+                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}" style="background-color:#00FFFF">{{ $fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_neto }}</option>
                                             @else   
-                                                <option value="{{ $subFondo->id . ',' . $subFondo->tipo }}">{{ $subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
+                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}">{{ $fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_neto }}</option>
                                             @endif
                                         @endforeach
                                     @else
                                         <option value="{{ $product->id_fondo_marketing . ',' . $product->id_tipo_fondo_marketing }}" style="background-color:gold" selected>
                                             {{ $product->thisSubFondo->subCategoria->descripcion . ' | ' . 
                                                $product->thisSubFondo->marca->descripcion . ' S/.' . 
-                                               $product->thisSubFondo->saldo . ' ( Reservado ' . $product->monto_asignado . ' ) ' }}
+                                               $product->thisSubFondo->saldo_neto . ' ( Reservado ' . $product->monto_asignado . ' ) ' }}
                                         </option>    
-                                        @foreach( $product->getSubFondo( $tipo_usuario , $solicitud ) as $subFondo )
-                                            @if ( $subFondo->id == $product->id_fondo_marketing )
-                                                <option value="{{ $subFondo->id . ',' . $subFondo->tipo }}" style="background-color:#00FFFF">{{$subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
+                                        @foreach( $product->getSubFondo( $tipo_usuario , $solicitud ) as $fondoMkt )
+                                            @if ( $fondoMkt->id == $product->id_fondo_marketing )
+                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}" style="background-color:#00FFFF">{{$fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_neto }}</option>
                                             @else   
-                                                <option value="{{ $subFondo->id . ',' . $subFondo->tipo }}">{{$subFondo->descripcion . ' S/.' . $subFondo->saldo }}</option>
+                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}">{{$fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_neto }}</option>
                                             @endif
                                         @endforeach
                                     @endif
                                 </select>
                             @else
-                                <span class="input-group-addon">
-                                    {{ $product->thisSubFondo->subCategoria->descripcion . ' | ' . $product->thisSubFondo->marca->descripcion . ' S/.' . ( floor( $product->thisSubFondo->saldo * 100 ) / 100 )  . ' ( Reservado ' . $product->monto_asignado . ' )' }}
+                                <span class="input-group-addon" style="max-width:350px;overflow:hidden">
+                                    {{ $product->thisSubFondo->subCategoria->descripcion . ' | ' . $product->thisSubFondo->marca->descripcion . ' S/.' . ( floor( $product->thisSubFondo->saldo_neto * 100 ) / 100 )  . ' ( Reservado ' . $product->monto_asignado . ' )' }}
                                 </span>
                                 <input type="hidden" value="{{ $product->id_fondo_marketing . ',' . $product->id_tipo_fondo_marketing }}" name="fondo_producto[]">
                             @endif

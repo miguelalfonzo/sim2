@@ -66,6 +66,9 @@
     <!-- Tasa de Cambio del Dia del Deposito -->
     @include('Dmkt.Solicitud.Detail.tasa')
 
+    <!-- MONTO de DEVOLUCION -->
+    <!-- nclude('Dmkt.Solicitud.Detail.devolucion')
+ -->
     @if( ! is_null( $detalle->numero_operacion_devolucion ) )
         <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
             <label class="control-label">Devolucion Nº de Operación</label>
@@ -76,9 +79,7 @@
     @endif
     
     <!-- Fecha de Descuento al Responsable del Gasto -->
-    @if ( ! is_null( $detalle->descuento ) )
-        @include('Dmkt.Solicitud.Detail.discount')
-    @endif
+    @include('Dmkt.Solicitud.Detail.discount')
 
     <!-- Observation-->
     @include('Dmkt.Solicitud.Detail.anotation')
