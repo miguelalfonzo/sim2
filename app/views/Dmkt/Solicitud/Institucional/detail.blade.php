@@ -71,10 +71,8 @@
 	@include('Dmkt.Solicitud.Detail.devolucion')
 
 	<!-- Fecha de Descuento al Responsable del Gasto -->
-	@if ( ! is_null( $detalle->descuento ) )
-        @include('Dmkt.Solicitud.Detail.discount')
-    @endif
-
+	@include('Dmkt.Solicitud.Detail.discount')
+    
 	@if ( ! is_null( $solicitud->observacion) )
 		<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
 			<label class="control-label">Observación</label>
