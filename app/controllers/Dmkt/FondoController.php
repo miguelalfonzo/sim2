@@ -109,7 +109,7 @@ class FondoController extends BaseController
             if ( $fondo->saldo_neto < $detalle->monto_solicitado )
                 return $this->warningException( 'No se cuenta con saldo en el fondo ' . $fondo->subCategoria->descripcion . ' para terminar los Fondos Institucionales.'  , __FUNCTION__ , __LINE__ , __FILE__ );
             else
-                $fondoMktController->decreaseFondoInstitucional( $fondo->id , $detalle->monto_solicitado );
+                $fondoMktController->decreaseFondoInstitucional( $fondo , $detalle->monto_solicitado );
             
             $jDetalle                 = json_decode( $detalle->detalle );
             $jDetalle->monto_aprobado = $jDetalle->monto_solicitado;
@@ -137,6 +137,7 @@ class FondoController extends BaseController
             $fondoMktHistory = array( 'idFondo' => $fondo->id , 'idFondoTipo' => INVERSION_INSTITUCIONAL ,
                                       'oldSaldo' => $fondoOldSaldo , 'oldSaldoNeto' => $fondoOldSaldoNeto ,
                                       'newSaldo' => $fondo->saldo , 'newSaldoNeto' => $fondo->saldo_neto , 'reason' => FONDO_RETENCION );
+            \Log::error( $fondoMktHistory );
             $fondoMktController->setFondoMktHistory( $fondoMktHistory , $solicitud->id );    
         }
         if ( $msgWarning === '' )

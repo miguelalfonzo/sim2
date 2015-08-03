@@ -20,7 +20,7 @@ class FondoInstitucional extends Eloquent
 	public static function getSubFondo()
 	{
 		return DB::table( 'Fondo_Institucion f' )
-            ->select( "fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo saldo' , 'f.id id' , '\'AG\' tipo' )
+            ->select( "fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo' , 'f.saldo_neto' , 'f.id' , '\'AG\' tipo' )
             ->leftJoin( 'fondo_subcategoria fsc' , 'f.subcategoria_id' , '=' , 'fsc.id' )
             ->leftJoin( 'fondo_categoria fc' , 'fsc.id_fondo_categoria' , '=' , 'fc.id' )
             ->where( 'fsc.tipo' , FONDO_SUBCATEGORIA_INSTITUCION )->get();

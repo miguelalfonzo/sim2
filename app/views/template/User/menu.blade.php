@@ -6,7 +6,7 @@
                 @foreach( $states as $estado )
                     @if ( Auth::user()->type == TESORERIA )
                         @if( in_array( $estado->id , array( R_REVISADO , R_GASTO ) ) )
-                            <option value="{{$estado->id}}" selected>{{$estado->nombre}}</option>
+                            <option value="{{$estado->id}}">{{$estado->nombre}}</option>
                         @endif
                     @elseif ( Auth::user()->type == CONT )
                         @if( in_array( $estado->id , array( R_APROBADO , R_REVISADO , R_GASTO , R_FINALIZADO ) ) )

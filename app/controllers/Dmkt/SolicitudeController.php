@@ -41,6 +41,7 @@ use \Common\FileStorage;
 use \Response;
 use \Carbon\Carbon;
 use \Fondo\FondoMkt;
+use \Fondo\FondoInstitucional;
 
 class SolicitudeController extends BaseController
 {
@@ -312,6 +313,7 @@ class SolicitudeController extends BaseController
         $moneda = $detalle->id_moneda;
         $userTypes = array();
         $ids_fondo_mkt = array();
+        \Log::error( $fondo );
         foreach ( $solProductIds as $key => $solProductId ) 
         {
             $solProduct = SolicitudProduct::find( $solProductId );
@@ -334,35 +336,21 @@ class SolicitudeController extends BaseController
                                       'new'         => $solProduct->id_fondo_marketing ,
                                       'newMonto'    => $solProduct->monto_asignado );   
         }
+        \Log::error( $fondos );
         $fondoMktController->discountBalance( $ids_fondo_mkt , $moneda , $tc , $detalle->solicitud->id , $userTypeforDiscount );    
         return $fondoMktController->validateBalance( $userTypes , $fondos );
-    }
-
-    private function setHistoryData( &$historyFondoMkt , $subFondo , $tasaCompra , $monto , $userType , $reason )
-    {
-        $oldSaldo     = $subFondo->saldo;
-        $oldSaldoNeto = $subFondo->saldo_neto;
-        if ( $reason == FONDO_LIBERACION )
-            $subFondo->saldo_neto += round( $monto * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN );
-        elseif ( $reason == FONDO_RETENCION )
-            $subFondo->saldo_neto -= round( $monto * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN );
-            
-        $subFondo->save();
-        $historyFondoMkt[] = array( 'idFondo' => $subFondo->id , 'idFondoTipo' => $id_fondo[ 'oldUserType'] ,
-                                    'oldSaldo' => $oldSaldo , 'oldSaldoNeto' => $oldSaldoNeto , 
-                                    'newSaldo' => $subFondo->saldo , 'newSaldoNeto' => $subFondo->saldo_neto , 'reason' => $reason );
     }
 
     private function renovateBalance( $solicitud )
     {
         $fondoMktController = new FondoMkt;
-        $solicitudProducts = $solicitud->products;
-        $ids_fondo_mkt = array();
+        $solicitudProducts  = $solicitud->products;
+        $ids_fondo_mkt      = array();
         foreach( $solicitudProducts as $solicitudProduct )
         {
-             $ids_fondo_mkt[] = array( 'old'         => $solicitudProduct->id_fondo_marketing , 
-                                       'oldUserType' => $solicitudProduct->id_tipo_fondo_marketing , 
-                                       'oldMonto'    => $solicitudProduct->monto_asignado );
+            $ids_fondo_mkt[] = array( 'old'         => $solicitudProduct->id_fondo_marketing , 
+                                      'oldUserType' => $solicitudProduct->id_tipo_fondo_marketing , 
+                                      'oldMonto'    => $solicitudProduct->monto_asignado );
         }
         $fondoMktController->discountBalance( $ids_fondo_mkt , $solicitud->detalle->id_moneda , ChangeRate::getTc() , $solicitud->id );
     }
@@ -678,12 +666,13 @@ class SolicitudeController extends BaseController
                 $message = '';
                 foreach( $inputs['solicitudes'] as $solicitud )
                 {
-                    $solicitud = Solicitud::where( 'token' , $solicitud )->first();
-                    $ids_fondos = $solicitud->orderProducts()->lists( 'id_fondo_marketing'  , 'id_tipo_fondo_marketing' );
-                    \Log::error( $ids_fondos );
-                    $fondo = array();
-                    foreach ( $ids_fondos as $key => $id_fondo )
-                        $fondo[] = $id_fondo . ',' . $key;
+                    $solicitud         = Solicitud::where( 'token' , $solicitud )->first();
+                    $solicitudProducts = $solicitud->orderProducts;
+                    $fondo             = array();
+
+                    foreach ( $solicitudProducts as $solicitudProduct )
+                        $fondo[] = $solicitudProduct->id_fondo_marketing . ',' . $solicitudProduct->id_tipo_fondo_marketing;
+
                     $inputs = array( 'idsolicitud' => $solicitud->id ,
                                      'monto'       => $solicitud->detalle->monto_actual ,
                                      'producto'    => $solicitud->orderProducts()->lists( 'id' ),
@@ -737,6 +726,9 @@ class SolicitudeController extends BaseController
     {
         DB::beginTransaction();
         $middleRpta = $this->validateInputAcceptSolRep( $inputs );
+
+        \Log::error( '1' );
+
         if ( $middleRpta[ status] === ok )
         {
             $solicitud   = Solicitud::find( $idSolicitud );
@@ -762,8 +754,12 @@ class SolicitudeController extends BaseController
                 else if ( $solicitud->id_estado == APROBADO );
                     $detalle->monto_aprobado = $monto;
                     
+                \Log::error( '2' );
+
                 $middleRpta = $this->setProductsAmount( $inputs[ 'producto' ] , $inputs[ 'monto_producto' ] , $inputs[ 'fondo_producto' ] , $solDetalle );                 
-                
+                \Log::error( json_encode( $middleRpta ) );
+                \Log::error( '3' );
+
                 if ( $middleRpta[ status ] != ok ):
                     DB::rollback();
                     return $middleRpta;
@@ -972,9 +968,9 @@ class SolicitudeController extends BaseController
                 else
                     $result['error'][] = $accountResult['error'];
             }
-
+            \Log::error( $solicitud );
             $userElement = $solicitud->asignedTo;
-
+            \Log::error( $userElement );
             $tipo_responsable = $userElement->tipo_responsable;
             $username = '';
 
@@ -1353,7 +1349,8 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.Cont.documents_menu')->with($data);
     }
 
-    public function showSolicitudeInstitution(){
+    public function showSolicitudeInstitution()
+    {
         if ( in_array( Auth::user()->type , array(ASIS_GER ) ) )
             $state = R_PENDIENTE;
         $mWarning = array();

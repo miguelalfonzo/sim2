@@ -198,7 +198,7 @@ class AlertController extends BaseController
 		return array( 'type' => 'warning' , 'msg' => $msg, 'data' => $result, 'typeData' => 'clientAlert');
     }
 
-     public function clientalert()
+    public function clientalert()
     {
     	$msg = '';
     	$tipo_cliente_requerido = array( MEDICO , INSTITUCION );

@@ -169,9 +169,11 @@ class DepositController extends BaseController
                 $fondo->save();
                 $fondoDataHistories[] = array( 'idFondo' => $fondo->id , 'idFondoTipo' => $fondo_type ,
                                                'oldSaldo' => $oldSaldo , 'oldSaldoNeto' => $oldSaldoNeto , 
-                                               'newSaldo' => $fondo->saldo , 'newSaldoNeto' => $fondo->saldo_neto , 'reason' => FONDO_TRANSFERENCIA );
+                                               'newSaldo' => $fondo->saldo , 'newSaldoNeto' => $fondo->saldo_neto , 'reason' => FONDO_DEPOSITO );
             }       
-            $this->validateFondoSaldo( $fondosData , $fondo_type , $msg );
+            $middleRpta = $fondoMktController->validateFondoSaldo( $fondosData , $fondo_type , $msg );
+            if ( $middleRpta[ status] != ok )
+                return $middleRpta;
         }
         elseif ( $solicitud->idtiposolicitud == SOL_INST )
         {    
@@ -186,35 +188,10 @@ class DepositController extends BaseController
             $fondo->save();
             $fondoDataHistories[] = array( 'idFondo' => $fondo->id , 'idFondoTipo' => INVERSION_INSTITUCIONAL ,
                                        'oldSaldo' => $oldSaldo , 'oldSaldoNeto' => $oldSaldoNeto , 
-                                       'newSaldo' => $fondo->saldo , 'newSaldoNeto' => $fondo->saldo_neto , 'reason' => FONDO_TRANSFERENCIA );
+                                       'newSaldo' => $fondo->saldo , 'newSaldoNeto' => $fondo->saldo_neto , 'reason' => FONDO_DEPOSITO );
         }
         $fondoMktController->setFondoMktHistories( $fondoDataHistories , $solicitud->id );  
         return $this->setRpta();
-    }
-
-
-    private function setDepositHistory( $solicitud )
-    {
-        $fondoMktController = new FondoMkt;
-        if ( $solicitud->idtiposolicitud == SOL_INST )
-        {
-            $fondo = $detalle->thisSubFondo;
-
-            $fondoHistoryData   =  array( 'idFondo' => $fondo->id , 'idFondoTipo' => INVERSION_INSTITUCIONAL ,
-                                  'oldSaldo' => $fondo->saldo , 'newSaldo' => $fondo->saldo , 'reason' => FONDO_TRANSFERENCIA );
-            $fondoMktController->setFondoMktHistory( $fondoHistoryData , $solicitud->id );
-
-        }
-        elseif ( $solicitud->idtiposolicitud == SOL_REP )
-        {
-            foreach( $solicitud->products as $solicitudProduct )
-            {
-                $fondo = $solicitudProduct->thisSubFondo;
-                $fondoHistoryData   =  array( 'idFondo' => $fondo->id , 'idFondoTipo' => $solicitudProduct->id_tipo_fondo_marketing ,
-                                      'oldSaldo' => $fondo->saldo , 'newSaldo' => $fondo->saldo , 'reason' => FONDO_TRANSFERENCIA );
-                $fondoMktController->setFondoHistories( $fondoHistoryData , $solicitud->id );
-            }
-        }                  
     }
 
     public function confirmDevolution()
@@ -232,6 +209,18 @@ class DepositController extends BaseController
             $oldIdestado = $solicitud->id_estado;
             $solicitud->id_estado = REGISTRADO;
             $solicitud->save();
+
+            $detalle    = $solicitud->detalle;
+            $jDetalle   = json_decode( $detalle->detalle );
+
+            $totalGasto = $solicitud->expenses->sum( 'monto' );
+            $monto_descuento = $detalle->monto_aprobado - $totalGasto;
+            $jDetalle->monto_descuento = $monto_descuento;
+            $detalle->detalle          = json_encode( $jDetalle );
+            $detalle->save();
+            $this->renewFondo( $solicitud , $monto_descuento );
+            
+
             $middleRpta = $this->setStatus( $oldIdestado, $solicitud->id_estado , Auth::user()->id , USER_CONTABILIDAD , $solicitud->id );
             if ( $middleRpta[ status ] == ok )
                 DB::commit();
@@ -245,5 +234,53 @@ class DepositController extends BaseController
             return $this->internalException( $e , __FUNCTION__ );
         }
     }
+
+    private function renewFondo( $solicitud , $monto_renovado )
+    {
+        $fondoMktController = new FondoMKt;
+        $tc = ChangeRate::getTc();
+        $detalle = $solicitud->detalle;
+        if ( $detalle->id_moneda == DOLARES )
+            $tasaCompra = $tc->compra;
+        elseif ( $detalle->id_moneda == SOLES )
+            $tasaCompra = 1;
+        $fondoDataHistories = array();
+        if ( $solicitud->idtiposolicitud == SOL_REP )
+        {
+            $solicitudProducts = $solicitud->products;
+            $fondo_type        = $solicitud->products[ 0 ]->id_tipo_fondo_marketing;
+            $monto_aprobado    = $solicitud->detalle->monto_aprobado;
+            foreach( $solicitudProducts as $solicitudProduct )
+            {
+                $fondo          = $solicitudProduct->thisSubFondo;
+                $oldSaldo       = $fondo->saldo;
+                $oldSaldoNeto   = $fondo->saldo_neto;
+                $monto_renovado_final = ( $monto_renovado * $solicitudProduct->monto_asignado ) / $monto_aprobado;
+                $monto_renovado_final = $monto_renovado_final * $tasaCompra;
+                
+                $fondo->saldo       += $monto_renovado_final;
+                $fondo->saldo_neto  += $monto_renovado_final;
+                $fondo->save();
+                $fondoDataHistories[] = array( 'idFondo' => $fondo->id , 'idFondoTipo' => $fondo_type ,
+                                               'oldSaldo' => $oldSaldo , 'oldSaldoNeto' => $oldSaldoNeto , 
+                                               'newSaldo' => $fondo->saldo , 'newSaldoNeto' => $fondo->saldo_neto , 'reason' => FONDO_DEVOLUCION );
+            }
+        }
+        elseif ( $solicitud->idtiposolicitud == SOL_INST )
+        {
+            $fondo = $solicitud->detalle->thisSubFondo;
+            $oldSaldo = $fondo->saldo;
+            $oldSaldoNeto = $fondo->saldo_neto;
+            $fondo->saldo       += $monto_renovado;
+            $fondo->saldo_neto  += $monto_renovado;
+            $fondo->save();
+            $fondoDataHistories[] = array( 'idFondo' => $fondo->id , 'idFondoTipo' => INVERSION_INSTITUCIONAL ,
+                                           'oldSaldo' => $oldSaldo , 'oldSaldoNeto' => $oldSaldoNeto , 
+                                           'newSaldo' => $fondo->saldo , 'newSaldoNeto' => $fondo->saldo_neto , 'reason' => FONDO_DEVOLUCION );
+        }
+        \Log::error( $fondoDataHistories );
+        $fondoMktController->setFondoMktHistories( $fondoDataHistories , $solicitud->id );  
+    }
+
 
 }

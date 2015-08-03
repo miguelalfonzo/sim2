@@ -227,7 +227,10 @@ class Solicitud extends Eloquent
 
     public function userApprovalPolicy( $userType )
     {
-        return $this->hasOne( 'Policy\AprovalPolicy' , 'id_inversion' , 'id_inversion' )->where( 'tipo_usuario' , $userType )->first();
+        return $this->hasOne( 'Policy\InvestmentAprovalPolicy' , 'id_inversion' , 'id_inversion' )->wherehas( 'policy' , function( $query ) use ( $userType )
+        {
+            $query->where( 'tipo_usuario' , $userType );
+        })->first();
     }
 
     protected function investment()

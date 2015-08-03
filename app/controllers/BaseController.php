@@ -16,7 +16,7 @@ class BaseController extends Controller
     protected function fondoName( $fondo )
     {
         if ( ! is_null ( $fondo->marca ) && ! is_null( $fondo->supervisor_id ) && ! is_null( $fondo->subcategoria_id ) )
-            return $fondo->subCategoria->descripcion . ' | ' . $fondo->marca->descripcion . ' | ' . $fondo->user->sup->full_name;
+            return $fondo->subCategoria->descripcion . ' | ' . $fondo->marca->descripcion . ' | ' . $fondo->sup->full_name;
         elseif ( ! is_null( $fondo->marca ) && ! is_null( $fondo->subcategoria_id ) )
             return $fondo->subCategoria->descripcion . ' | ' . $fondo->marca->descripcion;
         elseif( ! is_null( $fondo->subcategoria_id ) )

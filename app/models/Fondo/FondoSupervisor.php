@@ -29,4 +29,5 @@ class FondoSupervisor extends Eloquent
 	{
 		return FondoSupervisor::orderBy( 'updated_at' , 'desc' )->get();
 	}
+
 }

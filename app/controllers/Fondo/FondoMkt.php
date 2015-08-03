@@ -4,17 +4,18 @@ namespace Fondo;
 
 use \BaseController;
 use \System\FondoMktHistory;
+use \Auth;
 
 class FondoMkt extends BaseController
 {
 
-	private function setFondoMktHistories( $historiesFondoMkt , $idSolicitud )
+	public function setFondoMktHistories( $historiesFondoMkt , $idSolicitud )
     {
         foreach( $historiesFondoMkt as $historyFondoMkt )
             $this->setFondoMktHistory( $historyFondoMkt , $idSolicitud );
     }
 
-    private function setFondoMktHistory( $historyFondoMkt , $idSolicitud )
+    public function setFondoMktHistory( $historyFondoMkt , $idSolicitud )
     {
         $fondoMktHistory                          = new FondoMktHistory;
         $fondoMktHistory->id                      = $fondoMktHistory->nextId();
@@ -29,14 +30,14 @@ class FondoMkt extends BaseController
         $fondoMktHistory->save();
     }
 
-    private function decreaseFondoInstitucional( $idFondo , $monto )
+    public function decreaseFondoInstitucional( $fondo , $montoTotal )
     {
-            $fondo = FondoInstitucional::find(  $idFondo );
-            $fondo->saldo -= $montoTotal;
-            $fondo->save; 
+            $fondo->saldo_neto -= $montoTotal;
+            $fondo->save();
+            \Log::error( $fondo->toJson() );    
     }
 
-    private function validateBalance( $userTypes , $fondos )
+    public function validateBalance( $userTypes , $fondos )
     {
         $userTypes = array_unique( $userTypes );
         if ( count( $userTypes) != 1 )
@@ -53,13 +54,13 @@ class FondoMkt extends BaseController
             return $this->warningException( 'No es posible seleccionar Fondos de Diferentes SubCategorias por Solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
         
         $msg = ' el cual no es suficiente para completar el registro , se requiere un saldo de S/.';
-        $middleRpta = $this->validateFondoSaldo( $fondos , $userType , $msg );
+        $middleRpta = $this->validateFondoSaldo( $fondos , $userType , $msg , '_neto' );
         if ( $middleRpta[ status ] == ok )
             return $this->setRpta( $userType );
         return $middleRpta;
     }
 
-    private function discountBalance( $ids_fondo , $moneda , $tc , $idSolicitud , $userType = NULL )
+    public function discountBalance( $ids_fondo , $moneda , $tc , $idSolicitud , $userType = NULL )
     {
         if ( $moneda == SOLES )
             $tasaCompra = 1;
@@ -87,10 +88,11 @@ class FondoMkt extends BaseController
                 $this->setHistoryData( $historiesFondoMkt , $fondoMkt , $tasaCompra , $id_fondo[ 'newMonto' ] , $userType , FONDO_RETENCION );            
             }
         }
+        \Log::error( $historiesFondoMkt );
         $this->setFondoMktHistories( $historiesFondoMkt , $idSolicitud ); 
     }
 
-    private function validateFondoSaldo( $fondosData , $fondoType , $msg )
+    public function validateFondoSaldo( $fondosData , $fondoType , $msg , $tipo = '' )
     {
         foreach( $fondosData as $idFondo => $fondoMonto )
         {
@@ -98,13 +100,15 @@ class FondoMkt extends BaseController
                 $fondo = FondoSupervisor::find( $idFondo );
             elseif ( $fondoType == GER_PROD )
                 $fondo = FondoGerProd::find( $idFondo );
-            if ( $fondo->saldo < 0 )
-                return $this->warningException( 'El Fondo ' .  $this->fondoName( $fondo ) . ' solo cuenta con S/.' . ( $fondo->saldo + $fondoMonto ) . 
+            \Log::error( $fondo->toJson() );
+            if ( $fondo->{ 'saldo' . $tipo } < 0 )
+                return $this->warningException( 'El Fondo ' .  $this->fondoName( $fondo ) . ' solo cuenta con S/.' . ( $fondo->{ 'saldo' . $tipo } + $fondoMonto ) . 
                                                 $msg . $fondoMonto . ' en total' , __FUNCTION__ , __FILE__ , __LINE__ );
         }
+        return $this->setRpta();
     }
 
-    private function setFondo( $fondoData , $solProduct , $detalle , $tc , &$userTypes , &$fondos )
+    public function setFondo( $fondoData , $solProduct , $detalle , $tc , &$userTypes , &$fondos )
     {
         $fondoData = explode( ',' , $fondoData );
 
@@ -138,6 +142,21 @@ class FondoMkt extends BaseController
         $solProduct->id_fondo_marketing      = $fondoData[ 0 ];
         $solProduct->id_tipo_fondo_marketing = $fondoData[ 1 ];
         return $this->setRpta();
+    }
+
+    private function setHistoryData( &$historyFondoMkt , $subFondo , $tasaCompra , $monto , $userType , $reason )
+    {
+        $oldSaldo     = $subFondo->saldo;
+        $oldSaldoNeto = $subFondo->saldo_neto;
+        if ( $reason == FONDO_LIBERACION )
+            $subFondo->saldo_neto += round( $monto * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN );
+        elseif ( $reason == FONDO_RETENCION )
+            $subFondo->saldo_neto -= round( $monto * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN );
+            
+        $subFondo->save();
+        $historyFondoMkt[] = array( 'idFondo' => $subFondo->id , 'idFondoTipo' => $userType ,
+                                    'oldSaldo' => $oldSaldo , 'oldSaldoNeto' => $oldSaldoNeto , 
+                                    'newSaldo' => $subFondo->saldo , 'newSaldoNeto' => $subFondo->saldo_neto , 'reason' => $reason );
     }
 
 }

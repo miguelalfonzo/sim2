@@ -26,6 +26,7 @@ use \PDF2;
 use \Dmkt\InvestmentType;
 use \Users\Supervisor;
 use \Users\Visitador;
+use \Fondo\FondoMkt;
 
 class ExpenseController extends BaseController
 {
@@ -242,26 +243,49 @@ class ExpenseController extends BaseController
 
 	private function renewFondo( $solicitud , $monto_renovado )
 	{
+		$fondoMktController = new FondoMKt;
 		$tc = ChangeRate::getTc();
+		$detalle = $solicitud->detalle;
+		if ( $detalle->id_moneda == DOLARES )
+			$tasaCompra = $tc->compra;
+		elseif ( $detalle->id_moneda == SOLES )
+			$tasaCompra = 1;
+		$fondoDataHistories = array();
 		if ( $solicitud->idtiposolicitud == SOL_REP )
 		{
 			$solicitudProducts = $solicitud->products;
+			$fondo_type 	   = $solicitud->products[ 0 ]->id_tipo_fondo_marketing;
 			$monto_aprobado    = $solicitud->detalle->monto_aprobado;
  		    foreach( $solicitudProducts as $solicitudProduct )
 		    {
 		    	$fondo 			= $solicitudProduct->thisSubFondo;
-		    	$monto_renovado = ( $monto_renovado / $monto_aprobado ) * $solicitudProduct->monto_asignado;
-		    	if ( $solicitud->detalle->id_moneda == DOLARES )
-		    		$monto_renovado = $monto_renovado * $tc->compra;
-		    	$fondo->saldo += $monto_renovado;
+		    	$oldSaldo       = $fondo->saldo;
+		    	$oldSaldoNeto   = $fondo->saldo_neto;
+		    	$monto_renovado_final = ( $monto_renovado / $monto_aprobado ) * $solicitudProduct->monto_asignado;
+		    	$monto_renovado_final = $monto_renovado_final * $tasaCompra;
+		    	
+		    	$fondo->saldo 		+= $monto_renovado_final;
+		    	$fondo->saldo_neto  += $monto_renovado_final;
 		    	$fondo->save();
+		    	$fondoDataHistories[] = array( 'idFondo' => $fondo->id , 'idFondoTipo' => $fondo_type ,
+                                               'oldSaldo' => $oldSaldo , 'oldSaldoNeto' => $oldSaldoNeto , 
+                                               'newSaldo' => $fondo->saldo , 'newSaldoNeto' => $fondo->saldo_neto , 'reason' => FONDO_DEVOLUCION );
 		    }
 		}
-		else
+		elseif ( $solicitud->idtiposolicitud == SOL_INST )
 		{
 			$fondo = $solicitud->detalle->thisSubFondo;
-			$fondo->saldo += $monto_renovado;
+			$oldSaldo = $fondo->saldo;
+			$oldSaldoNeto = $fondo->saldo_neto;
+			$fondo->saldo 		+= $monto_renovado;
+			$fondo->saldo_neto  += $monto_renovado;
+			$fondo->save();
+			$fondoDataHistories[] = array( 'idFondo' => $fondo->id , 'idFondoTipo' => INVERSION_INSTITUCIONAL ,
+                                           'oldSaldo' => $oldSaldo , 'oldSaldoNeto' => $oldSaldoNeto , 
+                                           'newSaldo' => $fondo->saldo , 'newSaldoNeto' => $fondo->saldo_neto , 'reason' => FONDO_DEVOLUCION );
 		}
+		\Log::error( $fondoDataHistories );
+		$fondoMktController->setFondoMktHistories( $fondoDataHistories , $solicitud->id );  
 	}
 
 	public function confirmDiscount()
@@ -550,20 +574,10 @@ class ExpenseController extends BaseController
 		$clientes     = implode('<br><br>',$clientes);
 		$cmps         = implode('<br><br> ',$cmps);
 		$zona = null;
-		if($solicitud->createdBy->type == REP_MED ){
-			$created_by = $solicitud->rm->full_name;
-			Log::error("=========================================================000");
-			Log::error($solicitud->rm->idrm);
-			Log::error("=========================================================000");
-			$zona = $this->getZonaRep($solicitud->rm->idrm);
-		}else if ($solicitud->createdBy->type == SUP ){
-			$created_by = $solicitud->sup->full_name;
-			Log::error($solicitud->sup->idsup);
-			$zona = $this->getZonaSup($solicitud->sup->idsup);
-		}else
-			$created_by = 'Usuario no Autorizado';
+		
+		$created_by = $solicitud->asignedTo->rm->full_name;
 		$dni = new BagoUser;
-		$dni = $dni->dni($solicitud->createdBy->username);
+		$dni = $dni->dni($solicitud->asignedTo->username);
 		if ($dni[status] == ok )
 			$dni = $dni[data];
 		else
