@@ -264,8 +264,8 @@ class ExpenseController extends BaseController
 		    	$monto_renovado_final = ( $monto_renovado / $monto_aprobado ) * $solicitudProduct->monto_asignado;
 		    	$monto_renovado_final = $monto_renovado_final * $tasaCompra;
 		    	
-		    	$fondo->saldo 		+= $monto_renovado_final;
-		    	$fondo->saldo_neto  += $monto_renovado_final;
+		    	$fondo->saldo 		+= round( $monto_renovado_final , 2 , PHP_ROUND_HALF_DOWN );
+		    	$fondo->saldo_neto  += round( $monto_renovado_final , 2 , PHP_ROUND_HALF_DOWN );
 		    	$fondo->save();
 		    	$fondoDataHistories[] = array( 'idFondo' => $fondo->id , 'idFondoTipo' => $fondo_type ,
                                                'oldSaldo' => $oldSaldo , 'oldSaldoNeto' => $oldSaldoNeto , 

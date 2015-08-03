@@ -22,7 +22,7 @@
 			@if( is_null( $flujo->policy->desde ) && is_null( $flujo->policy->hasta ) )
 				<h3 class="stage-title">Validación {{$flujo->policy->tipo_usuario}}.</h3>
 			@else
-				<h3 class="stage-title" style="white-space:nowrap">Aprobacion</h3>
+				<h3 class="stage-title" style="white-space:nowrap">Aprobacion {{ $flujo->policy->tipo_usuario . '.' }}</h3>
 			@endif
 			<!-- <div class="stage-info" style="white-space:nowrap"> -->
 				<span class="label label-info">
