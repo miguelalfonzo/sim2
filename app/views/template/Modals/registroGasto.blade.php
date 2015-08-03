@@ -1,4 +1,4 @@
-@if ( is_null( $solicitud->registerHistory ) || is_null( $solicitud->toDevolutionHistory ) )
+@if ( is_null( $solicitud->registerHistory ) && is_null( $solicitud->toDevolutionHistory ) )
 	@if ( is_null( $solicitud->expenseHistory ) )
 		<div class="stage col-md-3 col-sm-3">
 			<div class="stage-header"></div>

@@ -67,8 +67,8 @@
     @include('Dmkt.Solicitud.Detail.tasa')
 
     <!-- MONTO de DEVOLUCION -->
-    @include('Dmkt.Solicitud.Detail.devolucion')
-
+    <!-- nclude('Dmkt.Solicitud.Detail.devolucion')
+ -->
     @if( ! is_null( $detalle->numero_operacion_devolucion ) )
         <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
             <label class="control-label">Devolucion Nº de Operación</label>

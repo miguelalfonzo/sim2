@@ -68,7 +68,7 @@
 	@include('Dmkt.Solicitud.Detail.tasa')
 
 	<!-- MONTO de DEVOLUCION -->
-	@include('Dmkt.Solicitud.Detail.devolucion')
+	<!-- nclude('Dmkt.Solicitud.Detail.devolucion') -->
 
 	<!-- Fecha de Descuento al Responsable del Gasto -->
 	@include('Dmkt.Solicitud.Detail.discount')
