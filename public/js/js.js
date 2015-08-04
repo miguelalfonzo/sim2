@@ -110,16 +110,18 @@ $(function()
 
     //Default events
     //Calculate the IGV loading
-    if(parseFloat($(".total-item").val())) calcularIGV();
-    if(parseFloat($("#balance").val()) === 0)
+    if( parseFloat( $( ".total-item" ).val() ) ) 
+        calcularIGV();
+    if( parseFloat( $( "#balance" ).val() ) === 0 )
         $(".detail-expense").hide();
+
     //Restrictions on data entry forms
+    
     //only numbers integers
     $("#ruc").numeric({negative:false,decimal:false});
     $("#number-prefix").numeric({negative:false,decimal:false});
     $("#number-serie").numeric({negative:false,decimal:false});
-    $("#op-number").numeric({negative:false,decimal:false});
-    //$("#number_account").numeric({negative:false,decimal:false});
+    
     //only numbers floats
     $("#imp-ser").numeric({negative:false});
     $(".total-item input").numeric({negative:false});
@@ -1667,6 +1669,12 @@ $(function()
     $( document ).on( 'click' , '#periodo' , function()
     {
         $( this ).parent().parent().removeClass( 'has-error' );
+    });
+
+    $( document ).off( 'click' , '.modal_extorno' );
+    $( document ).on( 'click' , '.modal_extorno' , function()
+    {
+
     });
 
     $( '#confirm-discount' ).on( 'click' , function()
