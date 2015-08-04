@@ -1252,12 +1252,14 @@ class SolicitudeController extends BaseController
     {
 
         $solicitud = Solicitud::find($id);
+        //$solicitudHistory = $solicitud->histories;
         $solicitud_history = SolicitudHistory::where('id_solicitud', '=', $id)
             ->orderby('ID', 'ASC')
             ->get();
 //        dd((array)$solicitud_history);
 
         $previus_date = null;
+        $orden_history = 1;
         foreach ($solicitud_history as $history) {
             if ($previus_date) {
                 $date_a = $history->created_at;
@@ -1269,7 +1271,8 @@ class SolicitudeController extends BaseController
             }
 
             $previus_date = $history->created_at;
-
+            $solicitud_history->orden =$orden_history;
+            $orden_history++;
         }
 
 
