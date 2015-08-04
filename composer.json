@@ -5,11 +5,12 @@
 	"license": "MIT",
 	"require": {
 		"laravel/framework": "4.2.*",
-        "yajra/laravel-oci8": "*",
+		"yajra/laravel-oci8": "2.*",
         "intervention/image": "2.*",
 		"thujohn/pdf": "dev-master",
 		"barryvdh/laravel-dompdf": "0.4.*",
-        "maatwebsite/excel": "1.*"
+        "maatwebsite/excel": "1.*",
+        "kmd/logviewer": "1.2.*"
     },
 	"autoload": {
 		"classmap": [

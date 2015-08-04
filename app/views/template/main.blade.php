@@ -27,6 +27,7 @@
     <title>Sistema de Inversiones Marketing</title>
     
     {{ HTML::style('css/bootstrap.min.css') }}
+    {{ HTML::style('css/bago.bootstrap.css') }}
     {{ HTML::style('css/bootstrap-lightbox.css')}}
     {{ HTML::style('css/bootstrap-theme.min.css') }} 
     {{ HTML::style('css/jquery-ui.min.css') }}
@@ -55,11 +56,12 @@
         {{ HTML::link('/show_user', '', array('id' => 'logo', 'title' => 'Bagó Perú', 'alt' => 'Bagó Perú')) }}
     @endif
     <a id="logout" href="{{URL::to('logout')}}" title="Cerrar Sesión" alt="Cerrar Sesión">
-        <bdi style="font-size: 11pt;">{{ Auth::user()->getFirstName() }}  | 
+        <div class="pull-left" style="font-size: 11pt; color: #fff; margin-top: 20px; margin-right: 10px; margin-left: 10px;">{{ Auth::user()->getFirstName() }}  | 
             <span class="closed-session">Cerrar sesión</span>
-            <span class="off"></span>
-        </bdi>
-        <img src="{{URL::to('/')}}/img/user.png">
+        </div>
+        <div class="pull-left">
+            <img class="img-circle" src="{{URL::to('/')}}/img/user.png">
+        </div>
     </a>
     @if( ! is_null( Auth::user() ) )
         <input id="typeUser" type="hidden" value="{{ Auth::user()->type }}">
@@ -67,7 +69,7 @@
 </header>
 
 <div class="container-fluid" style="max-height: 100vh; padding-left: 0; padding-right: 0;">
-        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="/*margin-bottom: 0*/; z-index: 10;">
+        <nav class="navbar navbar-bago navbar-static-top" role="navigation" style="/*margin-bottom: 0*/; z-index: 10;">
             <div class="container-fluid">
                 <div class="navbar-header relative">
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
