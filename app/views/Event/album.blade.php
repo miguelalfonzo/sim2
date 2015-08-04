@@ -1,3 +1,8 @@
+		@if(count($events) == 0)
+			<blockquote>
+				<p>No se encontraron eventos registrados.</p>
+			</blockquote>
+		@endif
 		@foreach($events as $event)
 		  	<div class="col-sm-6 col-md-4">
 			    <div class="thumbnail">
