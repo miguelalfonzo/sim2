@@ -278,9 +278,33 @@ class DepositController extends BaseController
                                            'oldSaldo' => $oldSaldo , 'oldSaldoNeto' => $oldSaldoNeto , 
                                            'newSaldo' => $fondo->saldo , 'newSaldoNeto' => $fondo->saldo_neto , 'reason' => FONDO_DEVOLUCION );
         }
-        \Log::error( $fondoDataHistories );
         $fondoMktController->setFondoMktHistories( $fondoDataHistories , $solicitud->id );  
     }
 
+    public function modalExtorno()
+    {
+        $inputs = Input::all();
+        $solicitud = Solicitud::find( $inputs[ 'idSolicitud' ] );
+        if ( is_null ( $solicitud ) )
+            return $this->warningException( 'No se encontro la solicitud N° ' . $inputs[ 'idSolicitud' ] , __FUNCTION__ , __FILE__ , __LINE__ );
+        else
+            return $this->setRpta( 'View' => View::make( 'template.List.Modals.extorno' , array( $solicitud ) ) );
+    }
 
+    public function confirmExtorno()
+    {
+        $inputs = Input::all();
+        $solicitud = Solicitud::find( $inputs[ 'idSolicitud' ] );
+        if ( is_null( $solicitud ) )
+            return $this->warningException( 'No se encontro la solicitud N° ' . $inputs[ 'idSolicitud' ] , __FUNCTION__ , __FILE__ , __LINE__ );
+        elseif( $solicitud->id_estado != DEPOSITADO )
+            return $this->warningException( 'La solicitud ya ha sido validada por contabilidad' , __FUNCTION__ , __FILE__ , __LINE__ );
+        else
+        {
+            $deposito = $solicitud->detalle->deposit;
+            $deposito->num_transferencia = $inputs[ 'numero_operacion' ];
+            $deposito->save();
+            return $this->setRpta();
+        }
+    }
 }

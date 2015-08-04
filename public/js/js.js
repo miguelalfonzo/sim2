@@ -1674,7 +1674,71 @@ $(function()
     $( document ).off( 'click' , '.modal_extorno' );
     $( document ).on( 'click' , '.modal_extorno' , function()
     {
-
+        var element = $( this );
+        $.ajax(
+        {
+            type : 'post',
+            url  : server + 'modal-extorno',
+            data : 
+            {
+                _token      : GBREPORTS.token ,
+                idSolicitud : element.parent().parent().parent().find('#sol_token').val()
+            }
+        }).fail( function( statusCode , errorThrow )
+        {
+            ajaxError( statusCode , errorThrow );
+        }).done( function ( response ) 
+        {
+            if ( response.Status == 'Ok' )
+                bootbox.dialog( 
+                {
+                    title   : 'Cambio de N° de Operación' ,
+                    message : response.View ,
+                    locale  : 'es' ,
+                    buttons: 
+                    {
+                        danger: 
+                        {
+                            label:'Cancelar',
+                            className: 'btn-primary',
+                            callback: function() 
+                            {
+                                bootbox.hideAll();
+                            }
+                        },
+                        success: 
+                        {
+                            label: 'Confirmar',
+                            className: 'btn-success',
+                            callback: function()
+                            {
+                                $.ajax(
+                                {
+                                    type : 'post',
+                                    url  : server + 'confirm-extorno',
+                                    data : 
+                                    {
+                                        _token           : GBREPORTS.token ,
+                                        idSolicitud      : element.parent().parent().parent().find('#sol_token').val(),
+                                        numero_operacion : $( '#numero_operacion' ).val()
+                                    }
+                                }).fail( function( statusCode , errorThrow )
+                                {
+                                    ajaxError( statusCode , errorThrow );
+                                }).done( function ( response ) 
+                                {
+                                    if ( response.Status == 'Ok' )
+                                        listTable( 'solicitudes' );
+                                    else
+                                        bootbox.alert( '<h4 class="red">' + response.Status + ' : ' + response.Description + '</h4>' );
+                                });
+                            }
+                        }
+                    }
+                });
+            else
+                bootbox.alert( '<h4 class="red">' + response.Status + ' : ' + response.Description + '</h4>');
+        }); 
     });
 
     $( '#confirm-discount' ).on( 'click' , function()
