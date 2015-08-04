@@ -48,7 +48,7 @@ return array(
 	'connections' => array(
 
 		'oracle' => array(
-			'driver' => 'pdo-via-oci8',
+			'driver' => 'oracle',
 			'host' => '192.168.1.4',
 			'port' => '1521',
 			'database' => 'BDBAGO',
@@ -85,7 +85,7 @@ return array(
 		)
 		/*
 		'oracle_ms' => array(
-			'driver' => 'pdo-via-oci8',
+			'driver' => 'oracle',
 			'host' => '192.168.1.4',
 			'port' => '1521',
 			'database' => 'BDBAGO',

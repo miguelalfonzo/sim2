@@ -19,8 +19,19 @@
 		@endif
 	@endif
 		<div class="stage-content">
+<<<<<<< HEAD
+<<<<<<< HEAD
+			<p>{{ $flujo->orderHisteries }}</p>
 			@if( is_null( $flujo->policy->desde ) && is_null( $flujo->policy->hasta ) )
 				<h3 class="stage-title">Validación {{$flujo->policy->tipo_usuario}}.</h3>
+=======
+			@if( is_null( $flujo->desde ) && is_null( $flujo->hasta ) )
+				<h3 class="stage-title">Validación {{$flujo->tipo_usuario}}.</h3>
+>>>>>>> 6af0523bc23035a57ae9f5a8e90a9a65764e377d
+=======
+			@if( is_null( $flujo->policy->desde ) && is_null( $flujo->policy->hasta ) )
+				<h3 class="stage-title">Validación {{$flujo->policy->tipo_usuario}}.</h3>
+>>>>>>> 9a710f6be29ecb41c13f99e2a89c6d9bcf590884
 			@else
 				<h3 class="stage-title" style="white-space:nowrap">Aprobacion {{ $flujo->policy->tipo_usuario . '.' }}</h3>
 			@endif
