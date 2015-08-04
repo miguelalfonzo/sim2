@@ -1085,7 +1085,7 @@ class SolicitudeController extends BaseController
                         $description_seat_renta4ta_deposit   = strtoupper( 'RENTA 4TA CATEGORIA ' . $desc );
                 
                         //ASIENTO DOCUMENT - NO ITEM
-                        $description_seat_other_doc = strtoupper( $username.' '. $expense->descripcion );
+                        $description_seat_other_doc = strtoupper( $username .' '. $expense->descripcion );
                         $seatList[] = $this->createSeatElement($cuentaMkt , $solicitud->id , $cuentaExpense , $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_BASE, ASIENTO_GASTO_COD_PROV, $expense->razon, ASIENTO_GASTO_COD, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, $expense->monto, $marca, $description_seat_other_doc, $tipo_responsable, ''); 
                     
                         //ASIENTO IMPUESTO A LA RENTA
