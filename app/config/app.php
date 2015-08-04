@@ -126,7 +126,8 @@ return array(
         'Intervention\Image\ImageServiceProvider',
         'Thujohn\Pdf\PdfServiceProvider',
         'Maatwebsite\Excel\ExcelServiceProvider',
-        'Barryvdh\DomPDF\ServiceProvider'
+        'Barryvdh\DomPDF\ServiceProvider',
+        'Kmd\Logviewer\LogviewerServiceProvider',
 	),
 
 	/*

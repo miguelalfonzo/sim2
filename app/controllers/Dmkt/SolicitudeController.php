@@ -100,7 +100,7 @@ class SolicitudeController extends BaseController
 
     public function newSolicitude()
     {
-        include(app_path() . '\models\Query\QueryProducts.php');
+        include(app_path() . '/models/Query/QueryProducts.php');
         $data = array('reasons' => Reason::all(),
             'activities' => Activity::order(),
             'payments' => TypePayment::all(),
@@ -114,7 +114,7 @@ class SolicitudeController extends BaseController
 
     public function editSolicitud($token)
     {
-        include(app_path() . '\models\Query\QueryProducts.php');
+        include(app_path() . '/models/Query/QueryProducts.php');
         $data = array('solicitud' => Solicitud::where('token', $token)->firstOrFail(),
             'reasons' => Reason::all(),
             'activities' => Activity::order(),
