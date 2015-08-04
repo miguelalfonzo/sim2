@@ -949,8 +949,10 @@ class SolicitudeController extends BaseController
                         //ASIENTO IMPUESTO SERVICIO
                         if (!($expense->imp_serv == null || $expense->imp_serv == 0 || $expense->imp_serv == '')) {
                             $porcentaje = $total_neto / $expense->imp_serv;
-                            $description_seat_tax_service = strtoupper('SERVICIO ' . $porcentaje . '% ' . $expense->descripcion);
-                            $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, '', $cuentaExpense, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_BASE, $expense->imp_serv, $marca, $description_seat_tax_service, '', 'SER');
+
+                            $description_seat_tax_service    = strtoupper('SERVICIO '. $porcentaje .'% '. $expense->descripcion);
+                            $seatList[] = $this->createSeatElement( $cuentaMkt , $solicitud->id, $cuentaExpense , '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_BASE, $expense->imp_serv, $marca, $description_seat_tax_service, '', 'SER');       
+
                         }
                         //ASIENTO REPARO
                         if ($expense->reparo == 1) {

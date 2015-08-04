@@ -33,7 +33,7 @@
 				<h3 class="stage-title">Validación {{$flujo->policy->tipo_usuario}}.</h3>
 >>>>>>> 9a710f6be29ecb41c13f99e2a89c6d9bcf590884
 			@else
-				<h3 class="stage-title" style="white-space:nowrap">Aprobacion</h3>
+				<h3 class="stage-title" style="white-space:nowrap">Aprobacion {{ $flujo->policy->tipo_usuario . '.' }}</h3>
 			@endif
 			<!-- <div class="stage-info" style="white-space:nowrap"> -->
 				<span class="label label-info">

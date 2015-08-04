@@ -109,8 +109,6 @@ class TableController extends BaseController
 			{
 				case 'cuentas-marca':
 					return $this->getDailySeatRelation();
-				case 'fondo':
-					return $this->getFondos();
 				case 'fondo-cuenta':
 					return $this->getFondoAccount();
 				case 'inversion':
@@ -143,12 +141,6 @@ class TableController extends BaseController
 		return View::make( 'Maintenance.table' )->with( array( 'records' => $records , 'columns' => $columns , 'type' => 'parametro' , 'titulo' => 'Mantenimiento de Parametros' ) );
 	}
 
-	public function getMaintenanceTableDataFondos()
-	{
-		$fondos = Fondo::order();
-        return View::make('Maintenance.Fondo.table')->with('fondos' , $fondos);
-
-	}
 	public function getMaintenanceTableFondoAccount()
 	{
 		$fondos = Fondo::order();
@@ -207,26 +199,24 @@ class TableController extends BaseController
 														'titulo' => 'Fondos de Institucion', 'add' => false ) );
 	}
 
-	private function getFondos()
-    {
-        $fondos = Fondo::order();
-        return $this->setRpta( View::make('Maintenance.Fondo.table')->with('fondos' , $fondos)->render() );
-    }
 	private function getFondoAccount()
 	{
 		$fondos = Fondo::order();
 		return $this->setRpta( View::make( 'Maintenance.FondoCuenta.table' )->with( 'fondos' , $fondos )->render() );
 	}
+
 	private function getInversion()
 	{
 		$inversion = InvestmentType::withTrashed()->orderBy( 'deleted_at' ,'desc' , 'updated_at' , 'desc')->get();
 		return $this->setRpta( View::make( 'Maintenance.Investment.table')->with( 'inversion' , $inversion )->render() );
 	}
+
 	private function getActividad()
 	{
 		$actividad = Activity::withTrashed()->orderBy( 'deleted_at' ,'desc' , 'updated_at' , 'desc')->get();
 		return $this->setRpta( View::make( 'Maintenance.Activity.table' )->with( 'actividad' , $actividad )->render() );
 	}
+	
 	private function getInvestmentActivity()
 	{
 		$inversionActividad = InvestmentActivity::withTrashed()->orderBy( 'deleted_at' ,'desc' , 'updated_at' , 'desc')->get();

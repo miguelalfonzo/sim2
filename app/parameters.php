@@ -51,13 +51,14 @@ const ESTADO_ACEPTADO = 'POR APROBAR';
 
 //ID USUARIOS
 const USER_CONTABILIDAD = 43;
-const USER_GERENTE_COMERCIAL = 17;
 const USER_TESORERIA = 42;
 
 // EMAIL DE PRUEBAS
 const POSTMAN_USER_EMAIL = 'manueltemple@gmail.com';
 const POSTMAN_USER_NAME = 'Manuel Temple';
 const SOPORTE_EMAIL = 'jortiz@esinergy.com';
+
+const SOPORTE_EMAIL         = 'jortiz@esinergy.com';
 
 //ESTADO RANGOS
 const R_PENDIENTE = 1;
@@ -76,11 +77,14 @@ const GER_PROM = 'GP';
 const GER_COM = 'G';
 const CONT = 'C';
 const TESORERIA = 'T';
-const ASIS_GER = 'AG';
+
 
 //TABLAS EXTERNAS
 const TB_DOCTOR = 'FICPE.PERSONAFIS';
 const TB_INSTITUTE = 'FICPEF.PERSONAJUR';
+
+const ASIS_GER  = 'AG';
+const GER_MKT   = 'GM';
 
 //ID DE TIPO DE SOLICITUDES
 const SOL_REP = 1;
@@ -95,15 +99,11 @@ const INACTIVE = 3;
 const PAGO_CHEQUE = 2;
 const PAGO_DEPOSITO = 3;
 
-//MOTIVO
-const REASON_REGALO = 2;
-
 //CUENTAS
 const FONDO = 1;
 const BANCO = 2;
 const RETENCION = 3;
 const GASTO = 4;
-
 
 /*
 |--------------------------------------------------------------------------
@@ -146,6 +146,7 @@ const REPORT_DATA_NOT_FOUND = 'Lo sentimos, no se encontro información disponib
 | TABLA PARAMETRO -> ID
 |--------------------------------------------------------------------------
 */
+
 const ALERTA_TIEMPO_ESPERA_POR_DOCUMENTO = 1;
 const ALERTA_TIEMPO_REGISTRO_GASTO = 2;
 const ALERTA_INSTITUCION_CLIENTE = 3;

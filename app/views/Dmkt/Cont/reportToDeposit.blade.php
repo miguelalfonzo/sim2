@@ -17,11 +17,11 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Titulo</th>
+                            <th>Solicitud</th>
                             <th>Fecha a Depositar</th>
-                            <th>Tipo de Deposito</th>
-                            <th>Depositar A</th>
-                            <th>N° Cuenta</th>
+                            <th>Tipo de Pago</th>
+                            <th>Responsable</th>
+                            <th>N° Cuenta / RUC</th>
                             <th>Monto a Depositar</th>
                         </tr>
                     </thead>
@@ -53,10 +53,14 @@
                                     @endif
                                 </td>
                                 <td>
-                                    @if ( $solicitud->asignedTo->type == REP_MED && ! is_null( $solicitud->asignedTo->rm->bagoVisitador ) && ! is_null( $solicitud->asignedTo->rm->bagoVisitador->cuenta ) )
-                                        {{ $solicitud->asignedTo->rm->bagoVisitador->cuenta->cuenta }}
+                                    @if ( $solicitud->detalle->id_pago != PAGO_CHEQUE )
+                                        @if ( $solicitud->asignedTo->type == REP_MED && ! is_null( $solicitud->asignedTo->rm->bagoVisitador ) && ! is_null( $solicitud->asignedTo->rm->bagoVisitador->cuenta ) )
+                                            N° Cta: {{ $solicitud->asignedTo->rm->bagoVisitador->cuenta->cuenta }}
+                                        @else
+                                            N° Cta:
+                                        @endif
                                     @else
-                                        Ingrese el N° Cuenta :                 
+                                        RUC: {{ $solicitud->detalle->num_ruc }}         
                                     @endif
                                 </td>
                                 <td>{{ $solicitud->detalle->typeMoney->simbolo . ' ' . $solicitud->detalle->monto_actual }}</td>

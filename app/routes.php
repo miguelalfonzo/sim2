@@ -158,9 +158,6 @@
     {
         Route::post('end-expense', 'Expense\ExpenseController@finishExpense');
         Route::get('ver-gasto/{token}', 'Expense\ExpenseController@viewExpense');
-        Route::get('expense-institucion', 'Expense\ExpenseController@expenseInstitucional');
-
-        
     });
 
     Route::group(array('before' => 'rm_sup_gerprod'), function ()
