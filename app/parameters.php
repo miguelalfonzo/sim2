@@ -58,8 +58,6 @@ const POSTMAN_USER_EMAIL = 'manueltemple@gmail.com';
 const POSTMAN_USER_NAME = 'Manuel Temple';
 const SOPORTE_EMAIL = 'jortiz@esinergy.com';
 
-const SOPORTE_EMAIL         = 'jortiz@esinergy.com';
-
 //ESTADO RANGOS
 const R_PENDIENTE = 1;
 const R_APROBADO = 2;
