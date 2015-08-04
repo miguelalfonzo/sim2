@@ -132,29 +132,29 @@
                         <h3 class="stage-title">Deposito del Anticipo</h3>
                         <!-- <div class="stage-info" style="white-space:nowrap"> -->
                         <span class="label label-info">
-                    @if ( is_null( $solicitud->toAdvanceSeatHistory ) )
-                            TESORERÍA
-                        @else
-                            {{ strtoupper($solicitud->toAdvanceSeatHistory->createdBy->person->full_name) }}
-                        @endif
+                            @if ( is_null( $solicitud->toAdvanceSeatHistory ) )
+                                    TESORERÍA
+                            @else
+                                {{ strtoupper($solicitud->toAdvanceSeatHistory->createdBy->person->full_name) }}
+                            @endif
                         </span>
                                                     <!-- </div> -->
                         </div>
                     </div>
-                        @if ( is_null( $solicitud->expenseHistory ) )
-                            @if ( is_null( $solicitud->toAdvanceSeatHistory ) )
-                                <div class="stage col-md-3 col-sm-3">
-                                    <div class="stage-header"></div>
-                            @else
-                                <div class="stage col-md-3 col-sm-3 pending">
-                                    <div class="stage-header stage-pending"></div>
-                            @endif
+                    @if ( is_null( $solicitud->expenseHistory ) )
+                        @if ( is_null( $solicitud->toAdvanceSeatHistory ) )
+                            <div class="stage col-md-3 col-sm-3">
+                                <div class="stage-header"></div>
                         @else
-                            <div class="stage col-md-3 col-sm-3 success">
-                                <div class="stage-header stage-success"></div>
+                            <div class="stage col-md-3 col-sm-3 pending">
+                                <div class="stage-header stage-pending"></div>
                         @endif
-                            <div class="stage-content">
-                                <h3 class="stage-title">Asiento de Anticipo</h3>
+                    @else
+                        <div class="stage col-md-3 col-sm-3 success">
+                            <div class="stage-header stage-success"></div>
+                    @endif
+                        <div class="stage-content">
+                            <h3 class="stage-title">Asiento de Anticipo</h3>
                             <!-- <div class="stage-info" style="white-space:nowrap"> -->
                             <span class="label label-info">
                                 @if ( is_null( $solicitud->expenseHistory ) )
@@ -166,25 +166,25 @@
                             <!-- </div> -->
                         </div>
                     </div>
-            @endif
-			@elseif( $solicitud->idtiposolicitud == SOL_INST )
-				@if ( $solicitud->id_estado == CANCELADO )
-					<div class="stage col-md-3 col-sm-3 rejected">
-						<div class="stage-header stage-rejected"></div>
-				@else
-					<div class="stage col-md-3 col-sm-3 success">
-						<div class="stage-header stage-success"></div>
-				@endif
-					<div class="stage-content">
-						<h3 class="stage-title" style="white-space:nowrap">Inicio Fondo Institucional</h3>
-						<span class="label label-info">
-							{{ strtoupper($solicitud->createdBy->person->full_name) }}
-						</span>
-					</div>
-				</div>
-				@include('template.Modals.toDepositTimeLine')
-				@include( 'template.Modals.depSeatTimeLine' )
-			@endif
+                @endif
+                @elseif( $solicitud->idtiposolicitud == SOL_INST )
+                    @if ( $solicitud->id_estado == CANCELADO )
+                        <div class="stage col-md-3 col-sm-3 rejected">
+                            <div class="stage-header stage-rejected"></div>
+                    @else
+                        <div class="stage col-md-3 col-sm-3 success">
+                            <div class="stage-header stage-success"></div>
+                    @endif
+                        <div class="stage-content">
+                            <h3 class="stage-title" style="white-space:nowrap">Inicio Fondo Institucional</h3>
+                            <span class="label label-info">
+                                {{ strtoupper($solicitud->createdBy->person->full_name) }}
+                            </span>
+                        </div>
+                    </div>
+                    @include('template.Modals.toDepositTimeLine')
+                    @include( 'template.Modals.depSeatTimeLine' )
+                @endif
 			@include( 'template.Modals.registroGasto')
 			@if( $solicitud->detalle->id_motivo == REEMBOLSO )
 				@if ( is_null( $solicitud->toGenerateHistory ) )
