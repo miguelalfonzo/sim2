@@ -1254,7 +1254,7 @@ class SolicitudeController extends BaseController
         $data = array('state' => $state, 'states' => StateRange::order(), 'warnings' => $mWarning);
         if (Auth::user()->type == ASIS_GER) 
         {
-            $data[ 'investment' ] = InvestmentType::orderInst();
+            $data[ 'investments' ] = InvestmentType::orderInst();
             $data[ 'subFondos' ]  = FondoInstitucional::getSubFondo();
         }
         if (Session::has('id_solicitud')) {
