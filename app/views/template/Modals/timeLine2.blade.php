@@ -2,21 +2,21 @@
     <div class="container-fluid hide">
 
         {{--<div class="stage-container">--}}
-            {{--@foreach($flujo as $fl)--}}
-                {{--<div class="stage col-md-3 col-sm-3">--}}
-                    {{--<div class="stage-header "></div>--}}
-                    {{--<div class="stage-content">--}}
-                        {{--@if( is_null( $fl->desde ) && is_null( $fl->hasta ) )--}}
-                            {{--<h3 class="stage-title">Validaci&oacute;n {{$fl->tipo_usuario}} .</h3>--}}
-                        {{--@else--}}
-                            {{--<h3 class="stage-title" style="white-space:nowrap">Aprobaci&oacute;n</h3>--}}
-                        {{--@endif--}}
-                        {{--<span class="label label-info">--}}
-                                {{--{{$fl->nombre_usuario}}--}}
-                            {{--</span>--}}
-                    {{--</div>--}}
-                {{--</div>--}}
-            {{--@endforeach--}}
+        {{--@foreach($flujo as $fl)--}}
+        {{--<div class="stage col-md-3 col-sm-3">--}}
+        {{--<div class="stage-header "></div>--}}
+        {{--<div class="stage-content">--}}
+        {{--@if( is_null( $fl->desde ) && is_null( $fl->hasta ) )--}}
+        {{--<h3 class="stage-title">Validaci&oacute;n {{$fl->tipo_usuario}} .</h3>--}}
+        {{--@else--}}
+        {{--<h3 class="stage-title" style="white-space:nowrap">Aprobaci&oacute;n</h3>--}}
+        {{--@endif--}}
+        {{--<span class="label label-info">--}}
+        {{--{{$fl->nombre_usuario}}--}}
+        {{--</span>--}}
+        {{--</div>--}}
+        {{--</div>--}}
+        {{--@endforeach--}}
         {{--</div>--}}
         <div class="stage-container">
             @for ($i = 0; $i < count($solicitud_history); $i++)
@@ -43,11 +43,20 @@
                             @endif
                         </h3>
 
-                    <span class="label label-info">
+                        <span class="label label-info">
                                 {{ $history->createdBy->getName()}}
                             </span>
+                        {{--<span class="label label-default">--}}
+                                {{--{{ $history->user_from}}--}}
+                            {{--</span>--}}
+                        {{--<span class="label label-default">--}}
+                                {{--{{ $history->status_from}}--}}
+                            {{--</span>--}}
+                        <span class="label label-primary">
+                                {{ $history->estimed_time}}
+                            </span>
                         <span class="label label-info">{{ $history->created_at}}</span>
-                        <span class="label label-warning">{{ $history->duration}}</span>
+                        <span class="label label-{{$history->duration_color}}">{{ $history->duration}}</span>
                     </div>
                 </div>
             @endfor
@@ -87,6 +96,10 @@
                             <span class="label label-info">
                                 {{$fl->nombre_usuario}}
                             </span>
+                                <span class="label label-primary">
+                                {{$fl->estimed_time}}
+                            </span>
+
                         </div>
                     </div>
                 @endfor
@@ -107,6 +120,13 @@
                 <span class="label label-info">
                 {{$line['info']}}
                 </span>
+                        @foreach ($time_flow_event as $time_flow)
+                            @if ($time_flow->status_id == $line['status_id'] && $time_flow->to_user_type == $line['user_type_id'])
+                                <span class="label label-primary">
+                                    {{ $time_flow->hours  }}
+                                </span>
+                            @endif
+                        @endforeach
                     </div>
                 </div>
 

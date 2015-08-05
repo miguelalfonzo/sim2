@@ -18,6 +18,7 @@ use \Image;
 use \Input;
 use \Session;
 use System\SolicitudHistory;
+use System\TiempoEstimadoFlujo;
 use \URL;
 use \User;
 use \Validator;
@@ -950,8 +951,8 @@ class SolicitudeController extends BaseController
                         if (!($expense->imp_serv == null || $expense->imp_serv == 0 || $expense->imp_serv == '')) {
                             $porcentaje = $total_neto / $expense->imp_serv;
 
-                            $description_seat_tax_service    = strtoupper('SERVICIO '. $porcentaje .'% '. $expense->descripcion);
-                            $seatList[] = $this->createSeatElement( $cuentaMkt , $solicitud->id, $cuentaExpense , '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_BASE, $expense->imp_serv, $marca, $description_seat_tax_service, '', 'SER');       
+                            $description_seat_tax_service = strtoupper('SERVICIO ' . $porcentaje . '% ' . $expense->descripcion);
+                            $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, $cuentaExpense, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_BASE, $expense->imp_serv, $marca, $description_seat_tax_service, '', 'SER');
 
                         }
                         //ASIENTO REPARO
@@ -1256,22 +1257,39 @@ class SolicitudeController extends BaseController
         $solicitud_history = SolicitudHistory::where('id_solicitud', '=', $id)
             ->orderby('ID', 'ASC')
             ->get();
-////        dd((array)$solicitud_history);
-
+//        dd((array)$solicitud_history);
+        $time_flow_event = TiempoEstimadoFlujo::all();
         $previus_date = null;
         $orden_history = 0;
+        $duration_limit = 5;
+        $duration_limit_max = 10;
+        foreach ($solicitud_history as $history) {
+            foreach ($time_flow_event as $time_flow){
+                if ($time_flow->status_id == $history->status_from && $time_flow->to_user_type == $history->user_from){
+                    $history->estimed_time = $time_flow->hours;
+                    break;
+                }
+            }
+        }
         foreach ($solicitud_history as $history) {
             if ($previus_date) {
                 $date_a = $history->created_at;
                 $date_b = $previus_date;
 
                 $interval = date_diff($date_a, $date_b);
-
-                $history->duration = $interval->format('%h:%i:%s');
+//                dd($interval);
+                $history->duration = $interval->format('%h H');
+                if ($interval->h <= $history->estimed_time)
+                    $history->duration_color = 'success';
+                elseif ($interval->h <= $duration_limit_max)
+                    $history->duration_color = 'warning';
+                else
+                    $history->duration_color = 'danger';
             }
             $previus_date = $history->created_at;
-            $history->orden =$orden_history;
+            $history->orden = $orden_history;
             $orden_history++;
+
         }
 
 
@@ -1296,6 +1314,23 @@ class SolicitudeController extends BaseController
             }
 
         }
+        $status_flow = null;
+        foreach ($flujo as $fl) {
+            if(isset($status_flow))
+            {
+                $fl->status = 2;
+            }else{
+                $status_flow = 1;
+                $fl->status = 1;
+            }
+
+            foreach ($time_flow_event as $time_flow){
+                if ($time_flow->status_id == $fl->status && $time_flow->to_user_type == $fl->tipo_usuario){
+                    $fl->estimed_time = $time_flow->hours;
+                    break;
+                }
+            }
+        }
 //        dd($flujo);
         $linehard = unserialize(TIMELINEHARD);
         $motivo = $solicitud->detalle->id_motivo;
@@ -1309,18 +1344,17 @@ class SolicitudeController extends BaseController
                 } elseif ($key == 'cond_sol_motivo' && $motivo == $value) {
                     $cond = true;
                     break;
-                }elseif($key == 'cond'){
+                } elseif ($key == 'cond') {
                     $cond = true;
                 }
             }
-            if($cond)
+            if ($cond)
                 array_push($line_static, $line);
         }
 
 
-
         return View::make('template.Modals.timeLine2')->with(array('solicitud' => $solicitud, 'solicitud_history' =>
-            $solicitud_history, 'flujo' => $flujo, 'line_static' => $line_static))->render();
+            $solicitud_history, 'flujo' => $flujo, 'line_static' => $line_static , 'time_flow_event' => $time_flow_event))->render();
     }
 
     public function album()
