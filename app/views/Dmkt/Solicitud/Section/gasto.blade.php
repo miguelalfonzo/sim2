@@ -38,7 +38,7 @@
 					<div class="input-group">
 						<input id="number-prefix" type="text" class="form-control" maxlength="4">
 						<div class="input-group-addon">-</div>
-				      	<input id="number-serie" class="form-control" type="text" maxlength="8">
+				      	<input id="number-serie" class="form-control" type="text" maxlength="12">
 					</div>
 				</div>
 			</div>

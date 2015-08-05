@@ -119,7 +119,6 @@ $(function()
     
     //only numbers integers
     $("#ruc").numeric({negative:false,decimal:false});
-    $("#number-prefix").numeric({negative:false,decimal:false});
     $("#number-serie").numeric({negative:false,decimal:false});
     
     //only numbers floats
@@ -1681,8 +1680,8 @@ $(function()
             url  : server + 'modal-extorno',
             data : 
             {
-                _token      : GBREPORTS.token ,
-                idSolicitud : element.parent().parent().parent().find('#sol_token').val()
+                _token : GBREPORTS.token ,
+                token  : element.parent().parent().parent().find('#sol_token').val()
             }
         }).fail( function( statusCode , errorThrow )
         {
@@ -1693,7 +1692,7 @@ $(function()
                 bootbox.dialog( 
                 {
                     title   : 'Cambio de N° de Operación' ,
-                    message : response.View ,
+                    message : response.Data.View ,
                     locale  : 'es' ,
                     buttons: 
                     {
@@ -1719,8 +1718,8 @@ $(function()
                                     data : 
                                     {
                                         _token           : GBREPORTS.token ,
-                                        idSolicitud      : element.parent().parent().parent().find('#sol_token').val(),
-                                        numero_operacion : $( '#numero_operacion' ).val()
+                                        token            : element.parent().parent().parent().find('#sol_token').val(),
+                                        numero_operacion : $( '#nuevo_num_ope' ).val()
                                     }
                                 }).fail( function( statusCode , errorThrow )
                                 {
@@ -1728,7 +1727,10 @@ $(function()
                                 }).done( function ( response ) 
                                 {
                                     if ( response.Status == 'Ok' )
+                                    {
+                                        bootbox.alert( '<h4 class="green">Cambio de N° de Operacion Confirmado</h4>');
                                         listTable( 'solicitudes' );
+                                    }
                                     else
                                         bootbox.alert( '<h4 class="red">' + response.Status + ' : ' + response.Description + '</h4>' );
                                 });

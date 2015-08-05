@@ -1190,7 +1190,7 @@ $(document).on('click' , '.maintenance-edit' , function()
         else if ( td.attr('editable') == 3 )
         {
             var val = td.html();
-            td.html('<input type="text" maxlength=7 style="width:100%" value="' + val.trim() + '">');
+            td.html('<input type="text" style="width:100%" value="' + val.trim() + '">');
             td.children().numeric();
         }
         else if ( td.attr('editable') == 4 )

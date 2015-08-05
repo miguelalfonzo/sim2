@@ -284,19 +284,23 @@ class DepositController extends BaseController
     public function modalExtorno()
     {
         $inputs = Input::all();
-        $solicitud = Solicitud::find( $inputs[ 'idSolicitud' ] );
+        $solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
         if ( is_null ( $solicitud ) )
-            return $this->warningException( 'No se encontro la solicitud N° ' . $inputs[ 'idSolicitud' ] , __FUNCTION__ , __FILE__ , __LINE__ );
+            return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ , __FILE__ , __LINE__ );
         else
-            return $this->setRpta( 'View' => View::make( 'template.List.Modals.extorno' , array( $solicitud ) ) );
+            return $this->setRpta( array( 'View' => View::make( 'template.Modals.extorno' , array( 'solicitud' => $solicitud ) )->render() ) );
     }
 
     public function confirmExtorno()
     {
-        $inputs = Input::all();
-        $solicitud = Solicitud::find( $inputs[ 'idSolicitud' ] );
+        $inputs    = Input::all();
+        $rules = array( 'numero_operacion' => 'required|min:1' );
+        $validator = Validator::make( $inputs , $rules );
+        if ( $validator->fails() )
+            return $this->warningException( substr( $this->msgValidator( $validator ), 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
+        $solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
         if ( is_null( $solicitud ) )
-            return $this->warningException( 'No se encontro la solicitud N° ' . $inputs[ 'idSolicitud' ] , __FUNCTION__ , __FILE__ , __LINE__ );
+            return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ , __FILE__ , __LINE__ );
         elseif( $solicitud->id_estado != DEPOSITADO )
             return $this->warningException( 'La solicitud ya ha sido validada por contabilidad' , __FUNCTION__ , __FILE__ , __LINE__ );
         else
