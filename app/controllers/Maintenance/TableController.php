@@ -246,64 +246,87 @@ class TableController extends BaseController
 		}
 	}
 
+	private function validateFondoSaldoNeto( $fondo )
+	{
+		if ( $fondo->saldo < $fondo->saldo_neto )
+			return $this->warningException( 'No puede asignar un saldo menor al saldo reservado por las solicitudes' , __FUNCTION__ , __LINE__ , __FILE__ );
+		else
+			return $this->setRpta();
+	}
+
 	private function maintenanceUpdateFondosSupervisor( $val )
 	{
 		$fondoSup = FondoSupervisor::find( $val[ 'id' ] );
 		$oldSaldo = $fondoSup->saldo;
+		
 		foreach( $val[ data ] as $key => $data )
 			$fondoSup->$key = $data;
-		$fondoSup->save();
-
-		$fondoMktHistory = new FondoMktHistory;
-		$fondoMktHistory->id = $fondoMktHistory->nextId();
-		$fondoMktHistory->id_to_fondo = $val[ 'id' ];
-		$fondoMktHistory->to_old_saldo = $oldSaldo;
-		$fondoMktHistory->to_new_saldo = $fondoSup->saldo;
-		$fondoMktHistory->id_fondo_history_reason = FONDO_AJUSTE;
-		$fondoMktHistory->id_tipo_to_fondo = SUP;
-		$fondoMktHistory->save();
-
-		return $this->setRpta();
+		
+		$middleRpta = $this->validateFondoSaldoNeto( $fondoSup );
+		if ( $middleRpta[ status ] == ok )
+		{
+			$fondoSup->save();
+			$fondoMktHistory = new FondoMktHistory;
+			$fondoMktHistory->id = $fondoMktHistory->nextId();
+			$fondoMktHistory->id_to_fondo = $val[ 'id' ];
+			$fondoMktHistory->to_old_saldo = $oldSaldo;
+			$fondoMktHistory->to_new_saldo = $fondoSup->saldo;
+			$fondoMktHistory->id_fondo_history_reason = FONDO_AJUSTE;
+			$fondoMktHistory->id_tipo_to_fondo = SUP;
+			$fondoMktHistory->save();
+			return $this->setRpta();
+		}
+		return $middleRpta;
 	}
 
 	private function maintenanceUpdateFondosGerProd( $val )
 	{
 		$fondoGerProd = FondoGerProd::find( $val[ 'id' ] );
 		$oldSaldo = $fondoGerProd->saldo;
+		
 		foreach( $val[ data ] as $key => $data )
 			$fondoGerProd->$key = $data;
-		$fondoGerProd->save();
 		
-		$fondoMktHistory = new FondoMktHistory;
-		$fondoMktHistory->id = $fondoMktHistory->nextId();
-		$fondoMktHistory->id_to_fondo = $val[ 'id' ];
-		$fondoMktHistory->to_old_saldo = $oldSaldo;
-		$fondoMktHistory->to_new_saldo = $fondoGerProd->saldo;
-		$fondoMktHistory->id_fondo_history_reason = FONDO_AJUSTE; 
-		$fondoMktHistory->id_tipo_to_fondo = GER_PROD;
-		$fondoMktHistory->save();
-
-		return $this->setRpta();
+		$middleRpta = $this->validateFondoSaldoNeto( $fondoSup );
+		if ( $middleRpta[ status ] == ok )
+		{
+			$fondoGerProd->save();	
+			$fondoMktHistory = new FondoMktHistory;
+			$fondoMktHistory->id = $fondoMktHistory->nextId();
+			$fondoMktHistory->id_to_fondo = $val[ 'id' ];
+			$fondoMktHistory->to_old_saldo = $oldSaldo;
+			$fondoMktHistory->to_new_saldo = $fondoGerProd->saldo;
+			$fondoMktHistory->id_fondo_history_reason = FONDO_AJUSTE; 
+			$fondoMktHistory->id_tipo_to_fondo = GER_PROD;
+			$fondoMktHistory->save();
+			return $this->setRpta();
+		}
+		return $middleRpta;
 	}
 
 	private function maintenanceUpdateFondosInstitution( $val )
 	{
 		$fondoInstitution = FondoInstitucional::find( $val[ 'id' ] );
 		$oldSaldo = $fondoInstitution->saldo;		
+		
 		foreach( $val[ data ] as $key => $data )
 			$fondoInstitution->$key = $data;
-		$fondoInstitution->save();
-
-		$fondoMktHistory = new FondoMktHistory;
-		$fondoMktHistory->id = $fondoMktHistory->nextId();
-		$fondoMktHistory->id_to_fondo = $val[ 'id' ];
-		$fondoMktHistory->to_old_saldo = $oldSaldo;
-		$fondoMktHistory->to_new_saldo = $fondoInstitution->saldo;
-		$fondoMktHistory->id_fondo_history_reason = FONDO_AJUSTE; 
-		$fondoMktHistory->id_tipo_to_fondo = FONDO_SUBCATEGORIA_INSTITUCION;
-		$fondoMktHistory->save();
-
-		return $this->setRpta();
+		
+		$middleRpta = $this->validateFondoSaldoNeto( $fondoSup );
+		if ( $middleRpta[ status ] == ok )
+		{
+			$fondoInstitution->save();
+			$fondoMktHistory = new FondoMktHistory;
+			$fondoMktHistory->id = $fondoMktHistory->nextId();
+			$fondoMktHistory->id_to_fondo = $val[ 'id' ];
+			$fondoMktHistory->to_old_saldo = $oldSaldo;
+			$fondoMktHistory->to_new_saldo = $fondoInstitution->saldo;
+			$fondoMktHistory->id_fondo_history_reason = FONDO_AJUSTE; 
+			$fondoMktHistory->id_tipo_to_fondo = FONDO_SUBCATEGORIA_INSTITUCION;
+			$fondoMktHistory->save();
+			return $this->setRpta();
+		}
+		return $middleRpta;
 	}
 
 	private function maintenanceUpdateparametro( $val )

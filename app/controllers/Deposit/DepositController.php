@@ -278,9 +278,37 @@ class DepositController extends BaseController
                                            'oldSaldo' => $oldSaldo , 'oldSaldoNeto' => $oldSaldoNeto , 
                                            'newSaldo' => $fondo->saldo , 'newSaldoNeto' => $fondo->saldo_neto , 'reason' => FONDO_DEVOLUCION );
         }
-        \Log::error( $fondoDataHistories );
         $fondoMktController->setFondoMktHistories( $fondoDataHistories , $solicitud->id );  
     }
 
+    public function modalExtorno()
+    {
+        $inputs = Input::all();
+        $solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
+        if ( is_null ( $solicitud ) )
+            return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ , __FILE__ , __LINE__ );
+        else
+            return $this->setRpta( array( 'View' => View::make( 'template.Modals.extorno' , array( 'solicitud' => $solicitud ) )->render() ) );
+    }
 
+    public function confirmExtorno()
+    {
+        $inputs    = Input::all();
+        $rules = array( 'numero_operacion' => 'required|min:1' );
+        $validator = Validator::make( $inputs , $rules );
+        if ( $validator->fails() )
+            return $this->warningException( substr( $this->msgValidator( $validator ), 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
+        $solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
+        if ( is_null( $solicitud ) )
+            return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ , __FILE__ , __LINE__ );
+        elseif( $solicitud->id_estado != DEPOSITADO )
+            return $this->warningException( 'La solicitud ya ha sido validada por contabilidad' , __FUNCTION__ , __FILE__ , __LINE__ );
+        else
+        {
+            $deposito = $solicitud->detalle->deposit;
+            $deposito->num_transferencia = $inputs[ 'numero_operacion' ];
+            $deposito->save();
+            return $this->setRpta();
+        }
+    }
 }

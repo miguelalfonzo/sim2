@@ -115,6 +115,8 @@
     {
         Route::post( 'deposit-solicitude', 'Deposit\DepositController@depositSolicitudeTes');
         Route::post( 'confirm-devolution', 'Deposit\DepositController@confirmDevolution' ); 
+        Route::post( 'modal-extorno' , 'Deposit\DepositController@modalExtorno' );
+        Route::post( 'confirm-extorno' , 'Deposit\DepositController@confirmExtorno' );
     });
 
     /*

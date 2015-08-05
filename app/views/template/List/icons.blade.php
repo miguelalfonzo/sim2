@@ -18,72 +18,45 @@
                 </a>            
             @endif    
         @endif
+        @if( in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD ) ) )
+            @if( $solicitud->id_estado == PENDIENTE && $solicitud->created_by == Auth::user()->id )
+                @if( $solicitud->status == 1 )
+                    <a class="btn btn-default" href="{{URL::to('editar-solicitud').'/'.$solicitud->token}}">
+                        <span  class="glyphicon glyphicon-pencil"></span>
+                    </a>
+                    <a class="btn btn-default cancel-solicitude" data-idsolicitude="{{$solicitud->id}}" data-token="{{csrf_token()}}">
+                        <span  class="glyphicon glyphicon-remove"></span>
+                    </a>
+                @endif
+            @endif
+        @elseif ( Auth::user()->type == CONT )
+            @if( $solicitud->id_estado == REGISTRADO )
+                <a class="btn btn-default" href="{{URL::to('generar-asiento-gasto/'.$solicitud->token)}}">
+                    <span  class="glyphicon glyphicon-book"></span>
+                </a>
+            @endif   
+        @elseif ( Auth::user()->type == TESORERIA )
+            @if( $solicitud->id_estado == DEPOSITO_HABILITADO )
+                <a class="btn btn-default modal_deposit">
+                    <span  class="glyphicon glyphicon-usd"></span>
+                </a>
+            @elseif( $solicitud->id_estado == DEPOSITADO )
+                <a class="btn btn-default modal_extorno">
+                    <span  class="glyphicon glyphicon-pencil"></span>
+                </a>
+            @endif
+        @endif
         @if ( $solicitud->idtiposolicitud == SOL_REP )
              @if( in_array( $solicitud->id_estado , array( REGISTRADO , DEVOLUCION ) ) && Auth::user()->id == $solicitud->id_user_assign )
                 <a class="btn btn-default" target="_blank" href="{{URL::to('a'.'/'.$solicitud->token)}}">
                     <span  class="glyphicon glyphicon-print"></span>
                 </a>
             @endif
-            @if( Auth::user()->type == REP_MED)
-                @if( $solicitud->id_estado == PENDIENTE && $solicitud->created_by == Auth::user()->id )
-                    @if( $solicitud->status == 1 )
-                        <a class="btn btn-default" href="{{URL::to('editar-solicitud').'/'.$solicitud->token}}">
-                            <span  class="glyphicon glyphicon-pencil"></span>
-                        </a>
-                        <a class="btn btn-default cancel-solicitude" data-idsolicitude="{{$solicitud->id}}" data-token="{{csrf_token()}}">
-                            <span  class="glyphicon glyphicon-remove"></span>
-                        </a>
-                    @endif
-                @endif
-            @elseif ( Auth::user()->type == SUP )
-                @if( $solicitud->id_estado == PENDIENTE && $solicitud->created_by == Auth::user()->id )
-                    <a class="btn btn-default" href="{{URL::to('editar-solicitud').'/'.$solicitud->token}}">
-                        <span   class="glyphicon glyphicon-pencil"></span>
-                    </a>
-                    <a href="#" class="btn btn-default cancel-solicitude" data-idsolicitude = "{{$solicitud->id}}"  data-token="{{csrf_token()}}">
-                        <span  class="glyphicon glyphicon-remove"></span>
-                    </a>
-                @endif
-            @elseif ( Auth::user()->type == GER_PROD )
-                @if( $solicitud->id_estado == PENDIENTE && $solicitud->created_by == Auth::user()->id )
-                    <a class="btn btn-default" href="{{URL::to('editar-solicitud').'/'.$solicitud->token}}">
-                        <span   class="glyphicon glyphicon-pencil"></span>
-                    </a>
-                    <a href="#" class="btn btn-default cancel-solicitude" data-idsolicitude = "{{$solicitud->id}}"  data-token="{{csrf_token()}}">
-                        <span  class="glyphicon glyphicon-remove"></span>
-                    </a>
-                @endif
-            @elseif ( Auth::user()->type == CONT )
-                @if( $solicitud->id_estado == REGISTRADO )
-                    <a class="btn btn-default" href="{{URL::to('generar-asiento-gasto/'.$solicitud->token)}}">
-                        <span  class="glyphicon glyphicon-book"></span>
-                    </a>
-                @endif   
-            @elseif ( Auth::user()->type == TESORERIA )
-                @if( $solicitud->id_estado == DEPOSITO_HABILITADO )
-                    <a class="btn btn-default modal_deposit">
-                        <span  class="glyphicon glyphicon-usd"></span>
-                    </a>
-                @endif
-            @endif
         @elseif ( $solicitud->idtiposolicitud == SOL_INST )
-            @if( ( $solicitud->id_estado == REGISTRADO || $solicitud->id_estado == DEVOLUCION ) && Auth::user()->id == $solicitud->id_user_assign )   
+            @if( ( in_array( $solicitud->id_estado , array( REGISTRADO , DEVOLUCION ) ) ) && Auth::user()->id == $solicitud->id_user_assign )   
                 <a class="btn btn-default" href="{{URL::to('report-fondo')}}/{{$solicitud->token}}">
                     <span class="glyphicon glyphicon-print" ></span>
                 </a>
-            @endif
-            @if ( Auth::user()->type == CONT )
-                @if( $solicitud->id_estado == REGISTRADO )
-                    <a class="btn btn-default" href="{{URL::to('generar-asiento-gasto/'.$solicitud->token)}}">
-                        <span  class="glyphicon glyphicon-book"></span>
-                    </a>
-                @endif  
-            @elseif ( Auth::user()->type == TESORERIA )
-                @if ( $solicitud->id_estado == DEPOSITO_HABILITADO )
-                    <a class="btn btn-default modal_deposit">
-                        <span  class="glyphicon glyphicon-usd"></span>
-                    </a>
-                @endif
             @endif
         @endif
     </div>

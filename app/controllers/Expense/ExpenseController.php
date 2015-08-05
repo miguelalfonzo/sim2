@@ -62,11 +62,11 @@ class ExpenseController extends BaseController
         	$date 	   = $this->getExpenseDate( $solicitud , 1 );
         	$rules[ 'fecha_movimiento' ] = 'required|string|date_format:"d/m/Y"|after:' . $date[ 'startDate' ] . '|before:' . $date[ 'endDate'] ;
         	$validator = Validator::make( $inputs , $rules );
-        	$validator->sometimes( 'number_prefix' , 'required|numeric|min:1|digits_between:1,4' , function( $input ) use( $proofType )
+        	$validator->sometimes( 'number_prefix' , 'required|string|min:1|max:4' , function( $input ) use( $proofType )
             {
                 return $proofType->marca != 'N';
             });
-            $validator->sometimes( 'number_serie' , 'required|numeric|min:1|digits_between:1,8' , function( $input ) use( $proofType )
+            $validator->sometimes( 'number_serie' , 'required|numeric|min:1|digits_between:1,12' , function( $input ) use( $proofType )
             {
                 return $proofType->marca != 'N';
             });

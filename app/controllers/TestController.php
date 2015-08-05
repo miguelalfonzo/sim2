@@ -495,5 +495,10 @@ class TestController extends BaseController
 		return array( 'type' => 'warning' , 'msg' => $msg, 'data' => $result, 'typeData' => 'clientAlert');
 	}
 
+	public function getQuery()
+	{
+		
+	}
+
 
 }
