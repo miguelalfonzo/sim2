@@ -100,7 +100,7 @@ class SolicitudeController extends BaseController
 
     public function newSolicitude()
     {
-        include(app_path() . '\models\Query\QueryProducts.php');
+        include(app_path() . '/models/Query/QueryProducts.php');
         $data = array('reasons' => Reason::all(),
             'activities' => Activity::order(),
             'payments' => TypePayment::all(),
@@ -114,7 +114,7 @@ class SolicitudeController extends BaseController
 
     public function editSolicitud($token)
     {
-        include(app_path() . '\models\Query\QueryProducts.php');
+        include(app_path() . '/models/Query/QueryProducts.php');
         $data = array('solicitud' => Solicitud::where('token', $token)->firstOrFail(),
             'reasons' => Reason::all(),
             'activities' => Activity::order(),
@@ -1266,12 +1266,14 @@ class SolicitudeController extends BaseController
     {
 
         $solicitud = Solicitud::find($id);
+//        $solicitud_history = $solicitud->histories;
         $solicitud_history = SolicitudHistory::where('id_solicitud', '=', $id)
             ->orderby('ID', 'ASC')
             ->get();
-//        dd((array)$solicitud_history);
+////        dd((array)$solicitud_history);
 
         $previus_date = null;
+        $orden_history = 0;
         foreach ($solicitud_history as $history) {
             if ($previus_date) {
                 $date_a = $history->created_at;
@@ -1281,9 +1283,9 @@ class SolicitudeController extends BaseController
 
                 $history->duration = $interval->format('%h:%i:%s');
             }
-
             $previus_date = $history->created_at;
-
+            $history->orden =$orden_history;
+            $orden_history++;
         }
 
 
