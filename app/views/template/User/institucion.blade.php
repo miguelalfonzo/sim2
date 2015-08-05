@@ -27,16 +27,28 @@
                     </div>
 
                     <!-- Fondos -->
-                     <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+                    <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
                         <label class="control-label">Fondo</label>
                         <select name="fondo_producto[]" class="selectpicker form-control">
                             <option selected disabled value="0">Seleccione el Fondo</option>
                             @foreach( $subFondos as $subFondo )
-                                <option value="{{ $subFondo->id }}" style="background-color:#00FFFF">{{ $subFondo->descripcion . ' S/.' . $subFondo->saldo_neto }}</option>
+                                <option value="{{ $subFondo->id }}">{{ $subFondo->descripcion . ' S/.' . $subFondo->saldo_neto }}</option>
                             @endforeach
                         </select>
                     </div>
                     
+                    <!-- INVERSION -->
+                    <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+                        <label class="control-label">Inversion</label>
+                        <select name="inversion" class="selectpicker form-control">
+                            <option selected disabled value="0">Seleccione la Inversion</option>
+                            @foreach( $investments as $investment )
+                                <option value="{{ $investment->id }}">{{ $investment->nombre }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    
+
                     <div class="clearfix"></div>
 
                     <!-- SISOL -->
@@ -49,9 +61,6 @@
                         </div>
                     </div>
 
-                    <!-- ETIQUETA -->
-                    <!-- include('Dmkt.Register.Detail.activity') -->
-                    
                     <!-- REPRESENTANTE -->
                     <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
                         <label class="control-label">Depositar a</label>
@@ -62,22 +71,6 @@
                             </a>
                         </div>
                     </div>
-  
-                    <!-- Cuenta -->
-                    <!-- <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
-                        <label class="control-label">N° de Cuenta</label>
-                        <div>
-                            <input id="fondo_cuenta" name="cuenta" type="text" class="form-control input-md" maxlength="25">
-                        </div>
-                    </div> -->
-
-                    <!-- SUPERVISOR -->
-                    <!--<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
-                        <label class="control-label">Supervisor</label>
-                        <div>
-                            <input id="fondo_supervisor" name="supervisor" data-cod="0" type="text" class="form-control input-md">
-                        </div>
-                    </div> -->
 
                     <!-- MONTO -->
                     <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
@@ -101,6 +94,7 @@
                             </button>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
