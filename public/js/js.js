@@ -1632,12 +1632,14 @@ $(function()
                 bootbox.alert("error" );
             }).done( function ( data ) 
             {
-                bootbox.dialog({
-                    message: data,
-                    title  : "Galería de Fotos",
-                    size   : "large"
-                });
-                $('.carousel').carousel();
+                if(typeof(data.title)){
+                    bootbox.dialog({
+                        message: data.view,
+                        title  : data.title,
+                        size   : "large"
+                    });
+                    $('.carousel').carousel();
+                }
             }); 
         }
     });
