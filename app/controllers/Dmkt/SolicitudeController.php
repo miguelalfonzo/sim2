@@ -1346,19 +1346,22 @@ class SolicitudeController extends BaseController
     public function getEventList()
     {
         // dd(Input::all());
-        $start = Input::get("date_start");
-        $end = Input::get("date_end");
-        $data = array();
+        $start          = Input::get("date_start");
+        $end            = Input::get("date_end");
+        $data           = array();
         $data['events'] = Event::whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1")->get();
         return View::make('Event.album', $data);
     }
 
     public function photos()
     {
-        $event_id = Input::get('event_id');
-        $photos = FotoEventos::where('event_id', $event_id)->get();
-        $view = View::make('Event.carousel', compact('photos'))->render();
-        return $view;
+        $result          = array();
+        $event_id        = Input::get('event_id');
+        $photos          = FotoEventos::where('event_id', $event_id)->get();
+        $photo           = $photos->first();
+        $result['title'] = $photo->event->name;
+        $result['view']  = View::make('Event.carousel', compact('photos'))->render();
+        return $result;
     }
 
     public function createEventHandler()
