@@ -188,38 +188,52 @@ define("TIMELINEHARD", serialize(array(
 //
 //    ),
     '1' => array(
+        'status_id' => 3,
+        'user_type_id' => 'C',
         'title' => 'Validación Cont.',
         'info' => 'CONTABILIDAD',
         'cond_sol_type' => SOL_REP
     ),
     '2' => array(
+        'status_id' => 1,
+        'user_type_id' => 'AG',
         'title' => 'Habilitación Fondo Inst.',
         'info' => 'ASISTENTE GERENCIA',
         'cond_sol_type' => SOL_INST
     ),
     '3' => array(
+        'status_id' => 13,
+        'user_type_id' => 'T',
         'title' => 'Deposito del Anticipo',
         'info' => 'TESORERÍA',
         'cond' => true
     ),
     '4' => array(
+        'status_id' => 4,
+        'user_type_id' => 'C',
         'title' => 'Asiento de Anticipo',
         'info' => 'CONTABILIDAD',
         'cond' => true
     ),
     '5' => array(
+        'status_id' => 12,
+        'user_type_id' => 'R',
         'title' => 'Reg. de Gastos',
         'info' => 'RESPONSABLE DEL GASTO',
         'cond' => true
 
     ),
     '6' => array(
+        'status_id' => 5,
+        'user_type_id' => 'C',
         'title' => 'Asiento de Diario',
         'info' => 'CONTABILIDAD',
         'cond' => true
 
     ),
     '7' => array(
+        'status_id' => 20,
+        'user_type_id' => 'C',
         'title' => 'Deposito del Reembolso',
         'info' => 'TESORERIA',
         'cond_sol_motivo' => REEMBOLSO
