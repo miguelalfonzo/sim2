@@ -20,7 +20,7 @@
                     </select>
                     <br>
                     <label for="op-number">Número de Operación, Transacción, Cheque:</label>
-                    <input id="op-number" type="text" class="form-control">
+                    <input id="op-number" type="text" class="form-control" maxlength="200">
                     <p id="message-op-number" style="margin-top:1em;color:#a94442;"></p>
                 </div>
                 <div class="modal-footer">

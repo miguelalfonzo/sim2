@@ -110,16 +110,17 @@ $(function()
 
     //Default events
     //Calculate the IGV loading
-    if(parseFloat($(".total-item").val())) calcularIGV();
-    if(parseFloat($("#balance").val()) === 0)
+    if( parseFloat( $( ".total-item" ).val() ) ) 
+        calcularIGV();
+    if( parseFloat( $( "#balance" ).val() ) === 0 )
         $(".detail-expense").hide();
+
     //Restrictions on data entry forms
+    
     //only numbers integers
     $("#ruc").numeric({negative:false,decimal:false});
-    $("#number-prefix").numeric({negative:false,decimal:false});
     $("#number-serie").numeric({negative:false,decimal:false});
-    $("#op-number").numeric({negative:false,decimal:false});
-    //$("#number_account").numeric({negative:false,decimal:false});
+    
     //only numbers floats
     $("#imp-ser").numeric({negative:false});
     $(".total-item input").numeric({negative:false});
@@ -1631,12 +1632,14 @@ $(function()
                 bootbox.alert("error" );
             }).done( function ( data ) 
             {
-                bootbox.dialog({
-                    message: data,
-                    title  : "Galería de Fotos",
-                    size   : "large"
-                });
-                $('.carousel').carousel();
+                if(typeof(data.title)){
+                    bootbox.dialog({
+                        message: data.view,
+                        title  : data.title,
+                        size   : "large"
+                    });
+                    $('.carousel').carousel();
+                }
             }); 
         }
     });
@@ -1667,6 +1670,79 @@ $(function()
     $( document ).on( 'click' , '#periodo' , function()
     {
         $( this ).parent().parent().removeClass( 'has-error' );
+    });
+
+    $( document ).off( 'click' , '.modal_extorno' );
+    $( document ).on( 'click' , '.modal_extorno' , function()
+    {
+        var element = $( this );
+        $.ajax(
+        {
+            type : 'post',
+            url  : server + 'modal-extorno',
+            data : 
+            {
+                _token : GBREPORTS.token ,
+                token  : element.parent().parent().parent().find('#sol_token').val()
+            }
+        }).fail( function( statusCode , errorThrow )
+        {
+            ajaxError( statusCode , errorThrow );
+        }).done( function ( response ) 
+        {
+            if ( response.Status == 'Ok' )
+                bootbox.dialog( 
+                {
+                    title   : 'Cambio de N° de Operación' ,
+                    message : response.Data.View ,
+                    locale  : 'es' ,
+                    buttons: 
+                    {
+                        danger: 
+                        {
+                            label:'Cancelar',
+                            className: 'btn-primary',
+                            callback: function() 
+                            {
+                                bootbox.hideAll();
+                            }
+                        },
+                        success: 
+                        {
+                            label: 'Confirmar',
+                            className: 'btn-success',
+                            callback: function()
+                            {
+                                $.ajax(
+                                {
+                                    type : 'post',
+                                    url  : server + 'confirm-extorno',
+                                    data : 
+                                    {
+                                        _token           : GBREPORTS.token ,
+                                        token            : element.parent().parent().parent().find('#sol_token').val(),
+                                        numero_operacion : $( '#nuevo_num_ope' ).val()
+                                    }
+                                }).fail( function( statusCode , errorThrow )
+                                {
+                                    ajaxError( statusCode , errorThrow );
+                                }).done( function ( response ) 
+                                {
+                                    if ( response.Status == 'Ok' )
+                                    {
+                                        bootbox.alert( '<h4 class="green">Cambio de N° de Operacion Confirmado</h4>');
+                                        listTable( 'solicitudes' );
+                                    }
+                                    else
+                                        bootbox.alert( '<h4 class="red">' + response.Status + ' : ' + response.Description + '</h4>' );
+                                });
+                            }
+                        }
+                    }
+                });
+            else
+                bootbox.alert( '<h4 class="red">' + response.Status + ' : ' + response.Description + '</h4>');
+        }); 
     });
 
     $( '#confirm-discount' ).on( 'click' , function()

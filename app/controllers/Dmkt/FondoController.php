@@ -57,13 +57,14 @@ class FondoController extends BaseController
             $jDetalle = json_decode($detalle->detalle);
             $rm = $solInst->asignedTo->rm;
             $institution = $solInst->clients()->where( 'id_tipo_cliente' , 3)->first();
-            $data = array( 'rm'          => strtoupper( $rm->nombres.' '.$rm->apellidos ) ,
-                           'idrm'        => $rm->idrm ,
-                           'monto'       => $jDetalle->monto_solicitado ,
-                           'periodo'     => $detalle->periodo->aniomes ,
-                           'idfondo'     => $detalle->id_fondo ,
-                           'institucion' => $institution->institution->pejrazon ,
-                           'institucion-cod' => $institution->id_cliente );
+            $data = array( 'rm'              => strtoupper( $rm->nombres.' '.$rm->apellidos ) ,
+                           'idrm'            => $rm->idrm ,
+                           'monto'           => $jDetalle->monto_solicitado ,
+                           'periodo'         => $detalle->periodo->aniomes ,
+                           'idfondo'         => $detalle->id_fondo ,
+                           'institucion'     => $institution->institution->pejrazon ,
+                           'institucion-cod' => $institution->id_cliente , 
+                           'idinversion'     => $solInst->id_inversion );
             return $this->setRpta( $data );
         }
         catch ( Exception $e )
@@ -128,7 +129,8 @@ class FondoController extends BaseController
                              'codrepmed'       => $solicitud->asignedTo->rm->idrm,
                              'total'           => $solicitud->detalle->monto_aprobado,
                              'fondo_producto'  => $solicitud->detalle->id_fondo,
-                             'mes'             => $this->nextPeriod( $solicitud->detalle->periodo->aniomes ) );
+                             'mes'             => $this->nextPeriod( $solicitud->detalle->periodo->aniomes ) ,
+                             'inversion'       => $solicitud->id_inversion );
             
             $middleRpta = $this->processsInstitutionalSolicitud( $inputs );
             if ( $middleRpta[ status ] != ok )
@@ -271,12 +273,13 @@ class FondoController extends BaseController
                 }
                 else
                 {
-                    $solicitud             = new Solicitud;
-                    $solicitud->id         = $solicitud->lastId() + 1;
-                    $solicitud->token      = sha1( md5( uniqid( $solicitud->id , true ) ) );
-                    $detalle               = new SolicitudDetalle;
-                    $detalle->id           = $detalle->lastId() + 1;
-                    $solicitud->id_detalle = $detalle->id;
+                    $solicitud               = new Solicitud;
+                    $solicitud->id           = $solicitud->lastId() + 1;
+                    $solicitud->token        = sha1( md5( uniqid( $solicitud->id , true ) ) );
+                    $solicitud->id_inversion = $inputs[ 'inversion' ];
+                    $detalle                 = new SolicitudDetalle;
+                    $detalle->id             = $detalle->lastId() + 1;
+                    $solicitud->id_detalle   = $detalle->id;
                 }
                 $inputs[ 'supervisor' ]     = $middleRpta[ data ][ 'sup' ];
                 $inputs[ 'cuenta' ]         = $middleRpta[ data ][ 'cuentaRep' ];
@@ -451,7 +454,8 @@ class FondoController extends BaseController
                         'codrepmed'       => 'required|integer|min:1|exists:ficpe.visitador,visvisitador',
                         'total'           => 'required|numeric|min:1',
                         'fondo_producto'  => 'required|string|min:1',
-                        'mes'             => 'required|string|date_format:m-Y|after:'.date("Y-m") );
+                        'mes'             => 'required|string|date_format:m-Y|after:'.date("Y-m"),
+                        'inversion'       => 'required|exists:tipo_inversion,id' );
         $validator = Validator::make($inputs, $rules);
         if ($validator->fails()) 
             return $this->warningException( substr($this->msgValidator($validator), 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
