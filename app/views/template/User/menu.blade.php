@@ -51,5 +51,5 @@
             </span>
         </div>
     @endif
-    <div class="container-fluid table_solicitudes"></div>
+    <div class="container-fluid table_solicitudes" id="solicitudes"></div>
 </div>

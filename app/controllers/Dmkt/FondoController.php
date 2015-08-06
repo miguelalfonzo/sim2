@@ -22,6 +22,7 @@ use \Fondo\FondoMkt;
 
 class FondoController extends BaseController
 {
+    
 
     private function period( $date )
     {

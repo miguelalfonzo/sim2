@@ -416,7 +416,7 @@ function listTable( type , date )
         // l.stop();
         if ( response.Status == 'Ok' )
         {
-            dataTable( 'table_' + type , response.Data.View , type );
+            dataTable( type , response.Data.View , type );
             if ( response.Data.Total !== undefined )
             {
                 $( '.estado-cuenta-deposito' ).first().val( response.Data.Total.Soles);
@@ -433,6 +433,7 @@ var calcDataTableHeight = function() {
 };
 function dataTable( element , html , message )
 {
+    console.log( element );
     $( '#table_' + element + '_wrapper' ).remove();
 
     if( html != null )
