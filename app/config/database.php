@@ -26,7 +26,8 @@ return array(
 	|
 	*/
 
-	'default' => 'oracle',
+	//'default' => 'oracle',
+	'default' => 'oracle_dev',
 	//'default' => 'mysql',
 
 	/*
@@ -54,6 +55,17 @@ return array(
 			'database' => 'BDBAGO',
 			'username' => 'sim',
 			'password' => 'sim',
+			'charset' => 'utf8',
+			'prefix' => '',
+        ) ,
+
+		'oracle_dev' => array(
+			'driver' => 'oracle',
+			'host' => '192.168.1.4',
+			'port' => '1521',
+			'database' => 'BDBAGO',
+			'username' => 'simp',
+			'password' => 'simp',
 			'charset' => 'utf8',
 			'prefix' => '',
         ) ,
