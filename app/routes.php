@@ -231,7 +231,7 @@ Route::get('getleyenda', 'BaseController@getLeyenda');
 */
 Route::get('maintenance/dailyseatrelation' , 'Maintenance\TableController@getMaintenanceTableDailySeatRelation');
 Route::get('maintenance/fondos' , 'Maintenance\TableController@getMaintenanceTableDataFondos');
-Route::get('maintenance/fondoaccount' , 'Maintenance\TableController@getMaintenanceTableFondoAccount');
+Route::get('maintenance/fondoaccount' , 'Maintenance\TableController@getViewFondoCuenta');
 Route::get('maintenance/inversion' , 'Maintenance\TableController@getMaintenanceTableDataInversion');
 Route::get('maintenance/activity' , 'Maintenance\TableController@getMaintenanceTableDataActivity');
 Route::get('maintenance/investmentactivity' , 'Maintenance\TableController@getMaintenanceTableDataInvestmentActivity');

@@ -79,13 +79,13 @@ class SolicitudeController extends BaseController
         }
         $data = array('state' => $state, 'states' => StateRange::order(), 'warnings' => $mWarning);
         if (Auth::user()->type == TESORERIA) {
-            $data['tc'] = ChangeRate::getTc();
+            $data['tc']    = ChangeRate::getTc();
             $data['banks'] = Account::banks();
         } elseif (Auth::user()->type == ASIS_GER) {
             $data['activities'] = Activity::order();
         } elseif (Auth::user()->type == CONT) {
             $data['proofTypes'] = ProofType::order();
-            $data['regimenes'] = Regimen::all();
+            $data['regimenes']  = Regimen::all();
         }
 
         if (Session::has('id_solicitud')) {
@@ -867,9 +867,7 @@ class SolicitudeController extends BaseController
                 } else
                     $result['error'][] = $accountResult['error'];
             }
-            \Log::error($solicitud);
             $userElement = $solicitud->asignedTo;
-            \Log::error($userElement);
             $tipo_responsable = $userElement->tipo_responsable;
             $username = '';
 

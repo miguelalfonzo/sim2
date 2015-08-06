@@ -25,7 +25,7 @@ return array(
 	|
 	*/
 
-	'default' => 'oracle',
+	'default' => 'oracle_local_xe',
 	//'default' => 'mysql',
 
 	/*
@@ -46,12 +46,6 @@ return array(
 
 	'connections' => array(
 
-		'sqlite' => array(
-			'driver'   => 'sqlite',
-			'database' => __DIR__.'/../database/production.sqlite',
-			'prefix'   => '',
-		),
-
 		'mysql' => array(
 			'driver'    => 'mysql',
 			'host'      => 'localhost',
@@ -63,28 +57,8 @@ return array(
 			'prefix'    => '',
 			'options'	=> array( PDO::ATTR_CASE => PDO::CASE_LOWER )
 		),
-
-		'pgsql' => array(
-			'driver'   => 'pgsql',
-			'host'     => 'localhost',
-			'database' => 'forge',
-			'username' => 'forge',
-			'password' => '',
-			'charset'  => 'utf8',
-			'prefix'   => '',
-			'schema'   => 'public',
-		),
-
-		'sqlsrv' => array(
-			'driver'   => 'sqlsrv',
-			'host'     => 'localhost',
-			'database' => 'database',
-			'username' => 'root',
-			'password' => '',
-			'prefix'   => '',
-		),
 		
-		'oracle' => array(
+		'oracle_local_xe' => array(
 			'driver' => 'pdo-via-oci8',
 			'host' => '192.168.1.36',
 			'port' => '1521',
