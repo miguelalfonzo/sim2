@@ -837,22 +837,11 @@ class SolicitudeController extends BaseController
 
     private function searchFundAccount($solicitud)
     {
-        $products = $solicitud->products;
-        $idFondoContable = array();
-        if ($solicitud->idtiposolicitud == SOL_REP) {
-            foreach ($products as $product) {
-                $fondo = $product->thisSubFondo;
-                $subFondo = $fondo->subCategoria;
-                $idFondoContable[] = $subFondo->id_fondo;
-            }
-            if (empty($idFondoContable))
-                return $this->warningException('No se encontro el Fondo asignado a la solicitud', __FUNCTION__, __LINE__, __FILE__);
-            elseif (count(array_unique($idFondoContable)) >= 2)
+        $fondo = $solicitud->investment->accountFund;
+            if (is_null($fondo))
                 return $this->warningException('No se encontro el Fondo asignado a la solicitud', __FUNCTION__, __LINE__, __FILE__);
             else
-                return $this->setRpta($subFondo->accountFondo);
-        } else
-            return $this->setRpta($solicitud->detalle->thisSubFondo->subCategoria->accountFondo);
+                return $this->setRpta($fondo);
     }
 
     public function generateSeatExpenseData($solicitud)

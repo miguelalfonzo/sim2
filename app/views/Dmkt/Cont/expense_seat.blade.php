@@ -24,11 +24,7 @@
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Fondo</label>
-						@if ( $solicitud->idtiposolicitud == SOL_REP )
-							<input type="text" class="form-control" value="{{mb_convert_case($solicitud->products[ 0 ]->thisSubFondo->subCategoria->accountFondo->nombre , MB_CASE_TITLE, 'UTF-8')}}" disabled>
-						@else
-							<input type="text" class="form-control" value="{{mb_convert_case($solicitud->detalle->thisSubFondo->subCategoria->accountFondo->nombre , MB_CASE_TITLE, 'UTF-8')}}" disabled>		
-						@endif
+						<input type="text" class="form-control" value="{{ mb_convert_case( $solicitud->investment->accountFund->nombre , MB_CASE_TITLE, 'UTF-8')}}" disabled>	
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">

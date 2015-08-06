@@ -40,7 +40,7 @@
                     <!-- INVERSION -->
                     <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
                         <label class="control-label">Inversion</label>
-                        <select name="inversion" class="selectpicker form-control">
+                        <select id="fondo-inversion" class="selectpicker form-control">
                             <option selected disabled value="0">Seleccione la Inversion</option>
                             @foreach( $investments as $investment )
                                 <option value="{{ $investment->id }}">{{ $investment->nombre }}</option>
