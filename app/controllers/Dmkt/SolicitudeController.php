@@ -837,22 +837,11 @@ class SolicitudeController extends BaseController
 
     private function searchFundAccount($solicitud)
     {
-        $products = $solicitud->products;
-        $idFondoContable = array();
-        if ($solicitud->idtiposolicitud == SOL_REP) {
-            foreach ($products as $product) {
-                $fondo = $product->thisSubFondo;
-                $subFondo = $fondo->subCategoria;
-                $idFondoContable[] = $subFondo->id_fondo;
-            }
-            if (empty($idFondoContable))
-                return $this->warningException('No se encontro el Fondo asignado a la solicitud', __FUNCTION__, __LINE__, __FILE__);
-            elseif (count(array_unique($idFondoContable)) >= 2)
+        $fondo = $solicitud->investment->accountFund;
+            if (is_null($fondo))
                 return $this->warningException('No se encontro el Fondo asignado a la solicitud', __FUNCTION__, __LINE__, __FILE__);
             else
-                return $this->setRpta($subFondo->accountFondo);
-        } else
-            return $this->setRpta($solicitud->detalle->thisSubFondo->subCategoria->accountFondo);
+                return $this->setRpta($fondo);
     }
 
     public function generateSeatExpenseData($solicitud)
@@ -1252,9 +1241,10 @@ class SolicitudeController extends BaseController
             $mWarning[data] = substr($mWarning[data], 0, -1);
         }
         $data = array('state' => $state, 'states' => StateRange::order(), 'warnings' => $mWarning);
-        if (Auth::user()->type == ASIS_GER) {
-            $data['subFondos'] = FondoInstitucional::getSubFondo();
-            $data['activities'] = Activity::order();
+        if (Auth::user()->type == ASIS_GER) 
+        {
+            $data[ 'investments' ] = InvestmentType::orderInst();
+            $data[ 'subFondos' ]  = FondoInstitucional::getSubFondo();
         }
         if (Session::has('id_solicitud')) {
             $solicitud = Solicitud::find(Session::pull('id_solicitud'));

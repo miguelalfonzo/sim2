@@ -41,4 +41,9 @@ class InvestmentType extends Eloquent
     {
         return InvestmentType::orderBy('nombre','asc')->where( 'codigo_actividad' , INVERSION_INSTITUCIONAL )->get();
     }
+
+    protected function accountFund()
+    {
+        return $this->hasOne( '\Fondo\Fondo' , 'id' , 'id_fondo_contable' );
+    }
 }
