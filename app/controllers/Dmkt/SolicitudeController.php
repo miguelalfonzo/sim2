@@ -5,6 +5,8 @@ namespace Dmkt;
 use \Auth;
 use \BaseController;
 use Common\TypeUser;
+use DateInterval;
+use DatePeriod;
 use \Fondo\Fondo;
 use \Common\State;
 use \Common\TypePayment;
@@ -1283,13 +1285,29 @@ class SolicitudeController extends BaseController
 
                 $interval = date_diff($date_a, $date_b);
 //                dd($interval);
+                $days = $interval->days;
+//                $period = new DatePeriod($date_a, new DateInterval('P1D'), $date_b);
+//                foreach($period as $dt) {
+//                    $curr = $dt->format('D');
+//                    // substract if Saturday or Sunday
+//                    if ($curr == 'Sat' || $curr == 'Sun') {
+//                        $days--;
+//                    }
+//                }
+//
+//
+
                 $history->duration = $interval->format('%h H');
-                if ($interval->h <= $history->estimed_time)
+                if ($interval->h <= $history->estimed_time){
                     $history->duration_color = 'success';
-                elseif ($interval->h <= $duration_limit_max)
-                    $history->duration_color = 'warning';
-                else
+                    $history->hand = 'glyphicon-thumbs-up';
+                }
+//                elseif ($interval->h <= $duration_limit_max)
+//                    $history->duration_color = 'warning';
+                else{
                     $history->duration_color = 'danger';
+                    $history->hand = 'glyphicon-thumbs-down';
+                }
             }
             $previus_date = $history->created_at;
             $history->orden = $orden_history;

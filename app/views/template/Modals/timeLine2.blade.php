@@ -47,16 +47,23 @@
                                 {{ $history->createdBy->getName()}}
                             </span>
                         {{--<span class="label label-default">--}}
-                                {{--{{ $history->user_from}}--}}
-                            {{--</span>--}}
+                        {{--{{ $history->user_from}}--}}
+                        {{--</span>--}}
                         {{--<span class="label label-default">--}}
-                                {{--{{ $history->status_from}}--}}
-                            {{--</span>--}}
-                        <span class="label label-primary">
-                                {{ $history->estimed_time}}
-                            </span>
+                        {{--{{ $history->status_from}}--}}
+                        {{--</span>--}}
+                        @if($history->estimed_time)
+                            <div class="time-estimated">
+                                <span class="label label-primary">
+                                    {{ $history->estimed_time}}
+                                </span>
+                            </div>
+                        @endif
                         <span class="label label-info">{{ $history->created_at}}</span>
-                        <span class="label label-{{$history->duration_color}}">{{ $history->duration}}</span>
+                        <div class="time-history-duration">
+                            <span class="label label-{{$history->duration_color}}">{{ $history->duration}} <span class="glyphicon {{$history->hand}}">
+                            </span></span>
+                        </div>
                     </div>
                 </div>
             @endfor
@@ -70,7 +77,7 @@
                   }
               }
 
-   /*           if (count($historyArray) > 1) {
+               if (count($historyArray) > 1) {
                   $lastHistory = $historyArray[count($historyArray) - 1];
                   $num = $lastHistory["status_from"]["id"] + $adicional;
               }*/
@@ -96,9 +103,11 @@
                             <span class="label label-info">
                                 {{$fl->nombre_usuario}}
                             </span>
-                                <span class="label label-primary">
-                                {{$fl->estimed_time}}
-                            </span>
+                                <div class="time-estimated">
+                                <span class="label label-primary ">{{$fl->estimed_time}}
+                                    </span>
+                                </div>
+
 
                         </div>
                     </div>
@@ -122,9 +131,11 @@
                 </span>
                         @foreach ($time_flow_event as $time_flow)
                             @if ($time_flow->status_id == $line['status_id'] && $time_flow->to_user_type == $line['user_type_id'])
+                                <div class="time-estimated">
                                 <span class="label label-primary">
                                     {{ $time_flow->hours  }}
                                 </span>
+                                </div>
                             @endif
                         @endforeach
                     </div>
