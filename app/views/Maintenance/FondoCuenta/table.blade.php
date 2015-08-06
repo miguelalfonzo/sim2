@@ -1,9 +1,4 @@
-@extends('template.main')
-@section('solicitude')
-<div class="page-header">
-  <h3>Mantenimiento de Fondo-Cuenta</h3>
-</div>
-<table class="table table-hover table-bordered table-condensed dataTable" id="table_fondo-cuenta" style="width: 100%">
+<table class="table table-hover table-bordered table-condensed dataTable" id="table_fondoCuenta" style="width: 100%">
     <thead>
         <tr>
             <th>#</th>
@@ -14,7 +9,7 @@
     </thead>
     <tbody>
         @foreach ( $fondos as $fondo )
-            <tr row-id="{{$fondo->id}}" type="fondo-cuenta">
+            <tr row-id="{{$fondo->id}}" type="fondoCuenta">
                 <td style="text-align:center">{{$fondo->id}}</td>
                 <td class="nombre" style="text-align:center">{{$fondo->nombre}}</td>
                 <td class="num_cuenta" editable=3 style="text-align:center">{{$fondo->num_cuenta}}</td>
@@ -22,15 +17,8 @@
                     <a class="maintenance-edit">
                         <span class="glyphicon glyphicon-pencil"></span>
                     </a>
-                    <!-- <a class="elementDelete" href="#"><span class="glyphicon glyphicon-remove"></span></a> -->
                 </td>
             </tr>
         @endforeach
     </tbody>
 </table>
-<script>
-    $(document).on('ready', function(){
-        dataTable('table_fondo-cuenta', null, 'registros')
-    })
-</script>
-@stop

@@ -15,7 +15,6 @@ var delivery_date = $('input[name=fecha]');
 var clients       = $('#clientes');
 
 var invoice_amount  = $('input[name=monto_factura]');
-var invoice_img     = $('input[name=factura]');
 var comprobante_img = $( '.img-responsive' );
 var ruc             = $('input[name=ruc]');
 
@@ -258,16 +257,15 @@ $( document ).on( 'click' , '.products' , function ()
     $(this).css('border-color', 'none');
     $('.families_repeat').text('').css('color','');
 });
+
 date_start.on('focus', function () {
     $(this).parent().removeClass('has-error');
 });
+
 date_end.on('focus', function () {
     $(this).parent().removeClass('has-error');
 });
-/*invoice_img.on('focus', function () {
-    $(this).parent().parent().parent().parent().parent().removeClass('has-error');
-    $(this).parent().parent().parent().children('input').removeClass('input-placeholder-error');
-});*/
+
 ruc.on('focus', function () {
     $(this).parent().parent().removeClass('has-error');
 });
@@ -286,9 +284,9 @@ function listMaintenanceTable( type )
 {
     $.ajax(
     {
-        url: server + 'get-table-maintenance-info',
-        type: 'POST' ,
-        data:
+        url  : server + 'get-table-maintenance-info',
+        type : 'POST' ,
+        data :
         {
             _token : GBREPORTS.token,
             type   : type
@@ -299,19 +297,15 @@ function listMaintenanceTable( type )
     }).done(function ( response ) 
     {
         if ( response.Status == 'Ok' )
-            dataTable( 'table_' + type , response.Data , 'registros' );
+            dataTable( type , response.Data , 'registros' );
         else
             bootbox.alert('<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
     });
 }
 
-//Function list Solicitude
-
-
 function listDocuments()
 {
-    var l = Ladda.create( $("#search-documents")[0] );
-    // l.start();
+    var l = Ladda.create( $( "#search-documents" )[ 0 ] );
     
     $.ajax({
         url: server + 'list-documents',
@@ -326,11 +320,9 @@ function listDocuments()
         }
     }).fail( function ( statusCode , errorThrown)
     {
-        // l.stop();
         ajaxError( statusCode , errorThrown );
     }).done(function (data)
     {
-        // l.stop();
         if ( data.Status == 'Ok' )
             dataTable( 'table_documents' , data.Data, 'registros' );
         else
@@ -441,40 +433,35 @@ var calcDataTableHeight = function() {
 };
 function dataTable( element , html , message )
 {
-    $( '#' + element + '_wrapper').remove();
-    if(html != null)
-        $( '.' + element ).append( html );
-    $( '#' + element ).DataTable(
+    $( '#table_' + element + '_wrapper' ).remove();
+
+    if( html != null )
+        $( '#' + element ).append( html );
+
+    $( '#table_' + element ).DataTable(
     {
-        // processing     : true,
-        // serverside     : true,
-        // ajax           : server + 'dt' ,
-        // dom: '<f<t>ip<r>>',
-        dom: "<'row'<'col-xs-6'><'col-xs-6 pull-right'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
-        stateSave      : true,
-        autoWidth      : true,
-        scrollY        : calcDataTableHeight(),
-        sScrollX       : "100%",
-        bScrollCollapse: true,
-        iDisplayLength : 10 ,
-        language       :
+        dom             : "<'row'<'col-xs-6'><'col-xs-6 pull-right'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
+        stateSave       : true,
+        autoWidth       : true,
+        scrollY         : calcDataTableHeight(),
+        sScrollX        : "100%",
+        bScrollCollapse : true,
+        iDisplayLength  : 10 ,
+        language        :
         {
-            search      : 'Buscar',
-            zeroRecords : 'No hay ' + message ,
-            infoEmpty   : 'No ha encontrado ' + message +'disponible',
-            info        : 'Mostrando _END_ de _TOTAL_ ' + message ,
-            lengthMenu  : "Mostrando _MENU_ registros por página",
-            infoEmpty   : "No ha encontrado informacion disponible",
-            infoFiltered: "(filtrado de _MAX_ regitros en total)",
-            paginate    : 
+            search       : 'Buscar',
+            zeroRecords  : 'No hay ' + message ,
+            infoEmpty    : 'No ha encontrado ' + message +'disponible',
+            info         : 'Mostrando _END_ de _TOTAL_ ' + message ,
+            lengthMenu   : "Mostrando _MENU_ registros por página",
+            infoEmpty    : "No ha encontrado informacion disponible",
+            infoFiltered : "(filtrado de _MAX_ regitros en total)",
+            paginate     : 
             {
                 sPrevious : 'Anterior',
                 sNext     : 'Siguiente'
             }
         },
-        /*columns : [
-        { class          : "details-control"} ,
-        null , null , null]*/
     });
 }
 
@@ -615,11 +602,6 @@ $(".date_end").datepicker({
     language: 'es',
     endDate: new Date(),
     format: 'dd/mm/yyyy'
-});
-
-$('.btn-file :file').on('fileselect', function (event, numFiles, label) {
-
-    invoice_img.val(label);
 });
 
 /** ---------------------------------------------- GERENTE PRODUCTO -------------------------------------------- **/
@@ -1012,48 +994,10 @@ $(document).on('click','.btn_cancel_fondo',function(e){
     $('#table_reporte_institucional > tbody > tr').css('background-color','');
 });
 
-
-
-function addImage(e) 
-{
-    var file = e.target.files[0],
-        imageType = /image.*/;
-    if (!file.type.match(imageType))
-        bootbox.alert('<h4 class=blue">Ingrese solo Imagenes</h4>');
-    else 
-    {
-        var reader = new FileReader();
-        reader.onload = fileOnload;
-        reader.readAsDataURL(file);
-        invoice_img.parent().parent().parent().children().last().val( file.name );
-    }
-}
-
 function fileOnload( event ) 
 {
     $('.img-responsive').attr("src", event.target.result );
 }
-
-/* $(document).on('change', '.btn-file :file', function (e) {
-
-    var file = e.target.files[0],*/ 
-   //     imageType = /image.*/;
-    /*if (!file.type.match(imageType))
-        alert('ingrese solo imagenes');
-    else 
-    {
-        var input = $(this),
-        numFiles = input.get(0).files ? input.get(0).files.length : 1,
-        label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
-        input.trigger('fileselect', [numFiles, label]);
-    }
-});*/
-
-invoice_img.on("change", function(e)
-{
-    console.log(e);
-    addImage(e);
-});
 
 /* Menu */
 var navItems = $('.admin-menu li > a');
@@ -1103,7 +1047,7 @@ $(document).on("click", ".elementEdit", function()
     });
 });
 
-$(document).off( 'click' , '.maintenance-add');
+$(document).off( 'click' , '.maintenance-add' );
 $(document).on( 'click' , '.maintenance-add' , function()
 {
     var button = $(this);
@@ -1156,9 +1100,9 @@ $(document).on("click", "#add-doc", function()
 $(document).off( 'click' , '.maintenance-cancel');
 $(document).on( 'click' , '.maintenance-cancel' , function()
 {
-    window.location.reload(true);
-    /*var tr = $(this).parent().parent();
-    listMaintenanceTable( tr.attr('type')  );*/
+    var tr = $(this).parent().parent();
+    $( 'input[case=' + tr.attr( 'type' ) + ']' ).show();
+    listMaintenanceTable( tr.attr('type')  );
 });
 
 $(document).off('click' , '.maintenance-edit');
@@ -1332,7 +1276,7 @@ function enableTd( data )
         data: 
         {
             type   : td[0].className ,
-            val    : td.html(),
+            val    : td.html().trim(),
             _token : _token
         }
     }).fail( function( statusCode , errorThrown )

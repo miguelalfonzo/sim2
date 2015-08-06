@@ -18,6 +18,8 @@ return array(
 	|
 	*/
 
+	'default' => 'oracle',
+
 	'connections' => array(
 
 		'oracle' => array(

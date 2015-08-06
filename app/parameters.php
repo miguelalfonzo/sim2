@@ -179,6 +179,7 @@ const TIPO_GERPROD = 128;
 const INVERSION_MKT = 'M';
 const INVERSION_INSTITUCIONAL = 'I';
 
+const FONDO_CUENTA = 'PRUEBA FONDO CUENTA';
 
 define("TIMELINEHARD", serialize(array(
 //    '0' => array(
