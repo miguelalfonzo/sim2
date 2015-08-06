@@ -1299,7 +1299,7 @@ class SolicitudeController extends BaseController
 //
 //
 
-                $history->duration = $interval->format('%h H');
+                $history->duration = $interval->h < 1? $interval->format('%i M') :$interval->format('%h H');
                 if ($interval->h <= $history->estimed_time){
                     $history->duration_color = 'success';
                     $history->hand = 'glyphicon-thumbs-up';

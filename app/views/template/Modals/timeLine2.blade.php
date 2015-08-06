@@ -44,7 +44,7 @@
                         </h3>
 
                         <span class="label label-info">
-                                {{ $history->createdBy->getName()}}
+                                {{ strtoupper($history->createdBy->getName())}}
                             </span>
                         {{--<span class="label label-default">--}}
                         {{--{{ $history->user_from}}--}}
@@ -146,4 +146,4 @@
     </div>
 </div>
 
-@include('template.Modals.timeLine')
+{{--@include('template.Modals.timeLine')--}}
