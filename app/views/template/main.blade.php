@@ -132,7 +132,7 @@
                             <li><a href="{{ URL::to('export/solicitudToDeposit') }}">Exportar Solicitudes a Depositar</a></li>
                             <li><a href="{{ URL::to('maintenance/finddocument') }}">Mantenimiento de Documentos</a></li>
                             <li><a href="{{ URL::to('maintenance/documenttype') }}">Mantenimiento de Tipo de Documentos</a></li>
-                            <li><a href="{{ URL::to('maintenance/fondoaccount') }}">Mantenimiento de Cuentas de Fondos</a></li>
+                            <li><a href="{{ URL::to('maintenance/view/Fondo') }}">Mantenimiento de Fondo de Contabilidad</a></li>
                             <li><a href="{{ URL::to('maintenance/dailyseatrelation') }}">Mantenimiento de Cuentas - Marcas</a></li>
                             @endif
                         </ul>

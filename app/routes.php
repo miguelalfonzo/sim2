@@ -239,6 +239,8 @@ Route::get('maintenance/finddocument', 'Dmkt\SolicitudeController@findDocument')
 Route::get('maintenance/documenttype', 'Dmkt\FondoController@listDocuments');
 Route::get('maintenance/parameters', 'Maintenance\TableController@getMaintenanceTableParameter');
 
+Route::get( 'maintenance/view/{type}' , 'Maintenance\TableController@getView' );
+
 /*
 |--------------------------------------------------------------------------
 | EVENTOS

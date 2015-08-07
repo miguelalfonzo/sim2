@@ -240,3 +240,5 @@ define("TIMELINEHARD", serialize(array(
         'cond_sol_motivo' => REEMBOLSO
     )
 )));
+
+const MANTENIMIENTO_FONDO = 6;
