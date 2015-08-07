@@ -50,7 +50,7 @@
 </div>
 @endif
 
-@if ( ( is_null( $solicitud->toGenerateHistory ) && $solicitud->detalle->id_motivo != REEMBOLSO ) || ( is_null( $solicitud->toDepositHistory ) && $solicitud->detalle->id_motivo == REEMBOLSO ) )
+@if ( ( is_null( $solicitud->toGenerateHistory ) && $solicitud->idtiposolicitud != REEMBOLSO ) || ( is_null( $solicitud->toDepositHistory ) && $solicitud->idtiposolicitud == REEMBOLSO ) )
 	@if( is_null( $solicitud->registerHistory ) )
 		<div class="stage col-md-3 col-sm-3">
 			<div class="stage-header"></div>
@@ -65,10 +65,10 @@
 	<div class="stage-content">
 		<h3 class="stage-title">Asiento de Diario</h3>
 		<span class="label label-info">
-		@if ( ( is_null( $solicitud->toGenerateHistory ) && $solicitud->detalle->id_motivo != REEMBOLSO ) || ( is_null( $solicitud->toDepositHistory ) && $solicitud->detalle->id_motivo == REEMBOLSO ) )
+		@if ( ( is_null( $solicitud->toGenerateHistory ) && $solicitud->idtiposolicitud != REEMBOLSO ) || ( is_null( $solicitud->toDepositHistory ) && $solicitud->idtiposolicitud == REEMBOLSO ) )
 			CONTABILIDAD
 		@else
-			@if ( $solicitud->detalle->id_motivo == REEMBOLSO )
+			@if ( $solicitud->idtiposolicitud == REEMBOLSO )
 				{{ strtoupper( $solicitud->toDepositHistory->createdBy->person->full_name ) }}
 			@else
 				{{ strtoupper( $solicitud->toGenerateHistory->createdBy->person->full_name ) }}

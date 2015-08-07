@@ -108,7 +108,7 @@ class DepositController extends BaseController
                     $detalle->detalle     = json_encode( $middleRpta[data]['jDetalle'] );
                     $detalle->save();
 
-                    if ( $detalle->id_motivo == REEMBOLSO )
+                    if ( $solicitud->idtiposolicitud == REEMBOLSO )
                         $solicitud->id_estado = GENERADO;
                     else
                         $solicitud->id_estado = DEPOSITADO;
@@ -118,14 +118,14 @@ class DepositController extends BaseController
                     
                     if ( $middleRpta[ status ] == ok )
                     {
-                        if ( $detalle->id_motivo == REEMBOLSO )
+                        if ( $solicitud->idtiposolicitud == REEMBOLSO )
                             $middleRpta = $this->setStatus( $oldIdestado, GENERADO , Auth::user()->id , USER_CONTABILIDAD , $solicitud->id );
                         else
                             $middleRpta = $this->setStatus( $oldIdestado, DEPOSITADO , Auth::user()->id , USER_CONTABILIDAD , $solicitud->id );
                 
                         if ( $middleRpta[status] == ok )
                         {
-                            if ( $solicitud->detalle->id_motivo == REEMBOLSO )
+                            if ( $solicitud->idtiposolicitud == REEMBOLSO )
                                 Session::put( 'state' , R_FINALIZADO );
                             else
                                 Session::put( 'state' , R_REVISADO );
@@ -203,7 +203,7 @@ class DepositController extends BaseController
             $solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
             if( $solicitud->id_estado != DEVOLUCION )
                 return $this->warningException( 'Cancelado - La solicitud no se encuentra en la etapa de confirmacion de la devolucion' , __FUNCTION__ , __LINE__ , __FILE__ );
-            elseif( $solicitud->detalle->id_motivo == REEMBOLSO )
+            elseif( $solicitud->idtiposolicitud == REEMBOLSO )
                 return $this->warningException( 'Cancelado - Los Reembolos no estan habilitados para la confirmacion de la devolucion' , __FUNCTION__ , __LINE__ , __FILE__ );
                 
             $oldIdestado = $solicitud->id_estado;

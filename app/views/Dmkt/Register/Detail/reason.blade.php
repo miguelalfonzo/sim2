@@ -3,7 +3,7 @@
     <div>
         <select class="form-control" name="motivo">
             @foreach( $reasons as $reason )
-                @if( isset( $solicitud ) && $solicitud->detalle->id_motivo == $reason->id)
+                @if( isset( $solicitud ) && $solicitud->idtiposolicitud == $reason->id)
                     <option selected value="{{$reason->id}}">{{$reason->nombre}}</option>
                 @else
                     <option value="{{$reason->id}}">{{$reason->nombre}}</option>

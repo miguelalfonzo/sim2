@@ -120,6 +120,7 @@
                                 <li><a data-toggle="modal" data-target="#modal-temporal-user">Derivación de Usuario</a></li>
                             @endif
                             @if ( in_array(Auth::user()->type, array(GER_COM)) )
+                                <li><a href="{{ URL::to('fondoHistoria') }}">Historia de los Fondos</a></li>
                                 <li><a href="{{ URL::to('maintenance/inversion') }}">Mantenimiento de Inversion</a></li>
                                 <li><a href="{{ URL::to('maintenance/activity') }}">Mantenimiento de Actividades</a></li>
                                 <li><a href="{{ URL::to('maintenance/investmentactivity') }}">Mantenimiento de Inversion-Actividad</a></li>
@@ -127,13 +128,12 @@
                                 <li><a href="{{ URL::to('maintenance/FondosSupervisor') }}">Mantenimiento de Fondos de Supervisor</a></li>
                                 <li><a href="{{ URL::to('maintenance/FondosGerProd') }}">Mantenimiento de Fondos de G. Producto</a></li>
                                 <li><a href="{{ URL::to('maintenance/FondosInstitution') }}">Mantenimiento de Fondos Institucionales</a></li>
-                            @endif
-                            @if ( in_array(Auth::user()->type, array(CONT)) )
-                            <li><a href="{{ URL::to('export/solicitudToDeposit') }}">Exportar Solicitudes a Depositar</a></li>
-                            <li><a href="{{ URL::to('maintenance/finddocument') }}">Mantenimiento de Documentos</a></li>
-                            <li><a href="{{ URL::to('maintenance/documenttype') }}">Mantenimiento de Tipo de Documentos</a></li>
-                            <li><a href="{{ URL::to('maintenance/view/Fondo') }}">Mantenimiento de Fondo de Contabilidad</a></li>
-                            <li><a href="{{ URL::to('maintenance/dailyseatrelation') }}">Mantenimiento de Cuentas - Marcas</a></li>
+                            @elseif ( in_array(Auth::user()->type, array(CONT)) )
+                                <li><a href="{{ URL::to('export/solicitudToDeposit') }}">Exportar Solicitudes a Depositar</a></li>
+                                <li><a href="{{ URL::to('maintenance/finddocument') }}">Mantenimiento de Documentos</a></li>
+                                <li><a href="{{ URL::to('maintenance/documenttype') }}">Mantenimiento de Tipo de Documentos</a></li>
+                                <li><a href="{{ URL::to('maintenance/view/Fondo') }}">Mantenimiento de Fondo de Contabilidad</a></li>
+                                <li><a href="{{ URL::to('maintenance/dailyseatrelation') }}">Mantenimiento de Cuentas - Marcas</a></li>
                             @endif
                         </ul>
                     </li>
@@ -150,12 +150,10 @@
                             <span class="glyphicon-class">  Enviar Correo</span>
                         </a>
                     </li>
-                    
-                 </ul>
-                 
-                 <a class="btn btn-primary navbar-btn sim_alerta" href="{{ URL::to('alerts') }}" role="button">Alertas <span class="badge badge-success"></span></a>
-                 
-
+                </ul>
+                <a class="btn btn-primary navbar-btn sim_alerta" href="{{ URL::to('alerts') }}" role="button">Alertas
+                    <span class="badge badge-success"></span>
+                </a>
                  <div id="drp_menubar" class="navbar-form navbar-right btn-default navbar-btn" style="cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; margin-right: -8px;">
                     <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
                     <span></span> <b class="caret"></b>
