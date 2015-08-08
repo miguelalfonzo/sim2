@@ -95,10 +95,10 @@
                 
                 <td class="text-center">
                     @if ( $solicitud->idtiposolicitud == SOL_REP )
-                        @if ( is_null( $solicitud->detalle->reason ) )
+                        @if ( is_null( $solicitud->typeSolicitude ) )
                             -
                         @else    
-                            {{ $solicitud->detalle->reason->nombre }}
+                            {{ $solicitud->typeSolicitude->nombre }}
                         @endif
                     @elseif ( $solicitud->idtiposolicitud == SOL_INST ) 
                         {{ $solicitud->typesolicitude->nombre }}

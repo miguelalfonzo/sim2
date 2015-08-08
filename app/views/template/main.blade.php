@@ -124,16 +124,16 @@
                                 <li><a href="{{ URL::to('maintenance/inversion') }}">Mantenimiento de Inversion</a></li>
                                 <li><a href="{{ URL::to('maintenance/activity') }}">Mantenimiento de Actividades</a></li>
                                 <li><a href="{{ URL::to('maintenance/investmentactivity') }}">Mantenimiento de Inversion-Actividad</a></li>
-                                <li><a href="{{ URL::to('maintenance/parameters') }}">Mantenimiento de Parametros</a></li>
-                                <li><a href="{{ URL::to('maintenance/FondosSupervisor') }}">Mantenimiento de Fondos de Supervisor</a></li>
-                                <li><a href="{{ URL::to('maintenance/FondosGerProd') }}">Mantenimiento de Fondos de G. Producto</a></li>
-                                <li><a href="{{ URL::to('maintenance/FondosInstitution') }}">Mantenimiento de Fondos Institucionales</a></li>
+                                <li><a href="{{ URL::to('maintenance/view/Parametro') }}">Mantenimiento de Parametros</a></li>
+                                <li><a href="{{ URL::to('maintenance/view/Fondo_Supervisor') }}">Mantenimiento de Fondos de Supervisor</a></li>
+                                <li><a href="{{ URL::to('maintenance/view/Fondo_Gerente_Producto') }}">Mantenimiento de Fondos de G. Producto</a></li>
+                                <li><a href="{{ URL::to('maintenance/view/Fondo_Institucion') }}">Mantenimiento de Fondos Institucionales</a></li>
                             @elseif ( in_array(Auth::user()->type, array(CONT)) )
                                 <li><a href="{{ URL::to('export/solicitudToDeposit') }}">Exportar Solicitudes a Depositar</a></li>
                                 <li><a href="{{ URL::to('maintenance/finddocument') }}">Mantenimiento de Documentos</a></li>
                                 <li><a href="{{ URL::to('maintenance/documenttype') }}">Mantenimiento de Tipo de Documentos</a></li>
                                 <li><a href="{{ URL::to('maintenance/view/Fondo') }}">Mantenimiento de Fondo de Contabilidad</a></li>
-                                <li><a href="{{ URL::to('maintenance/dailyseatrelation') }}">Mantenimiento de Cuentas - Marcas</a></li>
+                                <li><a href="{{ URL::to('maintenance/view/Cuenta_Gasto_Marca') }}">Mantenimiento de Cuentas - Marcas</a></li>
                             @endif
                         </ul>
                     </li>

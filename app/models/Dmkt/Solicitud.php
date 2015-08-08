@@ -49,7 +49,7 @@ class Solicitud extends Eloquent
         return $this->hasOne('User','id','id_user_assign');
     }
 
-    protected function toAcceptedApprovedHistories()
+    public function toAcceptedApprovedHistories()
     {
         return $this->hasMany( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->whereIn( 'status_to' , array( ACEPTADO , APROBADO ) );
     }

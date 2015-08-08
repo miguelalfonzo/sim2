@@ -537,7 +537,7 @@ class SolicitudeController extends BaseController
     private function verifyPolicy( $solicitud , $monto )
     {
         $type = array(Auth::user()->type, Auth::user()->tempType());
-        $approvalPolicy = $solicitud->investment->approvalInstance->approvalPolicyType( $type , $solicitud->histories->count() );
+        $approvalPolicy = $solicitud->investment->approvalInstance->approvalPolicyTypesOrder( $type , $solicitud->histories->count() );
         if ( is_null( $approvalPolicy ) )
             return $this->warningException( 'No se encontro la politica de aprobacion para la inversion: ' . $solicitud->id_inversion . ' y su rol: ' . Auth::user()->type, __FUNCTION__, __LINE__, __FILE__);
         

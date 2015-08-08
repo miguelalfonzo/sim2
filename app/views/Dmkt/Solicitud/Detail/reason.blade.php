@@ -2,6 +2,6 @@
     <label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label">Motivo</label>
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
         <input type="text" class="form-control input-md"
-        value="{{$detalle->reason->nombre}}" readonly>
+        value="{{$solicitud->typeSolicitude->nombre}}" readonly>
     </div>
 </div>

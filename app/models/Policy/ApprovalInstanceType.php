@@ -19,9 +19,15 @@ class ApprovalInstanceType extends Eloquent
     	return $this->hasOne( '\Policy\ApprovalPolicy' , 'id_tipo_instancia_aprobacion' )->where( 'orden' , $order )->first();
     }
 
-    public function approvalPolicyType( $type , $order )
+    public function approvalPolicyTypesOrder( $type , $order )
     {
     	return $this->hasOne( '\Policy\ApprovalPolicy' , 'id_tipo_instancia_aprobacion' )->whereIn( 'tipo_usuario' , $type )->where( 'orden' , $order )->first();
+    }
+
+    public function approvalPolicyType( $type )
+    {
+        return $this->hasOne( '\Policy\ApprovalPolicy' , 'id_tipo_instancia_aprobacion' )->where( 'tipo_usuario' , $type )->first();
+
     }
 
 }

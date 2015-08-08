@@ -18,6 +18,11 @@ class MarkProofAccounts extends Eloquent
             return $lastId->id;
     }
 
+    protected static function order()
+    {
+    	return MarkProofAccounts::orderBy( 'updated_at' , 'DESC' )->get();
+    }
+
 	protected static function getMarks( $num_cuenta_mkt , $num_cuenta_expense )
 	{
 		return MarkProofAccounts::where('CUENTA_GASTO_MARCA.num_cuenta_gasto' , $num_cuenta_expense )->where('cuenta_gasto_marca.num_cuenta_fondo' , $num_cuenta_mkt )->select( 'marca_codigo')->get();

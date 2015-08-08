@@ -358,6 +358,15 @@ class ExpenseController extends BaseController
 			$monto_aprobado = $detalle->monto_aprobado;
 			$totalGasto 	= $solicitud->expenses->sum( 'monto' );
 			$balance    	= $monto_aprobado - $totalGasto;
+
+			$tc = ChangeRate::getTc();
+			if ( $solicitd->detalle->id_moneda == SOLES )
+				$tasa = 1;
+			elseif ( $solicitd->detalle->id_moneda == DOLARES )
+				$tasa = $tc->compra;
+
+			$balance = $balance * $tasa;
+
 			$jDetalle       = json_decode( $detalle->detalle );
 
 			if ( $solicitud->idtiposolicitud == SOL_REP )

@@ -271,8 +271,8 @@ class DepositController extends BaseController
             $fondo = $solicitud->detalle->thisSubFondo;
             $oldSaldo = $fondo->saldo;
             $oldSaldoNeto = $fondo->saldo_neto;
-            $fondo->saldo       += $monto_renovado;
-            $fondo->saldo_neto  += $monto_renovado;
+            $fondo->saldo       += round( $monto_renovado , 2 , PHP_ROUND_HALF_DOWN );
+            $fondo->saldo_neto  += round( $monto_renovado , 2 , PHP_ROUND_HALF_DOWN );
             $fondo->save();
             $fondoDataHistories[] = array( 'idFondo' => $fondo->id , 'idFondoTipo' => INVERSION_INSTITUCIONAL ,
                                            'oldSaldo' => $oldSaldo , 'oldSaldoNeto' => $oldSaldoNeto , 

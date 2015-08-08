@@ -34,6 +34,17 @@ class TableController extends BaseController
 		switch( $type ):
 			case 'Fondo':
 				return array( 'model' => new Fondo() , 'id' => MANTENIMIENTO_FONDO );
+			case 'Cuenta_Gasto_Marca':
+				return array( 'model' => new MarkProofAccounts , 'id' => 1 );
+			case 'Parametro':
+				return array( 'model' => new Parameter , 'id' => 2 );
+			case 'Fondo_Supervisor':
+				return array( 'model' => new FondoSupervisor , 'id' => 3 );
+			case 'Fondo_Gerente_Producto':
+				return array( 'model' => new FondoGerProd , 'id' => 4 );
+			case 'Fondo_Institucion':
+				return array( 'model' => new FondoInstitucional , 'id' => 5 );
+			
 		endswitch;
 	}
 

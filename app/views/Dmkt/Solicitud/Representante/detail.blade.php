@@ -7,7 +7,7 @@
     <!-- MOTIVO  -->
     <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
         <label class="control-label">Motivo</label>
-        <input type="text" class="form-control" value="{{$detalle->reason->nombre}}" readonly>
+        <input type="text" class="form-control" value="{{$solicitud->typeSolicitude->nombre}}" readonly>
     </div>
 
     <!-- INVERSION -->
