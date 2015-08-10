@@ -10,7 +10,7 @@ use \Eloquent;
 
 class TypeUser extends Eloquent{
 
-    protected $table = 'OUTDVP.TIPO_USUARIO';
+    protected $table = TB_TIPO_USUARIO;
     protected $primaryKey = 'codigo';
 
     // protected static function dmkt()

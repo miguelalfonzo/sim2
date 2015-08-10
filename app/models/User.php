@@ -14,7 +14,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	 *
 	 * @var string
 	 */
-	protected $table = 'OUTDVP.USERS';
+	protected $table = TB_USUARIOS;
 
 	/**
 	 * The attributes excluded from the model's JSON form.
@@ -42,23 +42,23 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
         return User::where( 'type' , $userType )->lists( 'id' );
     }
     
-    protected function person(){
-        return $this->hasOne('Users\Person','iduser','id');
+    protected function Personal(){
+        return $this->hasOne('Users\Personal','user_id','id');
     }
-    public function rm(){
-        return $this->hasOne('Users\Rm','iduser','id');
-    }
-    public function sup(){
-        return $this->hasOne('Users\Sup','iduser','id');
-    }
+    // public function rm(){
+    //     return $this->hasOne('Users\Rm','iduser','id');
+    // }
+    // public function sup(){
+    //     return $this->hasOne('Users\Sup','iduser','id');
+    // }
 
     public function solicituds(){
         return $this->hasMany('Dmkt\Solicitud','iduser','id');
     }
 
-    public function gerProd(){
-        return $this->hasOne('Users\Manager','iduser','id');
-    }
+    // public function gerProd(){
+    //     return $this->hasOne('Users\Manager','iduser','id');
+    // }
 
     public function userType(){
         return $this->hasOne('Common\TypeUser','codigo','type');
@@ -74,32 +74,13 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 
     public function getName()
     {
-        $username = '';
-        $userType = $this->type;
-        if( $userType == REP_MED )
-            $username .= $this->rm->full_name ;
-        elseif( $userType == SUP )
-            $username .= $this->sup->full_name;
-        elseif( $userType == GER_PROD )
-            $username = $this->gerProd->descripcion;
-        else
-            $username .= $this->person->full_name;
+        
+            $username .= ucwords(strtolower($this->personal->nombres)) .' '. ucwords(strtolower($this->personal->apellidos)) ;
         return $username;
     }
 
     public function getFirstName(){
-        $username = '';
-        $userType = $this->type;
-        if( $userType == REP_MED )
-            $username = $this->rm->nombres;
-        elseif( $userType == SUP )
-            $username = $this->sup->nombres;
-        elseif( $userType == GER_PROD ){
-            $name     = explode(' ' , trim( $this->gerProd->descripcion ));
-            $username = ucwords(strtolower( $name[ 0 ] ));
-        }else
-            $username = $this->person->nombres;
-        return ucwords(strtolower($username));
+        return ucwords(strtolower($this->personal->nombres));
     }
 
     protected function assignTempUser()

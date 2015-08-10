@@ -10,7 +10,7 @@ use \Eloquent;
 class UserApp extends Eloquent{
 
 
-    protected $table = 'OUTDVP.USER_APP';
+    protected $table = TB_USER_APP;
     protected $primaryKey = 'id';
 
 }

@@ -204,19 +204,21 @@ class SolicitudeController extends BaseController
 
     private function validateInputSolRep($inputs)
     {
-        $rules = array('idsolicitud' => 'integer|min:1|exists:solicitud,id',
-            'motivo' => 'required|integer|min:1|exists:motivo,id',
-            'inversion' => 'required|integer|min:1|exists:tipo_inversion,id',
-            'actividad' => 'required|integer|min:1|exists:tipo_actividad,id',
-            'titulo' => 'required|string|min:1|max:50',
-            'moneda' => 'required|integer|min:1|exists:tipo_moneda,id',
-            'monto' => 'required|numeric|min:1',
-            'pago' => 'required|integer|min:1|exists:tipo_pago,id',
-            'fecha' => 'required|date_format:"d/m/Y"|after:' . date("Y-m-d"),
-            'productos' => 'required|array|min:1|each:integer|each:min,1|each:exists,outdvp.marcas,id',
-            'clientes' => 'required|array|min:1|each:integer|each:min,1',
+        $rules = array(
+            'idsolicitud'   => 'integer|min:1|exists:solicitud,id',
+            'motivo'        => 'required|integer|min:1|exists:motivo,id',
+            'inversion'     => 'required|integer|min:1|exists:tipo_inversion,id',
+            'actividad'     => 'required|integer|min:1|exists:tipo_actividad,id',
+            'titulo'        => 'required|string|min:1|max:50',
+            'moneda'        => 'required|integer|min:1|exists:tipo_moneda,id',
+            'monto'         => 'required|numeric|min:1',
+            'pago'          => 'required|integer|min:1|exists:tipo_pago,id',
+            'fecha'         => 'required|date_format:"d/m/Y"|after:' . date("Y-m-d"),
+            'productos'     => 'required|array|min:1|each:integer|each:min,1|each:exists,outdvp.marcas,id',
+            'clientes'      => 'required|array|min:1|each:integer|each:min,1',
             'tipos_cliente' => 'required|array|min:1|each:integer|each:min,1|each:exists,tipo_cliente,id',
-            'descripcion' => 'string|max:200');
+            'descripcion'   => 'string|max:200'
+        );
         if (in_array(Auth::user()->type, array(SUP, GER_PROD)))
             $rules['responsable'] = 'required|numeric|min:1|exists:outdvp.dmkt_rg_rm,iduser';
 
@@ -360,28 +362,32 @@ class SolicitudeController extends BaseController
     {
         try {
             DB::beginTransaction();
-            $inputs = Input::all();
+            $inputs     = Input::all();
             $middleRpta = $this->validateInputSolRep($inputs);
             if ($middleRpta[status] == ok) {
                 if (isset($inputs['idsolicitud'])) {
                     $solicitud = Solicitud::find($inputs['idsolicitud']);
-                    $detalle = $solicitud->detalle;
+                    $detalle   = $solicitud->detalle;
                     $this->unsetRelations($solicitud);
                 } else {
                     $solicitud = new Solicitud;
                     $solicitud->id = $solicitud->lastId() + 1;
                 }
-                $detalle = new SolicitudDetalle;
-                $detalle->id = $detalle->lastId() + 1;
+
+                $detalle               = new SolicitudDetalle;
+                $detalle->id           = $detalle->lastId() + 1;
                 $solicitud->id_detalle = $detalle->id;
-                $solicitud->token = sha1(md5(uniqid($solicitud->id, true)));
+                $solicitud->token      = sha1(md5(uniqid($solicitud->id, true)));
                 $this->setSolicitud($solicitud, $inputs);
+                // dd($inputs);
                 $solicitud->save();
-                $jDetalle = new stdClass();
+
+                $jDetalle              = new stdClass();
                 $this->setJsonDetalle($jDetalle, $inputs);
-                $detalle->detalle = json_encode($jDetalle);
+                $detalle->detalle      = json_encode($jDetalle);
                 $this->setDetalle($detalle, $inputs);
                 $detalle->save();
+
                 $middleRpta = $this->setClients($solicitud->id, $inputs['clientes'], $inputs['tipos_cliente']);
                 if ($middleRpta[status] == ok) {
                     $middleRpta = $this->setProducts($solicitud->id, $inputs['productos']);
@@ -416,7 +422,7 @@ class SolicitudeController extends BaseController
 
     private function setJsonDetalle(&$jDetalle, $inputs)
     {
-        $jDetalle->monto_solicitado = round($inputs['monto'], 2, PHP_ROUND_HALF_DOWN);
+        // $jDetalle->monto_solicitado = round($inputs['monto'], 2, PHP_ROUND_HALF_DOWN);
         $jDetalle->fecha_entrega = $inputs['fecha'];
         $this->setPago($jDetalle, $inputs['pago'], $inputs['ruc']);
     }
@@ -428,7 +434,7 @@ class SolicitudeController extends BaseController
         $solicitud->id_inversion = $inputs['inversion'];
         $solicitud->descripcion = $inputs['descripcion'];
         $solicitud->id_estado = PENDIENTE;
-        $solicitud->idtiposolicitud = SOL_REP;
+        $solicitud->idtiposolicitud = $inputs['motivo'];
         $solicitud->status = ACTIVE;
         if (in_array(Auth::user()->type, array(SUP, GER_PROD)))
             $solicitud->id_user_assign = $inputs['responsable'];
@@ -439,7 +445,7 @@ class SolicitudeController extends BaseController
     private function setDetalle($detalle, $inputs)
     {
         $detalle->id_moneda = $inputs['moneda'];
-        $detalle->id_motivo = $inputs['motivo'];
+        // $detalle->id_motivo = $inputs['motivo'];
         $detalle->id_pago = $inputs['pago'];
     }
 

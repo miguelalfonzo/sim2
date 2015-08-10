@@ -63,9 +63,23 @@
                     @endif
                     <label>{{$solicitud->titulo}}</label>
                 </td>
-                @include('template.List.first_user')
+                <td class="text-center">
+                    {{ $solicitud->createdBy->personal->getFullName() }}
+                </td>
                 <td class="text-center">{{$solicitud->created_at}}</td>
-                @include('template.List.last_user')
+                <td class="text-center">
+                    @if ( $solicitud->id_estado != PENDIENTE )
+                        @if( $solicitud->lastHistory->count() != 0 )
+                            @if (is_object($solicitud->lastHistory->user ) )
+                                {{ $solicitud->lastHistory->user->personal->getFullName() }}
+                            @else
+                                -
+                            @endif
+                        @endif
+                    @else
+                        -
+                    @endif
+                </td>
                 @include('template.List.lastdate')
                 @if( Auth::user()->type == TESORERIA )
                     <td style="display:none;" class="total_deposit">
