@@ -73,7 +73,7 @@
         Route::get('maintenance/FondosSupervisor', 'Maintenance\TableController@getSupFunds');
         Route::get('maintenance/FondosGerProd', 'Maintenance\TableController@getGerProdFunds');
         Route::get('maintenance/FondosInstitution', 'Maintenance\TableController@getInstitutionFunds');
-         
+        Route::get( 'fondoHistorial' , 'Fondo\FondoMkt@getFondoHistorial' );
     });
 
     /*

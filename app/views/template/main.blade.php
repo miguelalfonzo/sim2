@@ -120,7 +120,7 @@
                                 <li><a data-toggle="modal" data-target="#modal-temporal-user">Derivación de Usuario</a></li>
                             @endif
                             @if ( in_array(Auth::user()->type, array(GER_COM)) )
-                                <li><a href="{{ URL::to('fondoHistoria') }}">Historia de los Fondos</a></li>
+                                <li><a href="{{ URL::to('fondoHistorial') }}">Historial de Saldo de los Fondos</a></li>
                                 <li><a href="{{ URL::to('maintenance/view/Tipo_Inversion') }}">Mantenimiento de Inversion</a></li>
                                 <li><a href="{{ URL::to('maintenance/view/Tipo_Actividad') }}">Mantenimiento de Actividades</a></li>
                                 <li><a href="{{ URL::to('maintenance/view/Inversion_Actividad') }}">Mantenimiento de Inversion-Actividad</a></li>

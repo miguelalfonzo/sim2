@@ -5,6 +5,7 @@ namespace Fondo;
 use \BaseController;
 use \System\FondoMktHistory;
 use \Auth;
+use \View;
 
 class FondoMkt extends BaseController
 {
@@ -34,7 +35,6 @@ class FondoMkt extends BaseController
     {
             $fondo->saldo_neto -= $montoTotal;
             $fondo->save();
-            \Log::error( $fondo->toJson() );    
     }
 
     public function validateBalance( $userTypes , $fondos )
@@ -154,9 +154,23 @@ class FondoMkt extends BaseController
             $subFondo->saldo_neto -= round( $monto * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN );
             
         $subFondo->save();
-        $historyFondoMkt[] = array( 'idFondo' => $subFondo->id , 'idFondoTipo' => $userType ,
-                                    'oldSaldo' => $oldSaldo , 'oldSaldoNeto' => $oldSaldoNeto , 
-                                    'newSaldo' => $subFondo->saldo , 'newSaldoNeto' => $subFondo->saldo_neto , 'reason' => $reason );
+        $historyFondoMkt[] = array( 
+            'idFondo' => $subFondo->id , 
+            'idFondoTipo' => $userType ,
+            'oldSaldo' => $oldSaldo , 
+            'oldSaldoNeto' => $oldSaldoNeto , 
+            'newSaldo' => $subFondo->saldo , 
+            'newSaldoNeto' => $subFondo->saldo_neto , 
+            'reason' => $reason 
+        );
+    }
+
+    public function getFondoHistorial()
+    {
+        $data = array( 
+            'FondoMktHistories' => FondoMktHistory::order()
+        );
+        return View::make( 'Tables.fondo_mkt_history' , $data );
     }
 
 }
