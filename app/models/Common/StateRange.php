@@ -10,7 +10,7 @@ use \Eloquent;
 
 class StateRange extends Eloquent{
 
-    protected $table = 'ESTADO';
+    protected $table = TB_ESTADO;
     protected $primaryKey = 'id';
 
     protected function order()

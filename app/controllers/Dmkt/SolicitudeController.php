@@ -207,15 +207,15 @@ class SolicitudeController extends BaseController
 
         $rules = array(
             'idsolicitud'   => 'integer|min:1|exists:solicitud,id',
-            'motivo'        => 'required|integer|min:1|exists:motivo,id',
-            'inversion'     => 'required|integer|min:1|exists:tipo_inversion,id',
-            'actividad'     => 'required|integer|min:1|exists:tipo_actividad,id',
+            'motivo'        => 'required|integer|min:1|exists:'.TB_MOTIVO.',id',
+            'inversion'     => 'required|integer|min:1|exists:'.TB_TIPO_INVERSION.',id',
+            'actividad'     => 'required|integer|min:1|exists:'.TB_TIPO_ACTIVIDAD.',id',
             'titulo'        => 'required|string|min:1|max:50',
-            'moneda'        => 'required|integer|min:1|exists:tipo_moneda,id',
+            'moneda'        => 'required|integer|min:1|exists:'.TB_TIPO_MONEDA.',id',
             'monto'         => 'required|numeric|min:1',
-            'pago'          => 'required|integer|min:1|exists:tipo_pago,id',
+            'pago'          => 'required|integer|min:1|exists:'.TB_TIPO_PAGO.',id',
             'fecha'         => 'required|date_format:"d/m/Y"|after:' . date("Y-m-d"),
-            'productos'     => 'required|array|min:1|each:integer|each:min,1|each:exists,outdvp.marcas,id',
+            'productos'     => 'required|array|min:1|each:integer|each:min,1|each:exists,'.TB_MARCAS_BAGO.',id',
             'clientes'      => 'required|array|min:1|each:integer|each:min,1',
             'tipos_cliente' => 'required|array|min:1|each:integer|each:min,1|each:exists,tipo_cliente,id',
             'descripcion'   => 'string|max:200'
@@ -1043,7 +1043,7 @@ class SolicitudeController extends BaseController
             if ($client->from_table == TB_DOCTOR) {
                 $doctors = $client->doctors;
                 $nom = $doctors->pefnombres . ' ' . $doctors->pefpaterno . ' ' . $doctors->pefmaterno;
-            } elseif ($client->from_table == TB_INSTITUTE)
+            } elseif ($client->from_table == TB_FARMACIA)
                 $nom = $client->institutes->pejrazon;
             else
                 $nom = 'No encontrado';

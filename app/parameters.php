@@ -79,7 +79,7 @@ const TESORERIA                               = 'T';
 
 //TABLAS EXTERNAS
 // const TB_DOCTOR                               = 'FICPE.PERSONAFIS';
-const TB_INSTITUTE                            = 'FICPEF.PERSONAJUR';
+//const TB_INSTITUTE                            = 'FICPEF.PERSONAJUR';
 
 const ASIS_GER                                = 'AG';
 const GER_MKT                                 = 'GM';
@@ -261,7 +261,7 @@ const TB_DOCTOR                        = 'FICPE.PERSONAFIS';
 const TB_INSTITUCIONES                 = 'FICPE.PERSONAJUR';
 const TB_FARMACIA                      = 'FICPEF.PERSONAJUR';
 const TB_DEPOSITO                      = 'DEPOSITO';
-const TB_DOCUMENTO                     = 'FILE_STORAGE';
+//const TB_DOCUMENTO                     = 'FILE_STORAGE';
 const TB_ESTADO_SUB                    = 'SUB_ESTADO';
 const TB_ESTADO                        = 'ESTADO';
 const TB_TIPO_MONEDA                   = 'TIPO_MONEDA';

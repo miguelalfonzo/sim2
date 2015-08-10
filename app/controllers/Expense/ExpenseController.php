@@ -517,7 +517,7 @@ class ExpenseController extends BaseController
 							"E1.NOMESP AS ESPECIALIDAD1, " .
 							"E2.NOMESP AS ESPECIALIDAD2 " .
 						"FROM " .
-							"FICPE.PERSONAFIS P " .
+								TB_DOCTOR." P " .
 								"LEFT JOIN " .
 								  "FICPE.ESPECIAL E1 " .
 								  "ON TO_NUMBER(NVL(TRIM(P.PEFESPECIAL1),'0')) = E1.CODESP " .

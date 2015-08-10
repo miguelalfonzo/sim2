@@ -10,7 +10,7 @@ class InvestmentActivity extends Eloquent
 
     use SoftDeletingTrait;
 
-    protected $table = 'INVERSION_ACTIVIDAD';
+    protected $table = TB_INVERSION_ACTIVIDAD;
     protected $primaryKey = 'id';
 
     public function nextId()

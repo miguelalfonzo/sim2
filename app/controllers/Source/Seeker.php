@@ -28,7 +28,7 @@ class Seeker extends BaseController
 		try
 		{
 			$inputs = Input::all();
-			$json = ' [{"name":"FICPE.PERSONAJUR",'.
+			$json = ' [{"name":"'.TB_INSTITUCIONES.'",'.
 					' "wheres":{"likes":[ "PEJRAZON" ], '.
 					' "equal":{"PEJESTADO":1 , "PEJTIPPERJ":2 }}, '.
 					' "selects":["PEJCODPERS","PEJRAZON" , "\'INSTITUCION\'" , 3 ]} '.
@@ -47,20 +47,20 @@ class Seeker extends BaseController
 		try
 		{
 			$inputs = Input::all();
-			$json = ' [{"name":"FICPE.PERSONAFIS" , '.
+			$json = ' [{"name":"'.TB_DOCTOR.'", '.
 					' "wheres":{"likes":["PEFNRODOC1","(PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)"], '.
 					' "equal":{"PEFESTADO":1}},'.
 					' "selects":["PEFCODPERS","( PEFNRODOC1 || \'-\' || PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)" , "\'DOCTOR\'" , 1 ]}, '.
-					' {"name":"FICPEF.PERSONAJUR",'.
+					' {"name":"'.TB_FARMACIA.'",'.
 					' "wheres":{"likes":["PEJNRODOC","PEJRAZON"], '.
 					' "equal":{"PEJESTADO":1 , "PEJTIPPERJ":1 }}, '.
 					' "selects":["PEJCODPERS","( PEJNRODOC || \'-\' || PEJRAZON )" , "\'FARMACIA\'" , 2 ]}, '.
-					' {"name":"FICPE.PERSONAJUR",'.
+					' {"name":"'.TB_INSTITUCIONES.'",'.
 					' "wheres":{"likes":[ "PEJRAZON" ], '.
 					' "equal":{"PEJESTADO":1 , "PEJTIPPERJ":2 }}, '.
 					' "selects":["PEJCODPERS","PEJRAZON" , "\'INSTITUCION\'" , 3 ]}, '.
-					' {"name":"VTADIS.CLIENTES",'.
-					' "wheres":{"likes":[ "CLRUT" , "CLNOMBRE" ], '.
+					' {"name":"'.TB_DISTRIMED_CLIENTES.'",'.
+					' "wheres":{likes":[ "CLRUT" , "CLNOMBRE" ], '.
 					' "equal":{ "CLESTADO":1 }, '.
 					' "in":{ "CLCLASE": [ 1 , 6 ] } }, '.
 					' "selects":[ "CLCODIGO" , " ( CLRUT || \'-\' || CLNOMBRE ) " , "CASE WHEN CLCLASE = 1 THEN \'DISTRIBUIDOR\' WHEN CLCLASE = 6 THEN \'BODEGA\' END" , "CASE WHEN CLCLASE = 1 THEN 4 WHEN CLCLASE = 6 THEN 5 END" ]} '.

@@ -5,7 +5,7 @@ use \Eloquent;
 
 class Periodo extends Eloquent
 {
-    protected $table = 'PERIODO';
+    protected $table = TB_PERIODO;
     protected $primaryKey = 'id';
 
     public function lastId()

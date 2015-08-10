@@ -8,7 +8,7 @@ class Activity extends Eloquent
 {
     use SoftDeletingTrait;
 
-    protected $table = 'TIPO_ACTIVIDAD';
+    protected $table = TB_TIPO_ACTIVIDAD;
     protected $primaryKey = 'id';
 
     public function nextId()

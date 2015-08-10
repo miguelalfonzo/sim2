@@ -193,7 +193,7 @@ class MoveController extends BaseController
             {
                 $query->where( 'idtiposolicitud' , SOL_INST )->wherehas( 'detalle' , function ( $query ) use( $start , $end )
                 {
-                    $query->whereHas( 'periodo' , function( $query ) use( $start , $end )
+                    $query->whereHas(TB_PERIODO, function( $query ) use( $start , $end )
                     {
                         $query->where( 'aniomes' , '>=' , $this->formatAnioMes( $start ) )->where( 'aniomes' , '<=' , $this->formatAnioMes( $end ) );
                     });
