@@ -37,6 +37,7 @@ use \Policy\ApprovalPolicy;
 use \Users\Manager;
 use \Users\Sup;
 use \Users\Rm;
+use \Users\Personal;
 use \Client\ClientType;
 use \yajra\Pdo\Oci8\Exceptions\Oci8Exception;
 use \Alert\AlertController;
@@ -424,7 +425,7 @@ class SolicitudeController extends BaseController
 
     private function setJsonDetalle(&$jDetalle, $inputs)
     {
-        // $jDetalle->monto_solicitado = round($inputs['monto'], 2, PHP_ROUND_HALF_DOWN);
+        $jDetalle->monto_solicitado = round($inputs['monto'], 2, PHP_ROUND_HALF_DOWN);
         $jDetalle->fecha_entrega = $inputs['fecha'];
         $this->setPago($jDetalle, $inputs['pago'], $inputs['ruc']);
     }
@@ -577,12 +578,14 @@ class SolicitudeController extends BaseController
         if ( ! is_null( $approvalPolicy->desde ) || ! is_null( $approvalPolicy->hasta ) )
             $msg .= ' para la siguiente etapa del flujo , comuniquese con Informatica. El rol aprueba montos ' . ( is_null( $approvalPolicy->desde ) ? '' : 'mayores a S/.' . $approvalPolicy->desde . ' ') . ( is_null( $approvalPolicy->hasta ) ? '' : 'hasta S/.' . $approvalPolicy->hasta );
         if ( $userType == SUP ): 
-            if ( Auth::user()->type === REP_MED )
-                $idsUser = array( Rm::getSup( Auth::user()->id )->iduser );
+            if ( Auth::user()->type === REP_MED ){
+                $temp = Personal::getSup( Auth::user()->id );
+                $idsUser = array( $temp->user_id ); // idkc : ES CORRECTO ESTE TIPO DE PARSE? SI ES UN MODELO XQ NO USAR ->toArray() ?
+            }
             else if ( Auth::user()->type === SUP )
                 $idsUser = array( Auth::user()->id );
             else if ( Auth::user()->type === GER_PROD )
-                $idsUser = array( Rm::getSup( $responsable )->iduser );
+                $idsUser = array( Personal::getSup( $responsable )->user_id );
             else
                 return $this->warningException( 'El rol ' . Auth::user()->type . ' no tiene permisos para crear o derivar al supervisor' , __FUNCTION__ , __LINE__ , __FILE__ );
         elseif ( $userType == GER_PROD ):
