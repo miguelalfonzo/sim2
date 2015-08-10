@@ -22,7 +22,7 @@ class Activity extends Eloquent
 
     protected static function order()
     {
-    	return Activity::orderBy('nombre','asc')->get();
+    	return Activity::orderBy( 'nombre' , 'asc' )->get();
     }
 
 

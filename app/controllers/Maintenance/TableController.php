@@ -44,7 +44,14 @@ class TableController extends BaseController
 				return array( 'model' => new FondoGerProd , 'id' => 4 );
 			case 'Fondo_Institucion':
 				return array( 'model' => new FondoInstitucional , 'id' => 5 );
-			
+			case 'Tipo_Inversion':
+				return array( 'model' => new InvestmentType , 'id' => 7 );
+			case 'Tipo_Actividad':
+				return array( 'model' => new Activity , 'id' => 8 );
+			case 'Inversion_Actividad':
+				return array( 'model' => new InvestmentActivity , 'id' => 9 );
+			case 'Tipo_Cliente':
+				return array( 'model' => new ClientType , 'key' => 'descripcion' );
 		endswitch;
 	}
 
@@ -61,8 +68,10 @@ class TableController extends BaseController
 		try
 		{
 			$inputs = Input::all();
-			switch( $inputs['type'] )
-			{
+			$vData = $this->getModel( $inputs[ 'type'] );
+			$data = array( 'datos' => $vData[ 'model']::all() , 'val' => $inputs[ 'val' ] , 'key' => $vData[ 'key' ] );
+			return $this->setRpta( View::make( 'Maintenance.td' , $data )->render() );
+			/*switch( $inputs['type'] ):
 				case 'idusertype':
 					return $this->getCellTipoUsuario( $inputs['val'] );
 				case 'idfondo':
@@ -77,7 +86,7 @@ class TableController extends BaseController
 					return $this->getCellInversion( $inputs[ 'val' ] );
 				case 'id_actividad':
 					return $this->getCellActividad( $inputs[ 'val' ] );
-			}
+			endswitch;*/
 		}
 		catch( Exception $e )
 		{
@@ -148,7 +157,9 @@ class TableController extends BaseController
 
 	public function getView( $type )
 	{
+		\Log::error( $type );
 		$vData       = $this->getModel( $type );
+		\Log::error( $vData );
 		$model  	 = $vData[ 'model' ];
 		$id          = $vData[ 'id' ];
 		$records     = $model::order();

@@ -121,9 +121,9 @@
                             @endif
                             @if ( in_array(Auth::user()->type, array(GER_COM)) )
                                 <li><a href="{{ URL::to('fondoHistoria') }}">Historia de los Fondos</a></li>
-                                <li><a href="{{ URL::to('maintenance/inversion') }}">Mantenimiento de Inversion</a></li>
-                                <li><a href="{{ URL::to('maintenance/activity') }}">Mantenimiento de Actividades</a></li>
-                                <li><a href="{{ URL::to('maintenance/investmentactivity') }}">Mantenimiento de Inversion-Actividad</a></li>
+                                <li><a href="{{ URL::to('maintenance/view/Tipo_Inversion') }}">Mantenimiento de Inversion</a></li>
+                                <li><a href="{{ URL::to('maintenance/view/Tipo_Actividad') }}">Mantenimiento de Actividades</a></li>
+                                <li><a href="{{ URL::to('maintenance/view/Inversion_Actividad') }}">Mantenimiento de Inversion-Actividad</a></li>
                                 <li><a href="{{ URL::to('maintenance/view/Parametro') }}">Mantenimiento de Parametros</a></li>
                                 <li><a href="{{ URL::to('maintenance/view/Fondo_Supervisor') }}">Mantenimiento de Fondos de Supervisor</a></li>
                                 <li><a href="{{ URL::to('maintenance/view/Fondo_Gerente_Producto') }}">Mantenimiento de Fondos de G. Producto</a></li>
