@@ -30,6 +30,17 @@ class Personal extends Eloquent
         return $name;
     }
 
+    protected function getSup( $user_id )
+    {
+        $persona = Personal::where( 'user_id' , $user_id )->first();
+        return $persona->rmSup;
+    }
+
+    public function rmSup()
+    {
+        return $this->belongsTo( '\Users\Personal' , 'referencia_id' , 'bago_id' );
+    }
+
     // public function reps()
     // {
     //     return $this->hasMany('Users\Rm','idsup','idsup');

@@ -74,9 +74,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 
     public function getName()
     {
-        
-            $username .= ucwords(strtolower($this->personal->nombres)) .' '. ucwords(strtolower($this->personal->apellidos)) ;
-        return $username;
+        return ucwords(strtolower($this->personal->nombres)) .' '. ucwords(strtolower($this->personal->apellidos));
     }
 
     public function getFirstName(){

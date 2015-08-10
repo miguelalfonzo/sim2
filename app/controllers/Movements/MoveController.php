@@ -250,15 +250,39 @@ class MoveController extends BaseController
     {
         try
         {
-            $inputs = Input::all();
+            $inputs    = Input::all();
+            // dd($inputs);
             $solicitud = Solicitud::find( $inputs[ 'id_solicitud'] );
-            $data = array( 'solicitud' => $solicitud , 'politicStatus' => false , 'detalle' => $solicitud->detalle , 'view' => true );
-            return $this->setRpta( array( 'View' => View::make( 'Dmkt.Solicitud.Tab.tabs' )->with( $data )->render() ) );
+            $data      = array(
+                            'solicitud'     => $solicitud, 
+                            'politicStatus' => false, 
+                            'detalle'       => $solicitud->detalle, 
+                            'view'          => true 
+                        );
+            return $this->setRpta(
+                            array(
+                                'View' => View::make( 'Dmkt.Solicitud.Tab.tabs' )
+                                            ->with( $data )->render()
+                            )
+                        );
+            // dd("hola");
             
-            if ( $solicitud->idtiposolicitud == SOL_REP )
-                return $this->setRpta( array( 'View' => View::make( 'Dmkt.Solicitud.Representante.detail' )->with( $data )->render() ) );
-            else
-                return $this->setRpta( array( 'View' => View::make( 'Dmkt.Solicitud.Institucional.detail' )->with( $data )->render() ) );
+            // if ( $solicitud->idtiposolicitud == SOL_REP )
+            //     return $this->setRpta(
+            //                     array(
+            //                         'View' => View::make( 'Dmkt.Solicitud.Representante.detail' )
+            //                                     ->with( $data )
+            //                                     ->render()
+            //                     )
+            //                 );
+            // else
+            //     return $this->setRpta(
+            //                     array(
+            //                         'View' => View::make( 'Dmkt.Solicitud.Institucional.detail' )
+            //                         ->with( $data )
+            //                         ->render()
+            //                     )
+            //                 );
         }
         catch( Exception $e )
         {
