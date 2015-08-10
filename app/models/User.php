@@ -45,12 +45,14 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
     protected function Personal(){
         return $this->hasOne('Users\Personal','user_id','id');
     }
+    
     // public function rm(){
     //     return $this->hasOne('Users\Rm','iduser','id');
     // }
-    // public function sup(){
-    //     return $this->hasOne('Users\Sup','iduser','id');
-    // }
+    
+    public function sup(){
+        return $this->hasOne('Users\Personal','user_id','id')->where('tipo', '=', 'S');
+    }
 
     public function solicituds(){
         return $this->hasMany('Dmkt\Solicitud','iduser','id');
