@@ -16,7 +16,7 @@
                     <tbody>
                         <tr>
                             <th class="sin-border text-right">Colaborador Bagó:</th>
-                            <td class="sin-border text-left">{{$solicitud->asignedTo->rm->full_name}}</td>  
+                            <td class="sin-border text-left">{{ $solicitud->asignedTo->personal->getFullName() }}</td>  
                             <th class="sin-border text-right">Cargo:</th>
                             <td class="sin-border text-left">{{ ucwords( strtolower( $solicitud->asignedTo->userType->descripcion ) ) }}</td>
                             
@@ -26,32 +26,10 @@
                             <td class="sin-border text-left">{{$date['toDay']}}</td>
                         </tr>
                         <tr>
-                        @if ( $solicitud->approvedHistory->updatedBy->type == SUP )
                             <th class="sin-border text-right">Autorizado por:</th>
-                            <td class="sin-border text-left">{{$solicitud->approvedHistory->updatedBy->sup->full_name}}</td>
+                            <td class="sin-border text-left">{{ $solicitud->approvedHistory->updatedBy->personal->getFullName() }}</td>
                             <th class="sin-border text-right">Cargo:</th>
-                            <td class="sin-border text-left">Supervisor</td>
-                        @elseif ( $solicitud->approvedHistory->updatedBy->type == GER_PROD )
-                            <th class="sin-border text-right">Autorizado por:</th>
-                            <td class="sin-border text-left">{{$solicitud->approvedHistory->updatedBy->gerProd->full_name}}</td>
-                            <th class="sin-border text-right">Cargo:</th>
-                            <td class="sin-border text-left">G. Producto</td>
-                        @else
-                            <th class="sin-border text-right">Autorizado por:</th>
-                            <td class="sin-border text-left">
-                                @if( $solicitud->approvedHistory->createdBy->type == SUP )
-                                    {{ $solicitud->approvedHistory->createdBy->sup->full_name }}
-                                @elseif( $solicitud->approvedHistory->createdBy->type == GER_PROD )
-                                    {{ $solicitud->approvedHistory->createdBy->gerProd->full_name }}  
-                                @elseif( ! is_null( $solicitud->approvedHistory->createdBy->simApp ) )
-                                    {{ $solicitud->approvedHistory->createdBy->person->full_name }}
-                                @endif                                
-                            </td>
-                            <th class="sin-border text-right">Cargo:</th>
-                            <td class="sin-border text-left">
-                                {{ $solicitud->approvedHistory->createdBy->userType->descripcion }}  
-                            </td>
-                        @endif
+                            <td class="sin-border text-left">{{ ucwords( strtolower( $solicitud->approvedHistory->updatedBy->userType->descripcion ) ) }}</td>
                             <th class="sin-border text-right">Fondo:</th>
                             <td class="sin-border text-left">{{mb_convert_case($solicitud->products[0]->thisSubFondo->subCategoria->descripcion ,MB_CASE_TITLE,'UTF-8')}}</td>   
                             <th class="sin-border text-right">Código Comercial:</th>
@@ -112,23 +90,23 @@
                                                     </tbody>
                                                 </table>
                                             </td>
+                                            @foreach( $solicitud->toAcceptedApprovedHistories()->orderBy( 'updated_at' , 'ASC' )->get() as $acceptedApprovedHistory )
+                                                @if( ! is_null( $solicitud->investment->approvalInstance->approvalPolicyType( $acceptedApprovedHistory->user_from ) ) && 
+                                                     ! ( is_null( $solicitud->investment->approvalInstance->approvalPolicyType( $acceptedApprovedHistory->user_from )->desde ) ) )
                                             <td class="sin-border"  style="width: 50%;">
                                                 <table style="margin: 0 auto; min-width: 200px">
                                                     <tbody>
                                                         <tr>
                                                             <td style="border-top: 1px solid;">
-                                                                @foreach( $solicitud->toAcceptedApprovedHistories()->orderBy( 'updated_at' , 'ASC' )->get() as $acceptedApprovedHistory )
-                                                                    @if( ! is_null( $solicitud->investment->approvalInstance->approvalPolicyType( $acceptedApprovedHistory->user_from ) ) && 
-                                                                         ! ( is_null( $solicitud->investment->approvalInstance->approvalPolicyType( $acceptedApprovedHistory->user_from )->desde ) ) )
-                                                                        V°B° {{ $acceptedApprovedHistory->fromUserType->descripcion }}
-                                                                    @endif
-                                                                @endforeach
+                                                                        V°B° {{ ucwords( strtolower( $acceptedApprovedHistory->fromUserType->descripcion ) ) }}
                                                             </td>
                                                         </tr>
                                                         <tr><td>&nbsp;</td></tr>
                                                     </tbody>
                                                 </table>
                                             </td>
+                                                                    @endif
+                                                                @endforeach
                                         </tr>
                                     </tbody>
                                 </table>
