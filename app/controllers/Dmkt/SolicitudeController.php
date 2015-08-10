@@ -206,7 +206,7 @@ class SolicitudeController extends BaseController
     {
 
         $rules = array(
-            'idsolicitud'   => 'integer|min:1|exists:solicitud,id',
+            'idsolicitud'   => 'integer|min:1|exists:'.TB_SOLICITUD.',id',
             'motivo'        => 'required|integer|min:1|exists:'.TB_MOTIVO.',id',
             'inversion'     => 'required|integer|min:1|exists:'.TB_TIPO_INVERSION.',id',
             'actividad'     => 'required|integer|min:1|exists:'.TB_TIPO_ACTIVIDAD.',id',
@@ -658,10 +658,10 @@ class SolicitudeController extends BaseController
 
     private function validateInputAcceptSolRep($inputs)
     {
-        $rules = array('idsolicitud' => 'required|integer|min:1|exists:solicitud,id',
+        $rules = array('idsolicitud' => 'required|integer|min:1|exists:'.TB_SOLICITUD.',id',
             'monto' => 'required|numeric|min:1',
             'anotacion' => 'sometimes|string|min:1',
-            'producto' => 'required|array|min:1|each:integer|each:min,1|each:exists,solicitud_producto,id',
+            'producto' => 'required|array|min:1|each:integer|each:min,1|each:exists,'.TB_SOLICITUD_PRODUCTO.',id',
             'monto_producto' => 'required|array|min:1|each:numeric|each:min,1|sumequal:monto',
             'fondo_producto' => 'required|array|each:string|each:min,1');
         $validator = Validator::make($inputs, $rules);

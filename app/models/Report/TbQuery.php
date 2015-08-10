@@ -6,7 +6,7 @@ use \Eloquent;
 
 class TbQuery extends Eloquent 
 {
-	protected $table      = 'REPORTE_QUERY';
+	protected $table      = TB_REPORTE_QUERY;
 	protected $primaryKey = 'id';
 	public $incrementing  = false;
 	protected $fillable   = array('id','name','query');

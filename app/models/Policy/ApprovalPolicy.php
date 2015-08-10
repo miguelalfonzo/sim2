@@ -6,7 +6,7 @@ use \Eloquent;
 
 class ApprovalPolicy extends Eloquent 
 {
-    protected $table = 'POLITICA_APROBACION';
+    protected $table = TB_POLITICA_APROBACION;
     protected $primaryKey = 'id';
 
     protected function userType()

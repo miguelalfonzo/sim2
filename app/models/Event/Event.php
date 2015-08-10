@@ -7,7 +7,7 @@ use \FotoEventos;
 
 class Event extends Eloquent 
 {
-    protected $table = 'EVENT';
+    protected $table = TB_EVENTO;
     protected $primaryKey = 'ID';
     protected $fillable = array('id', 'name', 'description', 'place', 'event_date', 'solicitud_id');
 

@@ -6,7 +6,7 @@ use \Eloquent;
 
 class Parameter extends Eloquent
 {
-    protected $table= 'PARAMETRO';
+    protected $table= TB_PARAMETRO;
     protected $primaryKey = 'id';
 
     protected static function order()

@@ -85,7 +85,7 @@ class Seeker extends BaseController
 				$cuenta = null;
 			else
 				$cuenta = $cuenta->cuenta;
-			$sup = DB::table('FICPE.LINSUPVIS a')->where('LSVVISITADOR',$inputs['rm'])->leftJoin('FICPE.SUPERVISOR b','b.SUPSUPERVISOR','=','a.LSVSUPERVISOR')
+			$sup = DB::table(TB_LINSUPVIS.' a')->where('LSVVISITADOR',$inputs['rm'])->leftJoin(TB_SUPERVISOR.' b','b.SUPSUPERVISOR','=','a.LSVSUPERVISOR')
 			->SELECT(DB::raw("b.supsupervisor as idsup , (b.supnombre || ' ' || b.suppaterno || ' ' || b.supmaterno) as nombre"))->first();
 			$data = array('cuenta' => $cuenta , 'sup' => $sup);
 			$rpta = $this->setRpta($data);
@@ -102,7 +102,7 @@ class Seeker extends BaseController
 		try
 		{
 			$inputs = Input::all();
-			$json = '[{"name":"FICPE.VISITADOR","wheres":{"likes":["VISLEGAJO","(VISNOMBRE || \' \' || VISPATERNO || \' \' || VISMATERNO)"],"equal":{"VISACTIVO":"S","LENGTH(VISLEGAJO)":8}},"selects":["VISVISITADOR","(VISNOMBRE || \' \' || VISPATERNO || \' \' || VISMATERNO)" , "\'REP\'" ]}]';
+			$json = '[{"name":"'.TB_SOLICITUD.'","wheres":{"likes":["VISLEGAJO","(VISNOMBRE || \' \' || VISPATERNO || \' \' || VISMATERNO)"],"equal":{"VISACTIVO":"S","LENGTH(VISLEGAJO)":8}},"selects":["VISVISITADOR","(VISNOMBRE || \' \' || VISPATERNO || \' \' || VISMATERNO)" , "\'REP\'" ]}]';
 			$cAlias = array('value','label' , 'type' );	
 			return $this->searchSeeker( $inputs['sVal'] , $json , $cAlias );
 		}

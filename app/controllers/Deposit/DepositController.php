@@ -30,7 +30,7 @@ class DepositController extends BaseController
     private function validateInpustDeposit( $inputs )
     {
         $rules = array( 'token'       => 'required|exists:solicitud,token,id_estado,' . DEPOSITO_HABILITADO ,
-                        'num_cuenta'  => 'required|numeric|exists:b3o.plancta,ctactaextern',
+                        'num_cuenta'  => 'required|numeric|exists:'.TB_PLAN_CUENTA.',ctactaextern',
                         'op_number'   => 'required|string|min:1' );
         $validator = Validator::make( $inputs , $rules );
         if ( $validator->fails() ) 

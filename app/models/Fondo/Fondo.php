@@ -6,7 +6,7 @@ use \Eloquent;
 
 class Fondo extends Eloquent {
 
-    protected $table = 'FONDO_CONTABLE';
+    protected $table = TB_FONDO_CONTABLE;
     protected $primaryKey = 'id';
 
     public function getIdusertypeAttribute($value)

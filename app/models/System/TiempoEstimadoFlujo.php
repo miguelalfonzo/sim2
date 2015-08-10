@@ -6,7 +6,7 @@ use \Eloquent;
 
 class TiempoEstimadoFlujo extends Eloquent{
 
-    protected $table = 'TIEMPO_ESTIMADO_FLUJO';
+    protected $table = TB_FLUJO_TIEMPO_ESTIMADO;
     protected $primaryKey = 'id';
 
     public function StatusId(){

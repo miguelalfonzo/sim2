@@ -7,7 +7,7 @@ use \Eloquent;
 class FondoSupervisor extends Eloquent
 {
 
-	protected $table      = 'FONDO_SUPERVISOR';
+	protected $table      = TB_FONDO_SUPERVISOR;
 	protected $primaryKey = 'id';
 
 	public function subCategoria()

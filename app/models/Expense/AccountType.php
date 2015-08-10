@@ -6,7 +6,7 @@ use \Eloquent;
 
 class AccountType extends Eloquent
 {
-    protected $table= 'CUENTA_TIPO';
+    protected $table= TB_TIPO_CUENTA;
     protected $primaryKey = 'id';
    
 }

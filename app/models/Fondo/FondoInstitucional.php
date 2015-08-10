@@ -8,7 +8,7 @@ use \DB;
 class FondoInstitucional extends Eloquent
 {
 
-	protected $table      = 'FONDO_INSTITUCION';
+	protected $table      = TB_FONDO_INSTITUCION;
 	protected $primaryKey = 'id';
 	protected $fillable   = array('id','descripcion');
 
@@ -19,10 +19,10 @@ class FondoInstitucional extends Eloquent
 
 	public static function getSubFondo()
 	{
-		return DB::table( 'Fondo_Institucion f' )
+		return DB::table( TB_FONDO_INSTITUCION.' f' )
             ->select( "fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo' , 'f.saldo_neto' , 'f.id' , '\'AG\' tipo' )
-            ->leftJoin( 'fondo_subcategoria fsc' , 'f.subcategoria_id' , '=' , 'fsc.id' )
-            ->leftJoin( 'fondo_categoria fc' , 'fsc.id_fondo_categoria' , '=' , 'fc.id' )
+            ->leftJoin( TB_FONDO_CATEGORIA_SUB.' fsc' , 'f.subcategoria_id' , '=' , 'fsc.id' )
+            ->leftJoin( TB_FONDO_CATEGORIA.' fc' , 'fsc.id_fondo_categoria' , '=' , 'fc.id' )
             ->where( 'fsc.tipo' , FONDO_SUBCATEGORIA_INSTITUCION )->get();
     }
 

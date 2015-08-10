@@ -9,7 +9,7 @@ class TemporalUser extends Eloquent
 {
     use SoftDeletingTrait;
 
-    protected $table = 'USER_TEMPORAL';
+    protected $table = TB_USER_TEMPORAL;
     protected $primaryKey = 'id' ;
     protected $dates = ['deleted_at'];
 
