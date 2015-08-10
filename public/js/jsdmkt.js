@@ -1106,8 +1106,8 @@ $(document).on( 'click' , '.maintenance-cancel' , function()
     listMaintenanceTable( tr.attr('type')  );
 });
 
-$(document).off('click' , '.maintenance-edit');
-$(document).on('click' , '.maintenance-edit' , function()
+$(document).off( 'click' , '.maintenance-edit' );
+$(document).on( 'click' , '.maintenance-edit' , function()
 {
     var trElement = $(this).parent().parent();
     trElement.children().each(function(i,data)
@@ -1276,7 +1276,7 @@ function enableTd( data )
         url :  server + 'get-cell-maintenance-info' ,
         data: 
         {
-            type   : td[0].className ,
+            type   : td[ 0 ].classList[ 0 ] ,
             val    : td.html().trim(),
             _token : _token
         }

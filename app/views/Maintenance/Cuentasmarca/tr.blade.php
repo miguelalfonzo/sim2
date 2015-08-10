@@ -1,4 +1,4 @@
-<tr type="cuentasMarca">
+<tr type="Cuenta_Gasto_Marca">
     <td style="text-align:center" disabled></td>
     <td class="idfondo" style="text-align:center" disabled></td>
     <td class="num_cuenta_fondo" save=1 style="text-align:center">

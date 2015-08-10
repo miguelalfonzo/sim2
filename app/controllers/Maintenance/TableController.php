@@ -219,6 +219,8 @@ class TableController extends BaseController
 				return $this->addInversion();
 			case 'Inversion_Actividad':
 				return $this->addInversionActividad();
+			case 'Cuenta_Gasto_Marca':
+				return $this->addcuentasMarca();
 		endswitch;
 		return $this->addRow( $inputs );
 	}
@@ -445,8 +447,8 @@ class TableController extends BaseController
 
 	private function addcuentasMarca()
 	{
-		$data = array( 'fondos' => Fondo::all() , 'docs' => Proof::all() );
-		return $this->setRpta( View::make( 'Maintenance.Cuentasmarca.tr')->with( $data )->render() );
+		$data = array( 'Tipos_Documento' => Proof::all() );
+		return $this->setRpta( View::make( 'Maintenance.Cuentasmarca.tr' , $data )->render() );
 	}
 
 	private function addfondo()
