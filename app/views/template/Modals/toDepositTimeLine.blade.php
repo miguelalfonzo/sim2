@@ -1,5 +1,5 @@
-@if ( ( ( $solicitud->detalle->id_motivo != REEMBOLSO || $solicitud->idtiposolicitud == SOL_INST )  && is_null( $solicitud->toDepositHistory ) ) || 
-( $solicitud->detalle->id_motivo == REEMBOLSO && is_null( $solicitud->expenseHistory ) ) )
+@if ( ( ( $solicitud->idtiposolicitud != REEMBOLSO || $solicitud->idtiposolicitud == SOL_INST )  && is_null( $solicitud->toDepositHistory ) ) || 
+( $solicitud->idtiposolicitud == REEMBOLSO && is_null( $solicitud->expenseHistory ) ) )
 	@if ( ( is_null( $solicitud->approvedHistory ) && $solicitud->idtiposolicitud == SOL_REP ) || 
 	( is_null( $solicitud->toPendingHistory ) && $solicitud->idtiposolicitud == SOL_INST ) || $solicitud->id_estado == CANCELADO )
 		<div class="stage col-md-3 col-sm-3">

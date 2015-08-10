@@ -241,6 +241,8 @@ define("TIMELINEHARD", serialize(array(
     )
 )));
 
+const MANTENIMIENTO_FONDO = 6;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -251,4 +253,3 @@ const TB_USUARIOS     = 'USRP.USERS';
 const TB_TIPO_USUARIO = 'USRP.TIPO_USUARIO';
 const TB_USER_APP     = 'USRP.USER_APP';
 const TB_PERSONAL     = 'USRP.PERSONAL';
-

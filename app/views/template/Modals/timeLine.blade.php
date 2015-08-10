@@ -78,8 +78,8 @@
                 {{---------------------------------------------------------}}
 				{{--@include('template.Modals.toDepositTimeLine')--}}
 
-                @if ( ( ( $solicitud->detalle->id_motivo != REEMBOLSO || $solicitud->idtiposolicitud == SOL_INST )  && is_null( $solicitud->toDepositHistory ) ) ||
-                    ( $solicitud->detalle->id_motivo == REEMBOLSO && is_null( $solicitud->expenseHistory ) ) )
+                @if ( ( ( $solicitud->idtiposolicitud != REEMBOLSO || $solicitud->idtiposolicitud == SOL_INST )  && is_null( $solicitud->toDepositHistory ) ) ||
+                    ( $solicitud->idtiposolicitud == REEMBOLSO && is_null( $solicitud->expenseHistory ) ) )
                     @if ( ( is_null( $solicitud->approvedHistory ) && $solicitud->idtiposolicitud == SOL_REP ) ||
                         ( is_null( $solicitud->toPendingHistory ) && $solicitud->idtiposolicitud == SOL_INST ) || $solicitud->id_estado == CANCELADO )
                         <div class="stage col-md-3 col-sm-3">
@@ -114,7 +114,7 @@
                             </div>
                         </div>
                 {{---------------------------------------------------------}}
-				@if ( $solicitud->detalle->id_motivo != REEMBOLSO )
+				@if ( $solicitud->idtiposolicitud != REEMBOLSO )
 {{--					@include( 'template.Modals.depSeatTimeLine' )--}}
                     @if ( is_null( $solicitud->toAdvanceSeatHistory ) )
                         @if( is_null( $solicitud->toDepositHistory ) )
@@ -186,7 +186,7 @@
                     @include( 'template.Modals.depSeatTimeLine' )
                 @endif
 			@include( 'template.Modals.registroGasto')
-			@if( $solicitud->detalle->id_motivo == REEMBOLSO )
+			@if( $solicitud->idtiposolicitud == REEMBOLSO )
 				@if ( is_null( $solicitud->toGenerateHistory ) )
 					@if ( is_null( $solicitud->toDepositHistory ) )
 						<div class="stage col-md-3 col-sm-3">

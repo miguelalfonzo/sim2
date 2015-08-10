@@ -29,6 +29,32 @@ use \System\FondoMktHistory;
 class TableController extends BaseController
 {
 
+	private function getModel( $type )
+	{
+		switch( $type ):
+			case 'Fondo':
+				return array( 'model' => new Fondo() , 'id' => MANTENIMIENTO_FONDO );
+			case 'Cuenta_Gasto_Marca':
+				return array( 'model' => new MarkProofAccounts , 'id' => 1 );
+			case 'Parametro':
+				return array( 'model' => new Parameter , 'id' => 2 );
+			case 'Fondo_Supervisor':
+				return array( 'model' => new FondoSupervisor , 'id' => 3 );
+			case 'Fondo_Gerente_Producto':
+				return array( 'model' => new FondoGerProd , 'id' => 4 );
+			case 'Fondo_Institucion':
+				return array( 'model' => new FondoInstitucional , 'id' => 5 );
+			case 'Tipo_Inversion':
+				return array( 'model' => new InvestmentType , 'id' => 7 );
+			case 'Tipo_Actividad':
+				return array( 'model' => new Activity , 'id' => 8 );
+			case 'Inversion_Actividad':
+				return array( 'model' => new InvestmentActivity , 'id' => 9 );
+			case 'Tipo_Cliente':
+				return array( 'model' => new ClientType , 'key' => 'descripcion' );
+		endswitch;
+	}
+
 	private function getName( $function , $type )
 	{
 		if( $type === 1 )
@@ -42,8 +68,10 @@ class TableController extends BaseController
 		try
 		{
 			$inputs = Input::all();
-			switch( $inputs['type'] )
-			{
+			$vData = $this->getModel( $inputs[ 'type'] );
+			$data = array( 'datos' => $vData[ 'model']::all() , 'val' => $inputs[ 'val' ] , 'key' => $vData[ 'key' ] );
+			return $this->setRpta( View::make( 'Maintenance.td' , $data )->render() );
+			/*switch( $inputs['type'] ):
 				case 'idusertype':
 					return $this->getCellTipoUsuario( $inputs['val'] );
 				case 'idfondo':
@@ -58,29 +86,13 @@ class TableController extends BaseController
 					return $this->getCellInversion( $inputs[ 'val' ] );
 				case 'id_actividad':
 					return $this->getCellActividad( $inputs[ 'val' ] );
-			}
+			endswitch;*/
 		}
 		catch( Exception $e )
 		{
 			return $this->internalException( $e , __FUNCTION__ );
 		}
 	}
-
-	public function saveMaintenanceData()
-	{
-		try
-		{
-			$inputs = Input::all();
-			$method = 'save' . $inputs[ 'type' ];
-			return $this->$method( $inputs );
-		}
-		catch( Exception $e )
-		{
-			DB::rollback();
-			return $this->internalException( $e , __FUNCTION__ );
-		}
-	}
-
 
 	private function getCellInversion( $val )
 	{
@@ -125,20 +137,6 @@ class TableController extends BaseController
 		return $this->setRpta( View::make( 'Maintenance.td')->with( $data)->render() );
 	}*/
 
-	public function getMaintenanceTableData()
-	{
-		try
-		{
-			$inputs = Input::all();
-			$method = 'getTable' . $inputs[ 'type' ];
-				return $this->$method();
-		}
-		catch( Exception $e )
-		{
-			return $this->internalException( $e , __FUNCTION__ );
-		}
-	}
-
 	public function getTableDailySeatRelation()
 	{
 		$records = MarkProofAccounts::all();
@@ -157,54 +155,130 @@ class TableController extends BaseController
 
 	//FONDO CONTABILIDAD
 
-	public function getViewfondoCuenta()
+	public function getView( $type )
 	{
-		$nn = 'Fondo';
-		$records = Fondo::order();
-		$columns = json_decode( Maintenance::find( 6 )->formula );
+		\Log::error( $type );
+		$vData       = $this->getModel( $type );
+		\Log::error( $vData );
+		$model  	 = $vData[ 'model' ];
+		$id          = $vData[ 'id' ];
+		$records     = $model::order();
+		$maintenance = Maintenance::find( $id );
+		$columns = json_decode( $maintenance->formula );
 		return View::make( 'Maintenance.view' , 
 			array( 
 				'records' => $records , 
 				'columns' => $columns , 
-				'titulo'  => 'Mantenimiento de Cuentas de Fondos' , 
-				'type'    => $this->getName( __FUNCTION__ , 1 )
+				'titulo'  => 'Mantenimiento de ' . $maintenance->descripcion , 
+				'type'    => $type
 			) 
 		);		
 	}
 
-	public function getTablefondoCuenta()
+	public function getMaintenanceTableData()
 	{
-		$fondos = Fondo::order();
-		return $this->setRpta( View::make( 'Maintenance.FondoCuenta.table' )->with( 'fondos' , $fondos )->render() );			
+		try
+		{
+			$inputs = Input::all();
+			return $this->getTable( $inputs );
+		}
+		catch( Exception $e )
+		{
+			return $this->internalException( $e , __FUNCTION__ );
+		}
 	}
 
-	private function updatefondoCuenta( $val )
+	private function getTable( $inputs )
 	{
-		$fondo = Fondo::find( $val['id'] );
+		$vData       = $this->getModel( $inputs[ 'type' ] );
+		$model  	 = $vData[ 'model' ];
+		$id          = $vData[ 'id' ];
+		$records     = $model::order();
+		$maintenance = Maintenance::find( $id );
+		$columns = json_decode( $maintenance->formula );
+		return $this->setRpta( 
+			View::make( 'Maintenance.table' , 
+				array( 
+					'records' => $records , 
+					'columns' => $columns , 
+					'type'    => $inputs[ 'type' ]
+				) 
+			)->render()
+		);
+	}
+
+	public function updateMaintenanceData()
+	{
+		try
+		{
+			$inputs = Input::all();
+			\Log::error( $inputs );
+			switch( $inputs[ 'type' ] ):
+				case 'fondo':
+					return $this->updateFondo( $inputs );
+				case 'cuentasMarca':
+					return $this->updateCuentasMarca( $inputs );
+				case 'fondo-cuenta':
+					return $this->updateFondo( $inputs);
+			endswitch;
+			return $this->updateGeneric( $inputs );
+		}
+		catch ( Exception $e )
+		{
+			return $this->internalException( $e , __FUNCTION__ );
+		}
+	}
+
+	private function updateGeneric( $val )
+	{
+		$model  = $this->getModel( $val[ 'type' ] )[ 'model' ];
+		$record = $model::find( $val['id'] );
 		foreach ( $val[data] as $key => $data )
-			$fondo->$key = $data ;
-		$fondo->save();
+			$record->$key = $data ;
+		$record->save();
 		return $this->setRpta();
 	}
 
-	private function addfondoCuenta()
+	private function saveMaintenance( $inputs )
 	{
-		$data = array( 
-			'records' => json_decode( Maintenance::find( 6 )->formula ) ,
-			'type'    => $this->getName( __FUNCTION__ , 4 ) 
-		);
-		return $this->setRpta( View::make( 'Maintenance.tr' , $data )->render() );	
-	}
-
-	private function savefondoCuenta( $val )
-	{
-		$fondo = new Fondo;
-		$fondo->id = $fondo->lastId() + 1 ;
-		foreach ( $val[ data ] as $key => $data )
-			$fondo->$key = $data;
-		$fondo->save();
+		$vData = $this->getModel( $inputs[ 'type' ] );
+		$record = $vData[ 'model' ];
+		$record->id = $record->lastId() + 1 ;
+		foreach ( $inputs[ data ] as $column => $data )
+			$record->$column = $data;
+		$record->save();
 		DB::commit();
 		return $this->setRpta();
+	}
+
+	public function saveMaintenanceData()
+	{
+		try
+		{
+			$inputs = Input::all();
+			return $this->saveMaintenance( $inputs );
+		}
+		catch( Exception $e )
+		{
+			DB::rollback();
+			return $this->internalException( $e , __FUNCTION__ );
+		}
+	}
+
+	public function addMaintenanceData()
+	{
+		$inputs = Input::all();
+		return $this->addRow( $inputs );
+	}
+
+	private function addRow( $inputs )
+	{
+		$id = $this->getModel( $inputs[ 'type' ] )[ 'id' ];
+		$data = array(
+			'records' => json_decode( Maintenance::find( $id )->formula ),
+			'type'	  => $inputs[ 'type' ]
+		);
+		return $this->setRpta( View::make( 'Maintenance.tr' , $data )->render() );
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -283,29 +357,6 @@ class TableController extends BaseController
 	{
 		$inversionActividad = InvestmentActivity::withTrashed()->orderBy( 'deleted_at' ,'desc' , 'updated_at' , 'desc')->get();
 		return $this->setRpta( View::make( 'Maintenance.InvestmentActivity.table')->with( 'inversion_actividad' , $inversionActividad )->render() );
-	}
-
-	public function updateMaintenanceData()
-	{
-		try
-		{
-			$inputs = Input::all();
-			$method = 'update'. $inputs['type'];
-			switch( $inputs['type'] )			
-			{
-				case 'fondo':
-					return $this->updateFondo( $inputs );
-				case 'cuentasMarca':
-					return $this->updateCuentasMarca( $inputs );
-				case 'fondo-cuenta':
-					return $this->updateFondo( $inputs);
-			}
-			return $this->$method( $inputs );
-		}
-		catch ( Exception $e )
-		{
-			return $this->internalException( $e , __FUNCTION__ );
-		}
 	}
 
 	private function validateFondoSaldoNeto( $fondo )
@@ -542,31 +593,6 @@ class TableController extends BaseController
 		}
 	}
 
-	/*private function updateFondo( $idfondo , $idcuenta )
-	{
-		try
-		{
-			$fondo = Fondo::where( 'idcuenta' , $idcuenta )->get();
-			if ( $fondo->count() >= 1 )
-				return $this->warningException( 'No se puede asignar la misma cuenta a mas de 1 Fondo' , __FUNCTION__ , __LINE__ , __FILE__ );
-			else
-			{
-				$fondo = Fondo::find($idfondo);
-				if ( is_null( $fondo->idcuenta) )
-				{
-					$fondo->idcuenta = $idcuenta;
-					$fondo->save();
-					return $this->setRpta();
-				}
-				else
-					return $this->setRpta();
-			}
-		}
-		catch ( Exception $e )
-		{
-			return $this->internalException( $e , __FUNCTION__ );
-		}
-	}*/
 
 	private function processAccount( $val , $tipocuenta )
 	{
@@ -596,13 +622,6 @@ class TableController extends BaseController
 		{
 			return $this->internalException( $e , __FUNCTION__ );
 		}
-	}
-
-	public function addMaintenanceData()
-	{
-		$inputs = Input::all();
-		$method = 'add' . $inputs[ 'type' ];
-		return $this->$method( $inputs );
 	}
 
 	private function addactividad()

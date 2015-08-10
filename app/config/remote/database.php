@@ -59,12 +59,12 @@ return array(
 		),
 		
 		'oracle_local_xe' => array(
-			'driver' => 'pdo-via-oci8',
-			'host' => '192.168.1.36',
+			'driver' => 'oracle',
+			'host' => '192.168.1.199',
 			'port' => '1521',
 			'database' => 'xe',
-			'username' => 'sim',
-			'password' => 'sim',
+			'username' => 'simp',
+			'password' => 'simp',
 			'charset' => 'utf8',
 			'prefix' => '',
 		)

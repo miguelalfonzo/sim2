@@ -29,4 +29,15 @@ class FondoGerProd extends Eloquent
 	{
 		return FondoGerProd::orderBy( 'updated_at' , 'desc' )->get();
 	}
+
+	protected function setSaldoAttribute( $value )
+	{
+		$this->attributes[ 'saldo' ] = round( $value , 2 , PHP_ROUND_HALF_DOWN );
+	}
+
+	protected function setSaldoNetoAttribute( $value )
+	{
+		$this->attributes[ 'saldo_neto' ] = round( $value , 2 , PHP_ROUND_HALF_DOWN );
+	}
+
 }

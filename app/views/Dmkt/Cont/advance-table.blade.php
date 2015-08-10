@@ -13,22 +13,10 @@
 		</thead>
 		<tbody>
 			<tr>
-				<td>
-					@if( $solicitud->idtiposolicitud == SOL_REP )
-						{{ $solicitud->products[ 0 ]->thisSubFondo->subCategoria->accountFondo->nombre }}
-					@else
-						{{ $solicitud->detalle->fondo->nombre }}
-					@endif
-				</td>
-				<td>
-					@if( $solicitud->idtiposolicitud == SOL_REP )
-						{{ $solicitud->products[ 0 ]->thisSubFondo->subCategoria->accountFondo->num_cuenta }}</td>
-					@else
-						{{ $solicitud->detalle->fondo->num_cuenta }}
-					@endif
-				</td>
+				<td>{{ $solicitud->investment->accountFund->nombre }}</td>
+				<td>{{ $solicitud->investment->accountFund->num_cuenta }}</td> 
 				<td>{{ $solicitud->detalle->deposit->updated_at }}</td>
-				<td>D</td>
+				<td>{{ ASIENTO_GASTO_BASE }}</td>
 				<td>S/.</td>
 				<td>
 					@if ( $solicitud->detalle->id_moneda == DOLARES )
@@ -45,7 +33,7 @@
 				<td>{{ $solicitud->detalle->deposit->bagoAccount->ctanombrecta }}</td>
 				<td>{{ $solicitud->detalle->deposit->num_cuenta }}</td>
 				<td>{{ $solicitud->detalle->deposit->updated_at }}</td>
-				<td>C</td>
+				<td>{{ ASIENTO_GASTO_DEPOSITO }}</td>
 				<td>S/.</td>
 				<td>
 					@if ( $solicitud->detalle->deposit->account->idtipomoneda == DOLARES )

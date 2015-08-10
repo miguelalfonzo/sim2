@@ -33,7 +33,7 @@ use \Expense\MarkProofAccounts;
 use \Expense\Table;
 use \Expense\Regimen;
 use \stdClass;
-use \Policy\AprovalPolicy;
+use \Policy\ApprovalPolicy;
 use \Users\Manager;
 use \Users\Sup;
 use \Users\Rm;
@@ -118,14 +118,14 @@ class SolicitudeController extends BaseController
     public function editSolicitud($token)
     {
         include(app_path() . '/models/Query/QueryProducts.php');
-        $data = array('solicitud' => Solicitud::where('token', $token)->firstOrFail(),
-            'reasons' => Reason::all(),
-            'activities' => Activity::order(),
-            'payments' => TypePayment::all(),
-            'currencies' => TypeMoney::all(),
-            'families' => $qryProducts->get(),
-            'investments' => InvestmentType::orderMkt(),
-            'edit' => true);
+            $data = array( 'solicitud'   => Solicitud::where('token', $token)->firstOrFail(),
+                           'reasons'     => Reason::all(),
+                           'activities'  => Activity::order(),
+                           'payments'    => TypePayment::all(),
+                           'currencies'  => TypeMoney::all(),
+                           'families'    => $qryProducts->get(),
+                           'investments' => InvestmentType::orderMkt(),
+                           'edit'        => true);
         $data['detalle'] = $data['solicitud']->detalle;
         if (in_array(Auth::user()->type, array(SUP, GER_PROD)))
             $data['reps'] = Rm::order();
@@ -145,9 +145,9 @@ class SolicitudeController extends BaseController
             $data = array('solicitud' => $solicitud, 'detalle' => $detalle);
 
             if ($solicitud->idtiposolicitud != SOL_INST && in_array($solicitud->id_estado, array(PENDIENTE, DERIVADO, ACEPTADO))) {
-                $politicType = $solicitud->aprovalPolicy($solicitud->histories->count())->policy->tipo_usuario;
-                if (in_array($politicType, array(Auth::user()->type, Auth::user()->tempType()))
-                    && (array_intersect(array(Auth::user()->id, Auth::user()->tempId()), $solicitud->managerEdit($politicType)->lists('id_gerprod')))
+                $politicType = $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario;
+                if ( in_array( $politicType, array( Auth::user()->type , Auth::user()->tempType() ) )
+                    && (array_intersect( array( Auth::user()->id, Auth::user()->tempId() ), $solicitud->managerEdit($politicType)->lists('id_gerprod')))
                 ) {
                     $politicStatus = TRUE;
                     $data['tipo_usuario'] = $politicType;
@@ -204,6 +204,7 @@ class SolicitudeController extends BaseController
 
     private function validateInputSolRep($inputs)
     {
+
         $rules = array(
             'idsolicitud'   => 'integer|min:1|exists:solicitud,id',
             'motivo'        => 'required|integer|min:1|exists:motivo,id',
@@ -219,6 +220,7 @@ class SolicitudeController extends BaseController
             'tipos_cliente' => 'required|array|min:1|each:integer|each:min,1|each:exists,tipo_cliente,id',
             'descripcion'   => 'string|max:200'
         );
+
         if (in_array(Auth::user()->type, array(SUP, GER_PROD)))
             $rules['responsable'] = 'required|numeric|min:1|exists:outdvp.dmkt_rg_rm,iduser';
 
@@ -392,20 +394,20 @@ class SolicitudeController extends BaseController
                 if ($middleRpta[status] == ok) {
                     $middleRpta = $this->setProducts($solicitud->id, $inputs['productos']);
                     if ($middleRpta[status] == ok) {
-                        if (!isset($inputs['responsable']))
-                            $inputs['responsable'] = 0;
-                        $middleRpta = $this->toUser($inputs['inversion'], $inputs['productos'], 1, $inputs['responsable']);
-                        if ($middleRpta[status] == ok) {
+                        if ( ! isset( $inputs[ 'responsable' ] ) )
+                            $inputs[ 'responsable' ] = 0;
+                        $middleRpta = $this->toUser( $solicitud->investment->approvalInstance , $inputs['productos'] , 1 , $inputs['responsable'] );
+                        if ( $middleRpta[status] == ok ):
                             $middleRpta = $this->setGerProd($middleRpta[data]['iduser'], $solicitud->id, $middleRpta[data]['tipousuario']);
-                            if ($middleRpta[status] == ok) {
+                            if ($middleRpta[status] == ok):
                                 $middleRpta = $this->setStatus(0, PENDIENTE, Auth::user()->id, $middleRpta[data], $solicitud->id);
-                                if ($middleRpta[status] == ok) {
+                                if ($middleRpta[status] == ok):
                                     Session::put('state', R_PENDIENTE);
                                     DB::commit();
                                     return $middleRpta;
-                                }
-                            }
-                        }
+                                endif;
+                            endif;
+                        endif;
                     }
                 }
             }
@@ -434,7 +436,9 @@ class SolicitudeController extends BaseController
         $solicitud->id_inversion = $inputs['inversion'];
         $solicitud->descripcion = $inputs['descripcion'];
         $solicitud->id_estado = PENDIENTE;
+
         $solicitud->idtiposolicitud = $inputs['motivo'];
+
         $solicitud->status = ACTIVE;
         if (in_array(Auth::user()->type, array(SUP, GER_PROD)))
             $solicitud->id_user_assign = $inputs['responsable'];
@@ -445,7 +449,6 @@ class SolicitudeController extends BaseController
     private function setDetalle($detalle, $inputs)
     {
         $detalle->id_moneda = $inputs['moneda'];
-        // $detalle->id_motivo = $inputs['motivo'];
         $detalle->id_pago = $inputs['pago'];
     }
 
@@ -540,64 +543,68 @@ class SolicitudeController extends BaseController
         }
     }
 
-    private function verifyPolicy($solicitud, $monto)
+    private function verifyPolicy( $solicitud , $monto )
     {
         $type = array(Auth::user()->type, Auth::user()->tempType());
-        $aprovalPolicy = AprovalPolicy::getUserInvestmentPolicy($solicitud->id_inversion, $type, $solicitud->histories->count());
-        if (is_null($aprovalPolicy))
-            return $this->warningException('No se encontro la politica de aprobacion para la inversion: ' . $solicitud->id_inversion . ' y su rol: ' . Auth::user()->type, __FUNCTION__, __LINE__, __FILE__);
-        if (is_null($aprovalPolicy->desde) && is_null($aprovalPolicy->hasta))
-            return $this->setRpta(ACEPTADO); //$this->setRpta( DERIVADO );
-        else {
-            if ($solicitud->detalle->id_moneda == DOLARES)
+        $approvalPolicy = $solicitud->investment->approvalInstance->approvalPolicyTypesOrder( $type , $solicitud->histories->count() );
+        if ( is_null( $approvalPolicy ) )
+            return $this->warningException( 'No se encontro la politica de aprobacion para la inversion: ' . $solicitud->id_inversion . ' y su rol: ' . Auth::user()->type, __FUNCTION__, __LINE__, __FILE__);
+        
+        if ( is_null( $approvalPolicy->desde ) && is_null( $approvalPolicy->hasta ) ):
+            return $this->setRpta( ACEPTADO ); //$this->setRpta( DERIVADO );
+        else:
+            if ( $solicitud->detalle->id_moneda == DOLARES )
                 $monto = $monto * ChangeRate::getTc()->compra;
-            if ($monto > $aprovalPolicy->hasta) {
-                return $this->setRpta(ACEPTADO);
-                return $this->warningException('Por Politica solo puede aceptar para este Tipo de Inversion montos menores a: ' . $aprovalPolicy->hasta, __FUNCTION__, __LINE__, __FILE__);
-            } else if ($monto < $aprovalPolicy->desde)
-                return $this->warningException('Por Politica solo puede aceptar para este Tipo de Inversion montos mayores a: ' . $aprovalPolicy->desde, __FUNCTION__, __LINE__, __FILE__);
+            if ( $monto > $approvalPolicy->hasta )
+                return $this->setRpta( ACEPTADO );
+            elseif ($monto < $approvalPolicy->desde )
+                return $this->warningException( 'Por Politica solo puede aceptar para este Tipo de Inversion montos mayores a: ' . $approvalPolicy->desde , __FUNCTION__ , __LINE__ , __FILE__ );
             else
-                return $this->setRpta(APROBADO);
-        }
+                return $this->setRpta( APROBADO );
+        endif;
     }
 
-    private function toUser($investmentType, $idsProducto, $order, $responsable = NULL)
+    private function toUser( $approvalInstance , $idsProducto, $order, $responsable = NULL)
     {
-        $aprovalPolicy = AprovalPolicy::getToUser($investmentType, $order);
-        if (is_null($aprovalPolicy))
-            return $this->warningException('La inversion no  tiene politica de aprobacion', __FUNCTION__, __LINE__, __FILE__);
-        $userType = $aprovalPolicy->tipo_usuario;
+        $approvalPolicy = $approvalInstance->approvalPolicyOrder( $order );
+        
+        if ( is_null( $approvalPolicy ) )
+            return $this->warningException( 'La inversion no cuenta con una politica de aprobacion para esta etapa del flujo (' . $order . ')' , __FUNCTION__, __LINE__, __FILE__);
+        
+        $userType = $approvalPolicy->tipo_usuario;
         $msg = '';
-        if (!is_null($aprovalPolicy->desde) || !is_null($aprovalPolicy->hasta))
-            $msg .= ' para la siguiente etapa del flujo , comuniquese con Informatica. El rol aprueba montos ' . (is_null($aprovalPolicy->desde) ? '' : 'mayores a S/.' . $aprovalPolicy->desde . ' ') . (is_null($aprovalPolicy->hasta) ? '' : 'hasta S/.' . $aprovalPolicy->hasta);
-        if ($userType == SUP) {
-            if (Auth::user()->type === REP_MED)
-                $idsUser = array(Rm::getSup(Auth::user()->id)->iduser);
-            else if (Auth::user()->type === SUP)
-                $idsUser = array(Auth::user()->id);
-            else if (Auth::user()->type === GER_PROD)
-                $idsUser = array(Rm::getSup($responsable)->iduser);
+        
+        if ( ! is_null( $approvalPolicy->desde ) || ! is_null( $approvalPolicy->hasta ) )
+            $msg .= ' para la siguiente etapa del flujo , comuniquese con Informatica. El rol aprueba montos ' . ( is_null( $approvalPolicy->desde ) ? '' : 'mayores a S/.' . $approvalPolicy->desde . ' ') . ( is_null( $approvalPolicy->hasta ) ? '' : 'hasta S/.' . $approvalPolicy->hasta );
+        if ( $userType == SUP ): 
+            if ( Auth::user()->type === REP_MED )
+                $idsUser = array( Rm::getSup( Auth::user()->id )->iduser );
+            else if ( Auth::user()->type === SUP )
+                $idsUser = array( Auth::user()->id );
+            else if ( Auth::user()->type === GER_PROD )
+                $idsUser = array( Rm::getSup( $responsable )->iduser );
             else
-                return $this->warningException('El rol ' . Auth::user()->type . ' no tiene permisos para crear o derivar al supervisor', __FUNCTION__, __LINE__, __FILE__);
-        } else if ($userType == GER_PROD) {
-            $idsGerProd = Marca::whereIn('id', $idsProducto)->lists('gerente_id');
-            $uniqueIdsGerProd = array_unique($idsGerProd);
-            $repeatIds = array_count_values($idsGerProd);
-            $maxNumberRepeat = max($repeatIds);
-            Session::put('maxRepeatIdsGerProd', Manager::whereIn('id', array_keys($repeatIds, $maxNumberRepeat))->lists('iduser'));
-            $notRegisterGerProdName = Manager::getGerProdNotRegisteredName($uniqueIdsGerProd);
-            if (count($notRegisterGerProdName) === 0)
-                $idsUser = Manager::whereIn('id', $uniqueIdsGerProd)->lists('iduser');
+                return $this->warningException( 'El rol ' . Auth::user()->type . ' no tiene permisos para crear o derivar al supervisor' , __FUNCTION__ , __LINE__ , __FILE__ );
+        elseif ( $userType == GER_PROD ):
+            $idsGerProd = Marca::whereIn( 'id' , $idsProducto )->lists( 'gerente_id' );
+            $uniqueIdsGerProd = array_unique( $idsGerProd );
+            $repeatIds = array_count_values( $idsGerProd );
+            $maxNumberRepeat = max( $repeatIds );
+            Session::put( 'maxRepeatIdsGerProd' , Manager::whereIn( 'id' , array_keys( $repeatIds , $maxNumberRepeat ) )->lists( 'iduser' ) );
+            $notRegisterGerProdName = Manager::getGerProdNotRegisteredName( $uniqueIdsGerProd );
+        
+            if ( count( $notRegisterGerProdName ) === 0 )
+                $idsUser = Manager::whereIn( 'id' , $uniqueIdsGerProd )->lists( 'iduser' );
             else
-                return $this->warningException('Los siguientes Gerentes de Producto no estan registrados en el sistema: ' . implode(' , ', $notRegisterGerProdName), __FUNCTION__, __LINE__, __FILE__);
-        } else {
-            $user = User::getUserType($userType);
-            if (count($user) === 0)
-                return $this->warningException('No existe el usuario con el Rol de ' . $aprovalPolicy->userType->descripcion . $msg, __FUNCTION__, __LINE__, __FILE__);
+                return $this->warningException( 'Los siguientes Gerentes de Producto no estan registrados en el sistema: ' . implode( ' , ' , $notRegisterGerProdName ) , __FUNCTION__ , __LINE__ , __FILE__ );
+        else:
+            $user = User::getUserType( $userType );
+            if ( count( $user ) === 0 )
+                return $this->warningException( 'No existe el usuario con el Rol de ' . $approvalPolicy->userType->descripcion . $msg , __FUNCTION__ , __LINE__ , __FILE__ );
             else
                 $idsUser = $user;
-        }
-        return $this->setRpta(array('iduser' => $idsUser, 'tipousuario' => $userType));
+        endif;
+        return $this->setRpta( array( 'iduser' => $idsUser , 'tipousuario' => $userType ) );
     }
 
     public function massApprovedSolicitudes()
@@ -669,8 +676,6 @@ class SolicitudeController extends BaseController
         DB::beginTransaction();
         $middleRpta = $this->validateInputAcceptSolRep($inputs);
 
-        \Log::error('1');
-
         if ($middleRpta[status] === ok) {
             $solicitud = Solicitud::find($idSolicitud);
             $middleRpta = $this->verifyPolicy($solicitud, $inputs['monto']);
@@ -709,7 +714,7 @@ class SolicitudeController extends BaseController
                 $solDetalle->save();
 
                 if ($solicitud->id_estado != APROBADO) {
-                    $middleRpta = $this->toUser($solicitud->id_inversion, SolicitudProduct::getSolProducts($inputs['producto']), $solicitud->histories->count() + 1);
+                    $middleRpta = $this->toUser( $solicitud->investment->approvalInstance , SolicitudProduct::getSolProducts( $inputs['producto'] ), $solicitud->histories->count() + 1 );
                     if ($middleRpta[status] != ok)
                         return $middleRpta;
                     else {
@@ -736,10 +741,13 @@ class SolicitudeController extends BaseController
 
     public function acceptedSolicitude()
     {
-        try {
+        try 
+        {
             $inputs = Input::all();
             return $this->acceptedSolicitudTransaction($inputs['idsolicitud'], $inputs);
-        } catch (Exception $e) {
+        } 
+        catch (Exception $e) 
+        {
             return $this->internalException($e, __FUNCTION__);
         }
     }
@@ -757,7 +765,7 @@ class SolicitudeController extends BaseController
                 return $this->warningException('Cancelado - No se puede procesar una solicitud que no ha sido Aprobada', __FUNCTION__, __LINE__, __FILE__);
 
             $oldIdEstado = $solicitud->id_estado;
-            if ($solicitud->detalle->id_motivo == REEMBOLSO) {
+            if ($solicitud->idtiposolicitud == REEMBOLSO) {
                 $solicitud->id_estado = GASTO_HABILITADO;
                 $toUser = $solicitud->id_user_assign;
                 $state = R_GASTO;
@@ -983,7 +991,7 @@ class SolicitudeController extends BaseController
                         }
 
                         //ASIENTO DETRACCION REEMBOLSO
-                        if ($expense->idtipotributo == 2 && $solicitud->id_motivo == REEMBOLSO) 
+                        if ($expense->idtipotributo == 2 && $solicitud->idtiposolicitud == REEMBOLSO) 
                         {
                             $total_percepciones += ($expense->monto - $expense->monto_tributo);
                             $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, CUENTA_DETRACCION_REEMBOLSO, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_BASE, $expense->monto - $expense->monto_tributo, $marca, $description_detraccion_reembolso, '', 'DET');
@@ -1005,7 +1013,7 @@ class SolicitudeController extends BaseController
                         }
 
                         //ASIENTO IMPUESTO A LA RENTA REEMBOLSO
-                        if ($expense->idtipotributo == 1 && $solicitud->id_motivo == REEMBOLSO ) 
+                        if ($expense->idtipotributo == 1 && $solicitud->idtiposolicitud == REEMBOLSO ) 
                         {
                             $total_percepciones += ($expense->monto - $expense->monto_tributo);
                             $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, CUENTA_DETRACCION_REEMBOLSO, '', $fecha_origen, '', '', '',
@@ -1106,21 +1114,21 @@ class SolicitudeController extends BaseController
 
             $solicitud = Solicitud::find($dataInputs['idsolicitud']);
             $oldIdEstado = $solicitud->id_estado;
-            if ($solicitud->detalle->id_motivo == REEMBOLSO)
+            if ($solicitud->idtiposolicitud == REEMBOLSO)
                 $solicitud->id_estado = DEPOSITO_HABILITADO;
             else
                 $solicitud->id_estado = GENERADO;
             $user = Auth::user();
             $solicitud->save();
 
-            if ($solicitud->detalle->id_motivo == REEMBOLSO)
+            if ($solicitud->idtiposolicitud == REEMBOLSO)
                 $middleRpta = $this->setStatus($oldIdEstado, DEPOSITO_HABILITADO, $user->id, USER_TESORERIA, $solicitud->id);
             else
                 $middleRpta = $this->setStatus($oldIdEstado, GENERADO, $user->id, $user->id, $solicitud->id);
 
             if ($middleRpta[status] == ok) {
                 DB::commit();
-                if ($solicitud->detalle->id_motivo == REEMBOLSO)
+                if ($solicitud->idtiposolicitud == REEMBOLSO)
                     Session::put('state', R_REVISADO);
                 else
                     Session::put('state', R_FINALIZADO);
@@ -1322,7 +1330,7 @@ class SolicitudeController extends BaseController
         }
 
 
-        $flujo = DB::table('INVERSION_POLITICA_APROBACION')
+        /*$flujo = DB::table('INVERSION_POLITICA_APROBACION')
             ->join('POLITICA_APROBACION', function ($join) use ($solicitud) {
                 $join->on('INVERSION_POLITICA_APROBACION.ID_POLITICA_APROBACION', '=', 'POLITICA_APROBACION.ID')
                     ->where('INVERSION_POLITICA_APROBACION.ID_INVERSION', '=', $solicitud->id_inversion);
@@ -1330,8 +1338,10 @@ class SolicitudeController extends BaseController
             ->where('POLITICA_APROBACION.DESDE', '<', $solicitud->detalle->monto_actual)
             ->orwhere('POLITICA_APROBACION.DESDE', '=', null)
             ->orderBy('ORDEN', 'ASC')
-            ->get();
+            ->get();*/
 
+        $flujo = $solicitud->investment->approvalInstance->approvalPolicies()->orderBy( 'orden' , 'ASC' )->get();
+        
         $type_user = TypeUser::all();
         foreach ($flujo as $fl) {
 
@@ -1362,7 +1372,9 @@ class SolicitudeController extends BaseController
         }
 //        dd($flujo);
         $linehard = unserialize(TIMELINEHARD);
-        $motivo = $solicitud->detalle->id_motivo;
+        //$motivo = $solicitud->detalle->id_motivo;
+        $motivo = $solicitud->idtiposolicitud;
+
         $line_static = array();
         foreach ($linehard as $line) {
             $cond = false;

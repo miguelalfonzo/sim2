@@ -109,10 +109,10 @@
                 
                 <td class="text-center">
                     @if ( $solicitud->idtiposolicitud == SOL_REP )
-                        @if ( is_null( $solicitud->detalle->reason ) )
+                        @if ( is_null( $solicitud->typeSolicitude ) )
                             -
                         @else    
-                            {{ $solicitud->detalle->reason->nombre }}
+                            {{ $solicitud->typeSolicitude->nombre }}
                         @endif
                     @elseif ( $solicitud->idtiposolicitud == SOL_INST ) 
                         {{ $solicitud->typesolicitude->nombre }}
@@ -122,8 +122,8 @@
                 @if ( Auth::user()->type == GER_COM )
                     <td class="text-center">
                         @if ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) )
-                        && isset( $solicitud->id_inversion ) && $solicitud->aprovalPolicy( $solicitud->histories->count() )->policy->tipo_usuario === Auth::user()->type
-                        && in_array( Auth::user()->id , $solicitud->managerEdit( $solicitud->aprovalPolicy( $solicitud->histories->count() )->policy->tipo_usuario )->lists( 'id_gerprod' ) ) )
+                        && $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario === Auth::user()->type
+                        && in_array( Auth::user()->id , $solicitud->managerEdit( $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario )->lists( 'id_gerprod' ) ) )
                             <input type="checkbox" name="mass-aprov">
                         @else
                             <input type="checkbox" name="mass-aprov" disabled>

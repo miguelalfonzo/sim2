@@ -49,7 +49,7 @@ class Solicitud extends Eloquent
         return $this->hasOne('User','id','id_user_assign');
     }
 
-    protected function toAcceptedApprovedHistories()
+    public function toAcceptedApprovedHistories()
     {
         return $this->hasMany( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->whereIn( 'status_to' , array( ACEPTADO , APROBADO ) );
     }
@@ -165,16 +165,6 @@ class Solicitud extends Eloquent
         return $this->belongsTo( 'User' , 'id_user_assign' );
     }
 
-    protected function rm()
-    {
-        return $this->hasOne('Users\Rm','iduser','created_by')->select('nombres,apellidos,iduser');
-    }
-
-    protected function sup()
-    {
-        return $this->hasOne('Users\Sup','iduser','created_by')->select('nombres,apellidos,iduser,idsup');;
-    }
-
     public function activity()
     {
         return $this->hasOne('Dmkt\Activity','id','id_actividad');
@@ -209,35 +199,7 @@ class Solicitud extends Eloquent
     {
         return $this->hasMany( 'Expense\Entry' , 'id_solicitud' )->where( 'tipo_asiento' , ASIENTO_GASTO_TIPO )->orderBy( 'id' , 'ASC' );
     }
-
-    public function policies()
-    {
-        return $this->hasMany( 'Policy\InvestmentAprovalPolicy' , 'id_inversion' , 'id_inversion' );
-    }
-
-    public function investmentPolicy()
-    {
-        return $this->hasMany( 'Policy\InvestmentAprovalPolicy' , 'id_inversion' , 'id_inversion' )
-            ->leftJoin( 'POLITICA_APROBACION z' , 'z.id' , '=' , 'INVERSION_POLITICA_APROBACION.id_politica_aprobacion')
-            ->orderBy( 'z.orden' , 'ASC' )->select( 'INVERSION_POLITICA_APROBACION.*' );
-    }
-
-    public function aprovalPolicy( $order )
-    {
-        return $this->hasOne( 'Policy\InvestmentAprovalPolicy' , 'id_inversion' , 'id_inversion' )->whereHas( 'policy' , function( $query ) use( $order )
-        {
-            $query->where( 'orden' , $order );
-        })->first();            
-    }
-
-    public function userApprovalPolicy( $userType )
-    {
-        return $this->hasOne( 'Policy\InvestmentAprovalPolicy' , 'id_inversion' , 'id_inversion' )->wherehas( 'policy' , function( $query ) use ( $userType )
-        {
-            $query->where( 'tipo_usuario' , $userType );
-        })->first();
-    }
-
+    
     protected function investment()
     {
         return $this->hasOne( 'Dmkt\InvestmentType' , 'id' , 'id_inversion' );

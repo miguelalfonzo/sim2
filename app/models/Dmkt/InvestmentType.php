@@ -46,4 +46,9 @@ class InvestmentType extends Eloquent
     {
         return $this->hasOne( '\Fondo\Fondo' , 'id' , 'id_fondo_contable' );
     }
+
+    protected function approvalInstance()
+    {
+        return $this->belongsTo( '\Policy\ApprovalInstanceType' , 'id_tipo_instancia_aprobacion' );
+    }
 }

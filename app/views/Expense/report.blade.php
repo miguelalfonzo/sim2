@@ -117,10 +117,9 @@
                                                     <tbody>
                                                         <tr>
                                                             <td style="border-top: 1px solid;">
-                                                                @foreach( $solicitud->toAcceptedApprovedHistories as $acceptedApprovedHistory )
-                                                                    @if( ! is_null( $solicitud->userApprovalPolicy( $acceptedApprovedHistory->user_from ) ) && 
-                                                                         ! ( is_null( $solicitud->userApprovalPolicy( $acceptedApprovedHistory->user_from )->policy->desde ) && 
-                                                                         is_null( $solicitud->userApprovalPolicy( $acceptedApprovedHistory->user_from )->policy->hasta ) ) )
+                                                                @foreach( $solicitud->toAcceptedApprovedHistories()->orderBy( 'updated_at' , 'ASC' )->get() as $acceptedApprovedHistory )
+                                                                    @if( ! is_null( $solicitud->investment->approvalInstance->approvalPolicyType( $acceptedApprovedHistory->user_from ) ) && 
+                                                                         ! ( is_null( $solicitud->investment->approvalInstance->approvalPolicyType( $acceptedApprovedHistory->user_from )->desde ) ) )
                                                                         V°B° {{ $acceptedApprovedHistory->fromUserType->descripcion }}
                                                                     @endif
                                                                 @endforeach
