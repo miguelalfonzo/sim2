@@ -38,11 +38,11 @@ class Personal extends Eloquent
 
     public function rmSup()
     {
-        return $this->belongsTo( '\Users\Personal' , 'referencia_id' , 'bago_id' );
+        return $this->belongsTo( '\Users\Personal' , 'referencia_id' , 'bago_id' )->where('tipo', '=', 'S');
     }
 
-    // public function reps()
-    // {
-    //     return $this->hasMany('Users\Rm','idsup','idsup');
-    // }
+    public function reps()
+    {
+        return $this->hasMany('Users\Personal','referencia_id', 'bago_id')->where('tipo', '=', 'RM');
+    }
 }
