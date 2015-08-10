@@ -7,10 +7,10 @@
         @include( 'Maintenance.table')
     </div>
     <div>
-        @if ( $titulo == 'Mantenimiento de Parametros' || ( isset( $add ) && ! $add ) )
-            <input class="btn btn-primary maintenance-add" type="button" case="{{$type}}" value="Agregar" style="display:none">
+        @if ( $add )
+            <input class="btn btn-primary maintenance-add" type="button" case="{{ $type }}" value="Agregar">
         @else
-            <input class="btn btn-primary maintenance-add" type="button" case="{{$type}}" value="Agregar">
+            <input class="btn btn-primary maintenance-add" type="button" case="{{ $type }}" value="Agregar" style="display:none">
         @endif
     </div>
     <script>

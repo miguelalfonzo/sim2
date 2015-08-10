@@ -3,8 +3,12 @@
 namespace Fondo;
 
 use \Eloquent;
+use Illuminate\Database\Eloquent\SoftDeletingTrait;
 
-class Fondo extends Eloquent {
+class Fondo extends Eloquent
+{
+
+    use SoftDeletingTrait;
 
     protected $table = 'FONDO_CONTABLE';
     protected $primaryKey = 'id';
@@ -23,9 +27,24 @@ class Fondo extends Eloquent {
         	return $lastId->id;
  	}
 
+    public function nextId()
+    {
+        $lastId = Fondo::withTrashed()->orderBy('id','desc')->first();
+        if( is_null( $lastId ) )
+            return 0;
+        else
+            return $lastId->id + 1;
+
+    }
+
     protected static function order()
     {
         return Fondo::orderBy( 'updated_at' , 'desc' )->get();
+    }
+
+    protected static function orderWithTrashed()
+    {
+        return Fondo::orderBy( 'updated_at' , 'DESC' )->withTrashed()->get();
     }
 
     public function bagoAccount()

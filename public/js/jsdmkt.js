@@ -1185,7 +1185,7 @@ $(document).on('click' , '.maintenance-update' , function()
     {
         var td = $(data);
         if ( td.attr('editable') == 1  || td.attr('editable') == 3 || td.attr('editable') == 4 )
-            aData.Data[td[0].classList[0]] = td.children().val()
+            aData.Data[ td.attr( 'data-key') ] = td.children().val()
     });
     $.ajax(
     {

@@ -1,4 +1,4 @@
-<select>
+<select style="width:100%">
 	@foreach( $tipo_cliente as $clientType )
 		@if ( isset( $val ) && $clientType->id == $val )
 			<option value="{{$clientType->id}}" selected style="background-color:#A9E2F3">{{$clientType->descripcion}}</option>

@@ -3,9 +3,13 @@
 namespace Expense;
 
 use \Eloquent;
-use \Log;
+use Illuminate\Database\Eloquent\SoftDeletingTrait;
+
 class MarkProofAccounts extends Eloquent
 {
+
+	use SoftDeletingTrait;
+
     protected $table= 'CUENTA_GASTO_MARCA';
     protected $primaryKey = 'id';
  
@@ -18,10 +22,24 @@ class MarkProofAccounts extends Eloquent
             return $lastId->id;
     }
 
+    public function nextId()
+    {
+		$lastId = MarkProofAccounts::orderBy('id','desc')->first();
+		if( is_null( $lastId ) )
+            return 1;
+        else
+            return $lastId->id + 1;
+    }
+
     protected static function order()
     {
     	return MarkProofAccounts::orderBy( 'updated_at' , 'DESC' )->get();
     }
+
+	protected static function orderWithTrashed()
+    {
+    	return MarkProofAccounts::orderBy( 'updated_at' , 'DESC' )->withTrashed()->get();
+    }    
 
 	protected static function getMarks( $num_cuenta_mkt , $num_cuenta_expense )
 	{

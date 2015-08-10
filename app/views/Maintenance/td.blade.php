@@ -1,4 +1,4 @@
-<select>
+<select style="width:100%">
 	@foreach( $datos as $dato )
 		@if ( isset( $val ) && $dato->$key == $val )
 			<option value="{{$dato->id}}" selected style="background-color:#A9E2F3">{{$dato->$key}}</option>

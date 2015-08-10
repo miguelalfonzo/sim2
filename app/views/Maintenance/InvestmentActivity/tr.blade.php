@@ -1,4 +1,4 @@
-<tr type="inversionactividad">
+<tr type="Inversion_Actividad">
     <td disabled></td>
     <td class="id_inversion text-center" save=1>
         @include('Maintenance.InvestmentActivity.inversion')

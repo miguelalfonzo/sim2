@@ -1,4 +1,4 @@
-<tr type="actividad">
+<tr type="Tipo_Actividad">
     <td disabled></td>
     <td class="nombre text-center" save=1>
         <input type="text" style="width:100%">

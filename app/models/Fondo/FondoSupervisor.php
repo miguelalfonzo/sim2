@@ -3,9 +3,12 @@
 namespace Fondo;
 
 use \Eloquent;
+use Illuminate\Database\Eloquent\SoftDeletingTrait;
 
 class FondoSupervisor extends Eloquent
 {
+
+	use SoftDeletingTrait;
 
 	protected $table      = 'FONDO_SUPERVISOR';
 	protected $primaryKey = 'id';
@@ -29,6 +32,11 @@ class FondoSupervisor extends Eloquent
 	{
 		return FondoSupervisor::orderBy( 'updated_at' , 'desc' )->get();
 	}
+
+	protected static function orderWithTrashed()
+	{
+		return FondoSupervisor::orderBy( 'updated_at' , 'desc' )->withTrashed()->get();
+	}	
 
 	protected function setSaldoAttribute( $value )
 	{

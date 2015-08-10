@@ -1,6 +1,7 @@
 <?php
 
 namespace Dmkt;
+
 use \Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletingTrait;
 
@@ -25,6 +26,10 @@ class Activity extends Eloquent
     	return Activity::orderBy( 'nombre' , 'asc' )->get();
     }
 
+    protected static function orderWithTrashed()
+    {
+        return Activity::orderBy( 'updated_at' , 'desc' )->withTrashed()->get();
+    }
 
     public function investmentActivity()
     {

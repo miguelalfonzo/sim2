@@ -3,9 +3,13 @@
 namespace Fondo;
 
 use \Eloquent;
+use Illuminate\Database\Eloquent\SoftDeletingTrait;
 
 class FondoGerProd extends Eloquent
 {
+
+	use SoftDeletingTrait;
+
 	protected $table      = 'FONDO_GERENTE_PRODUCTO';
 	protected $primaryKey = 'id';
 	protected $fillable   = array('id','fondos_subcategoria_id','marca_id');
@@ -28,6 +32,11 @@ class FondoGerProd extends Eloquent
 	protected static function order()
 	{
 		return FondoGerProd::orderBy( 'updated_at' , 'desc' )->get();
+	}
+
+	protected static function orderWithTrashed()
+	{
+		return FondoGerProd::orderBy( 'updated_at' , 'DESC' )->withTrashed()->get();
 	}
 
 	protected function setSaldoAttribute( $value )

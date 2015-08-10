@@ -4,9 +4,12 @@ namespace Fondo;
 
 use \Eloquent;
 use \DB;
+use Illuminate\Database\Eloquent\SoftDeletingTrait;
 
 class FondoInstitucional extends Eloquent
 {
+
+	use SoftDeletingTrait;
 
 	protected $table      = 'FONDO_INSTITUCION';
 	protected $primaryKey = 'id';
@@ -29,6 +32,11 @@ class FondoInstitucional extends Eloquent
     protected static function order()
 	{
 		return FondoInstitucional::orderBy( 'updated_at' , 'desc' )->get();
+	}
+
+	protected static function orderWithTrashed()
+	{
+		return FondoInstitucional::orderBy( 'updated_at' , 'DESC' )->withTrashed()->get();
 	}
 
 	protected function setSaldoAttribute( $value )
