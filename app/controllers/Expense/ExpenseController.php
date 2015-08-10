@@ -572,7 +572,7 @@ class ExpenseController extends BaseController
 		$cmps         = implode('<br><br> ',$cmps);
 		$zona = null;
 		
-		$created_by = $solicitud->asignedTo->rm->full_name;
+		$created_by = $solicitud->asignedTo->personal->getFullName();
 		$dni = new BagoUser;
 		$dni = $dni->dni($solicitud->asignedTo->username);
 		if ($dni[status] == ok )
@@ -581,21 +581,9 @@ class ExpenseController extends BaseController
 			$dni = '';
 		$expenses = $solicitud->expenses;
 		$aproved_user = User::where( 'id' , $solicitud->approvedHistory->updated_by )->firstOrFail();
-		if( $aproved_user->type == GER_PROD )
-		{
-			$name_aproved = $aproved_user->gerprod->full_name;
-			$charge = "Gerente de Producto";
-		}
-		elseif( $aproved_user->type == SUP )
-		{
-			$name_aproved = $aproved_user->sup->full_name;
-			$charge = "Supervisor";
-		}
-		else
-		{
-			$name_aproved = $aproved_user->person->full_name;
-			$charge = $aproved_user->userType->descripcion;
-		}
+	
+		$name_aproved = $aproved_user->personal->getFullName();
+		$charge = $aproved_user->userType->descripcion;
 
 		if ( $solicitud->detalle->idmoneda == DOLARES )
 		{
