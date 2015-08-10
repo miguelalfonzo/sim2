@@ -78,7 +78,7 @@ const TESORERIA                               = 'T';
 
 
 //TABLAS EXTERNAS
-const TB_DOCTOR                               = 'FICPE.PERSONAFIS';
+// const TB_DOCTOR                               = 'FICPE.PERSONAFIS';
 const TB_INSTITUTE                            = 'FICPEF.PERSONAJUR';
 
 const ASIS_GER                                = 'AG';
@@ -249,7 +249,70 @@ const MANTENIMIENTO_FONDO = 6;
 | TABLAS
 |--------------------------------------------------------------------------
 */
-const TB_USUARIOS     = 'USRP.USERS';
-const TB_TIPO_USUARIO = 'USRP.TIPO_USUARIO';
-const TB_USER_APP     = 'USRP.USER_APP';
-const TB_PERSONAL     = 'USRP.PERSONAL';
+const TB_USUARIOS                      = 'USRP.USERS';
+const TB_TIPO_USUARIO                  = 'USRP.TIPO_USUARIO';
+const TB_USER_APP                      = 'USRP.USER_APP';
+const TB_PERSONAL                      = 'USRP.PERSONAL';
+const TB_USUARIO_BAGO                  = 'D1J.USUARIO';
+const TB_EVENTO_FOTO                   = 'FILE_STORAGE';
+const TB_CLIENTE_TIPO                  = 'TIPO_CLIENTE';
+const TB_DISTRIMED_CLIENTES            = 'VTADIS.CLIENTES';
+const TB_DOCTOR                        = 'FICPE.PERSONAFIS';
+const TB_INSTITUCIONES                 = 'FICPE.PERSONAJUR';
+const TB_FARMACIA                      = 'FICPEF.PERSONAJUR';
+const TB_DEPOSITO                      = 'DEPOSITO';
+const TB_DOCUMENTO                     = 'FILE_STORAGE';
+const TB_ESTADO_SUB                    = 'SUB_ESTADO';
+const TB_ESTADO                        = 'ESTADO';
+const TB_TIPO_MONEDA                   = 'TIPO_MONEDA';
+const TB_TIPO_PAGO                     = 'TIPO_PAGO';
+const TB_CUENTA                        = 'CUENTA';
+const TB_TIPO_ACTIVIDAD                = 'TIPO_ACTIVIDAD';
+const TB_CUENTA_RM                     = 'VAR.BENEFICIARIOS_CTA_BANC';
+const TB_INVERSION_ACTIVIDAD           = 'INVERSION_ACTIVIDAD';
+const TB_TIPO_INVERSION                = 'TIPO_INVERSION';
+const TB_MARCAS_BAGO                   = 'OUTDVP.MARCAS';
+const TB_PERIODO                       = 'PERIODO';
+const TB_MOTIVO                        = 'MOTIVO';
+const TB_SOLICITUD                     = 'SOLICITUD';
+const TB_SOLICITUD_CLIENTE             = 'SOLICITUD_CLIENTE';
+const TB_SOLICITUD_DETALLE             = 'SOLICITUD_DETALLE';
+const TB_SOLICITUD_GERENTE             = 'SOLICITUD_GERENTE';
+const TB_SOLICITUD_PRODUCTO            = 'SOLICITUD_PRODUCTO';
+const TB_SOLICITUD_TIPO                = 'SOLICITUD_TIPO';
+const TB_EVENTO                        = 'EVENT';
+const TB_TIPO_CUENTA                   = 'CUENTA_TIPO';
+const TB_TIPO_DE_CAMBIO                = 'B3O.CXP_TC';
+const TB_ASIENTO                       = 'ASIENTO';
+const TB_GASTO                         = 'GASTO';
+const TB_GASTO_ITEM                    = 'GASTO_ITEM';
+const TB_TIPO_GASTO                    = 'TIPO_GASTO';
+const TB_MARCA                         = 'MARCA';
+const TB_CUENTA_GASTO_MARCA            = 'CUENTA_GASTO_MARCA';
+const TB_PLAN_CUENTA                   = 'B3O.PLANCTA';
+const TB_MARCA_DOCUMENTO               = 'DOCUMENTO';
+const TB_TIPO_COMPROBANTE              = 'TIPO_COMPROBANTE';
+const TB_TIPO_REGIMEN                  = 'TIPO_REGIMEN';
+const TB_VTA_TABLAS                    = 'VTA.TABLAS';
+const TB_FONDO_CONTABLE                = 'FONDO_CONTABLE';
+const TB_FONDO_CATEGORIA               = 'FONDO_CATEGORIA';
+const TB_FONDO_GERENTE_PRODUCTO        = 'FONDO_GERENTE_PRODUCTO';
+const TB_FONDO_INSTITUCION             = 'FONDO_INSTITUCION';
+const TB_FONDO_CATEGORIA_SUB           = 'FONDO_SUBCATEGORIA';
+const TB_FONDO_SUPERVISOR              = 'FONDO_SUPERVISOR';
+const TB_MANTENIMIENTO                 = 'MANTENIMIENTO';
+const TB_PARAMETRO                     = 'PARAMETRO';
+const TB_POLITICA_APROBACION           = 'POLITICA_APROBACION';
+const TB_INVERSION_POLITICA_APROBACION = 'INVERSION_POLITICA_APROBACION';
+const TB_REPORTE_QUERY                 = 'REPORTE_QUERY';
+const TB_REPORTE_FORMULA               = 'REPORTE_FORMULA';
+const TB_REPORTE_USUARIO               = 'REPORTE_USUARIO';
+const TB_FONDO_CONTABLE_HISTORIAL      = 'FONDO_CONTABLE_HISTORIA';
+const TB_FONDO_MARKETING_HISTORIAL     = 'FONDO_MARKETING_HISTORIA';
+const TB_SOLICITUD_HISTORIAL           = 'SOLICITUD_HISTORIAL';
+const TB_FLUJO_TIEMPO_ESTIMADO         = 'TIEMPO_ESTIMADO_FLUJO';
+const TB_LINSUPVIS                     = 'FICPE.LINSUPVIS';
+const TB_SUPERVISOR                    = 'FICPE.SUPERVISOR';
+const TB_USER_TEMPORAL                 = 'USER_TEMPORAL';
+const TB_VISITADOR                     = 'FICPE.VISITADOR';
+
