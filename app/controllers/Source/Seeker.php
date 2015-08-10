@@ -3,6 +3,7 @@
 namespace Source;
 
 use Dmkt\Solicitud;
+use Users\Personal;
 use Users\Rm;
 use Dmkt\Account;
 use \BaseController;
@@ -20,8 +21,8 @@ use \Dmkt\InvestmentType;
 use \Client\ClientType;
 use \Exception;
 
-class Seeker extends BaseController 
-{	
+class Seeker extends BaseController
+{
 
 	public function institutionSource()
 	{
@@ -103,7 +104,7 @@ class Seeker extends BaseController
 		{
 			$inputs = Input::all();
 			$json = '[{"name":"'.TB_SOLICITUD.'","wheres":{"likes":["VISLEGAJO","(VISNOMBRE || \' \' || VISPATERNO || \' \' || VISMATERNO)"],"equal":{"VISACTIVO":"S","LENGTH(VISLEGAJO)":8}},"selects":["VISVISITADOR","(VISNOMBRE || \' \' || VISPATERNO || \' \' || VISMATERNO)" , "\'REP\'" ]}]';
-			$cAlias = array('value','label' , 'type' );	
+			$cAlias = array('value','label' , 'type' );
 			return $this->searchSeeker( $inputs['sVal'] , $json , $cAlias );
 		}
 		catch (Exception $e)
@@ -115,11 +116,37 @@ class Seeker extends BaseController
 	public function userSource()
 	{
 		$inputs = Input::all();
-		$json = '[{ "name": "OUTDVP.DMKT_RG_SUPERVISOR" , "wheres":{ "likes": ["( NOMBRES || \' \' || APELLIDOS )" ] , "notnull": ["IDUSER"] } , "selects" : [ "IDUSER" , "( NOMBRES || \' \' || APELLIDOS )" , "\'SUPERVISOR\'" ] } , ' . 
-				'{ "name" : "OUTDVP.GERENTES" , "wheres":{ "likes": ["DESCRIPCION"] , "notnull" : [ "IDUSER" ] } , "selects" : [ "IDUSER" , "DESCRIPCION" , "\'G. PRODUCTO\'"] } , ' .
-				'{ "name" : "OUTDVP.PERSONAS a" , "joins":{ "innerjoin":[ "outdvp.users b" , "a.iduser" , "=" , "b.id" ] } , "wheres":{ "likes": [ "( a.NOMBRES || \' \' || a.APELLIDOS )" ] , "notnull" : [ "a.IDUSER" ] , "in":{ "b.TYPE":[ "GP" , "G" ] } } , "selects" : [ "a.IDUSER" , "( a.NOMBRES || \' \' || a.APELLIDOS )" , "CASE WHEN b.type = \'GP\' THEN \'G. PROMOCION\' WHEN b.type = \'G\' THEN \'G. COMERCIAL\' END" ] }]';
-		$cAlias = array( 'value' , 'label' , "type" );
-		return $this->searchSeeker( $inputs['sVal'] , $json , $cAlias , 2 );			
+
+        $personal = Personal::select(DB::raw('(NOMBRES || \' \' || APELLIDOS) as label, USER_ID as value, TIPO as type'))
+                    ->whereRaw("NOMBRES || ' ' || APELLIDOS like UPPER('%".$inputs['sVal']."%')")
+//                    ->whereRaw("NOMBRES || ' ' || APELLIDOS like UPPER('%mel%')")
+                    ->orderBy('label')
+                    ->get();
+//        dd($personal);4
+        $rpta = array();
+        foreach( $personal as $array )
+            $rpta[] = $array;
+        return $this->setRpta( $rpta );
+//        $json  = "";
+//		$json = '[{ "name": "OUTDVP.DMKT_RG_SUPERVISOR" , "wheres":{ "likes": ["( NOMBRES || \' \' || APELLIDOS )" ] ,
+//		 "notnull": ["IDUSER"] } , "selects" : [ "IDUSER" , "( NOMBRES || \' \' || APELLIDOS )" , "\'SUPERVISOR\'" ] } , ' .
+//				'{ "name" : "OUTDVP.GERENTES" , "wheres":{ "likes": ["DESCRIPCION"] , "notnull" : [ "IDUSER" ] } ,
+//				 "selects" : [ "IDUSER" , "DESCRIPCION" , "\'G. PRODUCTO\'"] } , ' .
+//				'{ "name" : "OUTDVP.PERSONAS a" , "joins":{ "innerjoin":[ "outdvp.users b" , "a.iduser" , "=" , "b.id" ] } ,
+//				 "wheres":{ "likes": [ "( a.NOMBRES || \' \' || a.APELLIDOS )" ] , "notnull" : [ "a.IDUSER" ] ,
+//				  "in":{ "b.TYPE":[ "GP" , "G" ] } } , "selects" : [ "a.IDUSER" , "( a.NOMBRES || \' \' || a.APELLIDOS )" ,
+//				  "CASE WHEN b.type = \'GP\' THEN \'G. PROMOCION\' WHEN b.type = \'G\' THEN \'G. COMERCIAL\' END" ] }]';
+		$cAlias = array( 'value' , 'label' , "type" );	$json = '[{ "name": "OUTDVP.DMKT_RG_SUPERVISOR" , "wheres":{ "likes": ["( NOMBRES || \' \' || APELLIDOS )" ] ,
+		 "notnull": ["IDUSER"] } , "selects" : [ "IDUSER" , "( NOMBRES || \' \' || APELLIDOS )" , "\'SUPERVISOR\'" ] } , ' .
+				'{ "name" : "OUTDVP.GERENTES" , "wheres":{ "likes": ["DESCRIPCION"] , "notnull" : [ "IDUSER" ] } ,
+				 "selects" : [ "IDUSER" , "DESCRIPCION" , "\'G. PRODUCTO\'"] } , ' .
+				'{ "name" : "OUTDVP.PERSONAS a" , "joins":{ "innerjoin":[ "outdvp.users b" , "a.iduser" , "=" , "b.id" ] } ,
+				 "wheres":{ "likes": [ "( a.NOMBRES || \' \' || a.APELLIDOS )" ] , "notnull" : [ "a.IDUSER" ] ,
+				  "in":{ "b.TYPE":[ "GP" , "G" ] } } , "selects" : [ "a.IDUSER" , "( a.NOMBRES || \' \' || a.APELLIDOS )" ,
+				  "CASE WHEN b.type = \'GP\' THEN \'G. PROMOCION\' WHEN b.type = \'G\' THEN \'G. COMERCIAL\' END" ] }]';
+//		$cAlias = array( 'value' , 'label' , "type" );
+//		return $this->searchSeeker( $inputs['sVal'] , $json , $cAlias , 2 );
+//		return $this->searchSeeker( 'users', $json , $cAlias , 2 );
 	}
 
     private function searchSeeker( $inputs , $json , $cAlias , $type = 1 )
@@ -150,7 +177,7 @@ class Seeker extends BaseController
 		    			if ( $key == 'likes' )
 		    			{
 		    				foreach ( $where as $key => $like )
-		    					$query->orWhereRaw(" UPPER(" .$like. ") like '%" .strtoupper( $inputs ). "%' ");
+                                    $query->orWhereRaw(" UPPER(" .$like. ") like '%" .strtoupper( $inputs ). "%' ");
 		    			}
 		    			else if ( $key == 'equal' )
 		    			{
@@ -169,7 +196,7 @@ class Seeker extends BaseController
 		    			}
 		    		}
 		    		for ( $i=0 ; $i< count( $cAlias ) ; $i++ )
-		    			$select = $select. ' ' .$table->selects[$i]. ' as "' .$cAlias[$i]. '",';			
+		    			$select = $select. ' ' .$table->selects[$i]. ' as "' .$cAlias[$i]. '",';
 		    		$select = substr($select,0,-1);
 		    		$query->select( DB::raw( $select ) );
 		    		$query->take( 50 );
@@ -193,11 +220,11 @@ class Seeker extends BaseController
 		    	return $this->warningException( 'Json: Formato Incorrecto' , __FUNCTION__ , __LINE__ , __FILE__ );
 	    }
 	    else
-	    	return $this->warningException( 'Input Vacio (Post: "Json" Vacio)' , __FUNCTION__ , __LINE__ , __FILE__ );   
+	    	return $this->warningException( 'Input Vacio (Post: "Json" Vacio)' , __FUNCTION__ , __LINE__ , __FILE__ );
 	}
 
 	private function filterUserType( $var )
-	{	
+	{
 		//return true;
 		if ( \Auth::user()->type == SUP )
 			return ( $var->type == 'SUPERVISOR' || $var->type == 'G. PROMOCION' );
@@ -216,7 +243,7 @@ class Seeker extends BaseController
 	    	$inputs = Input::all();
 	    	$rules = array(	'id_tipo_cliente' => 'required|min:1|in:'.implode( ',' , ClientType::lists('id') ) );
 	    	$validator = Validator::make( $inputs[ 'data' ] , $rules );
-            if ($validator->fails()) 
+            if ($validator->fails())
                 return $this->warningException( substr($this->msgValidator($validator) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
             else
             {
@@ -224,11 +251,11 @@ class Seeker extends BaseController
 
 				$act = Activity::where('tipo_cliente' , $tipo_cliente )->lists('id');
 				$inv = InvestmentActivity::whereIn( 'id_actividad' , $act )->lists( 'id_inversion');
-        		
-        		return $this->setRpta( array( 
-        			'View' => View::make( 'Seeker.client' )->with( $inputs[ 'data' ] )->render() , 
+
+        		return $this->setRpta( array(
+        			'View' => View::make( 'Seeker.client' )->with( $inputs[ 'data' ] )->render() ,
         			'id_actividad' => $act ,
-        			'id_inversion' => $inv 
+        			'id_inversion' => $inv
         		));
             }
         }
