@@ -3,25 +3,8 @@
         <label class="control-label"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Aprobado por</label>
         <div>
             <div class="input-group">
-                <span class="input-group-addon">
-                    {{ $solicitud->approvedHistory->user->type }}
-                </span>  
-                @if ( $solicitud->approvedHistory->user->type == SUP )
-                    <input type="text" class="form-control input-md"  readonly
-                    value="{{$solicitud->approvedHistory->user->sup->full_name}}">
-                @elseif( $solicitud->approvedHistory->user->type == GER_PROD )
-                    <input type="text" class="form-control input-md"  readonly
-                    value="{{$solicitud->approvedHistory->user->gerProd->full_name}}">
-                @elseif( $solicitud->approvedHistory->user->type == REP_MED )
-                    <input type="text" class="form-control input-md"  readonly
-                    value="{{$solicitud->approvedHistory->user->rm->full_name}}">
-                @elseif( ! is_null( $solicitud->approvedHistory->user->simApp ) )
-                    <input type="text" class="form-control input-md"  readonly
-                    value="{{$solicitud->approvedHistory->user->person->full_name}}">                
-                @else
-                    <input type="text" class="form-control input-md"
-                    value="No Registrado" readonly>
-                @endif
+                <span class="input-group-addon">{{ $solicitud->approvedHistory->user->type }}</span>  
+                <input type="text" class="form-control input-md"  readonly value="{{ $solicitud->approvedHistory->user->personal->getFullName() }}">
             </div>
         </div>
     </div>
