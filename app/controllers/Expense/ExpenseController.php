@@ -360,9 +360,9 @@ class ExpenseController extends BaseController
 			$balance    	= $monto_aprobado - $totalGasto;
 
 			$tc = ChangeRate::getTc();
-			if ( $solicitd->detalle->id_moneda == SOLES )
+			if ( $solicitud->detalle->id_moneda == SOLES )
 				$tasa = 1;
-			elseif ( $solicitd->detalle->id_moneda == DOLARES )
+			elseif ( $solicitud->detalle->id_moneda == DOLARES )
 				$tasa = $tc->compra;
 
 			$balance = $balance * $tasa;

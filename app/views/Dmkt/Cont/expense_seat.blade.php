@@ -40,22 +40,8 @@
 					<div class="form-expense">
 						<label>Nombre del Solicitante</label>
 						<div class="input-group">
-	                        @if($solicitud->createdBy->type == 'R')
-	                        <span class="input-group-addon">R</span>
-	                        <input id="textinput" name="titulo" type="text" placeholder=""
-	                               value="{{mb_convert_case($solicitud->createdBy->rm->nombres.' '.$solicitud->createdBy->rm->apellidos,MB_CASE_TITLE,'UTF-8')}}" disabled
-	                               class="form-control">
-	                        @elseif ( $solicitud->createdBy->type == SUP )
-	                        <span class="input-group-addon">S</span>
-	                        <input id="textinput" name="titulo" type="text" placeholder=""
-	                               value="{{$solicitud->createdBy->sup->full_name}}" disabled
-	                               class="form-control">
-	                        @else
-	                        	<span class="input-group-addon">AG</span>
-		                        <input id="textinput" name="titulo" type="text" placeholder=""
-	                            value="{{$solicitud->createdBy->person->full_name}}" disabled
-	                            class="form-control">
-	                        @endif
+	            			<span class="input-group-addon">{{ $solicitud->createdBy->type }}</span>
+	                        <input id="textinput" name="titulo" type="text" placeholder="" value="{{ $solicitud->createdBy->personal->getFullName() }}" class="form-control" disabled>
 	                    </div>							
 					</div>
 				</div>
@@ -64,23 +50,12 @@
 						<label>Autorizado por</label>
 						<div class="input-group">
 							@if ( $solicitud->createdBy->type == ASIS_GER )
-		                        <span class="input-group-addon">AG</span>
+		                        <span class="input-group-addon">{{ $solicitud->createdBy->type }}</span>
+		                        <input id="textinput" name="titulo" type="text" placeholder="" value="{{ $solicitud->createdBy->personal->getFullName() }}" class="form-control" disabled>   
+	                        @else
+		                        <span class="input-group-addon">{{ $solicitud->approvedHistory->user->type }}</span>
 		                        <input id="textinput" name="titulo" type="text" placeholder=""
-		                        value="{{$solicitud->createdBy->person->full_name}}" disabled class="form-control">   
-	                        @elseif( $solicitud->approvedHistory->user->type == SUP )
-		                        <span class="input-group-addon">S</span>
-		                        <input id="textinput" name="titulo" type="text" placeholder=""
-	                            value="{{ $solicitud->approvedHistory->updatedBy->sup->full_name}}" disabled
-	                            class="form-control">
-	                        @elseif( $solicitud->approvedHistory->user->type == GER_PROD )
-		                        <span class="input-group-addon">G</span>
-		                        <input id="textinput" name="titulo" type="text" placeholder=""
-		                        value="{{ $solicitud->approvedHistory->updatedBy->gerprod->full_name }}" disabled class="form-control">
-	                        @elseif( ! is_null( $solicitud->approvedHistory->user->simApp ) )
-		                        <span class="input-group-addon">G</span>
-		                        <input id="textinput" name="titulo" type="text" placeholder=""
-		                        value="{{ $solicitud->approvedHistory->updatedBy->person->full_name }}" disabled class="form-control">
-	                        
+	                            value="{{ $solicitud->approvedHistory->updatedBy->personal->getFullName() }}" class="form-control" disabled>
 	                        @endif
 	                    </div>							
 					</div>

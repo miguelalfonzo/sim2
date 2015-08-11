@@ -1481,7 +1481,7 @@ class SolicitudeController extends BaseController
                 $fileName = pathinfo($fileItem->getClientOriginalName(), PATHINFO_FILENAME);
                 $fileExt = pathinfo($fileItem->getClientOriginalName(), PATHINFO_EXTENSION);
                 $fileNameMD5 = md5(uniqid(rand(), true));
-                $fileStorage = new FileStorage;
+                $fileStorage = new FotoEventos;
                 $fileStorage->id = $fileNameMD5;
                 $fileStorage->name = pathinfo($fileItem->getClientOriginalName(), PATHINFO_FILENAME);
                 $fileStorage->extension = $fileExt;
