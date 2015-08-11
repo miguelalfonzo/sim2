@@ -149,9 +149,9 @@ class FondoMkt extends BaseController
         $oldSaldo     = $subFondo->saldo;
         $oldSaldoNeto = $subFondo->saldo_neto;
         if ( $reason == FONDO_LIBERACION )
-            $subFondo->saldo_neto += round( $monto * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN );
+            $subFondo->saldo_neto += $monto * $tasaCompra ;
         elseif ( $reason == FONDO_RETENCION )
-            $subFondo->saldo_neto -= round( $monto * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN );
+            $subFondo->saldo_neto -= $monto * $tasaCompra ;
             
         $subFondo->save();
         $historyFondoMkt[] = array( 

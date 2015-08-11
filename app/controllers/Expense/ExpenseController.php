@@ -153,7 +153,7 @@ class ExpenseController extends BaseController
 					$expense_detail->cantidad = $inputs['quantity'][$i];
 					$expense_detail->descripcion = $inputs['description'][$i];
 					$expense_detail->tipo_gasto = $inputs['tipo_gasto'][$i];
-					$expense_detail->importe = round( $inputs['total_item'][$i] / $pIGV , 2 , PHP_ROUND_HALF_DOWN ) ;
+					$expense_detail->importe = $inputs['total_item'][$i] / $pIGV ;
 					$expense_detail->save();				
 				}
 				DB::commit();
@@ -264,8 +264,8 @@ class ExpenseController extends BaseController
 		    	$monto_renovado_final = ( $monto_renovado / $monto_aprobado ) * $solicitudProduct->monto_asignado;
 		    	$monto_renovado_final = $monto_renovado_final * $tasaCompra;
 		    	
-		    	$fondo->saldo 		+= round( $monto_renovado_final , 2 , PHP_ROUND_HALF_DOWN );
-		    	$fondo->saldo_neto  += round( $monto_renovado_final , 2 , PHP_ROUND_HALF_DOWN );
+		    	$fondo->saldo 		+= $monto_renovado_final ;
+		    	$fondo->saldo_neto  += $monto_renovado_final ;
 		    	$fondo->save();
 		    	$fondoDataHistories[] = array( 'idFondo' => $fondo->id , 'idFondoTipo' => $fondo_type ,
                                                'oldSaldo' => $oldSaldo , 'oldSaldoNeto' => $oldSaldoNeto , 

@@ -22,4 +22,9 @@ class ExpenseItem extends Eloquent{
     {
 		return $this->hasOne('ExpenseType','idtipogasto','tipo_gasto');
 	}
+
+    protected function setImporteAttribute( $value )
+    {
+        $this->attributes[ 'importe' ] = round( $value , 2 , PHP_ROUND_HALF_DOWN );
+    }
 }

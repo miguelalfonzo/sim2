@@ -97,4 +97,9 @@ class SolicitudProduct extends Eloquent
     {
         return $this->hasOne( 'User' , 'id' , 'id_fondo_user');
     }
+
+    protected function setMontoAsignadoAttribute( $value )
+    {
+        $this->attributes[ 'monto_asignado' ] = round( $value , 2 , PHP_ROUND_HALF_DOWN );
+    }
 }

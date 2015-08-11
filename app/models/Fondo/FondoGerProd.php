@@ -49,4 +49,9 @@ class FondoGerProd extends Eloquent
 		$this->attributes[ 'saldo_neto' ] = round( $value , 2 , PHP_ROUND_HALF_DOWN );
 	}
 
+	protected function getFullNameAttribute()
+	{
+		return $this->SubCategoria->descripcion . ' | ' . $this->marca->descripcion;
+	}
+
 }

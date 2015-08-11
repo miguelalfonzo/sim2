@@ -101,7 +101,7 @@ class DepositController extends BaseController
                     $newDeposit->id                 = $newDeposit->lastId() + 1;
                     $newDeposit->num_transferencia  = $inputs['op_number'];
                     $newDeposit->num_cuenta         = $inputs['num_cuenta'];
-                    $newDeposit->total              = round( $middleRpta[data]['monto'] , 2 , PHP_ROUND_HALF_DOWN );
+                    $newDeposit->total              = $middleRpta[data]['monto'];
                     $newDeposit->save();
 
                     $detalle->id_deposito = $newDeposit->id;
@@ -258,8 +258,8 @@ class DepositController extends BaseController
                 $monto_renovado_final = ( $monto_renovado * $solicitudProduct->monto_asignado ) / $monto_aprobado;
                 $monto_renovado_final = $monto_renovado_final * $tasaCompra;
                 
-                $fondo->saldo       += round( $monto_renovado_final , 2 , PHP_ROUND_HALF_DOWN );
-                $fondo->saldo_neto  += round( $monto_renovado_final , 2 , PHP_ROUND_HALF_DOWN );
+                $fondo->saldo       += $monto_renovado_final ;
+                $fondo->saldo_neto  += $monto_renovado_final ;
                 $fondo->save();
                 $fondoDataHistories[] = array( 'idFondo' => $fondo->id , 'idFondoTipo' => $fondo_type ,
                                                'oldSaldo' => $oldSaldo , 'oldSaldoNeto' => $oldSaldoNeto , 
@@ -271,8 +271,8 @@ class DepositController extends BaseController
             $fondo = $solicitud->detalle->thisSubFondo;
             $oldSaldo = $fondo->saldo;
             $oldSaldoNeto = $fondo->saldo_neto;
-            $fondo->saldo       += round( $monto_renovado , 2 , PHP_ROUND_HALF_DOWN );
-            $fondo->saldo_neto  += round( $monto_renovado , 2 , PHP_ROUND_HALF_DOWN );
+            $fondo->saldo       += $monto_renovado ;
+            $fondo->saldo_neto  += $monto_renovado ;
             $fondo->save();
             $fondoDataHistories[] = array( 'idFondo' => $fondo->id , 'idFondoTipo' => INVERSION_INSTITUCIONAL ,
                                            'oldSaldo' => $oldSaldo , 'oldSaldoNeto' => $oldSaldoNeto , 

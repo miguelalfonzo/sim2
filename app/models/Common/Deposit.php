@@ -44,4 +44,9 @@ class Deposit extends Eloquent{
 	{
 		return $this->hasOne( 'User' , 'id' , 'created_by');
 	}
+
+	protected function setTotalAttribute( $value )
+	{
+		$this->attributes[ 'total' ] = round( $value , 2 , PHP_ROUND_HALF_DOWN );
+	}
 }

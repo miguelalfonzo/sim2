@@ -291,7 +291,7 @@ class SolicitudeController extends BaseController
         return $this->setRpta($idsGerProd);
     }
 
-    private function setProductsAmount($solProductIds, $amount, $fondo, $detalle)
+    private function setProductsAmount( $solProductIds, $amount, $fondo, $detalle )
     {
         $fondoMktController = new FondoMkt;
         $fondos = array();
@@ -307,8 +307,7 @@ class SolicitudeController extends BaseController
             $old_cod_user_type = $solProduct->id_tipo_fondo_marketing;
             $old_ammount = $solProduct->monto_asignado;
 
-            $montoAsignado = round($amount[$key], 2, PHP_ROUND_HALF_DOWN);
-            $solProduct->monto_asignado = $montoAsignado;
+            $solProduct->monto_asignado = $amount[$key];
 
             $middleRpta = $fondoMktController->setFondo($fondo[$key], $solProduct, $detalle, $tc, $userTypes, $fondos);
             if ($middleRpta[status] != ok)
@@ -702,11 +701,7 @@ class SolicitudeController extends BaseController
                 else if ($solicitud->id_estado == APROBADO) ;
                 $detalle->monto_aprobado = $monto;
 
-                \Log::error('2');
-
                 $middleRpta = $this->setProductsAmount($inputs['producto'], $inputs['monto_producto'], $inputs['fondo_producto'], $solDetalle);
-                \Log::error(json_encode($middleRpta));
-                \Log::error('3');
 
                 if ($middleRpta[status] != ok):
                     DB::rollback();
