@@ -31,8 +31,6 @@ class FondoMktHistory extends Eloquent
 
     protected function fromFund()
     {
-        \Log::error( $this->id_tipo_to_fondo );
-        \Log::error( $this->id_to_fondo );
         if ( $this->id_tipo_to_fondo == 'I' )
             return $this->belongsTo( '\Fondo\FondoInstitucional' , 'id_from_fondo' );
         elseif ( $this->id_tipo_to_fondo == GER_PROD )
@@ -43,14 +41,21 @@ class FondoMktHistory extends Eloquent
 
     protected function toFund()
     {
-
-        \Log::error( $this->id_tipo_to_fondo );
-        \Log::error( $this->id_to_fondo );
         if ( $this->id_tipo_to_fondo == 'I' )
             return $this->belongsTo( '\Fondo\FondoInstitucional' , 'id_to_fondo' );
         elseif ( $this->id_tipo_to_fondo == GER_PROD )
             return $this->belongsTo( '\Fondo\FondoGerProd' , 'id_to_fondo' );
         elseif ( $this->id_tipo_to_fondo == SUP )
             return $this->belongsTo( '\Fondo\FondoSupervisor' , 'id_to_fondo' );
+    }
+
+    protected function updatedBy()
+    {
+        return $this->belongsTo( 'User' , 'updated_by' );
+    }
+
+    protected function fondoMktHistoryReason()
+    {
+        return $this->belongsTo( '\Fondo\fondoMktHistoryReason' , 'id_fondo_history_reason' );
     }
 }

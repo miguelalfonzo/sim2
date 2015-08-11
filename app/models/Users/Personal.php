@@ -30,6 +30,11 @@ class Personal extends Eloquent
         return $name;
     }
 
+    public function getFullNameAttribute()
+    {
+        return ucwords( strtolower( $this->nombres . ' ' . $this->apellidos ) );
+    }
+
     // idkc : RETORNA MODELO DE SUPERVISOR
     protected function getSup( $user_id )
     {

@@ -152,23 +152,40 @@ class TableController extends BaseController
 		);
 	}
 
+	private function updateFondoMkt( $inputs )
+	{
+		DB::beginTransaction();
+		$middleRpta = $this->updateGeneric( $inputs );
+		$data   = $middleRpta[ data ];
+		$middleRpta = $this->validateFondoSaldoNeto( $data[ 'newRecord' ] );
+		if ( $middleRpta[ status ] == ok ):
+			$this->setFondoMktHistory( $data , $inputs[ 'type' ] );
+			DB::commit();
+		else:
+			DB::rollback();
+		endif;
+		return $middleRpta;
+	}
+
 	public function updateMaintenanceData()
 	{
 		try
 		{
 			$inputs = Input::all();
 			switch( $inputs[ 'type' ] ):
-				case 'fondo':
-					return $this->updateFondo( $inputs );
-				case 'cuentasMarca':
-					return $this->updateCuentasMarca( $inputs );
-				case 'fondo-cuenta':
-					return $this->updateFondo( $inputs);
+				case 'Fondo_Gerente_Producto':
+					return $this->updateFondoMkt( $inputs );
+				case 'Fondo_Institucion':
+					return $this->updateFondoMkt( $inputs );
+				case 'Fondo_Supervisor':
+					return $this->updateFondoMkt( $inputs );
 			endswitch;
-			return $this->updateGeneric( $inputs );
+			$this->updateGeneric( $inputs );
+			return $this->setRpta();
 		}
 		catch ( Exception $e )
 		{
+			DB::rollback();
 			return $this->internalException( $e , __FUNCTION__ );
 		}
 	}
@@ -177,11 +194,107 @@ class TableController extends BaseController
 	{
 		$model  = $this->getModel( $val[ 'type' ] )[ 'model' ];
 		$record = $model::withTrashed()->find( $val['id'] );
+		$oldRecord = json_decode( $record->toJson() );
 		foreach ( $val[data] as $key => $data )
 			$record->$key = $data ;
 		$record->save();
-		return $this->setRpta();
+		return $this->setRpta( array( 'oldRecord' => $oldRecord , 'newRecord' => $record ) );
 	}
+
+	private function validateFondoSaldoNeto( $fondo )
+	{
+		if ( $fondo->saldo < $fondo->saldo_neto )
+			return $this->warningException( 'No puede asignar un saldo menor al saldo reservado por las solicitudes' , __FUNCTION__ , __LINE__ , __FILE__ );
+		else
+			return $this->setRpta();
+	}
+
+	private function setFondoMktHistory( $fondos , $type )
+	{
+		$fondoMktHistory                          = new FondoMktHistory;
+		$fondoMktHistory->id                      = $fondoMktHistory->nextId();
+		$fondoMktHistory->id_to_fondo             = $fondos[ 'newRecord' ]->id ;
+		$fondoMktHistory->to_old_saldo            = $fondos[ 'oldRecord' ]->saldo;
+		$fondoMktHistory->to_new_saldo            = $fondos[ 'newRecord' ]->saldo;
+		$fondoMktHistory->to_old_saldo_neto       = $fondos[ 'oldRecord' ]->saldo_neto;
+		$fondoMktHistory->to_new_saldo_neto       = $fondos[ 'newRecord' ]->saldo_neto;
+		$fondoMktHistory->id_fondo_history_reason = FONDO_AJUSTE;
+		$fondoMktHistory->id_tipo_to_fondo        = $this->getFondoType( $type );
+		$fondoMktHistory->save();
+	}
+
+	private function getFondoType( $type )
+	{
+		if ( $type == 'Fondo_Supervisor' )
+			return SUP;
+		elseif ( $type == 'Fondo_Gerente_Producto' )
+			return GER_PROD;
+		elseif( $type == 'Fondo_Institucion' )
+			return 'I';
+	}
+
+	private function updateFondosSupervisor( $val )
+	{
+		$fondoSup = FondoSupervisor::find( $val[ 'id' ] );
+		$oldSaldo = $fondoSup->saldo;
+		
+		foreach( $val[ data ] as $key => $data )
+			$fondoSup->$key = $data;
+		
+		$middleRpta = $this->validateFondoSaldoNeto( $fondoSup );
+		
+	}
+
+	private function updateFondosGerProd( $val )
+	{
+		$fondoGerProd = FondoGerProd::find( $val[ 'id' ] );
+		$oldSaldo = $fondoGerProd->saldo;
+		
+		foreach( $val[ data ] as $key => $data )
+			$fondoGerProd->$key = $data;
+		
+		$middleRpta = $this->validateFondoSaldoNeto( $fondoSup );
+		if ( $middleRpta[ status ] == ok )
+		{
+			$fondoGerProd->save();	
+			$fondoMktHistory = new FondoMktHistory;
+			$fondoMktHistory->id = $fondoMktHistory->nextId();
+			$fondoMktHistory->id_to_fondo = $val[ 'id' ];
+			$fondoMktHistory->to_old_saldo = $oldSaldo;
+			$fondoMktHistory->to_new_saldo = $fondoGerProd->saldo;
+			$fondoMktHistory->id_fondo_history_reason = FONDO_AJUSTE; 
+			$fondoMktHistory->id_tipo_to_fondo = GER_PROD;
+			$fondoMktHistory->save();
+			return $this->setRpta();
+		}
+		return $middleRpta;
+	}
+
+	private function updateFondosInstitution( $val )
+	{
+		$fondoInstitution = FondoInstitucional::find( $val[ 'id' ] );
+		$oldSaldo = $fondoInstitution->saldo;		
+		
+		foreach( $val[ data ] as $key => $data )
+			$fondoInstitution->$key = $data;
+		
+		$middleRpta = $this->validateFondoSaldoNeto( $fondoSup );
+		if ( $middleRpta[ status ] == ok )
+		{
+			$fondoInstitution->save();
+			$fondoMktHistory = new FondoMktHistory;
+			$fondoMktHistory->id = $fondoMktHistory->nextId();
+			$fondoMktHistory->id_to_fondo = $val[ 'id' ];
+			$fondoMktHistory->to_old_saldo = $oldSaldo;
+			$fondoMktHistory->to_new_saldo = $fondoInstitution->saldo;
+			$fondoMktHistory->id_fondo_history_reason = FONDO_AJUSTE; 
+			$fondoMktHistory->id_tipo_to_fondo = FONDO_SUBCATEGORIA_INSTITUCION;
+			$fondoMktHistory->save();
+			return $this->setRpta();
+		}
+		return $middleRpta;
+	}
+
 
 	private function saveMaintenance( $inputs )
 	{
@@ -247,89 +360,6 @@ class TableController extends BaseController
 		$columns = Maintenance::find(1);
 		$columns = json_decode( $columns->formula );
 		return $this->setRpta( View::make( 'Maintenance.table' )->with( array( 'records' => $records , 'columns' => $columns , 'type' => 'cuentasMarca' ) )->render() );
-	}
-
-	private function validateFondoSaldoNeto( $fondo )
-	{
-		if ( $fondo->saldo < $fondo->saldo_neto )
-			return $this->warningException( 'No puede asignar un saldo menor al saldo reservado por las solicitudes' , __FUNCTION__ , __LINE__ , __FILE__ );
-		else
-			return $this->setRpta();
-	}
-
-	private function updateFondosSupervisor( $val )
-	{
-		$fondoSup = FondoSupervisor::find( $val[ 'id' ] );
-		$oldSaldo = $fondoSup->saldo;
-		
-		foreach( $val[ data ] as $key => $data )
-			$fondoSup->$key = $data;
-		
-		$middleRpta = $this->validateFondoSaldoNeto( $fondoSup );
-		if ( $middleRpta[ status ] == ok )
-		{
-			$fondoSup->save();
-			$fondoMktHistory = new FondoMktHistory;
-			$fondoMktHistory->id = $fondoMktHistory->nextId();
-			$fondoMktHistory->id_to_fondo = $val[ 'id' ];
-			$fondoMktHistory->to_old_saldo = $oldSaldo;
-			$fondoMktHistory->to_new_saldo = $fondoSup->saldo;
-			$fondoMktHistory->id_fondo_history_reason = FONDO_AJUSTE;
-			$fondoMktHistory->id_tipo_to_fondo = SUP;
-			$fondoMktHistory->save();
-			return $this->setRpta();
-		}
-		return $middleRpta;
-	}
-
-	private function updateFondosGerProd( $val )
-	{
-		$fondoGerProd = FondoGerProd::find( $val[ 'id' ] );
-		$oldSaldo = $fondoGerProd->saldo;
-		
-		foreach( $val[ data ] as $key => $data )
-			$fondoGerProd->$key = $data;
-		
-		$middleRpta = $this->validateFondoSaldoNeto( $fondoSup );
-		if ( $middleRpta[ status ] == ok )
-		{
-			$fondoGerProd->save();	
-			$fondoMktHistory = new FondoMktHistory;
-			$fondoMktHistory->id = $fondoMktHistory->nextId();
-			$fondoMktHistory->id_to_fondo = $val[ 'id' ];
-			$fondoMktHistory->to_old_saldo = $oldSaldo;
-			$fondoMktHistory->to_new_saldo = $fondoGerProd->saldo;
-			$fondoMktHistory->id_fondo_history_reason = FONDO_AJUSTE; 
-			$fondoMktHistory->id_tipo_to_fondo = GER_PROD;
-			$fondoMktHistory->save();
-			return $this->setRpta();
-		}
-		return $middleRpta;
-	}
-
-	private function updateFondosInstitution( $val )
-	{
-		$fondoInstitution = FondoInstitucional::find( $val[ 'id' ] );
-		$oldSaldo = $fondoInstitution->saldo;		
-		
-		foreach( $val[ data ] as $key => $data )
-			$fondoInstitution->$key = $data;
-		
-		$middleRpta = $this->validateFondoSaldoNeto( $fondoSup );
-		if ( $middleRpta[ status ] == ok )
-		{
-			$fondoInstitution->save();
-			$fondoMktHistory = new FondoMktHistory;
-			$fondoMktHistory->id = $fondoMktHistory->nextId();
-			$fondoMktHistory->id_to_fondo = $val[ 'id' ];
-			$fondoMktHistory->to_old_saldo = $oldSaldo;
-			$fondoMktHistory->to_new_saldo = $fondoInstitution->saldo;
-			$fondoMktHistory->id_fondo_history_reason = FONDO_AJUSTE; 
-			$fondoMktHistory->id_tipo_to_fondo = FONDO_SUBCATEGORIA_INSTITUCION;
-			$fondoMktHistory->save();
-			return $this->setRpta();
-		}
-		return $middleRpta;
 	}
 
 	private function getAccount( $val )
