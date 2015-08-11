@@ -465,18 +465,20 @@ class SolicitudeController extends BaseController
     private function textAccepted($solicitud)
     {
         if ($solicitud->idtiposolicitud == SOL_REP)
-            if ($solicitud->approvedHistory->user->type == SUP)
-                return $solicitud->approvedHistory->user->sup->full_name;
-            elseif ($solicitud->approvedHistory->user->type == GER_PROD)
-                return $solicitud->approvedHistory->user->gerProd->full_name;
-            elseif ($solicitud->approvedHistory->user->type == REP_MED)
-                return $solicitud->approvedHistory->user->rm->full_name;
-            elseif (!is_null($solicitud->approvedHistory->user->simApp))
-                return $solicitud->approvedHistory->user->person->full_name;
-            else
-                return 'No Registrado';
+            // if ($solicitud->approvedHistory->user->type == SUP)
+            //     return $solicitud->approvedHistory->user->sup->full_name;
+            // elseif ($solicitud->approvedHistory->user->type == GER_PROD)
+            //     return $solicitud->approvedHistory->user->gerProd->full_name;
+            // elseif ($solicitud->approvedHistory->user->type == REP_MED)
+            //     return $solicitud->approvedHistory->user->rm->full_name;
+            // elseif (!is_null($solicitud->approvedHistory->user->simApp))
+            //     return $solicitud->approvedHistory->user->person->full_name;
+            // else
+            //     return 'No Registrado';
+            return $solicitud->approvedHistory->user->personal->getFullName();
         else if ($solicitud->idtiposolicitud == SOL_INST)
-            return $solicitud->createdBy->person->full_name;
+            // return $solicitud->createdBy->person->full_name;
+            return $solicitud->createdBy->personal->getFullName();
     }
 
     private function textClients($solicitud)
@@ -1340,8 +1342,15 @@ class SolicitudeController extends BaseController
             ->orderBy('ORDEN', 'ASC')
             ->get();*/
 
-        $flujo = $solicitud->investment->approvalInstance->approvalPolicies()->orderBy( 'orden' , 'ASC' )->get();
-        
+        $flujo1 = $solicitud->investment->approvalInstance->approvalPolicies()
+            ->orderBy( 'orden' , 'ASC' )->get();
+        $flujo = array();
+        foreach($flujo1 as $fl){
+            if($fl->desde == null)
+                $flujo[] = $fl;
+            elseif($fl->desde < $solicitud->detalle->monto_actual)
+                $flujo[] = $fl;
+        }
         $type_user = TypeUser::all();
         foreach ($flujo as $fl) {
 

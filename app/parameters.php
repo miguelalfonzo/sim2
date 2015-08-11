@@ -253,6 +253,7 @@ const TB_USUARIOS                      = 'USRP.USERS';
 const TB_TIPO_USUARIO                  = 'USRP.TIPO_USUARIO';
 const TB_USER_APP                      = 'USRP.USER_APP';
 const TB_PERSONAL                      = 'USRP.PERSONAL';
+const TB_TIPO_PERSONAL                 = 'USRP.TIPO_PERSONAL';
 const TB_USUARIO_BAGO                  = 'D1J.USUARIO';
 const TB_EVENTO_FOTO                   = 'FILE_STORAGE';
 const TB_CLIENTE_TIPO                  = 'TIPO_CLIENTE';
