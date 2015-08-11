@@ -30,19 +30,28 @@ class Personal extends Eloquent
         return $name;
     }
 
+    // idkc : RETORNA MODELO DE SUPERVISOR
     protected function getSup( $user_id )
     {
         $persona = Personal::where( 'user_id' , $user_id )->first();
         return $persona->rmSup;
     }
 
+    // idkc : SOLO RM
     public function rmSup()
     {
         return $this->belongsTo( '\Users\Personal' , 'referencia_id' , 'bago_id' )->where('tipo', '=', 'S');
     }
 
+    // idkc : SOLO SUPERVISOR
     public function reps()
     {
         return $this->hasMany('Users\Personal','referencia_id', 'bago_id')->where('tipo', '=', 'RM');
+    }
+
+    // idkc : SOLO GERENTE DE PRODUCTO
+    public function solicituds()
+    {
+        return $this->hasMany('Dmkt\SolicitudGer' , 'id_gerprod' , 'bago_id');
     }
 }
