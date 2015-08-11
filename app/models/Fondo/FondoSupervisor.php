@@ -10,7 +10,7 @@ class FondoSupervisor extends Eloquent
 
 	use SoftDeletingTrait;
 
-	protected $table      = 'FONDO_SUPERVISOR';
+	protected $table      = TB_FONDO_SUPERVISOR;
 	protected $primaryKey = 'id';
 
 	public function subCategoria()

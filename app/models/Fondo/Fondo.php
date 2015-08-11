@@ -10,7 +10,7 @@ class Fondo extends Eloquent
 
     use SoftDeletingTrait;
 
-    protected $table = 'FONDO_CONTABLE';
+    protected $table = TB_FONDO_CONTABLE;
     protected $primaryKey = 'id';
 
     public function getIdusertypeAttribute($value)

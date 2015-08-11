@@ -6,7 +6,7 @@ use \Eloquent;
 
 class CtaRm extends Eloquent 
 {
-    protected $table = 'VAR.BENEFICIARIOS_CTA_BANC';
+    protected $table = TB_CUENTA_RM;
     protected $primaryKey = 'cl_codigo';
 
     public function cuenta($dni)
@@ -14,9 +14,9 @@ class CtaRm extends Eloquent
     	try
     	{
     		$rpta = array();
-    		$cta = CtaRm::WHERE('CODBENEFICIARIO',$dni)->WHERE('TIPO','H')->SELECT('CUENTA')->first();
+    		$cta = CtaRm::WHERE('CODBENEFICIARIO',$dni)->WHERE('TIPO','H')->SELECT(TB_CUENTA)->first();
     		if (!$cta)
-    			$cta = CtaRm::WHERE('CODBENEFICIARIO',$dni)->WHERE('TIPO','B')->SELECT('CUENTA')->first();
+    			$cta = CtaRm::WHERE('CODBENEFICIARIO',$dni)->WHERE('TIPO','B')->SELECT(TB_CUENTA)->first();
     		$rpta[status] = ok;
     		$rpta[data] = $cta;
     	}

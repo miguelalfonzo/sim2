@@ -42,10 +42,10 @@ class ExpenseController extends BaseController
 
     private function validateInputExpense( $inputs )
     {
-        $rules = array( 'token'    		   => 'required|string|size:40|exists:solicitud,token' ,
-                        'proof_type'       => 'required|integer|min:1|exists:tipo_comprobante,id' ,
+        $rules = array( 'token'    		   => 'required|string|size:40|exists:'.TB_SOLICITUD.',token' ,
+                        'proof_type'       => 'required|integer|min:1|exists:'.TB_TIPO_COMPROBANTE.',id' ,
                         'desc_expense'     => 'required|string|min:1',
-                        'tipo_gasto'	   => 'required|array|min:1|each:integer|each:min,1|each:exists,tipo_gasto,id',
+                        'tipo_gasto'	   => 'required|array|min:1|each:integer|each:min,1|each:exists,'.TB_TIPO_GASTO.',id',
                         'quantity'		   => 'required|array|min:1|each:integer|each:min,1',
                         'description'	   => 'required|array|min:1|each:string|each:min,1',
                         'total_item'	   => 'required|array|min:1|each:numeric|each:min,1',
@@ -517,7 +517,7 @@ class ExpenseController extends BaseController
 							"E1.NOMESP AS ESPECIALIDAD1, " .
 							"E2.NOMESP AS ESPECIALIDAD2 " .
 						"FROM " .
-							"FICPE.PERSONAFIS P " .
+								TB_DOCTOR." P " .
 								"LEFT JOIN " .
 								  "FICPE.ESPECIAL E1 " .
 								  "ON TO_NUMBER(NVL(TRIM(P.PEFESPECIAL1),'0')) = E1.CODESP " .

@@ -6,7 +6,7 @@ use \Eloquent;
 
 class ExpenseType extends Eloquent{
 
-	protected $table     = 'TIPO_GASTO';
+	protected $table     = TB_TIPO_GASTO;
 	protected $primarKey = 'id';
 
 	protected static function order()

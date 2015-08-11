@@ -7,7 +7,7 @@ use \Eloquent;
 class FondoMktHistory extends Eloquent
 {
 	
-    protected $table = 'FONDO_MARKETING_HISTORIA';
+    protected $table = TB_FONDO_MARKETING_HISTORIAL;
     protected $primaryKey = 'id';
     
     public function nextId()

@@ -221,9 +221,9 @@ class BaseController extends Controller
         {
             $user = Auth::user();
             if ( $user->type == SUP )
-            { 
-                $reps = $user->Sup->Reps;
-                $users_ids = array();
+            {
+                $reps       = $user->Sup->Reps;
+                $users_ids  = array();
                 foreach ($reps as $rm)
                     $users_ids[] = $rm->iduser;
                 $users_ids[] = $user->id;

@@ -35,18 +35,18 @@ class Client extends BaseController
     		{
                 $act    = Activity::where( 'tipo_cliente' , $inputs['tipo_cliente'] )->lists('id');
                 $act    = InvestmentActivity::with('activity')
-                            ->join('TIPO_ACTIVIDAD', 'INVERSION_ACTIVIDAD.id_actividad', '=', 'TIPO_ACTIVIDAD.id')
+                            ->join(TB_TIPO_ACTIVIDAD, TB_INVERSION_ACTIVIDAD.'.id_actividad', '=',TB_TIPO_ACTIVIDAD.'.id')
                             ->where( 'id_inversion' , $inputs['id_inversion'] )
                             ->whereIn( 'id_actividad' , $act )
-                            ->orderBy('TIPO_ACTIVIDAD.nombre', 'asc')
+                            ->orderBy(TB_TIPO_ACTIVIDAD.'.nombre', 'asc')
                             ->get();
                 $result =  $act;
     		}
     		else{
                 $act = InvestmentActivity::with('activity')
-                        ->join('TIPO_ACTIVIDAD', 'INVERSION_ACTIVIDAD.id_actividad', '=', 'TIPO_ACTIVIDAD.id')
+                        ->join(TB_TIPO_ACTIVIDAD, TB_INVERSION_ACTIVIDAD.'.id_actividad', '=', TB_TIPO_ACTIVIDAD.'.id')
                         ->where( 'id_inversion' , $inputs['id_inversion'] )
-                        ->orderBy('TIPO_ACTIVIDAD.nombre', 'asc')
+                        ->orderBy(TB_TIPO_ACTIVIDAD.'.nombre', 'asc')
                         ->get();
                 // dd(json_encode($act));
                 $result = $act;

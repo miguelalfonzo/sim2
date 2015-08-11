@@ -6,7 +6,7 @@ use \Eloquent;
 
 class Solicitud extends Eloquent
 {
-    protected $table = 'SOLICITUD';
+    protected $table = TB_SOLICITUD;
     protected $primaryKey = 'id';
 
     protected function getFecOriginAttribute()
@@ -32,7 +32,7 @@ class Solicitud extends Eloquent
     {
         return Solicitud::orderBy('id','desc')->whereHas('detalle' , function ( $q ) use ( $periodo )
         {
-            $q->whereHas('periodo' , function ( $t ) use ( $periodo )
+            $q->whereHas(TB_PERIODO , function ( $t ) use ( $periodo )
             {
                 $t->where( 'aniomes' , $periodo );
             });

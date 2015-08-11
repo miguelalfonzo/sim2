@@ -45,7 +45,7 @@ use \System\FondoMktHistory;
 	Account::observe( 			new Transaction());
 	Mark::observe( 				new Transaction());
 	MarkProofAccounts::observe( new Transaction());
-	FileStorage::observe(		new Transaction());
+//	FileStorage::observe(		new Transaction());
 	TemporalUser::observe(      new SoftDelete());
 	InvestmentType::observe(    new Transaction());
 	Activity::observe(          new SoftDelete());

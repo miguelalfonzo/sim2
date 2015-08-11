@@ -6,7 +6,7 @@ use \Eloquent;
 
 class SolicitudHistory extends Eloquent{
 	
-    protected $table = 'SOLICITUD_HISTORIAL';
+    protected $table = TB_SOLICITUD_HISTORIAL;
     protected $fillable = array( 'user_from' , 'id_solicitud' , 'status_to');
 	protected $primaryKey = 'id';
     

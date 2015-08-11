@@ -450,9 +450,9 @@ class FondoController extends BaseController
 
     private function validateInputSolInst( $inputs )
     {
-        $rules = array( 'idsolicitud'     => 'sometimes|integer|min:1|exists:solicitud,id,id_estado,1,idtiposolicitud,'.SOL_INST ,
+        $rules = array( 'idsolicitud'     => 'sometimes|integer|min:1|exists:'.TB_SOLICITUD.',id,id_estado,1,idtiposolicitud,'.SOL_INST ,
                         'institucion-cod' => 'required|numeric|min:1',
-                        'codrepmed'       => 'required|integer|min:1|exists:ficpe.visitador,visvisitador',
+                        'codrepmed'       => 'required|integer|min:1|exists:'.TB_VISITADOR.',visvisitador',
                         'total'           => 'required|numeric|min:1',
                         'fondo_producto'  => 'required|string|min:1',
                         'mes'             => 'required|string|date_format:m-Y|after:'.date("Y-m"),

@@ -10,7 +10,7 @@ class Parameter extends Eloquent
 
 	use SoftDeletingTrait;
 	
-    protected $table= 'PARAMETRO';
+    protected $table= TB_PARAMETRO;
     protected $primaryKey = 'id';
 
     protected static function order()

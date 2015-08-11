@@ -37,6 +37,7 @@ use \Policy\ApprovalPolicy;
 use \Users\Manager;
 use \Users\Sup;
 use \Users\Rm;
+use \Users\Personal;
 use \Client\ClientType;
 use \yajra\Pdo\Oci8\Exceptions\Oci8Exception;
 use \Alert\AlertController;
@@ -206,16 +207,16 @@ class SolicitudeController extends BaseController
     {
 
         $rules = array(
-            'idsolicitud'   => 'integer|min:1|exists:solicitud,id',
-            'motivo'        => 'required|integer|min:1|exists:motivo,id',
-            'inversion'     => 'required|integer|min:1|exists:tipo_inversion,id',
-            'actividad'     => 'required|integer|min:1|exists:tipo_actividad,id',
+            'idsolicitud'   => 'integer|min:1|exists:'.TB_SOLICITUD.',id',
+            'motivo'        => 'required|integer|min:1|exists:'.TB_MOTIVO.',id',
+            'inversion'     => 'required|integer|min:1|exists:'.TB_TIPO_INVERSION.',id',
+            'actividad'     => 'required|integer|min:1|exists:'.TB_TIPO_ACTIVIDAD.',id',
             'titulo'        => 'required|string|min:1|max:50',
-            'moneda'        => 'required|integer|min:1|exists:tipo_moneda,id',
+            'moneda'        => 'required|integer|min:1|exists:'.TB_TIPO_MONEDA.',id',
             'monto'         => 'required|numeric|min:1',
-            'pago'          => 'required|integer|min:1|exists:tipo_pago,id',
+            'pago'          => 'required|integer|min:1|exists:'.TB_TIPO_PAGO.',id',
             'fecha'         => 'required|date_format:"d/m/Y"|after:' . date("Y-m-d"),
-            'productos'     => 'required|array|min:1|each:integer|each:min,1|each:exists,outdvp.marcas,id',
+            'productos'     => 'required|array|min:1|each:integer|each:min,1|each:exists,'.TB_MARCAS_BAGO.',id',
             'clientes'      => 'required|array|min:1|each:integer|each:min,1',
             'tipos_cliente' => 'required|array|min:1|each:integer|each:min,1|each:exists,tipo_cliente,id',
             'descripcion'   => 'string|max:200'
@@ -424,7 +425,7 @@ class SolicitudeController extends BaseController
 
     private function setJsonDetalle(&$jDetalle, $inputs)
     {
-        // $jDetalle->monto_solicitado = round($inputs['monto'], 2, PHP_ROUND_HALF_DOWN);
+        $jDetalle->monto_solicitado = round($inputs['monto'], 2, PHP_ROUND_HALF_DOWN);
         $jDetalle->fecha_entrega = $inputs['fecha'];
         $this->setPago($jDetalle, $inputs['pago'], $inputs['ruc']);
     }
@@ -577,12 +578,14 @@ class SolicitudeController extends BaseController
         if ( ! is_null( $approvalPolicy->desde ) || ! is_null( $approvalPolicy->hasta ) )
             $msg .= ' para la siguiente etapa del flujo , comuniquese con Informatica. El rol aprueba montos ' . ( is_null( $approvalPolicy->desde ) ? '' : 'mayores a S/.' . $approvalPolicy->desde . ' ') . ( is_null( $approvalPolicy->hasta ) ? '' : 'hasta S/.' . $approvalPolicy->hasta );
         if ( $userType == SUP ): 
-            if ( Auth::user()->type === REP_MED )
-                $idsUser = array( Rm::getSup( Auth::user()->id )->iduser );
+            if ( Auth::user()->type === REP_MED ){
+                $temp = Personal::getSup( Auth::user()->id );
+                $idsUser = array( $temp->user_id ); // idkc : ES CORRECTO ESTE TIPO DE PARSE? SI ES UN MODELO XQ NO USAR ->toArray() ?
+            }
             else if ( Auth::user()->type === SUP )
                 $idsUser = array( Auth::user()->id );
             else if ( Auth::user()->type === GER_PROD )
-                $idsUser = array( Rm::getSup( $responsable )->iduser );
+                $idsUser = array( Personal::getSup( $responsable )->user_id );
             else
                 return $this->warningException( 'El rol ' . Auth::user()->type . ' no tiene permisos para crear o derivar al supervisor' , __FUNCTION__ , __LINE__ , __FILE__ );
         elseif ( $userType == GER_PROD ):
@@ -658,10 +661,10 @@ class SolicitudeController extends BaseController
 
     private function validateInputAcceptSolRep($inputs)
     {
-        $rules = array('idsolicitud' => 'required|integer|min:1|exists:solicitud,id',
+        $rules = array('idsolicitud' => 'required|integer|min:1|exists:'.TB_SOLICITUD.',id',
             'monto' => 'required|numeric|min:1',
             'anotacion' => 'sometimes|string|min:1',
-            'producto' => 'required|array|min:1|each:integer|each:min,1|each:exists,solicitud_producto,id',
+            'producto' => 'required|array|min:1|each:integer|each:min,1|each:exists,'.TB_SOLICITUD_PRODUCTO.',id',
             'monto_producto' => 'required|array|min:1|each:numeric|each:min,1|sumequal:monto',
             'fondo_producto' => 'required|array|each:string|each:min,1');
         $validator = Validator::make($inputs, $rules);
@@ -1043,7 +1046,7 @@ class SolicitudeController extends BaseController
             if ($client->from_table == TB_DOCTOR) {
                 $doctors = $client->doctors;
                 $nom = $doctors->pefnombres . ' ' . $doctors->pefpaterno . ' ' . $doctors->pefmaterno;
-            } elseif ($client->from_table == TB_INSTITUTE)
+            } elseif ($client->from_table == TB_FARMACIA)
                 $nom = $client->institutes->pejrazon;
             else
                 $nom = 'No encontrado';

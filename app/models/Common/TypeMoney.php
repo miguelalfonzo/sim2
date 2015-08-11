@@ -11,7 +11,7 @@ namespace Common;
 use \Eloquent;
 class TypeMoney extends Eloquent{
 
-    protected $table = 'TIPO_MONEDA';
+    protected $table = TB_TIPO_MONEDA;
     protected $primaryKey = 'id';
 
 }

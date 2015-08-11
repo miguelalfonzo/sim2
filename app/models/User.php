@@ -45,12 +45,15 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
     protected function Personal(){
         return $this->hasOne('Users\Personal','user_id','id');
     }
-    // public function rm(){
-    //     return $this->hasOne('Users\Rm','iduser','id');
-    // }
-    // public function sup(){
-    //     return $this->hasOne('Users\Sup','iduser','id');
-    // }
+    
+    public function rm(){
+        return $this->hasOne('Users\Personal','user_id','id')->where('tipo', '=', 'RM');
+        // return $this->hasOne('Users\Rm','iduser','id');
+    }
+    
+    public function sup(){
+        return $this->hasOne('Users\Personal','user_id','id')->where('tipo', '=', 'S');
+    }
 
     public function solicituds(){
         return $this->hasMany('Dmkt\Solicitud','iduser','id');
@@ -74,9 +77,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 
     public function getName()
     {
-        
-            $username .= ucwords(strtolower($this->personal->nombres)) .' '. ucwords(strtolower($this->personal->apellidos)) ;
-        return $username;
+        return ucwords(strtolower($this->personal->nombres)) .' '. ucwords(strtolower($this->personal->apellidos));
     }
 
     public function getFirstName(){

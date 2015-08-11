@@ -6,7 +6,7 @@ use \Eloquent;
 
 class FondoSubCategoria extends Eloquent
 {
-	protected $table      = 'FONDO_SUBCATEGORIA';
+	protected $table      = TB_FONDO_CATEGORIA_SUB;
 	protected $primaryKey = 'id';
 	protected $fillable   = array('id','descripcion', 'fondos_categorias_id');
 

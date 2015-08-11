@@ -2,7 +2,7 @@
 
 class BagoUser extends Eloquent
 {
-    protected $table= 'D1J.USUARIO';
+    protected $table= TB_USUARIO_BAGO;
     protected $primaryKey = 'usucodusu';
     public $incrementing = false;
 

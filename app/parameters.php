@@ -79,7 +79,7 @@ const TESORERIA                               = 'T';
 
 //TABLAS EXTERNAS
 // const TB_DOCTOR                               = 'FICPE.PERSONAFIS';
-const TB_INSTITUTE                            = 'FICPEF.PERSONAJUR';
+//const TB_INSTITUTE                            = 'FICPEF.PERSONAJUR';
 
 const ASIS_GER                                = 'AG';
 const GER_MKT                                 = 'GM';
@@ -261,7 +261,7 @@ const TB_DOCTOR                        = 'FICPE.PERSONAFIS';
 const TB_INSTITUCIONES                 = 'FICPE.PERSONAJUR';
 const TB_FARMACIA                      = 'FICPEF.PERSONAJUR';
 const TB_DEPOSITO                      = 'DEPOSITO';
-const TB_DOCUMENTO                     = 'FILE_STORAGE';
+//const TB_DOCUMENTO                     = 'FILE_STORAGE';
 const TB_ESTADO_SUB                    = 'SUB_ESTADO';
 const TB_ESTADO                        = 'ESTADO';
 const TB_TIPO_MONEDA                   = 'TIPO_MONEDA';
@@ -303,7 +303,7 @@ const TB_FONDO_SUPERVISOR              = 'FONDO_SUPERVISOR';
 const TB_MANTENIMIENTO                 = 'MANTENIMIENTO';
 const TB_PARAMETRO                     = 'PARAMETRO';
 const TB_POLITICA_APROBACION           = 'POLITICA_APROBACION';
-const TB_INVERSION_POLITICA_APROBACION = 'INVERSION_POLITICA_APROBACION';
+//const TB_INVERSION_POLITICA_APROBACION = 'INVERSION_POLITICA_APROBACION';//no tiene modelo
 const TB_REPORTE_QUERY                 = 'REPORTE_QUERY';
 const TB_REPORTE_FORMULA               = 'REPORTE_FORMULA';
 const TB_REPORTE_USUARIO               = 'REPORTE_USUARIO';
@@ -316,3 +316,18 @@ const TB_SUPERVISOR                    = 'FICPE.SUPERVISOR';
 const TB_USER_TEMPORAL                 = 'USER_TEMPORAL';
 const TB_VISITADOR                     = 'FICPE.VISITADOR';
 
+
+const PENDIENTE             = 1;
+const ACEPTADO              = 2;
+const APROBADO              = 3;
+const DEPOSITADO            = 4;
+const REGISTRADO            = 5;
+const ENTREGADO             = 6;
+const GENERADO              = 7;
+const CANCELADO             = 8;
+const RECHAZADO             = 9;
+const TODOS                 = 10;
+const DERIVADO              = 11;
+const GASTO_HABILITADO      = 12;
+const DEPOSITO_HABILITADO   = 13;
+const DEVOLUCION            = 14;

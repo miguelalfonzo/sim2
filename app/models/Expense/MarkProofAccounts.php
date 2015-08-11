@@ -10,7 +10,7 @@ class MarkProofAccounts extends Eloquent
 
 	use SoftDeletingTrait;
 
-    protected $table= 'CUENTA_GASTO_MARCA';
+    protected $table= TB_CUENTA_GASTO_MARCA;
     protected $primaryKey = 'id';
  
     public function lastId()
@@ -43,7 +43,7 @@ class MarkProofAccounts extends Eloquent
 
 	protected static function getMarks( $num_cuenta_mkt , $num_cuenta_expense )
 	{
-		return MarkProofAccounts::where('CUENTA_GASTO_MARCA.num_cuenta_gasto' , $num_cuenta_expense )->where('cuenta_gasto_marca.num_cuenta_fondo' , $num_cuenta_mkt )->select( 'marca_codigo')->get();
+		return MarkProofAccounts::where(TB_CUENTA_GASTO_MARCA.'.num_cuenta_gasto' , $num_cuenta_expense )->where('cuenta_gasto_marca.num_cuenta_fondo' , $num_cuenta_mkt )->select( 'marca_codigo')->get();
 	} 
 
 	protected static function listData( $num_cuenta )

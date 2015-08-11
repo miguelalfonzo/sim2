@@ -10,7 +10,7 @@ class FondoGerProd extends Eloquent
 
 	use SoftDeletingTrait;
 
-	protected $table      = 'FONDO_GERENTE_PRODUCTO';
+	protected $table      = TB_FONDO_GERENTE_PRODUCTO;
 	protected $primaryKey = 'id';
 	protected $fillable   = array('id','fondos_subcategoria_id','marca_id');
 

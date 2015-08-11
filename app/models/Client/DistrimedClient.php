@@ -6,7 +6,7 @@ use \Eloquent;
 class DistrimedClient extends Eloquent
 {
 
-    protected $table = 'VTADIS.CLIENTES';
+    protected $table = TB_DISTRIMED_CLIENTES;
     protected $primaryKey = 'clcodigo';
 
     protected function getFullNameAttribute()
