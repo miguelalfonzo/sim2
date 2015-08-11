@@ -158,22 +158,30 @@ class FondoMkt extends BaseController
             
         $subFondo->save();
         $historyFondoMkt[] = array( 
-            'idFondo' => $subFondo->id , 
-            'idFondoTipo' => $userType ,
-            'oldSaldo' => $oldSaldo , 
+            'idFondo'      => $subFondo->id , 
+            'idFondoTipo'  => $userType ,
+            'oldSaldo'     => $oldSaldo , 
             'oldSaldoNeto' => $oldSaldoNeto , 
-            'newSaldo' => $subFondo->saldo , 
+            'newSaldo'     => $subFondo->saldo , 
             'newSaldoNeto' => $subFondo->saldo_neto , 
-            'reason' => $reason 
+            'reason'       => $reason 
         );
     }
 
     public function getFondoHistorial()
     {
         $data = array( 
-            'FondoMktHistories' => FondoMktHistory::order()
+            'FondoMktHistories'  => $this->getFondoSubCategoryHistorial() ,
+            'fondoSubCategories' => FondoSubCategoria::order()
         );
         return View::make( 'Tables.fondo_mkt_history' , $data );
+    }
+
+    public function getFondoSubCategoryHistorial()
+    {
+        //$fondoSubCategory = FondoSubCategoria::find( 1 );
+        //$fondos = $fondoSubCategory->fondos;
+        return FondoMktHistory::whereRaw( "created_at between to_date( '$start' , 'DD-MM-YY' ) and to_date( '$end' , 'DD-MM-YY' ) + 1" );
     }
 
 }

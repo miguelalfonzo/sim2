@@ -1379,7 +1379,7 @@ class SolicitudeController extends BaseController
                 }
             }
         }
-//        dd($flujo);
+//      dd($flujo);
         $linehard = unserialize(TIMELINEHARD);
         //$motivo = $solicitud->detalle->id_motivo;
         $motivo = $solicitud->idtiposolicitud;

@@ -24,5 +24,10 @@ class FondoSubCategoria extends Eloquent
 	{
 		return $this->hasOne( 'Fondo\Fondo' , 'id' , 'id_fondo' );
 	}
+
+	protected static function order()
+	{
+		return FondoSubCategoria::orderBy( 'descripcion' , 'ASC' )->get();
+	}
 	
 }

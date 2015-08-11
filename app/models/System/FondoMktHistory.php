@@ -39,7 +39,7 @@ class FondoMktHistory extends Eloquent
             return $this->belongsTo( '\Fondo\FondoSupervisor' , 'id_from_fondo' );
     }
 
-    protected function toFund()
+    public function toFund()
     {
         if ( $this->id_tipo_to_fondo == 'I' )
             return $this->belongsTo( '\Fondo\FondoInstitucional' , 'id_to_fondo' );
