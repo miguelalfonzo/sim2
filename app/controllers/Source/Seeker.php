@@ -110,12 +110,43 @@ class Seeker extends BaseController
             ->whereRaw("NOMBRES || ' ' || APELLIDOS like UPPER('%" . $inputs['sVal'] . "%')")
             ->orderBy('label')
             ->get();
+
+
+//        if (\Auth::user()->type == SUP)
+//            return ($var->type == 'SUPERVISOR' || $var->type == 'G. PROMOCION');
+//        elseif (\Auth::user()->type == GER_PROD)
+//            return ($var->type == 'G. PRODUCTO' || $var->type == 'G. COMERCIAL');
+//        elseif (\Auth::user()->type == GER_COM)
+//            return $var->type == 'G. PROMOCION';
+//        elseif (\Auth::user()->type == GER_PROM)
+//            return $var->type == 'G. COMERCIAL';
+        $personal_filter = array();
         foreach ($personal as $p) {
-            $p->type = $p->getType->descripcion;
+            if ($p->getType){
+                $p->type = $p->getType->descripcion;
+                if (\Auth::user()->type == SUP)
+                    if($p->getType->id == 4)
+                        $personal_filter[] = $p;
+//                      return ($var->type == 'SUPERVISOR' || $var->type == 'G. PROMOCION');
+                elseif (\Auth::user()->type == GER_PROD)
+                    if($p->getType->id == 5)
+                        $personal_filter[] = $p;
+//                    return ($var->type == 'G. PRODUCTO' || $var->type == 'G. COMERCIAL');
+                elseif (\Auth::user()->type == GER_COM)
+                    if($p->getType->id == 6)
+                        $personal_filter[] = $p;
+//                    return $var->type == 'G. PROMOCION';
+                elseif (\Auth::user()->type == GER_PROM)
+                    if($p->getType->id == 7)
+                        $personal_filter[] = $p;
+//                    return $var->type == 'G. COMERCIAL';
+
+            }
 
         }
+
         $rpta = array();
-        foreach ($personal as $array)
+        foreach ($personal_filter as $array)
             $rpta[] = $array;
         return $this->setRpta($rpta);
 //        $json  = "";
