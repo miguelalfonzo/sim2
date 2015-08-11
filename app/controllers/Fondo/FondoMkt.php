@@ -55,8 +55,10 @@ class FondoMkt extends BaseController
         
         $msg = ' el cual no es suficiente para completar el registro , se requiere un saldo de S/.';
         $middleRpta = $this->validateFondoSaldo( $fondos , $userType , $msg , '_neto' );
+        
         if ( $middleRpta[ status ] == ok )
             return $this->setRpta( $userType );
+
         return $middleRpta;
     }
 
@@ -100,10 +102,11 @@ class FondoMkt extends BaseController
                 $fondo = FondoSupervisor::find( $idFondo );
             elseif ( $fondoType == GER_PROD )
                 $fondo = FondoGerProd::find( $idFondo );
-            \Log::error( $fondo->toJson() );
-            if ( $fondo->{ 'saldo' . $tipo } < 0 )
+
+            if ( $fondo->{ 'saldo' . $tipo } < 0 ){
                 return $this->warningException( 'El Fondo ' .  $this->fondoName( $fondo ) . ' solo cuenta con S/.' . ( $fondo->{ 'saldo' . $tipo } + $fondoMonto ) . 
                                                 $msg . $fondoMonto . ' en total' , __FUNCTION__ , __FILE__ , __LINE__ );
+            }
         }
         return $this->setRpta();
     }
