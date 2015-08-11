@@ -45,4 +45,10 @@ class Personal extends Eloquent
     {
         return $this->hasMany('Users\Personal','referencia_id', 'bago_id')->where('tipo', '=', 'RM');
     }
+
+    public function getType()
+    {
+        return $this->hasOne('Users\PersonalType','id','tipo_personal_id');
+
+    }
 }

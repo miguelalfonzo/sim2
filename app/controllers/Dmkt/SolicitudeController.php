@@ -1343,8 +1343,15 @@ class SolicitudeController extends BaseController
             ->orderBy('ORDEN', 'ASC')
             ->get();*/
 
-        $flujo = $solicitud->investment->approvalInstance->approvalPolicies()->orderBy( 'orden' , 'ASC' )->get();
-        
+        $flujo1 = $solicitud->investment->approvalInstance->approvalPolicies()
+            ->orderBy( 'orden' , 'ASC' )->get();
+        $flujo = array();
+        foreach($flujo1 as $fl){
+            if($fl->desde == null)
+                $flujo[] = $fl;
+            elseif($fl->desde < $solicitud->detalle->monto_actual)
+                $flujo[] = $fl;
+        }
         $type_user = TypeUser::all();
         foreach ($flujo as $fl) {
 
