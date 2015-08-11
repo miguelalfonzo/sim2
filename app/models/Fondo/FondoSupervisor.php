@@ -23,10 +23,14 @@ class FondoSupervisor extends Eloquent
 		return $this->belongsTo( 'Dmkt\Marca', 'marca_id' );
 	}
 
-	protected function sup()
-	{
-		return $this->hasOne( 'Users\Sup' , 'iduser' , 'supervisor_id' );
-	}
+	protected function sup(){
+        return $this->hasOne('Users\Personal','user_id','id')->where('tipo', '=', 'S');
+    }
+
+	// protected function sup()
+	// {
+	// 	return $this->hasOne( 'Users\Sup' , 'iduser' , 'supervisor_id' );
+	// }
 
 	protected static function order()
 	{

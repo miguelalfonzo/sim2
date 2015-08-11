@@ -15,12 +15,17 @@ class BaseController extends Controller
 
     protected function fondoName( $fondo )
     {
-        if ( ! is_null ( $fondo->marca ) && ! is_null( $fondo->supervisor_id ) && ! is_null( $fondo->subcategoria_id ) )
-            return $fondo->subCategoria->descripcion . ' | ' . $fondo->marca->descripcion . ' | ' . $fondo->sup->full_name;
-        elseif ( ! is_null( $fondo->marca ) && ! is_null( $fondo->subcategoria_id ) )
-            return $fondo->subCategoria->descripcion . ' | ' . $fondo->marca->descripcion;
-        elseif( ! is_null( $fondo->subcategoria_id ) )
-            return $fondo->subCategoria->descripcion;
+        try{
+            if ( ! is_null ( $fondo->marca ) && ! is_null( $fondo->supervisor_id ) && ! is_null( $fondo->subcategoria_id ) ){
+                return $fondo->subCategoria->descripcion . ' | ' . $fondo->marca->descripcion . ' | ' . $fondo->sup->getFullName();
+            }elseif ( ! is_null( $fondo->marca ) && ! is_null( $fondo->subcategoria_id ) ){
+                return $fondo->subCategoria->descripcion . ' | ' . $fondo->marca->descripcion;
+            }elseif( ! is_null( $fondo->subcategoria_id ) ){
+                return $fondo->subCategoria->descripcion;
+            }
+        }catch(Exception $e){
+            return $e;
+        }
     }
 
     protected function getExpenseDate( $solicitud , $range = 0 )

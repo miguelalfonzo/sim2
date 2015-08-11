@@ -2,6 +2,7 @@
 
 namespace Dmkt;
 
+use \Log;
 use \Auth;
 use \BaseController;
 use Common\TypeUser;
@@ -294,13 +295,13 @@ class SolicitudeController extends BaseController
     private function setProductsAmount( $solProductIds, $amount, $fondo, $detalle )
     {
         $fondoMktController = new FondoMkt;
-        $fondos = array();
-        $tc = ChangeRate::getTc();
-        $moneda = $detalle->id_moneda;
-        $userTypes = array();
-        $ids_fondo_mkt = array();
-        \Log::error($fondo);
-        foreach ($solProductIds as $key => $solProductId) {
+        $fondos             = array();
+        $tc                 = ChangeRate::getTc();
+        $moneda             = $detalle->id_moneda;
+        $userTypes          = array();
+        $ids_fondo_mkt      = array();
+        foreach ($solProductIds as $key => $solProductId) 
+        {
             $solProduct = SolicitudProduct::find($solProductId);
 
             $old_id_fondo_mkt = $solProduct->id_fondo_marketing;
@@ -308,19 +309,20 @@ class SolicitudeController extends BaseController
             $old_ammount = $solProduct->monto_asignado;
 
             $solProduct->monto_asignado = $amount[$key];
+            
+            $middleRpta                 = $fondoMktController->setFondo($fondo[$key], $solProduct, $detalle, $tc, $userTypes, $fondos);
 
-            $middleRpta = $fondoMktController->setFondo($fondo[$key], $solProduct, $detalle, $tc, $userTypes, $fondos);
             if ($middleRpta[status] != ok)
                 return $middleRpta;
             $solProduct->save();
             $userTypeforDiscount = $solProduct->id_tipo_fondo_marketing;
-            $ids_fondo_mkt[] = array('old' => $old_id_fondo_mkt,
+            $ids_fondo_mkt[] = array(
+                'old'         => $old_id_fondo_mkt,
                 'oldUserType' => $old_cod_user_type,
-                'oldMonto' => $old_ammount,
-                'new' => $solProduct->id_fondo_marketing,
-                'newMonto' => $solProduct->monto_asignado);
+                'oldMonto'    => $old_ammount,
+                'new'         => $solProduct->id_fondo_marketing,
+                'newMonto'    => $solProduct->monto_asignado );
         }
-        \Log::error($fondos);
         $fondoMktController->discountBalance($ids_fondo_mkt, $moneda, $tc, $detalle->solicitud->id, $userTypeforDiscount);
         return $fondoMktController->validateBalance($userTypes, $fondos);
     }
@@ -660,12 +662,14 @@ class SolicitudeController extends BaseController
 
     private function validateInputAcceptSolRep($inputs)
     {
-        $rules = array('idsolicitud' => 'required|integer|min:1|exists:'.TB_SOLICITUD.',id',
-            'monto' => 'required|numeric|min:1',
-            'anotacion' => 'sometimes|string|min:1',
-            'producto' => 'required|array|min:1|each:integer|each:min,1|each:exists,'.TB_SOLICITUD_PRODUCTO.',id',
-            'monto_producto' => 'required|array|min:1|each:numeric|each:min,1|sumequal:monto',
-            'fondo_producto' => 'required|array|each:string|each:min,1');
+        $rules = array(
+                    'idsolicitud'    => 'required|integer|min:1|exists:'.TB_SOLICITUD.',id',
+                    'monto'          => 'required|numeric|min:1',
+                    'anotacion'      => 'sometimes|string|min:1',
+                    'producto'       => 'required|array|min:1|each:integer|each:min,1|each:exists,'.TB_SOLICITUD_PRODUCTO.',id',
+                    'monto_producto' => 'required|array|min:1|each:numeric|each:min,1|sumequal:monto',
+                    'fondo_producto' => 'required|array|each:string|each:min,1'
+                );
         $validator = Validator::make($inputs, $rules);
         if ($validator->fails())
             return $this->warningException(substr($this->msgValidator($validator), 0, -1), __FUNCTION__, __LINE__, __FILE__);
@@ -677,22 +681,20 @@ class SolicitudeController extends BaseController
     {
         DB::beginTransaction();
         $middleRpta = $this->validateInputAcceptSolRep($inputs);
-
         if ($middleRpta[status] === ok) {
-            $solicitud = Solicitud::find($idSolicitud);
+            $solicitud  = Solicitud::find($idSolicitud);
             $middleRpta = $this->verifyPolicy($solicitud, $inputs['monto']);
             if ($middleRpta[status] == ok) {
-                $oldIdEstado = $solicitud->id_estado;
+                $oldIdEstado          = $solicitud->id_estado;
                 $solicitud->id_estado = $middleRpta[data];
-                $solicitud->status = ACTIVE;
+                $solicitud->status    = ACTIVE;
                 if (isset($inputs['anotacion']))
                     $solicitud->anotacion = $inputs['anotacion'];
                 $solicitud->save();
 
                 $solDetalle = $solicitud->detalle;
-                $detalle = json_decode($solDetalle->detalle);
-
-                $monto = round($inputs['monto'], 2, PHP_ROUND_HALF_DOWN);
+                $detalle    = json_decode($solDetalle->detalle);                
+                $monto      = round($inputs['monto'], 2, PHP_ROUND_HALF_DOWN);
 
                 if ($solicitud->id_estado == DERIVADO)
                     $detalle->monto_derivado = $monto;
