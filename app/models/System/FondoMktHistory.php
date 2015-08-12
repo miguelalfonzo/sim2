@@ -49,6 +49,21 @@ class FondoMktHistory extends Eloquent
             return $this->belongsTo( '\Fondo\FondoSupervisor' , 'id_to_fondo' );
     }
 
+    public function fromSupFund()
+    {
+        return $this->belongsTo( '\Fondo\FondoSupervisor' , 'id_to_fondo' );    
+    }
+
+    public function fromGerProdFund()
+    {
+        return $this->belongsTo( '\Fondo\FondoGerProd' , 'id_to_fondo' );    
+    }
+
+    public function fromInstitutionFund()
+    {
+        return $this->belongsTo( '\Fondo\FondoInstitucional' , 'id_to_fondo' );    
+    }    
+
     protected function updatedBy()
     {
         return $this->belongsTo( 'User' , 'updated_by' );

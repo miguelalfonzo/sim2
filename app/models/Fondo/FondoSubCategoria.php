@@ -15,19 +15,14 @@ class FondoSubCategoria extends Eloquent
 		return $this->belongsTo('Maintenance\FondosCategorias','fondos_categorias_id');
 	}*/
 
-	/*public function fondos()
-	{
-		return $this->hasMany('Maintenance\fondos');
-	}*/
-
-	public function accountFondo()
-	{
-		return $this->hasOne( 'Fondo\Fondo' , 'id' , 'id_fondo' );
-	}
-
 	protected static function order()
 	{
 		return FondoSubCategoria::orderBy( 'descripcion' , 'ASC' )->get();
+	}
+
+	protected function fondoMktType()
+	{
+		return $this->hasOne( 'Fondo\FondoMktType' , 'codigo' , 'tipo' );
 	}
 	
 }
