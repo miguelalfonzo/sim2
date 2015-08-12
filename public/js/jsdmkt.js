@@ -43,9 +43,6 @@ var amount_error_families = $('#amount_error_families');
 var userType = $('#typeUser').val();//tipo de usuario se encuentra en main
 var amount_families = $('.amount_families');
 
-//HISTORIAL FONDO
-var fondo_subcategoria = $( '#fondoMkt' );
-
 //SUB-ESTADOS
 var PENDIENTE     = 1;
 var ACEPTADO      = 2;
@@ -397,7 +394,6 @@ function listTable( type , date )
 {
     date = typeof date !== 'undefined' ? date : null;
     var l = Ladda.create($("#search-solicitude")[0]);
-    // l.start();
     $.ajax({
         url: server + 'list-table',
         type: 'POST',
@@ -412,11 +408,9 @@ function listTable( type , date )
         }
     }).fail( function ( statusCode , errorThrown)
     {
-        // l.stop();
         ajaxError( statusCode , errorThrown );
     }).done(function ( response ) 
     {
-        // l.stop();
         if ( response.Status == 'Ok' )
         {
             dataTable( type , response.Data.View , type );
@@ -436,7 +430,6 @@ var calcDataTableHeight = function() {
 };
 function dataTable( element , html , message )
 {
-    console.log( element );
     $( '#table_' + element + '_wrapper' ).remove();
 
     if( html != null )

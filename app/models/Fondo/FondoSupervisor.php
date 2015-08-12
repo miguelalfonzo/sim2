@@ -53,4 +53,9 @@ class FondoSupervisor extends Eloquent
 		return $this->SubCategoria->descripcion . ' | ' . $this->marca->descripcion . ' | '  . $this->sup->full_name;
 	}
 
+	protected function getMiddleNameAttribute()
+	{
+		return $this->marca->descripcion . ' | '  . $this->sup->full_name;
+	}
+
 }

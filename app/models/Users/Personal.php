@@ -78,7 +78,16 @@ class Personal extends Eloquent
     public function solicituds()
     {
         return $this->hasMany('Dmkt\SolicitudGer' , 'id_gerprod' , 'bago_id');
+    }
 
+    protected static function getGerProd( $ids )
+    {
+        return Personal::whereIn( 'id' , $ids )->where( 'tipo' , GER_PROD )->get();
+    }
+
+    protected static function getGerProdNotRegisteredName( $uniqueIdsGerProd )
+    {
+        return Personal::whereIn( 'id' , $uniqueIdsGerProd )->whereNull( 'user_id' )->get()->lists( 'full_name' );
     }
 
 

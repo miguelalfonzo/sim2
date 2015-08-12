@@ -596,11 +596,11 @@ class SolicitudeController extends BaseController
             $uniqueIdsGerProd = array_unique( $idsGerProd );
             $repeatIds = array_count_values( $idsGerProd );
             $maxNumberRepeat = max( $repeatIds );
-            Session::put( 'maxRepeatIdsGerProd' , Manager::whereIn( 'id' , array_keys( $repeatIds , $maxNumberRepeat ) )->lists( 'iduser' ) );
-            $notRegisterGerProdName = Manager::getGerProdNotRegisteredName( $uniqueIdsGerProd );
+            Session::put( 'maxRepeatIdsGerProd' , Personal::getGerProd( array_keys( $repeatIds , $maxNumberRepeat ) )->lists( 'user_id' ) );
+            $notRegisterGerProdName = Personal::getGerProdNotRegisteredName( $uniqueIdsGerProd );
         
             if ( count( $notRegisterGerProdName ) === 0 )
-                $idsUser = Manager::whereIn( 'id' , $uniqueIdsGerProd )->lists( 'iduser' );
+                $idsUser = Personal::whereIn( 'id' , $uniqueIdsGerProd )->lists( 'user_id' );
             else
                 return $this->warningException( 'Los siguientes Gerentes de Producto no estan registrados en el sistema: ' . implode( ' , ' , $notRegisterGerProdName ) , __FUNCTION__ , __LINE__ , __FILE__ );
         else:

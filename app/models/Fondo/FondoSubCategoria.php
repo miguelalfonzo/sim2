@@ -25,4 +25,19 @@ class FondoSubCategoria extends Eloquent
 		return $this->hasOne( 'Fondo\FondoMktType' , 'codigo' , 'tipo' );
 	}
 	
+	protected function fromSupFund()
+	{
+		return $this->hasMany( 'Fondo\FondoSupervisor' , 'subcategoria_id' );
+	}
+
+	protected function fromGerProdFund()
+	{
+		return $this->hasMany( 'Fondo\FondoGerProd' , 'subcategoria_id' );
+	}
+
+	protected function fromInstitutionFund()
+	{
+		return $this->hasMany( 'Fondo\FondoInstitucional' , 'subcategoria_id' );
+	}
+
 }

@@ -241,53 +241,6 @@ class ExpenseController extends BaseController
 		}
 	}
 
-	private function renewFondo( $solicitud , $monto_renovado )
-	{
-		$fondoMktController = new FondoMKt;
-		$tc = ChangeRate::getTc();
-		$detalle = $solicitud->detalle;
-		if ( $detalle->id_moneda == DOLARES )
-			$tasaCompra = $tc->compra;
-		elseif ( $detalle->id_moneda == SOLES )
-			$tasaCompra = 1;
-		$fondoDataHistories = array();
-		if ( $solicitud->idtiposolicitud == SOL_REP )
-		{
-			$solicitudProducts = $solicitud->products;
-			$fondo_type 	   = $solicitud->products[ 0 ]->id_tipo_fondo_marketing;
-			$monto_aprobado    = $solicitud->detalle->monto_aprobado;
- 		    foreach( $solicitudProducts as $solicitudProduct )
-		    {
-		    	$fondo 			= $solicitudProduct->thisSubFondo;
-		    	$oldSaldo       = $fondo->saldo;
-		    	$oldSaldoNeto   = $fondo->saldo_neto;
-		    	$monto_renovado_final = ( $monto_renovado / $monto_aprobado ) * $solicitudProduct->monto_asignado;
-		    	$monto_renovado_final = $monto_renovado_final * $tasaCompra;
-		    	
-		    	$fondo->saldo 		+= $monto_renovado_final ;
-		    	$fondo->saldo_neto  += $monto_renovado_final ;
-		    	$fondo->save();
-		    	$fondoDataHistories[] = array( 'idFondo' => $fondo->id , 'idFondoTipo' => $fondo_type ,
-                                               'oldSaldo' => $oldSaldo , 'oldSaldoNeto' => $oldSaldoNeto , 
-                                               'newSaldo' => $fondo->saldo , 'newSaldoNeto' => $fondo->saldo_neto , 'reason' => FONDO_DEVOLUCION );
-		    }
-		}
-		elseif ( $solicitud->idtiposolicitud == SOL_INST )
-		{
-			$fondo = $solicitud->detalle->thisSubFondo;
-			$oldSaldo = $fondo->saldo;
-			$oldSaldoNeto = $fondo->saldo_neto;
-			$fondo->saldo 		+= $monto_renovado;
-			$fondo->saldo_neto  += $monto_renovado;
-			$fondo->save();
-			$fondoDataHistories[] = array( 'idFondo' => $fondo->id , 'idFondoTipo' => INVERSION_INSTITUCIONAL ,
-                                           'oldSaldo' => $oldSaldo , 'oldSaldoNeto' => $oldSaldoNeto , 
-                                           'newSaldo' => $fondo->saldo , 'newSaldoNeto' => $fondo->saldo_neto , 'reason' => FONDO_DEVOLUCION );
-		}
-		\Log::error( $fondoDataHistories );
-		$fondoMktController->setFondoMktHistories( $fondoDataHistories , $solicitud->id );  
-	}
-
 	public function confirmDiscount()
 	{
 		try
@@ -313,7 +266,10 @@ class ExpenseController extends BaseController
 				$jDetalle->monto_descuento = $monto_descuento;
 				$detalle->detalle    	   = json_encode( $jDetalle );
 				$detalle->save();
-				$this->renewFondo( $solicitud , $monto_descuento );
+				
+				$fondoMktController = new FondoMkt;
+				$fondoMktController->refund( $solicitud , $monto_descuento , FONDO_DEVOLUCION_PLANILLA );
+				
 				DB::commit();
 				return $this->setRpta();
 			}

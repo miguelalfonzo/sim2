@@ -54,4 +54,9 @@ class FondoGerProd extends Eloquent
 		return $this->SubCategoria->descripcion . ' | ' . $this->marca->descripcion;
 	}
 
+	protected function getMiddleNameAttribute()
+	{
+		return $this->marca->descripcion;
+	}
+
 }

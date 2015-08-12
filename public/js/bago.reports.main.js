@@ -6,8 +6,10 @@ $(document).ready(function()
 			listTable('solicitudes');
 		}else if($("#container-event").length === 1){
 			getEvents();
-		}
-		else{
+		}else if( $("#fondo_mkt_history").length === 1){
+			if ( $( '#fondoMkt' ).val() !== null )
+				getSubCategoryHistory( $( '#fondoMkt' ) );
+		}else{
 			$(".btn_extra").hide("slow");
 			GBREPORTS.openReport();
 		}
