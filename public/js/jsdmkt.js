@@ -43,6 +43,9 @@ var amount_error_families = $('#amount_error_families');
 var userType = $('#typeUser').val();//tipo de usuario se encuentra en main
 var amount_families = $('.amount_families');
 
+//HISTORIAL FONDO
+var fondo_subcategoria = $( '#fondoMkt' );
+
 //SUB-ESTADOS
 var PENDIENTE     = 1;
 var ACEPTADO      = 2;

@@ -74,6 +74,7 @@
         Route::get('maintenance/FondosGerProd', 'Maintenance\TableController@getGerProdFunds');
         Route::get('maintenance/FondosInstitution', 'Maintenance\TableController@getInstitutionFunds');
         Route::get( 'fondoHistorial' , 'Fondo\FondoMkt@getFondoHistorial' );
+        Route::post( 'fondo-subcategoria-history' , 'Fondo\FondoMkt@getFondoSubCategoryHistory' );
     });
 
     /*

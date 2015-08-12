@@ -6,6 +6,7 @@ use \BaseController;
 use \System\FondoMktHistory;
 use \Auth;
 use \View;
+use \Input;
 
 class FondoMkt extends BaseController
 {
@@ -171,17 +172,23 @@ class FondoMkt extends BaseController
     public function getFondoHistorial()
     {
         $data = array( 
-            'FondoMktHistories'  => $this->getFondoSubCategoryHistorial() ,
             'fondoSubCategories' => FondoSubCategoria::order()
         );
         return View::make( 'Tables.fondo_mkt_history' , $data );
     }
 
-    public function getFondoSubCategoryHistorial()
+    public function getFondoSubCategoryHistory()
     {
+        $inputs = Input::all();
+        $start = $inputs[ 'start' ];
+        $end   = $inputs[ 'end' ];  
         //$fondoSubCategory = FondoSubCategoria::find( 1 );
         //$fondos = $fondoSubCategory->fondos;
-        return FondoMktHistory::whereRaw( "created_at between to_date( '$start' , 'DD-MM-YY' ) and to_date( '$end' , 'DD-MM-YY' ) + 1" );
+        $data = array( 
+            'FondoMktHistories' => FondoMktHistory::whereRaw( "created_at between to_date( '$start' , 'DD-MM-YY' ) and to_date( '$end' , 'DD-MM-YY' ) + 1" )->get() 
+            );
+        return $this->setRpta( array( 'View' => View::make( 'Tables.table_fondo_mkt_history' , $data )->render() ) );
+    
     }
 
 }
