@@ -184,6 +184,9 @@ class FondoMkt extends BaseController
         $end   = $inputs[ 'end' ];  
         //$fondoSubCategory = FondoSubCategoria::find( 1 );
         //$fondos = $fondoSubCategory->fondos;
+        $subCategory = FondoSubCategoria::find( $inputs[ 'id_subcategoria' ] );
+
+        
         $data = array( 
             'FondoMktHistories' => FondoMktHistory::whereRaw( "created_at between to_date( '$start' , 'DD-MM-YY' ) and to_date( '$end' , 'DD-MM-YY' ) + 1" )->get() 
             );
