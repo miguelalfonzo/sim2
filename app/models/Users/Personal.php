@@ -42,6 +42,20 @@ class Personal extends Eloquent
         return $persona->rmSup;
     }
 
+    // mamv : RETORNA MODELO DE REPRESENTANTE MEDICO por ID BAGO
+    protected function getRM( $bago_id )
+    {
+        $persona = Personal::where( 'bago_id' , $bago_id)->where('tipo', '=', 'RM')->first();
+        return $persona;
+    }
+
+    // mamv : RETORNA MODELO DE REPRESENTANTE SUPERVISOR por ID BAGO
+    protected function getSupvervisor( $bago_id )
+    {
+        $persona = Personal::where( 'bago_id' , $bago_id)->where('tipo', '=', 'S')->first();
+        return $persona;
+    }
+
     // idkc : SOLO RM
     public function rmSup()
     {
@@ -65,5 +79,11 @@ class Personal extends Eloquent
     {
         return $this->hasMany('Dmkt\SolicitudGer' , 'id_gerprod' , 'bago_id');
 
+    }
+
+
+    protected function bagoVisitador()
+    {
+        return $this->hasOne( 'Users\Visitador' , 'visvisitador' , 'bago_id' );
     }
 }

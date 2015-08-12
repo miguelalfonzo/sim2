@@ -3,6 +3,7 @@
 namespace Dmkt;
 
 use \BaseController;
+use Users\Personal;
 use \View;
 use \DB;
 use \Input;
@@ -267,7 +268,7 @@ class FondoController extends BaseController
 
             if( $middleRpta[status] == ok )
             {
-                if ( isset( $inputs[ 'idsolicitud' ] ) )
+                if ( isset( $inputs[ 'idsolicitud' ]) &&  $inputs[ 'idsolicitud'] != null )
                 {
                     $solicitud = Solicitud::find( $inputs['idsolicitud'] );
                     $detalle = $solicitud->detalle;
@@ -285,7 +286,7 @@ class FondoController extends BaseController
                 $inputs[ 'supervisor' ]     = $middleRpta[ data ][ 'sup' ];
                 $inputs[ 'cuenta' ]         = $middleRpta[ data ][ 'cuentaRep' ];
                 $inputs[ 'codsup']          = $middleRpta[ data ][ 'codsup' ];
-                $razonInstitucion           = Institution::find( $inputs[ 'institucion-cod' ] )->pejrazon;  
+                $razonInstitucion           = Institution::find( $inputs[ 'institucion-cod' ] )->pejrazon;
                 $solicitud->titulo          = TITULO_INSTITUCIONAL . ' ' . $inputs[ 'mes' ] . ' - ' . $razonInstitucion;
                 $solicitud->id_estado       = PENDIENTE;
                 $solicitud->idtiposolicitud = SOL_INST;
@@ -405,18 +406,31 @@ class FondoController extends BaseController
         
     }
 
+//    private function validateRm( $codrepmed )
+//    {
+//        $repmed = Rm::find( $codrepmed );
+//        if ( is_null( $repmed ) )
+//            return $this->warningException( 'El representante Medico no esta registrado en el sistema. Codigo de Representante: ' . $codrepmed , __FUNCTION__ , __LINE__ , __FILE__ );
+//        $codsup = $repmed->bagoVisitador->linsupvis->lsvsupervisor;
+//        $sup = Sup::find( $codsup );
+//        if ( is_null( $sup) )
+//            return $this->warningException( 'El Supervisor no esta registrado en el sistema. Codigo de Supervisor: ' . $codsup , __FUNCTION__ , __LINE__ , __FILE__ );
+//        if ( $repmed->idsup != $codsup )
+//            return $this->warningException( 'El sistema no tiene la relacion Representate-Supervisor o ha sido actualizada. Se esperaba al Supervisor : ' . $repmed->rmSup->full_name . ' con codigo:' . $codsup . ' .Comuniquese con Informatica' , __FUNCTION__ , __LINE__ , __FILE__ );
+//        return $this->setRpta( array( 'rm' => $repmed->iduser , 'sup' => $sup->iduser , 'codsup' => $codsup , 'cuentaRep' => $repmed->bagoVisitador->cuenta->cuenta ) );
+//    }
     private function validateRm( $codrepmed )
     {
-        $repmed = Rm::find( $codrepmed );
+        $repmed = Personal::getRM($codrepmed);
         if ( is_null( $repmed ) )
             return $this->warningException( 'El representante Medico no esta registrado en el sistema. Codigo de Representante: ' . $codrepmed , __FUNCTION__ , __LINE__ , __FILE__ );
-        $codsup = $repmed->bagoVisitador->linsupvis->lsvsupervisor;
-        $sup = Sup::find( $codsup );
+        $codsup = $repmed->referencia_id;
+        $sup = Personal::getSupvervisor( $codsup );
         if ( is_null( $sup) )
             return $this->warningException( 'El Supervisor no esta registrado en el sistema. Codigo de Supervisor: ' . $codsup , __FUNCTION__ , __LINE__ , __FILE__ );
-        if ( $repmed->idsup != $codsup )
-            return $this->warningException( 'El sistema no tiene la relacion Representate-Supervisor o ha sido actualizada. Se esperaba al Supervisor : ' . $repmed->rmSup->full_name . ' con codigo:' . $codsup . ' .Comuniquese con Informatica' , __FUNCTION__ , __LINE__ , __FILE__ );
-        return $this->setRpta( array( 'rm' => $repmed->iduser , 'sup' => $sup->iduser , 'codsup' => $codsup , 'cuentaRep' => $repmed->bagoVisitador->cuenta->cuenta ) );
+//        if ( $repmed->idsup != $codsup )
+//            return $this->warningException( $repmed->bagoVisitador->cuenta->cuenta , __FUNCTION__ , __LINE__ , __FILE__ );
+        return $this->setRpta( array( 'rm' => $repmed->user_id , 'sup' => $sup->user_id , 'codsup' => $codsup , 'cuentaRep' => $repmed->bagoVisitador->cuenta->cuenta ) );
     }
 
     private function verifyPeriodo( $periodo )

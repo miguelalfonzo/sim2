@@ -6,7 +6,7 @@ use \Eloquent;
 
 class Visitador extends Eloquent 
 {
-    protected $table = TB_SOLICITUD;
+    protected $table = TB_VISITADOR;
     protected $primaryKey = 'VISVISITADOR';
 
     protected function cuenta()
