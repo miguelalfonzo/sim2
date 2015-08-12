@@ -94,7 +94,7 @@ class Seeker extends BaseController
     {
         try {
             $inputs = Input::all();
-            $json = '[{"name":"' . TB_SOLICITUD . '","wheres":{"likes":["VISLEGAJO","(VISNOMBRE || \' \' || VISPATERNO || \' \' || VISMATERNO)"],"equal":{"VISACTIVO":"S","LENGTH(VISLEGAJO)":8}},"selects":["VISVISITADOR","(VISNOMBRE || \' \' || VISPATERNO || \' \' || VISMATERNO)" , "\'REP\'" ]}]';
+            $json = '[{"name":"' . TB_VISITADOR . '","wheres":{"likes":["VISLEGAJO","(VISNOMBRE || \' \' || VISPATERNO || \' \' || VISMATERNO)"],"equal":{"VISACTIVO":"S","LENGTH(VISLEGAJO)":8}},"selects":["VISVISITADOR","(VISNOMBRE || \' \' || VISPATERNO || \' \' || VISMATERNO)" , "\'REP\'" ]}]';
             $cAlias = array('value', 'label', 'type');
             return $this->searchSeeker($inputs['sVal'], $json, $cAlias);
         } catch (Exception $e) {
