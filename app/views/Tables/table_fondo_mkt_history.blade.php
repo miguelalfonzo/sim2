@@ -2,86 +2,69 @@
     <thead>
         <tr>
             <th>#</th>
-            <th>Razon</th>
-            <th>Actualizado por</th>
+            <th>Fecha</th>
+            <th>Descripcion</th>
             <th>Fondo</th>
-            <th>Saldo</th>
-            <th>Saldo Neto</th>
-            <th>Fecha de Movimiento</th>
+            <th>Autorizado Por</th>
+            <th>Abono</th>
+            <th>Cargo</th>
         </tr>
     </thead>
     <tbody>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="text-center">Saldo del Mes Anterior</td>
+            <td class="text-center">{{ $saldo }}</td>
+        </tr>
         @foreach ( $FondoMktHistories as $FondoMktHistory )
-            <tr>
-                <td class="text-center">{{$FondoMktHistory->id}}</td>
-                <td class="text-center">
-                    @if ( ! is_null( $FondoMktHistory->id_solicitud ) )
-                        {{ 'Solicitud #' . $FondoMktHistory->solicitud->id }}
-                    @endif
-                    <span class="label label-primary">{{ $FondoMktHistory->fondoMktHistoryReason->descripcion }}</span>
-                </td>
-                <td class="text-center">{{ $FondoMktHistory->updatedBy->personal->full_name }}</td>
-                <td class="text-center">
-                    @if( is_null( $FondoMktHistory->id_from_fondo ) )
-                        {{ $FondoMktHistory->toFund->full_name }}
-                    @else
-                        {{ $FondoMktHistory->fromFund->full_name }}  
-                        <span class="glyphicon glyphicon-circle-arrow-right green"></span>
-                        {{ $FondoMktHistory->toFund->full_name }}    
-                    @endif
-                </td>
-                <td class="text-center">
-                    @if( ! is_null( $FondoMktHistory->id_from_fondo ) )
-                        @if( $FondoMktHistory->from_old_saldo == $FondoMktHistory->from_new_saldo )
-                            {{ 'S/.' . $FondoMktHistory->from_new_saldo }}
-                        @else
-                            {{ 'S/.' . $FondoMktHistory->from_old_saldo }} 
-                            <span class="glyphicon glyphicon-circle-arrow-right green"></span>
-                            {{ 'S/.' . $FondoMktHistory->from_new_saldo }}
-                        @endif                            
-                    @endif
-                    
-                    @if( ! is_null( $FondoMktHistory->id_from_fondo ) && ! is_null( $FondoMktHistory->id_to_fondo ) )
-                        &nbsp;|&nbsp;
-                    @endif
-
-                    @if ( ! is_null( $FondoMktHistory->id_to_fondo ) )
-                        @if( $FondoMktHistory->to_old_saldo == $FondoMktHistory->to_new_saldo )
-                            {{ 'S/.' . $FondoMktHistory->to_new_saldo }}
-                        @else
-                            {{ 'S/.' . $FondoMktHistory->to_old_saldo }}
-                            <span class="glyphicon glyphicon-circle-arrow-right green"></span>
-                            {{ 'S/.' . $FondoMktHistory->to_new_saldo }}
-                        @endif                            
-                    @endif
-                </td>
-                <td class="text-center">
-                    @if( ! is_null( $FondoMktHistory->id_from_fondo ) )
-                        @if( $FondoMktHistory->from_old_saldo_neto == $FondoMktHistory->from_new_saldo_neto )
-                            {{ 'S/.' . $FondoMktHistory->from_new_saldo_neto }}
-                        @else
-                            {{ 'S/.' . $FondoMktHistory->from_old_saldo_neto }} 
-                            <span class="glyphicon glyphicon-circle-arrow-right green"></span>
-                            {{ 'S/.' . $FondoMktHistory->from_new_saldo_neto }}
-                        @endif                            
-                    @endif
-                    
-                    @if( ! is_null( $FondoMktHistory->id_from_fondo ) && ! is_null( $FondoMktHistory->id_to_fondo ) )
-                        &nbsp;|&nbsp;
-                    @endif
-
-                    @if ( ! is_null( $FondoMktHistory->id_to_fondo ) )
-                        @if( $FondoMktHistory->to_old_saldo_neto == $FondoMktHistory->to_new_saldo_neto )
-                            {{ 'S/.' . $FondoMktHistory->to_new_saldo_neto }}
-                        @else
-                            {{ 'S/.' . $FondoMktHistory->to_old_saldo_neto }} 
-                            <span class="glyphicon glyphicon-circle-arrow-right green"></span>
-                            {{ 'S/.' . $FondoMktHistory->to_new_saldo_neto }}
-                        @endif                            
-                    @endif
-                </td>
-                <td class="text-center">{{$FondoMktHistory->updated_at}}</td>
-            </tr>
+            @if ( in_array( $FondoMktHistory->id_fondo_history_reason , array( FONDO_AJUSTE , FONDO_DEPOSITO , FONDO_DEVOLUCION_PLANILLA , FONDO_DEVOLUCION_TESORERIA ) ) )
+                <tr>
+                    <td class="text-center">{{ $FondoMktHistory->id }}</td>
+                    <td class="text-center">{{ $FondoMktHistory->updated_at }}
+                    <td class="text-center">
+                        <span class="label label-primary">{{ $FondoMktHistory->fondoMktHistoryReason->descripcion }}</span>
+                        @if ( ! is_null( $FondoMktHistory->id_solicitud ) )
+                            {{ 'Solicitud #' . $FondoMktHistory->id_solicitud }}
+                        @endif
+                    </td>
+                    <td>{{ $FondoMktHistory->toFund->middle_name }}</td>
+                    <td class="text-center">{{ $FondoMktHistory->updatedBy->personal->full_name }}</td>
+                    <td class="text-center">
+                        @if ( $FondoMktHistory->to_old_saldo > $FondoMktHistory->to_new_saldo )
+                            {{ $FondoMktHistory->to_old_saldo - $FondoMktHistory->to_new_saldo }}
+                        @endif
+                    </td>
+                    <td class="text-center">
+                        @if ( $FondoMktHistory->to_new_saldo > $FondoMktHistory->to_old_saldo )
+                            {{ $FondoMktHistory->to_new_saldo - $FondoMktHistory->to_old_saldo }}
+                        @endif
+                    </td>
+                </tr>
+            @endif
         @endforeach
     </tbody>
+    <tfoot>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="text-center">Saldo Disponible</td>
+            <td class="text-center">{{ $saldoNeto }}</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="text-center">Saldo Contable</td>
+            <td class="text-center">{{ $saldoContable }}</td>    
+        </tr>
+    </tfoot>
 </table>

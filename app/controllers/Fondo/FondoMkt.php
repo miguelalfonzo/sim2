@@ -7,6 +7,7 @@ use \System\FondoMktHistory;
 use \Auth;
 use \View;
 use \Input;
+use \Expense\ChangeRate;
 
 class FondoMkt extends BaseController
 {
@@ -91,7 +92,6 @@ class FondoMkt extends BaseController
                 $this->setHistoryData( $historiesFondoMkt , $fondoMkt , $tasaCompra , $id_fondo[ 'newMonto' ] , $userType , FONDO_RETENCION );            
             }
         }
-        \Log::error( $historiesFondoMkt );
         $this->setFondoMktHistories( $historiesFondoMkt , $idSolicitud ); 
     }
 
@@ -152,10 +152,13 @@ class FondoMkt extends BaseController
     {
         $oldSaldo     = $subFondo->saldo;
         $oldSaldoNeto = $subFondo->saldo_neto;
-        if ( $reason == FONDO_LIBERACION )
+        if ( $reason == FONDO_LIBERACION ):
             $subFondo->saldo_neto += $monto * $tasaCompra ;
-        elseif ( $reason == FONDO_RETENCION )
+            $subFondo->retencion  -= $monto * $tasaCompra ;
+        elseif ( $reason == FONDO_RETENCION ):
             $subFondo->saldo_neto -= $monto * $tasaCompra ;
+            $subFondo->retencion  += $monto * $tasaCompra ;
+        endif;
             
         $subFondo->save();
         $historyFondoMkt[] = array( 
@@ -182,26 +185,106 @@ class FondoMkt extends BaseController
         $inputs = Input::all();
         $start = $inputs[ 'start' ];
         $end   = $inputs[ 'end' ];  
-        //$fondoSubCategory = FondoSubCategoria::find( 1 );
-        //$fondos = $fondoSubCategory->fondos;
         $subCategory = FondoSubCategoria::find( $inputs[ 'id_subcategoria' ] );
-        \Log::error( $subCategory->toJson() );
         
         $subCategoryType = $subCategory->fondoMktType;
-        \Log::error( $subCategoryType->toJson() );
         
-        $fondoMktHistories = FondoMktHistory::whereRaw( "created_at between to_date( '$start' , 'DD-MM-YY' ) and to_date( '$end' , 'DD-MM-YY' ) + 1" )
+        $fondoMktHistoriesData = FondoMktHistory::whereRaw( "created_at between to_date( '$start' , 'YYYY/MM/DD' ) and to_date( '$end' , 'YYYY/MM/DD' ) + 1" )
                                 ->where( 'id_tipo_to_fondo' , $subCategory->tipo )
                                 ->whereHas( $subCategoryType->relacion , function( $query ) use ( $subCategory )
                                 {
                                     $query->where( 'subcategoria_id' , $subCategory->id );
                                 })->get();
-        \Log::error( json_encode( $fondoMktHistories ) );
+        
+        $fondoMktHistoriesTotalData = FondoMktHistory::whereRaw( "created_at between to_date( '$start' , 'YYYY/MM/DD' ) and sysdate" )
+                                ->where( 'id_tipo_to_fondo' , $subCategory->tipo )
+                                ->whereHas( $subCategoryType->relacion , function( $query ) use ( $subCategory )
+                                {
+                                    $query->where( 'subcategoria_id' , $subCategory->id );
+                                })->get();
+
+        
+        
+        $FondosTotal   = $subCategory->{ $subCategoryType->relacion }->sum( 'saldo' ); 
+        $totalOld      = $fondoMktHistoriesTotalData->sum( 'to_old_saldo' );
+        $totalNew      = $fondoMktHistoriesTotalData->sum( 'to_new_saldo' );
+        $historyTotal  = $totalOld - $totalNew;
+        $saldoAnterior = $FondosTotal - $historyTotal;
+        $periodTotal   = $fondoMktHistoriesData->sum( 'to_old_saldo' ) - $fondoMktHistoriesData->sum( 'to_new_saldo' );
+        $saldoContable = $saldoAnterior + $periodTotal;
+
+        $FondosTotalNeto    = $subCategory->{ $subCategoryType->relacion }->sum( 'saldo_neto' );
+        $totalOldNeto      = $fondoMktHistoriesTotalData->sum( 'to_old_saldo_neto' );
+        $totalNewNeto      = $fondoMktHistoriesTotalData->sum( 'to_new_saldo_neto' );
+        $historyTotalNeto  = $totalOldNeto - $totalNewNeto;
+        $saldoAnteriorNeto = $FondosTotalNeto - $historyTotalNeto;
+        $periodTotalNeto   = $fondoMktHistoriesData->sum( 'to_old_saldo' ) - $fondoMktHistoriesData->sum( 'to_new_saldo' );
+        $saldoNeto         = $saldoAnteriorNeto + $periodTotalNeto;
+      
         $data = array( 
-            'FondoMktHistories' => $fondoMktHistories 
+            'FondoMktHistories' => $fondoMktHistoriesData ,
+            'saldo'             => $saldoAnterior ,
+            'saldoContable'     => $saldoContable ,
+            'saldoNeto'         => $saldoNeto
             );
         return $this->setRpta( array( 'View' => View::make( 'Tables.table_fondo_mkt_history' , $data )->render() ) );
-    
     }
+
+
+    public function refund( $solicitud , $monto_renovado , $type )
+    {
+        $tc = ChangeRate::getTc();
+        $detalle = $solicitud->detalle;
+        if ( $detalle->id_moneda == DOLARES )
+            $tasaCompra = $tc->compra;
+        elseif ( $detalle->id_moneda == SOLES )
+            $tasaCompra = 1;
+        $fondoDataHistories = array();
+        if ( $solicitud->idtiposolicitud == SOL_REP )
+        {
+            $solicitudProducts = $solicitud->products;
+            $fondo_type        = $solicitud->products[ 0 ]->id_tipo_fondo_marketing;
+            $monto_aprobado    = $solicitud->detalle->monto_aprobado;
+            foreach( $solicitudProducts as $solicitudProduct )
+            {
+                $fondo          = $solicitudProduct->thisSubFondo;
+                $oldSaldo       = $fondo->saldo;
+                $oldSaldoNeto   = $fondo->saldo_neto;
+                $monto_renovado_final = ( $monto_renovado / $monto_aprobado ) * $solicitudProduct->monto_asignado;
+                $monto_renovado_final = $monto_renovado_final * $tasaCompra;
+                
+                $fondo->saldo       += $monto_renovado_final ;
+                $fondo->saldo_neto  += $monto_renovado_final ;
+                $fondo->save();
+                $fondoDataHistories[] = array( 
+                    'idFondo'      => $fondo->id , 
+                    'idFondoTipo'  => $fondo_type ,
+                    'oldSaldo'     => $oldSaldo , 
+                    'oldSaldoNeto' => $oldSaldoNeto , 
+                    'newSaldo'     => $fondo->saldo ,
+                    'newSaldoNeto' => $fondo->saldo_neto ,
+                    'reason'       => $type );
+            }
+        }
+        elseif ( $solicitud->idtiposolicitud == SOL_INST )
+        {
+            $fondo = $solicitud->detalle->thisSubFondo;
+            $oldSaldo = $fondo->saldo;
+            $oldSaldoNeto = $fondo->saldo_neto;
+            $fondo->saldo       += $monto_renovado;
+            $fondo->saldo_neto  += $monto_renovado;
+            $fondo->save();
+            $fondoDataHistories[] = array( 
+               'idFondo'      => $fondo->id , 
+               'idFondoTipo'  => INVERSION_INSTITUCIONAL ,
+               'oldSaldo'     => $oldSaldo , 
+               'oldSaldoNeto' => $oldSaldoNeto , 
+               'newSaldo'     => $fondo->saldo , 
+               'newSaldoNeto' => $fondo->saldo_neto , 
+               'reason'       => $type );
+        }
+        $this->setFondoMktHistories( $fondoDataHistories , $solicitud->id );  
+    }
+
 
 }

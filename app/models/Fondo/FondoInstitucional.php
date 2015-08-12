@@ -53,4 +53,9 @@ class FondoInstitucional extends Eloquent
 	{
 		return $this->SubCategoria->descripcion;
 	}
+
+	protected function getMiddleNameAttribute()
+	{
+		return $this->SubCategoria->descripcion;
+	}
 }

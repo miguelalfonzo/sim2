@@ -1824,26 +1824,4 @@ $(function()
         });
     });
 
-    fondo_subcategoria.on( 'change' , function()
-    {
-        data = 
-        {
-            _token : GBREPORTS.token,
-            id_subcategoria : $( this ).val(),
-            start :  $('#drp_menubar').data('daterangepicker').startDate.format("L"),
-            end :  $('#drp_menubar').data('daterangepicker').endDate.format("L")
-        };
-        $.post( server + 'fondo-subcategoria-history' , data )
-        .fail( function( statusCode , errorThrow )
-        {
-            ajaxError( statusCode , errorThrow );
-        }).done( function ( response )
-        {
-            if( response.Status == 'Ok' )
-                  dataTable( 'fondo_mkt_history' , response.Data.View , 'registros' )
-            else
-                bootbox.alert( '<h4 class="red">' + response.Status + ' : ' + response.Description + '</h4>' );
-        });
-    });
-
 }); 

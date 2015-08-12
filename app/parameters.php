@@ -87,6 +87,7 @@ const GER_MKT                                 = 'GM';
 //ID DE TIPO DE SOLICITUDES
 const SOL_REP                                 = 1;
 const SOL_INST                                = 2;
+const REEMBOLSO                               = 3;
 
 //ESTADOS
 const ACTIVE                                  = 1;
@@ -109,8 +110,6 @@ const GASTO                                   = 4;
 |--------------------------------------------------------------------------
 */
 
-//MOTIVO DE LA SOLICITUD
-const REEMBOLSO        = 3;
 
 //TIPO DE DOCUMENTO
 const RECIBO_HONORARIO = 2;
@@ -166,12 +165,13 @@ const APP_ID                    = 2;
 const TITULO_INSTITUCIONAL      = 'FONDO INSTITUCIONAL';
 const MONTO_DESCUENTO_PLANILLA  = 50;
 
-const FONDO_AJUSTE              = 1;
-const FONDO_RETENCION           = 2;
-const FONDO_LIBERACION          = 3;
-const FONDO_DEPOSITO            = 4;
-const FONDO_DEVOLUCION          = 5;
-const FONDO_TRANSFERENCIA       = 6;
+const FONDO_AJUSTE               = 1;
+const FONDO_RETENCION            = 2;
+const FONDO_LIBERACION           = 3;
+const FONDO_DEPOSITO             = 4;
+const FONDO_DEVOLUCION_PLANILLA  = 5;
+const FONDO_TRANSFERENCIA        = 6;
+const FONDO_DEVOLUCION_TESORERIA = 7;
 
 const TIPO_FAMILIA              = 129;
 const TIPO_GERPROD              = 128;
