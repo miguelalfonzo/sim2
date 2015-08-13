@@ -27,6 +27,7 @@ use \Dmkt\InvestmentActivity;
 use \Fondo\FondoSupervisor;
 use \Fondo\FondoGerProd;
 use \Fondo\FondoInstitucional;
+use \Fondo\FondoMktPeriodHistory;
 use \System\FondoMktHistory;
 	
 	Solicitud::observe(			new Transaction());
@@ -54,3 +55,4 @@ use \System\FondoMktHistory;
 	FondoGerProd::observe( new Transaction());
 	FondoInstitucional::observe( new Transaction());
 	FondoMktHistory::observe( new Transaction());
+	FondoMktPeriodHistory::observe( new Transaction());

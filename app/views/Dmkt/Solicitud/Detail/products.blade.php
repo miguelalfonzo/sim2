@@ -18,9 +18,9 @@
                                         <option selected disabled value="0">Seleccione el Fondo</option>
                                         @foreach( $product->getSubFondo( $tipo_usuario , $solicitud ) as $fondoMkt )
                                             @if ( $fondoMkt->marca_id == $product->id_producto )
-                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}" style="background-color:#00FFFF">{{ $fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_neto }}</option>
+                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}" style="background-color:#00FFFF">{{ $fondoMkt->descripcion . ' S/.' . ( $fondoMkt->saldo - $fondoMkt->retencion ) }}</option>
                                             @else   
-                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}">{{ $fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_neto }}</option>
+                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}">{{ $fondoMkt->descripcion . ' S/.' . ( $fondoMkt->saldo - $fondoMkt->retencion ) }}</option>
                                             @endif
                                         @endforeach
                                     @else
@@ -31,9 +31,9 @@
                                         </option>    
                                         @foreach( $product->getSubFondo( $tipo_usuario , $solicitud ) as $fondoMkt )
                                             @if ( $fondoMkt->id == $product->id_fondo_marketing )
-                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}" style="background-color:#00FFFF">{{$fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_neto }}</option>
+                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}" style="background-color:#00FFFF">{{$fondoMkt->descripcion . ' S/.' . ( $fondoMkt->saldo - $fondoMkt->retencion ) }}</option>
                                             @else   
-                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}">{{$fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_neto }}</option>
+                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}">{{$fondoMkt->descripcion . ' S/.' . ( $fondoMkt->saldo - $fondoMkt->retencion ) }}</option>
                                             @endif
                                         @endforeach
                                     @endif

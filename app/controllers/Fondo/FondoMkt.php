@@ -8,6 +8,7 @@ use \Auth;
 use \View;
 use \Input;
 use \Expense\ChangeRate;
+use \Carbon\Carbon;
 
 class FondoMkt extends BaseController
 {
@@ -148,28 +149,68 @@ class FondoMkt extends BaseController
         return $this->setRpta();
     }
 
+    private function lastPeriod( $period )
+    {
+
+    }
+
+    private function setPeriodHistoryData( $subCategoryId , $data )
+    {
+        $now     = Carbon::now();
+        $period  = $now->format( 'Ym' );
+        $fondoPeriodHistory = FondoMktPeriodHistory::getFondoMktPeriod( $period , $subCategoryId );
+
+        if ( is_null( $fondoPeriodHistory ) ):
+            $lastFondoPeriodHistory       = FondoMktPeriodHistory::getFondoMktPeriod( $now->subMonth()->format( 'Ym' ) , $subCategoryId );
+            $fondoPeriodHistory          = new FondoMktPeriodHistory;
+            $fondoPeriodHistory->id      = $fondoPeriodHistory->nextId();
+            $fondoPeriodHistory->periodo = $period;
+            $fondoPeriodHistory->subcategoria_id = $subCategoryId;
+            if ( is_null( $lastFondoPeriodHistory ) ):
+                $fondoSubCategory = FondoSubCategoria::find( $subCategoryId );
+                $fondos = $fondoSubCategory->fund;
+                $fondoPeriodHistory->saldo_inicial = $fondos->sum( 'saldo' );
+                $fondoPeriodHistory->retencion_inicial = $fondos->sum( 'retencion' );    
+            else:
+                $fondoPeriodHistory->saldo_inicial     = $lastFondoPeriodHistory->saldo_final;
+                $fondoPeriodHistory->retencion_inicial = $lastFondoPeriodHistory->retencion_final;
+            endif;            
+            $fondoPeriodHistory->saldo_final       =  $fondoPeriodHistory->saldo_inicial  + ( $data[ 'newSaldo' ] - $data[ 'oldSaldo' ] );
+            $fondoPeriodHistory->retencion_final   = $fondoPeriodHistory->retencion_inicial + ( $data[ 'newRetencion' ] - $data[ 'oldRetencion' ] );
+        else:
+            $fondoPeriodHistory->saldo_final     += $data[ 'newSaldo' ] - $data[ 'oldSaldo' ];
+            $fondoPeriodHistory->retencion_final += $data[ 'newRetencion' ] - $data[ 'oldRetencion' ];
+        endif;
+
+        $fondoPeriodHistory->save();
+
+    }
+
     private function setHistoryData( &$historyFondoMkt , $subFondo , $tasaCompra , $monto , $userType , $reason )
     {
         $oldSaldo     = $subFondo->saldo;
         $oldSaldoNeto = $subFondo->saldo_neto;
+        $oldRetencion = $subFondo->retencion;
         if ( $reason == FONDO_LIBERACION ):
             $subFondo->saldo_neto += $monto * $tasaCompra ;
             $subFondo->retencion  -= $monto * $tasaCompra ;
         elseif ( $reason == FONDO_RETENCION ):
             $subFondo->saldo_neto -= $monto * $tasaCompra ;
             $subFondo->retencion  += $monto * $tasaCompra ;
-        endif;
-            
-        $subFondo->save();
-        $historyFondoMkt[] = array( 
+        endif;  
+        $data = array( 
             'idFondo'      => $subFondo->id , 
             'idFondoTipo'  => $userType ,
             'oldSaldo'     => $oldSaldo , 
-            'oldSaldoNeto' => $oldSaldoNeto , 
+            'oldSaldoNeto' => $oldSaldoNeto ,
+            'oldRetencion' => $oldRetencion ,
             'newSaldo'     => $subFondo->saldo , 
             'newSaldoNeto' => $subFondo->saldo_neto , 
-            'reason'       => $reason 
-        );
+            'newRetencion' => $subFondo->retencion ,
+            'reason'       => $reason );
+        $historyFondoMkt[] = $data;
+        $this->setPeriodHistoryData( $subFondo->subcategoria_id , $data );
+        $subFondo->save();
     }
 
     public function getFondoHistorial()
