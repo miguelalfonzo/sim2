@@ -28,7 +28,7 @@ class SolicitudProduct extends Eloquent
         {
             $userid = $solicitud->asigned_to->rm->rmSup->user_id;
             return DB::table(TB_FONDO_SUPERVISOR.' fs')
-                        ->select("m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'fs.saldo' , 'fs.saldo_neto' , 'fs.id' , 'fs.marca_id' , '\'S\' tipo' )
+                        ->select("m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'fs.saldo' , 'fs.retencion' , 'fs.id' , 'fs.marca_id' , '\'S\' tipo' )
                         ->leftJoin(TB_FONDO_CATEGORIA_SUB.' fsc' , 'fsc.id' , '=' , 'fs.subcategoria_id' )
                         ->leftJoin(TB_FONDO_CATEGORIA.' fc' , 'fc.id' , '=' , 'fsc.id_fondo_categoria' )
                         ->leftJoin(TB_MARCAS_BAGO.' m' , 'fs.marca_id' , '=' , 'm.id' )
@@ -40,7 +40,7 @@ class SolicitudProduct extends Eloquent
         else if( $userType == GER_PROD )
         {
             return DB::table( TB_FONDO_GERENTE_PRODUCTO.' f' )
-            ->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo' , 'f.saldo_neto', 'f.id' , 'f.marca_id' , '\'P\' tipo' )
+            ->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo' , 'f.retencion', 'f.id' , 'f.marca_id' , '\'P\' tipo' )
             ->leftJoin( TB_FONDO_CATEGORIA_SUB.' fsc' , 'f.subcategoria_id' , '=' , 'fsc.id' )
             ->leftJoin( TB_FONDO_CATEGORIA.' fc' , 'fsc.id_fondo_categoria' , '=' , 'fc.id' )
             ->leftJoin( TB_MARCAS_BAGO.' m' , 'f.marca_id' , '=' , 'm.id' )
@@ -55,7 +55,7 @@ class SolicitudProduct extends Eloquent
         else if( $userType == ASIS_GER )
         {
             return DB::table( TB_FONDO_INSTITUCION.' f' )
-            ->select( "fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo' , 'f.saldo_neto' , 'f.id' , '\'AG\' tipo' )
+            ->select( "fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo' , 'f.retencion' , 'f.id' , '\'AG\' tipo' )
             ->leftJoin( TB_FONDO_CATEGORIA_SUB.' fsc' , 'f.subcategoria_id' , '=' , 'fsc.id' )
             ->leftJoin( TB_FONDO_CATEGORIA.' fc' , 'fsc.id_fondo_categoria' , '=' , 'fc.id' )
             ->where( 'fsc.tipo' , FONDO_SUBCATEGORIA_INSTITUCION )->get();
