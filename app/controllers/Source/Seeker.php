@@ -20,6 +20,7 @@ use \Dmkt\InvestmentActivity;
 use \Dmkt\InvestmentType;
 use \Client\ClientType;
 use \Exception;
+use \Auth;
 
 class Seeker extends BaseController
 {
@@ -102,73 +103,38 @@ class Seeker extends BaseController
         }
     }
 
+    private function getHierarchyType()
+    {
+        if ( Auth::user()->type == SUP )
+            return array( SUP , GER_PROM );
+        elseif ( Auth::user()->type == GER_PROD )
+            return array( GER_PROD );
+        elseif ( Auth::user()->type == GER_COM )
+            return array( GER_PROM );
+        elseif ( Auth::user()->type == GER_PROM )
+            return array( GER_COM );
+    }
+
     public function userSource()
     {
-        $inputs = Input::all();
-        $personal = Personal::select(DB::raw('(NOMBRES || \' \' || APELLIDOS) as label, USER_ID as value, tipo_personal_id'))
-//                    ->whereRaw("NOMBRES || ' ' || APELLIDOS like UPPER('%mel%')")
-            ->whereRaw("NOMBRES || ' ' || APELLIDOS like UPPER('%" . $inputs['sVal'] . "%')")
-            ->orderBy('label')
+        $inputs    = Input::all();
+        $userTypes = $this->getHierarchyType();
+        $personal  = Personal::select( 'NOMBRES , APELLIDOS , USER_ID' )
+            ->whereRaw( "NOMBRES || ' ' || APELLIDOS like UPPER( '%" . $inputs[ 'sVal' ] . "%' )" )
+            ->whereHas( 'user' , function( $query ) use( $userTypes )
+            {
+                $query->whereIn( 'type' , $userTypes );
+            })
+            ->orderBy( 'NOMBRES' )
             ->get();
 
-
-//        if (\Auth::user()->type == SUP)
-//            return ($var->type == 'SUPERVISOR' || $var->type == 'G. PROMOCION');
-//        elseif (\Auth::user()->type == GER_PROD)
-//            return ($var->type == 'G. PRODUCTO' || $var->type == 'G. COMERCIAL');
-//        elseif (\Auth::user()->type == GER_COM)
-//            return $var->type == 'G. PROMOCION';
-//        elseif (\Auth::user()->type == GER_PROM)
-//            return $var->type == 'G. COMERCIAL';
-        $personal_filter = array();
-        foreach ($personal as $p) {
-            if ($p->getType){
-                $p->type = $p->getType->descripcion;
-                if (\Auth::user()->type == SUP)
-                    if($p->getType->id == 4)
-                        $personal_filter[] = $p;
-//                      return ($var->type == 'SUPERVISOR' || $var->type == 'G. PROMOCION');
-                elseif (\Auth::user()->type == GER_PROD)
-                    if($p->getType->id == 5)
-                        $personal_filter[] = $p;
-//                    return ($var->type == 'G. PRODUCTO' || $var->type == 'G. COMERCIAL');
-                elseif (\Auth::user()->type == GER_COM)
-                    if($p->getType->id == 6)
-                        $personal_filter[] = $p;
-//                    return $var->type == 'G. PROMOCION';
-                elseif (\Auth::user()->type == GER_PROM)
-                    if($p->getType->id == 7)
-                        $personal_filter[] = $p;
-//                    return $var->type == 'G. COMERCIAL';
-
-            }
-
+        foreach ( $personal as $person )
+        {
+            $person->label = $person->full_name;
+            $person->value = $person->user_id;
+            $person->type  = $person->user->userType->descripcion;
         }
-
-        $rpta = array();
-        foreach ($personal_filter as $array)
-            $rpta[] = $array;
-        return $this->setRpta($rpta);
-//        $json  = "";
-//		$json = '[{ "name": "OUTDVP.DMKT_RG_SUPERVISOR" , "wheres":{ "likes": ["( NOMBRES || \' \' || APELLIDOS )" ] ,
-//		 "notnull": ["IDUSER"] } , "selects" : [ "IDUSER" , "( NOMBRES || \' \' || APELLIDOS )" , "\'SUPERVISOR\'" ] } , ' .
-//				'{ "name" : "OUTDVP.GERENTES" , "wheres":{ "likes": ["DESCRIPCION"] , "notnull" : [ "IDUSER" ] } ,
-//				 "selects" : [ "IDUSER" , "DESCRIPCION" , "\'G. PRODUCTO\'"] } , ' .
-//				'{ "name" : "OUTDVP.PERSONAS a" , "joins":{ "innerjoin":[ "outdvp.users b" , "a.iduser" , "=" , "b.id" ] } ,
-//				 "wheres":{ "likes": [ "( a.NOMBRES || \' \' || a.APELLIDOS )" ] , "notnull" : [ "a.IDUSER" ] ,
-//				  "in":{ "b.TYPE":[ "GP" , "G" ] } } , "selects" : [ "a.IDUSER" , "( a.NOMBRES || \' \' || a.APELLIDOS )" ,
-//				  "CASE WHEN b.type = \'GP\' THEN \'G. PROMOCION\' WHEN b.type = \'G\' THEN \'G. COMERCIAL\' END" ] }]';
-//		$cAlias = array( 'value' , 'label' , "type" );	$json = '[{ "name": "OUTDVP.DMKT_RG_SUPERVISOR" , "wheres":{ "likes": ["( NOMBRES || \' \' || APELLIDOS )" ] ,
-//		 "notnull": ["IDUSER"] } , "selects" : [ "IDUSER" , "( NOMBRES || \' \' || APELLIDOS )" , "\'SUPERVISOR\'" ] } , ' .
-//				'{ "name" : "OUTDVP.GERENTES" , "wheres":{ "likes": ["DESCRIPCION"] , "notnull" : [ "IDUSER" ] } ,
-//				 "selects" : [ "IDUSER" , "DESCRIPCION" , "\'G. PRODUCTO\'"] } , ' .
-//				'{ "name" : "OUTDVP.PERSONAS a" , "joins":{ "innerjoin":[ "outdvp.users b" , "a.iduser" , "=" , "b.id" ] } ,
-//				 "wheres":{ "likes": [ "( a.NOMBRES || \' \' || a.APELLIDOS )" ] , "notnull" : [ "a.IDUSER" ] ,
-//				  "in":{ "b.TYPE":[ "GP" , "G" ] } } , "selects" : [ "a.IDUSER" , "( a.NOMBRES || \' \' || a.APELLIDOS )" ,
-//				  "CASE WHEN b.type = \'GP\' THEN \'G. PROMOCION\' WHEN b.type = \'G\' THEN \'G. COMERCIAL\' END" ] }]';
-//		$cAlias = array( 'value' , 'label' , "type" );
-//		return $this->searchSeeker( $inputs['sVal'] , $json , $cAlias , 2 );
-//		return $this->searchSeeker( 'users', $json , $cAlias , 2 );
+        return $this->setRpta( $personal->toArray() );    
     }
 
     private function searchSeeker($inputs, $json, $cAlias, $type = 1)

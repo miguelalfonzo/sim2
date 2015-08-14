@@ -40,24 +40,16 @@
                                     @endif
                                 </td>
                                 <td>
-                                    @if ( $solicitud->asignedTo->type == REP_MED )
-                                        {{ $solicitud->asignedTo->rm->full_name }}
-                                    @elseif ( $solicitud->asignedTo->type == SUP )
-                                        {{ $solicitud->asignedTo->sup->full_name }}
-                                    @elseif ( $solicitud->asignedTo->type == GER_PROD )
-                                        {{ $solicitud->asignedTo->gerProd->full_name }}
-                                    @elseif ( ! is_null( $solicitud->asignedTo->simApp ) )
-                                        {{ $solicitud->asignedTo->person->full_name }}
-                                    @else
+                                    @if ( is_null ( $solicitud->asignedTo->personal ) )
                                         Sin Rol o No Autorizado
+                                    @else
+                                        {{ $solicitud->asignedTo->personal->full_name }}
                                     @endif
                                 </td>
                                 <td>
                                     @if ( $solicitud->detalle->id_pago != PAGO_CHEQUE )
                                         @if ( $solicitud->asignedTo->type == REP_MED && ! is_null( $solicitud->asignedTo->rm->bagoVisitador ) && ! is_null( $solicitud->asignedTo->rm->bagoVisitador->cuenta ) )
-                                            N° Cta: {{ $solicitud->asignedTo->rm->bagoVisitador->cuenta->cuenta }}
-                                        @else
-                                            N° Cta:
+                                            {{ $solicitud->asignedTo->rm->bagoVisitador->cuenta->cuenta }}
                                         @endif
                                     @else
                                         RUC: {{ $solicitud->detalle->num_ruc }}         
@@ -72,7 +64,7 @@
         </main>
         <footer>
             <p class="firma">V°B° Contabilidad</p>
-            <div style="width:120px;text-align:center" ><span class="dni">{{Auth::user()->person->full_name}}</span></div>
+            <div style="width:120px;text-align:center" ><span class="dni">{{ Auth::user()->personal->full_name }}</span></div>
         </footer>
     </div>
 </body>

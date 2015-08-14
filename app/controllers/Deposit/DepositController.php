@@ -160,22 +160,24 @@ class DepositController extends BaseController
             {
                 $fondo            = $solicitudProduct->thisSubFondo;
                 $oldSaldo         = $fondo->saldo;
-                $oldSaldoNeto     = $fondo->saldo_neto;
+                $oldRetencion     = $fondo->retencion;
                 $fondo->saldo     -= $solicitudProduct->monto_asignado;
                 $fondo->retencion -= $solicitudProduct->monto_asignado;
                 if ( isset( $fondoData[ $fondo->id ] ) )
                     $fondosData[ $fondo->id ] += $solicitudProduct->monto_asignado;
                 else
                     $fondosData[ $fondo->id ] = $solicitudProduct->monto_asignado;
-                $fondo->save();
-                $fondoDataHistories[] = array(
+                $data = array(
                    'idFondo'      => $fondo->id , 
                    'idFondoTipo'  => $fondo_type ,
-                   'oldSaldo'     => $oldSaldo , 
-                   'oldSaldoNeto' => $oldSaldoNeto , 
+                   'oldSaldo'     => $oldSaldo ,
+                   'oldRetencion' => $oldRetencion , 
                    'newSaldo'     => $fondo->saldo , 
-                   'newSaldoNeto' => $fondo->saldo_neto , 
+                   'newRetencion' => $fondo->retencion ,
                    'reason'       => FONDO_DEPOSITO );
+                $fondoDataHistories[] = $data;
+                $fondoMktController->setPeriodHistoryData( $fondo->subcategoria_id , $data );
+                $fondo->save();
             }       
             $middleRpta = $fondoMktController->validateFondoSaldo( $fondosData , $fondo_type , $msg );
             if ( $middleRpta[ status] != ok )
@@ -184,25 +186,29 @@ class DepositController extends BaseController
         elseif ( $solicitud->idtiposolicitud == SOL_INST )
         {    
             $detalle          = $solicitud->detalle;
+
             $fondo            = $detalle->thisSubFondo;
             $oldSaldo         = $fondo->saldo;
-            $oldSaldoNeto     = $fondo->saldo_neto;
+            $oldRetencion     = $fondo->retencion;
             $fondo->saldo     -= $detalle->monto_aprobado;
             $fondo->retencion -= $detalle->monto_aprobado;
 
             if ( $fondo->saldo < 0 )
                 return $this->warningException( 'El Fondo ' . $this->fondoName( $fondo ) . ' solo cuenta con S/.' . ( $fondo->saldo + $fondoMonto ) . 
                                                 $msg . $fondoMonto . ' en total' , __FUNCTION__ , __FILE__ , __LINE__ );
-            $fondo->save();
-            $fondoDataHistories[] = array(
+            $data = array(
                 'idFondo'      => $fondo->id , 
                 'idFondoTipo'  => INVERSION_INSTITUCIONAL ,
                 'oldSaldo'     => $oldSaldo , 
-                'oldSaldoNeto' => $oldSaldoNeto , 
+                'oldRetencion' => $oldRetencion , 
                 'newSaldo'     => $fondo->saldo , 
-                'newSaldoNeto' => $fondo->saldo_neto , 
+                'newRetencion' => $fondo->retencion , 
                 'reason'       => FONDO_DEPOSITO );
+            $fondoDataHistories[] = $data;
+            $fondoMktController->setPeriodHistoryData( $fondo->subcategoria_id , $data );
+            $fondo->save();
         }
+
         $fondoMktController->setFondoMktHistories( $fondoDataHistories , $solicitud->id );  
         return $this->setRpta();
     }
@@ -226,8 +232,8 @@ class DepositController extends BaseController
             $detalle    = $solicitud->detalle;
             $jDetalle   = json_decode( $detalle->detalle );
 
-            $totalGasto = $solicitud->expenses->sum( 'monto' );
-            $monto_descuento = $detalle->monto_aprobado - $totalGasto;
+            $totalGasto                = $solicitud->expenses->sum( 'monto' );
+            $monto_descuento           = $detalle->monto_aprobado - $totalGasto;
             $jDetalle->monto_descuento = $monto_descuento;
             $detalle->detalle          = json_encode( $jDetalle );
             $detalle->save();
@@ -237,9 +243,13 @@ class DepositController extends BaseController
 
             $middleRpta = $this->setStatus( $oldIdestado, $solicitud->id_estado , Auth::user()->id , USER_CONTABILIDAD , $solicitud->id );
             if ( $middleRpta[ status ] == ok )
+            {
+                Session::put( 'state' , R_GASTO );
                 DB::commit();
+            }
             else
                 DB::rollback();
+
             return $middleRpta;
         }
         catch( Exception $e )

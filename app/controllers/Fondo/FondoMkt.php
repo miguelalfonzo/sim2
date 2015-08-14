@@ -29,8 +29,8 @@ class FondoMkt extends BaseController
         $fondoMktHistory->id_fondo_history_reason = $historyFondoMkt[ 'reason' ];
         $fondoMktHistory->to_old_saldo            = $historyFondoMkt[ 'oldSaldo' ];
         $fondoMktHistory->to_new_saldo            = $historyFondoMkt[ 'newSaldo' ];
-        $fondoMktHistory->to_old_saldo_neto       = $historyFondoMkt[ 'oldSaldoNeto' ];
-        $fondoMktHistory->to_new_saldo_neto       = $historyFondoMkt[ 'newSaldoNeto' ];
+        $fondoMktHistory->old_retencion           = $historyFondoMkt[ 'oldRetencion' ];
+        $fondoMktHistory->new_retencion           = $historyFondoMkt[ 'newRetencion' ];
         $fondoMktHistory->save();
     }
 
@@ -149,12 +149,7 @@ class FondoMkt extends BaseController
         return $this->setRpta();
     }
 
-    private function lastPeriod( $period )
-    {
-
-    }
-
-    private function setPeriodHistoryData( $subCategoryId , $data )
+    public function setPeriodHistoryData( $subCategoryId , $data )
     {
         $now     = Carbon::now();
         $period  = $now->format( 'Ym' );
@@ -189,23 +184,18 @@ class FondoMkt extends BaseController
     private function setHistoryData( &$historyFondoMkt , $subFondo , $tasaCompra , $monto , $userType , $reason )
     {
         $oldSaldo     = $subFondo->saldo;
-        $oldSaldoNeto = $subFondo->saldo_neto;
         $oldRetencion = $subFondo->retencion;
-        if ( $reason == FONDO_LIBERACION ):
-            $subFondo->saldo_neto += $monto * $tasaCompra ;
+        if ( $reason == FONDO_LIBERACION )
             $subFondo->retencion  -= $monto * $tasaCompra ;
-        elseif ( $reason == FONDO_RETENCION ):
-            $subFondo->saldo_neto -= $monto * $tasaCompra ;
+        elseif ( $reason == FONDO_RETENCION )
             $subFondo->retencion  += $monto * $tasaCompra ;
-        endif;  
+
         $data = array( 
             'idFondo'      => $subFondo->id , 
             'idFondoTipo'  => $userType ,
             'oldSaldo'     => $oldSaldo , 
-            'oldSaldoNeto' => $oldSaldoNeto ,
             'oldRetencion' => $oldRetencion ,
             'newSaldo'     => $subFondo->saldo , 
-            'newSaldoNeto' => $subFondo->saldo_neto , 
             'newRetencion' => $subFondo->retencion ,
             'reason'       => $reason );
         $historyFondoMkt[] = $data;
@@ -244,19 +234,17 @@ class FondoMkt extends BaseController
                                     $query->where( 'subcategoria_id' , $subCategory->id );
                                 })->get();
 
-        
-        
         $FondosTotal   = $subCategory->{ $subCategoryType->relacion }->sum( 'saldo' ); 
         $totalOld      = $fondoMktHistoriesTotalData->sum( 'to_old_saldo' );
         $totalNew      = $fondoMktHistoriesTotalData->sum( 'to_new_saldo' );
         $historyTotal  = $totalOld - $totalNew;
-        $saldoAnterior = $FondosTotal - $historyTotal;
+        $saldoAnterior = $FondosTotal + $historyTotal;
         $periodTotal   = $fondoMktHistoriesData->sum( 'to_old_saldo' ) - $fondoMktHistoriesData->sum( 'to_new_saldo' );
-        $saldoContable = $saldoAnterior + $periodTotal;
+        $saldoContable = $saldoAnterior - $periodTotal;
 
         $FondosTotalNeto    = $subCategory->{ $subCategoryType->relacion }->sum( 'saldo_neto' );
-        $totalOldNeto      = $fondoMktHistoriesTotalData->sum( 'to_old_saldo_neto' );
-        $totalNewNeto      = $fondoMktHistoriesTotalData->sum( 'to_new_saldo_neto' );
+        $totalOldNeto      = $fondoMktHistoriesTotalData->sum( 'old_retencion' );
+        $totalNewNeto      = $fondoMktHistoriesTotalData->sum( 'new_retencion' );
         $historyTotalNeto  = $totalOldNeto - $totalNewNeto;
         $saldoAnteriorNeto = $FondosTotalNeto - $historyTotalNeto;
         $periodTotalNeto   = $fondoMktHistoriesData->sum( 'to_old_saldo' ) - $fondoMktHistoriesData->sum( 'to_new_saldo' );
@@ -266,7 +254,7 @@ class FondoMkt extends BaseController
             'FondoMktHistories' => $fondoMktHistoriesData ,
             'saldo'             => $saldoAnterior ,
             'saldoContable'     => $saldoContable ,
-            'saldoNeto'         => $saldoNeto
+            'saldoNeto'         => $saldoContable - $historyTotalNeto
             );
         return $this->setRpta( array( 'View' => View::make( 'Tables.table_fondo_mkt_history' , $data )->render() ) );
     }
@@ -290,32 +278,32 @@ class FondoMkt extends BaseController
             {
                 $fondo          = $solicitudProduct->thisSubFondo;
                 $oldSaldo       = $fondo->saldo;
-                $oldSaldoNeto   = $fondo->saldo_neto;
+                $oldRetencion   = $fondo->retencion;
                 $monto_renovado_final = ( $monto_renovado / $monto_aprobado ) * $solicitudProduct->monto_asignado;
                 $monto_renovado_final = $monto_renovado_final * $tasaCompra;
                 
                 $fondo->saldo       += $monto_renovado_final ;
-                $fondo->saldo_neto  += $monto_renovado_final ;
-                $fondo->save();
-                $fondoDataHistories[] = array( 
+                
+                $data = array( 
                     'idFondo'      => $fondo->id , 
                     'idFondoTipo'  => $fondo_type ,
                     'oldSaldo'     => $oldSaldo , 
-                    'oldSaldoNeto' => $oldSaldoNeto , 
+                    'oldRetencion' => $oldRetencion , 
                     'newSaldo'     => $fondo->saldo ,
-                    'newSaldoNeto' => $fondo->saldo_neto ,
+                    'newRetencion' => $fondo->retencion ,
                     'reason'       => $type );
+                $fondoDataHistories[] = $data;
+                $this->setPeriodHistoryData( $fondo->subcategoria_id , $data );
+                $fondo->save();
             }
         }
         elseif ( $solicitud->idtiposolicitud == SOL_INST )
         {
             $fondo = $solicitud->detalle->thisSubFondo;
             $oldSaldo = $fondo->saldo;
-            $oldSaldoNeto = $fondo->saldo_neto;
+            $oldRetencion = $fondo->retencion;
             $fondo->saldo       += $monto_renovado;
-            $fondo->saldo_neto  += $monto_renovado;
-            $fondo->save();
-            $fondoDataHistories[] = array( 
+            $data = array( 
                'idFondo'      => $fondo->id , 
                'idFondoTipo'  => INVERSION_INSTITUCIONAL ,
                'oldSaldo'     => $oldSaldo , 
@@ -323,6 +311,9 @@ class FondoMkt extends BaseController
                'newSaldo'     => $fondo->saldo , 
                'newSaldoNeto' => $fondo->saldo_neto , 
                'reason'       => $type );
+            $fondoDataHistories[] = $data;
+            $this->setPeriodHistoryData( $fondo->subcategoria_id , $data ); 
+            $fondo->save();
         }
         $this->setFondoMktHistories( $fondoDataHistories , $solicitud->id );  
     }

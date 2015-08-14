@@ -59,10 +59,10 @@
                 <select name="responsable" class="form-control">
                     <option value="0" selected disabled>Seleccione el Representante Responsable</option>    
                     @foreach( $reps as $rep )
-                        @if( isset( $solicitud ) && $solicitud->id_user_assign == $rep->iduser )
-                            <option value="{{ $rep->iduser }}" selected>{{ $rep->full_name }}</option>
+                        @if( isset( $solicitud ) && $solicitud->id_user_assign == $rep->user_id )
+                            <option value="{{ $rep->user_id }}" selected>{{ $rep->full_name }}</option>
                         @else
-                            <option value="{{ $rep->iduser }}">{{ $rep->full_name }}</option>
+                            <option value="{{ $rep->user_id }}">{{ $rep->full_name }}</option>
                         @endif
                     @endforeach
                 </select>

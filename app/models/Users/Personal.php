@@ -3,10 +3,10 @@
 namespace Users;
 
 use \Eloquent;
+use \Auth;
 
 class Personal extends Eloquent
 {
-
 
     protected $table = TB_PERSONAL;
     protected $primaryKey = 'id';
@@ -45,8 +45,25 @@ class Personal extends Eloquent
     // mamv : RETORNA MODELO DE REPRESENTANTE MEDICO por ID BAGO
     protected function getRM( $bago_id )
     {
-        $persona = Personal::where( 'bago_id' , $bago_id)->where('tipo', '=', 'RM')->first();
-        return $persona;
+        return Personal::where( 'bago_id' , $bago_id)->whereHas( 'user' , function( $query )
+        {
+            $query->where( 'type' , REP_MED );
+        })->first();
+    }
+
+    protected function getRms()
+    {
+        if ( Auth::user()->type == GER_PROD )
+            return Personal::wherehas( 'user' , function( $query )
+            {
+                $query->where( 'type' , REP_MED );
+            })->get();
+        elseif( Auth::user()->type == SUP )
+            return Personal::where( 'referencia_id' , Auth::user()->sup->bago_id )
+            ->wherehas( 'user' , function( $query )
+            {
+                $query->where( 'type' , REP_MED );
+            })->get();
     }
 
     // mamv : RETORNA MODELO DE REPRESENTANTE SUPERVISOR por ID BAGO
@@ -80,9 +97,9 @@ class Personal extends Eloquent
         return $this->hasMany('Dmkt\SolicitudGer' , 'id_gerprod' , 'bago_id');
     }
 
-    protected static function getGerProd( $ids )
+    protected static function getGerProd( $bagoIds )
     {
-        return Personal::whereIn( 'id' , $ids )->where( 'tipo' , GER_PROD )->get();
+        return Personal::whereIn( 'bago_id' , $bagoIds )->where( 'tipo' , GER_PROD )->get();
     }
 
     protected static function getGerProdNotRegisteredName( $uniqueIdsGerProd )
@@ -94,5 +111,10 @@ class Personal extends Eloquent
     protected function bagoVisitador()
     {
         return $this->hasOne( 'Users\Visitador' , 'visvisitador' , 'bago_id' );
+    }
+
+    public function user()
+    {
+        return $this->belongsTo( 'User' , 'user_id' );
     }
 }

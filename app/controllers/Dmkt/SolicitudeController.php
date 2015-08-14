@@ -35,9 +35,6 @@ use \Expense\Table;
 use \Expense\Regimen;
 use \stdClass;
 use \Policy\ApprovalPolicy;
-use \Users\Manager;
-use \Users\Sup;
-use \Users\Rm;
 use \Users\Personal;
 use \Client\ClientType;
 use \yajra\Pdo\Oci8\Exceptions\Oci8Exception;
@@ -113,7 +110,7 @@ class SolicitudeController extends BaseController
             'families' => $qryProducts->get(),
             'investments' => InvestmentType::orderMkt());
         if (in_array(Auth::user()->type, array(SUP, GER_PROD)))
-            $data['reps'] = Rm::order();
+            $data[ 'reps' ] = Personal::getRms();
         return View::make('Dmkt.Register.solicitud', $data);
     }
 
@@ -127,10 +124,10 @@ class SolicitudeController extends BaseController
                            'currencies'  => TypeMoney::all(),
                            'families'    => $qryProducts->get(),
                            'investments' => InvestmentType::orderMkt(),
-                           'edit'        => true);
-        $data['detalle'] = $data['solicitud']->detalle;
+                           'edit'        => true );
+        $data[ 'detalle'] = $data['solicitud']->detalle;
         if (in_array(Auth::user()->type, array(SUP, GER_PROD)))
-            $data['reps'] = Rm::order();
+            $data[ 'reps' ] = Personal::getRms();
         return View::make('Dmkt.Register.solicitud', $data);
     }
 
@@ -223,8 +220,8 @@ class SolicitudeController extends BaseController
             'descripcion'   => 'string|max:200'
         );
 
-        if (in_array(Auth::user()->type, array(SUP, GER_PROD)))
-            $rules['responsable'] = 'required|numeric|min:1|exists:outdvp.dmkt_rg_rm,iduser';
+        if (in_array(Auth::user()->type, array( SUP, GER_PROD ) ) )
+            $rules['responsable'] = 'required|numeric|min:1|exists:' . TB_USUARIOS . ',id,type,' . REP_MED ;
 
         $validator = Validator::make($inputs, $rules);
         if ($validator->fails())
@@ -1220,32 +1217,6 @@ class SolicitudeController extends BaseController
             return $middleRpta;
         } catch (Exception $e) {
             DB::rollback();
-            return $this->internalException($e, __FUNCTION__);
-        }
-    }
-
-    public function findResponsables()
-    {
-        try {
-            $inputs = Input::all();
-            $responsables = array();
-            $solicitud = Solicitud::find($inputs['idsolicitud']);
-            if (is_null($solicitud->id_user_assign)) {
-                if ($solicitud->id_estado == PENDIENTE || $solicitud->id_estado == DERIVADO) {
-                    if ($solicitud->createdBy->type == REP_MED)
-                        array_push($responsables, $solicitud->createdBy->rm);
-                    else {
-                        if (Auth::user()->type == SUP)
-                            $responsables = array_merge($responsables, Auth::user()->sup->reps->toArray());
-                        else
-                            $responsables = array_merge($responsables, Rm::all()->toArray());
-                    }
-                    return $this->setRpta($responsables);
-                } else
-                    return $this->warningException(__FUNCTION__, 'No se puede buscar los responsable de la solicitud con Id: ' . $solicitud->id . ' debido a que no se encuentra PENDIENTE');
-            } else
-                return $this->setRpta('');
-        } catch (Exception $e) {
             return $this->internalException($e, __FUNCTION__);
         }
     }

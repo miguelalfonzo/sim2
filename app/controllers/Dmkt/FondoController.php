@@ -60,7 +60,7 @@ class FondoController extends BaseController
             $rm = $solInst->asignedTo->rm;
             $institution = $solInst->clients()->where( 'id_tipo_cliente' , 3)->first();
             $data = array( 'rm'              => strtoupper( $rm->nombres.' '.$rm->apellidos ) ,
-                           'idrm'            => $rm->idrm ,
+                           'idrm'            => $rm->bago_id ,
                            'monto'           => $jDetalle->monto_solicitado ,
                            'periodo'         => $detalle->periodo->aniomes ,
                            'idfondo'         => $detalle->id_fondo ,
@@ -128,7 +128,7 @@ class FondoController extends BaseController
                 return $middleRpta;
             
             $inputs = array( 'institucion-cod' => $solicitud->clients()->where( 'id_tipo_cliente' , 3 )->first()->id_cliente ,
-                             'codrepmed'       => $solicitud->asignedTo->rm->idrm,
+                             'codrepmed'       => $solicitud->asignedTo->rm->bago_id,
                              'total'           => $solicitud->detalle->monto_aprobado,
                              'fondo_producto'  => $solicitud->detalle->id_fondo,
                              'mes'             => $this->nextPeriod( $solicitud->detalle->periodo->aniomes ) ,
@@ -402,25 +402,13 @@ class FondoController extends BaseController
                     }   
                 } 
             });  
-        })->download('xls');
-        
+        })->download('xls');    
     }
 
-//    private function validateRm( $codrepmed )
-//    {
-//        $repmed = Rm::find( $codrepmed );
-//        if ( is_null( $repmed ) )
-//            return $this->warningException( 'El representante Medico no esta registrado en el sistema. Codigo de Representante: ' . $codrepmed , __FUNCTION__ , __LINE__ , __FILE__ );
-//        $codsup = $repmed->bagoVisitador->linsupvis->lsvsupervisor;
-//        $sup = Sup::find( $codsup );
-//        if ( is_null( $sup) )
-//            return $this->warningException( 'El Supervisor no esta registrado en el sistema. Codigo de Supervisor: ' . $codsup , __FUNCTION__ , __LINE__ , __FILE__ );
-//        if ( $repmed->idsup != $codsup )
-//            return $this->warningException( 'El sistema no tiene la relacion Representate-Supervisor o ha sido actualizada. Se esperaba al Supervisor : ' . $repmed->rmSup->full_name . ' con codigo:' . $codsup . ' .Comuniquese con Informatica' , __FUNCTION__ , __LINE__ , __FILE__ );
-//        return $this->setRpta( array( 'rm' => $repmed->iduser , 'sup' => $sup->iduser , 'codsup' => $codsup , 'cuentaRep' => $repmed->bagoVisitador->cuenta->cuenta ) );
-//    }
+
     private function validateRm( $codrepmed )
     {
+        \Log::error( $codrepmed );
         $repmed = Personal::getRM($codrepmed);
         if ( is_null( $repmed ) )
             return $this->warningException( 'El representante Medico no esta registrado en el sistema. Codigo de Representante: ' . $codrepmed , __FUNCTION__ , __LINE__ , __FILE__ );
@@ -428,8 +416,6 @@ class FondoController extends BaseController
         $sup = Personal::getSupvervisor( $codsup );
         if ( is_null( $sup) )
             return $this->warningException( 'El Supervisor no esta registrado en el sistema. Codigo de Supervisor: ' . $codsup , __FUNCTION__ , __LINE__ , __FILE__ );
-//        if ( $repmed->idsup != $codsup )
-//            return $this->warningException( $repmed->bagoVisitador->cuenta->cuenta , __FUNCTION__ , __LINE__ , __FILE__ );
         return $this->setRpta( array( 'rm' => $repmed->user_id , 'sup' => $sup->user_id , 'codsup' => $codsup , 'cuentaRep' => $repmed->bagoVisitador->cuenta->cuenta ) );
     }
 

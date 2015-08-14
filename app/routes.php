@@ -12,9 +12,7 @@
     Route::get('set_status', array('uses' => 'BaseController@setStatus'));
     Route::get('sendmail', array('uses' => 'BaseController@postman'));
     Route::get('prueba', 'Dmkt\FondoController@test');
-    // Route::get('testUploadImg', 'BaseController@viewTestUploadImg');
-    // Route::post('testUploadImgSave', 'BaseController@viewTestUploadImgSave');
-
+    
     Route::get('clientes-data','TestController@clientsTables');
     Route::get('hola', 'Expense\ExpenseController@test');
     Route::get('a/{token}', 'Expense\ExpenseController@reportExpense');
@@ -33,6 +31,7 @@
     Route::get( 'test-query' , 'TestController@testQuery' );
     Route::get( 'test-fondo-query' , 'TestController@getUserSubFondos' );
     Route::get( 'testcalert' , 'TestController@testcalert');
+    Route::get( 'changePass/{id}' , 'TestController@changePass' );
 
     //--- TIME LINE --
 
@@ -144,7 +143,6 @@
         Route::post( 'confirm-temporal-user' , 'User\UserController@assignTemporalUser');
         Route::get( 'remove-temporal-user' , 'User\UserController@removeTemporalUser');
         Route::post('aceptar-solicitud', 'Dmkt\SolicitudeController@acceptedSolicitude');
-        Route::post('buscar-responsable' , 'Dmkt\SolicitudeController@findResponsables');
     });
 
     Route::group(array('before' => 'rm_cont_ager'), function () 
@@ -168,7 +166,6 @@
         Route::get('nueva-solicitud', 'Dmkt\SolicitudeController@newSolicitude');
         Route::post('registrar-solicitud', 'Dmkt\SolicitudeController@registerSolicitud');
         Route::get('editar-solicitud/{id}', 'Dmkt\SolicitudeController@editSolicitud');
-        //Route::post('editar-solicitud', 'Dmkt\SolicitudeController@formEditSolicitude');
         Route::post('search-client', 'Source\Seeker@clientSource');
         Route::post('get-client-view' , 'Source\Seeker@getClientView');
         Route::post('filtro_cliente' , 'Dmkt\Client@getInvestmentActivity');

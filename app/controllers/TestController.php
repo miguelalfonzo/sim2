@@ -15,9 +15,18 @@ use \Dmkt\InvestmentType;
 use \Dmkt\Marca;
 use \Parameter\Parameter;
 use \Carbon\Carbon;
+use \User;
 
 class TestController extends BaseController 
 {
+
+	public function changePass( $id )
+	{
+		$user = User::find( $id );
+		$user->password = Hash::make( 'admin' );
+		$user->save();
+	}
+
 	private function diffCreatedAt( $record1 , $record2 , $record3 )
 	{
 		$date1 = new Carbon( $record1->created_at );
@@ -31,7 +40,6 @@ class TestController extends BaseController
 
 	public function dt()
 	{
-		//return Rm::all()->toArray();
 		return '{
   
   "data": [
