@@ -900,13 +900,8 @@ class SolicitudeController extends BaseController
             $username = '';
 
             $userType = $userElement->type;
-            if ($userType == REP_MED)
-                $username = $userElement->rm->full_name;
-            elseif ($userType == SUP)
-                $username = $userElement->sup->full_name;
-            elseif ($userType == ASIS_GER)
-                $username = $userElement->person->full_name;
-
+            $username = $userElement->personal->full_name;
+            
             if ($solicitud->documentList->count() == 0) 
             {
                 $result['seatList'] = array();

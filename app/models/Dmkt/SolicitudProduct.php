@@ -26,7 +26,7 @@ class SolicitudProduct extends Eloquent
     {
         if ( $userType == SUP )
         {
-            $userid = $solicitud->asigned_to->rm->rmSup->user_id;
+            $userid = $solicitud->asigned_to->personal->rmSup->user_id;
             return DB::table(TB_FONDO_SUPERVISOR.' fs')
                         ->select("m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'fs.saldo' , 'fs.retencion' , 'fs.id' , 'fs.marca_id' , '\'S\' tipo' )
                         ->leftJoin(TB_FONDO_CATEGORIA_SUB.' fsc' , 'fsc.id' , '=' , 'fs.subcategoria_id' )

@@ -45,7 +45,7 @@ class Personal extends Eloquent
     // mamv : RETORNA MODELO DE REPRESENTANTE MEDICO por ID BAGO
     protected function getRM( $bago_id )
     {
-        return Personal::where( 'bago_id' , $bago_id)->whereHas( 'user' , function( $query )
+        return Personal::where( 'bago_id' , $bago_id )->whereHas( 'user' , function( $query )
         {
             $query->where( 'type' , REP_MED );
         })->first();
@@ -69,20 +69,26 @@ class Personal extends Eloquent
     // mamv : RETORNA MODELO DE REPRESENTANTE SUPERVISOR por ID BAGO
     protected function getSupvervisor( $bago_id )
     {
-        $persona = Personal::where( 'bago_id' , $bago_id)->where('tipo', '=', 'S')->first();
+        $persona = Personal::where( 'bago_id' , $bago_id)->where( 'tipo' , SUP )->first();
         return $persona;
     }
 
     // idkc : SOLO RM
     public function rmSup()
     {
-        return $this->belongsTo( '\Users\Personal' , 'referencia_id' , 'bago_id' )->where('tipo', '=', 'S');
+        return $this->belongsTo( '\Users\Personal' , 'referencia_id' , 'bago_id' )->whereHas( 'user' , function( $query )
+        {
+            $query->where( 'type' , SUP );
+        });
     }
 
     // idkc : SOLO SUPERVISOR
     public function reps()
     {
-        return $this->hasMany('Users\Personal','referencia_id', 'bago_id')->where('tipo', '=', 'RM');
+        return $this->hasMany( 'Users\Personal' , 'referencia_id' , 'bago_id' )->whereHas( 'user' , function( $query )
+        {
+            $query->where( 'type' , REP_MED );
+        });
     }
 
 

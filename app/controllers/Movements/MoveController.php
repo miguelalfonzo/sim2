@@ -32,11 +32,8 @@ class MoveController extends BaseController
     
         $dates = $this->setDates( $date );
 
-        $middleRpta = $this->userType();
-
-        if ($middleRpta[ status ] == ok)
-        {
-            $middleRpta = $this->searchSolicituds( R_FINALIZADO , $middleRpta[data] , $dates['start'] , $dates['end']);
+        
+            $middleRpta = $this->searchSolicituds( R_FINALIZADO , $dates['start'] , $dates['end']);
             if ($middleRpta[status] == ok)
             {
                 foreach ( $middleRpta[data] as $solicitud )
@@ -73,7 +70,6 @@ class MoveController extends BaseController
                 }
                 $middleRpta[data]['View'] = $view;
             }
-        }
         return $middleRpta;
     }
 
@@ -150,22 +146,23 @@ class MoveController extends BaseController
     {
         $today = getdate();
         $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];      
+        
         if ( Input::has('idstate'))
             $estado = $inputs['idstate'];
         else
             $estado = R_TODOS;
+        
         if ( Input::has('date_start'))
             $start = $inputs['date_start'];
         else
             $start = date('01-m-Y', strtotime($m));
+        
         if (Input::has('date_end'))
             $end = $inputs['date_end'];
         else
             $end = date('t-m-Y', strtotime($m));
-        $middleRpta = $this->userType();
-        if ( $middleRpta[status] == ok )
-        {
-            $middleRpta = $this->searchSolicituds( $estado , $middleRpta[data] , $start , $end );
+        
+            $middleRpta = $this->searchSolicituds( $estado , $start , $end );
             if ( $middleRpta[status] == ok )
             {
                 $data = array( 'solicituds' => $middleRpta[data] );
@@ -173,7 +170,6 @@ class MoveController extends BaseController
                     $data['tc'] = ChangeRate::getTc();
                 return $this->setRpta( array( 'View' => View::make('template.List.solicituds')->with( $data )->render() ) );
             }
-        }
         return $middleRpta;
     }
 
@@ -182,7 +178,7 @@ class MoveController extends BaseController
         return Carbon::createFromFormat( 'd/m/Y' , $date )->format( 'Ym' );
     }
 
-    protected function searchSolicituds( $estado , $idUser , $start , $end )
+    protected function searchSolicituds( $estado , $start , $end )
     {
         $solicituds = Solicitud::where( function( $query ) use( $start , $end )
         {

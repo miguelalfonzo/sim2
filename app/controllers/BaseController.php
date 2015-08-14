@@ -220,40 +220,6 @@ class BaseController extends Controller
         return array( status => ok , 'Data' => $data );
     }
 
-    protected function userType()
-    {
-        try
-        {
-            $user = Auth::user();
-            if ( $user->type == SUP )
-            {
-                $reps       = $user->Sup->Reps;
-                $users_ids  = array();
-                foreach ($reps as $rm)
-                    $users_ids[] = $rm->iduser;
-                $users_ids[] = $user->id;
-                return $this->setRpta($users_ids);
-            }
-            else if ( $user->type == GER_PROD )
-            {
-                $solicitud_ids = [];
-                $solicituds = $user->gerProd->solicituds;
-                foreach ($solicituds as $sol)
-                    $solicitud_ids[] = $sol->idsolicitud; // jalo los ids de las solicitudes pertenecientes al gerente de producto
-                $solicitud_ids[] = 0; // el cero va para que tenga al menos con que comparar, para que no salga error
-                return $this->setRpta( $solicitud_ids );
-            }
-            else if ( ! is_null( $user->simApp ) )
-                return $this->setRpta( array( $user->id ) );
-            else
-                return $this->warningException( 'Se ha solicitado buscar solicitudes por un usuario no autorizado: '.$user->id , __FUNCTION__ , __LINE__ , __FILE__ );
-        }
-        catch (Exception $e)
-        {
-            return $this->internalException( $e , __FUNCTION__ );
-        }
-    }
-
     public function viewTestUploadImg(){
         return View::make('test.testUploadImg');
     }
