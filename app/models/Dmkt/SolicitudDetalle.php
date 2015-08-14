@@ -3,6 +3,7 @@
 namespace Dmkt;
 
 use Eloquent;
+use Users\Personal;
 
 class SolicitudDetalle extends Eloquent
 {
@@ -50,7 +51,8 @@ class SolicitudDetalle extends Eloquent
     protected function getSupervisorAttribute()
     {
         $idSup = json_decode( $this->detalle )->supervisor;
-        return \Users\Sup::where( 'iduser' , $idSup )->first()->full_name;
+//        return \Users\Sup::where( 'iduser' , $idSup )->first()->full_name;
+        return Personal::where( 'user_id' , $idSup)->first()->getFullName();
     }    
 
     protected function getMontoActualAttribute()

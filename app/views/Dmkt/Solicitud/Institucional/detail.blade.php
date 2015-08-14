@@ -37,7 +37,7 @@
 	<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
 		<label class="control-label"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Supervisor</label>
 		<div class="input-group">
-		 	<span class="input-group-addon">S</span>   
+		 	<span class="input-group-addon">S</span>
 	        <input type="text" class="form-control input-md" value="{{$detalle->supervisor}}" disabled>
 		</div>
 	</div>
@@ -72,7 +72,7 @@
 
 	<!-- Fecha de Descuento al Responsable del Gasto -->
 	@include('Dmkt.Solicitud.Detail.discount')
-    
+
 	@if ( ! is_null( $solicitud->observacion) )
 		<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
 			<label class="control-label">Observación</label>
@@ -83,7 +83,7 @@
 	@endif
 
     <div class="clearfix"></div>
-    
+
     <!-- CLIENTES -->
     @include('Dmkt.Solicitud.Detail.clients')
 
