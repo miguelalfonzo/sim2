@@ -61,13 +61,14 @@ class SolicitudeController extends BaseController
     {
         if (Session::has('state'))
             $state = Session::get('state');
-        else {
+        else 
+        {
             if (Auth::user()->type == CONT)
                 $state = R_APROBADO;
-            else if (in_array(Auth::user()->type, array(REP_MED, SUP, GER_PROD, GER_PROM, GER_COM, ASIS_GER)))
-                $state = R_PENDIENTE;
             elseif (Auth::user()->type == TESORERIA)
                 $state = R_REVISADO;
+            else if ( ! is_null( Auth::user()->simApp ) )
+                $state = R_PENDIENTE;
         }
         $mWarning = array();
         if (Session::has('warnings')) {

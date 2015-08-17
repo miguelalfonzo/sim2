@@ -56,10 +56,7 @@ Log::useDailyFiles(storage_path().'/logs/'.$logFile);
 
 App::error( function( Exception $exception, $code)
 {
-	Log::error( $exception );
-	/*$rpta = array( status => error , description => $code. ': ' . $exception->getMessage() );
-	$rpta[ data ] = View::make( 'soporte' )->with( 'exception' , $exception );
-	return $rpta;*/
+	return App::make('BaseController')->callAction( 'internalException' , array( $exception , __FUNCTION__ , 'Fatal Error' ) );
 });
 
 

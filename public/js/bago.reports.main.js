@@ -2,14 +2,19 @@ $(document).ready(function()
 {
 	$('#drp_menubar').on('apply.daterangepicker', function(ev, picker) {
 		$('#btn_extra').hide();
-		if($("#idState").length === 1){
-			listTable('solicitudes');
-		}else if($("#container-event").length === 1){
+		if( $( '#idState' ).length === 1 )
+			listTable( 'solicitudes' );
+		else if( $( '#container-event' ).length === 1 )
 			getEvents();
-		}else if( $("#fondo_mkt_history").length === 1){
+		else if( $( '#fondo_mkt_history' ).length === 1 )
+		{
 			if ( $( '#fondoMkt' ).val() !== null )
 				getSubCategoryHistory( $( '#fondoMkt' ) );
-		}else{
+		}
+		else if( $( '#movimientos' ).length === 1 )
+			listTable( 'movimientos' , null );
+		else
+		{
 			$(".btn_extra").hide("slow");
 			GBREPORTS.openReport();
 		}

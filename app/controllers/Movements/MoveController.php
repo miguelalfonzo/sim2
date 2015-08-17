@@ -25,15 +25,13 @@ class MoveController extends BaseController
         $this->beforeFilter('active-user');
     }
 
-    private function searchMove( $date )
+    private function searchMove( $start , $end )
     {
-    	if ( empty( $date ) )
-            return $this->warningException('El campo fecha se encuentra vacio' ,__FUNCTION__ , __LINE__ , __FILE__ );
-    
-        $dates = $this->setDates( $date );
+    	
+        $dates = $this->setDates( $start , $end );
 
         
-            $middleRpta = $this->searchSolicituds( R_FINALIZADO , $dates['start'] , $dates['end']);
+            $middleRpta = $this->searchSolicituds( R_FINALIZADO , $dates[ 'start' ] , $dates[ 'end' ] );
             if ($middleRpta[status] == ok)
             {
                 foreach ( $middleRpta[data] as $solicitud )
@@ -73,11 +71,11 @@ class MoveController extends BaseController
         return $middleRpta;
     }
 
-    private function setDates($date)
+    private function setDates( $start , $end )
     {
         $dates = array(
-            'start' => (new DateTime('01-'.$date))->format('d/m/Y'),
-            'end'   => (new DateTime('01-'.$date))->format('t/m/y')
+            'start' => Carbon::createFromFormat( 'd/m/Y' , $start )->format( '01/m/Y' ) ,
+            'end'   => Carbon::createFromFormat( 'd/m/Y' , $end )->format( 't/m/Y' )
         );
         return $dates;
     }
@@ -133,7 +131,7 @@ class MoveController extends BaseController
                 case 'estado-fondos':
                     return $this->getFondoReport( $inputs['date'] );
                 case 'movimientos':
-                    return $this->searchMove( $inputs['date'] );
+                    return $this->searchMove( $inputs['date_start' ] , $inputs[ 'date_end' ] );
             }
         }
         catch ( Exception $e )

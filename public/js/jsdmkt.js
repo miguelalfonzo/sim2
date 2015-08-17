@@ -1626,15 +1626,12 @@ $(".date_month").datepicker(date_options2).on('changeDate', function (e) {
     var date = $(this).val();
     var type = $(this).attr('data-type');
 
-    if(date!='')
-        if( type != 'estado-cuenta' )
-        {
-            $( '.date_month' ).val( date );
-            if ( ! id_solicitud.val() )
-                searchFondos(date);
-        }
-        else
-            listTable( 'movimientos' , date);
+    if( date != '' && type != 'estado-cuenta' )
+    {
+        $( '.date_month' ).val( date );
+        if ( ! id_solicitud.val() )
+            searchFondos(date);
+    }
 });
 
 /* Filter all solicitude by date */

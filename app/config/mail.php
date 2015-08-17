@@ -54,7 +54,7 @@ return array(
 	|
 	*/
 
-	'from' => array('address' => "mensajeria@bagoperu.com.pe", 'name' => "DMKT APP"),
+	'from' => array('address' => "mensajeria@bagoperu.com.pe", 'name' => "SIM APP" ),
 
 	/*
 	|--------------------------------------------------------------------------
