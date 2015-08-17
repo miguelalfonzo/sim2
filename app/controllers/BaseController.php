@@ -82,8 +82,8 @@ class BaseController extends Controller
         Mail::send( 'soporte' , array( 'description' => $description , 'function' => $function , 'line' => $line , 'file' => $file ) , 
         function( $message ) use( $function )
         {
-            $message->to( SOPORTE_EMAIL );
-            $message->subject( warning.' - Function: '.$function);      
+            $message->to( array( SOPORTE_EMAIL_1 => POSTMAN_USER_NAME_1 , SOPORTE_EMAIL_2 => POSTMAN_USER_NAME_2 ) )
+            ->subject( warning.' - Function: '. $function );      
         });
         return array( status => warning , description => $description );
     }
@@ -91,12 +91,11 @@ class BaseController extends Controller
     protected function internalException( $exception , $function , $type = 'System' )
     {
         Log::error( $exception );
-        //Log::error( 'OCI---ERROR: $' . oci_error() );
         Log::error( $exception->getMessage() );
         Mail::send('soporte', array( 'exception' => $exception ), function( $message ) use( $function )
         {
-            $message->to(SOPORTE_EMAIL);
-            $message->subject(error.' - Function: '.$function);
+            $message->to( array( SOPORTE_EMAIL_1 => POSTMAN_USER_NAME_1 , SOPORTE_EMAIL_2 => POSTMAN_USER_NAME_2 ) )
+            ->subject( error.' - Function: '.$function );
         });
         return array( status => error , description => $type. ': '.$exception->getMessage() );
     }
@@ -147,10 +146,11 @@ class BaseController extends Controller
             {
                 Mail::send('soporte', array( 'subject' => 'No se pudo enviar email, debido a que el usuario o password son Incorrectos' ) , function($message) use ($subject)
                 {
-                    $message->to(SOPORTE_EMAIL)->subject('PostMan [BaseController:89]:');
+                    $message->to( array( SOPORTE_EMAIL_1 => POSTMAN_USER_NAME_1 , SOPORTE_EMAIL_2 => POSTMAN_USER_NAME_2 ) )
+                    ->subject('PostMan [BaseController:89]:');
                 });
                 Log::error("IDKC [BaseController:109]: No se pudo enviar email, debido a que el usuario o password son Incorrectos");
-                return $this->warningException( 'No se encontro los usuarios para la solicitud n°: '.$idSolicitud , __FUNCTION__ , __LINE__ , __FILE__ );
+                return $this->warningException( 'No se encontro los usuarios para la solicitud n°: '. $idSolicitud , __FUNCTION__ , __LINE__ , __FILE__ );
             }
         }
         catch ( Swift_TransportException $e )
