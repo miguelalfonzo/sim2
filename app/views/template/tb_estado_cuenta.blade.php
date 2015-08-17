@@ -8,7 +8,7 @@
             </span>
         </div>
     </div>
-    <div class="table_movimientos"></div>
+    <div id="movimientos"></div>
     @if ( Auth::user()->type == TESORERIA )
         <div class="input-group">
             <span class="input-group-addon">S/.</span>

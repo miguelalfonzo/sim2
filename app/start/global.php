@@ -56,7 +56,6 @@ Log::useDailyFiles(storage_path().'/logs/'.$logFile);
 
 App::error( function( Exception $exception, $code)
 {
-	\Log::error( $exception );
 	return App::make('BaseController')->callAction( 'internalException' , array( $exception , __FUNCTION__ , 'Fatal Error' ) );
 });
 
