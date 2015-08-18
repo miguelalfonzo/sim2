@@ -603,7 +603,7 @@ $(function()
             }
         }).done( function ( response )
         {
-            if ( response.Status == 'Ok' )
+            if ( response.Status == 'Ok' ){
                 setTimeout(function()
                 {
                     responseUI('Editar Gasto','green');
@@ -688,11 +688,21 @@ $(function()
                     var balance = deposit - tot_expenses;
                     $("#balance").val(balance.toFixed(2));
                     $(".detail-expense").show();
-                    $('#cancel-expense').show();
+                    //$('#cancel-expense').show();
+                    $('#expense-register').modal('show');
                 },1000);
+                 
+            }
             else
                 bootbox.alert('<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+
+                    
         });
+
+    });
+
+    $( "#open-expense-register" ).click( function(){
+        rechargeViewExpense()
     });
     //Validation spending record button
     $( "#save-expense" ).click( function( e )
@@ -784,9 +794,11 @@ $(function()
         //Mostrando errores de cabeceras si es que existen
         if( error !== 0 )
         {
-            $("html, body").animate({
+            $("#expense-register").animate({
                 scrollTop: $("#proof-type").parent().parent().offset().top
             } , 300 );
+            bootbox.alert('<h4 class="red">Llene los Campos Obligatorios</h4>');
+
             return false;
         }
         else
@@ -1097,7 +1109,7 @@ $(function()
         $("#total-expense").val('');
         $("#tot-edit-hidden").val('');
         $("#desc-expense").val('');
-        $( '#cancel-expense' ).hide();
+        //$( '#cancel-expense' ).hide();
         $("#table-expense tbody tr").removeClass("select-row");
     }
 

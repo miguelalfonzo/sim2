@@ -1,6 +1,24 @@
 @if ( ( $solicitud->id_user_assign == Auth::user()->id  && ! is_null( $solicitud->expenseHistory ) ) || ( Auth::user()->type == CONT && ! is_null( $solicitud->registerHistory ) ) )
 	@if ( ( $solicitud->id_user_assign == Auth::user()->id &&  $solicitud->id_estado == GASTO_HABILITADO ) || ( Auth::user()->type == CONT && $solicitud->id_estado == REGISTRADO ) )
-		<section class="row reg-expense">
+		
+		<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-toggle="modal"  id="open-expense-register" data-target="#expense-register">
+  Registar Documento
+</button>
+<button type="button" class="btn btn-primary" data-toggle="modal"  id="open-event-section" data-target="#event-section">
+  Evento
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="expense-register" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-keyboard="false" data-backdrop="static">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+      </div>
+      <div class="modal-body">
+       <section class="row reg-expense">
 			<input type="hidden" name="idgasto">
 			<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
 				<label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label">Tipo de Comprobante</label>
@@ -92,7 +110,7 @@
 										<th class="w-quantity">Cantidad</th>
 										<th class="w-desc-item">Descripción</th>
 										<th class="w-type-expense">Tipo de Gasto</th>
-										<th class="w-total-item">Valor de Venta</th>
+										<th class="w-total-item">Valor de Venta {{$solicitud->detalle->typemoney->simbolo}}</th>
 										<th>Eliminar</th>
 									</tr>
 								</thead>
@@ -109,7 +127,6 @@
 										</th>
 										<th class="total-item">
 											<div class="input-group">
-										    	<div class="input-group-addon">{{$solicitud->detalle->typemoney->simbolo}}</div>
 										      	<input class="form-control" type="text" maxlength="8">
 										    </div>
 										</th>
@@ -216,19 +233,36 @@
 		<section class="row reg-expense detail-expense" style="margin:0">
 			<div class="col-xs-12 col-sm-12 col-md-12">
 				<div class="form-expense">
-					<button id="save-expense" type="button" class="btn btn-primary">Registrar</button>
-					<button id="cancel-expense" type="button" class="btn btn-danger" style="display:none">Cancelar</button>
+					
 					<div class="inline"><p class="inline message-expense"></p></div>
 				</div>
 			</div>
 		</section>
 
-		@if ( Auth::user()->id == $solicitud->id_user_assign )
-			<section class="container-fluid" >
+		
+      </div>
+      <div class="modal-footer">
+        <button id="save-expense" type="button" class="btn btn-primary" data-dismiss="modal">Registrar</button>
+		<button id="cancel-expense" type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="event-section" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Detalle de Evento</h4>
+      		</div>
+      			<div class="modal-body">
+      		@if ( Auth::user()->id == $solicitud->id_user_assign )
+			<!--<section class="container-fluid" >
 	        	<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title">Detalle de Evento</h3>
-					</div>
+					</div>-->
 					<div class="panel-body">
 						<form class="form-horizontal" {{ isset($event) ? '' : 'action="'. URL::to('createEvent') .'" accept-charset="UTF-8" method="POST"' }}>
 							{{ Form::token() }}
@@ -269,51 +303,47 @@
 							</div>
 							@if(!isset($event))
 							<div class="form-group">
-								<label class="col-sm-2 control-label"></label>
-								<div class="col-sm-10">
-									<div class="btn-group" role="group" aria-label="Opciones">
-										<button type="button" class="btn btn-primary btn_event_submit">Crear</button>
-										<button type="button" class="btn btn-primary hide">CANCEL</button>
-									</div>
-								</div>
+								<div class="col-sm-offset-2 col-sm-10">						
+						        	<button type="button" class="btn btn-primary btn_event_submit">Crear</button>
+						        </div>
 							</div>
-							@endif
+						    @endif
 						</form>
-						@if(!isset($event) || !$event->photos())
-						<div class="container">
-							<form class="form-horizontal" id="solicitude-upload-image-event" enctype="multipart/form-data" method="post" action="{{ url('testUploadImgSave') }}" autocomplete="off" style="{{ isset($event) ? '' : 'display:none;' }}">
-								{{ Form::token() }}
-								<div class="form-group hide">
-									<label for="name" class="col-sm-2 control-label">Id Evento</label>
-									<div class="col-sm-10">
-										<input type="text" class="form-control" name="event_id" placeholder="Id del Evento" maxlength="100" required="required" value="{{ isset($event) ? $event->id : '' }}">
-									</div>
-								</div>
-								<div class="form-group ">
-									<label for="name" class="col-sm-2 control-label"></label>
-									<div class="col-sm-10">
-										<span class="btn btn-info btn-file">
-										Subir Imagenes <input type="file" name="image[]" id="upload-image-event" multiple="true" /> 
-										</span>
-									</div>
-								</div>
-							</form>
-						</div>
-						@endif
-						<div class="span5" id="output">
-							@if(isset($event))
-								@if($event->photos())
-									@foreach($event->photos() as $key => $photo)
-										<div class="col-xs-6 col-md-3 solicitude_img thumbnail show_event_img" data-slide-num="{{ $key }}">
-											<img data-img-id="{{$photo->id}}" src="{{asset($photo->directory.$photo->id.'.'.$photo->extension)}}" >
+								<form class="form-horizontal" id="solicitude-upload-image-event" enctype="multipart/form-data" method="post" action="{{ url('testUploadImgSave') }}" autocomplete="off" style="{{ isset($event) ? '' : 'display:none;' }}">
+									{{ Form::token() }}
+									<div class="form-group hide">
+										<label for="name" class="col-sm-2 control-label">Id Evento</label>
+										<div class="col-sm-10">
+											<input type="text" class="form-control" name="event_id" placeholder="Id del Evento" maxlength="100" required="required" value="{{ isset($event) ? $event->id : '' }}">
 										</div>
-									@endforeach
+									</div>
+									<div class="form-group ">
+										<label for="name" class="col-sm-2 control-label"></label>
+										<div class="col-sm-10">
+											<span class="btn btn-info btn-file">
+											Subir Imagenes <input type="file" name="image[]" id="upload-image-event" multiple="true" /> 
+											</span>
+										</div>
+									</div>
+								</form>
+							<div id="output">
+								@if(isset($event))
+									@if($event->photos())
+										@foreach($event->photos() as $key => $photo)
+											<div class="col-xs-6 col-md-3 solicitude_img thumbnail show_event_img" data-slide-num="{{ $key }}">
+												<img data-img-id="{{$photo->id}}" src="{{asset($photo->directory.$photo->id.'.'.$photo->extension)}}" >
+											</div>
+										@endforeach
+									@endif
 								@endif
-							@endif
+							</div>
 						</div>
+					<div class="modal-footer">
+					        	<button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
 					</div>
 				</div>
-	    	</section>
+			</div>
+	    	<!--</section> -->
 		
 			<script>
 
@@ -335,7 +365,7 @@
 			        $('#solicitude-upload-image-event').ajaxForm(options).submit();         
 			    }); 
 			    $('.btn_event_submit').click(function(){
-			        var eventForm = $(this).parent().parent().parent().parent();
+			        var eventForm = $(this).parent().parent().parent();
 			    	console.log("click");
 			        eventForm.ajaxForm({
 			                success: function(result){
@@ -427,6 +457,12 @@
 	                 });
 		        </script>
 			@endif
+      
+    
+  			</div>
+		</div>
+
+		
 		@endif
 	@endif
 	<section class="row reg-expense" style="margin:0">
