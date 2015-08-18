@@ -13,9 +13,25 @@
                     </a>
                 @endif
             @else
-                <a class="btn btn-default" href="{{URL::to('ver-solicitud/'.$solicitud->token)}}">
-                    <span  class="glyphicon glyphicon-edit"></span>
-                </a>            
+                @if( $solicitud->id_estado == REGISTRADO )
+                    @if( Auth::user()->type == CONT && $solicitud->devolutions()->whereIn( 'id_estado_devolucion' , array( DEVOLUCION_POR_REALIZAR , DEVOLUCION_POR_VALIDAR ) )->get()->count() === 0 )
+                        <a class="btn btn-default" href="{{URL::to('ver-solicitud/'.$solicitud->token)}}">
+                            <span  class="glyphicon glyphicon-edit"></span>
+                        </a>
+                    @elseif( Auth::user()->type == TESORERIA && $solicitud->devolutions()->where( 'id_estado_devolucion' , DEVOLUCION_POR_VALIDAR )->get()->count() !== 0 )
+                        <a class="btn btn-default" href="{{URL::to('ver-solicitud/'.$solicitud->token)}}">
+                            <span  class="glyphicon glyphicon-edit"></span>
+                        </a>
+                    @elseif( Auth::user()->id == $solicitud->id_user_assign && $solicitud->devolutions()->where( 'id_estado_devolucion' , DEVOLUCION_POR_REALIZAR )->get()->count() !== 0 )
+                        <a class="btn btn-default" href="{{URL::to('ver-solicitud/'.$solicitud->token)}}">
+                            <span  class="glyphicon glyphicon-edit"></span>
+                        </a>
+                    @endif
+                @else
+                    <a class="btn btn-default" href="{{URL::to('ver-solicitud/'.$solicitud->token)}}">
+                        <span  class="glyphicon glyphicon-edit"></span>
+                    </a>
+                @endif         
             @endif    
         @endif
         @if( in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD ) ) )

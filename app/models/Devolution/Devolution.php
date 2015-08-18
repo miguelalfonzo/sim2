@@ -18,4 +18,14 @@ class Devolution extends Eloquent
             return $nextId->id + 1;
     }
 
+    protected function type()
+    {
+        return $this->belongsTo( 'Devolution\DevolutionType' , 'id_tipo_devolucion' );
+    }
+
+    protected function state()
+    {
+        return $this->belongsTo( 'Devolution\DevolutionState' , 'id_estado_devolucion' );
+    }
+
 }

@@ -205,7 +205,7 @@ class Solicitud extends Eloquent
         return $this->hasMany( 'Dmkt\SolicitudProduct' , 'id_solicitud' )->orderBy( 'updated_at' , 'DESC' );
     }
 
-    public function devolution()
+    public function devolutions()
     {
         return $this->hasMany( 'Devolution\Devolution' , 'id_solicitud' );
     }

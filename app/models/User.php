@@ -37,6 +37,11 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
         return User::where( 'type' , ASIS_GER )->where( 'active' , 1 )->get();
     }
 
+    protected static function getCont()
+    {
+        return User::where( 'type' , CONT )->where( 'active' , 1 )->get(); 
+    }
+
     protected static function getUserType( $userType )
     {
         return User::where( 'type' , $userType )->lists( 'id' );

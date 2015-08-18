@@ -115,19 +115,18 @@ class BaseController extends Controller
         return $rpta;
     }
 
-    public function postman($idSolicitud, $fromEstado, $toEstado, $toUser)
+    public function postman( $idSolicitud, $fromEstado, $toEstado, $toUser )
     {
         try 
         {
             $solicitud = Solicitud::find( $idSolicitud );
             $subject    = 'Solicitud N° '.$idSolicitud;
             
-            $user_email = $toUser->lists('email');
             $user_name  = array();
             foreach ( $toUser as $user )
-                $user_name[] = $user->getName();
+                $user_name[ $user->email ] = $user->getName();
         
-            if( count( $user_name ) != 0 && count( $user_email ) != 0 )
+            if( count( $user_name ) != 0 )
             {
                 $data = array(
                     'solicitud_id'          => $idSolicitud ,
@@ -135,10 +134,9 @@ class BaseController extends Controller
                     'solicitud_titulo'      => $solicitud->titulo ,
                     'solicitud_descripcion' => $solicitud->descripcion
                 );
-
-                Mail::send('emails.notification', $data, function($message) use ($subject, $user_name, $user_email)
+                Mail::send( 'emails.notification' , $data , function( $message ) use ( $subject , $user_name )
                 {
-                    $message->to( $user_email , $user_name )->subject($subject);
+                    $message->to( $user_name )->subject( $subject );
                 });
                 return $this->setRpta();
             }
@@ -197,7 +195,7 @@ class BaseController extends Controller
     {   
         $fData = array( 'status_to'    => $status_to ,
                         'id_solicitud' => $idSolicitud ,
-                        'user_from'      => $user_from->type );
+                        'user_from'    => $user_from->type );
 
         $statusSolicitude = SolicitudHistory::firstOrNew($fData);
         if ( ! isset( $statusSolicitude->rn ) )
