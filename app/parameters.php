@@ -221,7 +221,7 @@ define("TIMELINEHARD", serialize(array(
     '5' => array(
         'status_id' => 12,
         'user_type_id' => 'R',
-        'title' => 'Reg. de Gastos',
+        'title' => 'Descargo del Gasto',
         'info' => 'RESPONSABLE DEL GASTO',
         'cond' => true
 
