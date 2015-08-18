@@ -77,14 +77,7 @@ const GER_PROM                                = 'GP';
 const GER_COM                                 = 'G';
 const CONT                                    = 'C';
 const TESORERIA                               = 'T';
-
-
-//TABLAS EXTERNAS
-// const TB_DOCTOR                               = 'FICPE.PERSONAFIS';
-//const TB_INSTITUTE                            = 'FICPEF.PERSONAJUR';
-
 const ASIS_GER                                = 'AG';
-const GER_MKT                                 = 'GM';
 
 //ID DE TIPO DE SOLICITUDES
 const SOL_REP                                 = 1;

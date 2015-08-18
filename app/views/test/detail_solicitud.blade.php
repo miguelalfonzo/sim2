@@ -31,7 +31,7 @@
 		    				</td>
 		    				<td>
 		    					<h4><span class="label label-info">Asignado a</span></h4>&nbsp;
-		    					<label>{{$solicitud->assign->rm->full_name}}</label>
+		    					<label>{{$solicitud->asignedTo->personal->full_name}}</label>
 		    				</td>
 		    				<td>
 		    					<h4><span class="label label-info">Fondo</span></h4>&nbsp;

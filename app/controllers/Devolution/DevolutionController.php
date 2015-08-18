@@ -19,6 +19,7 @@ class DevolutionController extends BaseController
 		$devolution->monto = $monto_devolucion;
 		$devolution->id_estado_devolucion = $id_estado_devolucion;
 		$devolution->id_tipo_devolucion = $id_tipo_devolucion;
+		\Log::error( $devolution->toJson() );
 		$devolution->save();
 	}
 
