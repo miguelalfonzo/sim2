@@ -237,19 +237,16 @@ class FondoMkt extends BaseController
         $FondosTotal   = $subCategory->{ $subCategoryType->relacion }->sum( 'saldo' ); 
         $totalOld      = $fondoMktHistoriesTotalData->sum( 'to_old_saldo' );
         $totalNew      = $fondoMktHistoriesTotalData->sum( 'to_new_saldo' );
-        $historyTotal  = $totalOld - $totalNew;
-        $saldoAnterior = $FondosTotal + $historyTotal;
+        $historyTotal  = $totalNew - $totalOld;
+        $saldoAnterior = $FondosTotal - $historyTotal;
         $periodTotal   = $fondoMktHistoriesData->sum( 'to_old_saldo' ) - $fondoMktHistoriesData->sum( 'to_new_saldo' );
         $saldoContable = $saldoAnterior - $periodTotal;
 
         $FondosTotalNeto    = $subCategory->{ $subCategoryType->relacion }->sum( 'saldo_neto' );
         $totalOldNeto      = $fondoMktHistoriesTotalData->sum( 'old_retencion' );
         $totalNewNeto      = $fondoMktHistoriesTotalData->sum( 'new_retencion' );
-        $historyTotalNeto  = $totalOldNeto - $totalNewNeto;
-        $saldoAnteriorNeto = $FondosTotalNeto - $historyTotalNeto;
-        $periodTotalNeto   = $fondoMktHistoriesData->sum( 'to_old_saldo' ) - $fondoMktHistoriesData->sum( 'to_new_saldo' );
-        $saldoNeto         = $saldoAnteriorNeto + $periodTotalNeto;
-      
+        $historyTotalNeto  = $totalNewNeto - $totalOldNeto;
+        
         $data = array( 
             'FondoMktHistories' => $fondoMktHistoriesData ,
             'saldo'             => $saldoAnterior ,

@@ -1,5 +1,6 @@
 @extends('template.main')
 @section('solicitude')
+    <h3>Movimientos por Solicitud</h3>
     <div id="movimientos"></div>
     @if ( Auth::user()->type == TESORERIA )
         <div class="input-group">
@@ -10,7 +11,7 @@
         </div>
     @endif
     <script>
-    $(document).ready( function()
+    $( document ).ready( function()
     {    
         GBREPORTS.changeDateRange('M');
         listTable( 'movimientos' , null );
