@@ -320,7 +320,7 @@ class ExpenseController extends BaseController
 			}
 			else
 				DB::rollback();
-			return $rpta;
+			return $middleRpta;
 		}
 		catch (Exception $e)
 		{
@@ -353,7 +353,10 @@ class ExpenseController extends BaseController
     	if ( $solicitud->idtiposolicitud == SOL_REP )
 			if ( $balance > $payrollAmount )
 				if ( isset( $inputs[ 'numero_operacion_devolucion' ] ) && ! empty( trim( $inputs[ 'numero_operacion_devolucion'] ) ) )
-					$devolutionController->setDevolucion( $solicitud , $inputs[ 'numero_operacion_devolucion' ] , $balance , DEVOLUCION_POR_VALIDAR , DEVOLUCION_INMEDIATA );
+				{
+					$devolutionController->setDevolucion( $solicitud->id , $inputs[ 'numero_operacion_devolucion' ] , $balance , DEVOLUCION_POR_VALIDAR , DEVOLUCION_INMEDIATA );
+					$toUser = USER_TESORERIA;
+				}
 				else
 					return array( 
 						status  => 'Info' , 
@@ -370,7 +373,7 @@ class ExpenseController extends BaseController
 				if ( isset( $inputs[ 'inversion'] ) && isset( $inputs[ 'actividad' ] ) && isset( $inputs[ 'numero_operacion_devolucion' ] ) )
 				{
 					$this->setDataInstitucional( $solicitud , $inputs );	
-					$devolutionController->setDevolucion( $solicitud , $inputs[ 'numero_operacion_devolucion' ] , $balance , DEVOLUCION_POR_VALIDAR , DEVOLUCION_INMEDIATA );
+					$devolutionController->setDevolucion( $solicitud->id , $inputs[ 'numero_operacion_devolucion' ] , $balance , DEVOLUCION_POR_VALIDAR , DEVOLUCION_INMEDIATA );
 					$toUser = USER_TESORERIA;		
 				}
 				else
@@ -402,7 +405,7 @@ class ExpenseController extends BaseController
 				return $this->warningException( 'No se puede registrar los gastos si exceden al monto depositado' , __FUNCTION__ , __FILE__ , __LINE__ );
 		else
 			return $this->warningException( 'No se pudo identificar el tipo de solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
-		return $this->setRpta();
+		return $this->setRpta( $toUser );
     }
 
 	public function viewExpense($token)

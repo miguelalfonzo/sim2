@@ -41,17 +41,7 @@
                 @if ( in_array( Auth::user()->type , array( TESORERIA , GER_COM ) ))
                     <input type="hidden" id="sol_token" class="i-tokens" value="{{$solicitud->token}}">
                     @if( ! is_null( $solicitud->id_user_assign ) )
-                        @if( $solicitud->assign->type == REP_MED )
-                            <input type="hidden" value="{{$solicitud->assign->rm->full_name}}" class="benef">
-                        @elseif( $solicitud->assign->type == SUP )
-                            <input type="hidden" value="{{$solicitud->assign->sup->full_name}}" class="benef">
-                        @elseif ( $solicitud->assign->type == GER_COM )
-                            <input type="hidden" value="{{ $solicitud->assign->gerProd->full_name}}" class="benef">
-                        @elseif ( !is_null( $solicitud->assign->simApp ) )
-                            <input type="hidden" value="{{ $solicitud->assign->person->full_name}}" class="benef">
-                        @else
-                            <input type="hidden" value="Usuario no autorizado" class="benef">
-                        @endif
+                        <input type="hidden" value="{{ $solicitud->asignedTo->personal->full_name }}" class="benef">
                     @endif
                 @endif
                 <td class="text-center id_solicitud detail-control">{{$solicitud->id}}</td>

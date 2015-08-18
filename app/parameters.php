@@ -77,14 +77,7 @@ const GER_PROM                                = 'GP';
 const GER_COM                                 = 'G';
 const CONT                                    = 'C';
 const TESORERIA                               = 'T';
-
-
-//TABLAS EXTERNAS
-// const TB_DOCTOR                               = 'FICPE.PERSONAFIS';
-//const TB_INSTITUTE                            = 'FICPEF.PERSONAJUR';
-
 const ASIS_GER                                = 'AG';
-const GER_MKT                                 = 'GM';
 
 //ID DE TIPO DE SOLICITUDES
 const SOL_REP                                 = 1;
@@ -319,15 +312,15 @@ const TB_SUPERVISOR                    = 'FICPE.SUPERVISOR';
 const TB_USER_TEMPORAL                 = 'USER_TEMPORAL';
 const TB_VISITADOR                     = 'FICPE.VISITADOR';
 const TB_DEVOLUCION                    = 'DEVOLUCION';
-const TB_ESTADO_DEVOLUCION             = 'TIPO_DEVOLUCION';
-const TB_TIPO_DEVOLUCION               = 'ESTADO_DEVOLUCION';
+const TB_TIPO_DEVOLUCION             = 'TIPO_DEVOLUCION';
+const TB_ESTADO_DEVOLUCION               = 'ESTADO_DEVOLUCION';
 
 const DEVOLUCION_INMEDIATA             = 1;
 const DEVOLUCION_PLANILLA              = 2;
 
 const DEVOLUCION_POR_REALIZAR         = 1;
 const DEVOLUCION_POR_VALIDAR          = 2;
-const DEVOLUCION_POR_CONFIRMAR        = 3;
+const DEVOLUCION_CONFIRMADA           = 3;
 
 
 const PENDIENTE             = 1;

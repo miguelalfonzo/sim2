@@ -160,11 +160,6 @@ class Solicitud extends Eloquent
         return $this->hasMany( 'Dmkt\SolicitudGer' , 'id_solicitud'  , 'id' )->where( 'permiso' , 1 )->where( 'tipo_usuario' , $userType );
     }
 
-    protected function assign()
-    {
-        return $this->belongsTo( 'User' , 'id_user_assign' );
-    }
-
     public function activity()
     {
         return $this->hasOne('Dmkt\Activity','id','id_actividad');
@@ -210,8 +205,8 @@ class Solicitud extends Eloquent
         return $this->hasMany( 'Dmkt\SolicitudProduct' , 'id_solicitud' )->orderBy( 'updated_at' , 'DESC' );
     }
 
-    protected function getAllData()
+    public function devolutions()
     {
-        return Solicitud::with( array( 'createdBy' => 'usuario' ) )->get();
+        return $this->hasMany( 'Devolution\Devolution' , 'id_solicitud' );
     }
 }
