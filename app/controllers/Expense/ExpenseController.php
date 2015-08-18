@@ -27,6 +27,8 @@ use \Dmkt\InvestmentType;
 use \Users\Supervisor;
 use \Users\Visitador;
 use \Fondo\FondoMkt;
+use \Devolution\DevolutionController;
+use \Parameter\Parameter;
 
 class ExpenseController extends BaseController
 {
@@ -176,21 +178,22 @@ class ExpenseController extends BaseController
 
 	private function setExpense( $expense , $inputs )
 	{
-		$expense->idcomprobante    = $inputs['proof_type'];
-		$expense->num_prefijo      = $inputs['number_prefix'];
-		$expense->num_serie 	   = $inputs['number_serie'];
-		$expense->ruc 			   = $inputs['ruc'];
-		$expense->razon 		   = $inputs['razon'];
-		$expense->monto 		   = $inputs['total_expense'];
-		$expense->descripcion 	   = $inputs['desc_expense'];
-        $expense->fecha_movimiento = $inputs[ 'date' ];
-        $expense->idcomprobante    = $inputs['proof_type'];
- 		$expense->id_solicitud 	   = $inputs[ 'id_solicitud'];
+		$expense->idcomprobante    = $inputs[ 'proof_type' ];
+		$expense->num_prefijo      = $inputs[ 'number_prefix' ];
+		$expense->num_serie 	   = $inputs[ 'number_serie' ];
+		$expense->ruc 			   = $inputs[ 'ruc' ];
+		$expense->razon 		   = $inputs[ 'razon' ];
+		$expense->monto 		   = $inputs[ 'total_expense' ];
+		$expense->descripcion 	   = $inputs[ 'desc_expense' ];
+        $expense->fecha_movimiento = $inputs[  'date' ];
+        $expense->idcomprobante    = $inputs[ 'proof_type' ];
+ 		$expense->id_solicitud 	   = $inputs[ 'id_solicitud' ];
+
  		if ( isset( $inputs[ 'rep' ] ) )
-			$expense->reparo = $inputs['rep'];
+			$expense->reparo = $inputs[ 'rep' ];
 
  		if ( isset( $inputs[ 'idregimen' ] ) )
-            if ( $inputs['idregimen'] == 0 )
+            if ( $inputs[ 'idregimen' ] == 0 )
             {
             	$expense->idtipotributo = 0;
             	$expense->monto_tributo = 0;
@@ -282,19 +285,8 @@ class ExpenseController extends BaseController
 		}
 	}
 
-	private function setDevolucion( $solicitud , $detalle , $jDetalle , $inputs , $balance )
-	{
-		$solicitud->id_estado    = DEVOLUCION;
-		$jDetalle->numero_operacion_devolucion = $inputs[ 'numero_operacion_devolucion' ];
-		$jDetalle->monto_descuento             = $balance;
-		$detalle->detalle = json_encode( $jDetalle );
-		$detalle->save();
-		return USER_TESORERIA;
-	}
-
 	private function setDataInstitucional( $solicitud , $inputs )
 	{
-		$solicitud->id_inversion = $inputs[ 'inversion' ];
 		$solicitud->id_actividad = $inputs[ 'actividad' ];
 	}
 
@@ -304,89 +296,24 @@ class ExpenseController extends BaseController
 		try
 		{
 			DB::beginTransaction();
-			$inputs = Input::all();
-			$solicitud  = Solicitud::where('token', $inputs['token'] )->first();
+			$inputs 	= Input::all();
+			$solicitud  = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
+			
 			if( is_null( $solicitud ) )
 				return $this->warninException( 'No se encontro la solicitud con token: '.$inputs['token'] , __FUNCTION__ , __LINE__ , __FILE__ );
 
-			$oldIdEstado    = $solicitud->id_estado;
-			$detalle 		= $solicitud->detalle;
-			$monto_aprobado = $detalle->monto_aprobado;
-			$totalGasto 	= $solicitud->expenses->sum( 'monto' );
-			$balance    	= $monto_aprobado - $totalGasto;
+			$oldIdEstado = $solicitud->id_estado;
+		
+			$middleRpta = $this->validateExpense( $solicitud , $inputs );
+			if ( $middleRpta[ status ] != ok )
+				return $middleRpta;
 
-			$tc = ChangeRate::getTc();
-			if ( $solicitud->detalle->id_moneda == SOLES )
-				$tasa = 1;
-			elseif ( $solicitud->detalle->id_moneda == DOLARES )
-				$tasa = $tc->compra;
-
-			$balance = $balance * $tasa;
-
-			$jDetalle       = json_decode( $detalle->detalle );
-
-			if ( $solicitud->idtiposolicitud == SOL_REP )
-				if ( $balance > MONTO_DESCUENTO_PLANILLA )
-					if ( isset( $inputs[ 'numero_operacion_devolucion' ] ) && ! empty( trim( $inputs[ 'numero_operacion_devolucion'] ) ) )
-					{
-						$userTo = $this->setDevolucion( $solicitud , $detalle , $jDetalle , $inputs , $balance );
-					}
-					else
-						return array( 
-							status  => 'Info' , 
-				        	'View'  => View::make( 'Dmkt.Register.expense-missing-data' , array( 'devolucion' => true ) )->render() ,
-					        'Type'  => 'D' ,
-					        'Title' => 'Registro de la Operacion de Devolución' );
-				elseif ( $balance <= MONTO_DESCUENTO_PLANILLA && $balance >= 0  )
-				{
-					$solicitud->id_estado = REGISTRADO;
-					$userTo 			  = USER_CONTABILIDAD;
-				}
-				else
-					return $this->warningException( 'No se puede registrar los gastos si exceden al monto depositado' , __FUNCTION__ , __FILE__ , __LINE__ );
-			elseif( $solicitud->idtiposolicitud == SOL_INST )
-				if( $balance > MONTO_DESCUENTO_PLANILLA )
-				{
-					if ( isset( $inputs[ 'inversion'] ) && isset( $inputs[ 'actividad' ] ) && isset( $inputs[ 'numero_operacion_devolucion' ] ) )
-					{
-						$this->setDataInstitucional( $solicitud , $inputs );	
-						$userTo = $this->setDevolucion( $solicitud , $detalle , $jDetalle , $inputs ,$balance );
-					}
-					else
-					{
-						$investments = InvestmentType::orderInst();
-						return array( 
-							status => 'Info' , 
-							'View' => View::make( 'Dmkt.Register.expense-missing-data' , array( 'investments' => $investments , 'activities' => Activity::order() , 'devolucion' => true ) )->render() ,
-							'Type' => 'ID' ,
-							'Title' => 'Registro de la Operacion de Devolución , Inversion y Actividad' );
-					}
-				}
-				elseif ( $balance <= MONTO_DESCUENTO_PLANILLA && $balance >= 0 )
-					if ( isset( $inputs[ 'inversion'] ) && isset( $inputs[ 'actividad' ] ) )
-					{
-						$this->setDataInstitucional( $solicitud , $inputs );
-						$solicitud->id_estado = REGISTRADO;
-						$userTo = USER_CONTABILIDAD;
-					}
-					else
-					{
-						$investments = InvestmentType::orderInst();
-						return array( 
-							status => 'Info' , 
-							'View' => View::make( 'Dmkt.Register.expense-missing-data' , array( 'investments' => $investments , 'activities' => Activity::order() ) )->render() ,
-							'Type' => 'I' ,
-							'Title' => 'Registro de la Inversion y Actividad');
-					}
-				else
-					return $this->warningException( 'No se puede registrar los gastos si exceden al monto depositado' , __FUNCTION__ , __FILE__ , __LINE__ );
-			else
-				return $this->warningException( 'No se pudo identificar el tipo de solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
-	
+			$toUser = $middleRpta[ data ];
+			$solicitud->id_estado = REGISTRADO;
 			$solicitud->save();
 
-			$rpta = $this->setStatus( $oldIdEstado, $solicitud->id_estado , Auth::user()->id, $userTo , $solicitud->id );
-			if ( $rpta[status] == ok )
+			$middleRpta = $this->setStatus( $oldIdEstado , $solicitud->id_estado , Auth::user()->id, $toUser , $solicitud->id );
+			if ( $middleRpta[status] == ok )
 			{
 				Session::put( 'state' , R_GASTO );
 				DB::commit();
@@ -401,6 +328,82 @@ class ExpenseController extends BaseController
 			return $this->internalException( $e , __FUNCTION__ );
 		}
 	}
+
+	private function validateExpense( $solicitud , $inputs )
+    {
+
+		$devolutionController = new DevolutionController;
+		$detalle              = $solicitud->detalle;
+		$monto_aprobado       = $detalle->monto_aprobado;
+		$totalGasto           = $solicitud->expenses->sum( 'monto' );
+		$balance              = $monto_aprobado - $totalGasto;
+		$payrollAmount        = Parameter::find( 4 )->valor;
+
+		if ( $solicitud->detalle->id_moneda == SOLES )
+			$tasa = 1;
+		elseif ( $solicitud->detalle->id_moneda == DOLARES )
+		{
+			$tc   = ChangeRate::getTc();
+			$tasa = $tc->compra;
+		}
+
+		$balance  = $balance * $tasa;
+		$jDetalle = json_decode( $detalle->detalle );
+
+    	if ( $solicitud->idtiposolicitud == SOL_REP )
+			if ( $balance > $payrollAmount )
+				if ( isset( $inputs[ 'numero_operacion_devolucion' ] ) && ! empty( trim( $inputs[ 'numero_operacion_devolucion'] ) ) )
+					$devolutionController->setDevolucion( $solicitud , $inputs[ 'numero_operacion_devolucion' ] , $balance , DEVOLUCION_POR_VALIDAR , DEVOLUCION_INMEDIATA );
+				else
+					return array( 
+						status  => 'Info' , 
+			        	'View'  => View::make( 'Dmkt.Register.expense-missing-data' , array( 'devolucion' => true ) )->render() ,
+				        'Type'  => 'D' ,
+				        'Title' => 'Registro de la Operacion de Devolución' );
+			elseif ( $balance <= $payrollAmount && $balance >= 0  )
+				$toUser = USER_CONTABILIDAD;
+			else
+				return $this->warningException( 'No se puede registrar los gastos si exceden al monto depositado' , __FUNCTION__ , __FILE__ , __LINE__ );
+		elseif( $solicitud->idtiposolicitud == SOL_INST )
+			if( $balance > $payrollAmount )
+			{
+				if ( isset( $inputs[ 'inversion'] ) && isset( $inputs[ 'actividad' ] ) && isset( $inputs[ 'numero_operacion_devolucion' ] ) )
+				{
+					$this->setDataInstitucional( $solicitud , $inputs );	
+					$devolutionController->setDevolucion( $solicitud , $inputs[ 'numero_operacion_devolucion' ] , $balance , DEVOLUCION_POR_VALIDAR , DEVOLUCION_INMEDIATA );
+					$toUser = USER_TESORERIA;		
+				}
+				else
+				{
+					$investments = InvestmentType::orderInst();
+					return array( 
+						status  => 'Info' , 
+						'View'  => View::make( 'Dmkt.Register.expense-missing-data' , array( 'investments' => $investments , 'activities' => Activity::order() , 'devolucion' => true ) )->render() ,
+						'Type'  => 'ID' ,
+						'Title' => 'Registro de la Operacion de Devolución , Inversion y Actividad' );
+				}
+			}
+			elseif ( $balance <= $payrollAmount && $balance >= 0 )
+				if ( isset( $inputs[ 'inversion'] ) && isset( $inputs[ 'actividad' ] ) )
+				{
+					$this->setDataInstitucional( $solicitud , $inputs );
+					$toUser = USER_CONTABILIDAD;
+				}
+				else
+				{
+					$investments = InvestmentType::orderInst();
+					return array( 
+						status => 'Info' , 
+						'View' => View::make( 'Dmkt.Register.expense-missing-data' , array( 'investments' => $investments , 'activities' => Activity::order() ) )->render() ,
+						'Type' => 'I' ,
+						'Title' => 'Registro de la Inversion y Actividad');
+				}
+			else
+				return $this->warningException( 'No se puede registrar los gastos si exceden al monto depositado' , __FUNCTION__ , __FILE__ , __LINE__ );
+		else
+			return $this->warningException( 'No se pudo identificar el tipo de solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
+		return $this->setRpta();
+    }
 
 	public function viewExpense($token)
 	{
