@@ -41,7 +41,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($expense as $value)
+                        @foreach( $expenses as $value )
                             <tr>
 
                                 <td>{{date('d/m/Y',strtotime($value->fecha_movimiento))}}</td>

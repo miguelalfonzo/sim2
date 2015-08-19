@@ -516,98 +516,88 @@ class ExpenseController extends BaseController
 		$solicitud = Solicitud::where('token',$token)->firstOrFail();
 		$detalle   = $solicitud->detalle;
 		$jDetalle  = json_decode( $solicitud->detalle->detalle );
-		$clientes  = array();
-		$cmps      = array();
-		$getSpecialty = array();
-		foreach($solicitud->clients as $client)
-        {
-			$clientes[]     = $client->clientType->descripcion . ': ' . $client->{$client->clientType->relacion}->full_name;
-			if(!is_null($client->{$client->clientType->relacion}->pefnrodoc1))
-				$cmps[]         = $client->{$client->clientType->relacion}->pefnrodoc1;
-			$getSpecialtyResult = $this->getSpecialty($client->{$client->clientType->relacion}->pefnrodoc1);
-			if(!is_null($getSpecialtyResult)){
-				$getSpecialty[] = $getSpecialtyResult->especialidad1;
-			}
-        }
-		$getSpecialty = implode("<br><br>", $getSpecialty);
-		$clientes     = implode('<br><br>',$clientes);
-		$cmps         = implode('<br><br> ',$cmps);
-		$zona = null;
-		
-		$created_by = $solicitud->asignedTo->personal->getFullName();
+		$expenses  = $solicitud->expenses;
+		$total 	   = $expenses->sum('monto');
 		$dni = new BagoUser;
 		$dni = $dni->dni($solicitud->asignedTo->username);
 		if ($dni[status] == ok )
 			$dni = $dni[data];
 		else
 			$dni = '';
-		$expenses = $solicitud->expenses;
-		$aproved_user = User::where( 'id' , $solicitud->approvedHistory->updated_by )->firstOrFail();
-	
-		$name_aproved = $aproved_user->personal->getFullName();
-		$charge = $aproved_user->userType->descripcion;
-
-		if ( $solicitud->detalle->idmoneda == DOLARES )
+		
+		if ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , 3 ) ) )
 		{
-			foreach( $expenses as $expense )
-			{
-				$eTc = ChangeRate::where( 'fecha' , $expense->fecha_movimiento )->first();
-				if ( is_null( $eTc ) )
-					$expense->tc = ChangeRate::getTc();
-				else	
-					$expense->tc = $eTc;
-				$expense->monto = round ( $expense->monto * $expense->tc->compra , 2 , PHP_ROUND_HALF_DOWN );
-			}
-		}
+		
+			$clientes  = array();
+			$cmps      = array();
+			$getSpecialty = array();
+			foreach($solicitud->clients as $client)
+	        {
+				$clientes[]     = $client->clientType->descripcion . ': ' . $client->{$client->clientType->relacion}->full_name;
+				if(!is_null($client->{$client->clientType->relacion}->pefnrodoc1))
+					$cmps[]         = $client->{$client->clientType->relacion}->pefnrodoc1;
+				$getSpecialtyResult = $this->getSpecialty($client->{$client->clientType->relacion}->pefnrodoc1);
+				if(!is_null($getSpecialtyResult)){
+					$getSpecialty[] = $getSpecialtyResult->especialidad1;
+				}
+	        }
+			$getSpecialty = implode("<br><br>", $getSpecialty);
+			$clientes     = implode('<br><br>',$clientes);
+			$cmps         = implode('<br><br> ',$cmps);
+			$zona = null;
+			
+			$created_by = $solicitud->asignedTo->personal->getFullName();
+			$aproved_user = User::where( 'id' , $solicitud->approvedHistory->updated_by )->firstOrFail();
+		
+			$name_aproved = $aproved_user->personal->getFullName();
+			$charge = $aproved_user->userType->descripcion;
 
-		$total = $expenses->sum('monto');
-		$data  = array( 'solicitud'    => $solicitud,
-						'detalle'      => $jDetalle,
-						'clientes'     => $clientes,
-						'cmps'         => $cmps,
-						'getSpecialty' => $getSpecialty,
-						'date'         => array( 'toDay' => $solicitud->created_at , 'lastDay' => $jDetalle->fecha_entrega ),
-						'name'         => $name_aproved,
-						'dni'          => $dni,
-						'created_by'   => $created_by,
-						'charge'       => $charge,
-						'expenses'     => $expenses,
-						'zona'			=> $zona,
-						'total'        => $total );
-		$data['balance'] = $this->reportBalance( $solicitud , $detalle , $jDetalle , $total );
-		$html = View::make( 'Expense.report' , $data )->render();
+			if ( $solicitud->detalle->idmoneda == DOLARES )
+			{
+				foreach( $expenses as $expense )
+				{
+					$eTc = ChangeRate::where( 'fecha' , $expense->fecha_movimiento )->first();
+					if ( is_null( $eTc ) )
+						$expense->tc = ChangeRate::getTc();
+					else	
+						$expense->tc = $eTc;
+					$expense->monto = round ( $expense->monto * $expense->tc->compra , 2 , PHP_ROUND_HALF_DOWN );
+				}
+			}
+			$data  = array( 'solicitud'    => $solicitud,
+							'detalle'      => $jDetalle,
+							'clientes'     => $clientes,
+							'cmps'         => $cmps,
+							'getSpecialty' => $getSpecialty,
+							'date'         => array( 'toDay' => $solicitud->created_at , 'lastDay' => $jDetalle->fecha_entrega ),
+							'name'         => $name_aproved,
+							'dni'          => $dni,
+							'created_by'   => $created_by,
+							'charge'       => $charge,
+							'expenses'     => $expenses,
+							'zona'			=> $zona,
+							'total'        => $total );
+			$data['balance'] = $this->reportBalance( $solicitud , $detalle , $jDetalle , $total );
+			$html = View::make( 'Expense.report' , $data )->render();
+		}
+		elseif( $solicitud->idtiposolicitud == SOL_INST )
+		{
+			$data = array(  
+				'fondo'    => $solicitud,
+				'detalle'  => $jDetalle,
+				'dni'      => $dni,
+				'date'     => $this->getDay(),
+				'expenses' => $expenses );
+        	$data['balance'] = $this->reportBalance( $solicitud , $detalle , $jDetalle , $total );
+			$html = View::make('Expense.report-fondo',$data)->render();
+		}
+		return PDF2::loadHTML( $html )->setPaper( 'a4' , 'landscape' )->stream();
 		// return View::make( 'Expense.report' , $data )->render();
 		//return View::make('Expense.report',$data);//->render();
 		//return $html;
 		//return PDF::load( $html , 'A4' , 'landscape' )->show();
-		return PDF2::loadHTML( $html )->setPaper( 'a4' , 'landscape' )->stream();
 		// return $html;
 	}
-
-	public function reportExpenseFondo($token)
-	{
-		$fondo    = Solicitud::where('token',$token)->first();
-		$detalle  = $fondo->detalle;
-		$jDetalle = json_decode( $detalle->detalle );
-		$expense  = $fondo->expenses;
-		$dni      = new BagoUser;
-		$dni      = $dni->dni($fondo->createdBy->username);
-		if ($dni[status] == ok )
-			$dni = $dni[data];
-		else
-			$dni = '';
-        $data = array(  'fondo'    => $fondo,
-			            'detalle'  => $jDetalle,
-			            'dni'	   => $dni,
-			            'date'     => $this->getDay(),
-			            'expense'  => $expense );
-        $data['balance'] = $this->reportBalance( $fondo , $detalle , $jDetalle , $expense->sum('monto') );
-        
-        $html = View::make('Expense.report-fondo',$data)->render();
-        //return $html;
-        //return PDF2::loadHTML( $html )->setPaper( 'a4' , 'landscape' )->stream();
-        return PDF2::loadHTML( $html , 'a4' , 'portrait' )->stream();
-    }
 
     private function reportBalance( $solicitud , $detalle , $jDetalle , $mGasto )
 	{
