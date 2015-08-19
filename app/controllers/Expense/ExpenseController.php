@@ -244,7 +244,7 @@ class ExpenseController extends BaseController
 		}
 	}
 
-	public function confirmDiscount()
+	public function confirmPayrollDiscount()
 	{
 		try
 		{
@@ -254,22 +254,13 @@ class ExpenseController extends BaseController
 			if ( $middleRpta[ status] == ok )
 			{
 				$solicitud  = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
-				$detalle    = $solicitud->detalle;
-				$totalGasto = $solicitud->expenses->sum( 'monto' );
+				
 				if ( $solicitud->id_estado != REGISTRADO )
 					return $this->warningException( 'La solicitud no esta habilitado para que realize el descuento. Se requiere que se culmine con el Registro de Gastos' , __FUNCTION__ , __LINE__ , __FILE__ );
-				if ( $totalGasto >= $detalle->monto_aprobado )
-					return $this->warningException( 'No existe un saldo en contra del responsable para realizar un descuento' , __FUNCTION__ , __LINE__ , __FILE__ );
-				$jDetalle   = json_decode( $detalle->detalle );
-				if ( isset( $jDetalle->descuento ) )
-					return $this->warningException( 'Ya ha registrado el Descuento' , __FUNCTION__ , __LINE__ , __FILE__ );
 				
-				$monto_descuento           = $detalle->monto_aprobado - $totalGasto;
-				$jDetalle->descuento 	   = $inputs[ 'periodo' ];
-				$jDetalle->monto_descuento = $monto_descuento;
-				$detalle->detalle    	   = json_encode( $jDetalle );
-				$detalle->save();
-				
+				$devolutionController = new Devolution;
+				$devolutionController->setDevolucion( $solicitud->id , $inputs[ 'periodo' ] , $inputs[ 'monto' ] , DEVOLUCION_CONFIRMADA , DEVOLUCION_PLANILLA );
+					
 				$fondoMktController = new FondoMkt;
 				$fondoMktController->refund( $solicitud , $monto_descuento , FONDO_DEVOLUCION_PLANILLA );
 				

@@ -102,7 +102,7 @@
         Route::post('update-document' , 'Expense\ExpenseController@updateDocument');
 
         Route::get( 'export/solicitudToDeposit' , 'Export\ExportController@exportSolicitudToDeposit' );
-        Route::post( 'confirm-discount' , 'Expense\ExpenseController@confirmDiscount' );
+        Route::post( 'confirm-discount' , 'Expense\ExpenseController@confirmPayrollDiscount' );
     });
 
     /*
