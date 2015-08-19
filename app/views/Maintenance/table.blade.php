@@ -23,7 +23,7 @@
                     <a class="maintenance-edit" href="#">
                         <span class="glyphicon glyphicon-pencil"></span>
                     </a>
-                    @if( $type !== 'Parametro' )
+                    @if( ! in_array( $type , array( 'Parametro' , 'Fondo_Supervisor' , 'Fondo_Gerente_Producto' , 'Fondo_Institucion' , 'Fondo_Contable' , 'Cuenta_Gasto_Marca' , 'Inversion_Actividad' ) ) )
                         @if ( is_null( $record->deleted_at ) )
                             <a class="maintenance-disable" href="#">
                                 <span class="glyphicon glyphicon-remove red"></span>
