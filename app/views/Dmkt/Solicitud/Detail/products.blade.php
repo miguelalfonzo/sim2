@@ -18,29 +18,29 @@
                                         <option selected disabled value="0">Seleccione el Fondo</option>
                                         @foreach( $product->getSubFondo( $tipo_usuario , $solicitud ) as $fondoMkt )
                                             @if ( $fondoMkt->marca_id == $product->id_producto )
-                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}" style="background-color:#00FFFF">{{ $fondoMkt->descripcion . ' S/.' . ( $fondoMkt->saldo - $fondoMkt->retencion ) }}</option>
+                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}" style="background-color:#00FFFF">{{ $fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_disponible }}</option>
                                             @else   
-                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}">{{ $fondoMkt->descripcion . ' S/.' . ( $fondoMkt->saldo - $fondoMkt->retencion ) }}</option>
+                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}">{{ $fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_disponible }}</option>
                                             @endif
                                         @endforeach
                                     @else
                                         <option value="{{ $product->id_fondo_marketing . ',' . $product->id_tipo_fondo_marketing }}" style="background-color:gold" selected>
                                             {{ $product->thisSubFondo->subCategoria->descripcion . ' | ' . 
                                                $product->thisSubFondo->marca->descripcion . ' S/.' . 
-                                               $product->thisSubFondo->saldo_neto . ' ( Reservado ' . $product->monto_asignado . ' ) ' }}
+                                               $product->thisSubFondo->saldo_disponible . ' ( Reservado ' . $product->monto_asignado . ' ) ' }}
                                         </option>    
                                         @foreach( $product->getSubFondo( $tipo_usuario , $solicitud ) as $fondoMkt )
                                             @if ( $fondoMkt->id == $product->id_fondo_marketing )
-                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}" style="background-color:#00FFFF">{{$fondoMkt->descripcion . ' S/.' . ( $fondoMkt->saldo - $fondoMkt->retencion ) }}</option>
+                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}" style="background-color:#00FFFF">{{$fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_disponible }}</option>
                                             @else   
-                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}">{{$fondoMkt->descripcion . ' S/.' . ( $fondoMkt->saldo - $fondoMkt->retencion ) }}</option>
+                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}">{{$fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_disponible }}</option>
                                             @endif
                                         @endforeach
                                     @endif
                                 </select>
                             @else
                                 <span class="input-group-addon" style="max-width:350px;overflow:hidden">
-                                    {{ $product->thisSubFondo->subCategoria->descripcion . ' | ' . $product->thisSubFondo->marca->descripcion . ' S/.' . ( floor( $product->thisSubFondo->saldo_neto * 100 ) / 100 )  . ' ( Reservado ' . $product->monto_asignado . ' )' }}
+                                    {{ $product->thisSubFondo->subCategoria->descripcion . ' | ' . $product->thisSubFondo->marca->descripcion . ' S/.' . $product->thisSubFondo->saldo_disponible . ' ( Reservado ' . $product->monto_asignado . ' )' }}
                                 </span>
                                 <input type="hidden" value="{{ $product->id_fondo_marketing . ',' . $product->id_tipo_fondo_marketing }}" name="fondo_producto[]">
                             @endif

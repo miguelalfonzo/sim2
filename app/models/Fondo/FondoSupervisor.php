@@ -13,6 +13,11 @@ class FondoSupervisor extends Eloquent
 	protected $table      = TB_FONDO_SUPERVISOR;
 	protected $primaryKey = 'id';
 
+	protected function getSaldoDisponibleAttribute()
+	{
+		return $this->saldo - $this->retencion;
+	}
+
 	public function subCategoria()
 	{
 		return $this->hasOne( 'Fondo\FondoSubCategoria' , 'id' , 'subcategoria_id' );
@@ -43,9 +48,9 @@ class FondoSupervisor extends Eloquent
 		$this->attributes[ 'saldo' ] = round( $value , 2 , PHP_ROUND_HALF_DOWN );
 	}
 
-	protected function setSaldoNetoAttribute( $value )
+	protected function setRetencionAttribute( $value )
 	{
-		$this->attributes[ 'saldo_neto' ] = round( $value , 2 , PHP_ROUND_HALF_DOWN );
+		$this->attributes[ 'retencion' ] = round( $value , 2 , PHP_ROUND_HALF_DOWN );
 	}
 
 	protected function getFullNameAttribute()

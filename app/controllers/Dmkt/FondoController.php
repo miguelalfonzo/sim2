@@ -24,7 +24,6 @@ use \Fondo\FondoMkt;
 class FondoController extends BaseController
 {
     
-
     private function period( $date )
     {
         $period = explode('-', $date);
@@ -103,16 +102,16 @@ class FondoController extends BaseController
     {
         $fondoMktController = new FondoMkt;
         $msgWarning   = '';
+        $historiesFondoMkt = array();
         foreach( $solicituds as $solicitud )
         {
             $detalle           = $solicitud->detalle;
             $fondo             = $detalle->thisSubFondo;
-            $fondoOldSaldo     = $fondo->saldo;
-            $fondoOldRetencion = $fondo->retencion;
-            if ( $fondo->saldo_neto < $detalle->monto_solicitado )
+            if ( $fondo->saldo_disponible < $detalle->monto_solicitado )
                 return $this->warningException( 'No se cuenta con saldo en el fondo ' . $fondo->subCategoria->descripcion . ' para terminar los Fondos Institucionales.'  , __FUNCTION__ , __LINE__ , __FILE__ );
             else
-                $fondoMktController->decreaseFondoInstitucional( $fondo , $detalle->monto_solicitado );
+                $fondoMktController->setHistoryData( $historiesFondoMkt , $fondo , 1 , $detalle->monto_solicitado , 'I' , FONDO_RETENCION );
+               // $fondoMktController->decreaseFondoInstitucional( $fondo , $detalle->monto_solicitado );
             
             $jDetalle                 = json_decode( $detalle->detalle );
             $jDetalle->monto_aprobado = $jDetalle->monto_solicitado;
@@ -138,11 +137,8 @@ class FondoController extends BaseController
             if ( $middleRpta[ status ] != ok )
                 $msgWarning .= $middleRpta[ description ];
 
-            $fondoMktHistory = array( 'idFondo' => $fondo->id , 'idFondoTipo' => INVERSION_INSTITUCIONAL ,
-                                      'oldSaldo' => $fondoOldSaldo , 'newSaldo' => $fondo->saldo , 
-                                      'oldRetencion' => $fondoOldRetencion , 'newRetencion' => $fondo->retencion , 'reason' => FONDO_RETENCION );
-            $fondoMktController->setFondoMktHistory( $fondoMktHistory , $solicitud->id );    
         }
+        $fondoMktController->setFondoMktHistories( $historiesFondoMkt , $solicitud->id );
         if ( $msgWarning === '' )
             return $this->setRpta();
         else

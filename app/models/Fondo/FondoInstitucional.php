@@ -15,6 +15,11 @@ class FondoInstitucional extends Eloquent
 	protected $primaryKey = 'id';
 	protected $fillable   = array('id','descripcion');
 
+	protected function getSaldoDisponibleAttribute()
+	{
+		return $this->saldo - $this->retencion;
+	}
+
 	public function subCategoria()
 	{
 		return $this->hasOne( 'Fondo\FondoSubCategoria' , 'id' , 'subcategoria_id' );
@@ -23,7 +28,7 @@ class FondoInstitucional extends Eloquent
 	public static function getSubFondo()
 	{
 		return DB::table( TB_FONDO_INSTITUCION.' f' )
-            ->select( "fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo' , 'f.saldo_neto' , 'f.id' , '\'AG\' tipo' )
+            ->select( "fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo - f.retencion saldo_disponible' , 'f.id' , '\'AG\' tipo' )
             ->leftJoin( TB_FONDO_CATEGORIA_SUB.' fsc' , 'f.subcategoria_id' , '=' , 'fsc.id' )
             ->leftJoin( TB_FONDO_CATEGORIA.' fc' , 'fsc.id_fondo_categoria' , '=' , 'fc.id' )
             ->where( 'fsc.tipo' , FONDO_SUBCATEGORIA_INSTITUCION )->get();
@@ -44,9 +49,9 @@ class FondoInstitucional extends Eloquent
 		$this->attributes[ 'saldo' ] = round( $value , 2 , PHP_ROUND_HALF_DOWN );
 	}
 
-	protected function setSaldoNetoAttribute( $value )
+	protected function setRetencionAttribute( $value )
 	{
-		$this->attributes[ 'saldo_neto' ] = round( $value , 2 , PHP_ROUND_HALF_DOWN );
+		$this->attributes[ 'retencion' ] = round( $value , 2 , PHP_ROUND_HALF_DOWN );
 	}
 
 	protected function getFullNameAttribute()

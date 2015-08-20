@@ -14,6 +14,11 @@ class FondoGerProd extends Eloquent
 	protected $primaryKey = 'id';
 	protected $fillable   = array('id','fondos_subcategoria_id','marca_id');
 
+	protected function getSaldoDisponibleAttribute()
+	{
+		return $this->saldo - $this->retencion;
+	}
+
 	public function fondosSubCategorias()
 	{
 		return $this->belongsTo('Maintenance\FondosSubCategorias', 'fondos_subcategoria_id' );
@@ -44,9 +49,9 @@ class FondoGerProd extends Eloquent
 		$this->attributes[ 'saldo' ] = round( $value , 2 , PHP_ROUND_HALF_DOWN );
 	}
 
-	protected function setSaldoNetoAttribute( $value )
+	protected function setRetencionAttribute( $value )
 	{
-		$this->attributes[ 'saldo_neto' ] = round( $value , 2 , PHP_ROUND_HALF_DOWN );
+		$this->attributes[ 'retencion' ] = round( $value , 2 , PHP_ROUND_HALF_DOWN );
 	}
 
 	protected function getFullNameAttribute()
