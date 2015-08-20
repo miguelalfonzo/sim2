@@ -791,6 +791,14 @@ $(function()
             $("#balance").addClass("error-incomplete");
             error = 1;
         }
+        //alert('test');
+        //alert(validateEmpty($(".quantity input")));
+        //alert(validateEmpty( $(".total-item input")));
+        /*if(!validateEmpty($(".quantity input")) || !validateEmpty( $(".total-item input")))
+        {
+            error = 1;
+        }*/
+
         //Mostrando errores de cabeceras si es que existen
         if( error !== 0 )
         {
@@ -849,9 +857,9 @@ $(function()
                 else
                     rep = 0 ;
             }
-            ( data_quantity.length > 0 ) ? data.quantity = data_quantity : error_json = 1 ;
+            ( data_quantity  ) ? data.quantity = data_quantity : error_json = 1 ;
             data.description = arr_description;
-            ( data_total_item.length > 0 ) ? data.total_item = data_total_item : error_json = 1 ;
+            ( data_total_item ) ? data.total_item = data_total_item : error_json = 1 ;
             data.rep = rep;
             
             if( error_json === 0 )
@@ -943,8 +951,15 @@ $(function()
                             });
                         }
             }
-            else
-                $("html, body").animate({scrollTop:200},'500','swing');
+            else{
+                //$("html, body").animate({scrollTop:200},'500','swing');
+                    $("#expense-register").animate({
+                    scrollTop: $("#proof-type").parent().parent().offset().top
+                } , 300 );
+                bootbox.alert('<h4 class="red">Llene los Campos Obligatorios</h4>');
+
+                return false;
+            }
         }
     });
 
