@@ -123,23 +123,15 @@ $(document).on( 'click' , '.timeLine' , function(e)
     });
 });
 
-//NEW OR EDIT SOLICITUDE BY RM OR SUP CLIENTES
-/* $.getJSON(server + "getclients", function (data) {
-    clients = data;
-});
-*/
 //LEYENDA
 $('#show_leyenda').on('click',function(){
-    // $('#leyenda').show();
-    // $(this).hide();
-    // $('#hide_leyenda').show()
     var url = URL_BASE + "getleyenda";
     $.ajax({
         url: url,
         ContentType: GBREPORTS.contentTypeAjax,
         cache: false
-    }).done(function(dataResult) {
-        console.log(dataResult);
+    }).done(function(dataResult)
+    {
         bootbox.dialog({
             message: dataResult,
             title: "Leyenda de Estados",
@@ -399,12 +391,13 @@ function listTable( type , date )
         type: 'POST',
         data:
         {
-            _token    : GBREPORTS.token,
-            type      : type ,
-            date      : date ,
-            idstate   : $('#idState').val() ,
-            date_start: $('#drp_menubar').data('daterangepicker').startDate.format("L"),
-            date_end  : $('#drp_menubar').data('daterangepicker').endDate.format("L")
+            _token     : GBREPORTS.token,
+            type       : type ,
+            date       : date ,
+            idstate    : $('#idState').val() ,
+            date_start : $('#drp_menubar').data('daterangepicker').startDate.format("L"),
+            date_end   : $('#drp_menubar').data('daterangepicker').endDate.format("L") ,
+            filter     : $( '.filter' ).val()
         }
     }).fail( function ( statusCode , errorThrown)
     {
@@ -530,12 +523,10 @@ amount_families.keyup( function ()
 function verifySum( element , type )
 {
     amount_error_families.text('');
-    console.log("verify");
     var sum_total = 0;
     var precision = 11;
     amount_families.each(function(i,v)
     {
-        console.log( $(this).val() );
         sum_total += parseFloat( $(this).val() );
     });
     
@@ -1204,10 +1195,9 @@ $(document).on('click' , '.maintenance-update' , function()
     });
 });
 
-$(document).off('click' , '.maintenance-disable');
-$(document).on('click' , '.maintenance-disable' , function()
+$(document).off( 'click' , '.maintenance-disable' );
+$(document).on( 'click' , '.maintenance-disable' , function()
 {
-    console.log( 'mainte-disable');
     var trElement = $(this).parent().parent();
     var aData = {};
     aData._token = _token;
@@ -1444,7 +1434,6 @@ function seeker( element , name , url )
                     },
                 }).done( function (data)
                 {
-                    console.log( data )
                     if ( data.Status != 'Ok')
                         data.Data = '{"value":"0","label":"Error en la busqueda"}';   
                     return response( data.Data );
@@ -1518,10 +1507,6 @@ function seeker( element , name , url )
 function filterSelect( element , ids , type )
 {
     var select = $(element);
-    console.log( clients );
-    console.log( type );
-    console.log( ids );
-    console.log( $(element) );
     if ( ( type === 'cliente' && clients.children().length == 1 ) || ( type === 'eliminacion' && clients.children().length >= 1 ) ) 
     {
         select.val('').children().show();
@@ -1708,7 +1693,6 @@ $( '#registrar' ).on( 'click' , function ( e )
     var products      = $('.products');
     products.each( function (index) 
     {
-        console.log( $(this).val() );
         families_input[index] = $(this).val();
     });
 
@@ -1731,8 +1715,6 @@ $( '#registrar' ).on( 'click' , function ( e )
     {
         var form = $('#form-register-solicitude');
         var formData = new FormData(form[0]);
-        console.log(d_clients);
-        console.log(d_clients_type);
         d_clients.forEach( function( entry )
         {
             formData.append( "clientes[]", entry );
@@ -1906,7 +1888,6 @@ function colorTr(tokens)
 
 function addTr( data , tr )
 {
-    console.log( tr );
     var tr = $( tr );
     tr.a
 }
@@ -1938,15 +1919,12 @@ $( document ).on( 'click' , '.open-details' , function()
         td.addClass('open-details');
         if ( response.Status == 'Ok' )
         {
-            console.log( response.Data );
             bootbox.dialog({
                 message: response.Data.View,
                 animate: true ,
                 className : 'solicitud-detail-modal',
                 backdrop  : true,
-                onEscape  : true
-            });
-
+                onEscape  : true });
             return true;
             //addTr( td , response.Data.View );
         }
@@ -1978,7 +1956,6 @@ $( document ).on( 'click' , '.open-details2' , function()
     {
         if ( response.Status == 'Ok' )
         {
-            console.log( response.Data );
             bootbox.dialog({
                 message: response.Data.View,
                 animate: true ,
@@ -2009,7 +1986,6 @@ $( document ).ready(function()
         _token     : GBREPORTS.token
     }
     }).done(function(dataResult) {
-        console.log(dataResult);
         if(dataResult.status == 'OK'){
             if(typeof(dataResult.alerts) != 'undefined'){
                 if(dataResult.alerts.length > 0){

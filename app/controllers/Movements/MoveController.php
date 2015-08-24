@@ -16,6 +16,7 @@ use \Exception;
 use \System\FondoHistory;
 use \Dmkt\Solicitud;
 use \Carbon\Carbon;
+use \Fondo\FondoSubCategoria;
 
 class MoveController extends BaseController
 {
@@ -25,49 +26,47 @@ class MoveController extends BaseController
         $this->beforeFilter('active-user');
     }
 
-    private function searchMove( $start , $end )
+    private function searchMove( $start , $end , $subCategoriaId )
     {
     	
         $dates = $this->setDates( $start , $end );
-
-        
-            $middleRpta = $this->searchSolicituds( R_FINALIZADO , $dates[ 'start' ] , $dates[ 'end' ] );
-            if ($middleRpta[status] == ok)
-            {
-                foreach ( $middleRpta[data] as $solicitud )
-                { 
-                    $detalle = $solicitud->detalle;
-                    $jDetalle = json_decode($detalle->detalle);
-                    $deposito = $detalle->deposit;
-                    
-                        if ( $detalle->id_moneda == DOLARES )
-                            $solicitud->saldo = $detalle->typeMoney->simbolo . ' ' . ( $detalle->monto_actual - $solicitud->expenses->sum('monto') );
-                        elseif ( $detalle->id_moneda == SOLES )
-                            $solicitud->saldo = $detalle->typeMoney->simbolo . ' ' . ( $detalle->monto_actual - $solicitud->expenses->sum('monto') );
-                        else
-                            $solicitud->saldo = 'El Tipo de Moneda es: '.$detalle->id_moneda ;
-                }
-                $view = View::make('Tables.movimientos')->with( array( 'solicituds' => $middleRpta[data] ) )->render();
-                if ( Auth::user()->type == TESORERIA )
-                {
-                    $soles = $middleRpta[data]->sum( function( $solicitud )
-                    {
-                        $deposito = $solicitud->detalle->deposit;
-                        $moneda = $deposito->account->typeMoney;
-                        if ( $moneda->id == SOLES )
-                            return $solicitud->detalle->deposit->total;
-                    });
-                    $dolares = $middleRpta[data]->sum( function( $solicitud )
-                    {
-                        $deposito = $solicitud->detalle->deposit;
-                        $moneda = $deposito->account->typeMoney;
-                        if ( $moneda->id == DOLARES )
-                            return $solicitud->detalle->deposit->total;
-                    });
-                    $middleRpta[data]['Total'] = array( 'Soles' => $soles , 'Dolares' => $dolares );
-                }
-                $middleRpta[data]['View'] = $view;
+        $middleRpta = $this->searchSolicituds( R_FINALIZADO , $dates[ 'start' ] , $dates[ 'end' ] );
+        if ($middleRpta[status] == ok)
+        {
+            foreach ( $middleRpta[data] as $solicitud )
+            { 
+                $detalle = $solicitud->detalle;
+                $jDetalle = json_decode($detalle->detalle);
+                $deposito = $detalle->deposit;
+                
+                    if ( $detalle->id_moneda == DOLARES )
+                        $solicitud->saldo = $detalle->typeMoney->simbolo . ' ' . ( $detalle->monto_actual - $solicitud->expenses->sum('monto') );
+                    elseif ( $detalle->id_moneda == SOLES )
+                        $solicitud->saldo = $detalle->typeMoney->simbolo . ' ' . ( $detalle->monto_actual - $solicitud->expenses->sum('monto') );
+                    else
+                        $solicitud->saldo = 'El Tipo de Moneda es: '.$detalle->id_moneda ;
             }
+            $view = View::make('Tables.movimientos')->with( array( 'solicituds' => $middleRpta[data] , 'subCategoriaId' =>$subCategoriaId ) )->render();
+            if ( Auth::user()->type == TESORERIA )
+            {
+                $soles = $middleRpta[data]->sum( function( $solicitud )
+                {
+                    $deposito = $solicitud->detalle->deposit;
+                    $moneda = $deposito->account->typeMoney;
+                    if ( $moneda->id == SOLES )
+                        return $solicitud->detalle->deposit->total;
+                });
+                $dolares = $middleRpta[data]->sum( function( $solicitud )
+                {
+                    $deposito = $solicitud->detalle->deposit;
+                    $moneda = $deposito->account->typeMoney;
+                    if ( $moneda->id == DOLARES )
+                        return $solicitud->detalle->deposit->total;
+                });
+                $middleRpta[data]['Total'] = array( 'Soles' => $soles , 'Dolares' => $dolares );
+            }
+            $middleRpta[data]['View'] = $view;
+        }
         return $middleRpta;
     }
 
@@ -131,7 +130,7 @@ class MoveController extends BaseController
                 case 'estado-fondos':
                     return $this->getFondoReport( $inputs['date'] );
                 case 'movimientos':
-                    return $this->searchMove( $inputs['date_start' ] , $inputs[ 'date_end' ] );
+                    return $this->searchMove( $inputs['date_start' ] , $inputs[ 'date_end' ] , $inputs[ 'filter' ] );
             }
         }
         catch ( Exception $e )
@@ -176,7 +175,7 @@ class MoveController extends BaseController
         return Carbon::createFromFormat( 'd/m/Y' , $date )->format( 'Ym' );
     }
 
-    protected function searchSolicituds( $estado , $start , $end )
+    protected function searchSolicituds( $estado , $start , $end , $type = 'FLUJO' )
     {
         $solicituds = Solicitud::where( function( $query ) use( $start , $end )
         {
@@ -245,7 +244,6 @@ class MoveController extends BaseController
         try
         {
             $inputs    = Input::all();
-            // dd($inputs);
             $solicitud = Solicitud::find( $inputs[ 'id_solicitud'] );
             $data      = array(
                 'solicitud'     => $solicitud, 
@@ -264,12 +262,12 @@ class MoveController extends BaseController
 
     public function getStatement()
     {
-        if ( Auth::user()->type == GER_PROM )
-            $fondos = SubFondo::all();
-        elseif( Auth::user()->type == GER_COM )
-            $fondos = SubFondo::where( 'tipo' , 'I' )->get();
+        if ( Auth::user()->type == GER_COM )
+            $fondos = FondoSubCategoria::all();
+        elseif( Auth::user()->type == GER_PROM )
+            $fondos = FondoSubCategoria::where( 'tipo' , 'I' )->get();
         elseif( in_array( Auth::user()->type , array( SUP , GER_PROD ) ) )
-            $fondos = SubFondo::where( 'tipo' , Auth::user()->type )->get();
-        return View::make('template.tb_estado_cuenta');
+            $fondos = FondoSubCategoria::where( 'tipo' , Auth::user()->type )->get();
+        return View::make('template.tb_estado_cuenta' , array( 'fondosMkt' => $fondos ) );
     }
 }

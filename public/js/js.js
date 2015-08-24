@@ -1875,4 +1875,9 @@ $(function()
         });
     });
 
+    $( '.filter').on( 'change' , function()
+    {
+        listTable( 'movimientos' , null );
+    });
+
 }); 
