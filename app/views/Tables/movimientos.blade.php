@@ -3,14 +3,13 @@
         <tr>
             <th>#</th>
             <th>Solicitud</th>
-            <th>Solicitado por</th>
-            <th>Fecha de Solicitud</th>
+            <th>Responsable</th>
             <th>Aprobado por</th>
-            <th>Fecha de Aprobación</th>
-            <th>Deposito</th>
-            <th>Destinatario</th>
+            <th>Fecha de Creación</th>
+            <th>Culminación</th>
             <th>Productos</th>
-            <th>Saldo</th>
+            <th>Deposito</th>
+            <th>Descargo</th>
         </tr>
     </thead>
     <tbody>
@@ -27,9 +26,8 @@
                         <label>{{ $cuenta->titulo }}</label>
                     </td>
                     <td class="text-center">
-                        {{ $cuenta->createdBy->personal->full_name }}
+                        {{ $cuenta->asignedTo->personal->full_name }}
                     </td>
-                    <td class="text-center">{{$cuenta->created_at}}</td>
                     <td class="text-center">
                         @if ( $cuenta->idtiposolicitud == SOL_INST )
                             {{$cuenta->createdBy->personal->full_name}}
@@ -37,13 +35,8 @@
                             {{ $cuenta->approvedHistory->user->personal->full_name }}
                         @endif
                     </td>
+                    <td class="text-center">{{$cuenta->created_at}}</td>
                     <td class="text-center">{{$cuenta->updated_at}}</td>
-                    <td class="text-center">
-                        {{ $cuenta->detalle->deposit->account->typeMoney->simbolo . ' ' . $cuenta->detalle->deposit->total }}
-                    </td>
-                    <td class="text-center">
-                        {{ $cuenta->asignedTo->personal->full_name }}
-                    </td>
                     <td class="text-center">
                         @if ( $cuenta->products->count() == 0 )
                             -
@@ -53,7 +46,12 @@
                             @endforeach
                         @endif
                     </td>   
-                    <td>{{$cuenta->saldo}}</td>
+                    <td class="text-center">
+                        {{ $cuenta->detalle->deposit->account->typeMoney->simbolo . ' ' . $cuenta->detalle->deposit->total }}
+                    </td>
+                    <td class="text-center">
+                        {{ $cuenta->detalle->typeMoney->simbolo . ' ' . $cuenta->expenses->sum( 'monto' ) }}
+                    </td>          
                 </tr>
             @endforeach
         @endif

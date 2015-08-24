@@ -219,7 +219,7 @@ class MoveController extends BaseController
             if ( $estado == R_REVISADO )
                 $solicituds->whereIn( 'id_estado' , array( DEPOSITO_HABILITADO , DEPOSITADO ) );
             else if( $estado == R_GASTO )
-                $solicituds->whereIn( 'id_estado' ,array( DEVOLUCION , REGISTRADO ) );
+                $solicituds->whereIn( 'id_estado' , array( ENTREGADO ) );
 
         if ( $estado != R_TODOS)
             $solicituds->whereHas( 'state' , function ( $q ) use( $estado )
@@ -248,35 +248,13 @@ class MoveController extends BaseController
             // dd($inputs);
             $solicitud = Solicitud::find( $inputs[ 'id_solicitud'] );
             $data      = array(
-                            'solicitud'     => $solicitud, 
-                            'politicStatus' => false, 
-                            'detalle'       => $solicitud->detalle, 
-                            'view'          => true 
-                        );
-            return $this->setRpta(
-                            array(
-                                'View' => View::make( 'Dmkt.Solicitud.Tab.tabs' )
-                                            ->with( $data )->render()
-                            )
-                        );
-            // dd("hola");
-            
-            // if ( $solicitud->idtiposolicitud == SOL_REP )
-            //     return $this->setRpta(
-            //                     array(
-            //                         'View' => View::make( 'Dmkt.Solicitud.Representante.detail' )
-            //                                     ->with( $data )
-            //                                     ->render()
-            //                     )
-            //                 );
-            // else
-            //     return $this->setRpta(
-            //                     array(
-            //                         'View' => View::make( 'Dmkt.Solicitud.Institucional.detail' )
-            //                         ->with( $data )
-            //                         ->render()
-            //                     )
-            //                 );
+                'solicitud'     => $solicitud, 
+                'politicStatus' => false, 
+                'detalle'       => $solicitud->detalle, 
+                'view'          => true  );
+            return $this->setRpta( array(
+                'View' => View::make( 'Dmkt.Solicitud.Tab.tabs' )->with( $data )->render() )
+            );
         }
         catch( Exception $e )
         {
@@ -284,7 +262,14 @@ class MoveController extends BaseController
         }
     }
 
-    public function getStatement(){
+    public function getStatement()
+    {
+        if ( Auth::user()->type == GER_PROM )
+            $fondos = SubFondo::all();
+        elseif( Auth::user()->type == GER_COM )
+            $fondos = SubFondo::where( 'tipo' , 'I' )->get();
+        elseif( in_array( Auth::user()->type , array( SUP , GER_PROD ) ) )
+            $fondos = SubFondo::where( 'tipo' , Auth::user()->type )->get();
         return View::make('template.tb_estado_cuenta');
     }
 }

@@ -227,7 +227,7 @@ class DepositController extends BaseController
 
             $devolucion = $solicitud->devolutions()->where( 'id_estado_devolucion' , DEVOLUCION_POR_VALIDAR )->get();
 
-            if( $solicitud->id_estado != REGISTRADO && $solicitud->devolutions()->where( 'id_estado_devolucion' , DEVOLUCION_POR_VALIDAR )->get()->count() === 0 )
+            if( $solicitud->id_estado != ENTREGADO && $solicitud->devolutions()->where( 'id_estado_devolucion' , DEVOLUCION_POR_VALIDAR )->get()->count() === 0 )
                 return $this->warningException( 'Cancelado - La solicitud no se encuentra en la etapa de validación de la devolución' , __FUNCTION__ , __LINE__ , __FILE__ );
             
             if( $solicitud->idtiposolicitud == REEMBOLSO )

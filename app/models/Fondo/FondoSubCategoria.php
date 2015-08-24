@@ -10,11 +10,6 @@ class FondoSubCategoria extends Eloquent
 	protected $primaryKey = 'id';
 	protected $fillable   = array('id','descripcion', 'fondos_categorias_id');
 
-	/*public function fondosCategorias()
-	{
-		return $this->belongsTo('Maintenance\FondosCategorias','fondos_categorias_id');
-	}*/
-
 	protected static function order()
 	{
 		return FondoSubCategoria::orderBy( 'descripcion' , 'ASC' )->get();

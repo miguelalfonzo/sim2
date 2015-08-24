@@ -24,11 +24,11 @@
             @endif
             @if( $solicitud->id_estado == DEPOSITADO )
                 <a id="seat-solicitude" class="btn btn-success">Generar Asiento</a>
-            @elseif( $solicitud->id_estado == REGISTRADO )
-                @if( $solicitud->idtiposolicitud != REEMBOLSO && is_null( $solicitud->detalle->monto_descuento ) )
-                    <a id="confirm-discount" class="btn btn-success">Registrar Descuento por Planilla</a>
-                    @if ( $solicitud->devolutions()->whereIn( 'id_estado_devolucion' , array( DEVOLUCION_POR_REALIZAR , DEVOLUCION_POR_VALIDAR ) )->get()->count() == 0 )
-                        <a id="confirm-discount" class="btn btn-success" style="display:none">Terminar Registro de Gasto</a>
+            @elseif( $solicitud->id_estado == ENTREGADO )
+                @if( $solicitud->idtiposolicitud != REEMBOLSO )
+                    <a id="confirm-discount" class="btn btn-info">Descuento por Planilla</a>
+                    @if ( $solicitud->devolutions()->whereIn( 'id_estado_devolucion' , array( DEVOLUCION_POR_REALIZAR , DEVOLUCION_POR_VALIDAR ) )->get()->count() === 0 )
+                        <a id="finish-expense-record" class="btn btn-success">Terminar Registro de Gasto</a>
                     @endif
                 @endif
             @endif

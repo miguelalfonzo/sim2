@@ -164,10 +164,11 @@ class SolicitudeController extends BaseController
                 $data['date'] = $this->getDay();
                 if ($solicitud->id_estado == DEPOSITADO)
                     $data['lv'] = $this->textLv($solicitud);
-                elseif (!is_null($solicitud->registerHistory)) {
-                    $data = array_merge($data, $this->expenseData($solicitud, $detalle->monto_actual));
-                    $data['igv'] = Table::getIGV();
-                    $data['regimenes'] = Regimen::all();
+                elseif ( ! is_null( $solicitud->toDeliveredHistory ) )
+                {
+                    $data                = array_merge( $data , $this->expenseData( $solicitud, $detalle->monto_actual ) );
+                    $data[ 'igv' ]       = Table::getIGV();
+                    $data[ 'regimenes' ] = Regimen::all();
                 }
             } elseif (!is_null($solicitud->expenseHistory) && $user->id == $solicitud->id_user_assign) {
                 $data = array_merge($data, $this->expenseData($solicitud, $detalle->monto_actual));
@@ -177,7 +178,7 @@ class SolicitudeController extends BaseController
             Session::put('state', $data['solicitud']->state->id_estado);
             $data['politicStatus'] = $politicStatus;
             $alert = new AlertController;
-            if (is_null($data['solicitud']->registerHistory) && !in_array($data['solicitud']->id_estado, array(CANCELADO, RECHAZADO)))
+            if (is_null( $data['solicitud']->toDeliveredHistory ) && !in_array($data['solicitud']->id_estado, array(CANCELADO, RECHAZADO)))
                 $data['alert'] = $alert->compareTime($data['solicitud'], 'diffInMonths');
 
             $event = Event::where('solicitud_id', '=', $solicitud->id)->get();

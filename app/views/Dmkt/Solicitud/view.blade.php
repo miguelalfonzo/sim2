@@ -2,7 +2,7 @@
 @section('solicitude')
 <div class="content">
     <ul class="nav nav-tabs" role="tablist">
-        @if ( ( $solicitud->id_user_assign == Auth::user()->id  && ! is_null( $solicitud->expenseHistory ) ) || ( Auth::user()->type == CONT && $solicitud->id_estado == REGISTRADO )  )
+        @if ( ( $solicitud->id_user_assign == Auth::user()->id  && ! is_null( $solicitud->expenseHistory ) ) || ( Auth::user()->type == CONT && $solicitud->id_estado == ENTREGADO )  )
             <li>
                  @include('Dmkt.Solicitud.tabSolicitud')
             </li>
@@ -19,7 +19,7 @@
         @endif
     </ul>
     <div class="tab-content">
-        @if ( ( $solicitud->id_user_assign == Auth::user()->id  && ! is_null( $solicitud->expenseHistory ) ) || ( Auth::user()->type == CONT && $solicitud->id_estado == REGISTRADO )  )
+        @if ( ( $solicitud->id_user_assign == Auth::user()->id  && ! is_null( $solicitud->expenseHistory ) ) || ( Auth::user()->type == CONT && $solicitud->id_estado == ENTREGADO )  )
             <div class="tab-pane fade" id="solicitud" style="margin-top:20px">    
         @else
             <div class="tab-pane fade active in" id="solicitud" style="margin-top:20px">
@@ -45,7 +45,7 @@
                 @include('template.Modals.deposit-min')
             </form>
         </div>
-        @if ( ( $solicitud->id_user_assign == Auth::user()->id  && ! is_null( $solicitud->expenseHistory ) ) || ( Auth::user()->type == CONT && $solicitud->id_estado == REGISTRADO )  )
+        @if ( ( $solicitud->id_user_assign == Auth::user()->id  && ! is_null( $solicitud->expenseHistory ) ) || ( Auth::user()->type == CONT && $solicitud->id_estado == ENTREGADO )  )
             <div class="tab-pane fade active in" id="document" style="margin-top:20px; margin-bottom:20px">
         @else
             <div class="tab-pane fade" id="document" style="margin-top:20px; margin-bottom:20px">

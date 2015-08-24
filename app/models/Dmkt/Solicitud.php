@@ -64,6 +64,11 @@ class Solicitud extends Eloquent
         return $this->hasOne( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->where( 'status_to' , REGISTRADO );
     }
 
+    protected function toDeliveredHistory()
+    {
+        return $this->hasOne( 'System\SolicitudHistory' , 'id_solicitud' )->where( 'status_to' , ENTREGADO );
+    }
+
     protected function toPendingHistory()
     {
         return $this->hasOne( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->where( 'status_to' , PENDIENTE );

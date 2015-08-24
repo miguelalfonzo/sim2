@@ -17,11 +17,11 @@
                     <a class="btn btn-default" href="{{URL::to('ver-solicitud/'.$solicitud->token)}}">
                         <span class="glyphicon glyphicon-book"></span>
                     </a>              
-                @elseif ( $solicitud->id_estado == ENTREGADO && Auth::user()->type == CONT )
+                @elseif ( $solicitud->id_estado == REGISTRADO && Auth::user()->type == CONT )
                     <a class="btn btn-default" href="{{URL::to('generar-asiento-gasto/'.$solicitud->token)}}">
                         <span class="glyphicon glyphicon-book"></span>
                     </a>
-                @elseif( $solicitud->id_estado != REGISTRADO && $solicitud->id_estado != DEPOSITO_HABILITADO )
+                @elseif( $solicitud->id_estado != ENTREGADO && $solicitud->id_estado != DEPOSITO_HABILITADO )
                     <a class="btn btn-default" href="{{ URL::to( 'ver-solicitud/' . $solicitud->token ) }}">
                         <span class="glyphicon glyphicon-edit"></span>
                     </a>
@@ -50,7 +50,7 @@
             @endif
         @endif
         
-        @if( $solicitud->id_estado == REGISTRADO )
+        @if( $solicitud->id_estado == ENTREGADO )
             @if( Auth::user()->type == CONT && $solicitud->devolutions()->whereIn( 'id_estado_devolucion' , array( DEVOLUCION_POR_REALIZAR , DEVOLUCION_POR_VALIDAR ) )->get()->count() == 0 )
                 <a class="btn btn-default" href="{{URL::to('ver-solicitud/'.$solicitud->token)}}">
                     <span  class="glyphicon glyphicon-edit"></span>
@@ -66,7 +66,7 @@
             @endif
         @endif
 
-         @if( $solicitud->id_estado == REGISTRADO && Auth::user()->id == $solicitud->id_user_assign )
+         @if( $solicitud->id_estado == ENTREGADO && Auth::user()->id == $solicitud->id_user_assign )
             <a class="btn btn-default" target="_blank" href="{{URL::to('a'.'/'.$solicitud->token)}}">
                 <span  class="glyphicon glyphicon-print"></span>
             </a>

@@ -12,7 +12,7 @@
                 </a>
             </li>
         @endif
-        @if ( ! is_null( $solicitud->registerHistory ) && ( Auth::user()->type == CONT || Auth::user()->id == $solicitud->id_user_assign ) )
+        @if ( ! is_null( $solicitud->toDeliveredHistory ) && ( Auth::user()->type == CONT || Auth::user()->id == $solicitud->id_user_assign ) )
             <li>
                 <a href="#expense-tab" role="tab" data-toggle="tab">
                     <icon class="fa fa-home"></icon>
@@ -42,7 +42,7 @@
                 @endif        
             </div>
         @endif
-        @if ( ! is_null( $solicitud->registerHistory ) && ( Auth::user()->type == CONT || Auth::user()->id == $solicitud->id_user_assign ) )
+        @if ( ! is_null( $solicitud->toDeliveredHistory ) && ( Auth::user()->type == CONT || Auth::user()->id == $solicitud->id_user_assign ) )
             <div class="tab-pane fade" id="expense-tab" style="margin-top:20px; margin-bottom:20px">
                 @include( 'Dmkt.Solicitud.Section.gasto-table' )
             </div>    

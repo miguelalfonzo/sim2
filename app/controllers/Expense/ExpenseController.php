@@ -255,7 +255,7 @@ class ExpenseController extends BaseController
 			{
 				$solicitud  = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
 				
-				if ( $solicitud->id_estado != REGISTRADO )
+				if ( $solicitud->id_estado != ENTREGADO )
 					return $this->warningException( 'La solicitud no esta habilitado para que realize el descuento. Se requiere que se culmine con el Registro de Gastos' , __FUNCTION__ , __LINE__ , __FILE__ );
 				
 				$devolutionController = new Devolution;
@@ -300,7 +300,7 @@ class ExpenseController extends BaseController
 				return $middleRpta;
 
 			$toUser = $middleRpta[ data ];
-			$solicitud->id_estado = REGISTRADO;
+			$solicitud->id_estado = ENTREGADO;
 			$solicitud->save();
 
 			$middleRpta = $this->setStatus( $oldIdEstado , $solicitud->id_estado , Auth::user()->id, $toUser , $solicitud->id );
@@ -479,9 +479,6 @@ class ExpenseController extends BaseController
 								  "ON TO_NUMBER(NVL(TRIM(P.PEFESPECIAL2),'0')) = E2.CODESP " .
 						"WHERE " .
 						  "P.PEFNRODOC1 = ".$cmp;
-			Log::error("=========================================================000");
-			Log::error($query);					  
-			Log::error("=========================================================000");
 			$result = DB::select($query)[0];
 		}
 		return $result;
@@ -696,5 +693,33 @@ class ExpenseController extends BaseController
         if ( $validator->fails() ) 
             return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
 	    return $this->setRpta(); 
+    }
+
+    public function endExpenseRecord()
+    {
+    	try
+    	{
+			$inputs               = Input::all();
+			DB::beginTransaction();
+			$solicitud            = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
+			$oldIdEstado          = $solicitud->id_estado;
+			$solicitud->id_estado = REGISTRADO;
+			$solicitud->save();
+
+			$middleRpta = $this->setStatus( $oldIdEstado , $solicitud->id_estado , Auth::user()->id , USER_CONTABILIDAD , $solicitud->id );
+			if ( $middleRpta[status] == ok )
+			{
+				Session::put( 'state' , R_GASTO );
+				DB::commit();
+			}
+			else
+				DB::rollback();
+			return $middleRpta;
+		}
+		catch ( Exception $e )
+		{
+			DB::rollback();
+			return $this->internalException( $e , __FUNCTION__ );
+		}
     }
 }

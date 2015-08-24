@@ -1851,4 +1851,28 @@ $(function()
         });
     });
 
+    $( '#finish-expense-record' ).on( 'click' , function()
+    {
+        var element = $( this );
+        bootbox.confirm( '<h4 class="text-center text-info">¿ Confirme la culminacion del Registro de Gastos ?</h4>', function( response ) 
+        {    
+            if ( response ) 
+            {
+                data._token   = GBREPORTS.token;
+                data.token    = $( 'input[ name=token ]' ).val();
+                $.post( server + 'end-expense-record' , data )
+                .done(function ( response ) 
+                {
+                    if ( response.Status == 'Ok' )
+                        bootbox.alert( '<h4 class="green">Registro de Gastos Culimando</h4>' , function()
+                        {
+                            window.location.href = server + 'show_user';
+                        });
+                    else
+                        bootbox.alert( '<h4 style="color:red">' + response.Status + ' : ' + response.Description + '</h4>' );
+                });
+            }    
+        });
+    });
+
 }); 
