@@ -148,13 +148,14 @@ class SolicitudeController extends BaseController
             if ( $solicitud->idtiposolicitud != SOL_INST && in_array( $solicitud->id_estado, array(PENDIENTE, DERIVADO, ACEPTADO) ) ) {
                 $politicType = $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario;
                 if ( in_array( $politicType , array( Auth::user()->type , Auth::user()->tempType() ) )
-                    && (array_intersect( array( Auth::user()->id, Auth::user()->tempId() ), $solicitud->managerEdit($politicType)->lists('id_gerprod') ) ) ) {
+                    && ( array_intersect( array( Auth::user()->id, Auth::user()->tempId() ), $solicitud->managerEdit( $politicType )->lists( 'id_gerprod' ) ) ) ) 
+                {
                     $politicStatus = TRUE;
-                    $data['tipo_usuario'] = $politicType;
+                    $data[ 'tipo_usuario' ] = $politicType;
                     $solicitud->status = BLOCKED;
-                    Session::put('id_solicitud', $solicitud->id);
+                    Session::put( 'id_solicitud' , $solicitud->id );
                     $solicitud->save();
-                    $data['solicitud']->status = 1;
+                    $data[ 'solicitud' ]->status = 1;
                 }
             } elseif (Auth::user()->type == TESORERIA && $solicitud->id_estado == DEPOSITO_HABILITADO) {
                 $data['banks'] = Account::banks();
@@ -579,7 +580,7 @@ class SolicitudeController extends BaseController
         endif;
     }
 
-    private function toUser( $approvalInstance , $idsProducto, $order, $responsable = NULL)
+    private function toUser( $approvalInstance , $idsProducto, $order, $responsable = NULL )
     {
         $approvalPolicy = $approvalInstance->approvalPolicyOrder( $order );
         
@@ -611,7 +612,7 @@ class SolicitudeController extends BaseController
             $notRegisterGerProdName = Personal::getGerProdNotRegisteredName( $uniqueIdsGerProd );
         
             if ( count( $notRegisterGerProdName ) === 0 )
-                $idsUser = Personal::whereIn( 'id' , $uniqueIdsGerProd )->lists( 'user_id' );
+                $idsUser = Personal::whereIn( 'bago_id' , $uniqueIdsGerProd )->where( 'tipo' , GER_PROD )->lists( 'user_id' );
             else
                 return $this->warningException( 'Los siguientes Gerentes de Producto no estan registrados en el sistema: ' . implode( ' , ' , $notRegisterGerProdName ) , __FUNCTION__ , __LINE__ , __FILE__ );
         else:
