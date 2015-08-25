@@ -16,6 +16,11 @@ class Deposit extends Eloquent{
 		return Carbon::parse( $attr )->format('d/m/Y');
 	}
 
+	protected function getMoneyAmountAttribute()
+	{
+		return $this->account->typeMoney->simbolo . $this->total;
+	}
+
 	public function iddeposit()
 	{
 		return $this->hasOne('Dmkt\Solicitud','idsolicitud','idsolicitud');

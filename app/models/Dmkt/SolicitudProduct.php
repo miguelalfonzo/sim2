@@ -77,6 +77,16 @@ class SolicitudProduct extends Eloquent
             return $this->belongsTo( 'Fondo\FondoSupervisor' , 'id_fondo_marketing' );
     }
 
+    public function fondoSup()
+    {
+        return $this->belongsTo( 'Fondo\FondoSupervisor' , 'id_fondo_marketing' );
+    }
+
+    public function fondoGerProd()
+    {
+        return $this->belongsTo( 'Fondo\FondoGerProd' , 'id_fondo_marketing' );
+    }
+
 
     public function marca()
     {

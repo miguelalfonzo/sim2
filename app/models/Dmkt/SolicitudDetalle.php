@@ -123,20 +123,10 @@ class SolicitudDetalle extends Eloquent
     {
         return $this->hasOne('Common\Deposit','id','id_deposito');
     }
-    
-    public function fondo()
-    {
-        return $this->hasOne( 'Fondo\Fondo' , 'id' , 'id_fondo' );
-    }
 
-    protected function thisSubFondo()
+    public function thisSubFondo()
     {
         return $this->belongsTo( 'Fondo\FondoInstitucional' , 'id_fondo' );
-    }
-
-    protected function sup()
-    {
-        return $this->hasOne( 'Users\Sup' , 'iduser' , 'supervisor' );
     }
 
     protected function solicitud()

@@ -20,7 +20,8 @@ use \Fondo\FondoSubCategoria;
 
 class MoveController extends BaseController
 {
- public function __construct()
+    
+    public function __construct()
     {
         parent::__construct();
         $this->beforeFilter('active-user');
@@ -30,7 +31,7 @@ class MoveController extends BaseController
     {
     	
         $dates = $this->setDates( $start , $end );
-        $middleRpta = $this->searchSolicituds( R_FINALIZADO , $dates[ 'start' ] , $dates[ 'end' ] );
+        $middleRpta = $this->searchSolicituds( R_TODOS , $dates , $subCategoriaId , 'MOVIMIENTOS' );
         if ($middleRpta[status] == ok)
         {
             foreach ( $middleRpta[data] as $solicitud )
@@ -158,15 +159,17 @@ class MoveController extends BaseController
             $end = $inputs['date_end'];
         else
             $end = date('t-m-Y', strtotime($m));
-        
-            $middleRpta = $this->searchSolicituds( $estado , $start , $end );
-            if ( $middleRpta[status] == ok )
-            {
-                $data = array( 'solicituds' => $middleRpta[data] );
-                if ( Auth::user()->type == TESORERIA )
-                    $data['tc'] = ChangeRate::getTc();
-                return $this->setRpta( array( 'View' => View::make('template.List.solicituds')->with( $data )->render() ) );
-            }
+    
+        $dates = array( 'start' => $start , 'end' => $end );    
+
+        $middleRpta = $this->searchSolicituds( $estado , $dates , null );
+        if ( $middleRpta[status] == ok )
+        {
+            $data = array( 'solicituds' => $middleRpta[data] );
+            if ( Auth::user()->type == TESORERIA )
+                $data['tc'] = ChangeRate::getTc();
+            return $this->setRpta( array( 'View' => View::make('template.List.solicituds')->with( $data )->render() ) );
+        }
         return $middleRpta;
     }
 
@@ -175,52 +178,89 @@ class MoveController extends BaseController
         return Carbon::createFromFormat( 'd/m/Y' , $date )->format( 'Ym' );
     }
 
-    protected function searchSolicituds( $estado , $start , $end , $type = 'FLUJO' )
+    protected function searchSolicituds( $estado , $dates , $filter , $type = 'FLUJO' )
     {
-        $solicituds = Solicitud::where( function( $query ) use( $start , $end )
+        $solicituds = Solicitud::where( function( $query ) use( $dates )
         {
-            $query->where( function( $query ) use( $start , $end )
+            $query->where( function( $query ) use( $dates )
             {
-                $query->where( 'idtiposolicitud' , SOL_REP )->whereRaw( "created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1" );
-            })->orWhere( function( $query ) use( $start , $end )
+                $query->where( 'idtiposolicitud' , SOL_REP )->whereRaw( "created_at between to_date( '" . $dates[ 'start' ] . "','DD-MM-YY') and to_date( '" . $dates[ 'end' ] . "' ,'DD-MM-YY')+1" );
+            })->orWhere( function( $query ) use( $dates )
             {
-                $query->where( 'idtiposolicitud' , SOL_INST )->wherehas( 'detalle' , function ( $query ) use( $start , $end )
+                $query->where( 'idtiposolicitud' , SOL_INST )->wherehas( 'detalle' , function ( $query ) use( $dates )
                 {
-                    $query->whereHas(TB_PERIODO, function( $query ) use( $start , $end )
+                    $query->whereHas(TB_PERIODO, function( $query ) use( $dates )
                     {
-                        $query->where( 'aniomes' , '>=' , $this->formatAnioMes( $start ) )->where( 'aniomes' , '<=' , $this->formatAnioMes( $end ) );
+                        $query->where( 'aniomes' , '>=' , $this->formatAnioMes( $dates[ 'start' ] ) )->where( 'aniomes' , '<=' , $this->formatAnioMes( $dates[ 'end' ] ) );
                     });
                 });  
             });
         });
-        
-        if ( in_array( Auth::user()->type , array ( REP_MED , SUP , GER_PROD , GER_PROM , ASIS_GER ) ) )
-            $solicituds->where( function ( $query )
+        if ( $type == 'FLUJO' )
+        {
+            if ( in_array( Auth::user()->type , array ( REP_MED , SUP , GER_PROD , GER_PROM , ASIS_GER ) ) )
+                $solicituds->where( function ( $query )
+                {
+                    $query->whereHas( 'gerente' , function( $query )
+                    {
+                        $query->whereIn( 'id_gerprod' , array( Auth::user()->id , Auth::user()->tempId() ) );
+                    })->orWhereIn( 'created_by' , array( Auth::user()->id , Auth::user()->tempId() ) )
+                    ->orWhereIn( 'id_user_assign' , array( Auth::user()->id , Auth::user()->tempId() ) );
+                });
+            elseif ( Auth::user()->type == TESORERIA ) 
+                if ( $estado == R_REVISADO )
+                    $solicituds->whereIn( 'id_estado' , array( DEPOSITO_HABILITADO , DEPOSITADO ) );
+                else if( $estado == R_GASTO )
+                    $solicituds->where( 'id_estado' , ENTREGADO );
+        }
+        elseif( $type == 'MOVIMIENTOS' )
+        {
+            if ( in_array( Auth::user()->type , array ( SUP ) ) )
+                $solicituds->where( function ( $query )
+                {
+                    $query->whereHas( 'gerente' , function( $query )
+                    {
+                        $query->whereIn( 'id_gerprod' , array( Auth::user()->id , Auth::user()->tempId() ) );
+                    })->orWhereIn( 'created_by' , array( Auth::user()->id , Auth::user()->tempId() ) )
+                    ->orWhereIn( 'id_user_assign' , array( Auth::user()->id , Auth::user()->tempId() ) )
+                    ->orWhereIn( 'created_by' , array( Auth::user()->personal->employees->lists( 'user_id' ) ) )
+                    ->orWhereIn( 'id_user_assign' , array( Auth::user()->personal->employees->lists( 'user_id' ) ) );
+                });
+
+            if ( $filter != 0 )
             {
-                $query->where( function ( $query )
+                $solicituds->where( function ( $query ) use( $filter )
                 {
-                    $query->where( 'created_by' , '<>' , Auth::user()->id )->where( function ( $query )
+                    $query->where( 'idtiposolicitud' , SOL_REP )->whereHas( 'products' , function( $query ) use( $filter )
                     {
-                        $query->where( 'id_user_assign' , '<>' , Auth::user()->id )->orWhereNull( 'id_user_assign' );
-                    })->whereHas( 'gerente' , function( $query )
-                    {
-                        $query->where( 'id_gerprod' , Auth::user()->id )->orWhere( 'id_gerprod' , Auth::user()->tempId() );
+                        $query->where( function( $query ) use( $filter )
+                        {
+                            $query->where( 'id_tipo_fondo_marketing' , SUP )->whereHas( 'fondoSup' , function( $query ) use( $filter )
+                            {
+                                $query->where( 'subcategoria_id' , $filter );
+                            })->orWhere( function( $query ) use( $filter )
+                            {
+                                $query->where( 'id_tipo_fondo_marketing' , GER_PROD )->whereHas( 'fondoGerProd' , function( $query) use( $filter )
+                                {
+                                    $query->where( 'subcategoria_id' , $filter );
+                                });
+                            });
+                        });
                     });
-                })->orWhere( function ( $query )
+                })->orWhere( function( $query ) use( $filter )
                 {
-                    $query->where( 'created_by' , Auth::user()->id )->orWhere( function ( $query )
+                    $query->where( 'idtiposolicitud' , SOL_INST )->whereHas( 'detalle' , function( $query ) use( $filter )
                     {
-                        $query->where( 'created_by' , '<>' , Auth::user()->id )->where( 'id_user_assign' , Auth::user()->id );
+                        $query->whereHas( 'thisSubFondo' , function( $query ) use( $filter )
+                        {
+                            $query->where( 'subcategoria_id' , $filter );
+                        });
                     });
                 });
-            });
-        elseif ( Auth::user()->type == TESORERIA ) 
-            if ( $estado == R_REVISADO )
-                $solicituds->whereIn( 'id_estado' , array( DEPOSITO_HABILITADO , DEPOSITADO ) );
-            else if( $estado == R_GASTO )
-                $solicituds->whereIn( 'id_estado' , array( ENTREGADO ) );
+            }
+        }
 
-        if ( $estado != R_TODOS)
+        if ( $estado != R_TODOS )
             $solicituds->whereHas( 'state' , function ( $q ) use( $estado )
             {
                 $q->whereHas( 'rangeState' , function ( $t ) use( $estado )
@@ -265,7 +305,7 @@ class MoveController extends BaseController
         if ( Auth::user()->type == GER_COM )
             $fondos = FondoSubCategoria::all();
         elseif( Auth::user()->type == GER_PROM )
-            $fondos = FondoSubCategoria::where( 'tipo' , 'I' )->get();
+            $fondos = FondoSubCategoria::all();
         elseif( in_array( Auth::user()->type , array( SUP , GER_PROD ) ) )
             $fondos = FondoSubCategoria::where( 'tipo' , Auth::user()->type )->get();
         return View::make('template.tb_estado_cuenta' , array( 'fondosMkt' => $fondos ) );

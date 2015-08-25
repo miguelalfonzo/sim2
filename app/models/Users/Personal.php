@@ -66,6 +66,11 @@ class Personal extends Eloquent
             })->get();
     }
 
+    public function employees()
+    {
+        return $this->hasMany( 'Users\Personal' , 'referencia_id' , 'bago_id' );
+    }
+
     // mamv : RETORNA MODELO DE REPRESENTANTE SUPERVISOR por ID BAGO
     protected function getSupvervisor( $bago_id )
     {

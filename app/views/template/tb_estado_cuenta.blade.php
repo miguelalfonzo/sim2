@@ -3,7 +3,7 @@
     <h3>Movimientos</h3>
     <div class="form-group col-sm-2 col-md-2">
         <select class="form-control filter">
-            <option value="0" selected disabled>Seleccione el Fondo</option>
+            <option value="0" selected>Seleccione el Fondo</option>
             @foreach( $fondosMkt as $fondoMkt )
                 <option value="{{ $fondoMkt->id }}">{{ $fondoMkt->descripcion }}</option>
             @endforeach
