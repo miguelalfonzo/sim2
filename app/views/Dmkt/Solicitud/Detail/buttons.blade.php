@@ -12,8 +12,8 @@
         @if ( $solicitud->id_user_assign == Auth::user()->id ) 
             @if ( $solicitud->id_estado == GASTO_HABILITADO )
                 <a id="finish-expense" class="btn btn-success">Terminar</a>
-            @else( $solicitud->id_estado == REGISTRADO && $solicitud->devolutions()->where( 'id_estado_devolucion' , DEVOLUCION_POR_REALIZAR )->get()->count() !== 0 )
-                <a id="finish-expense" class="btn btn-success">Registrar Devolución</a>
+            @else( $solicitud->id_estado == ENTREGADO && $solicitud->devolutions()->where( 'id_estado_devolucion' , DEVOLUCION_POR_REALIZAR )->get()->count() !== 0 )
+                <a class="btn btn-info get-devolution-info" data-type="do-inmediate-devolution">Registro de la Devolución</a>
             @endif
         @endif
         @if ( Auth::user()->type == CONT )
@@ -26,17 +26,14 @@
                 <a id="seat-solicitude" class="btn btn-success">Generar Asiento</a>
             @elseif( $solicitud->id_estado == ENTREGADO )
                 @if( $solicitud->idtiposolicitud != REEMBOLSO )
-                    <a id="confirm-discount" class="btn btn-info">Descuento por Planilla</a>
                     @if ( $solicitud->devolutions()->whereIn( 'id_estado_devolucion' , array( DEVOLUCION_POR_REALIZAR , DEVOLUCION_POR_VALIDAR ) )->get()->count() === 0 )
+                        @if( $solicitud->devolutions()->where( 'id_tipo_devolucion' , DEVOLUCION_PLANILLA )->get()->count() === 0 )
+                            <a id="confirm-payroll-discount" class="btn btn-info">Registro de Descuento por Planilla</a>
+                        @endif
+                        <a class="btn btn-info get-devolution-info" data-type="register-inmediate-devolution">Solicitud de Descuento Inmediato</a>
                         <a id="finish-expense-record" class="btn btn-success">Terminar Registro de Gasto</a>
                     @endif
                 @endif
-            @endif
-        @elseif ( Auth::user()->type == TESORERIA )
-            @if ( $solicitud->id_estado == DEPOSITO_HABILITADO )
-                <a class="btn btn-success" data-toggle="modal" data-target="#myModal" >Registrar Depósito</a>
-            @elseif ( $solicitud->id_estado == REGISTRADO && $solicitud->devolutions()->where( 'id_estado_devolucion' , DEVOLUCION_POR_VALIDAR )->get()->count() !== 0 )
-                <a class="btn btn-success" id="confirm-devolucion">Confirmar Devolución</a>
             @endif
         @endif
         <a href="{{URL::to('show_user')}}" class="btn btn-primary">

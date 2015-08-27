@@ -96,13 +96,16 @@ Route::filter( 'ager' , function()
             return Redirect::to( 'show_user' );
 });
 
-Route::filter( 'rm_cont_ager' , function () 
+Route::filter( 'rm_cont' , function () 
 {
-    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
+    if ( ! Auth::check() || is_null( Auth::user()->simApp ) )
+    { 
         return Redirect::to( 'login' );
-    else     
-        if ( ! in_array( Auth::user()->type , array( REP_MED , CONT , ASIS_GER ) ) )
-            return Redirect::to( 'show_user' );
+    }
+    elseif ( ! in_array( Auth::user()->type , array( REP_MED , CONT , ASIS_GER ) ) )
+    {
+        return Redirect::to( 'show_user' );
+    }
 });
 
 Route::filter( 'sup_gerprod_gercom' , function () 
@@ -145,6 +148,21 @@ Route::filter( 'rm_sup_gerprod' , function ()
     else     
         if ( ! in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD ) ) )
             return Redirect::to( 'show_user' );
+});
+
+Route::filter( 'rm_cont_tes' , function()
+{
+    if ( ! Auth::check() || is_null( Auth::user()->simApp ) )
+    {
+        return Redirect::to( 'login' );
+    }
+    else
+    {     
+        if ( ! in_array( Auth::user()->type , array( REP_MED , CONT , TESORERIA ) ) )
+        {
+            return Redirect::to( 'show_user' ); 
+        }
+    }
 });
 
 /*

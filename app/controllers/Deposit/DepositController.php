@@ -214,60 +214,6 @@ class DepositController extends BaseController
         return $this->setRpta();
     }
 
-    public function confirmDevolution()
-    {
-        try
-        {
-            DB::beginTransaction();
-            $inputs = Input::all();
-            $solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
-            
-            if ( is_null( $solicitud ) )
-                return $this->warningException( 'Cancelado - No se encontro la solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
-
-            $devolucion = $solicitud->devolutions()->where( 'id_estado_devolucion' , DEVOLUCION_POR_VALIDAR )->get();
-
-            if( $solicitud->id_estado != ENTREGADO && $solicitud->devolutions()->where( 'id_estado_devolucion' , DEVOLUCION_POR_VALIDAR )->get()->count() === 0 )
-                return $this->warningException( 'Cancelado - La solicitud no se encuentra en la etapa de validación de la devolución' , __FUNCTION__ , __LINE__ , __FILE__ );
-            
-            if( $solicitud->idtiposolicitud == REEMBOLSO )
-                return $this->warningException( 'Cancelado - Los Reembolos no estan habilitados para la confirmacion de la devolucion' , __FUNCTION__ , __LINE__ , __FILE__ );
-                
-            $devolucion = $devolucion[ 0 ];
-
-            if ( $solicitud->detalle->id_moneda == SOLES )
-                $tasa = 1;
-            elseif( $solicitud->detalle->id_moneda == DOLARES )
-            {
-                $tc = ChangeRate::getTc();
-                $tasa = $tc->compra;
-            }
-
-            $devolucion->id_estado_devolucion = DEVOLUCION_CONFIRMADA;
-            $devolucion->save();
-            
-            $fondoMktController = new FondoMkt;
-            $fondoMktController->refund( $solicitud , $devolucion->monto * $tasa , FONDO_DEVOLUCION_TESORERIA );
-
-            $toUser = User::getCont();
-            $middleRpta = $this->postman( $solicitud->id_estado , $solicitud->id_estado , $solicitud->id_estado , $toUser );
-            if ( $middleRpta[ status ] == ok )
-            {
-                Session::put( 'state' , R_GASTO );
-                DB::commit();
-            }
-            else
-                DB::rollback();
-
-            return $middleRpta;
-        }
-        catch( Exception $e )
-        {
-            DB::rollback();
-            return $this->internalException( $e , __FUNCTION__ );
-        }
-    }
-
     public function modalExtorno()
     {
         $inputs = Input::all();

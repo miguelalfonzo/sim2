@@ -102,8 +102,8 @@
         Route::post('update-document' , 'Expense\ExpenseController@updateDocument');
 
         Route::get( 'export/solicitudToDeposit' , 'Export\ExportController@exportSolicitudToDeposit' );
-        Route::post( 'confirm-discount' , 'Expense\ExpenseController@confirmPayrollDiscount' );
         Route::post( 'end-expense-record' , 'Expense\ExpenseController@endExpenseRecord' );
+        
     });
 
     /*
@@ -115,7 +115,6 @@
     Route::group(array('before' => 'tes'), function()
     {
         Route::post( 'deposit-solicitude', 'Deposit\DepositController@depositSolicitudeTes');
-        Route::post( 'confirm-devolution', 'Deposit\DepositController@confirmDevolution' ); 
         Route::post( 'modal-extorno' , 'Deposit\DepositController@modalExtorno' );
         Route::post( 'confirm-extorno' , 'Deposit\DepositController@confirmExtorno' );
     });
@@ -138,6 +137,12 @@
         Route::post('search-institution', 'Source\Seeker@institutionSource');
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | SUPERVISOR , GERENTE DE PRODUCTO - PROMOCION - COMERCIAL
+    |--------------------------------------------------------------------------
+    */
+
     Route::group(array('before' => 'sup_gerprod_gerprom_gercom'), function ()
     {
         Route::post( 'search-users' , 'Source\Seeker@userSource');
@@ -146,7 +151,24 @@
         Route::post('aceptar-solicitud', 'Dmkt\SolicitudeController@acceptedSolicitude');
     });
 
-    Route::group(array('before' => 'rm_cont_ager'), function () 
+    /*
+    |--------------------------------------------------------------------------
+    | REPRESENTANTE , CONTABILIDAD , TESORERIA
+    |--------------------------------------------------------------------------
+    */
+
+    Route::group(array('before' => 'rm_cont_test'), function ()
+    {
+        Route::post( 'register-devolution-data' , 'Devolution\DevolutionController@registerDevolutionData' );
+        Route::post( 'get-devolution-info' , 'Devolution\DevolutionController@getDevolutionInfo' );
+        Route::post( 'get-inmediate-devolution-register-info' , 'Devolution\DevolutionController@getInmediateDevolutionRegisterInfo' );
+        Route::post( 'get-inmediate-devolution-confirmation-info' , 'Devolution\DevolutionController@getInmediateDevolutionConfirmationInfo' );
+        Route::post( 'get-payroll-info' , 'Devolution\DevolutionController@getPayrollInfo');
+        Route::post( 'register-inmediate-devolution', 'Devolution\DevolutionController@registerInmediateDevolution' );
+        Route::post( 'confirm-payroll-discount' , 'Devolution\DevolutionController@confirmPayrollDiscount' );
+    });
+
+    Route::group(array('before' => 'rm_cont' ), function () 
     {
         Route::post('get-expenses' , 'Expense\ExpenseController@getExpenses');
         Route::post('edit-expense', 'Expense\ExpenseController@editExpense');
@@ -160,6 +182,7 @@
     {
         Route::post('end-expense', 'Expense\ExpenseController@finishExpense');
         Route::get('ver-gasto/{token}', 'Expense\ExpenseController@viewExpense');
+        Route::post( 'do-inmediate-devolution' , 'Devolution\DevolutionController@doInmediateDevolution' );
     });
 
     Route::group(array('before' => 'rm_sup_gerprod'), function ()

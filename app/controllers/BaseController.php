@@ -5,12 +5,25 @@ use \Common\State;
 use \Common\StateRange;
 use \System\SolicitudHistory;
 use \Carbon\Carbon;
+use \Expense\ChangeRate;
 
 class BaseController extends Controller 
 {
     public function __construct()
     {
         $this->beforeFilter('csrf', array('on' => array('post', 'put', 'patch', 'delete')));
+    }
+
+    protected function getExchangeRate( $solicitud )
+    {
+        if ( $solicitud->detalle->id_moneda == SOLES )
+            $tasa = 1;
+        elseif( $solicitud->detalle->id_moneda == DOLARES )
+        {
+            $tc = ChangeRate::getTc();
+            $tasa = $tc->compra;
+        }
+        return $tasa;
     }
 
     protected function fondoName( $fondo )
@@ -213,9 +226,9 @@ class BaseController extends Controller
         return $this->setRpta();
     }
 
-    protected function setRpta( $data='' )
+    protected function setRpta( $data='' , $description = '' )
     {
-        return array( status => ok , 'Data' => $data );
+        return array( status => ok , data => $data , description => $description );
     }
 
     public function viewTestUploadImg(){
@@ -269,8 +282,12 @@ class BaseController extends Controller
             ));
         }
     }
-    public function getLeyenda(){
+
+    public function getLeyenda()
+    {
         $data = array('states' => StateRange::order());
         return View::make('template.leyenda', $data);
     }
+
+
 }

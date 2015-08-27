@@ -1,5 +1,5 @@
 @if ( ( $solicitud->id_user_assign == Auth::user()->id  && ! is_null( $solicitud->expenseHistory ) ) || ( Auth::user()->type == CONT && ! is_null( $solicitud->toDeliveredHistory ) ) )
-	@if ( ( $solicitud->id_user_assign == Auth::user()->id &&  $solicitud->id_estado == GASTO_HABILITADO ) || ( Auth::user()->type == CONT && $solicitud->id_estado == REGISTRADO ) )
+	@if ( ( $solicitud->id_user_assign == Auth::user()->id &&  $solicitud->id_estado == GASTO_HABILITADO ) || ( Auth::user()->type == CONT && $solicitud->id_estado == ENTREGADO ) )
 		<div class="col-sm-12 col-md-12 col-lg-12" style="text-align: center">  
 			<button type="button" class="btn btn-default" data-toggle="modal"  id="open-expense-register" data-target="#expense-register">
 				Registar Documento

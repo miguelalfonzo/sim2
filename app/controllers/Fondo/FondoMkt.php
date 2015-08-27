@@ -51,7 +51,7 @@ class FondoMkt extends BaseController
             return $this->warningException( 'No es posible seleccionar Fondos de Diferentes SubCategorias por Solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
         
         $msg = ' el cual no es suficiente para completar el registro , se requiere un saldo de S/.';
-        $middleRpta = $this->validateFondoSaldo( $fondos , $userType , $msg , '_neto' );
+        $middleRpta = $this->validateFondoSaldo( $fondos , $userType , $msg , '_disponible' );
         
         if ( $middleRpta[ status ] == ok )
             return $this->setRpta( $userType );

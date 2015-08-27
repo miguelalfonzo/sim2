@@ -244,38 +244,6 @@ class ExpenseController extends BaseController
 		}
 	}
 
-	public function confirmPayrollDiscount()
-	{
-		try
-		{
-			DB::beginTransaction();
-			$inputs     = Input::all();
-			$middleRpta = $this->validateDiscount( $inputs );
-			if ( $middleRpta[ status] == ok )
-			{
-				$solicitud  = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
-				
-				if ( $solicitud->id_estado != ENTREGADO )
-					return $this->warningException( 'La solicitud no esta habilitado para que realize el descuento. Se requiere que se culmine con el Registro de Gastos' , __FUNCTION__ , __LINE__ , __FILE__ );
-				
-				$devolutionController = new Devolution;
-				$devolutionController->setDevolucion( $solicitud->id , $inputs[ 'periodo' ] , $inputs[ 'monto' ] , DEVOLUCION_CONFIRMADA , DEVOLUCION_PLANILLA );
-					
-				$fondoMktController = new FondoMkt;
-				$fondoMktController->refund( $solicitud , $monto_descuento , FONDO_DEVOLUCION_PLANILLA );
-				
-				DB::commit();
-				return $this->setRpta();
-			}
-			return $middleRpta;
-		}
-		catch( Exception $e )
-		{
-			DB::rollback();
-			return $this->internalException( $e , __FUNCTION__ );
-		}
-	}
-
 	private function setDataInstitucional( $solicitud , $inputs )
 	{
 		$solicitud->id_actividad = $inputs[ 'actividad' ];
@@ -350,10 +318,13 @@ class ExpenseController extends BaseController
 				}
 				else
 					return array( 
-						status  => 'Info' , 
-			        	'View'  => View::make( 'Dmkt.Register.expense-missing-data' , array( 'devolucion' => true ) )->render() ,
-				        'Type'  => 'D' ,
-				        'Title' => 'Registro de la Operacion de Devolución' );
+						status  =>  'Info' , 
+			        	'View'  =>  View::make( 'Dmkt.Register.expense-missing-data' , array( 
+			        					'devolucion' => true , 
+			        					'balance'    => $balance ) 
+			        				)->render() ,
+				        'Type'  =>  'D' ,
+				        'Title' =>  'Registro de la Operacion de Devolución' );
 			elseif ( $balance <= $payrollAmount && $balance >= 0  )
 				$toUser = USER_CONTABILIDAD;
 			else
@@ -371,10 +342,15 @@ class ExpenseController extends BaseController
 				{
 					$investments = InvestmentType::orderInst();
 					return array( 
-						status  => 'Info' , 
-						'View'  => View::make( 'Dmkt.Register.expense-missing-data' , array( 'investments' => $investments , 'activities' => Activity::order() , 'devolucion' => true ) )->render() ,
-						'Type'  => 'ID' ,
-						'Title' => 'Registro de la Operacion de Devolución , Inversion y Actividad' );
+						status  =>  'Info' , 
+						'View'  =>  View::make( 'Dmkt.Register.expense-missing-data' , array( 
+										'investments' => $investments , 
+										'activities'  => Activity::order() , 
+										'devolucion'  => true ,
+										'balance'     => $balance ) 
+									)->render() ,
+						'Type'  =>  'ID' ,
+						'Title' =>  'Registro de la Operacion de Devolución , Inversion y Actividad' );
 				}
 			}
 			elseif ( $balance <= $payrollAmount && $balance >= 0 )
@@ -684,16 +660,6 @@ class ExpenseController extends BaseController
 			return $this->internalException( $e , __FUNCTION__ );	
 		}
 	}
-
-	private function validateDiscount( $inputs )
-    {
-        $rules = array( 'token'   => 'required|string|size:40|exists:solicitud,token' ,
-                        'periodo' => 'required|string|size:7|date_format:"m-Y"|after:'  . date( '01-m-Y' ) );  
-        $validator = Validator::make( $inputs, $rules );
-        if ( $validator->fails() ) 
-            return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
-	    return $this->setRpta(); 
-    }
 
     public function endExpenseRecord()
     {

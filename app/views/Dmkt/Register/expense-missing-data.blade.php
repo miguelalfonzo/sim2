@@ -1,10 +1,15 @@
+<div class="clearfix" style="border-bottom: 1px solid #E5E5E5"></div>
+@if( isset( $devolucion) && $devolucion )
+	<h4 class="text-warning">Si Realizo la devolucion del saldo de S/.{{ $balance}} ingrese la siguiente informacion para culminar el descargo caso contrario vuelva a ingresar cuando culmine con la devolucion del saldo</h4>
+@else
+	<h4 class="text-warning">Ingrese la siguiente informacion para culminar el descargo</h4>
+@endif
+
 <div class="row">
-	<div class="clearfix"></div>
-	
 	<!-- DEVOLUCION -->
 	@if( isset( $devolucion ) && $devolucion )
 		<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
-		    <label class="control-label">N° Operacion de Devolución</label>
+		    <label class="control-label">N° Operacion / Transferencia / Cheque de la Devolución</label>
 		    <div>
 		        <input type="text" class="form-control input-md" name="numero_operacion_devolucion">
 		    </div>

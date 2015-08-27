@@ -59,8 +59,8 @@ class SolicitudeController extends BaseController
 
     public function showUser()
     {
-        if (Session::has('state'))
-            $state = Session::get('state');
+        if ( Session::has( 'state' ) )
+            $state = Session::get( 'state' );
         else 
         {
             if (Auth::user()->type == CONT)
@@ -70,25 +70,27 @@ class SolicitudeController extends BaseController
             else if ( ! is_null( Auth::user()->simApp ) )
                 $state = R_PENDIENTE;
         }
+
         $mWarning = array();
-        if (Session::has('warnings')) {
+        if ( Session::has( 'warnings' ) ):
             $warnings = Session::pull('warnings');
             $mWarning[status] = ok;
-            if (!is_null($warnings))
-                foreach ($warnings as $key => $warning)
+            if ( ! is_null( $warnings ) )
+                foreach ( $warnings as $key => $warning )
                     $mWarning[data] = $warning[0] . ' ';
             $mWarning[data] = substr($mWarning[data], 0, -1);
-        }
-        $data = array('state' => $state, 'states' => StateRange::order(), 'warnings' => $mWarning);
-        if (Auth::user()->type == TESORERIA) {
+        endif;
+        
+        $data = array( 'state' => $state, 'states' => StateRange::order(), 'warnings' => $mWarning );
+        if (Auth::user()->type == TESORERIA):
             $data['tc']    = ChangeRate::getTc();
             $data['banks'] = Account::banks();
-        } elseif (Auth::user()->type == ASIS_GER) {
+        elseif (Auth::user()->type == ASIS_GER):
             $data['activities'] = Activity::order();
-        } elseif (Auth::user()->type == CONT) {
+        elseif (Auth::user()->type == CONT):
             $data['proofTypes'] = ProofType::order();
             $data['regimenes']  = Regimen::all();
-        }
+        endif;
 
         if (Session::has('id_solicitud')) {
             $solicitud = Solicitud::find(Session::pull('id_solicitud'));
@@ -324,7 +326,7 @@ class SolicitudeController extends BaseController
                 'newMonto'    => $solProduct->monto_asignado );
         }
         $fondoMktController->discountBalance($ids_fondo_mkt, $moneda, $tc, $detalle->solicitud->id, $userTypeforDiscount);
-        return $fondoMktController->validateBalance($userTypes, $fondos);
+        return $fondoMktController->validateBalance( $userTypes, $fondos);
     }
 
     private function renovateBalance($solicitud)
@@ -1031,6 +1033,13 @@ class SolicitudeController extends BaseController
                                 $description_seat_renta4ta_deposit, '', 'RENTA');
                         }
                     }
+                }
+
+                foreach( $solicitud->devolutions()->where( 'id_tipo_devolucion' , DEVOLUCION_INMEDIATA )->get() as $devolution )
+                {
+                    $seatList[] = $this->createSeatElement( $cuentaMkt , $solicitud->id , $cuentaExpense , '' , date( 'd/m/Y' , strtotime( $devolution->updated_at ) ) , '' , '' , '' ,
+                        '' , '' , '' , '' , ASIENTO_GASTO_BASE , $devolution->monto , '' , 
+                       'DEVOLUCION ' . $devolution->type->descripcion . ' - ' . $devolution->numero_operacion . ' - ' . $solicitud->asignedTo->personal->full_name , ' ' , 'DEVOLUCION' );
                 }
 
                 // CONTRAPARTE ASIENTO DE ANTICIPO

@@ -17,6 +17,7 @@ use \System\FondoHistory;
 use \Dmkt\Solicitud;
 use \Carbon\Carbon;
 use \Fondo\FondoSubCategoria;
+use \Session;
 
 class MoveController extends BaseController
 {
@@ -168,6 +169,7 @@ class MoveController extends BaseController
             $data = array( 'solicituds' => $middleRpta[data] );
             if ( Auth::user()->type == TESORERIA )
                 $data['tc'] = ChangeRate::getTc();
+            Session::put( 'state' , $estado );
             return $this->setRpta( array( 'View' => View::make('template.List.solicituds')->with( $data )->render() ) );
         }
         return $middleRpta;

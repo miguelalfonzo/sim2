@@ -37,7 +37,7 @@
 					<td>{{ $dailyEntry->d_c }}</td>
 					<td>{{ $dailyEntry->importe }}</td>
 					<td>{{ $dailyEntry->leyenda_fj }}</td>
-					<td>{{ $dailyEntry->leyenda_variable }}</td>
+					<td>{{ $dailyEntry->leyenda }}</td>
 					<td>{{ $dailyEntry->tipo_resp }}</td>
 				</tr>
 			@endforeach

@@ -21,7 +21,7 @@
                     <a class="btn btn-default" href="{{URL::to('generar-asiento-gasto/'.$solicitud->token)}}">
                         <span class="glyphicon glyphicon-book"></span>
                     </a>
-                @elseif( $solicitud->id_estado != ENTREGADO && $solicitud->id_estado != DEPOSITO_HABILITADO )
+                @elseif( $solicitud->id_estado != ENTREGADO && $solicitud->id_estado != DEPOSITO_HABILITADO && Auth::user()->type !== ASIS_GER ) 
                     <a class="btn btn-default" href="{{ URL::to( 'ver-solicitud/' . $solicitud->token ) }}">
                         <span class="glyphicon glyphicon-edit"></span>
                     </a>
@@ -56,8 +56,8 @@
                     <span  class="glyphicon glyphicon-edit"></span>
                 </a>
             @elseif( Auth::user()->type == TESORERIA && $solicitud->devolutions()->where( 'id_estado_devolucion' , DEVOLUCION_POR_VALIDAR )->get()->count() !== 0 )
-                <a class="btn btn-default" href="{{URL::to('ver-solicitud/'.$solicitud->token)}}">
-                    <span  class="glyphicon glyphicon-edit"></span>
+                <a class="btn btn-default get-devolution-info" data-type="confirm-inmediate-devolution">
+                    <span  class="glyphicon glyphicon-transfer"></span>
                 </a>
             @elseif( Auth::user()->id == $solicitud->id_user_assign && $solicitud->devolutions()->where( 'id_estado_devolucion' , DEVOLUCION_POR_REALIZAR )->get()->count() !== 0 )
                 <a class="btn btn-default" href="{{URL::to('ver-solicitud/'.$solicitud->token)}}">

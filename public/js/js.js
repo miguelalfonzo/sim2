@@ -202,7 +202,7 @@ $(function()
         {
             if ( response.Status == 'Ok' )
             {
-                bootbox.alert( '<h4 class="green">Gasto Registrado</h4>' , function()
+                bootbox.alert( '<h4 class="green">Descargo Registrado</h4>' , function()
                 {
                     window.location.href = server + 'show_user';
                 });
@@ -603,7 +603,8 @@ $(function()
             }
         }).done( function ( response )
         {
-            if ( response.Status == 'Ok' ){
+            if ( response.Status == 'Ok' )
+            {
                 setTimeout(function()
                 {
                     responseUI('Editar Gasto','green');
@@ -690,8 +691,7 @@ $(function()
                     $(".detail-expense").show();
                     //$('#cancel-expense').show();
                     $('#expense-register').modal('show');
-                },1000);
-                 
+                }, 500 );         
             }
             else
                 bootbox.alert('<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
@@ -1671,27 +1671,252 @@ $(function()
         }
     });
 
-    $('#confirm-devolucion').on( 'click' , function()
+    $( '#confirm-payroll-discount' ).on( 'click' , function()
     {
-        bootbox.confirm( '<h4 class="text-center text-info">Confirme la devolución</h4>' , function( response )
+        var element = $( this );
+        var data = 
         {
-            if( response )
+            _token : GBREPORTS.token ,
+            token  : $( 'input[ name=token ]' ).val()
+        };
+        $.post( server + 'get-payroll-info' , data )
+        .done( function ( response ) 
+        {
+            bootbox.dialog(
             {
-                var data = { _token : GBREPORTS.token , token : $( 'input[name=token]' ).val() };
-                $.post( server + 'confirm-devolution' , data )
-                .done(function ( response ) 
+                title: 'Confirmación del Descuento por Planilla',
+                message: response.Data.View ,
+                buttons: 
                 {
-                    if ( response.Status == 'Ok' )
-                        bootbox.alert( '<h4 class="green">Confirmacion Correcta</h4>' , function()
+                    danger: 
+                    {
+                        label:'Cancelar',
+                        className: 'btn-primary',
+                        callback: function() 
                         {
-                            window.location.href = server + 'show_user';
-                        });
-                    else
-                        bootbox.alert( '<h4 style="color:red">' + response.Status + ' : ' + response.Description + '</h4>' );
-                });
-            }  
+                            bootbox.hideAll();
+                        }
+                    },
+                    success: 
+                    {
+                        label: 'Confirmar',
+                        className: 'btn-success',
+                        callback: function( response )
+                        {
+                            if ( $( '#periodo' ).val().trim() == '' )
+                            {
+                                $( '#periodo' ).parent().parent().addClass( 'has-error' ).focus();
+                                return false;
+                            }
+
+                            if ( $( '#monto_descuento_planilla' ).val().trim() == '' )
+                            {
+                                $( '#monto_descuento_planilla' ).parent().parent().addClass( 'has-error' ).focus();
+                                return false;
+                            }                            
+
+                            if ( response )
+                            {
+                                var moneda                    = $( '#type-money' );    
+                                data.periodo                  = $( '#periodo' ).val();
+                                data.monto_descuento_planilla = $( '#monto_descuento_planilla' ).val();
+                                bootbox.confirm( '<h4 class="text-center text-warning">¿ Esta seguro de registrar el descuento de ' + moneda.html().trim() + data.monto_descuento_planilla + ' en el Periodo ' + data.periodo + ' ?</h4>', function( response ) 
+                                {    
+                                    if ( response ) 
+                                    {
+                                        $.post( server + 'confirm-payroll-discount' , data )
+                                        .done(function ( response ) 
+                                        {
+                                            if ( response.Status == 'Ok' )
+                                            {
+                                                bootbox.alert( '<h4 class="text-success">Descuento de Planilla Registrado</h4>' , function()
+                                                {
+                                                    location.reload();
+                                                });
+                                            }
+                                            else
+                                            {
+                                                bootbox.alert( '<h4 class="text-danger">' + response.Status + ' : ' + response.Description + '</h4>' );
+                                            }
+                                        });
+                                    }    
+                                });
+                            }
+                        }
+                    }
+                }
+            });
+            $( '#periodo' ).datepicker(
+            {
+                format: 'mm-yyyy',
+                startDate: '+0m',
+                endDate: '+1y',
+                minViewMode: 1,
+                language: "es",
+                orientation: "top",
+                autoclose: true
+            });
+            $( '#monto_descuento_planilla' ).numeric(
+            {
+                negative:false
+            });
         });
     });
+
+    $( document ).off( 'click' , '.get-devolution-info' );
+    $( document ).on( 'click' , '.get-devolution-info' , function()
+    {
+        var data =
+        {
+            _token : GBREPORTS.token ,
+            tipo   : $( this ).attr( 'data-type' ) ,
+            token  : $( 'input[ name=token ]' ).length === 1 && $( 'input[ name=token ]' ).val().trim() !== '' ? 
+                     $( 'input[ name=token ]' ).val() : 
+                     $( this ).parent().parent().parent().find( '#sol_token' ).val()
+        };
+        $.post( server + 'get-devolution-info' , data )
+        .done( function ( response ) 
+        {
+            if( response.Status === 'Ok' )
+            {
+                if ( response.Data.Type === 'input' )
+                {
+                    bootbox.dialog(
+                    {
+                        title   : response.Data.Title,
+                        message : response.Data.View ,
+                        buttons : 
+                        {
+                            danger: 
+                            {
+                                label     : 'Cancelar',
+                                className : 'btn-primary',
+                                callback  : function() 
+                                {
+                                    bootbox.hideAll();
+                                }
+                            },
+                            success: 
+                            {
+                                label     : 'Confirmar',
+                                className : 'btn-success',
+                                callback  : function()
+                                {
+                                    if( data.tipo == 'register-inmediate-devolution' )
+                                    {
+                                        var check = verifyRegisterInmediateDevolutionData();
+                                    }
+                                    else if ( data.tipo == 'do-inmediate-devolution' )
+                                    {
+                                        var check = verifyDoInmediateDevolutionData();    
+                                    }
+
+                                    if ( check )
+                                    {
+                                        if( data.tipo == 'register-inmediate-devolution' )
+                                        {
+                                            registerInmediateDevolution( data , response );
+                                        }
+                                        else if( data.tipo == 'do-inmediate-devolution' )
+                                        {
+                                            registerDoInmediateDevolution( data , response );
+                                        }
+                                    }
+                                    else
+                                    {
+                                        return false;
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                else if( response.Data.Type == 'confirmation' )
+                {
+                    if( data.tipo == 'confirm-inmediate-devolution' )
+                    {
+                        registerDevolutionData( data , response , '' );
+                    }
+                }
+            }
+            else
+            {
+                bootbox.alert( '<h4 class="text-danger">' + response.Status + ' : ' + response.Description + '</h4>' );
+            }
+        }).fail( function( statusCode , errorThrow )
+        {
+            ajaxError( statusCode , errorThrow );
+        });
+    })
+
+    function verifyDoInmediateDevolutionData()
+    {
+        var check = true;
+        if ( $( '#numero_operacion_devolucion' ).val().trim() === '' )
+        {
+            $( '#numero_operacion_devolucion' ).parent().parent().addClass( 'has-error' ).focus();
+            check = false;
+        }
+        return check;
+    }
+
+    function verifyRegisterInmediateDevolutionData()
+    {
+        var check = true;
+        if ( $( '#monto_devolucion_inmediata' ).val().trim() === '' )
+        {
+            $( '#monto__devolucion_inmediata' ).parent().parent().addClass( 'has-error' ).focus();
+            check = false;
+        }
+        return check;
+    }
+
+    function registerInmediateDevolution( data , response )
+    {
+        data.monto_devolucion = $( '#monto_devolucion_inmediata' ).val();
+        registerDevolutionData( data , response , $( '#type-money' ).html().trim() + data.monto_devolucion + '</h4>' );
+    }
+
+    function registerDoInmediateDevolution( data , response )
+    {
+        data.numero_operacion_devolucion = $( '#numero_operacion_devolucion' ).val();
+        console.log( data );
+        console.log( response );
+        registerDevolutionData( data , response , data.numero_operacion_devolucion + '</h4>' );
+    }
+
+    function registerDevolutionData( data , response , description )
+    {
+        bootbox.confirm( response.Description + description , function( result )
+        {
+            if( result )
+            {
+                $.post( server + 'register-devolution-data' , data )
+                .done( function( response)
+                {
+                    if( response.Status == 'Ok' )
+                    {
+                        bootbox.alert( '<h4 class="text-success">' + response.Description + '</h4>' , function()
+                        {
+                            if ( data.tipo == 'confirm-inmediate-devolution')
+                            {    
+                                listTable( 'solicitudes' );
+                            }
+                            else if( data.tipo == 'do-inmediate-devolution' || data.tipo == 'register-inmediate-devolution' )
+                            {
+                                window.location.href = server + 'show_user';
+                            }
+                        });
+                    }
+                    else
+                        bootbox.alert( '<h4 class="text-danger">' + response.Status + ' : ' + response.Description + '</h4>' );
+                }).fail( function( statusCode , errorThrow )
+                {
+                    ajaxError( statusCode , errorThrow );
+                });
+            }
+        });
+    }
 
     $( document ).off( 'click' , '#periodo' );
     $( document ).on( 'click' , '#periodo' , function()
@@ -1772,85 +1997,6 @@ $(function()
         }); 
     });
 
-    $( '#confirm-discount' ).on( 'click' , function()
-    {
-        var element = $( this );
-        var html    = '<div class="form-group">' +
-                      '<label class="control-label">Periodo del Descuento</label>' +
-                      '<div>' +
-                      '<input type="text" id="periodo" class="form-control date" size=7 placeholder="Seleccione el Periodo MM-YYYY" readonly>' +
-                      '</div>'+
-                      '</div>';
-        var object  = $( html );
-        object.find( '#periodo' ).datepicker(
-        {
-            format: 'mm-yyyy',
-            startDate: '+0m',
-            endDate: '+1y',
-            minViewMode: 1,
-            language: "es",
-            orientation: "top",
-            autoclose: true
-        });
-
-        bootbox.dialog({
-            title: 'Confirmacion del Descuento',
-            message: object ,
-            buttons: 
-            {
-                danger: 
-                {
-                    label:'Cancelar',
-                    className: 'btn-primary',
-                    callback: function() 
-                    {
-                        bootbox.hideAll();
-                    }
-                },
-                success: 
-                {
-                    label: 'Confirmar',
-                    className: 'btn-success',
-                    callback: function( response )
-                    {
-                        if ( $( '#periodo' ).val().trim() == '' )
-                        {
-                            $( '#periodo' ).parent().parent().addClass( 'has-error' ).focus();
-                            return false;
-                        }
-                        else
-                        {
-                            var data = {};
-                            data.periodo = $( '#periodo' ).val();
-                            if ( response )
-                            {
-                                bootbox.confirm( '<h4 class="text-center text-warning">¿ Esta seguro de realizar el descuento en el Periodo ' + data.periodo + ' ?</h4>', function( response ) 
-                                {    
-                                    if ( response ) 
-                                    {
-                                        data._token   = GBREPORTS.token;
-                                        data.token    = $( 'input[name=token]' ).val();
-                                        $.post( server + 'confirm-discount' , data )
-                                        .done(function ( response ) 
-                                        {
-                                            if ( response.Status == 'Ok' )
-                                                bootbox.alert( '<h4 class="green">Descuento Confirmado</h4>' , function()
-                                                {
-                                                    element.remove();
-                                                });
-                                            else
-                                                bootbox.alert( '<h4 style="color:red">' + response.Status + ' : ' + response.Description + '</h4>' );
-                                        });
-                                    }    
-                                });
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    });
-
     $( '#finish-expense-record' ).on( 'click' , function()
     {
         var element = $( this );
@@ -1864,12 +2010,16 @@ $(function()
                 .done(function ( response ) 
                 {
                     if ( response.Status == 'Ok' )
+                    {
                         bootbox.alert( '<h4 class="green">Registro de Gastos Culimando</h4>' , function()
                         {
                             window.location.href = server + 'show_user';
                         });
+                    }
                     else
+                    {
                         bootbox.alert( '<h4 style="color:red">' + response.Status + ' : ' + response.Description + '</h4>' );
+                    }
                 });
             }    
         });
@@ -1879,5 +2029,6 @@ $(function()
     {
         listTable( 'movimientos' , null );
     });
+
 
 }); 
