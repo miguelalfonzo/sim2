@@ -38,7 +38,7 @@
                 @else
                     <input type="hidden" id="timeLineStatus" value="{{$solicitud->id_estado}}">
                 @endif
-                @if ( in_array( Auth::user()->type , array( TESORERIA , GER_COM ) ))
+                @if ( in_array( Auth::user()->type , array( TESORERIA , GER_COM, CONT) ))
                     <input type="hidden" id="sol_token" class="i-tokens" value="{{$solicitud->token}}">
                     @if( ! is_null( $solicitud->id_user_assign ) )
                         <input type="hidden" value="{{ $solicitud->asignedTo->personal->full_name }}" class="benef">

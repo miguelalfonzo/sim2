@@ -247,4 +247,33 @@ class DepositController extends BaseController
             return $this->setRpta();
         }
     }
+
+     public function modalLiquidation()
+    {
+        $inputs = Input::all();
+        $solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
+        if ( is_null ( $solicitud ) )
+            return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ , __FILE__ , __LINE__ );
+        else
+            return $this->setRpta( array( 'View' => View::make( 'template.Modals.liquidation' , array( 'solicitud' => $solicitud ) )->render() ) );
+    }
+
+    public function confirmLiquidation()
+    {
+        $inputs    = Input::all();
+      
+            
+        $solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
+        
+        if ( is_null( $solicitud ) )
+            return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ , __FILE__ , __LINE__ );
+        elseif( !in_array($solicitud->id_estado, [DEPOSIATDO, GASTO_HABILIDATO])) 
+            return $this->warningException( 'No se puede Cancelar por Liquidacion' , __FUNCTION__ , __FILE__ , __LINE__ );
+        else
+        {
+            $solicitud->detalle->deposit;
+            
+            return $this->setRpta();
+        }
+    }
 }
