@@ -16,6 +16,9 @@
                 @if ( $solicitud->id_estado == DEPOSITADO && Auth::user()->type == CONT )
                     <a class="btn btn-default" href="{{URL::to('ver-solicitud/'.$solicitud->token)}}">
                         <span class="glyphicon glyphicon-book"></span>
+                    </a>
+                    <a class="btn btn-default modal_liquidacion">
+                        <span class="glyphicon glyphicon-inbox"></span>
                     </a>              
                 @elseif ( $solicitud->id_estado == REGISTRADO && Auth::user()->type == CONT )
                     <a class="btn btn-default" href="{{URL::to('generar-asiento-gasto/'.$solicitud->token)}}">
