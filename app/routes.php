@@ -104,6 +104,8 @@
         Route::get( 'export/solicitudToDeposit' , 'Export\ExportController@exportSolicitudToDeposit' );
         Route::post( 'confirm-discount' , 'Expense\ExpenseController@confirmPayrollDiscount' );
         Route::post( 'end-expense-record' , 'Expense\ExpenseController@endExpenseRecord' );
+        Route::post( 'modal-liquidation' , 'Deposit\DepositController@modalLiquidation' );
+        Route::post( 'confirm-liquidation' , 'Deposit\DepositController@confirmLiquidation' );
     });
 
     /*
@@ -118,6 +120,7 @@
         Route::post( 'confirm-devolution', 'Deposit\DepositController@confirmDevolution' ); 
         Route::post( 'modal-extorno' , 'Deposit\DepositController@modalExtorno' );
         Route::post( 'confirm-extorno' , 'Deposit\DepositController@confirmExtorno' );
+
     });
 
     /*

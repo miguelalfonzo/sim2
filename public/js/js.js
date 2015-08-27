@@ -1771,6 +1771,79 @@ $(function()
                 bootbox.alert( '<h4 class="red">' + response.Status + ' : ' + response.Description + '</h4>');
         }); 
     });
+    
+    $( document ).off( 'click' , '.modal_liquidacion' );
+    $( document ).on( 'click' , '.modal_liquidacion' , function()
+    {
+        var element = $( this );
+        $.ajax(
+        {
+            type : 'post',
+            url  : server + 'modal-liquidation',
+            data : 
+            {
+                _token : GBREPORTS.token ,
+                token  : element.parent().parent().parent().find('#sol_token').val()
+            }
+        }).fail( function( statusCode , errorThrow )
+        {
+            ajaxError( statusCode , errorThrow );
+        }).done( function ( response ) 
+        {
+            if ( response.Status == 'Ok' )
+                bootbox.dialog( 
+                {
+                    title   : 'Cancelacion de Solicitud' ,
+                    message : response.Data.View ,
+                    locale  : 'es' ,
+                    buttons: 
+                    {
+                        danger: 
+                        {
+                            label:'Cancelar',
+                            className: 'btn-primary',
+                            callback: function() 
+                            {
+                                bootbox.hideAll();
+                            }
+                        },
+                        success: 
+                        {
+                            label: 'Confirmar Liquidación',
+                            className: 'btn-success',
+                            callback: function()
+                            {
+                                $.ajax(
+                                {
+                                    type : 'post',
+                                    url  : server + 'confirm-liquidation',
+                                    data : 
+                                    {
+                                        _token           : GBREPORTS.token ,
+                                        token            : element.parent().parent().parent().find('#sol_token').val()
+                                    }
+                                }).fail( function( statusCode , errorThrow )
+                                {
+                                    ajaxError( statusCode , errorThrow );
+                                }).done( function ( response ) 
+                                {
+                                    if ( response.Status == 'Ok' )
+                                    {
+                                        bootbox.alert( '<h4 class="green">Cancelacion de la Solicitud por Cese Confirmado</h4>');
+                                        listTable( 'solicitudes' );
+                                    }
+                                    else
+                                        bootbox.alert( '<h4 class="red">' + response.Status + ' : ' + response.Description + '</h4>' );
+                                });
+                            }
+                        }
+                    }
+                });
+            else
+                bootbox.alert( '<h4 class="red">' + response.Status + ' : ' + response.Description + '</h4>');
+        }); 
+    });
+
 
     $( '#confirm-discount' ).on( 'click' , function()
     {
