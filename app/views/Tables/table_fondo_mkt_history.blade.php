@@ -21,7 +21,7 @@
             <td class="text-center">{{ $saldo }}</td>
         </tr>
         @foreach ( $FondoMktHistories as $FondoMktHistory )
-            @if ( in_array( $FondoMktHistory->id_fondo_history_reason , array( FONDO_AJUSTE , FONDO_DEPOSITO , FONDO_DEVOLUCION_PLANILLA , FONDO_DEVOLUCION_TESORERIA ) ) )
+            @if ( in_array( $FondoMktHistory->id_fondo_history_reason , array( FONDO_AJUSTE , FONDO_DEPOSITO , FONDO_DEVOLUCION_PLANILLA , FONDO_DEVOLUCION_TESORERIA , 8 ) ) )
                 <tr>
                     <td class="text-center">{{ $FondoMktHistory->id }}</td>
                     <td class="text-center">{{ $FondoMktHistory->updated_at }}
