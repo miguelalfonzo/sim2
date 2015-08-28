@@ -338,3 +338,5 @@ const DERIVADO              = 11;
 const GASTO_HABILITADO      = 12;
 const DEPOSITO_HABILITADO   = 13;
 const DEVOLUCION            = 14;
+
+const CUENTA_SOLES = 1041100;

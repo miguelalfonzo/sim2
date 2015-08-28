@@ -24,7 +24,7 @@
                     <a class="btn btn-default" href="{{URL::to('generar-asiento-gasto/'.$solicitud->token)}}">
                         <span class="glyphicon glyphicon-book"></span>
                     </a>
-                @elseif( $solicitud->id_estado != ENTREGADO && $solicitud->id_estado != DEPOSITO_HABILITADO && Auth::user()->type !== ASIS_GER ) 
+                @elseif( $solicitud->id_estado != 30 && $solicitud->id_estado != ENTREGADO && $solicitud->id_estado != DEPOSITO_HABILITADO && Auth::user()->type !== ASIS_GER ) 
                     <a class="btn btn-default" href="{{ URL::to( 'ver-solicitud/' . $solicitud->token ) }}">
                         <span class="glyphicon glyphicon-edit"></span>
                     </a>

@@ -262,9 +262,7 @@ class DepositController extends BaseController
 
     public function confirmLiquidation()
     {
-        $inputs    = Input::all();
-      
-            
+        $inputs    = Input::all();     
         $solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
         
         if ( is_null( $solicitud ) )

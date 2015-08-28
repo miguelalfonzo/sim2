@@ -1053,7 +1053,7 @@ class SolicitudeController extends BaseController
                 foreach( $solicitud->devolutions()->where( 'id_tipo_devolucion' , DEVOLUCION_INMEDIATA )->get() as $devolution )
                 {
                     $tasaCompra = $this->getExpenseChangeRate( $solicitud , $devolution->updated_at );
-                    $seatList[] = $this->createSeatElement( $cuentaMkt , $solicitud->id , $cuentaExpense , '' , date( 'd/m/Y' , strtotime( $devolution->updated_at ) ) , '' , '' , '' ,
+                    $seatList[] = $this->createSeatElement( $cuentaMkt , $solicitud->id , CUENTA_SOLES , '' , date( 'd/m/Y' , strtotime( $devolution->updated_at ) ) , '' , '' , '' ,
                         '' , '' , '' , '' , ASIENTO_GASTO_BASE , $devolution->monto  * $tasaCompra , '' , 
                         'DEVOLUCION ' . $devolution->type->descripcion . ' - ' . $devolution->numero_operacion . ' - ' . strtoupper( $solicitud->asignedTo->personal->full_name ) , ' ' , 'DEVOLUCION' );
                 }
