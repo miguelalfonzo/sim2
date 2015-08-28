@@ -63,9 +63,8 @@ class DevolutionController extends BaseController
 				$this->setDevolucion( $solicitud->id , $periodo , $inputs[ 'monto_descuento_planilla' ] , DEVOLUCION_CONFIRMADA , DEVOLUCION_PLANILLA );
 				
 				//DEVOLUCION DE SALDO A LOS FONDOS
-				$tasa               = $this->getExchangeRate( $solicitud );
 				$fondoMktController = new FondoMkt;
-				$fondoMktController->refund( $solicitud , $inputs[ 'monto_descuento_planilla' ] * $tasa , FONDO_DEVOLUCION_PLANILLA );
+				$fondoMktController->refund( $solicitud , $inputs[ 'monto_descuento_planilla' ] , FONDO_DEVOLUCION_PLANILLA );
 				
 				DB::commit();
 				return $this->setRpta();
@@ -195,8 +194,7 @@ class DevolutionController extends BaseController
     	{
     		DB::beginTransaction();
     		$inputs = Input::all();
-            \Log::error( $inputs );
-    		switch( $inputs[ 'tipo' ] )
+            switch( $inputs[ 'tipo' ] )
     		{
                 case 'register-inmediate-devolution':
                     return $this->getInmediateDevolutionRegisterInfo( $inputs );
@@ -270,13 +268,11 @@ class DevolutionController extends BaseController
             
         $devolucion = $devolucion[ 0 ];
 
-        $tasa = $this->getExchangeRate( $solicitud );
-
         $devolucion->id_estado_devolucion = DEVOLUCION_CONFIRMADA;
         $devolucion->save();
         
         $fondoMktController = new FondoMkt;
-        $fondoMktController->refund( $solicitud , $devolucion->monto * $tasa , FONDO_DEVOLUCION_TESORERIA );
+        $fondoMktController->refund( $solicitud , $devolucion->monto , FONDO_DEVOLUCION_TESORERIA );
 
         $toUser = User::getCont();
         $middleRpta = $this->postman( $solicitud->id , $solicitud->id_estado , $solicitud->id_estado , $toUser );

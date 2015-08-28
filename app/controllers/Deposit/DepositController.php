@@ -151,6 +151,9 @@ class DepositController extends BaseController
         $fondoMktController = new FondoMkt;
         $fondoDataHistories = array();
         $fondosData         = array();
+        
+        $tasaCompra           = $this->getExchangeRate( $solicitud );
+        $tasaCompraAprobacion = $this->getApprovalExchangeRate( $solicitud );
         $msg                = ' el cual no es suficiente para completar el deposito , se requiere un saldo de S/.';
         
         if ( $solicitud->idtiposolicitud == SOL_REP )
@@ -162,8 +165,8 @@ class DepositController extends BaseController
                 $fondo            = $solicitudProduct->thisSubFondo;
                 $oldSaldo         = $fondo->saldo;
                 $oldRetencion     = $fondo->retencion;
-                $fondo->saldo     -= $solicitudProduct->monto_asignado;
-                $fondo->retencion -= $solicitudProduct->monto_asignado;
+                $fondo->saldo     -= $solicitudProduct->monto_asignado * $tasaCompra;
+                $fondo->retencion -= $solicitudProduct->monto_asignado * $tasaCompraAprobacion;
                 if ( isset( $fondoData[ $fondo->id ] ) )
                     $fondosData[ $fondo->id ] += $solicitudProduct->monto_asignado;
                 else
@@ -191,8 +194,8 @@ class DepositController extends BaseController
             $fondo            = $detalle->thisSubFondo;
             $oldSaldo         = $fondo->saldo;
             $oldRetencion     = $fondo->retencion;
-            $fondo->saldo     -= $detalle->monto_aprobado;
-            $fondo->retencion -= $detalle->monto_aprobado;
+            $fondo->saldo     -= $detalle->monto_aprobado * $tasaCompra;
+            $fondo->retencion -= $detalle->monto_aprobado * $tasaCompraAprobacion;
 
             if ( $fondo->saldo < 0 )
                 return $this->warningException( 'El Fondo ' . $this->fondoName( $fondo ) . ' solo cuenta con S/.' . ( $fondo->saldo + $fondoMonto ) . 
@@ -209,7 +212,6 @@ class DepositController extends BaseController
             $fondoMktController->setPeriodHistoryData( $fondo->subcategoria_id , $data );
             $fondo->save();
         }
-
         $fondoMktController->setFondoMktHistories( $fondoDataHistories , $solicitud->id );  
         return $this->setRpta();
     }

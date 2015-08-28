@@ -481,7 +481,6 @@ class ExpenseController extends BaseController
 		$detalle   = $solicitud->detalle;
 		$jDetalle  = json_decode( $solicitud->detalle->detalle );
 		$expenses  = $solicitud->expenses;
-		$total 	   = $expenses->sum('monto');
 		$dni = new BagoUser;
 		$dni = $dni->dni($solicitud->asignedTo->username);
 		if ($dni[status] == ok )
@@ -516,18 +515,21 @@ class ExpenseController extends BaseController
 			$name_aproved = $aproved_user->personal->getFullName();
 			$charge = $aproved_user->userType->descripcion;
 
-			if ( $solicitud->detalle->idmoneda == DOLARES )
+			if ( $solicitud->detalle->id_moneda == DOLARES )
 			{
 				foreach( $expenses as $expense )
 				{
 					$eTc = ChangeRate::where( 'fecha' , $expense->fecha_movimiento )->first();
 					if ( is_null( $eTc ) )
-						$expense->tc = ChangeRate::getTc();
-					else	
-						$expense->tc = $eTc;
-					$expense->monto = round ( $expense->monto * $expense->tc->compra , 2 , PHP_ROUND_HALF_DOWN );
+					{
+						$eTc = ChangeRate::getTc();
+					}
+
+					$expense->monto = round ( $expense->monto * $eTc->compra , 2 , PHP_ROUND_HALF_DOWN );
 				}
 			}
+			$total 	   = $expenses->sum('monto');
+		
 			$data  = array( 'solicitud'    => $solicitud,
 							'detalle'      => $jDetalle,
 							'clientes'     => $clientes,

@@ -26,6 +26,25 @@ class BaseController extends Controller
         return $tasa;
     }
 
+    protected function getApprovalExchangeRate( $solicitud )
+    {
+        if( $solicitud->detalle->id_moneda == SOLES )
+        {
+            $tasa = 1;
+        }
+        elseif( $solicitud->detalle->id_moneda == DOLARES)
+        {
+            $pastDay = Carbon::createFromFormat( 'Y-m-d H:i' , $solicitud->approvedHistory->updated_at )->subDay()->format( 'Y/m/d' );
+            $tc = ChangeRate::getDayTc( $pastDay );
+            if( is_null( $tc ) )
+            {
+                $tc = ChangeRate::getTc();
+            }
+            $tasa = $tc->compra;
+        }
+        return $tasa;
+    }
+
     protected function fondoName( $fondo )
     {
         try{

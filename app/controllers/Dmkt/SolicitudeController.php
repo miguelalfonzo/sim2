@@ -919,6 +919,8 @@ class SolicitudeController extends BaseController
 
                 foreach ($solicitud->documentList as $expense) 
                 {
+                    $tasaCompra = $this->getExpenseChangeRate( $solicitud , $expense->updated_at );
+
                     $comprobante = $this->getTypeDoc($expense->idcomprobante);
                     $desc = substr($comprobante->descripcion, 0, 1) . '/' . $expense->num_prefijo . '-' . $expense->num_serie . ' ' . $expense->razon;
                     $description_detraccion_reembolso = 'VARIOS ' . $desc;
@@ -960,7 +962,7 @@ class SolicitudeController extends BaseController
                             // ASIENTO ITEM
                             $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, $cuentaExpense, $comprobante->cta_sunat, $fecha_origen,
                                 ASIENTO_GASTO_IVA_BASE, ASIENTO_GASTO_COD_PROV_IGV, $expense->razon, ASIENTO_GASTO_COD_IGV,
-                                $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, $itemElement->importe,
+                                $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, $itemElement->importe * $tasaCompra ,
                                 $marca, $description_seat_item, $tipo_responsable, '');
 
                             $total_neto += $itemElement->importe;
@@ -968,7 +970,9 @@ class SolicitudeController extends BaseController
 
                         //ASIENTO DE IGV
                         if ($expense->igv != 0)
-                            $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, $cuentaExpense, $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_IGV, ASIENTO_GASTO_COD_PROV_IGV, $expense->razon, ASIENTO_GASTO_COD_IGV, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, $expense->igv, $marca, $description_seat_igv, $tipo_responsable, 'IGV');
+                            $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, $cuentaExpense, $comprobante->cta_sunat, $fecha_origen, 
+                                ASIENTO_GASTO_IVA_IGV, ASIENTO_GASTO_COD_PROV_IGV, $expense->razon, ASIENTO_GASTO_COD_IGV, $expense->ruc, $expense->num_prefijo, 
+                                $expense->num_serie, ASIENTO_GASTO_BASE, $expense->igv * $tasaCompra , $marca, $description_seat_igv, $tipo_responsable, 'IGV');
 
                         //ASIENTO IMPUESTO SERVICIO
                         if ( ! ( $expense->imp_serv == null || $expense->imp_serv == 0 || $expense->imp_serv == '') )
@@ -977,36 +981,44 @@ class SolicitudeController extends BaseController
 
 
                             $description_seat_tax_service = strtoupper('SERVICIO ' . $porcentaje . '% ' . $expense->descripcion);
-                            $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, $cuentaExpense, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_BASE, $expense->imp_serv, $marca, $description_seat_tax_service, '', 'SER');
+                            $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, $cuentaExpense, '', $fecha_origen , 
+                                '', '', '', '', '', '', '', ASIENTO_GASTO_BASE, $expense->imp_serv * $tasaCompra , 
+                                $marca, $description_seat_tax_service, '', 'SER');
 
 
                         }
                         //ASIENTO REPARO
                         if ($expense->reparo == 1) 
                         {
-                            $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, CUENTA_REPARO_COMPRAS, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_BASE, $expense->igv, $marca, $description_seat_repair_base, '', 'REP');
-                            $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, CUENTA_REPARO_GOBIERNO, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO, $expense->igv, $marca, $description_seat_repair_deposit, '', 'REP');
+                            $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, CUENTA_REPARO_COMPRAS, '', $fecha_origen, 
+                                '', '', '', '', '', '', '', ASIENTO_GASTO_BASE, $expense->igv  * $tasaCompra , $marca, $description_seat_repair_base, '', 'REP');
+                            $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, CUENTA_REPARO_GOBIERNO, '', $fecha_origen, '', '', '', '', '', '', 
+                                '', ASIENTO_GASTO_DEPOSITO, $expense->igv  * $tasaCompra , $marca, $description_seat_repair_deposit, '', 'REP');
                         }
 
                         //ASIENTO RETENCION
                         if ($expense->idtipotributo == 1)
                         {
-                            $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, CUENTA_RETENCION_DEBE, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_BASE, $expense->monto_tributo, $marca, $description_seat_retencion_base, '', 'RET');
-                            $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, CUENTA_RETENCION_HABER, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO, $expense->monto_tributo, $marca, $description_seat_retencion_deposit, '', 'RET');
+                            $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, CUENTA_RETENCION_DEBE, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_BASE, 
+                                $expense->monto_tributo  * $tasaCompra , $marca, $description_seat_retencion_base, '', 'RET');
+                            $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, CUENTA_RETENCION_HABER, '', $fecha_origen, '', '', '', '', '', '', '', 
+                                ASIENTO_GASTO_DEPOSITO, $expense->monto_tributo  * $tasaCompra , $marca, $description_seat_retencion_deposit, '', 'RET');
                         }
 
                         //ASIENTO DETRACCION
                         if ($expense->idtipotributo == 2 )
                         {
                             $total_percepciones += $expense->monto_tributo;
-                            $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, CUENTA_DETRACCION_HABER, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO, $expense->monto_tributo, $marca, $description_seat_detraccion_deposit, '', 'DET');
+                            $seatList[] = $this->createSeatElement( $cuentaMkt, $solicitud->id, CUENTA_DETRACCION_HABER, '', $fecha_origen, '', '', '', '', '', '', '', 
+                                ASIENTO_GASTO_DEPOSITO, $expense->monto_tributo * $tasaCompra , $marca, $description_seat_detraccion_deposit, '', 'DET');
                         }
 
                         //ASIENTO DETRACCION REEMBOLSO
                         if ($expense->idtipotributo == 2 && $solicitud->idtiposolicitud == REEMBOLSO) 
                         {
                             $total_percepciones += ($expense->monto - $expense->monto_tributo);
-                            $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, CUENTA_DETRACCION_REEMBOLSO, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_BASE, $expense->monto - $expense->monto_tributo, $marca, $description_detraccion_reembolso, '', 'DET');
+                            $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, CUENTA_DETRACCION_REEMBOLSO, '', $fecha_origen, '', '', '', '', '', '', '', 
+                                ASIENTO_GASTO_BASE, ( $expense->monto - $expense->monto_tributo )  * $tasaCompra , $marca, $description_detraccion_reembolso, '', 'DET');
                         }
                     }
                     else //TODOS LOS OTROS DOCUMENTOS
@@ -1015,13 +1027,16 @@ class SolicitudeController extends BaseController
 
                         //ASIENTO DOCUMENT - NO ITEM
                         $description_seat_other_doc = strtoupper( $username .' '. $expense->descripcion );
-                        $seatList[] = $this->createSeatElement($cuentaMkt , $solicitud->id , $cuentaExpense , $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_BASE, ASIENTO_GASTO_COD_PROV, $expense->razon, ASIENTO_GASTO_COD, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, $expense->monto, $marca, $description_seat_other_doc, $tipo_responsable, ''); 
+                        $seatList[] = $this->createSeatElement($cuentaMkt , $solicitud->id , $cuentaExpense , $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_BASE, 
+                            ASIENTO_GASTO_COD_PROV, $expense->razon, ASIENTO_GASTO_COD, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, 
+                            $expense->monto  * $tasaCompra , $marca, $description_seat_other_doc, $tipo_responsable, ''); 
                     
                         //ASIENTO IMPUESTO A LA RENTA
                         if ($expense->idtipotributo == 1) 
                         {
                             $total_percepciones += $expense->monto_tributo;
-                            $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, CUENTA_RENTA_4TA_HABER, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO, $expense->monto_tributo, $marca, $description_seat_renta4ta_deposit, '', 'RENTA');
+                            $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, CUENTA_RENTA_4TA_HABER, '', $fecha_origen, '', '', '', '', '', '', '', 
+                                ASIENTO_GASTO_DEPOSITO, $expense->monto_tributo  * $tasaCompra , $marca, $description_seat_renta4ta_deposit, '', 'RENTA');
                         }
 
                         //ASIENTO IMPUESTO A LA RENTA REEMBOLSO
@@ -1029,7 +1044,7 @@ class SolicitudeController extends BaseController
                         {
                             $total_percepciones += ($expense->monto - $expense->monto_tributo);
                             $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, CUENTA_DETRACCION_REEMBOLSO, '', $fecha_origen, '', '', '',
-                                '', '', '', '', ASIENTO_GASTO_DEPOSITO, $expense->monto - $expense->monto_tributo, $marca,
+                                '', '', '', '', ASIENTO_GASTO_DEPOSITO, ( $expense->monto - $expense->monto_tributo )  * $tasaCompra  , $marca,
                                 $description_seat_renta4ta_deposit, '', 'RENTA');
                         }
                     }
@@ -1037,14 +1052,18 @@ class SolicitudeController extends BaseController
 
                 foreach( $solicitud->devolutions()->where( 'id_tipo_devolucion' , DEVOLUCION_INMEDIATA )->get() as $devolution )
                 {
+                    $tasaCompra = $this->getExpenseChangeRate( $solicitud , $devolution->updated_at );
                     $seatList[] = $this->createSeatElement( $cuentaMkt , $solicitud->id , $cuentaExpense , '' , date( 'd/m/Y' , strtotime( $devolution->updated_at ) ) , '' , '' , '' ,
-                        '' , '' , '' , '' , ASIENTO_GASTO_BASE , $devolution->monto , '' , 
-                       'DEVOLUCION ' . $devolution->type->descripcion . ' - ' . $devolution->numero_operacion . ' - ' . $solicitud->asignedTo->personal->full_name , ' ' , 'DEVOLUCION' );
+                        '' , '' , '' , '' , ASIENTO_GASTO_BASE , $devolution->monto  * $tasaCompra , '' , 
+                        'DEVOLUCION ' . $devolution->type->descripcion . ' - ' . $devolution->numero_operacion . ' - ' . strtoupper( $solicitud->asignedTo->personal->full_name ) , ' ' , 'DEVOLUCION' );
                 }
 
                 // CONTRAPARTE ASIENTO DE ANTICIPO
+                $tasaCompra = $this->getExpenseChangeRate( $solicitud , Carbon::now() );
+
                 $description_seat_back = strtoupper($username . ' ' . $solicitud->titulo);
-                $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, $cuentaMkt, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO, json_decode($solicitud->detalle->detalle)->monto_aprobado - $total_percepciones, '', $description_seat_back, '', 'CAN');
+                $seatList[] = $this->createSeatElement( $cuentaMkt, $solicitud->id, $cuentaMkt, '', Carbon::now()->format( 'd/m/Y' ) , '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO,
+                ( $solicitud->detalle->monto_aprobado - $total_percepciones )  * $tasaCompra , '', $description_seat_back, '', 'CAN');
                 $result['seatList'] = $seatList;
                 return $result;
             }
@@ -1485,5 +1504,26 @@ class SolicitudeController extends BaseController
             }
             return Response::json(array('success' => true, 'fileList' => $resultFileList));
         }
+    }
+
+    private function getExpenseChangeRate( $solicitud , $date )
+    {        
+        if( $solicitud->detalle->id_moneda == SOLES )
+        {
+            $tasaCompra = 1;
+        }
+        elseif( $solicitud->detalle->id_moneda == DOLARES )
+        {
+            $tc = ChangeRate::getDayTc( $date );
+            if ( is_null( $tc ) )
+            {
+                $tasaCompra = ChangeRate::getTc()->compra;
+            }
+            else
+            {
+                $tasaCompra = $tc->compra;
+            }
+        }
+        return $tasaCompra;
     }
 }

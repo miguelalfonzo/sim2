@@ -10,7 +10,7 @@
                     <li class="list-group-item">
                         <label class="label label-primary">{{ $devolution->updated_at }}</label> 
                         | <label class="label label-primary">{{ $devolution->state->descripcion }}</label>
-                        | <label class="label label-primary">S/.{{ $devolution->monto }}</label>    
+                        | <label class="label label-primary">{{ $solicitud->detalle->typeMoney->simbolo . $devolution->monto }}</label>    
                         <span class="badge">{{ $devolution->type->descripcion}}</span>
                     </li>
                 @endforeach

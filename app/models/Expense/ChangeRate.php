@@ -6,7 +6,7 @@ use \Eloquent;
 
 class ChangeRate extends Eloquent
 {
-    protected $table= TB_TIPO_DE_CAMBIO;
+    protected $table = TB_TIPO_DE_CAMBIO;
     
     protected function getFechaAttribute($value)
     {
@@ -18,25 +18,9 @@ class ChangeRate extends Eloquent
         return ChangeRate::where('moneda' , 'DO')->orderBy('fecha','desc')->first();
     }
 
-    protected static function getDateTc( $date )
+    protected static function getDayTc( $date )
     {
-    	$tc = ChangeRate::where('moneda' , 'DO' )->where( 'fecha' , $date)->first();
-    	if ( is_null( $tc ) )
-    		return ChangeRate::getTc();
-    	else
-    		return $tc;
-    }
-
-    protected static function getTcv( $date )
-    {
-        $tc = ChangeRate::where('fecha' , $date)->where('moneda' ,'DO')->first();
-        if ( is_null( $tc ) )
-        {
-            $tc = ChangeRate::getTc();
-            return $tc->venta;
-        }
-        else
-            return $tc->venta;
+        return ChangeRate::where( 'moneda' , 'DO' )->where( 'fecha' , $date )->first();
     }
 
 }

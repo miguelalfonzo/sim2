@@ -123,7 +123,6 @@
                             </td>
                         </tr>
                         <tr>
-
                             <td class="border align-left">Total Depositado</td>
                             <td class="border">
                                 <strong>

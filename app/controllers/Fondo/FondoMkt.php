@@ -256,10 +256,8 @@ class FondoMkt extends BaseController
     {
         $tc = ChangeRate::getTc();
         $detalle = $solicitud->detalle;
-        if ( $detalle->id_moneda == DOLARES )
-            $tasaCompra = $tc->compra;
-        elseif ( $detalle->id_moneda == SOLES )
-            $tasaCompra = 1;
+        
+        $tasaCompra = $this->getExchangeRate( $solicitud );
         $fondoDataHistories = array();
         if ( $solicitud->idtiposolicitud == SOL_REP )
         {
