@@ -2016,6 +2016,7 @@ $(function()
         }).done( function ( response ) 
         {
             if ( response.Status == 'Ok' )
+            {
                 bootbox.dialog( 
                 {
                     title   : 'Cancelacion de Solicitud' ,
@@ -2044,8 +2045,9 @@ $(function()
                                     url  : server + 'confirm-liquidation',
                                     data : 
                                     {
-                                        _token           : GBREPORTS.token ,
-                                        token            : element.parent().parent().parent().find('#sol_token').val()
+                                        _token  : GBREPORTS.token ,
+                                        token   : element.parent().parent().parent().find('#sol_token').val() ,
+                                        periodo : $( '#periodo' ).val()
                                     }
                                 }).fail( function( statusCode , errorThrow )
                                 {
@@ -2064,11 +2066,23 @@ $(function()
                         }
                     }
                 });
+                $( '#periodo' ).datepicker(
+                {
+                    format: 'mm-yyyy',
+                    startDate: '+0m',
+                    endDate: '+1y',
+                    minViewMode: 1,
+                    language: "es",
+                    orientation: "top",
+                    autoclose: true
+                });
+            }
             else
+            {
                 bootbox.alert( '<h4 class="red">' + response.Status + ' : ' + response.Description + '</h4>');
+            }
         }); 
     });
-
 
     $( '#finish-expense-record' ).on( 'click' , function()
     {
