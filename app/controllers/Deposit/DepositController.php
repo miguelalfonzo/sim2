@@ -16,6 +16,8 @@ use \Expense\PlanCta;
 use \Validator;
 use \Fondo\FondoMkt;
 use \User;
+use \Devolution\DevolutionController;
+use \Carbon\Carbon;
 
 class DepositController extends BaseController
 {
@@ -250,7 +252,7 @@ class DepositController extends BaseController
         }
     }
 
-     public function modalLiquidation()
+    public function modalLiquidation()
     {
         $inputs = Input::all();
         $solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
@@ -262,18 +264,56 @@ class DepositController extends BaseController
 
     public function confirmLiquidation()
     {
-        $inputs    = Input::all();     
-        $solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
-        
-        if ( is_null( $solicitud ) )
-            return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ , __FILE__ , __LINE__ );
-        elseif( !in_array($solicitud->id_estado, [DEPOSIATDO, GASTO_HABILIDATO])) 
-            return $this->warningException( 'No se puede Cancelar por Liquidacion' , __FUNCTION__ , __FILE__ , __LINE__ );
-        else
+        try
         {
-            $solicitud->detalle->deposit;
-            
-            return $this->setRpta();
+            $inputs    = Input::all();      
+            $solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
+            $oldIdestado = $solicitud->id_estado;
+
+            if ( is_null( $solicitud ) )
+            {
+                return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ , __FILE__ , __LINE__ );
+            }
+            elseif( ! in_array( $solicitud->id_estado, [DEPOSITADO, GASTO_HABILITADO] ) ) 
+            {
+                return $this->warningException( 'No se puede Cancelar por Liquidacion' , __FUNCTION__ , __FILE__ , __LINE__ );
+            }
+            else
+            {
+                DB::beginTransaction(); 
+                
+                //REGISTRO DE LA DEVOLUCION
+                $devolucion = new DevolutionController;
+                $periodo = Carbon::createFromFormat( 'm-Y' , $inputs[ 'periodo' ] )->format( 'Ym' );
+                $devolucion->setDevolucion( $solicitud->id , $periodo , $solicitud->detalle->monto_aprobado , DEVOLUCION_CONFIRMADA , DEVOLUCION_LIQUIDACION );
+
+                //RETORNO DE SALDO AL FONDO
+                $fondo = new FondoMkt;
+                $fondo->refund( $solicitud , $solicitud->detalle->monto_aprobado , 8 );
+                
+                //ACTUALIZACION DEL ESTADO DE LA SOLICITUD
+                $solicitud->id_estado = 30;
+                $solicitud->save();
+
+                $middleRpta = $this->setStatus( $oldIdestado , 30 , Auth::user()->id, $solicitud->approvedHistory->created_by , $solicitud->id );
+                if ( $middleRpta[ status ] == ok )
+                {
+                    Session::put( 'state' , R_FINALIZADO );
+                    DB::commit();
+                    return $this->setRpta();
+                }
+                else
+                {
+                    DB::rollback();
+                    return $middleRpta;
+                }
+            }
+
+        }
+        catch( Exception $e )
+        {
+            DB::rollback();
+            return $this->internalException($e,__FUNCTION__);
         }
     }
 }
