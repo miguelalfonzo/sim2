@@ -244,11 +244,23 @@ const MANTENIMIENTO_FONDO = 6;
 | TABLAS
 |--------------------------------------------------------------------------
 */
-const TB_USUARIOS                      = 'USRP.USERS';
-const TB_TIPO_USUARIO                  = 'USRP.TIPO_USUARIO';
-const TB_USER_APP                      = 'USRP.USER_APP';
-const TB_PERSONAL                      = 'USRP.PERSONAL';
-const TB_TIPO_PERSONAL                 = 'USRP.TIPO_PERSONAL';
+if( App::environment( 'production' ) )
+{
+    define( 'TB_USUARIOS'      , 'USR.USERS' );
+    define( 'TB_TIPO_USUARIO'  , 'USR.TIPO_USUARIO' );
+    define( 'TB_USER_APP'      , 'USR.USER_APP' );
+    define( 'TB_PERSONAL'      , 'USR.PERSONAL' );
+    define( 'TB_TIPO_PERSONAL' , 'USR.TIPO_PERSONAL' );
+}
+else
+{
+    define( 'TB_USUARIOS'      , 'USRP.USERS' );
+    define( 'TB_TIPO_USUARIO'  , 'USRP.TIPO_USUARIO' );
+    define( 'TB_USER_APP'      , 'USRP.USER_APP' );
+    define( 'TB_PERSONAL'      , 'USRP.PERSONAL' );
+    define( 'TB_TIPO_PERSONAL' , 'USRP.TIPO_PERSONAL' );
+}
+
 const TB_USUARIO_BAGO                  = 'D1J.USUARIO';
 const TB_EVENTO_FOTO                   = 'FILE_STORAGE';
 const TB_CLIENTE_TIPO                  = 'TIPO_CLIENTE';
