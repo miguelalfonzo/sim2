@@ -176,6 +176,17 @@ const INVERSION_INSTITUCIONAL   = 'I';
 
 const FONDO_CUENTA              = 'PRUEBA FONDO CUENTA';
 
+define('TIMELINECESE' , serialize( array(
+    '1' => array(
+        'status_id' => 30,
+        'user_type_id' => 'U',
+        'title' => 'Termino por Cese',
+        'info' => 'CONTABILIDAD',
+        'cond' => true
+    ) 
+)));
+
+
 define("TIMELINEHARD", serialize(array(
 //    '0' => array(
 //        'title' => 'Inicio Fondo Institucional',
@@ -209,22 +220,34 @@ define("TIMELINEHARD", serialize(array(
         'user_type_id' => 'C',
         'title' => 'Asiento de Anticipo',
         'info' => 'CONTABILIDAD',
-        'cond' => true
+        'cond' => true,
+        'cond_cese' => true,
     ),
     '5' => array(
         'status_id' => 12,
         'user_type_id' => 'R',
-        'title' => 'Descargo del Gasto',
+        'title' => 'Descargo',
         'info' => 'RESPONSABLE DEL GASTO',
-        'cond' => true
+        'cond' => true,
+        'cond_cese' => true
 
     ),
     '6' => array(
+        'status_id' => 6,
+        'user_type_id' => 'C',
+        'title' => 'Reg. de Gastos',
+        'info' => 'CONTABILIDAD',
+        'cond' => true,
+        'cond_cese' => true
+
+    ),
+    '7' => array(
         'status_id' => 5,
         'user_type_id' => 'C',
         'title' => 'Asiento de Diario',
         'info' => 'CONTABILIDAD',
-        'cond' => true
+        'cond' => true ,
+        'cond_cese' => true
 
     ),
     '7' => array(

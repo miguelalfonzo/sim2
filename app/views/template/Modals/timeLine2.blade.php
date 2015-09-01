@@ -21,8 +21,8 @@
         <div class="stage-container">
             @for ($i = 0; $i < count($solicitud_history); $i++)
                 {{ ''; $history = $solicitud_history[$i] }}
-                <div class="stage col-md-3 col-sm-3 @if($history->status_to == 9 || $history->status_to == 8) rejected @else success @endif">
-                    <div class="stage-header @if($history->status_to == 9 || $history->status_to == 8) stage-rejected @else stage-success @endif"></div>
+                <div class="stage col-md-3 col-sm-3 @if( in_array( $history->status_to , array( 8 , 9 , 30 ) ) ) rejected @else success @endif">
+                    <div class="stage-header @if( in_array( $history->status_to , array( 8 , 9 , 30 ) ) ) stage-rejected @else stage-success @endif"></div>
                     {{--<p>{{ $history->status_from }}</p>--}}
 
                     {{--<p>{{ $history->orden }}</p>--}}
@@ -39,19 +39,23 @@
                                 @else
                                     Inicio de Solicitud
                                 @endif
-                            @else {{ $history->statusFrom['descripcion_min'] }}
+                            @elseif ( $history->status_to == 30 )
+                                Termino por Cese
+                            @else {{ $history->statusFrom->descripcion_min }}
                             @endif
                         </h3>
 
                         <span class="label label-info">
-                                {{ strtoupper($history->createdBy->getName())}}
-                            </span>
+                            {{ strtoupper($history->createdBy->getName())}}
+                        </span>
+                        
                         {{--<span class="label label-default">--}}
                         {{--{{ $history->user_from}}--}}
                         {{--</span>--}}
                         {{--<span class="label label-default">--}}
                         {{--{{ $history->status_from}}--}}
                         {{--</span>--}}
+                        
                         @if($history->estimed_time)
                             <div class="time-estimated">
                                 <span class="label label-primary">

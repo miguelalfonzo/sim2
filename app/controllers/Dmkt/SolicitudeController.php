@@ -1391,12 +1391,14 @@ class SolicitudeController extends BaseController
         }
 //      dd($flujo);
         $linehard = unserialize(TIMELINEHARD);
+        $linecese = unserialize(TIMELINECESE);
         //$motivo = $solicitud->detalle->id_motivo;
         $motivo = $solicitud->idtiposolicitud;
 
         $line_static = array();
         foreach ($linehard as $line) {
             $cond = false;
+            $condFin = false;
             foreach ($line as $key => $value) {
                 if ($key == 'cond_sol_type' && $solicitud->idtiposolicitud == $value) {
                     $cond = true;
@@ -1407,9 +1409,24 @@ class SolicitudeController extends BaseController
                 } elseif ($key == 'cond') {
                     $cond = true;
                 }
+                elseif( $key == 'cond_cese' )
+                {
+                    if( $value && $solicitud->id_estado == 30 )
+                    {
+                        array_push( $line_static , $linecese[ 1 ] );
+                        $condFin = true;
+                        break;
+                    }
+                }
             }
-            if ($cond)
+            if( $condFin )
+            {
+                break;
+            }
+            elseif ($cond)
+            {
                 array_push($line_static, $line);
+            }
         }
 
 
