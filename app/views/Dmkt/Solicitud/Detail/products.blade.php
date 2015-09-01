@@ -10,7 +10,7 @@
             @foreach( $solicitud->products as $product )
                 <li class="list-group-item">        
                     @if( $politicStatus )
-                        <div class="input-group">
+                        <div class="input-group input-group-sm">
                             <span class="input-group-addon" style="width:15%;">{{{ is_null( $product->marca ) ? '' : $product->marca->descripcion}}}</span>
                             @if ( in_array( $tipo_usuario , array( SUP , GER_PROD ) ) )
                                 <select name="fondo_producto[]" class="selectpicker form-control">
