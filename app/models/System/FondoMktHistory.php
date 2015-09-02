@@ -71,6 +71,6 @@ class FondoMktHistory extends Eloquent
 
     protected function fondoMktHistoryReason()
     {
-        return $this->belongsTo( '\Fondo\fondoMktHistoryReason' , 'id_fondo_history_reason' );
+        return $this->belongsTo( '\Fondo\FondoMktHistoryReason' , 'id_fondo_history_reason' );
     }
 }

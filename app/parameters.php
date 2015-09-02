@@ -268,7 +268,7 @@ const MANTENIMIENTO_FONDO = 6;
 | TABLAS
 |--------------------------------------------------------------------------
 */
-if( App::environment( 'production' ) )
+if( ! App::environment( 'production' ) )
 {
     define( 'TB_USUARIOS'      , 'USR.USERS' );
     define( 'TB_TIPO_USUARIO'  , 'USR.TIPO_USUARIO' );
