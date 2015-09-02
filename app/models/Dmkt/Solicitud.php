@@ -175,7 +175,7 @@ class Solicitud extends Eloquent
         return $this->hasOne( 'Dmkt\Activity' , 'id' , 'id_actividad' )->withTrashed();
     }
 
-    protected function expenses()
+    public function expenses()
     {
         return $this->hasMany( 'Expense\Expense' , 'id_solicitud' , 'id' )->orderBy( 'updated_at' , 'desc');
     }

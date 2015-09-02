@@ -1284,13 +1284,11 @@ class SolicitudeController extends BaseController
 
     public function getTimeLine($id)
     {
-
         $solicitud = Solicitud::find($id);
-//        $solicitud_history = $solicitud->histories;
+        //$solicitud_history = $solicitud->histories;
         $solicitud_history = SolicitudHistory::where('id_solicitud', '=', $id)
             ->orderby('ID', 'ASC')
             ->get();
-//        dd((array)$solicitud_history);
         $time_flow_event = TiempoEstimadoFlujo::all();
         $previus_date = null;
         $orden_history = 0;
@@ -1341,17 +1339,6 @@ class SolicitudeController extends BaseController
 
         }
 
-
-        /*$flujo = DB::table('INVERSION_POLITICA_APROBACION')
-            ->join('POLITICA_APROBACION', function ($join) use ($solicitud) {
-                $join->on('INVERSION_POLITICA_APROBACION.ID_POLITICA_APROBACION', '=', 'POLITICA_APROBACION.ID')
-                    ->where('INVERSION_POLITICA_APROBACION.ID_INVERSION', '=', $solicitud->id_inversion);
-            })
-            ->where('POLITICA_APROBACION.DESDE', '<', $solicitud->detalle->monto_actual)
-            ->orwhere('POLITICA_APROBACION.DESDE', '=', null)
-            ->orderBy('ORDEN', 'ASC')
-            ->get();*/
-
         $flujo1 = $solicitud->investment->approvalInstance->approvalPolicies()
             ->orderBy( 'orden' , 'ASC' )->get();
         $flujo = array();
@@ -1396,26 +1383,52 @@ class SolicitudeController extends BaseController
         $motivo = $solicitud->idtiposolicitud;
 
         $line_static = array();
-        foreach ($linehard as $line) {
+        foreach ( $linehard as $line ) 
+        {
             $cond = false;
             $condFin = false;
-            foreach ($line as $key => $value) {
-                if ($key == 'cond_sol_type' && $solicitud->idtiposolicitud == $value) {
-                    $cond = true;
-                    break;
-                } elseif ($key == 'cond_sol_motivo' && $motivo == $value) {
-                    $cond = true;
-                    break;
-                } elseif ($key == 'cond') {
+            foreach ($line as $key => $value) 
+            {
+                if( $key == 'status_id' && $value == GASTO_HABILITADO )
+                {
+                    $line[ 'info' ] = is_null( $solicitud->id_user_assign ) ? $line[ 'info' ] : strtoupper( $solicitud->asignedTo->personal->full_name );
+                }
+
+                if ( $key == 'cond' ) 
+                {
                     $cond = true;
                 }
-                elseif( $key == 'cond_cese' )
+
+                if ( $key == 'cond_add_motivo' ) 
+                {
+                    if ( $motivo == $value )
+                    {
+                        $cond = true;
+                    }
+                    else
+                    {
+                        $cond = false;
+                    }
+                }
+                
+                if ( $key == 'cond_sub_motivo' )
+                {
+                    if ( $motivo == $value )
+                    {
+                        $cond = false;
+                    }
+                    else
+                    {
+                        $cond = true;
+                    }
+                }
+                
+                if( $key == 'cond_cese' )
                 {
                     if( $value && $solicitud->id_estado == 30 )
                     {
                         array_push( $line_static , $linecese[ 1 ] );
                         $condFin = true;
-                        break;
                     }
                 }
             }
@@ -1429,9 +1442,22 @@ class SolicitudeController extends BaseController
             }
         }
 
+        $devolutionHistory = $this->getDevolutionTimeLine( $solicitud );
 
-        return View::make('template.Modals.timeLine2')->with(array('solicitud' => $solicitud, 'solicitud_history' =>
-            $solicitud_history, 'flujo' => $flujo, 'line_static' => $line_static , 'time_flow_event' => $time_flow_event))->render();
+        return  View::make('template.Modals.timeLine2')
+                ->with( array(
+                    'solicitud'         => $solicitud, 
+                    'solicitud_history' => $solicitud_history, 
+                    'flujo'             => $flujo, 
+                    'line_static'       => $line_static, 
+                    'time_flow_event'   => $time_flow_event,
+                    'devolutions'       => $devolutionHistory )
+                )->render();
+    }
+
+    private function getDevolutionTimeLine( $solicitud )
+    {
+        return $solicitud->devolutions()->where( 'id_tipo_devolucion' , DEVOLUCION_INMEDIATA )->get();
     }
 
     public function album()

@@ -75,8 +75,8 @@
                             </div>
                     @endif
                 @endforeach
-                {{---------------------------------------------------------}}
-				{{--@include('template.Modals.toDepositTimeLine')--}}
+                
+                {{--@include('template.Modals.toDepositTimeLine')--}}
 
                 @if ( ( ( $solicitud->idtiposolicitud != REEMBOLSO || $solicitud->idtiposolicitud == SOL_INST )  && is_null( $solicitud->toDepositHistory ) ) ||
                     ( $solicitud->idtiposolicitud == REEMBOLSO && is_null( $solicitud->expenseHistory ) ) )

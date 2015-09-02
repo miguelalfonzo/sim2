@@ -197,37 +197,37 @@ define("TIMELINEHARD", serialize(array(
     '1' => array(
         'status_id' => 3,
         'user_type_id' => 'C',
-        'title' => 'Validación Cont.',
+        'title' => 'Validación Cont',
         'info' => 'CONTABILIDAD',
-        'cond_sol_type' => SOL_REP
+        'cond_sub_motivo' => SOL_INST
     ),
     '2' => array(
         'status_id' => 1,
         'user_type_id' => 'AG',
-        'title' => 'Habilitación Fondo Inst.',
+        'title' => 'Habilitación Fondo Inst',
         'info' => 'ASISTENTE GERENCIA',
-        'cond_sol_type' => SOL_INST
+        'cond_add_motivo' => SOL_INST
     ),
     '3' => array(
         'status_id' => 13,
         'user_type_id' => 'T',
         'title' => 'Deposito del Anticipo',
         'info' => 'TESORERÍA',
-        'cond' => true
+        'cond_sub_motivo' => REEMBOLSO
     ),
     '4' => array(
         'status_id' => 4,
         'user_type_id' => 'C',
         'title' => 'Asiento de Anticipo',
         'info' => 'CONTABILIDAD',
-        'cond' => true,
-        'cond_cese' => true,
+        'cond_sub_motivo' => REEMBOLSO ,
+        'cond_cese' => true 
     ),
     '5' => array(
         'status_id' => 12,
         'user_type_id' => 'R',
         'title' => 'Descargo',
-        'info' => 'RESPONSABLE DEL GASTO',
+        'info' => 'Responsable del Gasto' ,
         'cond' => true,
         'cond_cese' => true
 
@@ -250,12 +250,13 @@ define("TIMELINEHARD", serialize(array(
         'cond_cese' => true
 
     ),
-    '7' => array(
+    '8' => array(
         'status_id' => 20,
         'user_type_id' => 'C',
         'title' => 'Deposito del Reembolso',
         'info' => 'TESORERIA',
-        'cond_sol_motivo' => REEMBOLSO
+        'cond_add_motivo' => REEMBOLSO,
+        'cond_cese' => true
     )
 )));
 

@@ -37,6 +37,7 @@
 	font: 400 14px 'calibriregular', sans-serif;
 	padding-left: 0px;
 	text-align: center;
+	white-space: nowrap;
 }
 
 .stage-info {

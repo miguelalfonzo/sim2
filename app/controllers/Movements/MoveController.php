@@ -186,7 +186,7 @@ class MoveController extends BaseController
         {
             $query->where( function( $query ) use( $dates )
             {
-                $query->where( 'idtiposolicitud' , SOL_REP )->whereRaw( "created_at between to_date( '" . $dates[ 'start' ] . "','DD-MM-YY') and to_date( '" . $dates[ 'end' ] . "' ,'DD-MM-YY')+1" );
+                $query->where( 'idtiposolicitud' , '<>' , SOL_INST )->whereRaw( "created_at between to_date( '" . $dates[ 'start' ] . "','DD-MM-YY') and to_date( '" . $dates[ 'end' ] . "' ,'DD-MM-YY')+1" );
             })->orWhere( function( $query ) use( $dates )
             {
                 $query->where( 'idtiposolicitud' , SOL_INST )->wherehas( 'detalle' , function ( $query ) use( $dates )

@@ -298,13 +298,7 @@ class ExpenseController extends BaseController
 		$balance              = $monto_aprobado - $totalGasto;
 		$payrollAmount        = Parameter::find( 4 )->valor;
 
-		if ( $solicitud->detalle->id_moneda == SOLES )
-			$tasa = 1;
-		elseif ( $solicitud->detalle->id_moneda == DOLARES )
-		{
-			$tc   = ChangeRate::getTc();
-			$tasa = $tc->compra;
-		}
+		$tasa = $this->getExchangeRate( $solicitud );
 
 		$balance  = $balance * $tasa;
 		$jDetalle = json_decode( $detalle->detalle );

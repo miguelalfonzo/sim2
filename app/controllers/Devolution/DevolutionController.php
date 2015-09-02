@@ -14,6 +14,7 @@ use \Carbon\Carbon;
 use \Fondo\FondoMkt;
 use \Session;
 use \User;
+use \Auth;
 
 class DevolutionController extends BaseController
 {  
@@ -31,7 +32,43 @@ class DevolutionController extends BaseController
 		elseif( $id_estado_devolucion != DEVOLUCION_POR_REALIZAR )
 			$devolution->numero_operacion = $numero_operacion_devolucion;
 		$devolution->save();
-	}
+
+        if ( $id_tipo_devolucion == DEVOLUCION_INMEDIATA )
+        {
+            $devolutionUserTo = $this->getDevolutionUserTo( $devolution->id_estado_devolucion , $solicitud_id );
+            $this->setDevolutionHistory( $devolution , 0 , $devolutionUserTo );
+	   }
+    }
+
+    private function getDevolutionUserTo( $id_estado_devolucion , $solicitud_id )
+    {
+        $solicitud = Solicitud::find( $solicitud_id );
+        if( $id_estado_devolucion == 1 )
+        {
+            return $solicitud->asignedTo->type;
+        }
+        elseif( $id_estado_devolucion == 2 )
+        {
+            return TESORERIA;
+        }
+        elseif( $id_estado_devolucion == 3 )
+        {
+            return CONTABILIDAD;
+        }
+    }
+
+    private function setDevolutionHistory( $devolution , $oldState , $userTo )
+    {
+        $devolutionHistory                = new DevolutionHistory;
+        $devolutionHistory->id            = $devolutionHistory->nextId();
+        $devolutionHistory->id_devolucion = $devolution->id;
+        $devolutionHistory->status_from   = $oldState;
+        $devolutionHistory->status_to     = $devolution->id_estado_devolucion;
+        $devolutionHistory->user_from     = Auth::user()->type;
+        $devolutionHistory->user_to       = $userTo;
+        $devolutionHistory->save();
+        \Log::error( $devolutionHistory->toJson() );
+    }
 
     public function getPayrollInfo()
     {

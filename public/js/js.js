@@ -212,7 +212,10 @@ $(function()
                 bootboxExpense( response.Title , response.View , response.Type );
             }
             else
+            {
+                //return false;
                 bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+            }
         });
     }
 

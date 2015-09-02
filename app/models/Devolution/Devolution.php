@@ -28,4 +28,14 @@ class Devolution extends Eloquent
         return $this->belongsTo( 'Devolution\DevolutionState' , 'id_estado_devolucion' );
     }
 
+    protected function histories()
+    {
+        return $this->hasMany( 'Devolution\DevolutionHistory' , 'id_devolucion' )->orderBy( 'updated_at' , 'ASC')->orderBy( 'status_from' , 'ASC' );
+    }
+
+    protected function createdBy()
+    {
+        return $this->belongsTo( 'User' , 'created_by' );
+    }
+
 }

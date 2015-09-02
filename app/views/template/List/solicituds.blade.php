@@ -97,18 +97,10 @@
 
                 @include('template.List.states')
                 
-                <td class="text-center">
-                    @if ( $solicitud->idtiposolicitud == SOL_REP )
-                        @if ( is_null( $solicitud->typeSolicitude ) )
-                            -
-                        @else    
-                            {{ $solicitud->typeSolicitude->nombre }}
-                        @endif
-                    @elseif ( $solicitud->idtiposolicitud == SOL_INST ) 
-                        {{ $solicitud->typesolicitude->nombre }}
-                    @endif
-                </td>
+                <td class="text-center">{{ $solicitud->typeSolicitude->nombre }}</td>
+                
                 @include('template.List.icons')
+                
                 @if ( Auth::user()->type == GER_COM )
                     <td class="text-center">
                         @if ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) )
