@@ -295,7 +295,15 @@ class DepositController extends BaseController
                 $solicitud->id_estado = 30;
                 $solicitud->save();
 
-                $middleRpta = $this->setStatus( $oldIdestado , 30 , Auth::user()->id, $solicitud->approvedHistory->created_by , $solicitud->id );
+                if ( $solicitud->idtiposolicitud != SOL_INST )
+                {
+                    $middleRpta = $this->setStatus( $oldIdestado , 30 , Auth::user()->id, $solicitud->approvedHistory->created_by , $solicitud->id );
+                }
+                else
+                {
+                    $middleRpta = $this->setStatus( $oldIdestado , 30 , Auth::user()->id, $solicitud->created_by , $solicitud->id );    
+                }
+
                 if ( $middleRpta[ status ] == ok )
                 {
                     Session::put( 'state' , R_FINALIZADO );

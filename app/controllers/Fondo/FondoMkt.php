@@ -299,7 +299,7 @@ class FondoMkt extends BaseController
                'oldSaldo'     => $oldSaldo , 
                'newSaldo'     => $fondo->saldo , 
                'oldRetencion' => $oldRetencion ,
-               'newRetencion' => $newRetencion ,
+               'newRetencion' => $fondo->retencion ,
                'reason'       => $type );
             $fondoDataHistories[] = $data;
             $this->setPeriodHistoryData( $fondo->subcategoria_id , $data ); 
