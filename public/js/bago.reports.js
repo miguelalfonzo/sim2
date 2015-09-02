@@ -225,7 +225,6 @@
 				ContentType: gbReportsObject.contentTypeAjax,
 				cache      : false
             }).done(function(dataResult) {
-				console.log(dataResult);
 				if(dataResult.status == 'OK'){
 					if(typeof(dataResult.data) != 'undefined'){
 						$(".report_menubar_option").not(".new").remove();
@@ -576,8 +575,8 @@
 		},
 		getReportObject: function(id){
 			var result = null;
-			console.log( this );
-			if (this.reportsArray.length > 0) {
+			if ( this.reportsArray !== undefined && this.reportsArray.length > 0 ) 
+			{
 				for (var z = 0; z < this.reportsArray.length; z++)
 				{
 					if(this.reportsArray[z].id_reporte == id){
