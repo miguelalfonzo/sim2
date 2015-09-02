@@ -1,6 +1,6 @@
 <div class="timeLineModal">
     <div class="container-fluid hide">
-        <h6 class="text-center">DEVOLUCION</h6>
+        <h6 class="text-center">{{ $solicitud->typeSolicitude->nombre }}</h6>
         <div class="stage-container">
             @for ($i = 0; $i < count($solicitud_history); $i++)
                 {{ ''; $history = $solicitud_history[$i] }}
