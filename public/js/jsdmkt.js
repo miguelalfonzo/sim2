@@ -316,7 +316,7 @@ function listDocuments()
     }).done(function (data)
     {
         if ( data.Status == 'Ok' )
-            dataTable( 'table_documents' , data.Data, 'registros' );
+            dataTable( 'documents' , data.Data, 'registros' );
         else
             bootbox.alert( '<h4 class=red>' + data.Status + ': ' + data.Description + '</h4>');
     });
@@ -382,6 +382,11 @@ function searchFondos( datefondo , aux )
     });
 }
 
+var calcDataTableHeight = function() 
+{
+    return $(window).height()*50/100;
+};
+
 function listTable( type , date )
 {
     date = typeof date !== 'undefined' ? date : null;
@@ -418,9 +423,7 @@ function listTable( type , date )
             bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
     });
 }
-var calcDataTableHeight = function() {
-    return $(window).height()*50/100;
-};
+
 function dataTable( element , html , message )
 {
     $( '#table_' + element + '_wrapper' ).remove();
