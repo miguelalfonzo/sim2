@@ -481,6 +481,8 @@ class ExpenseController extends BaseController
 			$dni = $dni[data];
 		else
 			$dni = '';
+
+		$total 	   = $expenses->sum('monto');
 		
 		if ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , 3 ) ) )
 		{
@@ -522,8 +524,7 @@ class ExpenseController extends BaseController
 					$expense->monto = round ( $expense->monto * $eTc->compra , 2 , PHP_ROUND_HALF_DOWN );
 				}
 			}
-			$total 	   = $expenses->sum('monto');
-		
+			
 			$data  = array( 'solicitud'    => $solicitud,
 							'detalle'      => $jDetalle,
 							'clientes'     => $clientes,
