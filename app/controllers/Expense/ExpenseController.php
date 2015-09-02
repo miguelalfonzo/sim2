@@ -300,11 +300,11 @@ class ExpenseController extends BaseController
 
 		$tasa = $this->getExchangeRate( $solicitud );
 
-		$balance  = $balance * $tasa;
+		$balanceSoles  = $balance * $tasa;
 		$jDetalle = json_decode( $detalle->detalle );
 
     	if ( $solicitud->idtiposolicitud == SOL_REP )
-			if ( $balance > $payrollAmount )
+			if ( $balanceSoles > $payrollAmount )
 				if ( isset( $inputs[ 'numero_operacion_devolucion' ] ) && ! empty( trim( $inputs[ 'numero_operacion_devolucion'] ) ) )
 				{
 					$devolutionController->setDevolucion( $solicitud->id , $inputs[ 'numero_operacion_devolucion' ] , $balance , DEVOLUCION_POR_VALIDAR , DEVOLUCION_INMEDIATA );
@@ -315,16 +315,16 @@ class ExpenseController extends BaseController
 						status  =>  'Info' , 
 			        	'View'  =>  View::make( 'Dmkt.Register.expense-missing-data' , array( 
 			        					'devolucion' => true , 
-			        					'balance'    => $balance ) 
+			        					'balance'    => $balanceSoles ) 
 			        				)->render() ,
 				        'Type'  =>  'D' ,
 				        'Title' =>  'Registro de la Operacion de Devolución' );
-			elseif ( $balance <= $payrollAmount && $balance >= 0  )
+			elseif ( $balanceSoles <= $payrollAmount && $balanceSoles >= 0  )
 				$toUser = USER_CONTABILIDAD;
 			else
 				return $this->warningException( 'No se puede registrar los gastos si exceden al monto depositado' , __FUNCTION__ , __FILE__ , __LINE__ );
 		elseif( $solicitud->idtiposolicitud == SOL_INST )
-			if( $balance > $payrollAmount )
+			if( $balanceSoles > $payrollAmount )
 			{
 				if ( isset( $inputs[ 'inversion'] ) && isset( $inputs[ 'actividad' ] ) && isset( $inputs[ 'numero_operacion_devolucion' ] ) )
 				{
@@ -341,13 +341,13 @@ class ExpenseController extends BaseController
 										'investments' => $investments , 
 										'activities'  => Activity::order() , 
 										'devolucion'  => true ,
-										'balance'     => $balance ) 
+										'balance'     => $balanceSoles ) 
 									)->render() ,
 						'Type'  =>  'ID' ,
 						'Title' =>  'Registro de la Operacion de Devolución , Inversion y Actividad' );
 				}
 			}
-			elseif ( $balance <= $payrollAmount && $balance >= 0 )
+			elseif ( $balanceSoles <= $payrollAmount && $balanceSoles >= 0 )
 				if ( isset( $inputs[ 'inversion'] ) && isset( $inputs[ 'actividad' ] ) )
 				{
 					$this->setDataInstitucional( $solicitud , $inputs );
