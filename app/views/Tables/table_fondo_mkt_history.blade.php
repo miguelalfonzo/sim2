@@ -28,7 +28,9 @@
                     <td class="text-center">
                         <span class="label label-primary">{{ $FondoMktHistory->fondoMktHistoryReason->descripcion }}</span>
                         @if ( ! is_null( $FondoMktHistory->id_solicitud ) )
-                            {{ 'Solicitud #' . $FondoMktHistory->id_solicitud }}
+                            <span class="label label-success open-details2" rel="{{ $FondoMktHistory->id_solicitud }}" style="cursor:pointer">
+                                Solicitud #{{ $FondoMktHistory->id_solicitud }}
+                            </span>
                         @endif
                     </td>
                     <td>{{ $FondoMktHistory->toFund->middle_name }}</td>
@@ -54,7 +56,7 @@
             <td></td>
             <td></td>
             <td></td>
-            <td class="text-center">Saldo Disponible</td>
+            <td class="text-center">Saldo Disponible Final</td>
             <td class="text-center">{{ $saldoNeto }}</td>
         </tr>
         <tr>
@@ -63,7 +65,7 @@
             <td></td>
             <td></td>
             <td></td>
-            <td class="text-center">Saldo Contable</td>
+            <td class="text-center">Saldo Contable Final</td>
             <td class="text-center">{{ $saldoContable }}</td>    
         </tr>
     </tfoot>

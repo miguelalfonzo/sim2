@@ -238,9 +238,9 @@ class FondoMkt extends BaseController
         $periodTotal   = $fondoMktHistoriesData->sum( 'to_old_saldo' ) - $fondoMktHistoriesData->sum( 'to_new_saldo' );
         $saldoContable = $saldoAnterior - $periodTotal;
 
-        $totalOldNeto      = $fondoMktHistoriesTotalData->sum( 'old_retencion' );
-        $totalNewNeto      = $fondoMktHistoriesTotalData->sum( 'new_retencion' );
-        $historyTotalNeto  = $totalNewNeto - $totalOldNeto;
+        $totalOldRetencion = $fondoMktHistoriesTotalData->sum( 'old_retencion' );
+        $totalNewRetencion = $fondoMktHistoriesTotalData->sum( 'new_retencion' );
+        $historyTotalNeto  = $totalNewRetencion - $totalOldRetencion;
         
         $data = array( 
             'FondoMktHistories' => $fondoMktHistoriesData ,

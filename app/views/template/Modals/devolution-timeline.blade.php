@@ -13,13 +13,7 @@
 						@endif
 					</h3>
 					<span class="label label-info">{{ strtoupper( $devolutions[ 0 ]->createdBy->personal->full_name ) }}</span>
-					<span class="label label-info">
-						@if ( $devolutions[ 0 ]->histories[ 0 ]->status_to == 2 )
-							{{ $solicitud->expenses()->orderBy( 'updated_at' , 'DESC')->first()->updated_at }}      
-						@else
-							{{ $devolution[ 0 ]->created_at }}
-						@endif
-					</span>
+					<span class="label label-info">{{ $devolutions[ 0 ]->created_at }}</span>
 				</div>
 			</div>
 			@foreach( $devolutions as $devolution )
@@ -29,7 +23,7 @@
 						<div class="stage-content">
 							<h3 class="stage-title">
 								@if( $devolutionHistory->status_to == 1 )
-									Inicio por Revision de Documentos
+									Inicio por Rev. de Documentos
 								@elseif( $devolutionHistory->status_to == 2 )
 									Pago
 								@elseif( $devolutionHistory->status_to == 3 )
@@ -44,7 +38,24 @@
 					</div>
 				@endforeach
 				@if( $devolution->id_estado_devolucion == 1 )
-					---
+					<div class="stage col-md-3 col-sm-3 pending">
+						<div class="stage-header stage-pending"></div>
+						<div class="stage-content">
+							<h3 class="stage-title">Pago</h3>
+							<span class="label label-info">
+								{{ strtoupper( $solicitud->updatedBy->personal->full_name ) }}
+							</span>
+						</div>
+					</div>
+					<div class="stage col-md-3 col-sm-3">
+						<div class="stage-header"></div>
+						<div class="stage-content">
+							<h3 class="stage-title">Confirmacion</h3>
+							<span class="label label-info">
+								TESORERIA
+							</span>
+						</div>
+					</div>
 				@elseif( $devolution->id_estado_devolucion == 2 )
 					<div class="stage col-md-3 col-sm-3 pending">
 						<div class="stage-header stage-pending"></div>

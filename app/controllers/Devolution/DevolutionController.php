@@ -37,7 +37,7 @@ class DevolutionController extends BaseController
         {
             $devolutionUserTo = $this->getDevolutionUserTo( $devolution->id_estado_devolucion , $solicitud_id );
             $this->setDevolutionHistory( $devolution , 0 , $devolutionUserTo );
-	   }
+	    }
     }
 
     private function getDevolutionUserTo( $id_estado_devolucion , $solicitud_id )
@@ -53,7 +53,7 @@ class DevolutionController extends BaseController
         }
         elseif( $id_estado_devolucion == 3 )
         {
-            return CONTABILIDAD;
+            return CONT;
         }
     }
 
@@ -265,10 +265,16 @@ class DevolutionController extends BaseController
             return $this->warningException( 'Cancelado - La Devolucion no se encuentra en la etapa de registro del N° de Operacion' , __FUNCTION__ , __LINE__ , __FILE__ );
         
         $devolucion                       = $devolucion[ 0 ];
+        $oldDevolutionState               = $devolucion->id_estado_devolucion;
         $devolucion->numero_operacion     = $inputs[ 'numero_operacion_devolucion' ];
         $devolucion->id_estado_devolucion = DEVOLUCION_POR_VALIDAR;
         $devolucion->save();
+
+        //HISTORIAL DE LA DEVOLUCION
+        $devolutionUserTo = $this->getDevolutionUserTo( $devolucion->id_estado_devolucion , $solicitud->id );
+        $this->setDevolutionHistory( $devolucion , $oldDevolutionState , $devolutionUserTo );
         
+
         $toUser = User::getTesorerias();
         $middleRpta = $this->postman( $solicitud->id , $solicitud->id_estado , $solicitud->id_estado , $toUser );
         if ( $middleRpta[ status ] == ok )
@@ -301,12 +307,17 @@ class DevolutionController extends BaseController
         $devolucion = $solicitud->devolutions()->where( 'id_estado_devolucion' , DEVOLUCION_POR_VALIDAR )->get();
 
         if( $solicitud->id_estado != ENTREGADO && $solicitud->devolutions()->where( 'id_estado_devolucion' , DEVOLUCION_POR_VALIDAR )->get()->count() === 0 )
-            return $this->warningException( 'Cancelado - La solicitud no se encuentra en la etapa de validación de la devolución' , __FUNCTION__ , __LINE__ , __FILE__ );
+            return $this->warningException( 'Cancelado - La solicitud no se encuentra en la etapa de validación de la devolucion' , __FUNCTION__ , __LINE__ , __FILE__ );
             
         $devolucion = $devolucion[ 0 ];
 
+        $oldDevolutionState = $devolucion->id_estado_devolucion;
         $devolucion->id_estado_devolucion = DEVOLUCION_CONFIRMADA;
         $devolucion->save();
+
+        //HISTORIAL DE LA DEVOLUCION
+        $devolutionUserTo = $this->getDevolutionUserTo( $devolucion->id_estado_devolucion , $solicitud->id );
+        $this->setDevolutionHistory( $devolucion , $oldDevolutionState , $devolutionUserTo );
         
         $fondoMktController = new FondoMkt;
         $fondoMktController->refund( $solicitud , $devolucion->monto , FONDO_DEVOLUCION_TESORERIA );
