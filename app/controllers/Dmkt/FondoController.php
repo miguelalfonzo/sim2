@@ -195,7 +195,7 @@ class FondoController extends BaseController
             return $this->setRpta();
     }
 
-    private function setDetalleInst( $detalle , $inputs , $idPeriodo )
+    private function setDetalleInst( $detalle , $inputs , $idPeriodo , $idSolicitud )
     {
         $jDetalle = array( 'supervisor'      => $inputs[ 'supervisor' ] ,
                            'codsup'          => $inputs[ 'codsup' ] ,
@@ -206,14 +206,14 @@ class FondoController extends BaseController
         $detalle->id_moneda  = SOLES;
         $detalle->detalle = json_encode($jDetalle);
         $detalle->save();
-        SolicitudClient::where( 'id_solicitud' , $detalle->id )->delete();
+        SolicitudClient::where( 'id_solicitud' , $idSolicitud )->delete();
         $middleRpta = $this->validateOneInstitution( $idPeriodo , $inputs[ 'institucion-cod' ] );
         if ( $middleRpta[ status ] == ok )
         {
             $solicitudCliente     = new SolicitudClient;
             $solicitudCliente->id = $solicitudCliente->lastId() + 1;
             $solicitudCliente->id_tipo_cliente = 3;
-            $solicitudCliente->id_solicitud = $detalle->id;
+            $solicitudCliente->id_solicitud = $idSolicitud;
             $solicitudCliente->id_cliente = $inputs[ 'institucion-cod' ];
             $solicitudCliente->save();
             return $this->setRpta();                            
@@ -232,7 +232,10 @@ class FondoController extends BaseController
             {
                 $middleRpta = $this->processsInstitutionalSolicitud( $inputs );
                 if ( $middleRpta[ status] == ok )
+                {
+                    \Log::error( 'commit' );
                     DB::commit();
+                }
                 else
                     DB::rollback();
                 return $middleRpta;    
@@ -287,7 +290,7 @@ class FondoController extends BaseController
                 $solicitud->idtiposolicitud = SOL_INST;
                 $solicitud->id_user_assign  = $middleRpta[data]['rm'];
                 $solicitud->save();
-                $middleRpta   = $this->setDetalleInst( $detalle , $inputs , $idPeriodo );
+                $middleRpta   = $this->setDetalleInst( $detalle , $inputs , $idPeriodo , $solicitud->id );
                 if ( $middleRpta[status] == ok )
                 {
                     $userid = Auth::user()->id;
