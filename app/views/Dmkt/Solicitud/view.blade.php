@@ -32,7 +32,7 @@
                 <input name="idsolicitud" type="hidden" value="{{$solicitud->id}}">
                 <input name="token" type="hidden" value="{{$solicitud->token}}">
                 <!-- DETALLE DE LA SOLICITUD -->
-                @if ( $solicitud->idtiposolicitud == SOL_REP )
+                @if ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) )
                     @include('Dmkt.Solicitud.Representante.detail')
                 @elseif ( $solicitud->idtiposolicitud == SOL_INST )
                     @include('Dmkt.Solicitud.Institucional.detail')

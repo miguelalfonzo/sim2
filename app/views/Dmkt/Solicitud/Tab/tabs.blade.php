@@ -23,7 +23,7 @@
     </ul>
     <div class="tab-content">
         <div class="tab-pane fade active in" id="solicitud" style="margin-top:20px">
-            @if ( $solicitud->idtiposolicitud == SOL_REP )
+            @if ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) )
                 @include('Dmkt.Solicitud.Representante.detail')
             @elseif ( $solicitud->idtiposolicitud == SOL_INST )
                 @include('Dmkt.Solicitud.Institucional.detail')

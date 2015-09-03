@@ -509,7 +509,7 @@ class SolicitudeController extends BaseController
                 if ( count( Solicitud::solInst( $periodo->aniomes ) ) == 1 )
                     Periodo::inhabilitar( $periodo->aniomes );
             }
-            elseif ( $solicitud->idtiposolicitud == SOL_REP )
+            elseif ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) )
             {
                 if ( ! in_array( $solicitud->id_estado , State::getCancelStates() ) )
                     return $this->warningException( 'No se puede cancelar las solicitudes en esta etapa: ' . $solicitud->state->nombre , __FUNCTION__, __LINE__, __FILE__ );
@@ -517,10 +517,12 @@ class SolicitudeController extends BaseController
                 $politicType = $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario;
                 
                 if (  Auth::user()->id != $solicitud->created_by )
+                {
                     if ( ! in_array( $politicType , array( Auth::user()->type , Auth::user()->tempType() ) ) )
                         return $this->warningException( 'No puede rechazar la solicitud , verifique el estado de la solicitud se esperaba al usuario ( ' . $politicType . ' )' , __FUNCTION__ , __LINE__ , __FILE__ );
                     if ( ! array_intersect( array( Auth::user()->id, Auth::user()->tempId() ) , $solicitud->managerEdit( $politicType )->lists('id_gerprod') ) )
                         return $this->warningException( 'No puede rechazar la solicitud , su usuario no ha sido asociado a la solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
+                }
             }
             else
             {
@@ -1389,6 +1391,11 @@ class SolicitudeController extends BaseController
             $condFin = false;
             foreach ($line as $key => $value) 
             {
+                if( $solicitud->state->id_estado == R_NO_AUTORIZADO )
+                {
+                    break;
+                }
+                
                 if( $key == 'status_id' && $value == GASTO_HABILITADO )
                 {
                     $line[ 'info' ] = is_null( $solicitud->id_user_assign ) ? $line[ 'info' ] : strtoupper( $solicitud->asignedTo->personal->full_name );

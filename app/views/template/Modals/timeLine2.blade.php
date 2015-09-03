@@ -30,6 +30,8 @@
                                 @endif  
                             @elseif ( $history->status_to == 30 )
                                 Termino por Cese
+                            @elseif( $history->status_to == 8 )
+                                Cancelado
                             @else 
                                 {{ $history->statusFrom->descripcion_min }}
                             @endif
@@ -75,7 +77,7 @@
             }
             ?>
 
-            @if( $solicitud->idtiposolicitud != SOL_INST )
+            @if( $solicitud->idtiposolicitud != SOL_INST && $solicitud->state->id_estado != R_NO_AUTORIZADO )
                 @for ($i = $num; $i < $count_flujo; $i++)
                     {{ '' ; $fl = $flujo[$i] }}
                     <div class="stage col-md-3 col-sm-3 @if($i == $num) pending @endif">
