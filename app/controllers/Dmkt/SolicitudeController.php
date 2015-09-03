@@ -462,7 +462,7 @@ class SolicitudeController extends BaseController
 
     private function textLv($solicitud)
     {
-        if ($solicitud->idtiposolicitud == SOL_REP)
+        if ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) )
             return $this->textAccepted($solicitud) . ' - ' . $solicitud->titulo . ' - ' . $this->textClients($solicitud);
         else
             return $this->textAccepted($solicitud) . ' - ' . $solicitud->titulo;
@@ -470,7 +470,7 @@ class SolicitudeController extends BaseController
 
     private function textAccepted($solicitud)
     {
-        if ($solicitud->idtiposolicitud == SOL_REP)
+        if ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) )
             return $solicitud->approvedHistory->user->personal->getFullName();
         else if ($solicitud->idtiposolicitud == SOL_INST)
             return $solicitud->createdBy->personal->getFullName();
@@ -1395,7 +1395,7 @@ class SolicitudeController extends BaseController
                 {
                     break;
                 }
-                
+
                 if( $key == 'status_id' && $value == GASTO_HABILITADO )
                 {
                     $line[ 'info' ] = is_null( $solicitud->id_user_assign ) ? $line[ 'info' ] : strtoupper( $solicitud->asignedTo->personal->full_name );

@@ -158,7 +158,7 @@ class DepositController extends BaseController
         $tasaCompraAprobacion = $this->getApprovalExchangeRate( $solicitud );
         $msg                = ' el cual no es suficiente para completar el deposito , se requiere un saldo de S/.';
         
-        if ( $solicitud->idtiposolicitud == SOL_REP )
+        if ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) )
         {
             $products = $solicitud->products;
             $fondo_type = $products[ 0 ]->id_tipo_fondo_marketing;

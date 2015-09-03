@@ -17,7 +17,7 @@
             @endif
         @endif
         @if ( Auth::user()->type == CONT )
-            @if( $solicitud->idtiposolicitud == SOL_REP )
+            @if ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) )            
                 @if($solicitud->id_estado == APROBADO )
                     <a id="enable-deposit" class="btn btn-success">Confirmar</a>
                 @endif

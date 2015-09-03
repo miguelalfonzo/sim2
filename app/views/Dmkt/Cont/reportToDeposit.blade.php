@@ -33,10 +33,10 @@
                                 <td>{{ $solicitud->titulo }}</td>
                                 <td>{{ $solicitud->detalle->fecha_entrega }} </td>
                                 <td>
-                                    @if( $solicitud->idtiposolicitud == SOL_REP )
+                                    @if ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) )
                                         {{ $solicitud->detalle->typePayment->nombre }}
                                     @else
-                                        TRANSFERENCIA
+                                        Transferencia
                                     @endif
                                 </td>
                                 <td>

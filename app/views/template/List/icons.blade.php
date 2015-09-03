@@ -6,7 +6,7 @@
         
         @if ( in_array( $solicitud->histories()->orderBy( 'updated_at' , 'DESC' )->first()->user_to , array( Auth::user()->type , Auth::user()->tempType() ) ) 
         && $solicitud->state->id_estado != R_NO_AUTORIZADO && $solicitud->id_estado != GENERADO )
-            @if( $solicitud->idtiposolicitud == SOL_REP &&  in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) ) )
+            @if( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) &&  in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) ) )
                 @if( array_intersect( $solicitud->gerente()->lists( 'id_gerprod' ) , array( Auth::user()->id , Auth::user()->tempId() ) ) )
                     <a class="btn btn-default" href="{{URL::to('ver-solicitud/'.$solicitud->token)}}">
                         <span  class="glyphicon glyphicon-edit"></span>

@@ -33,7 +33,7 @@
                     <td class="text-center">
                         @if ( $solicitud->idtiposolicitud == SOL_INST )
                             {{ $solicitud->createdBy->personal->full_name }}
-                        @elseif ( $solicitud->idtiposolicitud == SOL_REP )
+                        @elseif ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) )
                             {{{ $solicitud->approvedHistory->user->personal->full_name or '' }}}
                         @endif
                     </td>
@@ -47,7 +47,7 @@
                         @endif
                     </td>
                     <td>
-                        @if( $solicitud->idtiposolicitud == SOL_REP )
+                        @if ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) )
                             {{ is_null( $solicitud->products[ 0 ]->thisSubFondo ) ? '' : $solicitud->products[ 0 ]->thisSubFondo->full_name }}
                         @elseif( $solicitud->idtiposolicitud == SOL_INST )
                             {{ $solicitud->detalle->thisSubFondo->full_name }}

@@ -129,8 +129,6 @@ class MoveController extends BaseController
             {
                 case 'solicitudes':
                     return $this->searchSim( $inputs );
-                case 'estado-fondos':
-                    return $this->getFondoReport( $inputs['date'] );
                 case 'movimientos':
                     return $this->searchMove( $inputs['date_start' ] , $inputs[ 'date_end' ] , $inputs[ 'filter' ] );
             }
@@ -273,12 +271,6 @@ class MoveController extends BaseController
         
         $solicituds = $solicituds->orderBy('id', 'ASC')->get();     
         return $this->setRpta( $solicituds );
-    }
-
-    private function getFondoReport()
-    {
-        $fondoHistories = FondoHistory::orderBy( 'updated_at' , 'desc' )->get();
-        return $this->setRpta( array( 'View' => View::make( 'Tables.fondo')->with( 'fondoHistories' , $fondoHistories )->render() ) );
     }
 
     public function getSolicitudDetail()
