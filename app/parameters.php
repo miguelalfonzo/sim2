@@ -39,7 +39,7 @@ const CUENTA_RETENCION_DEBE                   = 1681000;
 const CUENTA_RETENCION_HABER                  = 4011400;
 const CUENTA_DETRACCION_HABER                 = 4212300;
 const CUENTA_RENTA_4TA_HABER                  = 4017200;
-const CUENTA_DETRACCION_REEMBOLSO             = 4699700;
+const CUENTA_HABER_REEMBOLSO                  = 4699700;
 const ERROR_INVALID_ACCOUNT_MKT               = 'Error de Cuenta';
 const MSG_INVALID_ACCOUNT_MKT                 = 'Verificar campo de cuenta';
 
@@ -376,3 +376,10 @@ const DEPOSITO_HABILITADO   = 13;
 const DEVOLUCION            = 14;
 
 const CUENTA_SOLES = 1041100;
+
+//TIPO REGIMEN
+const REGIMEN_RETENCION  = 1;
+const REGIMEN_DETRACCION = 2;
+
+//DOCUMENTOS
+const DOC_RECIBO_HONORARIO = 2;

@@ -304,6 +304,7 @@ class ExpenseController extends BaseController
 		$jDetalle = json_decode( $detalle->detalle );
 
     	if ( $solicitud->idtiposolicitud == SOL_REP )
+		{
 			if ( $balanceSoles > $payrollAmount )
 				if ( isset( $inputs[ 'numero_operacion_devolucion' ] ) && ! empty( trim( $inputs[ 'numero_operacion_devolucion'] ) ) )
 				{
@@ -323,7 +324,9 @@ class ExpenseController extends BaseController
 				$toUser = USER_CONTABILIDAD;
 			else
 				return $this->warningException( 'No se puede registrar los gastos si exceden al monto depositado' , __FUNCTION__ , __FILE__ , __LINE__ );
+		}
 		elseif( $solicitud->idtiposolicitud == SOL_INST )
+		{
 			if( $balanceSoles > $payrollAmount )
 			{
 				if ( isset( $inputs[ 'inversion'] ) && isset( $inputs[ 'actividad' ] ) && isset( $inputs[ 'numero_operacion_devolucion' ] ) )
@@ -348,6 +351,7 @@ class ExpenseController extends BaseController
 				}
 			}
 			elseif ( $balanceSoles <= $payrollAmount && $balanceSoles >= 0 )
+			{
 				if ( isset( $inputs[ 'inversion'] ) && isset( $inputs[ 'actividad' ] ) )
 				{
 					$this->setDataInstitucional( $solicitud , $inputs );
@@ -362,10 +366,20 @@ class ExpenseController extends BaseController
 						'Type' => 'I' ,
 						'Title' => 'Registro de la Inversion y Actividad');
 				}
+			}			
 			else
+			{
 				return $this->warningException( 'No se puede registrar los gastos si exceden al monto depositado' , __FUNCTION__ , __FILE__ , __LINE__ );
+			}
+		}
+		elseif( $solicitud->idtiposolicitud == REEMBOLSO )
+		{
+			$toUser = USER_CONTABILIDAD;
+		}
 		else
+		{
 			return $this->warningException( 'No se pudo identificar el tipo de solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
+		}
 		return $this->setRpta( $toUser );
     }
 

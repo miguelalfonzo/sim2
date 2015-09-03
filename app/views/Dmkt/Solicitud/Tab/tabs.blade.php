@@ -3,8 +3,8 @@
         <li class="active">
              @include('Dmkt.Solicitud.tabSolicitud')
         </li>
-        @if ( Auth::user()->type == CONT && ( ( ! is_null( $solicitud->expenseHistory ) && $solicitud->idtiposolicitud != REEMBOLSO )  || 
-            ( ( $solicitud->id_estado == GENERADO && $solicitud->idtiposolicitud != REEMBOLSO ) || ( ! is_null( $solicitud->toGenerateHistory ) && $solicitud->idtiposolicitud == REEMBOLSO ) ) ) )
+        @if ( Auth::user()->type == CONT && ( ( $solicitud->idtiposolicitud != REEMBOLSO && ! is_null( $solicitud->expenseHistory ) ) || 
+            ( $solicitud->idtiposolicitud == REEMBOLSO && ! is_null( $solicitud->toDepositHistory ) ) ) )
             <li>
                 <a href="#seats-tab" role="tab" data-toggle="tab">
                     <icon class="fa fa-home"></icon>
@@ -29,14 +29,15 @@
                 @include('Dmkt.Solicitud.Institucional.detail')
             @endif
         </div>
-        @if ( ( ( ! is_null( $solicitud->expenseHistory ) && $solicitud->idtiposolicitud != REEMBOLSO ) && Auth::user()->type == CONT ) || 
-            ( ( $solicitud->id_estado == GENERADO && $solicitud->idtiposolicitud != REEMBOLSO ) || ( ! is_null( $solicitud->toGenerateHistory ) && $solicitud->idtiposolicitud == REEMBOLSO ) ) )
+        @if ( Auth::user()->type == CONT && ( ( $solicitud->idtiposolicitud != REEMBOLSO && ! is_null( $solicitud->expenseHistory ) ) || 
+            ( $solicitud->idtiposolicitud == REEMBOLSO && ! is_null( $solicitud->toDepositHistory ) ) ) )
             <div class="tab-pane fade" id="seats-tab" style="margin-top:20px; margin-bottom:20px">
-                @if ( ( ! is_null( $solicitud->expenseHistory ) && $solicitud->idtiposolicitud != REEMBOLSO ) && Auth::user()->type == CONT )
+                @if ( ! is_null( $solicitud->expenseHistory ) && $solicitud->idtiposolicitud != REEMBOLSO )
                     <h1>Asiento de Anticipo</h1>
                     @include( 'Dmkt.Cont.advance-table')
                 @endif
-                @if ( ( $solicitud->id_estado == GENERADO && $solicitud->idtiposolicitud != REEMBOLSO ) || ( ! is_null( $solicitud->toGenerateHistory ) && $solicitud->idtiposolicitud == REEMBOLSO ) )
+                @if ( ( $solicitud->idtiposolicitud != REEMBOLSO && $solicitud->id_estado == GENERADO ) || 
+                    ( $solicitud->idtiposolicitud == REEMBOLSO && ! is_null( $solicitud->toDepositHistory ) ) )
                     <h1>Asiento de Diario</h1>
                     @include( 'Dmkt.Cont.daily-table')        
                 @endif        

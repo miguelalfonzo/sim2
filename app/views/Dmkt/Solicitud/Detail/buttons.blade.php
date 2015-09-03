@@ -31,9 +31,9 @@
                             <a id="confirm-payroll-discount" class="btn btn-info">Registro de Descuento por Planilla</a>
                         @endif
                         <a class="btn btn-info get-devolution-info" data-type="register-inmediate-devolution">Solicitud de Descuento Inmediato</a>
-                        <a id="finish-expense-record" class="btn btn-success">Terminar Registro de Gasto</a>
                     @endif
                 @endif
+                <a id="finish-expense-record" class="btn btn-success">Terminar Registro de Gasto</a>    
             @endif
         @endif
         <a href="{{URL::to('show_user')}}" class="btn btn-primary">

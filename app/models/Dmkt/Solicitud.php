@@ -86,7 +86,7 @@ class Solicitud extends Eloquent
 
     public function toDepositHistory()
     {
-        return $this->hasOne( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->where( 'status_to' , DEPOSITO_HABILITADO );
+        return $this->hasOne( 'System\SolicitudHistory' , 'id_solicitud' )->where( 'status_to' , DEPOSITO_HABILITADO );
     }
 
     public function toAdvanceSeatHistory()
