@@ -228,25 +228,33 @@ class FondoMkt extends BaseController
                                     $query->where( 'subcategoria_id' , $subCategory->id );
                                 })->get();
 
-        $FondosTotal   = $subCategory->{ $subCategoryType->relacion }->sum( 'saldo' ); 
+        $Fondos         = $subCategory->{ $subCategoryType->relacion };
+        $FondosTotal    = $Fondos->sum( 'saldo' );
+        $RetencionTotal = $Fondos->sum( 'retencion' );
+        
         $totalNew      = $fondoMktHistoriesTotalData->sum( 'to_new_saldo' );
         $totalOld      = $fondoMktHistoriesTotalData->sum( 'to_old_saldo' );
-        
-        $historyTotal  = $totalNew - $totalOld;
-    
-        $saldoAnterior = $FondosTotal - $historyTotal;
-        $periodTotal   = $fondoMktHistoriesData->sum( 'to_old_saldo' ) - $fondoMktHistoriesData->sum( 'to_new_saldo' );
-        $saldoContable = $saldoAnterior - $periodTotal;
-
         $totalOldRetencion = $fondoMktHistoriesTotalData->sum( 'old_retencion' );
         $totalNewRetencion = $fondoMktHistoriesTotalData->sum( 'new_retencion' );
-        $historyTotalNeto  = $totalNewRetencion - $totalOldRetencion;
+        
+
+        $historyTotal  = $totalNew - $totalOld;
+        $historyTotalRetencion = $totalNewRetencion - $totalOldRetencion;
+        
+        $saldoAnterior = $FondosTotal - $historyTotal;
+        $retencionAnterior = $RetencionTotal - $historyTotalRetencion;
+
+        $periodTotal          = $fondoMktHistoriesData->sum( 'to_old_saldo' ) - $fondoMktHistoriesData->sum( 'to_new_saldo' );
+        $periodTotalRetencion = $fondoMktHistoriesData->sum( 'old_retencion' ) - $fondoMktHistoriesData->sum( 'new_retencion' );
+        
+        $saldoContable = $saldoAnterior - $periodTotal;
+        $saldoRetencion = $retencionAnterior - $periodTotalRetencion;
         
         $data = array( 
             'FondoMktHistories' => $fondoMktHistoriesData ,
             'saldo'             => $saldoAnterior ,
             'saldoContable'     => $saldoContable ,
-            'saldoNeto'         => $saldoContable - $historyTotalNeto
+            'saldoNeto'         => $saldoContable - $saldoRetencion
             );
         return $this->setRpta( array( 'View' => View::make( 'Tables.table_fondo_mkt_history' , $data )->render() ) );
     }
