@@ -1341,6 +1341,7 @@ class SolicitudeController extends BaseController
             $orden_history++;
 
         }
+        $tasa = $this->getExchangeRate( $solicitud );
 
         $flujo1 = $solicitud->investment->approvalInstance->approvalPolicies()
             ->orderBy( 'orden' , 'ASC' )->get();
@@ -1348,7 +1349,7 @@ class SolicitudeController extends BaseController
         foreach($flujo1 as $fl){
             if($fl->desde == null)
                 $flujo[] = $fl;
-            elseif($fl->desde < $solicitud->detalle->monto_actual)
+            elseif($fl->desde < ( $solicitud->detalle->monto_actual * $tasa ) )
                 $flujo[] = $fl;
         }
         $type_user = TypeUser::all();
