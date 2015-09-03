@@ -51,7 +51,6 @@
                             <th>Nombre del Médico o Institución</th>
                             <th>Total</th>
                         </tr>
-                        {{''; $size = count($expenses)}}
                         @foreach($expenses as $key => $value)
                             <tr>
                                 
@@ -82,7 +81,7 @@
                                                 <table style="margin: 0 auto; min-width: 200px">
                                                     <tbody>
                                                         <tr>
-                                                            <td style="border-top: 1px solid;">{{$created_by}}</td>
+                                                            <td style="border-top: 1px solid;">{{ $solicitud->asignedTo->personal->full_name }}</td>
                                                         </tr>
                                                         <tr>
                                                             <td class="text-left">DNI: {{$dni}}</td>
@@ -93,20 +92,20 @@
                                             @foreach( $solicitud->toAcceptedApprovedHistories()->orderBy( 'updated_at' , 'ASC' )->get() as $acceptedApprovedHistory )
                                                 @if( ! is_null( $solicitud->investment->approvalInstance->approvalPolicyType( $acceptedApprovedHistory->user_from ) ) && 
                                                      ! ( is_null( $solicitud->investment->approvalInstance->approvalPolicyType( $acceptedApprovedHistory->user_from )->desde ) ) )
-                                            <td class="sin-border"  style="width: 50%;">
-                                                <table style="margin: 0 auto; min-width: 200px">
-                                                    <tbody>
-                                                        <tr>
-                                                            <td style="border-top: 1px solid;">
+                                                    <td class="sin-border"  style="width: 50%;">
+                                                        <table style="margin: 0 auto; min-width: 200px">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td style="border-top: 1px solid;">
                                                                         V°B° {{ ucwords( strtolower( $acceptedApprovedHistory->fromUserType->descripcion ) ) }}
-                                                            </td>
-                                                        </tr>
-                                                        <tr><td>&nbsp;</td></tr>
-                                                    </tbody>
-                                                </table>
-                                            </td>
-                                                                    @endif
-                                                                @endforeach
+                                                                    </td>
+                                                                </tr>
+                                                                <tr><td>&nbsp;</td></tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
+                                                @endif
+                                            @endforeach
                                         </tr>
                                     </tbody>
                                 </table>

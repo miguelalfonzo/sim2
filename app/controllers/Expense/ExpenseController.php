@@ -475,39 +475,35 @@ class ExpenseController extends BaseController
 		$detalle   = $solicitud->detalle;
 		$jDetalle  = json_decode( $solicitud->detalle->detalle );
 		$expenses  = $solicitud->expenses;
-		$dni = new BagoUser;
-		$dni = $dni->dni($solicitud->asignedTo->username);
-		if ($dni[status] == ok )
-			$dni = $dni[data];
-		else
-			$dni = '';
+		$dni       = new BagoUser;
+		$dni       = $dni->dni($solicitud->asignedTo->username);
 
-		$total 	   = $expenses->sum('monto');
-		
-		if ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , 3 ) ) )
+		if ( $dni[ status ] == ok )
 		{
-		
-			$clientes  = array();
-			$cmps      = array();
-			$getSpecialty = array();
-			foreach($solicitud->clients as $client)
-	        {
-				$clientes[]     = $client->clientType->descripcion . ': ' . $client->{$client->clientType->relacion}->full_name;
-				if(!is_null($client->{$client->clientType->relacion}->pefnrodoc1))
-					$cmps[]         = $client->{$client->clientType->relacion}->pefnrodoc1;
-				$getSpecialtyResult = $this->getSpecialty($client->{$client->clientType->relacion}->pefnrodoc1);
-				if(!is_null($getSpecialtyResult)){
-					$getSpecialty[] = $getSpecialtyResult->especialidad1;
-				}
-	        }
-			$getSpecialty = implode("<br><br>", $getSpecialty);
-			$clientes     = implode('<br><br>',$clientes);
-			$cmps         = implode('<br><br> ',$cmps);
-			$zona = null;
-			
-			$created_by = $solicitud->asignedTo->personal->getFullName();
+			$dni = $dni[data];
+		}
+		else
+		{
+			$dni = '';
+		}
+
+		$zona  = null;
+		$total = $expenses->sum('monto');
+		$size  = $expenses->count();
+
+		$clientes  = array();
+		$cmps      = array();
+		$getSpecialty = array();
+
+		$this->setReportData( $solicitud , $clientes , $cmps , $getSpecialty );
+
+		$getSpecialty = implode("<br><br>", $getSpecialty);
+		$clientes     = implode('<br><br>',$clientes);
+		$cmps         = implode('<br><br> ',$cmps);
+
+		if ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) )
+		{	
 			$aproved_user = User::where( 'id' , $solicitud->approvedHistory->updated_by )->firstOrFail();
-		
 			$name_aproved = $aproved_user->personal->getFullName();
 			$charge = $aproved_user->userType->descripcion;
 
@@ -525,39 +521,55 @@ class ExpenseController extends BaseController
 				}
 			}
 			
-			$data  = array( 'solicitud'    => $solicitud,
-							'detalle'      => $jDetalle,
-							'clientes'     => $clientes,
-							'cmps'         => $cmps,
-							'getSpecialty' => $getSpecialty,
-							'date'         => array( 'toDay' => $solicitud->created_at , 'lastDay' => $jDetalle->fecha_entrega ),
-							'name'         => $name_aproved,
-							'dni'          => $dni,
-							'created_by'   => $created_by,
-							'charge'       => $charge,
-							'expenses'     => $expenses,
-							'zona'			=> $zona,
-							'total'        => $total );
+			$data  = array( 
+				'solicitud'    => $solicitud,
+				'detalle'      => $jDetalle,
+				'clientes'     => $clientes,
+				'cmps'         => $cmps,
+				'getSpecialty' => $getSpecialty,
+				'date'         => array( 'toDay' => $solicitud->created_at , 'lastDay' => $jDetalle->fecha_entrega ),
+				'name'         => $name_aproved,
+				'dni'          => $dni,
+				'charge'       => $charge,
+				'expenses'     => $expenses,
+				'zona'		   => $zona,
+				'total'        => $total, 
+				'size'		   => $size );
 			$data['balance'] = $this->reportBalance( $solicitud , $detalle , $jDetalle , $total );
 			$html = View::make( 'Expense.report' , $data )->render();
 		}
 		elseif( $solicitud->idtiposolicitud == SOL_INST )
 		{
 			$data = array(  
-				'fondo'    => $solicitud,
-				'detalle'  => $jDetalle,
-				'dni'      => $dni,
-				'date'     => $this->getDay(),
-				'expenses' => $expenses );
+				'fondo'        => $solicitud,
+				'detalle'      => $jDetalle,
+				'clientes'     => $clientes,
+				'cmps'         => $cmps,
+				'getSpecialty' => $getSpecialty,
+				'dni'          => $dni,
+				'date'         => $this->getDay(),
+				'expenses'     => $expenses ,
+				'zona'         => $zona,
+				'total'        => $total, 
+				'size'         => $size );
         	$data['balance'] = $this->reportBalance( $solicitud , $detalle , $jDetalle , $total );
 			$html = View::make('Expense.report-fondo',$data)->render();
 		}
 		return PDF2::loadHTML( $html )->setPaper( 'a4' , 'landscape' )->stream();
-		// return View::make( 'Expense.report' , $data )->render();
-		//return View::make('Expense.report',$data);//->render();
-		//return $html;
-		//return PDF::load( $html , 'A4' , 'landscape' )->show();
-		// return $html;
+	}
+
+	private function setReportData( $solicitud , &$clientes , &$cmps , &$getSpecialty )
+	{
+		foreach( $solicitud->clients as $client )
+        {
+			$clientes[]     = $client->clientType->descripcion . ': ' . $client->{$client->clientType->relacion}->full_name;
+			if(!is_null($client->{$client->clientType->relacion}->pefnrodoc1))
+				$cmps[]         = $client->{$client->clientType->relacion}->pefnrodoc1;
+			$getSpecialtyResult = $this->getSpecialty($client->{$client->clientType->relacion}->pefnrodoc1);
+			if(!is_null($getSpecialtyResult)){
+				$getSpecialty[] = $getSpecialtyResult->especialidad1;
+			}
+        }
 	}
 
     private function reportBalance( $solicitud , $detalle , $jDetalle , $mGasto )

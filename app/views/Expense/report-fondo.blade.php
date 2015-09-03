@@ -1,34 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Reporte</title>
-    {{ HTML::style('css/report.css') }}
-</head>
-<body style="background: url( {{ asset( 'img/logo-marcadeagua.png' ) }} ) no-repeat center fixed">
-    <div>
-        <header style="margin-top:-2em;">
-            <img src="{{ URL::to( 'img/logo-report.png' ) }}" style="width:170px;padding-top:30px">
-            <h1 style="text-align:center"><strong>REPORTE DE GASTOS DE FONDOS INSTITUCIONALES</strong></h1>
-        </header>
-        <main>
-            <section style="text-align:center;margin-top:2.5em;">
-                <strong><p style="display:inline">Fecha:</strong>&nbsp;{{$date['toDay']}}</p>
-                <strong><p style="display:inline">Ciudad:</strong>&nbsp;Lima</p>
-                <strong><p style="display:inline">Institucion:</strong>&nbsp;{{$fondo->clients[0]->institution->pejrazon}}</p>
-                <strong><p style="display:inline">Código Comercial:</strong>&nbsp;{{$fondo->id}}</p>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>Reporte</title>
+        {{ HTML::style('css/report.css') }}
+    </head>
+    <body style="background: url( {{ asset( 'img/logo-marcadeagua.png' ) }} ) no-repeat center fixed">
+        <div class="container-fluid">
+            <header>
+                <h3 style="text-align:center"><strong>REPORTE DE GASTOS DE FONDOS INSTITUCIONALES</strong></h3>
+                <img src="{{ URL::to( 'img/logo-report.png' ) }}" style="position:absolute;top:0;width:170px;padding:0px;margin:0;margin-left:-30px">
+            </header>
+            <section style="text-align:center;margin-top:1em;">
+                <table style="width: 100%">
+                    <tbody>
+                        <tr>
+                            <th class="sin-border text-right">Colaborador Bagó:</th>
+                            <td class="sin-border text-left">{{ $fondo->asignedTo->personal->full_name }}</td>     
+                            <th class="sin-border text-right">Cargo:</th>
+                            <td class="sin-border text-left">{{ $fondo->asignedTo->userType->descripcion }}</td>     
+                            <th class="sin-border text-right">Ciudad:</th>
+                            <td class="sin-border text-left">{{ $zona }}</td>    
+                            <th class="sin-border text-right">Fecha:</th>
+                            <td class="sin-border text-left">{{ $date[ 'toDay' ] }}</td>    
+                        </tr>
+                        <tr>
+                            <th class="sin-border text-right">Institucion:</th>
+                            <td class="sin-border text-left">{{ $fondo->clients[ 0 ]->institution->pejrazon }}</td>    
+                            <th class="sin-border text-right">N° de Deposito:</th>
+                            <td class="sin-border text-left">{{ $fondo->detalle->deposit->num_transferencia }}</td>     
+                            <th class="sin-border text-right">Fecha de Deposito:</th>
+                            <td class="sin-border text-left">{{ $fondo->detalle->deposit->created_at }}</td>     
+                            <th class="sin-border text-right">Código Comercial:</th>
+                            <td class="sin-border text-left">{{ $fondo->id }}</td>    
+                        </tr>
+                    </tbody>
+                </table>     
             </section>
-            <section style="text-align:center;margin-top:2em;">
-                <strong><p style="display:inline">Colaborador Bagó:</strong>&nbsp;{{$fondo->asignedTo->rm->full_name}}</p>
-                <strong><p style="display:inline">Cargo:</strong>&nbsp;Representante Med.</p>
-            </section>
-            <section style="text-align:center;margin-top:2em;">
-                <strong><p style="display:inline">Fecha de Deposito:</strong>&nbsp;{{$fondo->detalle->deposit->updated_at}}</p>
-                <strong><p style="display:inline">N° de Depósito:</strong>&nbsp;{{$fondo->detalle->deposit->num_transferencia}}</p>    
-            </section>    
-            <section style="margin-top:2em;">
-                <table class="table">
-                    <thead>
+            <section style="margin-top: 1.5em">
+                <table class="table" style="width: 100%">
+                    <tbody>
                         <tr>
                             <th>Fecha</th>
                             <th>Comprobante</th>
@@ -39,105 +50,113 @@
                             <th>Nombre del Médico o Institución</th>
                             <th>Total</th>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach( $expenses as $value )
+                        @foreach( $expenses as $key => $value )
                             <tr>
-
                                 <td>{{date('d/m/Y',strtotime($value->fecha_movimiento))}}</td>
                                 <td>{{mb_convert_case($value->proof->descripcion,MB_CASE_TITLE,'UTF-8')}}</td>
                                 <td>{{$value->num_prefijo.'-'.$value->num_serie}}</td>
                                 <td>{{mb_convert_case($value->descripcion,MB_CASE_TITLE,'UTF-8')}}</td>
-                                <td>
-                                   ---
-                                </td>
-                                <td>Dermatología</td>
-                                <td>
-                                    --
-                                </td>
+                                @if( $key == 0 )
+                                    <td rowspan="{{ $size }}">{{ $cmps }}</td>
+                                    <td rowspan="{{ $size }}">{{ $getSpecialty }}</td>
+                                    <td rowspan="{{ $size }}">{{ $clientes }}</td>
+                                 @endif  
                                 <td>S/.{{$value->monto}}</td>
                             </tr>
                         @endforeach
-                        <tfoot>
-                            <tr>
-                                <td class="border-white"></td>
-                                <td class="border-white"></td>
-                                <td class="border-white"></td>
-                                <td class="border-white"></td>
-                                <td class="border-white"></td>
-                                <td class="border-white other"></td>
-                                <td class="border align-left"><strong>Total Reportado</strong></td>
-                                <td class="border">
-                                    <strong>
-                                        <span class="symbol">{{$fondo->detalle->typeMoney->simbolo}}</span>
-                                        <span class="total-expense">&nbsp;{{$fondo->expenses->sum('monto')}}</span>
-                                    </strong>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td class="other"></td>
-                                <td class="border align-left">Total Depositado</td>
-                                <td class="border">
-                                    <strong>
-                                        <span class="symbol">S/.</span>
-                                        <span class="total-expense">
+                        <tr class="sin-border">
+                            <td class="sin-border" colspan="6" rowspan="5">
+                                <table class="tb-firmas" style="width: 100%;">
+                                    <tbody>
+                                        <tr>
+                                            <td class="sin-border" style="height: 100px">&nbsp;</td>
+                                            <td class="sin-border" style="height: 100px">&nbsp;</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="sin-border" style="width: 50%;">
+                                                <table style="margin: 0 auto; min-width: 200px">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td style="border-top: 1px solid;">{{ $fondo->asignedTo->personal->full_name }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-left">DNI: {{$dni}}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                            <td class="sin-border" style="width: 50%;">
+                                                <table style="margin: 0 auto; min-width: 200px">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td style="border-top: 1px solid;">V°B° Supervisor</td>
+                                                        </tr>
+                                                        <tr><td>&nbsp;</td></tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                            <td class="sin-border" style="width: 50%;">
+                                                <table style="margin: 0 auto; min-width: 200px">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td style="border-top: 1px solid;">V°B° Gerente Comercial</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <tr><td>&nbsp;</td></tr>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                            <td class="border align-left">
+                                <strong>Total Reportado</strong>
+                            </td>
+                            <td class="border">
+                                <strong>
+                                    <span class="symbol">S/.</span>
+                                    <span class="total-expense">{{$total}}</span>
+                                </strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="border align-left">Total Depositado</td>
+                            <td class="border">
+                                <strong>
+                                    <span class="symbol">S/.</span>
+                                    <span class="total-expense">
+                                        @if ( is_null( $fondo->detalle->deposit ) )
+                                            -
+                                        @else
                                             @if ( $fondo->detalle->deposit->account->idtipomoneda == DOLARES )
                                                 {{ round( $fondo->detalle->deposit->total * $detalle->tcv , 2 , PHP_ROUND_HALF_DOWN ) }}
                                             @elseif ( $fondo->detalle->deposit->account->idtipomoneda == SOLES )
                                                 {{ $fondo->detalle->deposit->total }}
                                             @endif 
-                                            </span>
-                                    </strong>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td class="other"></td>
-                                <td class="border bottom align-left">Aplicación Parcial del depósito</td>
-                                <td class="border bottom">-</td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td class="other"></td>
-                                <td class="border bottom align-left">Saldo a favor Compañía</td>
-                                <td class="border bottom">{{$fondo->detalle->typeMoney->simbolo.' '.$balance['bussiness']}}</td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td class="other"></td>
-                                <td class="border bottom align-left">Saldo a favor del Empleado</td>
-                                <td class="border bottom">{{$fondo->detalle->typeMoney->simbolo.' '.$balance['employed']}}</td>
-                            </tr>
-                        </tfoot>
+                                        @endif
+                                    </span>
+                                </strong>
+                            </td>
+                        </tr>   
+                        <tr>
+                            <td class="border bottom align-left">Aplicación Parcial del depósito</td>
+                            <td class="border bottom">-</td>
+                        </tr>
+                        <tr>
+                            <td class="border bottom align-left">Saldo a favor Compañía</td>
+                            <td class="border bottom">S/.{{$balance['bussiness']}}</td>
+                        </tr>
+                        <tr>
+                            <td class="border bottom align-left">Saldo a favor del Empleado</td>
+                            <td class="border bottom">S/.{{$balance['employed']}}</td>
+                        </tr>
                     </tbody>
                 </table>
+                <div class="clearfix"></div>        
+                <div class="clearfix"></div>
             </section>
-        </main>
-        <footer style="text-align:center">
-            <p class="firma">FIRMA DEL EMPLEADO</p>
-            <p class="firma">V°B° SUPERVISOR</p>
-            <p class="firma">V°B° GERENTE COMERCIAL</p>
-            <div style="text-align:left;margin-left:21em">DNI:&nbsp;<span class="dni">{{$dni}}</span></div>
-            <div style="text-align:left;margin-left:21em">NOMBRE:&nbsp;<span class="dni">{{ $fondo->asignedTo->rm->full_name }}</span></div>
-        </footer>
-            
-    </div>
-</body>
+        </div>
+    </body>
 </html>
