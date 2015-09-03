@@ -1457,7 +1457,8 @@ class SolicitudeController extends BaseController
 
     private function getDevolutionTimeLine( $solicitud )
     {
-        return $solicitud->devolutions()->where( 'id_tipo_devolucion' , DEVOLUCION_INMEDIATA )->get();
+        return $solicitud->devolutions()->where( 'id_tipo_devolucion' , DEVOLUCION_INMEDIATA )
+               ->orderBy( 'created_at' , 'ASC' )->orderBy( 'id' , 'ASC' )->get();
     }
 
     public function album()
