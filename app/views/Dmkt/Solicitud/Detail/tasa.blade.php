@@ -3,9 +3,9 @@
         <label class="control-label">Deposito Tasa de Cambio</label>
         <div>
             <div class="input-group">
-                <span class="input-group-addon">COMPRA</span>
+                <span class="input-group-addon">C</span>
                 <input type="text" value="{{$detalle->tcc}}" class="form-control input-md" readonly>
-                <span class="input-group-addon">VENTA</span>
+                <span class="input-group-addon">V</span>
                 <input type="text" value="{{$detalle->tcv}}" class="form-control input-md" readonly>
             </div>
         </div>

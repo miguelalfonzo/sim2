@@ -2,7 +2,7 @@
     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
         <div class="panel panel-default">
             <div class="panel-heading">
-                Devoluciones ( Fecha | Estado | Monto )
+                Devoluciones
                 <label class="pull-right">Tipo de Devolución</label>
             </div>
             <ul class="list-group">                 
