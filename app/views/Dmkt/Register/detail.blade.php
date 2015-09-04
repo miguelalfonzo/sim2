@@ -100,7 +100,7 @@
         <div class="form-group">
             <label class="control-label" for="descripcion">Descripcion de la Solicitud</label>
             <div>
-                <textarea class="form-control" name="descripcion" maxlength="200">{{ isset( $solicitud->descripcion ) ? $solicitud->descripcion : null }}</textarea>
+                <textarea class="form-control" name="descripcion" maxlength="200" placeholder="(maximo 200 caracteres)">{{ isset( $solicitud->descripcion ) ? $solicitud->descripcion : null }}</textarea>
             </div>
         </div>
     </div>
