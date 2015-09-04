@@ -19,7 +19,7 @@ var comprobante_img = $( '.img-responsive' );
 var ruc             = $('input[name=ruc]');
 
 var fondo = $('select[name="idfondo"]');
-var fondoProducto = $('select[name="fondo_producto[]"');
+var fondoProducto = $('select[name="fondo_producto[]"]');
 
 var search_cliente = $('.cliente-seeker');
 
