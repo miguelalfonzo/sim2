@@ -100,18 +100,20 @@
                     <li><a href="{{ URL::to('solicitude/statement')}}">Movimientos</a></li>
                     @endif
                     <li><a href="{{ URL::to('eventos')}}">Eventos</a></li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Reportes <span class="caret"></span></a>
-                        <ul id="menu-report" class="dropdown-menu" role="menu">
-                            <li class="report_menubar_option new">
-                                <a href="#" rel="new" data-toggle="modal" data-target=".report_new">
-                                    <span class="glyphicon glyphicon-plus" aria-hidden="true" ></span>
-                                    <span class="glyphicon-class"> Nuevo Reporte</span>
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                        </ul>
-                    </li>
+                    @if( Auth::user()->type != REP_MED ) 
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Reportes <span class="caret"></span></a>
+                            <ul id="menu-report" class="dropdown-menu" role="menu">
+                                    <li class="report_menubar_option new">
+                                        <a href="#" rel="new" data-toggle="modal" data-target=".report_new">
+                                            <span class="glyphicon glyphicon-plus" aria-hidden="true" ></span>
+                                            <span class="glyphicon-class"> Nuevo Reporte</span>
+                                        </a>
+                                    </li>
+                                <li class="divider"></li>
+                            </ul>
+                        </li>
+                    @endif
                     @if ( in_array(Auth::user()->type, array(SUP, GER_PROD, GER_PROM, GER_COM, CONT)) )
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Configuración <span class="caret"></span></a>
