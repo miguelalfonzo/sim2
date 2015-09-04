@@ -223,8 +223,8 @@ class MoveController extends BaseController
                         $query->whereIn( 'id_gerprod' , array( Auth::user()->id , Auth::user()->tempId() ) );
                     })->orWhereIn( 'created_by' , array( Auth::user()->id , Auth::user()->tempId() ) )
                     ->orWhereIn( 'id_user_assign' , array( Auth::user()->id , Auth::user()->tempId() ) )
-                    ->orWhereIn( 'created_by' , array( Auth::user()->personal->employees->lists( 'user_id' ) ) )
-                    ->orWhereIn( 'id_user_assign' , array( Auth::user()->personal->employees->lists( 'user_id' ) ) );
+                    ->orWhereIn( 'created_by' , Auth::user()->personal->employees->lists( 'user_id' ) )
+                    ->orWhereIn( 'id_user_assign' , Auth::user()->personal->employees->lists( 'user_id' ) );
                 });
 
             if ( $filter != 0 )
