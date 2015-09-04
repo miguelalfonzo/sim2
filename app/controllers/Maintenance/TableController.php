@@ -101,12 +101,15 @@ class TableController extends BaseController
 
 	public function getView( $type )
 	{
-		\Log::error( $type );
 		$vData       = $this->getModel( $type );
-		\Log::error( $vData );
 		$model  	 = $vData[ 'model' ];
 		$id          = $vData[ 'id' ];
-		$records     = $model::orderWithTrashed();
+		
+		if( $type == 'Inversion_Actividad' )
+			$records = $model::has( 'activity' )->has('investment' )->get();
+		else
+			$records = $model::orderWithTrashed();
+		
 		$maintenance = Maintenance::find( $id );
 		$columns = json_decode( $maintenance->formula );
 		return View::make( 'Maintenance.view' , 

@@ -38,6 +38,7 @@ class Client extends BaseController
                             ->join(TB_TIPO_ACTIVIDAD, TB_INVERSION_ACTIVIDAD.'.id_actividad', '=',TB_TIPO_ACTIVIDAD.'.id')
                             ->where( 'id_inversion' , $inputs['id_inversion'] )
                             ->whereIn( 'id_actividad' , $act )
+                            ->whereNull( TB_TIPO_ACTIVIDAD.'.deleted_at')
                             ->orderBy(TB_TIPO_ACTIVIDAD.'.nombre', 'asc')
                             ->get();
                 $result =  $act;
@@ -45,7 +46,8 @@ class Client extends BaseController
     		else{
                 $act = InvestmentActivity::with('activity')
                         ->join(TB_TIPO_ACTIVIDAD, TB_INVERSION_ACTIVIDAD.'.id_actividad', '=', TB_TIPO_ACTIVIDAD.'.id')
-                        ->where( 'id_inversion' , $inputs['id_inversion'] )
+                        ->where( 'id_inversion' , $inputs['id_inversion']  )
+                        ->whereNull( TB_TIPO_ACTIVIDAD.'.deleted_at')
                         ->orderBy(TB_TIPO_ACTIVIDAD.'.nombre', 'asc')
                         ->get();
                 // dd(json_encode($act));
