@@ -1488,6 +1488,7 @@ function seeker( element , name , url )
                         }
                         else
                             clients.append( data.Data.View );
+                        console.log( 'filter' );
                         filterSelect( investment , data.Data.id_inversion , 'cliente' );
                         filterSelect( activity , data.Data.id_actividad , 'cliente' );
                     }
@@ -1510,15 +1511,21 @@ function seeker( element , name , url )
 function filterSelect( element , ids , type )
 {
     var select = $(element);
+    console.log( type );
     if ( ( type === 'cliente' && clients.children().length == 1 ) || ( type === 'eliminacion' && clients.children().length >= 1 ) ) 
     {
         select.val('').children().show();
         select.val('');
         select.children().attr( '[type=' + type + ']' );
+        testc = ids;
         select.children().filter(function( index ) 
         {
+            console.log( 'INICIO');
+            console.log( $( this).val() );
+            console.log( $.inArray( $(this).val() ,  ids ) );
+            console.log( 'FIN' );
             return $.inArray( $(this).val() ,  ids ) == -1;
-        }).hide();
+        }).hide().attr( 'disabled' , true );
     }
     else if ( type === 'inversion' )
     {
@@ -1596,8 +1603,8 @@ $(document).on( 'click' , '.btn-delete-client' , function ()
         li.remove();
     if ( ul.children().length === 0 )
     {
-        investment.children().show();
-        activity.children().show();               
+        investment.children().show().attr( 'disabled' , false );
+        activity.children().show().attr( 'disabled' , false );               
     }
 });
 
