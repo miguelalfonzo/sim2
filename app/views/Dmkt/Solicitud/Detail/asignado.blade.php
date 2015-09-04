@@ -3,7 +3,7 @@
         <label class="control-label"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Asignado a</label>
         <div class="input-group">
             <span class="input-group-addon">{{$solicitud->asignedTo->type}}</span>
-            <input type="text" class="form-control input-md" disabled value="{{ $solicitud->asignedTo->personal->getFullName() }}">
+            <input type="text" class="form-control input-md" readonly value="{{ $solicitud->asignedTo->personal->getFullName() }}">
         </div>
     </div>
 @endif
