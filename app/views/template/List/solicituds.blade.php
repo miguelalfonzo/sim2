@@ -47,7 +47,7 @@
                 <td class="text-center id_solicitud detail-control">{{$solicitud->id}}</td>
                 <td class="text-left sol_titulo">
                     @if (! is_null( $solicitud->id_actividad ) )
-                        <span class="label" style="margin-right:1em;background-color:{{$solicitud->activity->color}}">
+                        <span class="label" style="margin-right:1em;background-color:{{$solicitud->activityTrash->color}}">
                             {{$solicitud->activityTrash->nombre}}
                         </span>
                     @endif
