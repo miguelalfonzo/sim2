@@ -14,13 +14,13 @@ class BagoUser extends Eloquent
             $rpta = array();
             $rpta['Status'] = 'Ok';
             $dni = BagoUser::where('usucodusu',strtoupper($usuario))->select('usutelefono')->first();
-            if (empty($dni))
+            if ( is_null( $dni ) )
             {
                 $rpta['Status'] = 'Warning';
                 $rpta['Description'] = 'No se encontro el DNI del usuario en el Sistema'; 
             }
             // if(isset($dni->usutelefono))                
-                $rpta['Data'] = is_null($dni->usutelefono) ? '' : $dni->usutelefono;
+            $rpta['Data'] = is_null( $dni ) ? '' : $dni->usutelefono;
         }
         catch (Exception $e)
         {

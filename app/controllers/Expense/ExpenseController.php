@@ -490,7 +490,7 @@ class ExpenseController extends BaseController
 		$jDetalle  = json_decode( $solicitud->detalle->detalle );
 		$expenses  = $solicitud->expenses;
 		$dni       = new BagoUser;
-		$dni       = $dni->dni($solicitud->asignedTo->username);
+		$dni       = $dni->dni( $solicitud->asignedTo->username );
 
 		if ( $dni[ status ] == ok )
 		{
@@ -502,6 +502,15 @@ class ExpenseController extends BaseController
 		}
 
 		$zona  = null;
+
+		if ( $detalle->id_moneda == DOLARES )
+		{
+			foreach( $expenses as $expense )
+			{
+				$expense->monto = $expense->monto * $this->getDateExchangeRate( $expense->fecha_movimiento );
+			}
+		}
+
 		$total = $expenses->sum('monto');
 		$size  = $expenses->count();
 
@@ -520,20 +529,6 @@ class ExpenseController extends BaseController
 			$aproved_user = User::where( 'id' , $solicitud->approvedHistory->updated_by )->firstOrFail();
 			$name_aproved = $aproved_user->personal->getFullName();
 			$charge = $aproved_user->userType->descripcion;
-
-			if ( $solicitud->detalle->id_moneda == DOLARES )
-			{
-				foreach( $expenses as $expense )
-				{
-					$eTc = ChangeRate::where( 'fecha' , $expense->fecha_movimiento )->first();
-					if ( is_null( $eTc ) )
-					{
-						$eTc = ChangeRate::getTc();
-					}
-
-					$expense->monto = round ( $expense->monto * $eTc->compra , 2 , PHP_ROUND_HALF_DOWN );
-				}
-			}
 			
 			$data  = array( 
 				'solicitud'    => $solicitud,

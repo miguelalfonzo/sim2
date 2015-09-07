@@ -14,6 +14,20 @@ class BaseController extends Controller
         $this->beforeFilter('csrf', array('on' => array('post', 'put', 'patch', 'delete')));
     }
 
+    protected function getDateExchangeRate( $date )
+    {
+        Log::error( $date );
+        $formatDate = Carbon::createFromFormat( 'Y-m-d' , $date )->format( 'Y/m/d' );
+        Log::error( $formatDate );
+        $tc = ChangeRate::getDayTc( $formatDate );
+        if( is_null( $tc ) )
+        {
+            $tc = ChangeRate::getTc();
+        }
+        $tasa = $tc->compra;
+        return $tasa;
+    }
+
     protected function getExchangeRate( $solicitud )
     {
         if ( $solicitud->detalle->id_moneda == SOLES )
@@ -32,8 +46,9 @@ class BaseController extends Controller
         {
             $tasa = 1;
         }
-        elseif( $solicitud->detalle->id_moneda == DOLARES)
+        elseif( $solicitud->detalle->id_moneda == DOLARES )
         {
+            //BUSQUEDA DEL TIPO DE CAMBIO DEL DIA PASADO , DEBIDO A QUE NO EXISTE TIPO DE CAMBIO DEL DIA ACTUAL
             $pastDay = Carbon::createFromFormat( 'Y-m-d H:i' , $solicitud->approvedHistory->updated_at )->subDay()->format( 'Y/m/d' );
             $tc = ChangeRate::getDayTc( $pastDay );
             if( is_null( $tc ) )

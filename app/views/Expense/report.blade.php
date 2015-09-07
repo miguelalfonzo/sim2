@@ -122,7 +122,9 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="border align-left">Total Depositado</td>
+                            <td class="border align-left">
+                                <strong>Total Depositado</strong>
+                            </td>
                             <td class="border">
                                 <strong>
                                     <span class="symbol">S/.</span>
@@ -141,16 +143,32 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="border bottom align-left">Aplicación Parcial del depósito</td>
-                            <td class="border bottom">-</td>
+                            <td class="border align-left">
+                                <strong>Aplicación Parcial del depósito</strong>
+                            </td>
+                            <td class="border"><strong>-</strong></td>
                         </tr>
                         <tr>
-                            <td class="border bottom align-left">Saldo a favor Compañía</td>
-                            <td class="border bottom">S/.{{$balance['bussiness']}}</td>
+                            <td class="border align-left">
+                                <strong>Saldo a favor Compañía</strong>
+                            </td>
+                            <td class="border">
+                                <strong>
+                                    <span class="symbol">S/.</span>
+                                    <span class="total-expense">{{ $balance[ 'bussiness' ] }}</span>
+                                </strong>
+                            </td>
                         </tr>
                         <tr>
-                            <td class="border bottom align-left">Saldo a favor del Empleado</td>
-                            <td class="border bottom">S/.{{$balance['employed']}}</td>
+                            <td class="border align-left">
+                                <strong>Saldo a favor del Empleado</strong>
+                            </td>
+                            <td class="border">
+                                <strong>
+                                    <span class="symbol">S/.</span>
+                                    <span class="total-expense">{{ $balance[ 'employed' ] }}</span>
+                                </strong>
+                            </td>
                         </tr>
                     </tbody>
                 </table>

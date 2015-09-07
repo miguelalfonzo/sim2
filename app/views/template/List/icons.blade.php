@@ -66,7 +66,7 @@
             @endif
         @endif
 
-        @if ( Auth::user()->type == CONT && in_array( $solicitud->id_estado , array( DEPOSITADO , GASTO_HABILITADO ) ) )
+        @if ( Auth::user()->type == CONT && $solicitud->idtiposolicitud != REEMBOLSO && in_array( $solicitud->id_estado , array( DEPOSITADO , GASTO_HABILITADO ) ) )
             <a class="btn btn-default modal_liquidacion">
                 <span class="glyphicon glyphicon-inbox"></span>
             </a>
