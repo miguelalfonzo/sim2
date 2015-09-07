@@ -37,22 +37,18 @@ class Client extends BaseController
     {
     	try
     	{
-            $inputs = Input::all();
-    		if ( isset( $inputs['tipo_cliente'] ) )
-    		{
-                $act    =   Activity::where( 'tipo_cliente' , $inputs['tipo_cliente'] )
-                            ->whereHas( 'investmentActivity' , function( $query ) use( $inputs )
-                            {
-                                $query->where( 'id_inversion' , $inputs[ 'id_inversion' ] );
-                            })->orderBy( 'nombre' , 'ASC' )->get();
+            $inputs =   Input::all();
+		    $act    =   Activity::whereHas( 'investmentActivity' , function( $query ) use( $inputs )
+                        {
+                            $query->where( 'id_inversion' , $inputs[ 'id_inversion' ] );
+                        })->orderBy( 'nombre' , 'ASC' );
+            
+            if ( isset( $inputs['tipo_cliente'] ) )
+            {
+                $act->where( 'tipo_cliente' , $inputs['tipo_cliente'] );
             }
-    		else
-            {   
-                $act    =   Activity::whereHas( 'investmentActivity' , function( $query ) use( $inputs )
-                            {
-                                $query->where( 'id_inversion' , $inputs[ 'id_inversion' ] );
-                            })->orderBy( 'nombre' , 'ASC' )->get();
-            }
+            
+            $act = $act->get();
             $dAct = $this->setRpta( $act , 'SELECCIONE LA ACTIVIDAD' );
     		return $this->setRpta( $dAct );
     	}
