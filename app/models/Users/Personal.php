@@ -53,17 +53,17 @@ class Personal extends Eloquent
 
     protected function getRms()
     {
-        if ( Auth::user()->type == GER_PROD )
-            return Personal::wherehas( 'user' , function( $query )
-            {
-                $query->where( 'type' , REP_MED );
-            })->get();
-        elseif( Auth::user()->type == SUP )
-            return Personal::where( 'referencia_id' , Auth::user()->sup->bago_id )
-            ->wherehas( 'user' , function( $query )
-            {
-                $query->where( 'type' , REP_MED );
-            })->get();
+        $rms = Personal::wherehas( 'user' , function( $query )
+        {
+            $query->where( 'type' , REP_MED );
+        })->orderBy( 'nombres' , 'ASC' );
+        
+        if ( Auth::user()->type == SUP )
+        {
+            $rms->where( 'referencia_id' , Auth::user()->sup->bago_id );
+        }
+        
+        return $rms->get();
     }
 
     public function employees()
