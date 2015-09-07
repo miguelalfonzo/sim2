@@ -252,9 +252,18 @@ define("TIMELINEHARD", serialize(array(
     ),
     '8' => array(
         'status_id' => 20,
-        'user_type_id' => 'C',
+        'user_type_id' => CONT,
         'title' => 'Deposito del Reembolso',
         'info' => 'TESORERIA',
+        'cond_add_motivo' => REEMBOLSO,
+        'cond_cese' => true
+    
+    ),
+    '9' => array(
+        'status_id' => 21,
+        'user_type_id' => CONT,
+        'title' => 'Asiento del Reembolso',
+        'info'  => 'CONTABILIDAD',
         'cond_add_motivo' => REEMBOLSO,
         'cond_cese' => true
     )

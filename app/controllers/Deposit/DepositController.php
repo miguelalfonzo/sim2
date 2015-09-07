@@ -111,27 +111,18 @@ class DepositController extends BaseController
                     $detalle->detalle     = json_encode( $middleRpta[data]['jDetalle'] );
                     $detalle->save();
 
-                    if ( $solicitud->idtiposolicitud == REEMBOLSO )
-                        $solicitud->id_estado = GENERADO;
-                    else
-                        $solicitud->id_estado = DEPOSITADO;
+                    $solicitud->id_estado = DEPOSITADO;
                     $solicitud->save();
 
                     $middleRpta = $this->discountFondoBalance( $solicitud );
                     
                     if ( $middleRpta[ status ] == ok )
                     {
-                        if ( $solicitud->idtiposolicitud == REEMBOLSO )
-                            $middleRpta = $this->setStatus( $oldIdestado, GENERADO , Auth::user()->id , USER_CONTABILIDAD , $solicitud->id );
-                        else
-                            $middleRpta = $this->setStatus( $oldIdestado, DEPOSITADO , Auth::user()->id , USER_CONTABILIDAD , $solicitud->id );
-                
+                        $middleRpta = $this->setStatus( $oldIdestado, DEPOSITADO , Auth::user()->id , USER_CONTABILIDAD , $solicitud->id );
+                        
                         if ( $middleRpta[status] == ok )
                         {
-                            if ( $solicitud->idtiposolicitud == REEMBOLSO )
-                                Session::put( 'state' , R_FINALIZADO );
-                            else
-                                Session::put( 'state' , R_REVISADO );
+                            Session::put( 'state' , R_REVISADO );
                             DB::commit();
                             return $middleRpta;
                         }

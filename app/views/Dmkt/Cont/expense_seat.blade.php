@@ -10,7 +10,7 @@
 <div class="content">
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			<h3 class="panel-title"><strong>Generar Asiento de Solicitud</strong></h3><strong class="user">Usuario : {{Auth::user()->username}}</strong>
+			<h3 class="panel-title"><strong>Generar Asiento Diario</strong></h3><strong class="user">Usuario : {{Auth::user()->username}}</strong>
 		</div>
 		<input value="{{csrf_token()}}" name="_token" id="_token" type="hidden">
 		<div class="panel-body">

@@ -1216,39 +1216,70 @@ class SolicitudeController extends BaseController
 
     public function generateSeatSolicitude()
     {
-        try {
+        try 
+        {
             $middleRpta = array();
             $inputs = Input::all();
-            $middleRpta = $this->validateInputAdvanceSeat($inputs);
-            if ($middleRpta[status] == ok) {
+            $middleRpta = $this->validateInputAdvanceSeat( $inputs );
+            if ( $middleRpta[status] == ok ) 
+            {
                 DB::beginTransaction();
-                $solicitud = Solicitud::find($inputs['idsolicitud']);
+                $solicitud = Solicitud::find( $inputs['idsolicitud'] );
                 $oldIdEstado = $solicitud->id_estado;
-                $solicitud->id_estado = GASTO_HABILITADO;
+                
+                if( $solicitud->idtiposolicitud == REEMBOLSO )
+                {
+                    $solicitud->id_estado = GENERADO;
+                }
+                elseif( in_array( $solicitud->id_estado , array( SOL_REP , SOL_INST ) ) )
+                {
+                    $solicitud->id_estado = GASTO_HABILITADO;    
+                }
                 $solicitud->save();
 
-                for ($i = 0; $i < count($inputs['number_account']); $i++) {
-                    $tbEntry = new Entry;
-                    $tbEntry->id = $tbEntry->lastId() + 1;
-                    $tbEntry->num_cuenta = $inputs['number_account'][$i];
-                    $tbEntry->fec_origen = Carbon::createFromFormat('d/m/Y', $solicitud->detalle->deposit->updated_at);
-                    $tbEntry->d_c = $inputs['dc'][$i];
-                    $tbEntry->importe = $inputs['total'][$i];
-                    $tbEntry->leyenda = trim($inputs['leyenda']);
-                    $tbEntry->id_solicitud = $inputs['idsolicitud'];
+                for ( $i = 0 ; $i < count( $inputs[ 'number_account' ] ) ; $i++ ) 
+                {
+                    $tbEntry               = new Entry;
+                    $tbEntry->id           = $tbEntry->lastId() + 1;
+                    $tbEntry->num_cuenta   = $inputs[ 'number_account' ][ $i ];
+                    $tbEntry->fec_origen   = Carbon::createFromFormat( 'd/m/Y' , $solicitud->detalle->deposit->updated_at );
+                    $tbEntry->d_c          = $inputs[ 'dc' ][ $i ];
+                    $tbEntry->importe      = $inputs[ 'total' ][ $i ];
+                    $tbEntry->leyenda      = trim( $inputs[ 'leyenda' ] );
+                    $tbEntry->id_solicitud = $inputs[ 'idsolicitud' ];
                     $tbEntry->tipo_asiento = TIPO_ASIENTO_ANTICIPO;
                     $tbEntry->save();
                 }
-                $middleRpta = $this->setStatus($oldIdEstado, GASTO_HABILITADO, Auth::user()->id, $solicitud->id_user_assign, $solicitud->id);
-                if ($middleRpta[status] === ok) {
-                    Session::put('state', R_GASTO);
+
+                if( $solicitud->idtiposolicitud == REEMBOLSO )
+                {
+                    $toUser = Auth::user()->id;    
+                }
+                elseif( in_array( $solicitud->id_estado , array( SOL_REP , SOL_INST ) ) )
+                {
+                    $toUser = $solicitud->id_user_assign;
+                }
+
+                $middleRpta = $this->setStatus( $oldIdEstado , $solicitud->id_estado , Auth::user()->id , $toUser , $solicitud->id );
+                if ( $middleRpta[ status ] === ok ) 
+                {
+                    if( $solicitud->idtiposolicitud == REEMBOLSO )
+                    {
+                        Session::put( 'state' , R_FINALIZADO );
+                    }
+                    elseif( in_array( $solicitud->id_estado , array( SOL_REP , SOL_INST ) ) )
+                    {
+                        Session::put( 'state' , R_GASTO );
+                    }
                     DB::commit();
                     return $middleRpta;
                 }
                 DB::rollback();
             }
             return $middleRpta;
-        } catch (Exception $e) {
+        }
+        catch ( Exception $e )
+        {
             DB::rollback();
             return $this->internalException($e, __FUNCTION__);
         }
