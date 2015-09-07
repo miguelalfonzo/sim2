@@ -1579,4 +1579,23 @@ class SolicitudeController extends BaseController
         }
         return $tasaCompra;
     }
+
+    public function getInvestmentsActivities()
+    {
+        try
+        {
+            $investments = array( 'investments' => InvestmentType::orderMkt() );
+            $activities  = array( 'activities'  => Activity::order() );
+            $vInvestment = View::make( 'Dmkt.Register.Detail.investments' , $investments )->render();
+            $vActivity   = View::make( 'Dmkt.Register.Detail.activities' , $activities )->render();
+            $data = array(
+                'Investments' => $vInvestment ,
+                'Activities'   => $vActivity );
+            return $this->setRpta( $data );
+        }
+        catch( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
+    }
 }

@@ -205,11 +205,12 @@ function inversionChange( id_inversion )
     {
         if ( response.Status === 'Ok' )
         {
-            activity.val('');
             filterSelect( activity , response.Data , 'inversion' );
         }
         else
+        {
             bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+        }
     });
 }
 
@@ -1471,7 +1472,9 @@ function seeker( element , name , url )
                 }).done( function ( data )
                 {
                     if ( data.Status != 'Ok')
+                    {
                         responseUI( 'Problema de Conexion' , 'red' );
+                    }
                     else if ( data.Status == 'Ok' )
                     {
                         if ( clients.children().length >= 1 )
@@ -1484,11 +1487,14 @@ function seeker( element , name , url )
                                     aux = 1;
                             });
                             if ( aux == 0 )
+                            {
                                 clients.append( data.Data.View );
+                            }
                         }
                         else
+                        {
                             clients.append( data.Data.View );
-                        console.log( 'filter' );
+                        }
                         filterSelect( investment , data.Data.id_inversion , 'cliente' );
                         filterSelect( activity , data.Data.id_actividad , 'cliente' );
                     }
@@ -1511,31 +1517,23 @@ function seeker( element , name , url )
 function filterSelect( element , ids , type )
 {
     var select = $(element);
-    console.log( type );
-    if ( ( type === 'cliente' && clients.children().length == 1 ) || ( type === 'eliminacion' && clients.children().length >= 1 ) ) 
+    if ( type === 'cliente' && clients.children().length === 1 ) 
     {
-        select.val('').children().show();
-        select.val('');
-        select.children().attr( '[type=' + type + ']' );
-        testc = ids;
         select.children().filter(function( index ) 
         {
-            console.log( 'INICIO');
-            console.log( $( this).val() );
-            console.log( $.inArray( $(this).val() ,  ids ) );
-            console.log( 'FIN' );
-            return $.inArray( $(this).val() ,  ids ) == -1;
-        }).hide().attr( 'disabled' , true );
+            var option = $( this );
+            return $.inArray( option.val() ,  ids ) == -1 && option.val() !== '0'  ;
+        }).remove();
     }
-    else if ( type === 'inversion' )
+    else if ( type === 'inversion' || type === 'eliminacion' )
     {
         select.empty();
-        if( ids.length > 0 )
+        if( ids.Status === 'Ok' && ids.Data.length > 0 )
         {
-            select.append("<option value disabled selected>SELECCIONE</option>")
-            $(ids).each(function(i,data)
+            select.append( '<option value=0 disabled selected>' + ids.Description + '</option>')
+            $( ids.Data ).each(function( i , data )
             {
-                select.append('<option value="'+ data.activity.id +'">'+ data.activity.nombre +'</option>');
+                select.append('<option value="'+ data.id +'">'+ data.nombre +'</option>');
             });
         }
     }
@@ -1578,13 +1576,30 @@ function clientFilter( tipo_cliente , tipo_filtro )
     {
         if ( response.Status === 'Ok' )
         {
-            filterSelect( activity , response.Data.id_actividad , tipo_filtro );
-            filterSelect( investment , response.Data.id_inversion , tipo_filtro );
+            filterSelect( activity , response.Data.Activities , tipo_filtro );
+            filterSelect( investment , response.Data.Investments , tipo_filtro );
         }
         else
-            bootbox.alert( '<h4 class="red">' + data.Status + ': ' + data.Description + '</h4>');
+        {
+            bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+        }
     });  
 }
+
+function fillInvestmentsActivities()
+{
+    $.get( server + 'get-investments-activities' ).done( function( response ) 
+    {
+        investment.empty();
+        activity.empty();
+        investment.append( response.Data.Investments );
+        activity.append( response.Data.Activities ); 
+    }).fail( function( statusCode , errorThrown )
+    {
+        ajaxError( statusCode , errorThrown );
+    });
+}
+
 
 $(document).off( 'click' , '.btn-delete-client' );
 $(document).on( 'click' , '.btn-delete-client' , function () 
@@ -1597,24 +1612,33 @@ $(document).on( 'click' , '.btn-delete-client' , function ()
         li.remove();
         var old_li2 = ul.children().first();
         if ( table !== old_li2.attr( 'tipo_cliente' ) )
-            clientFilter( old_li2.attr( 'tipo_cliente' ) , 'eliminacion' );
+        {
+            clientFilter( old_li2.attr( 'tipo_cliente' ) , 'eliminacion' );    
+        }
     }
     else
+    {
         li.remove();
+    }
     if ( ul.children().length === 0 )
     {
-        investment.children().show().attr( 'disabled' , false );
-        activity.children().show().attr( 'disabled' , false );               
+        fillInvestmentsActivities();
     }
 });
 
 
 function ajaxError(statusCode,errorThrown)
 {
-    if ( statusCode.status == 0 ) 
+    if ( statusCode.status == 0 )
+    {
         bootbox.alert('<h4 class="yellow">Internet: Problemas de Conexion</h4>');    
+    }
     else
+    {
+        console.log( statusCode );
+        console.log( errorThrown );
         bootbox.alert('<h4 class="red">Error del Sistema</h4>');  
+    }
 }
 
 $(".date_month").datepicker(date_options2).on('changeDate', function (e) {

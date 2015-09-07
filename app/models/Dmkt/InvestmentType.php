@@ -32,7 +32,7 @@ class InvestmentType extends Eloquent
         return InvestmentType::orderBy( 'updated_at' , 'desc' )->withTrashed()->get();
     }
 
-    protected function investmentActivity()
+    public function investmentActivity()
     {
     	return $this->hasMany('Dmkt\InvestmentActivity' , 'id_inversion' , 'id' );
     }

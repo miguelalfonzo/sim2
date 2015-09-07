@@ -65,7 +65,7 @@
     |--------------------------------------------------------------------------
     */
 
-    Route::group( array('before' => 'gercom') , function () 
+    Route::group( array( 'before' => 'gercom') , function () 
     {
         Route::post('aprobar-solicitud', 'Dmkt\SolicitudeController@approvedSolicitude');
         Route::post('gercom-mass-approv','Dmkt\SolicitudeController@massApprovedSolicitudes');
@@ -82,7 +82,7 @@
     |--------------------------------------------------------------------------
     */
     
-    Route::group( array('before' => 'cont' ), function () 
+    Route::group( array( 'before' => 'cont' ), function () 
     {
         Route::post('revisar-solicitud', 'Dmkt\SolicitudeController@checkSolicitud');
         Route::get('revisar-asiento-solicitud/{token}', 'Dmkt\SolicitudeController@viewSeatSolicitude');
@@ -115,7 +115,7 @@
     |--------------------------------------------------------------------------
     */
 
-    Route::group(array('before' => 'tes'), function()
+    Route::group( array( 'before' => 'tes' ), function()
     {
         Route::post( 'deposit-solicitude', 'Deposit\DepositController@depositSolicitudeTes');
         Route::post( 'modal-extorno' , 'Deposit\DepositController@modalExtorno' );
@@ -161,7 +161,7 @@
     |--------------------------------------------------------------------------
     */
 
-    Route::group(array('before' => 'rm_cont_test'), function ()
+    Route::group( array( 'before' => 'rm_cont_test' ), function ()
     {
         Route::post( 'register-devolution-data' , 'Devolution\DevolutionController@registerDevolutionData' );
         Route::post( 'get-devolution-info' , 'Devolution\DevolutionController@getDevolutionInfo' );
@@ -172,7 +172,7 @@
         Route::post( 'confirm-payroll-discount' , 'Devolution\DevolutionController@confirmPayrollDiscount' );
     });
 
-    Route::group(array('before' => 'rm_cont' ), function () 
+    Route::group( array( 'before' => 'rm_cont' ), function () 
     {
         Route::post('get-expenses' , 'Expense\ExpenseController@getExpenses');
         Route::post('edit-expense', 'Expense\ExpenseController@editExpense');
@@ -182,22 +182,24 @@
         Route::get('report-fondo/{token}','Expense\ExpenseController@reportExpenseFondo');
     });
 
-    Route::group(array('before' => 'rm'), function ()
+    Route::group( array( 'before' => 'rm' ), function ()
     {
         Route::post('end-expense', 'Expense\ExpenseController@finishExpense');
         Route::get('ver-gasto/{token}', 'Expense\ExpenseController@viewExpense');
         Route::post( 'do-inmediate-devolution' , 'Devolution\DevolutionController@doInmediateDevolution' );
     });
 
-    Route::group(array('before' => 'rm_sup_gerprod'), function ()
+    Route::group( array( 'before' => 'rm_sup_gerprod' ), function ()
     {    
-        Route::get('nueva-solicitud', 'Dmkt\SolicitudeController@newSolicitude');
-        Route::post('registrar-solicitud', 'Dmkt\SolicitudeController@registerSolicitud');
-        Route::get('editar-solicitud/{id}', 'Dmkt\SolicitudeController@editSolicitud');
-        Route::post('search-client', 'Source\Seeker@clientSource');
-        Route::post('get-client-view' , 'Source\Seeker@getClientView');
-        Route::post('filtro_cliente' , 'Dmkt\Client@getInvestmentActivity');
-        Route::post('filtro-inversion' , 'Dmkt\Client@getActivities');  
+        Route::get( 'nueva-solicitud', 'Dmkt\SolicitudeController@newSolicitude');
+        Route::get( 'get-investments-activities' , 'Dmkt\SolicitudeController@getInvestmentsActivities');
+        Route::post( 'registrar-solicitud', 'Dmkt\SolicitudeController@registerSolicitud');
+        Route::get( 'editar-solicitud/{id}', 'Dmkt\SolicitudeController@editSolicitud');
+        Route::post( 'search-client', 'Source\Seeker@clientSource');
+        Route::post( 'get-client-view' , 'Source\Seeker@getClientView');
+        Route::post( 'filtro_cliente' , 'Dmkt\Client@getInvestmentActivity');
+        Route::post( 'filtro-inversion' , 'Dmkt\Client@getActivities');  
+        
     });
 
     Route::group(array('before' => 'sys_user'), function ()

@@ -15,9 +15,17 @@ class Client extends BaseController
     	{
 	        $inputs = Input::all();
 	        $clientType = $inputs[ 'tipo_cliente' ];
-	 		$act = Activity::where('tipo_cliente' , $clientType )->lists('id');
-	 		$inv = InvestmentActivity::whereIn('id_actividad' , $act )->lists('id_inversion');
- 			return $this->setRpta( array( 'id_inversion' => $inv , 'id_actividad' => $act  ) );
+	 		$act =  Activity::where('tipo_cliente' , $clientType )->has( 'investmentActivity' )->orderBy( 'nombre' , 'ASC' )->get();
+	 		$inv =  InvestmentType::whereHas( 'investmentActivity' , function( $query ) use( $clientType )
+                    {
+                        $query->whereHas( 'activity' , function( $query ) use( $clientType )
+                        {
+                            $query->where( 'tipo_cliente' , $clientType );
+                        });
+                    })->orderBy( 'nombre' , 'ASC' )->get();
+            $dInv = $this->setRpta( $inv , 'SELECCIONE LA INVERSION' );
+            $dAct = $this->setRpta( $act , 'SELECCIONE LA ACTIVIDAD' );
+            return $this->setRpta( array( 'Investments' => $dInv , 'Activities' => $dAct  ) );
  		}
  		catch ( Exception $e )
  		{
@@ -29,31 +37,24 @@ class Client extends BaseController
     {
     	try
     	{
-            $result = null;
-    		$inputs = Input::all();
+            $inputs = Input::all();
     		if ( isset( $inputs['tipo_cliente'] ) )
     		{
-                $act    = Activity::where( 'tipo_cliente' , $inputs['tipo_cliente'] )->lists('id');
-                $act    = InvestmentActivity::with('activity')
-                            ->join(TB_TIPO_ACTIVIDAD, TB_INVERSION_ACTIVIDAD.'.id_actividad', '=',TB_TIPO_ACTIVIDAD.'.id')
-                            ->where( 'id_inversion' , $inputs['id_inversion'] )
-                            ->whereIn( 'id_actividad' , $act )
-                            ->whereNull( TB_TIPO_ACTIVIDAD.'.deleted_at')
-                            ->orderBy(TB_TIPO_ACTIVIDAD.'.nombre', 'asc')
-                            ->get();
-                $result =  $act;
-    		}
-    		else{
-                $act = InvestmentActivity::with('activity')
-                        ->join(TB_TIPO_ACTIVIDAD, TB_INVERSION_ACTIVIDAD.'.id_actividad', '=', TB_TIPO_ACTIVIDAD.'.id')
-                        ->where( 'id_inversion' , $inputs['id_inversion']  )
-                        ->whereNull( TB_TIPO_ACTIVIDAD.'.deleted_at')
-                        ->orderBy(TB_TIPO_ACTIVIDAD.'.nombre', 'asc')
-                        ->get();
-                // dd(json_encode($act));
-                $result = $act;
+                $act    =   Activity::where( 'tipo_cliente' , $inputs['tipo_cliente'] )
+                            ->whereHas( 'investmentActivity' , function( $query ) use( $inputs )
+                            {
+                                $query->where( 'id_inversion' , $inputs[ 'id_inversion' ] );
+                            })->orderBy( 'nombre' , 'ASC' )->get();
             }
-    		return $this->setRpta($result);
+    		else
+            {   
+                $act    =   Activity::whereHas( 'investmentActivity' , function( $query ) use( $inputs )
+                            {
+                                $query->where( 'id_inversion' , $inputs[ 'id_inversion' ] );
+                            })->orderBy( 'nombre' , 'ASC' )->get();
+            }
+            $dAct = $this->setRpta( $act , 'SELECCIONE LA ACTIVIDAD' );
+    		return $this->setRpta( $dAct );
     	}
     	catch( Exception $e )
     	{
