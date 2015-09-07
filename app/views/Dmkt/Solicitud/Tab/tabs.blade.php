@@ -32,7 +32,8 @@
         @if ( Auth::user()->type == CONT && ( ( $solicitud->idtiposolicitud != REEMBOLSO && ! is_null( $solicitud->expenseHistory ) ) || 
             ( $solicitud->idtiposolicitud == REEMBOLSO && ! is_null( $solicitud->toDepositHistory ) ) ) )
             <div class="tab-pane fade" id="seats-tab" style="margin-top:20px; margin-bottom:20px">
-                @if ( ! is_null( $solicitud->expenseHistory ) && $solicitud->idtiposolicitud != REEMBOLSO )
+                @if ( ( $solicitud->idtiposolicitud != REEMBOLSO && ! is_null( $solicitud->expenseHistory ) ) ||
+                      ( $solicitud->idtiposolicitud == REEMBOLSO && $solicitud->id_estado == GENERADO ) )
                     <h1>Asiento de Anticipo</h1>
                     @include( 'Dmkt.Cont.advance-table')
                 @endif

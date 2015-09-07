@@ -14,8 +14,9 @@ App::after(function ($request, $response) {});
 |
 */
 
-Route::filter('guest', function () {
-    if (Auth::check()) return Redirect::to('/');
+Route::filter('guest', function ()
+{
+    if ( Auth::check() ) return Redirect::to('/');
 });
 /*
 |--------------------------------------------------------------------------
