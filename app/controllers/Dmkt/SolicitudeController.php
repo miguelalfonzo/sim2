@@ -72,16 +72,22 @@ class SolicitudeController extends BaseController
         }
 
         $mWarning = array();
-        if ( Session::has( 'warnings' ) ):
+        if ( Session::has( 'warnings' ) )
+        {
             $warnings = Session::pull('warnings');
             $mWarning[status] = ok;
             if ( ! is_null( $warnings ) )
+            {
                 foreach ( $warnings as $key => $warning )
+                {
                     $mWarning[data] = $warning[0] . ' ';
+                }
+            }
             $mWarning[data] = substr($mWarning[data], 0, -1);
-        endif;
+        }
         
         $data = array( 'state' => $state, 'states' => StateRange::order(), 'warnings' => $mWarning );
+        
         if (Auth::user()->type == TESORERIA):
             $data['tc']    = ChangeRate::getTc();
             $data['banks'] = Account::banks();
@@ -92,14 +98,12 @@ class SolicitudeController extends BaseController
             $data['regimenes']  = Regimen::all();
         endif;
 
-        if (Session::has('id_solicitud')) {
+        if ( Session::has( 'id_solicitud' ) ) 
+        {
             $solicitud = Solicitud::find(Session::pull('id_solicitud'));
             $solicitud->status = ACTIVE;
             $solicitud->save();
         }
-
-        $alert = new AlertController;
-        $data['alert'] = $alert->alertConsole();
         return View::make('template.User.show', $data);
     }
 

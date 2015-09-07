@@ -214,6 +214,14 @@
         Route::post('cancelar-solicitud', 'Dmkt\SolicitudeController@cancelSolicitud');
         Route::post( 'list-table' , 'Movements\MoveController@getTable');
         Route::post( 'detail-solicitud' , 'Movements\MoveController@getSolicitudDetail');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Alert
+        |--------------------------------------------------------------------------
+        */
+        Route::get( 'alerts' , 'Alert\AlertController@show' );
+        Route::post( 'alerts' , 'Alert\AlertController@showAlerts' );
     });
 
     App::missing(function ($exception) 
@@ -279,13 +287,7 @@ Route::get('eventos','Dmkt\SolicitudeController@album');
 Route::post('eventos/list','Dmkt\SolicitudeController@getEventList');
 Route::post('photos', 'Dmkt\SolicitudeController@photos');
 Route::post('testUploadImgSave', 'Dmkt\SolicitudeController@viewTestUploadImgSave');
-/*
-|--------------------------------------------------------------------------
-| Alert
-|--------------------------------------------------------------------------
-*/
-Route::get('alerts', 'Alert\AlertController@show');
-Route::post('alerts', 'Alert\AlertController@showAlerts');
+
 /*
 |--------------------------------------------------------------------------
 | TEST MANTENIMIENTO

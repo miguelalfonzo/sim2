@@ -2009,31 +2009,39 @@ $( document ).on( 'click' , '.open-details2' , function()
 $( document ).ready(function() 
 {
     $(".sim_alerta").hide();
-    function getAlerts(){
-    var url = URL_BASE + "alerts";
-    $.ajax({
-        type       : 'POST',
-        url        : url,
-        ContentType: false,
-        cache      : false,
-        data       : {
-        _token     : GBREPORTS.token
-    }
-    }).done(function(dataResult) {
-        if(dataResult.status == 'OK'){
-            if(typeof(dataResult.alerts) != 'undefined'){
-                if(dataResult.alerts.length > 0){
-                    $(".sim_alerta").show("slow");
-                    var alerts = dataResult.alerts;
-                    $(".sim_alerta").find('span').html( ( typeof alerts[0] === 'undefined' ? 0 : alerts[0].data.length ) + 
-                                                        ( typeof alerts[1] === 'undefined' ? 0 : alerts[1].data.length ) + 
-                                                        ( typeof alerts[2] === 'undefined' ? 0 : alerts[2].data.length ) );
+    function getAlerts()
+    {
+        var url = URL_BASE + "alerts";
+        $.ajax(
+        {
+            type       : 'POST',
+            url        : url,
+            ContentType: false,
+            cache      : false,
+            data       : 
+            {
+                _token     : GBREPORTS.token
+            }
+        }).done( function( dataResult ) 
+        {
+            if( dataResult.status == 'OK' )
+            {
+                if( typeof( dataResult.alerts ) != 'undefined' )
+                {
+                    if( dataResult.alerts.length > 0 )
+                    {
+                        $( '.sim_alerta' ).show( 'slow' );
+                        var alerts = dataResult.alerts;
+                        $( '.sim_alerta' ).find( 'span' ).html( 
+                            ( typeof alerts[0] === 'undefined' ? 0 : alerts[0].data.length ) + 
+                            ( typeof alerts[1] === 'undefined' ? 0 : alerts[1].data.length ) + 
+                            ( typeof alerts[2] === 'undefined' ? 0 : alerts[2].data.length ) );
+                    }
                 }
             }         
-        }
-    });
-}
-getAlerts();
+        });
+    }
+    getAlerts();
 
     seeker( $( '.cliente-seeker' ) , 'clients' , 'search-client' );
     seeker( $( '.institucion-seeker' ) , 'institutions' , 'search-institution' );
@@ -2041,14 +2049,17 @@ getAlerts();
     seeker( $( '#user-seeker' ) , 'users' , 'search-users' );
 
     if ( $("#idState").length === 1 )
+    {
         listTable( 'solicitudes' );
+    }
+
     _token       =  GBREPORTS.token;
 
     /** --------------------------------------------- CONTABILIDAD ------------------------------------------------- **/
 
     $(document).off('change','#idState')
-    $(document).on('change','#idState',function(){
+    $(document).on('change','#idState',function()
+    {
         listTable( 'solicitudes' );
-    })
+    });
 });
-
