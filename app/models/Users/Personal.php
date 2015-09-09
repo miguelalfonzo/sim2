@@ -115,7 +115,7 @@ class Personal extends Eloquent
 
     protected static function getGerProdNotRegisteredName( $uniqueIdsGerProd )
     {
-        return Personal::whereIn( 'id' , $uniqueIdsGerProd )->whereNull( 'user_id' )->get()->lists( 'full_name' );
+        return Personal::whereIn( 'bago_id' , $uniqueIdsGerProd )->whereNull( 'user_id' )->get()->lists( 'full_name' );
     }
 
 
