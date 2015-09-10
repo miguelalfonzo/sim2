@@ -63,9 +63,9 @@ class SolicitudeController extends BaseController
             $state = Session::get( 'state' );
         else 
         {
-            if (Auth::user()->type == CONT)
+            if ( Auth::user()->type == CONT )
                 $state = R_APROBADO;
-            elseif (Auth::user()->type == TESORERIA)
+            elseif ( Auth::user()->type == TESORERIA )
                 $state = R_REVISADO;
             else if ( ! is_null( Auth::user()->simApp ) )
                 $state = R_PENDIENTE;
@@ -518,14 +518,16 @@ class SolicitudeController extends BaseController
                 if ( ! in_array( $solicitud->id_estado , State::getCancelStates() ) )
                     return $this->warningException( 'No se puede cancelar las solicitudes en esta etapa: ' . $solicitud->state->nombre , __FUNCTION__, __LINE__, __FILE__ );
                 
-                $politicType = $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario;
-                
-                if (  Auth::user()->id != $solicitud->created_by )
+                if( Auth::user()->type != CONT )
                 {
-                    if ( ! in_array( $politicType , array( Auth::user()->type , Auth::user()->tempType() ) ) )
-                        return $this->warningException( 'No puede rechazar la solicitud , verifique el estado de la solicitud se esperaba al usuario ( ' . $politicType . ' )' , __FUNCTION__ , __LINE__ , __FILE__ );
-                    if ( ! array_intersect( array( Auth::user()->id, Auth::user()->tempId() ) , $solicitud->managerEdit( $politicType )->lists('id_gerprod') ) )
-                        return $this->warningException( 'No puede rechazar la solicitud , su usuario no ha sido asociado a la solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
+                    $politicType = $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario;
+                    if (  Auth::user()->id != $solicitud->created_by )
+                    {
+                        if ( ! in_array( $politicType , array( Auth::user()->type , Auth::user()->tempType() ) ) )
+                            return $this->warningException( 'No puede rechazar la solicitud , verifique el estado de la solicitud se esperaba al usuario ( ' . $politicType . ' )' , __FUNCTION__ , __LINE__ , __FILE__ );
+                        if ( ! array_intersect( array( Auth::user()->id, Auth::user()->tempId() ) , $solicitud->managerEdit( $politicType )->lists('id_gerprod') ) )
+                            return $this->warningException( 'No puede rechazar la solicitud , su usuario no ha sido asociado a la solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
+                    }
                 }
             }
             else
@@ -547,7 +549,7 @@ class SolicitudeController extends BaseController
             $solicitud->status      = 1;
             $solicitud->save();
 
-            $rpta = $this->setStatus($oldIdEstado, $solicitud->id_estado, Auth::user()->id, $solicitud->created_by, $solicitud->id);
+            $rpta = $this->setStatus($oldIdEstado, $solicitud->id_estado, Auth::user()->id, $solicitud->created_by, $solicitud->id );
             if ($rpta[status] === ok)
             {
                 DB::commit();

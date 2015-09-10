@@ -20,6 +20,6 @@ class State extends Eloquent
 
     protected function getCancelStates()
     {
-    	return State::whereIn( 'id_estado' , array( PENDIENTE , DERIVADO , ACEPTADO ) )->lists( 'id' );
+    	return State::whereIn( 'id_estado' , array( PENDIENTE , DERIVADO , ACEPTADO , APROBADO , DEPOSITO_HABILITADO ) )->lists( 'id' );
     }
 }

@@ -66,10 +66,16 @@
             @endif
         @endif
 
-        @if ( Auth::user()->type == CONT && $solicitud->idtiposolicitud != REEMBOLSO && in_array( $solicitud->id_estado , array( DEPOSITADO , GASTO_HABILITADO ) ) )
-            <a class="btn btn-default modal_liquidacion">
-                <span class="glyphicon glyphicon-inbox"></span>
-            </a>
+        @if ( Auth::user()->type == CONT )
+            @if( $solicitud->idtiposolicitud != REEMBOLSO && in_array( $solicitud->id_estado , array( DEPOSITADO , GASTO_HABILITADO ) ) )
+                <a class="btn btn-default modal_liquidacion">
+                    <span class="glyphicon glyphicon-inbox"></span>
+                </a>
+            @elseif( $solicitud->id_estado == APROBADO || ( $solicitud->idtiposolicitud != REEMBOLSO && $solicitud->id_estado == DEPOSITO_HABILITADO ) )
+                <a class="btn btn-default cancel-solicitude" data-idsolicitude="{{ $solicitud->id }}" data-token="{{csrf_token()}}">
+                    <span  class="glyphicon glyphicon-remove"></span>
+                </a>
+            @endif
         @endif
 
          @if( $solicitud->id_estado == ENTREGADO && Auth::user()->id == $solicitud->id_user_assign )

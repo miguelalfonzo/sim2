@@ -202,6 +202,11 @@
         
     });
 
+    Route::group( array( 'before' => 'rm_sup_gerprod_gerprom_gercom_ager_cont' ) , function()
+    {
+        Route::post('cancelar-solicitud', 'Dmkt\SolicitudeController@cancelSolicitud');
+    });
+
     Route::group(array('before' => 'sys_user'), function ()
     {
         Route::post('buscar-solicitudes', 'Dmkt\SolicitudeController@searchDmkt');
@@ -211,7 +216,6 @@
         Route::get('show_user', 'Dmkt\SolicitudeController@showUser');
         Route::get('ver-solicitud/{token}', 'Dmkt\SolicitudeController@viewSolicitude');
         Route::get('show-fondo/{token}','Expense\ExpenseController@showFondo');
-        Route::post('cancelar-solicitud', 'Dmkt\SolicitudeController@cancelSolicitud');
         Route::post( 'list-table' , 'Movements\MoveController@getTable');
         Route::post( 'detail-solicitud' , 'Movements\MoveController@getSolicitudDetail');
 

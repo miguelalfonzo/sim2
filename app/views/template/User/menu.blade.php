@@ -12,7 +12,7 @@
                         @endif
                     @endif
                 @elseif ( Auth::user()->type == CONT )
-                    @if( in_array( $estado->id , array( R_APROBADO , R_REVISADO , R_GASTO , R_FINALIZADO ) ) )
+                    @if( in_array( $estado->id , array( R_APROBADO , R_REVISADO , R_GASTO , R_FINALIZADO , R_NO_AUTORIZADO ) ) )
                         @if( isset( $state ) && $state == $estado->id )
                             <option value="{{$estado->id}}" selected>{{$estado->nombre}}</option>
                         @else

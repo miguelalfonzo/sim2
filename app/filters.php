@@ -127,6 +127,15 @@ Route::filter( 'sup_gerprod_gerprom_gercom' , function ()
             return Redirect::to( 'show_user' );
 });
 
+Route::filter( 'rm_sup_gerprod_gerprom_gercom_ager_cont' , function () 
+{
+    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
+        return Redirect::to( 'login' );
+    else     
+        if ( ! in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD , GER_PROM , GER_COM , ASIS_GER , CONT ) ) )
+            return Redirect::to( 'show_user' );
+});
+
 Route::filter( 'rm_ager' , function ()
 {
     if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
