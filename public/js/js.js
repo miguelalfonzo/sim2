@@ -1041,17 +1041,31 @@ $(function()
                 type: 'get',
                 url: rout_ruc + ruc + '/',
                 cache: false,
+                timeout: 15000,
                 beforeSend:function(){
                     l.start();
                     $("#razon").css("color","#5c5c5c");
                     $("#ruc").attr("disabled",true);
                 },
-                error: function(){
+                error: function(x, t, m){
                     l.stop();
                     $("#razon").html("No se puede buscar el RUC.").parent().parent().addClass( 'has-error' ).removeClass( 'has-success' );;
                     $("#ruc").attr("disabled",false);
+                    if(t==="timeout") {
+                        alert("No se puede realizar la consulta. Por favor, ingrese la razon social");
+                        $("#razon-val").hide();
+                        $("#manual-razon").show();
+                    }
                 }
             }).done(function (response){
+                if(response == undefined || response == null || response == "")
+                {
+                    alert("No se puede realizar la consulta. Por favor, ingrese la razon social");
+                    $("#ruc").addClass("error-incomplete");
+                    $( '#razon' ).val( 1 ).html( 'ingrese manualmente.' ).parent().parent().addClass( 'has-error' ).removeClass( 'has-success' );
+                    $("#razon-val").hide();
+                    $("#manual-razon").show();
+                }
                 if(response.error == undefined)
                 {
                     $( '#razon' ).val( 2 ).html( response['razon_social'] ).parent().parent().addClass( 'has-success' ).removeClass( 'has-error' );;
@@ -1073,6 +1087,26 @@ $(function()
                 l.stop();
                 $("#ruc").attr("disabled",false);
             });
+        }
+    });
+
+    $(".add-manual-razon").on("click",function(){
+        var razon_social = $("#manual-razon-val").val();
+        //$("#razon").removeClass('error-incomplete');
+        if (razon_social.trim() == ""){
+            $("#ruc").addClass("error-incomplete");
+            $( '#razon' ).val( 1 ).html( 'Error al ingresar Razon Social' ).parent().parent().addClass( 'has-error' ).removeClass( 'has-success' );
+            alert('Valor del campo vacio')       
+
+        } else{
+
+
+        $( "#razon" ).val( 2 ).html( razon_social.toUpperCase() ).parent().parent().addClass( 'has-success' ).removeClass( 'has-error' );
+         var ruc = $("#ruc").val();
+        $("#ruc-hide").val( ruc );
+        $("#manual-razon").hide();
+        $("#razon-val").show();
+        //$("#ruc").attr("disabled",false);        
         }
     });
     //Save data to the controller Expense

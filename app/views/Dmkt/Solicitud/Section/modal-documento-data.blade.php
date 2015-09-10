@@ -33,9 +33,15 @@
 
 			<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
 				<label class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-label">Razón Social</label>
-				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="razon-val">
 					<button id="razon" type="button" class="form-control ladda-button" data-style="expand-left" data-spinner-color="#5c5c5c" value=0 data-edit=0 readonly>
 				</div>
+				<div class="input-group" id="manual-razon" style="display: none;">
+			      <input type="text" class="form-control" id="manual-razon-val" placeholder="Ingrese Razon Social">
+			      <span class="input-group-btn">
+			        <button class="btn btn-default add-manual-razon" type="button">Aceptar</button>
+			      </span>
+			    </div>
 			</div>
 
 			<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
