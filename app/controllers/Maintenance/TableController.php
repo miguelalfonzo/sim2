@@ -236,69 +236,6 @@ class TableController extends BaseController
 			return 'I';
 	}
 
-	private function updateFondosSupervisor( $val )
-	{
-		$fondoSup = FondoSupervisor::find( $val[ 'id' ] );
-		$oldSaldo = $fondoSup->saldo;
-		
-		foreach( $val[ data ] as $key => $data )
-			$fondoSup->$key = $data;
-		
-		$middleRpta = $this->validateFondoSaldoNeto( $fondoSup );
-		
-	}
-
-	private function updateFondosGerProd( $val )
-	{
-		$fondoGerProd = FondoGerProd::find( $val[ 'id' ] );
-		$oldSaldo = $fondoGerProd->saldo;
-		
-		foreach( $val[ data ] as $key => $data )
-			$fondoGerProd->$key = $data;
-		
-		$middleRpta = $this->validateFondoSaldoNeto( $fondoSup );
-		if ( $middleRpta[ status ] == ok )
-		{
-			$fondoGerProd->save();	
-			$fondoMktHistory = new FondoMktHistory;
-			$fondoMktHistory->id = $fondoMktHistory->nextId();
-			$fondoMktHistory->id_to_fondo = $val[ 'id' ];
-			$fondoMktHistory->to_old_saldo = $oldSaldo;
-			$fondoMktHistory->to_new_saldo = $fondoGerProd->saldo;
-			$fondoMktHistory->id_fondo_history_reason = FONDO_AJUSTE; 
-			$fondoMktHistory->id_tipo_to_fondo = GER_PROD;
-			$fondoMktHistory->save();
-			return $this->setRpta();
-		}
-		return $middleRpta;
-	}
-
-	private function updateFondosInstitution( $val )
-	{
-		$fondoInstitution = FondoInstitucional::find( $val[ 'id' ] );
-		$oldSaldo = $fondoInstitution->saldo;		
-		
-		foreach( $val[ data ] as $key => $data )
-			$fondoInstitution->$key = $data;
-		
-		$middleRpta = $this->validateFondoSaldoNeto( $fondoSup );
-		if ( $middleRpta[ status ] == ok )
-		{
-			$fondoInstitution->save();
-			$fondoMktHistory = new FondoMktHistory;
-			$fondoMktHistory->id = $fondoMktHistory->nextId();
-			$fondoMktHistory->id_to_fondo = $val[ 'id' ];
-			$fondoMktHistory->to_old_saldo = $oldSaldo;
-			$fondoMktHistory->to_new_saldo = $fondoInstitution->saldo;
-			$fondoMktHistory->id_fondo_history_reason = FONDO_AJUSTE; 
-			$fondoMktHistory->id_tipo_to_fondo = FONDO_SUBCATEGORIA_INSTITUCION;
-			$fondoMktHistory->save();
-			return $this->setRpta();
-		}
-		return $middleRpta;
-	}
-
-
 	private function saveMaintenance( $inputs )
 	{
 		$vData = $this->getModel( $inputs[ 'type' ] );
