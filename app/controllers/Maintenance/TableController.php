@@ -206,7 +206,7 @@ class TableController extends BaseController
 
 	private function validateFondoSaldoNeto( $fondo )
 	{
-		if ( $fondo->saldo < $fondo->saldo_neto )
+		if ( $fondo->saldo < $fondo->retencion )
 			return $this->warningException( 'No puede asignar un saldo menor al saldo reservado por las solicitudes' , __FUNCTION__ , __LINE__ , __FILE__ );
 		else
 			return $this->setRpta();
@@ -219,8 +219,8 @@ class TableController extends BaseController
 		$fondoMktHistory->id_to_fondo             = $fondos[ 'newRecord' ]->id ;
 		$fondoMktHistory->to_old_saldo            = $fondos[ 'oldRecord' ]->saldo;
 		$fondoMktHistory->to_new_saldo            = $fondos[ 'newRecord' ]->saldo;
-		$fondoMktHistory->to_old_saldo_neto       = $fondos[ 'oldRecord' ]->saldo_neto;
-		$fondoMktHistory->to_new_saldo_neto       = $fondos[ 'newRecord' ]->saldo_neto;
+		$fondoMktHistory->old_retencion           = $fondos[ 'oldRecord' ]->retencion;
+		$fondoMktHistory->new_retencion           = $fondos[ 'newRecord' ]->retencion;
 		$fondoMktHistory->id_fondo_history_reason = FONDO_AJUSTE;
 		$fondoMktHistory->id_tipo_to_fondo        = $this->getFondoType( $type );
 		$fondoMktHistory->save();
