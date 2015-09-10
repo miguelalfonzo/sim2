@@ -5,7 +5,7 @@
         <input class="form-control input-md" value="{{ $detalle->monto_solicitado }}" type="text" readonly>
         <span class="input-group-addon" id="type-money">{{$solicitud->detalle->typeMoney->simbolo}}</span>
         @if ( $politicStatus )
-            <input id="amount"value="{{$detalle->monto_actual}}" class="form-control input-md" name="monto" type="text">
+            <input id="amount" value="{{$detalle->monto_actual}}" class="form-control input-md" name="monto" type="text">
         @else
             <input id="amount" value="{{$detalle->monto_actual}}" class="form-control input-md" name="monto" type="text" readonly>
         @endif   

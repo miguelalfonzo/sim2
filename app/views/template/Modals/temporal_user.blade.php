@@ -12,7 +12,7 @@
                     </div>
                     <div class="modal-body">
                         <label>Ingresar usuario</label>
-                        <input id="user-seeker"class="form-control input-md" type="text">
+                        <input id="user-seeker" class="form-control input-md" type="text">
                         <br>
                     </div>
                     <div class="modal-footer">

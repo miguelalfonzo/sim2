@@ -29,7 +29,7 @@
             @endif    
         @endif
         
-        @if( in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD ) ) )
+        @if( in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD , ASIS_GER ) ) )
             @if( $solicitud->id_estado == PENDIENTE && $solicitud->created_by == Auth::user()->id && $solicitud->status == 1 )
                 <a class="btn btn-default" href="{{ URL::to( 'editar-solicitud' ) . '/' . $solicitud->token }}">
                     <span  class="glyphicon glyphicon-pencil"></span>

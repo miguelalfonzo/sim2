@@ -142,12 +142,12 @@ Route::filter( 'sys_user' , function ()
         return Redirect::to('login');
 });
 
-Route::filter( 'rm_sup_gerprod' , function () 
+Route::filter( 'rm_sup_gerprod_ager' , function () 
 {
     if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
         return Redirect::to( 'login' );
     else     
-        if ( ! in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD ) ) )
+        if ( ! in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD , ASIS_GER ) ) )
             return Redirect::to( 'show_user' );
 });
 

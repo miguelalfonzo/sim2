@@ -116,7 +116,7 @@ class SolicitudeController extends BaseController
             'currencies' => TypeMoney::all(),
             'families' => $qryProducts->get(),
             'investments' => InvestmentType::orderMkt());
-        if (in_array(Auth::user()->type, array(SUP, GER_PROD)))
+        if ( in_array(Auth::user()->type, array( SUP, GER_PROD , ASIS_GER ) ) )
             $data[ 'reps' ] = Personal::getRms();
         return View::make('Dmkt.Register.solicitud', $data);
     }
@@ -133,7 +133,7 @@ class SolicitudeController extends BaseController
                            'investments' => InvestmentType::orderMkt(),
                            'edit'        => true );
         $data[ 'detalle'] = $data['solicitud']->detalle;
-        if (in_array(Auth::user()->type, array(SUP, GER_PROD)))
+        if ( in_array(Auth::user()->type, array( SUP , GER_PROD , ASIS_GER ) ) )
             $data[ 'reps' ] = Personal::getRms();
         return View::make('Dmkt.Register.solicitud', $data);
     }
@@ -452,9 +452,9 @@ class SolicitudeController extends BaseController
         $solicitud->idtiposolicitud = $inputs['motivo'];
 
         $solicitud->status = ACTIVE;
-        if (in_array(Auth::user()->type, array(SUP, GER_PROD)))
+        if ( in_array( Auth::user()->type, array( SUP , GER_PROD , ASIS_GER ) ) )
             $solicitud->id_user_assign = $inputs['responsable'];
-        elseif (Auth::user()->type == REP_MED)
+        elseif ( Auth::user()->type == REP_MED )
             $solicitud->id_user_assign = Auth::user()->id;
     }
 
@@ -602,16 +602,23 @@ class SolicitudeController extends BaseController
         if ( ! is_null( $approvalPolicy->desde ) || ! is_null( $approvalPolicy->hasta ) )
             $msg .= ' para la siguiente etapa del flujo , comuniquese con Informatica. El rol aprueba montos ' . ( is_null( $approvalPolicy->desde ) ? '' : 'mayores a S/.' . $approvalPolicy->desde . ' ') . ( is_null( $approvalPolicy->hasta ) ? '' : 'hasta S/.' . $approvalPolicy->hasta );
         if ( $userType == SUP ): 
-            if ( Auth::user()->type === REP_MED ){
+            if ( Auth::user()->type === REP_MED )
+            {
                 $temp = Personal::getSup( Auth::user()->id );
                 $idsUser = array( $temp->user_id ); // idkc : ES CORRECTO ESTE TIPO DE PARSE? SI ES UN MODELO XQ NO USAR ->toArray() ?
             }
             else if ( Auth::user()->type === SUP )
+            {
                 $idsUser = array( Auth::user()->id );
-            else if ( Auth::user()->type === GER_PROD )
+            }
+            else if ( in_array( Auth::user()->type , array( GER_PROD , ASIS_GER ) ) )
+            {
                 $idsUser = array( Personal::getSup( $responsable )->user_id );
+            }
             else
+            {
                 return $this->warningException( 'El rol ' . Auth::user()->type . ' no tiene permisos para crear o derivar al supervisor' , __FUNCTION__ , __LINE__ , __FILE__ );
+            }
         elseif ( $userType == GER_PROD ):
             $idsGerProd = Marca::whereIn( 'id' , $idsProducto )->lists( 'gerente_id' );
             $uniqueIdsGerProd = array_unique( $idsGerProd );
@@ -719,11 +726,11 @@ class SolicitudeController extends BaseController
                 $detalle    = json_decode($solDetalle->detalle);                
                 $monto      = round($inputs['monto'], 2, PHP_ROUND_HALF_DOWN);
 
-                if ($solicitud->id_estado == DERIVADO)
+                if ( $solicitud->id_estado == DERIVADO )
                     $detalle->monto_derivado = $monto;
-                if ($solicitud->id_estado == ACEPTADO)
+                if ( $solicitud->id_estado == ACEPTADO )
                     $detalle->monto_aceptado = $monto;
-                else if ($solicitud->id_estado == APROBADO) ;
+                else if ( $solicitud->id_estado == APROBADO ) ;
                 $detalle->monto_aprobado = $monto;
 
                 $middleRpta = $this->setProductsAmount($inputs['producto'], $inputs['monto_producto'], $inputs['fondo_producto'], $solDetalle);
@@ -741,7 +748,7 @@ class SolicitudeController extends BaseController
                     if ($middleRpta[status] != ok)
                         return $middleRpta;
                     else {
-                        $middleRpta = $this->setGerProd($middleRpta[data]['iduser'], $solicitud->id, $middleRpta[data]['tipousuario']);
+                        $middleRpta = $this->setGerProd( $middleRpta[data]['iduser'], $solicitud->id, $middleRpta[data]['tipousuario']);
                         if ($middleRpta[status] == ok)
                             $toUser = $middleRpta[data];
                         else

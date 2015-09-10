@@ -189,7 +189,7 @@
         Route::post( 'do-inmediate-devolution' , 'Devolution\DevolutionController@doInmediateDevolution' );
     });
 
-    Route::group( array( 'before' => 'rm_sup_gerprod' ), function ()
+    Route::group( array( 'before' => 'rm_sup_gerprod_ager' ), function ()
     {    
         Route::get( 'nueva-solicitud', 'Dmkt\SolicitudeController@newSolicitude');
         Route::get( 'get-investments-activities' , 'Dmkt\SolicitudeController@getInvestmentsActivities');
