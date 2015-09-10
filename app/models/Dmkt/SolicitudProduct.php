@@ -35,6 +35,7 @@ class SolicitudProduct extends Eloquent
                         ->where('fs.saldo' , '>' , 0 )
                         ->where('fsc.tipo' , FONDO_SUBCATEGORIA_SUPERVISOR )
                         ->where('fs.supervisor_id' , $userid )->orderBy( 'm.descripcion' , 'asc' )
+                        ->where( 'fs.marca_id' , $this->id_producto )
                         ->get();
         }
         else if( $userType == GER_PROD )
@@ -50,7 +51,9 @@ class SolicitudProduct extends Eloquent
                     $query->where( 'fsc.tipo' , FONDO_SUBCATEGORIA_GERPROD );
                 else
                     $query->where( 'fsc.tipo' , 'NNN' );
-            })->where( 'f.saldo' , '>' , 0 )->orderBy( 'm.descripcion' , 'asc' )->get();
+            })->where( 'f.saldo' , '>' , 0 )->orderBy( 'm.descripcion' , 'asc' )
+              ->where( 'f.marca_id' , $this->id_producto )
+              ->get();
         }
         else if( $userType == ASIS_GER )
         {
