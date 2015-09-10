@@ -50,11 +50,7 @@
 <body>
 <div id="alert-console" class="container-fluid" style="z-index: 99999999; margin-top: 10px;"></div>
 <header>
-    @if (Auth::user()->type == ASIS_GER)
-        {{ HTML::link('/registrar-fondo', '', array('id' => 'logo', 'title' => 'Bagó Perú', 'alt' => 'Bagó Perú')) }}
-    @else
-        {{ HTML::link('/show_user', '', array('id' => 'logo', 'title' => 'Bagó Perú', 'alt' => 'Bagó Perú')) }}
-    @endif
+    {{ HTML::link('/show_user', '', array('id' => 'logo', 'title' => 'Bagó Perú', 'alt' => 'Bagó Perú')) }}
     <a id="logout" href="{{URL::to('logout')}}" title="Cerrar Sesión" alt="Cerrar Sesión">
         <div class="pull-left" style="font-size: 11pt; color: #fff; margin-top: 20px; margin-right: 10px; margin-left: 10px;">{{ Auth::user()->getFirstName() }}  | 
             <span class="closed-session">Cerrar sesión</span>
@@ -63,11 +59,7 @@
             <img class="img-circle" src="{{URL::to('/')}}/img/user.png">
         </div>
     </a>
-    @if( ! is_null( Auth::user() ) )
-        <input id="typeUser" type="hidden" value="{{ Auth::user()->type }}">
-    @endif
 </header>
-
 <div class="container-fluid" style="max-height: 100vh; padding-left: 0; padding-right: 0;">
         <nav class="navbar navbar-bago navbar-static-top" role="navigation" style="/*margin-bottom: 0*/; z-index: 10;">
             <div class="container-fluid">
@@ -84,15 +76,18 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Solicitud <span class="caret"></span></a>
                         <ul class="dropdown-menu">
-                            @if ( in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD ) ) )
-                            <li><a href="{{URL::to('nueva-solicitud')}}">
-                                <span class="glyphicon glyphicon-plus" aria-hidden="true" ></span>
-                                    <span class="glyphicon-class"> Nuevo</span></a></li>
-                            <li role="separator" class="divider"></li>
+                            @if ( in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD , ASIS_GER ) ) )
+                                <li>
+                                    <a href="{{URL::to('nueva-solicitud')}}">
+                                        <span class="glyphicon glyphicon-plus" aria-hidden="true" ></span>
+                                        <span class="glyphicon-class"> Nuevo</span>
+                                    </a>
+                                </li>
+                                <li role="separator" class="divider"></li>
                             @endif
                             <li><a href="{{ URL::to('show_user') }}">Listado de Solicitudes</a></li>
                             @if ( Auth::user()->type == ASIS_GER )
-                            <li><a href="{{ URL::to('solicitude/institution') }}">Solicitudes Institucionales</a></li>
+                                <li><a href="{{ URL::to('solicitude/institution') }}">Solicitudes Institucionales</a></li>
                             @endif
                         </ul>
                     </li>

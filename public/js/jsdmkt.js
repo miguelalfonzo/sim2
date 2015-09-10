@@ -39,8 +39,6 @@ var idState = $("#idState");
 //VALIDACION DE MONTOS DE FAMILIAS
 var amount_error_families = $('#amount_error_families');
 
-//TIPO DE USUARIO
-var userType = $('#typeUser').val();//tipo de usuario se encuentra en main
 var amount_families = $('.amount_families');
 
 //SUB-ESTADOS
