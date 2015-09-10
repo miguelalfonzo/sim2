@@ -1,6 +1,6 @@
 <div class="row">   
     {{Form::token()}}
-    <div class="form-group col-sm-2 col-md-2">
+    <div class="form-group col-xs-8 col-sm-4 col-md-2 col-lg-2">
         <select id="idState" name="idstate" class="form-control selectestatesolicitude">
             @foreach( $states as $estado )
                 @if ( Auth::user()->type == TESORERIA )
@@ -38,11 +38,22 @@
             </div>
         </div>
     @endif
-    @if (Auth::user()->type == TESORERIA)
-        <div class="form-group col-sm-3 col-md-3 pull-right" >
-            <span class="label label-warning">
-                TC {{$tc->fecha}}: Compra({{$tc->compra}}) - Venta({{$tc->venta}})
-            </span>
+    @if ( Auth::user()->type == TESORERIA )
+        <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-6 pull-left">
+            <h4 style="margin:0px">
+                Tasa de Cambio
+                <span class="label label-info">
+                    {{ $tc->fecha }}
+                </span>
+                Compra
+                <span class="label label-info">
+                    {{ $tc->compra }}
+                </span>
+                Venta
+                <span class="label label-info">
+                    {{$tc->venta}}
+                </span>
+            </h4>
         </div>
     @endif
     <div class="container-fluid table_solicitudes" id="solicitudes"></div>
