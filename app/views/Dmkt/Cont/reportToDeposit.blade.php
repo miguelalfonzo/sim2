@@ -30,7 +30,10 @@
                             <tr>
                                 
                                 <td>{{ $solicitud->id }}</td>
-                                <td>{{ $solicitud->titulo }}</td>
+                                <td>{{ $solicitud->titulo }} 
+                                    @if( $solicitud->idtiposolicitud != SOL_INST )
+                                        - {{ $solicitud->clients[ 0 ]->clientType->descripcion }} : {{{ $solicitud->clients[ 0 ]->{ $solicitud->clients[ 0 ]->clientType->relacion }->full_name or '' }}}</td>
+                                    @endif
                                 <td>{{ $solicitud->detalle->fecha_entrega }} </td>
                                 <td>
                                     @if ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) )
