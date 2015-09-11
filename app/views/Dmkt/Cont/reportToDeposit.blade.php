@@ -51,8 +51,8 @@
                                 </td>
                                 <td>
                                     @if ( $solicitud->detalle->id_pago != PAGO_CHEQUE )
-                                        @if ( $solicitud->asignedTo->type == REP_MED && ! is_null( $solicitud->asignedTo->rm->bagoVisitador ) && ! is_null( $solicitud->asignedTo->rm->bagoVisitador->cuenta ) )
-                                            {{ $solicitud->asignedTo->rm->bagoVisitador->cuenta->cuenta }}
+                                        @if ( $solicitud->asignedTo->type == REP_MED && ! is_null( $solicitud->asignedTo->personal->bagoVisitador ) && ! is_null( $solicitud->asignedTo->personal->bagoVisitador->cuenta ) )
+                                            {{ $solicitud->asignedTo->personal->bagoVisitador->cuenta->cuenta }}
                                         @endif
                                     @else
                                         RUC: {{ $solicitud->detalle->num_ruc }}         

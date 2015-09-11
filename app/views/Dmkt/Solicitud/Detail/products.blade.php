@@ -14,7 +14,7 @@
                             <span class="input-group-addon" style="width:15%;">{{{ is_null( $product->marca ) ? '' : $product->marca->descripcion}}}</span>
                             @if ( in_array( $tipo_usuario , array( SUP , GER_PROD ) ) )
                                 @if ( $tipo_usuario === SUP )
-                                    <select name="fondo_producto[]" class="selectpicker form-control" disabled>
+                                    <select name="fondo_producto[]" class="selectpicker form-control" readonly>
                                 @else
                                     <select name="fondo_producto[]" class="selectpicker form-control">
                                 @endif
@@ -24,7 +24,7 @@
                                                 <option selected disabled value="0">-</option>
                                             @else
                                                 @foreach( $product->getSubFondo( $tipo_usuario , $solicitud ) as $fondoMkt )
-                                                    <option selected value="{{ $fondoMkt->id . ' , ' . $fondoMkt->tipo }}">{{ $fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_disponible }}</option>
+                                                    <option selected value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}">{{ $fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_disponible }}</option>
                                                 @endforeach
                                             @endif
                                         @else

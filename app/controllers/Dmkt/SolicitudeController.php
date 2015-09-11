@@ -466,10 +466,7 @@ class SolicitudeController extends BaseController
 
     private function textLv($solicitud)
     {
-        if ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) )
-            return $this->textAccepted($solicitud) . ' - ' . $solicitud->titulo . ' - ' . $this->textClients($solicitud);
-        else
-            return $this->textAccepted($solicitud) . ' - ' . $solicitud->titulo;
+        return substr( $solicitud->id . ' ' . $solicitud->asignedTo->personal->seat_name . ' ' . strtoupper( $solicitud->titulo ) , 0 , 50 );
     }
 
     private function textAccepted($solicitud)
@@ -572,7 +569,7 @@ class SolicitudeController extends BaseController
 
     private function verifyPolicy( $solicitud , $monto )
     {
-        $type = array(Auth::user()->type, Auth::user()->tempType());
+        $type    = array( Auth::user()->type , Auth::user()->tempType() );
         $approvalPolicy = $solicitud->investment->approvalInstance->approvalPolicyTypesOrder( $type , $solicitud->histories->count() );
         if ( is_null( $approvalPolicy ) )
             return $this->warningException( 'No se encontro la politica de aprobacion para la inversion: ' . $solicitud->id_inversion . ' y su rol: ' . Auth::user()->type, __FUNCTION__, __LINE__, __FILE__);
@@ -716,10 +713,10 @@ class SolicitudeController extends BaseController
         if ($middleRpta[status] === ok) 
         {
             $solicitud  = Solicitud::find( $idSolicitud );
-            $middleRpta = $this->verifyPolicy($solicitud, $inputs['monto']);
-            if ($middleRpta[status] == ok)
+            $middleRpta = $this->verifyPolicy( $solicitud , $inputs['monto'] );
+            if ( $middleRpta[status] == ok )
             {
-                $oldIdEstado          = $solicitud->id_estado;
+                $oldIdEstado           = $solicitud->id_estado;
                 $solicitud->id_estado = $middleRpta[data];
                 $solicitud->status    = ACTIVE;
                 if ( isset( $inputs[ 'anotacion' ] ) )
@@ -815,7 +812,7 @@ class SolicitudeController extends BaseController
                 if ( $middleRpta[status] == ok ) 
                 {
                     Session::put( 'state' , $solicitud->state->rangeState->id );
-                    //DB::commit();
+                    DB::commit();
                     return $middleRpta;
                 }
             }
