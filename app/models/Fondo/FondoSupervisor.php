@@ -30,7 +30,7 @@ class FondoSupervisor extends Eloquent
 
 	protected function sup()
 	{
-        return $this->hasOne( 'Users\Personal', 'user_id' , 'supervisor_id' )->where( 'tipo' , '=' , 'S' );
+        return $this->hasOne( 'Users\Personal', 'user_id' , 'supervisor_id' );//No tiene informacion en el campo tipo->where( 'tipo' , '=' , 'S' );
     }
 
 	protected static function order()
