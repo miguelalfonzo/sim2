@@ -743,7 +743,39 @@ class SolicitudeController extends BaseController
                     $detalle->monto_aprobado = $monto;
                 }
 
-                $middleRpta = $this->setProductsAmount($inputs['producto'], $inputs['monto_producto'], $inputs['fondo_producto'], $solDetalle);
+                \Log::error( $inputs[ 'producto' ] );
+                \Log::error( $inputs[ 'monto_producto' ] );
+                \Log::error( $inputs[ 'fondo_producto' ] );
+                /*
+                if ( isset( $inputs[ 'eliminar_productos' ] ) || isset( $inputs[ 'agregar_productos'] )
+                {
+                    $productController = new ProductController;
+                    if ( isset( $inputs[ 'eliminar_productos' ] ) )
+                    {
+                        foreach( $inputs[ 'eliminar_productos' ] as $solicitudProductId )
+                        {
+                            $productController->removeSolicitudProduct( $solicitudProductId );
+                        }
+                    }
+
+                    if ( isset( $inputs[ 'agregar_productos' ] ) )
+                    {
+                        foreach( $inputs[ 'agregar_productos' ] as $productId )
+                        {
+                            $data = array(
+                                'id_solicitud' => $solicitud->id ,
+                                'id_producto'  => $productId );
+                            
+                            $id = $productController->newSolicitudProduct( $productId );
+                            //Asignar el id del registro al inputs producto
+                            $inputs[ 'producto' ][] = $id;
+                        }
+                    }
+                }
+
+                */
+
+                $middleRpta = $this->setProductsAmount( $inputs[ 'producto' ] , $inputs[ 'monto_producto' ] , $inputs[ 'fondo_producto' ] , $solDetalle );
 
                 if ($middleRpta[status] != ok)
                 {
@@ -780,9 +812,10 @@ class SolicitudeController extends BaseController
                 }
 
                 $middleRpta = $this->setStatus($oldIdEstado, $solicitud->id_estado, Auth::user()->id, $toUser, $solicitud->id);
-                if ($middleRpta[status] == ok) {
-                    Session::put('state', $solicitud->state->rangeState->id);
-                    DB::commit();
+                if ( $middleRpta[status] == ok ) 
+                {
+                    Session::put( 'state' , $solicitud->state->rangeState->id );
+                    //DB::commit();
                     return $middleRpta;
                 }
             }

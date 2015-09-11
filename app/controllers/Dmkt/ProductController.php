@@ -12,7 +12,12 @@ class ProductController extends BaseController
     public function deleteSolicitudProduct()
     {
     	$inputs = Input::all();
-    	SolicitudProduct::find( $inputs[ 'id_solicitud_producto' ] )->delete();
+    	$this->removeSolicitudProduct( $inputs[ 'id_solicitud_producto' ] );
+    }
+
+    public function removeSolicitudProduct( $idSolicitudProducto )
+    {
+		SolicitudProduct::find( $idSolicitudProducto )->delete();    	
     }
 
     public function addSolicitudProduct()

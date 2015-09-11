@@ -901,13 +901,17 @@ function acceptedSolicitude()
         ajaxError(statusCode,errorThrown);
     }).done(function (data)
     {
-        if (data.Status == 'Error')
+        if (data.Status == 'Error' )
+        {
             responseUI('Hubo un error al procesar la solicitud','red');
+        }
         else if (data.Status == 'Warning')
+        {
             bootbox.alert("<h4 class='red'>" + data.Status + ": " + data.Description + "</h4>");
+        }
         else if (data.Status == 'Ok')
         {
-            responseUI('Solicitud Procesada Correctamente','green');
+            responseUI( 'Solicitud Procesada Correctamente' , 'green' );
             setTimeout(function()
             {
                 window.location.href = server + 'show_user';
@@ -1746,7 +1750,7 @@ $( '#registrar' ).on( 'click' , function ( e )
     if ( aux == 0 ) 
     {
         var form = $('#form-register-solicitude');
-        var formData = new FormData(form[0]);
+        var formData = new FormData( form[ 0 ] );
         d_clients.forEach( function( entry )
         {
             formData.append( "clientes[]", entry );
