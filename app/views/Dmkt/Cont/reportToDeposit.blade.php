@@ -36,7 +36,7 @@
                                 @endif
                             <td>{{ $solicitud->detalle->fecha_entrega }} </td>
                             <td>
-                                @if ( isset( $solicitud->clients[ 0 ] ) && ! is_null( $solicitud->clientes[ 0 ] ) )
+                                @if ( isset( $solicitud->clients[ 0 ] ) && ! is_null( $solicitud->clients[ 0 ] ) )
                                     {{ $solicitud->clients[ 0 ]->{ $solicitud->clients[ 0 ]->clientType->relacion }->full_name }}
                                 @else
                                     -
