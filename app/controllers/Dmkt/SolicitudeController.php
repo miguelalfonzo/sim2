@@ -149,7 +149,8 @@ class SolicitudeController extends BaseController
                 return $this->warningException('No se encontro la Solicitud con Token: ' . $token, __FUNCTION__, __LINE__, __FILE__);
 
             $detalle = $solicitud->detalle;
-            $data = array('solicitud' => $solicitud, 'detalle' => $detalle);
+            include(app_path() . '/models/Query/QueryProducts.php');
+            $data = array('solicitud' => $solicitud, 'detalle' => $detalle,'families'    => $qryProducts->get());
 
             if ( $solicitud->idtiposolicitud != SOL_INST && in_array( $solicitud->id_estado, array(PENDIENTE, DERIVADO, ACEPTADO) ) ) {
                 $politicType = $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario;

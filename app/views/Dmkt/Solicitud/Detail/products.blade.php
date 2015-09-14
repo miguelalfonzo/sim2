@@ -5,6 +5,12 @@
             @if( ! in_array( $solicitud->id_estado , array( PENDIENTE , CANCELADO ) ) )
                 <label class="pull-right">Fondo</label>
             @endif
+
+            @if ( in_array( $tipo_usuario , array(GER_PROD ) ) )
+                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addProduct">
+                  agregar
+                </button>
+            @endif
         </div>
         <ul class="list-group">
             @foreach( $solicitud->products as $product )
@@ -63,3 +69,4 @@
         </ul>
     </div>
 </div>
+@include('Dmkt.Solicitud.Section.modal-select-producto')
