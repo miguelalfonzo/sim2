@@ -54,10 +54,10 @@ const USER_CONTABILIDAD                       = 43;
 const USER_TESORERIA                          = 42;
 
 // EMAIL DE PRUEBAS
-const POSTMAN_USER_NAME_1                       = 'Jhonattan Ortiz';
-const SOPORTE_EMAIL_1                           = 'jortiz@esinergy.com';
-const POSTMAN_USER_NAME_2                       = 'Marco Manrique';
-const SOPORTE_EMAIL_2                           = 'mmanrique@esinergy.com';
+const POSTMAN_USER_NAME_1                     = 'Jhonattan Ortiz';
+const SOPORTE_EMAIL_1                         = 'jortiz@esinergy.com';
+const POSTMAN_USER_NAME_2                     = 'Marco Manrique';
+const SOPORTE_EMAIL_2                         = 'mmanrique@esinergy.com';
 
 
 //ESTADO RANGOS
