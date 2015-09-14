@@ -24,10 +24,16 @@ class Personal extends Eloquent
         else
             return $lastId->id;
     }
-    public function getFullName(){
+    public function getFullName()
+    {
         $name = $this->nombres .' '. $this->apellidos;
         $name =ucwords(strtolower($name));
         return $name;
+    }
+
+    protected function getSeatNameAttribute()
+    {
+        return strtoupper( substr( $this->nombres , 0 , 2 ) . ' ' . $this->apellidos );
     }
 
     public function getFullNameAttribute()

@@ -48,7 +48,7 @@
 									{{ $solicitud->detalle->deposit->total }}
 								@endif
 							</td>
-							<td class="leyenda">{{$lv}}</td>
+							<td class="leyenda">{{ substr( $solicitud->detalle->deposit->num_transferencia . '-' . $lv , 0 , 50 ) }}</td>
 						</tr>
 					</tbody>
 				</table>

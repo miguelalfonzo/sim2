@@ -19,16 +19,30 @@
                         <div class="input-group input-group-sm">
                             <span class="input-group-addon" style="width:15%;">{{{ is_null( $product->marca ) ? '' : $product->marca->descripcion}}}</span>
                             @if ( in_array( $tipo_usuario , array( SUP , GER_PROD ) ) )
-                                <select name="fondo_producto[]" class="selectpicker form-control">
+                                @if ( $tipo_usuario === SUP )
+                                    <select name="fondo_producto[]" class="selectpicker form-control" readonly>
+                                @else
+                                    <select name="fondo_producto[]" class="selectpicker form-control">
+                                @endif
                                     @if ( is_null( $product->id_fondo_marketing ) )
-                                        <option selected disabled value="0">Seleccione el Fondo</option>
-                                        @foreach( $product->getSubFondo( $tipo_usuario , $solicitud ) as $fondoMkt )
-                                            @if ( $fondoMkt->marca_id == $product->id_producto )
-                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}" style="background-color:#00FFFF">{{ $fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_disponible }}</option>
-                                            @else   
-                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}">{{ $fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_disponible }}</option>
+                                        @if ( $tipo_usuario == SUP )
+                                            @if ( count( $product->getSubFondo( $tipo_usuario , $solicitud )  ) === 0 )
+                                                <option selected disabled value="0">-</option>
+                                            @else
+                                                @foreach( $product->getSubFondo( $tipo_usuario , $solicitud ) as $fondoMkt )
+                                                    <option selected value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}">{{ $fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_disponible }}</option>
+                                                @endforeach
                                             @endif
-                                        @endforeach
+                                        @else
+                                            <option selected disabled value="0">Seleccione el Fondo</option>
+                                            @foreach( $product->getSubFondo( $tipo_usuario , $solicitud ) as $fondoMkt )
+                                                @if ( $fondoMkt->marca_id == $product->id_producto )
+                                                    <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}" style="background-color:#00FFFF">{{ $fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_disponible }}</option>
+                                                @else   
+                                                    <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}">{{ $fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_disponible }}</option>
+                                                @endif
+                                            @endforeach
+                                        @endif
                                     @else
                                         <option value="{{ $product->id_fondo_marketing . ',' . $product->id_tipo_fondo_marketing }}" style="background-color:gold" selected>
                                             {{ $product->thisSubFondo->subCategoria->descripcion . ' | ' . 
