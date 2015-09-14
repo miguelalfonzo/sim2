@@ -18,6 +18,7 @@
                         <th>#</th>
                         <th>Solicitud</th>
                         <th>Fecha a Depositar</th>
+                        <th>Cliente</th>
                         <th>Tipo de Pago</th>
                         <th>Responsable</th>
                         <th>N° Cuenta / RUC</th>
@@ -34,6 +35,13 @@
                                     - {{ $solicitud->clients[ 0 ]->clientType->descripcion }} : {{{ $solicitud->clients[ 0 ]->{ $solicitud->clients[ 0 ]->clientType->relacion }->full_name or '' }}}</td>
                                 @endif
                             <td>{{ $solicitud->detalle->fecha_entrega }} </td>
+                            <td>
+                                @if ( isset( $solicitud->clients[ 0 ] ) && ! is_null( $solicitud->clientes[ 0 ] ) )
+                                    {{ $solicitud->clients[ 0 ]->{ $solicitud->clients[ 0 ]->clientType->relacion }->full_name }}
+                                @else
+                                    -
+                                @endif
+                            </td>
                             <td>
                                 @if ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) )
                                     {{ $solicitud->detalle->typePayment->nombre }}
