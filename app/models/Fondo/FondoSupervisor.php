@@ -63,4 +63,9 @@ class FondoSupervisor extends Eloquent
 		return $this->marca->descripcion . ' | '  . $this->sup->full_name;
 	}
 
+	protected function getApprovalProductNameAttribute()
+	{
+		return $this->subCategoria->descripcion . ' | ' . $this->marca->descripcion . ' S/.' . $this->saldo_disponible ;
+	}
+
 }

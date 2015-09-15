@@ -63,4 +63,5 @@ class FondoInstitucional extends Eloquent
 	{
 		return $this->SubCategoria->descripcion;
 	}
+
 }

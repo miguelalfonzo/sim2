@@ -37,12 +37,18 @@ class FondoSubCategoria extends Eloquent
 
 	protected function fund()
 	{
-		if ( $this->tipo == SUP )
+		if ( trim( $this->tipo ) == SUP )
+		{
 			return $this->hasMany( 'Fondo\FondoSupervisor' , 'subcategoria_id' );
-		elseif( $this->tipo == GER_PROD )
+		}
+		elseif ( in_array( trim( $this->tipo ) , array( GER_PROD , GER_PROM ) ) )
+		{
 			return $this->hasMany( 'Fondo\FondoGerProd' , 'subcategoria_id' );
-		elseif( $this->tipo == 'I' )
+		}
+		elseif ( trim( $this->tipo ) == 'I' )
+		{
 			return $this->hasMany( 'Fondo\FondoInstitucional' , 'subcategoria_id' );
+		}
 	}
 
 }

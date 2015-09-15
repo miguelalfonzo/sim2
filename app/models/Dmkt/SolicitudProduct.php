@@ -33,12 +33,12 @@ class SolicitudProduct extends Eloquent
                         ->leftJoin(TB_FONDO_CATEGORIA.' fc' , 'fc.id' , '=' , 'fsc.id_fondo_categoria' )
                         ->leftJoin(TB_MARCAS_BAGO.' m' , 'fs.marca_id' , '=' , 'm.id' )
                         ->where('fs.saldo' , '>' , 0 )
-                        ->where('fsc.tipo' , FONDO_SUBCATEGORIA_SUPERVISOR )
+                        ->where('trim( fsc.tipo )' , FONDO_SUBCATEGORIA_SUPERVISOR )
                         ->where('fs.supervisor_id' , $userid )->orderBy( 'm.descripcion' , 'asc' )
                         ->where( 'fs.marca_id' , $this->id_producto )
                         ->get();
         }
-        else if( $userType == GER_PROD )
+        else if ( in_array( $userType , array( GER_PROD , GER_PROM ) ) )
         {
             return DB::table( TB_FONDO_GERENTE_PRODUCTO.' f' )
             ->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo - f.retencion saldo_disponible', 'f.id' , 'f.marca_id' , '\'P\' tipo' )
@@ -47,13 +47,11 @@ class SolicitudProduct extends Eloquent
             ->leftJoin( TB_MARCAS_BAGO.' m' , 'f.marca_id' , '=' , 'm.id' )
             ->where( function( $query ) use( $userType )
             {
-                if ( $userType == GER_PROD )
-                    $query->where( 'fsc.tipo' , FONDO_SUBCATEGORIA_GERPROD );
-                else
-                    $query->where( 'fsc.tipo' , 'NNN' );
-            })->where( 'f.saldo' , '>' , 0 )->orderBy( 'm.descripcion' , 'asc' )
-              ->where( 'f.marca_id' , $this->id_producto )
-              ->get();
+                $query->where( 'trim( fsc.tipo )' , $userType );
+            })
+            ->where( 'f.saldo' , '>' , 0 )->orderBy( 'm.descripcion' , 'asc' )
+            ->where( 'f.marca_id' , $this->id_producto )
+            ->get();
         }
         else if( $userType == ASIS_GER )
         {

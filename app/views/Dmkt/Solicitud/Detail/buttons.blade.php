@@ -4,6 +4,11 @@
             <a class="btn btn-success" id="search_responsable">
                 Aceptar
             </a>
+            @if ( $tipo_usuario === SUP )
+                <a class="btn btn-warning" id="derivar_solicitud">
+                    Derivar
+                </a>
+            @endif
             <a id="deny_solicitude" class="btn btn-danger">
                 Rechazar
             </a>

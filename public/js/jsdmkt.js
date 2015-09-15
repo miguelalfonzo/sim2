@@ -875,19 +875,34 @@ function registerFondoInstitucional()
     }
 }
 
-$( '#search_responsable' ).on('click', function(e)
+$( '#search_responsable' ).on( 'click' , function(e)
 {
-    var div_monto = $("label[for=monto]").parent();
-    if ( div_monto.hasClass("has-success"))
+    var div_monto = $( 'label[for=monto]' ).parent();
+    if ( div_monto.hasClass( 'has-success' ) )
         acceptedSolicitude();
     else
         return false;
 });
 
-
-function acceptedSolicitude()
+$( '#derivar_solicitud' ).on( 'click' , function()
 {
-    var formData = new FormData(form_acepted_solicitude[0]);
+    acceptedSolicitude( 'derivacion' );   
+});
+
+
+function acceptedSolicitude( type )
+{
+    var formData = new FormData( form_acepted_solicitude[ 0 ] );
+    console.log( type );
+    if ( type !== undefined )
+    {
+        formData.append( 'derivacion' , 1 );
+    }
+    else
+    {
+        formData.append( 'derivacion' , 0 );
+    }
+
     $.ajax(
     {
         type: 'POST',

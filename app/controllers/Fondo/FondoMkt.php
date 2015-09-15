@@ -113,11 +113,13 @@ class FondoMkt extends BaseController
 
         if(  is_null( $solProduct->id_fondo_marketing ) )
         {
-            if ( ! ( Auth::user()->type == SUP || Auth::user()->type == GER_PROD ) )
+            if ( ! ( Auth::user()->type == SUP || Auth::user()->type == GER_PROD || Auth::user()->type == GER_PROM ) )
             {
                 if( $fondoData[ 1 ] == SUP && ! in_array( Auth::user()->type , array( SUP , GER_PROM ) ) )
                     return $this->warningException( 'Cancelado - No existe un fondo asignado y el usuario no puede asignar fondos' , __FUNCTION__ , __LINE__ , __FILE__ );
-                else if( $fondoData[ 1 ] == GER_PROD && ! in_array( Auth::user()->type , array( GER_PROD , GER_COM ) ) )
+                else if( $fondoData[ 1 ] == GER_PROD && ! in_array( Auth::user()->type , array( GER_PROD ) ) )
+                    return $this->warningException( 'Cancelado - No existe un fondo asignado y el usuario no puede asignar fondos' , __FUNCTION__ , __LINE__ , __FILE__ );
+                else if( $fondoData[ 1 ] == GER_PROM && ! in_array( Auth::user()->type , array( GER_PROM , GER_COM ) ) )
                     return $this->warningException( 'Cancelado - No existe un fondo asignado y el usuario no puede asignar fondos' , __FUNCTION__ , __LINE__ , __FILE__ );
             }
         }
@@ -150,15 +152,15 @@ class FondoMkt extends BaseController
         $fondoPeriodHistory = FondoMktPeriodHistory::getFondoMktPeriod( $period , $subCategoryId );
 
         if ( is_null( $fondoPeriodHistory ) ):
-            $lastFondoPeriodHistory       = FondoMktPeriodHistory::getFondoMktPeriod( $now->subMonth()->format( 'Ym' ) , $subCategoryId );
+            $lastFondoPeriodHistory      = FondoMktPeriodHistory::getFondoMktPeriod( $now->subMonth()->format( 'Ym' ) , $subCategoryId );
             $fondoPeriodHistory          = new FondoMktPeriodHistory;
             $fondoPeriodHistory->id      = $fondoPeriodHistory->nextId();
             $fondoPeriodHistory->periodo = $period;
             $fondoPeriodHistory->subcategoria_id = $subCategoryId;
             if ( is_null( $lastFondoPeriodHistory ) ):
-                $fondoSubCategory = FondoSubCategoria::find( $subCategoryId );
-                $fondos = $fondoSubCategory->fund;
-                $fondoPeriodHistory->saldo_inicial = $fondos->sum( 'saldo' );
+                $fondoSubCategory                      = FondoSubCategoria::find( $subCategoryId );
+                $fondos                                = $fondoSubCategory->fund;
+                $fondoPeriodHistory->saldo_inicial     = $fondos->sum( 'saldo' );
                 $fondoPeriodHistory->retencion_inicial = $fondos->sum( 'retencion' );    
             else:
                 $fondoPeriodHistory->saldo_inicial     = $lastFondoPeriodHistory->saldo_final;
