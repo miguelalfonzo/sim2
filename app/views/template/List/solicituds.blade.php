@@ -9,8 +9,6 @@
             <th>Aprobado por</th>
             <th>Fecha de Aprobación</th>
             @if(Auth::user()->type == TESORERIA)
-                <th style="display:none">Solicitado</th>
-                <th style="display:none">Retencion</th>
                 <th>Deposito</th>
             @else
                 <th>Monto</th>
@@ -38,7 +36,7 @@
                 @else
                     <input type="hidden" id="timeLineStatus" value="{{$solicitud->id_estado}}">
                 @endif
-                @if ( in_array( Auth::user()->type , array( TESORERIA , GER_COM, CONT) ))
+                @if ( in_array( Auth::user()->type , array( TESORERIA , GER_COM, CONT ) ) )
                     <input type="hidden" id="sol_token" class="i-tokens" value="{{$solicitud->token}}">
                     @if( ! is_null( $solicitud->id_user_assign ) )
                         <input type="hidden" value="{{ $solicitud->asignedTo->personal->full_name }}" class="benef">
@@ -72,16 +70,7 @@
                 </td>
                 @include('template.List.lastdate')
                 @if( Auth::user()->type == TESORERIA )
-                    <td style="display:none;" class="total_deposit">
-                        {{ $solicitud->detalle->monto_actual }}
-                    </td>
-                    <td style="display:none" class="tes-ret">
-                        @if ( is_null( $solicitud->detalle->idretencion ) )
-                            0
-                        @else
-                            {{$solicitud->detalle->typeRetention->account->typeMoney->simbolo.' '.json_decode($solicitud->detalle->detalle)->monto_retencion }}
-                        @endif
-                    </td>
+                    <input type="hidden" class="total_deposit" value="{{ $solicitud->detalle->monto_actual }}">
                     <td class="text-center deposit">
                         @if ( is_null( $solicitud->detalle->id_deposito ) )
                             {{ $solicitud->detalle->typemoney->simbolo .' '. $solicitud->detalle->monto_actual }}    

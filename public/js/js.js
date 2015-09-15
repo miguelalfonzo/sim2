@@ -1526,29 +1526,14 @@ $(function()
     $(document).off("click", ".modal_deposit");
     $(document).on("click", ".modal_deposit", function(e)
     {
-        //e.preventDefault();
-        var tr = $(this).parent().parent().parent();
-        var id_sol = tr.find('.id_solicitud').text();
-        var sol_titulo = tr.find('.sol_titulo').find('label').text();
-        var token = tr.find('#sol_token').val();
-        var beneficiario = tr.find('.benef').val();
+        var tr            = $( this ).parent().parent().parent();
+        var id_sol        = tr.find('.id_solicitud').text();
+        var sol_titulo    = tr.find('.sol_titulo').find('label').text();
+        var token         = tr.find('#sol_token').val();
+        var beneficiario  = tr.find('.benef').val();
         var total_deposit = tr.find('.total_deposit').text().trim().split(" ");
-        var retencion = tr.find('.tes-ret').html().trim();
-        
-        if ( retencion != 0 )
-        {
-            $("#tes-mon-ret").parent().css("display",true);
-            $("#tes-mon-sol").parent().css("display",true);
-        }
-        else
-        {
-            $("#tes-mon-ret").parent().css("display","none");
-            $("#tes-mon-sol").parent().css("display","none");    
-        }
         
         $("#sol-titulo").val(sol_titulo);
-        $("#tes-mon-sol").val(total_deposit[0] + " " + total_deposit[1]);
-        $("#tes-mon-ret").val(retencion);
         $("#id-solicitude").text(id_sol);
         $("input[name=token]").val(token);
         $(".register-deposit").attr("data-deposit",tr.attr("sol-type"));

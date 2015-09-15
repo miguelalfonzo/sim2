@@ -584,9 +584,9 @@ class SolicitudeController extends BaseController
                 $monto = $monto * ChangeRate::getTc()->compra;
             if ( $monto > $approvalPolicy->hasta )
                 return $this->setRpta( ACEPTADO );
-            /*elseif ( $monto < $approvalPolicy->desde )
+            elseif ( $monto < $approvalPolicy->desde )
                 return $this->warningException( 'Por Politica solo puede aceptar para este Tipo de Inversion montos mayores a: ' . $approvalPolicy->desde , __FUNCTION__ , __LINE__ , __FILE__ );
-            */else
+            else
                 return $this->setRpta( APROBADO );
         endif;
     }

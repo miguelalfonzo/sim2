@@ -28,18 +28,6 @@
                     </div>
                     <div class="col-xs-12 col-sm-6 col-md-6">
                         <div class="form-expense">
-                            <label>Monto Solicitado</label>
-                            <input id="tes-mon-sol" class="form-control" type="text" disabled>
-                        </div>
-                    </div>
-                    <div class="col-xs-12 col-sm-6 col-md-6">
-                        <div class="form-expense">
-                            <label>Retencion</label>
-                            <input id="tes-mon-ret" class="form-control" type="text" disabled>
-                        </div>
-                    </div>
-                    <div class="col-xs-12 col-sm-6 col-md-6">
-                        <div class="form-expense">
                             <label>Monto a Depositar</label>
                             <input id="total-deposit" class="form-control" type="text" disabled>
                         </div>
