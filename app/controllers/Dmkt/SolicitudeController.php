@@ -1251,12 +1251,13 @@ class SolicitudeController extends BaseController
 
     private function validateInputAdvanceSeat($inputs)
     {
-        $rules = array('idsolicitud' => 'required|integer|min:1|exists:solicitud,id',
+            $rules = array(
+            'idsolicitud'    => 'required|integer|min:1|exists:solicitud,id',
             'number_account' => 'required|array|size:2|each:numeric|each:digits,7|each:exists,cuenta,num_cuenta',
-            'dc' => 'required|array|size:2|each:string|each:size,1|each:in,D,C',
-            'total' => 'required|array|size:2|each:numeric|each:min,1',
-            'leyenda' => 'required|string|min:1');
-        $validator = Validator::make($inputs, $rules);
+            'dc'             => 'required|array|size:2|each:string|each:size,1|each:in,D,C',
+            'total'          => 'required|array|size:2|each:numeric|each:min,1',
+            'leyenda'        => 'required|array|size:2|each:required|each:string|each:min,1');
+        $validator = Validator::make( $inputs , $rules );
         if ($validator->fails())
             return $this->warningException(substr($this->msgValidator($validator), 0, -1), __FUNCTION__, __LINE__, __FILE__);
         else
@@ -1294,10 +1295,11 @@ class SolicitudeController extends BaseController
                     $tbEntry->fec_origen   = Carbon::createFromFormat( 'd/m/Y' , $solicitud->detalle->deposit->updated_at );
                     $tbEntry->d_c          = $inputs[ 'dc' ][ $i ];
                     $tbEntry->importe      = $inputs[ 'total' ][ $i ];
-                    $tbEntry->leyenda      = trim( $inputs[ 'leyenda' ] );
+                    $tbEntry->leyenda      = trim( $inputs[ 'leyenda' ][ $i ] );
                     $tbEntry->id_solicitud = $inputs[ 'idsolicitud' ];
                     $tbEntry->tipo_asiento = TIPO_ASIENTO_ANTICIPO;
                     $tbEntry->save();
+                    \Log::error( $tbEntry->toJson() );
                 }
 
                 if( $solicitud->idtiposolicitud == REEMBOLSO )
@@ -1316,7 +1318,7 @@ class SolicitudeController extends BaseController
                     {
                         Session::put( 'state' , R_FINALIZADO );
                     }
-                    elseif( in_array( $solicitud->id_estado , array( SOL_REP , SOL_INST ) ) )
+                    elseif( in_array( $solicitud->idtiposolicitud , array( SOL_REP , SOL_INST ) ) )
                     {
                         Session::put( 'state' , R_GASTO );
                     }

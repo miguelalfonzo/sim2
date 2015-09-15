@@ -373,13 +373,16 @@ $(function()
         $("#table-seat-solicitude tbody .dc").each(function(index){
             dc[index] = $(this).text().trim();
         });
+        $("#table-seat-solicitude tbody .leyenda").each(function(index){
+            leyenda[index] = $(this).text().trim();
+        });
         $("#table-seat-solicitude tbody .total").each(function(index){
             total[index] = parseFloat($(this).text());
         });
         data.number_account = number_account;
         data.dc = dc;
         data.total = total;
-        data.leyenda = $("#table-seat-solicitude tbody .leyenda:eq(0)").text();
+        data.leyenda = leyenda;
         var url = server+'generate-seat-solicitude';
         if($(this).data('url'))
         {
