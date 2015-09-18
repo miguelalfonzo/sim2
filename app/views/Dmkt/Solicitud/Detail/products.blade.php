@@ -65,4 +65,4 @@
         </ul>
     </div>
 </div>
-include('Dmkt.Solicitud.Section.modal-select-producto')
+@include('Dmkt.Solicitud.Section.modal-select-producto')
