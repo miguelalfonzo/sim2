@@ -18,6 +18,8 @@ class MigrateSeatController extends BaseController
 		try
 		{
 			\Log::error( TB_BAGO_ASIENTO );
+			$penclave = array();
+			$errors   = array();
 			$systemSeats = Entry::whereNull( 'estado' )->orderBy( 'id_solicitud' , 'asc' )->orderBy( 'tipo_asiento' , 'asc' )
 						   ->orderBy( 'updated_at' , 'asc' )->orderBy( 'id' , 'asc' )->get();
 			$seats = array();
@@ -34,8 +36,6 @@ class MigrateSeatController extends BaseController
 				}
 			}
 
-			$penclave = array();
-			$errors = array();
 			foreach( $seats as $idSolicitud => $seatTypes )
 			{
 				foreach( $seatTypes as $seatType => $seats )
@@ -47,7 +47,8 @@ class MigrateSeatController extends BaseController
 		}
 		catch( Exception $e )
 		{
-			return $this->internalException( $e , __FUNCTION__ );
+			$this->internalException( $e , __FUNCTION__ );
+			return $this->generateSeatExcel( $penclave , $errors );
 		}
 	}
 
@@ -98,8 +99,8 @@ class MigrateSeatController extends BaseController
 			}
 			
 		}
-		//DB::commit();
-		DB::rollback();
+		DB::commit();
+		//DB::rollback();
 	}
 
 	private function registerSeatLines( $key , $seat , $seatPrefix )

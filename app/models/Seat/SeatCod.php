@@ -3,6 +3,7 @@
 namespace Seat;
 
 use \Eloquent;
+use \Carbon\Carbon;
 
 class SeatCod extends Eloquent
 {
@@ -11,7 +12,7 @@ class SeatCod extends Eloquent
     protected $primaryKey = null;
     public $incrementing = null;
     public $timestamps = false;
-    protected $dates = [ 'f_proceso' , 'f_trn' ]; 
+    public $dates = [ 'f_proceso' , 'f_trn' ]; 
     
     protected static function generateTelecreditoSeatCod( $year , $origen )
     {
@@ -22,7 +23,7 @@ class SeatCod extends Eloquent
     	}
     	else
     	{
-    		$seat = $lastSeat + 1;
+    		$seat = $lastSeat->numasiento + 1 ;
     	}
 
     	return Self::registerSeat( $seat , $year , $origen , 0 );
@@ -35,6 +36,8 @@ class SeatCod extends Eloquent
         $seatCod->origen = $origen;
         $seatCod->numasiento = $seat;
         $seatCod->usuario = 'JORTIZ';
+        $seatCod->f_proceso = Carbon::now();
+        $seatCod->f_trn = Carbon::now();
         if ( $seatCod->save() )
         {
             return $seatCod->numasiento;

@@ -4,6 +4,7 @@ namespace Seat;
 
 use \Eloquent;
 use \Expense\Entry;
+use \Carbon\Carbon;
 
 class Seat extends Eloquent
 {
@@ -12,7 +13,7 @@ class Seat extends Eloquent
     protected $primaryKey = null;
     public $incrementing = false;
     public $timestamps = false;
-    protected $dates = [ 'penfchmod' ]; 
+    public $dates = [ 'penfchmod' ]; 
 
     protected static function generateManualSeatCod( $year , $origen )
     {
@@ -24,7 +25,9 @@ class Seat extends Eloquent
         }   
         else
         {
-            $seat = $lastSeat->numasiento + 1;
+            \Log::error( $origen );
+            $seat = $origen . str_pad( ( $lastSeat->numasiento + 1 ) , 4 , 0 , STR_PAD_LEFT );
+            \Log::error( $seat );
         }
         return $seat;
     }
@@ -40,9 +43,9 @@ class Seat extends Eloquent
         $seat->penaamovim    = $date->year; //AÑO DE REGISTRO DEL ASIENTO
         $seat->penctaextern  = $systemSeat->num_cuenta; //CUENTA CONTABLE 7 DIGITOS
         $seat->pencodcompor  = Self::blankspace( $systemSeat->cc ); // CODIGO DEL TIPO DE DOCUMENTO ESTABLECIDO POR SUNAT| '00' => NO SUSTENTABLE | CODIGOS DIFERENTES PARA FACTURAS , BOLETAS , TICKET , RECIBO POR HONORARIOS 
-        $seat->penddcomporg  = $date->day; // DIA DEL DOCUMENTO
-        $seat->penmmcomporg  = $date->month; // MES DEL DOCUMENTO  
-        $seat->penaacomporg  = $date->year; // AÑO DEL DOCUMENTO
+        $seat->penddcomporg  = $systemSeat->fec_origen->day; // DIA DEL DOCUMENTO
+        $seat->penmmcomporg  = $systemSeat->fec_origen->month; // MES DEL DOCUMENTO  
+        $seat->penaacomporg  = $systemSeat->fec_origen->year; // AÑO DEL DOCUMENTO
         $seat->pencodtar2    = '2'; // SETEADO UNICO VALOR
         $seat->penleyendafi  = Self::blankspace( $systemSeat->leyenda_fj ); // CENTRO DE COSTOS DE BAGO PARA LOS DOCUMENTOS 
         $seat->penleyendava  = substr( Self::blankspace( $systemSeat->leyenda ) , 50 ); // GLOSA , DESCRIPCION DEL ASIENTO | MAXIMO 50 CARACTERES
@@ -63,7 +66,8 @@ class Seat extends Eloquent
     	$seat->pennrocompor  = ' '; //CORRELATIVO POR DOCUMENTO DE BAGO PARA CONTROL DOCUMENTARIO , SE INGRESARA EN EL SISTEMA DEV DE BAGO
         $seat->pencodmoneda  = ' '; // CODIGO DE REGISTRO PARA LOS ASIENTOS EN DOLARES => 02 
     	$seat->pentipocambio = ' '; // TIPO DE CAMBIO PARA CUANDO EL ASIENTO ES EN DOLARES
-    	//$seat->penimporte2 = ' '; // IMPORTE EN SOLES DEL ASIENTO CUANDO 
+    	$seat->penfchmod     = Carbon::now();
+        //$seat->penimporte2 = ' '; // IMPORTE EN SOLES DEL ASIENTO CUANDO 
     	if ( $seat->save() )
         {
             $updateSystemSeat = Entry::find( $systemSeat->id );
