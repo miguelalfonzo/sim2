@@ -70,15 +70,6 @@
 	<!-- MONTO de DEVOLUCION -->
 	<!-- nclude('Dmkt.Solicitud.Detail.devolucion') -->
 
-	@if ( ! is_null( $solicitud->observacion) )
-		<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
-			<label class="control-label">Observación</label>
-			<div>
-				<textarea class="form-control" disabled>{{$solicitud->observacion}}</textarea>
-			</div>
-		</div>
-	@endif
-
     <div class="clearfix"></div>
 
     <!-- CLIENTES -->
@@ -86,5 +77,17 @@
 
     <!-- Lista de Devoluciones -->
     @include( 'Dmkt.Solicitud.Detail.devolucion2')
+
+    <!-- Observation-->
+    @include('Dmkt.Solicitud.Detail.anotation')
+
+    {{-- if ( ! is_null( $solicitud->observacion) )
+		<div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<label class="control-label"><strong>Observación</strong></label>
+			<div>
+				<textarea class="form-control" disabled>{{$solicitud->observacion}}</textarea>
+			</div>
+		</div>
+	endif --}}
 
 </section>

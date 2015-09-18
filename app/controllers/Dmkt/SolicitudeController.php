@@ -694,14 +694,14 @@ class SolicitudeController extends BaseController
 
     private function validateInputAcceptSolRep( $inputs )
     {
+        $size  = count( $inputs[ 'producto' ] ); 
         $rules = array(
                     'idsolicitud'    => 'required|integer|min:1|exists:'.TB_SOLICITUD.',id',
                     'monto'          => 'required|numeric|min:1',
                     'anotacion'      => 'sometimes|string|min:1',
                     'producto'       => 'required|array|min:1|each:integer|each:min,1|each:exists,'.TB_SOLICITUD_PRODUCTO.',id',
-                    'monto_producto' => 'required|array|min:1|each:numeric|each:min,1|sumequal:monto',
-                    'derivacion'     => 'required|numeric|boolean' ,
-                    'fondo_producto' => 'required_if:derivacion,0|array|each:string|each:min,1' );
+                    'derivacion'     => 'required|numeric|boolean' );
+        
         $messages = array();
         if ( Auth::user()->type === SUP )
         {
@@ -712,7 +712,19 @@ class SolicitudeController extends BaseController
             $messages[ 'fondo_producto.required_if' ] = 'El campo :attribute es obligatorio.' ;
             
         }
+
+        $messages[ 'fondo_producto.string' ] = 'El campo :attribute es obligatorio';
         $validator = Validator::make( $inputs , $rules , $messages );
+        
+        $validator->sometimes( 'monto_producto' , 'required|array|min:1|each:required|each:numeric|each:min,0|sumequal:monto', function ( $input ) 
+        {
+            return $input->derivacion == 0;
+        });
+        $validator->sometimes( 'fondo_producto' , 'required|array|size:'.$size.'|each:required|each:string|each:min,3', function ( $input ) 
+        {
+            return $input->derivacion == 0;
+        });
+        
         if ( $validator->fails() )
             return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
         else
@@ -802,7 +814,7 @@ class SolicitudeController extends BaseController
                 if ( $middleRpta[status] == ok ) 
                 {
                     Session::put( 'state' , $solicitud->state->rangeState->id );
-                    DB::commit();
+                    //DB::commit();
                     return $middleRpta;
                 }
             }

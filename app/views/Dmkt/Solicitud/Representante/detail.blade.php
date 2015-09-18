@@ -78,9 +78,6 @@
     <!-- Fecha de Descuento al Responsable del Gasto -->
     @include('Dmkt.Solicitud.Detail.discount')
 
-    <!-- Observation-->
-    @include('Dmkt.Solicitud.Detail.anotation')
-
     <div class="clearfix"></div>
     
     <!-- PRODUCTOS -->
@@ -103,4 +100,8 @@
         </label>
         <textarea class="form-control col-sm-12 col-md-12 col-lg-12" readonly>{{$solicitud->descripcion}}</textarea>
     </div>
+
+    <!-- Observation-->
+    @include('Dmkt.Solicitud.Detail.anotation')
+
 </section>

@@ -10,7 +10,8 @@
 		"thujohn/pdf": "dev-master",
 		"barryvdh/laravel-dompdf": "0.4.*",
         "maatwebsite/excel": "1.*",
-        "kmd/logviewer": "1.2.*"
+        "kmd/logviewer": "1.2.*",
+        "rap2hpoutre/laravel-log-viewer"
     },
 	"autoload": {
 		"classmap": [

@@ -175,6 +175,21 @@ Route::filter( 'rm_cont_tes' , function()
     }
 });
 
+Route::filter( 'developer' , function()
+{
+    if ( ! Auth::check() || is_null( Auth::user()->simApp ) )
+    {
+        return Redirect::to( 'login' );
+    }
+    else
+    {     
+        if ( Auth::user()->id != 39 )
+        {
+            return Redirect::to( 'show_user' ); 
+        }
+    }
+});
+
 /*
 |--------------------------------------------------------------------------
 | CSRF Protection Filter
