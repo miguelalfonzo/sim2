@@ -13,7 +13,7 @@ class SeatCod extends Eloquent
     public $timestamps = false;
     protected $dates = [ 'f_proceso' , 'f_trn' ]; 
     
-    protected static function generateSeatCod( $year , $origen )
+    protected static function generateTelecreditoSeatCod( $year , $origen )
     {
     	$lastSeat = SeatCod::where( 'anio' , $year )->where( 'origen' , $origen )->orderBy( 'numasiento' , 'desc' )->first();
     	if ( is_null( $lastSeat ) )
@@ -25,13 +25,33 @@ class SeatCod extends Eloquent
     		$seat = $lastSeat + 1;
     	}
 
-    	$seatCod = new SeatCod;
-    	$seatCod->anio   = $year;
-    	$seatCod->origen = $origen;
-    	$seatCod->numasiento = $seat;
-    	$seatCod->usuario = 'JORTIZ';
-    	$seatCod->save();
-    	return $seat;
+    	return Self::registerSeat( $seat , $year , $origen , 0 );
+    }
+
+    private static function registerSeat( $seat , $year , $origen , $i )
+    {
+        $seatCod = new SeatCod;
+        $seatCod->anio   = $year;
+        $seatCod->origen = $origen;
+        $seatCod->numasiento = $seat;
+        $seatCod->usuario = 'JORTIZ';
+        if ( $seatCod->save() )
+        {
+            return $seatCod->numasiento;
+        }
+        else
+        {
+            $seat ++;
+            $i ++;
+            if( $i === 3 )
+            {
+                return 0;
+            }
+            else
+            {
+                return $this->registerSeat( $seat , $i );
+            }
+        }
     }
 
 }

@@ -11,7 +11,7 @@
 		"barryvdh/laravel-dompdf": "0.4.*",
         "maatwebsite/excel": "1.*",
         "kmd/logviewer": "1.2.*",
-        "rap2hpoutre/laravel-log-viewer"
+        "rap2hpoutre/laravel-log-viewer":"0.4.2"
     },
 	"autoload": {
 		"classmap": [

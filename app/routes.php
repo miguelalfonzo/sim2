@@ -39,14 +39,19 @@
     
     /*
     |--------------------------------------------------------------------------
-    | SYSTEMA
+    | SYSTEM
     |--------------------------------------------------------------------------
     */
 
     Route::group( array( 'before' => 'developer' , 'namespace' => 'Seat' , 'prefix' => 'migrate' ) , function()
     {
-        Route::get( 'seats' , 'MigrateSeatController@migrateSeats');
+        Route::get( 'seats2' , 'MigrateSeatController@migrateSeats');
     });
+
+    Route::get( "logs", [ 
+        "before" => "developer",
+        "uses" => "\Rap2hpoutre\LaravelLogViewer\LogViewerController@index"
+    ]);
 
     /*
     |--------------------------------------------------------------------------
