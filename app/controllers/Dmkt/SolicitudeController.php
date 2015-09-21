@@ -138,6 +138,45 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.Register.solicitud', $data);
     }
 
+
+    public function addFamilyFundSolicitud()
+    {
+
+        try
+        {
+            $inputs =   Input::all();
+            $solicitud    =   Solicitud::where('token',  $inputs['_token'])->firstOrFail();
+
+            $product_found = false;
+            foreach($solicitud->products as $product){
+                if($product->id == $inputs['id__product'])
+                    $product_found = true;
+            }
+
+            $solicitud = $solicitud->get();
+            $dSol = $this->setRpta( $solicitud , 'SELECCIONE LA ACTIVIDAD' );
+            return $this->setRpta( $dSol );
+        }
+        catch( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
+
+        include(app_path() . '/models/Query/QueryProducts.php');
+        $data = array( 'solicitud'   => Solicitud::where('token', $token)->firstOrFail(),
+            'reasons'     => Reason::all(),
+            'activities'  => Activity::order(),
+            'payments'    => TypePayment::all(),
+            'currencies'  => TypeMoney::all(),
+            'families'    => $qryProducts->get(),
+            'investments' => InvestmentType::orderMkt(),
+            'edit'        => true );
+        $data[ 'detalle'] = $data['solicitud']->detalle;
+        if ( in_array(Auth::user()->type, array( SUP , GER_PROD , ASIS_GER ) ) )
+            $data[ 'reps' ] = Personal::getRms();
+        return View::make('Dmkt.Register.solicitud', $data);
+    }
+
     public function viewSolicitude($token)
     {
         try

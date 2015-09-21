@@ -65,4 +65,7 @@
         </ul>
     </div>
 </div>
-@include('Dmkt.Solicitud.Section.modal-select-producto')
+
+@if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD ) ) )
+    @include('Dmkt.Solicitud.Section.modal-select-producto')
+@endif
