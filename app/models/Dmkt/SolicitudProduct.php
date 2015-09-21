@@ -53,13 +53,36 @@ class SolicitudProduct extends Eloquent
             ->where( 'f.marca_id' , $this->id_producto )
             ->get();
         }
-        else if( $userType == ASIS_GER )
+        else if ( $userType == ASIS_GER )
         {
             return DB::table( TB_FONDO_INSTITUCION.' f' )
             ->select( "fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo - f.retencion saldo_disponible' , 'f.id' , '\'AG\' tipo' )
             ->leftJoin( TB_FONDO_CATEGORIA_SUB.' fsc' , 'f.subcategoria_id' , '=' , 'fsc.id' )
             ->leftJoin( TB_FONDO_CATEGORIA.' fc' , 'fsc.id_fondo_categoria' , '=' , 'fc.id' )
             ->where( 'fsc.tipo' , FONDO_SUBCATEGORIA_INSTITUCION )->get();
+        }
+        else if ( in_array( $userType , array( GER_COM , GER_GER ) ) )
+        {
+            $supFunds = DB::table(TB_FONDO_SUPERVISOR.' fs')
+                        ->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'fs.saldo - fs.retencion saldo_disponible' , 'fs.id' , 'fs.marca_id' , '\'S\' tipo' )
+                        ->leftJoin(TB_FONDO_CATEGORIA_SUB.' fsc' , 'fsc.id' , '=' , 'fs.subcategoria_id' )
+                        ->leftJoin(TB_FONDO_CATEGORIA.' fc' , 'fc.id' , '=' , 'fsc.id_fondo_categoria' )
+                        ->leftJoin(TB_MARCAS_BAGO.' m' , 'fs.marca_id' , '=' , 'm.id' )
+                        ->where('fs.saldo' , '>' , 0 )
+                        ->where('trim( fsc.tipo )' , FONDO_SUBCATEGORIA_SUPERVISOR )
+                        ->where( 'fs.marca_id' , $this->id_producto );
+            $gerFunds = DB::table( TB_FONDO_GERENTE_PRODUCTO.' f' )
+                        ->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo - f.retencion saldo_disponible', 'f.id' , 'f.marca_id' , '\'P\' tipo' )
+                        ->leftJoin( TB_FONDO_CATEGORIA_SUB.' fsc' , 'f.subcategoria_id' , '=' , 'fsc.id' )
+                        ->leftJoin( TB_FONDO_CATEGORIA.' fc' , 'fsc.id_fondo_categoria' , '=' , 'fc.id' )
+                        ->leftJoin( TB_MARCAS_BAGO.' m' , 'f.marca_id' , '=' , 'm.id' )
+                        ->whereIn( 'trim( fsc.tipo )' , array( GER_PROD , GER_PROM ) )
+                        ->where( 'f.saldo' , '>' , 0 )
+                        ->where( 'f.marca_id' , $this->id_producto );
+            return  $supFunds
+                    ->unionAll( $gerFunds )
+                    ->orderBy( 'descripcion' , 'asc' )
+                    ->get();
         }
         else
             return array();

@@ -79,7 +79,9 @@ class SolicitudDetalle extends Eloquent
     {
         $jDetalle = json_decode( $this->detalle );
         if ( isset( $jDetalle->fecha_entrega ) )
+        {
             return $jDetalle->fecha_entrega;
+        }
         else
         {
             return $this->periodo->aniomes;
@@ -90,9 +92,13 @@ class SolicitudDetalle extends Eloquent
     {
         $jDetalle = json_decode( $this->detalle );
         if ( isset( $jDetalle->num_ruc ) )
+        {
             return $jDetalle->num_ruc;
+        }
         else
-            return 0;
+        {
+            return null;
+        }
     }
 
     public function lastId()

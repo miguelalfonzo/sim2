@@ -124,15 +124,15 @@ class SolicitudeController extends BaseController
     public function editSolicitud($token)
     {
         include(app_path() . '/models/Query/QueryProducts.php');
-            $data = array( 'solicitud'   => Solicitud::where('token', $token)->firstOrFail(),
-                           'reasons'     => Reason::all(),
-                           'activities'  => Activity::order(),
-                           'payments'    => TypePayment::all(),
-                           'currencies'  => TypeMoney::all(),
-                           'families'    => $qryProducts->get(),
-                           'investments' => InvestmentType::orderMkt(),
-                           'edit'        => true );
-        $data[ 'detalle'] = $data['solicitud']->detalle;
+        $data = array( 'solicitud'   => Solicitud::where('token', $token)->firstOrFail(),
+                       'reasons'     => Reason::all(),
+                       'activities'  => Activity::order(),
+                       'payments'    => TypePayment::all(),
+                       'currencies'  => TypeMoney::all(),
+                       'families'    => $qryProducts->get(),
+                       'investments' => InvestmentType::orderMkt(),
+                       'edit'        => true );
+        $data[ 'detalle' ] = $data['solicitud']->detalle;
         if ( in_array(Auth::user()->type, array( SUP , GER_PROD , ASIS_GER ) ) )
             $data[ 'reps' ] = Personal::getRms();
         return View::make('Dmkt.Register.solicitud', $data);
@@ -158,6 +158,10 @@ class SolicitudeController extends BaseController
                     && ( array_intersect( array( Auth::user()->id, Auth::user()->tempId() ), $solicitud->managerEdit( $politicType )->lists( 'id_gerprod' ) ) ) ) 
                 {
                     $politicStatus = TRUE;
+                    if ( in_array( $politicType , array( GER_COM , GER_GER ) ) )
+                    {
+                        $data[ 'payments' ] = TypePayment::all();
+                    }
                     $data[ 'tipo_usuario' ] = $politicType;
                     $solicitud->status = BLOCKED;
                     Session::put( 'id_solicitud' , $solicitud->id );
@@ -247,9 +251,9 @@ class SolicitudeController extends BaseController
         return $this->setRpta();
     }
 
-    private function setPago(&$jDetalle, $paymentType, $ruc)
+    private function setPago( &$jDetalle , $paymentType , $ruc)
     {
-        if ($paymentType == PAGO_CHEQUE)
+        if ( $paymentType == PAGO_CHEQUE )
             $jDetalle->num_ruc = $ruc;
     }
 
@@ -662,11 +666,15 @@ class SolicitudeController extends BaseController
                     foreach ($solicitudProducts as $solicitudProduct)
                         $fondo[] = $solicitudProduct->id_fondo_marketing . ',' . $solicitudProduct->id_tipo_fondo_marketing;
 
-                    $inputs = array('idsolicitud' => $solicitud->id,
-                        'monto' => $solicitud->detalle->monto_actual,
-                        'producto' => $solicitud->orderProducts()->lists('id'),
-                        'anotacion' => $solicitud->anotacion,
-                        'fondo_producto' => $fondo);
+                    $inputs = array(
+                        'idsolicitud'    => $solicitud->id,
+                        'monto'          => $solicitud->detalle->monto_actual ,
+                        'producto'       => $solicitud->orderProducts()->lists('id') ,
+                        'anotacion'      => $solicitud->anotacion ,
+                        'fondo_producto' => $fondo ,
+                        'derivacion'     => 0 ,
+                        'pago'           => $solicitud->detalle->id_pago , 
+                        'ruc'            => $solicitud->detalle->num_ruc );
 
                     $solProducts = $solicitud->orderProducts();
                     if ($solicitud->id_estado == DERIVADO)
@@ -713,6 +721,11 @@ class SolicitudeController extends BaseController
             
         }
 
+        if ( in_array( Auth::user()->type , array( GER_COM , GER_GER ) ) )
+        {
+            $rules[ 'pago' ] = 'required|integer|min:1|exists:'.TB_TIPO_PAGO.',id';    
+        }
+        
         $messages[ 'fondo_producto.string' ] = 'El campo :attribute es obligatorio';
         $validator = Validator::make( $inputs , $rules , $messages );
         
@@ -723,6 +736,10 @@ class SolicitudeController extends BaseController
         $validator->sometimes( 'fondo_producto' , 'required|array|size:'.$size.'|each:required|each:string|each:min,3', function ( $input ) 
         {
             return $input->derivacion == 0;
+        });
+        $validator->sometimes( 'ruc' , 'required|numeric|digits:11'  , function ( $input ) 
+        {
+            return $input->pago == PAGO_CHEQUE;
         });
         
         if ( $validator->fails() )
@@ -773,6 +790,15 @@ class SolicitudeController extends BaseController
                         $detalle->monto_aprobado = $monto;
                     }
 
+                    if( isset( $inputs[ 'pago' ] ) )
+                    {
+                        $solDetalle->id_pago = $inputs[ 'pago' ];
+                    }
+                    if( isset( $inputs[ 'ruc' ] ) )
+                    {
+                        $detalle->num_ruc = $inputs[ 'ruc' ];
+                    }
+                    
                     $middleRpta = $this->setProductsAmount( $inputs[ 'producto' ] , $inputs[ 'monto_producto' ] , $inputs[ 'fondo_producto' ] , $solDetalle );
 
                     if ($middleRpta[status] != ok)
@@ -783,6 +809,7 @@ class SolicitudeController extends BaseController
 
                     $solDetalle->detalle = json_encode( $detalle );
                     $solDetalle->save();
+                    \Log::error( $solDetalle->toJson() );
                 }
 
                 if ( $solicitud->id_estado != APROBADO ) 
@@ -814,7 +841,7 @@ class SolicitudeController extends BaseController
                 if ( $middleRpta[status] == ok ) 
                 {
                     Session::put( 'state' , $solicitud->state->rangeState->id );
-                    //DB::commit();
+                    DB::commit();
                     return $middleRpta;
                 }
             }
@@ -1145,14 +1172,21 @@ class SolicitudeController extends BaseController
         $expenses = $solicitud->expenses;
         $clientes = array();
 
-        foreach ($solicitud->clients as $client) {
-            if ($client->from_table == TB_DOCTOR) {
+        foreach ( $solicitud->clients as $client ) 
+        {
+            if ($client->from_table == TB_DOCTOR) 
+            {
                 $doctors = $client->doctors;
                 $nom = $doctors->pefnombres . ' ' . $doctors->pefpaterno . ' ' . $doctors->pefmaterno;
-            } elseif ($client->from_table == TB_FARMACIA)
+            } 
+            else if ($client->from_table == TB_FARMACIA)
+            {
                 $nom = $client->institutes->pejrazon;
+            }
             else
+            {
                 $nom = 'No encontrado';
+            }
             $clientes[] = $nom;
         }
         $clientes = implode(',', $clientes);

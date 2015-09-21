@@ -18,7 +18,7 @@
                     @if( $politicStatus )
                         <div class="input-group input-group-sm">
                             <span class="input-group-addon" style="width:15%;">{{{ is_null( $product->marca ) ? '' : $product->marca->descripcion}}}</span>
-                            @if ( in_array( $tipo_usuario , array( SUP , GER_PROD , GER_PROM ) ) )
+                            @if ( in_array( $tipo_usuario , array( SUP , GER_PROD , GER_PROM , GER_COM , GER_GER ) ) )
                                 <select name="fondo_producto[]" class="selectpicker form-control">
                                     @if ( is_null( $product->id_fondo_marketing ) )
                                         <option selected disabled value="0">Seleccione el Fondo</option>

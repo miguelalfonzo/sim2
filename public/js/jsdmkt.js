@@ -14,27 +14,19 @@ var payment       = $('select[name=pago]');
 var delivery_date = $('input[name=fecha]');
 var clients       = $('#clientes');
 
-var invoice_amount  = $('input[name=monto_factura]');
-var comprobante_img = $( '.img-responsive' );
-var ruc             = $('input[name=ruc]');
-
-var fondo = $('select[name="idfondo"]');
-var fondoProducto = $('select[name="fondo_producto[]"]');
-
-var search_cliente = $('.cliente-seeker');
-
-var idamount = $('#amount');
-
-var doc_start = $('.date_start').last();
-var doc_end = $('.date_end').last();
-
+var invoice_amount    = $('input[name=monto_factura]');
+var comprobante_img   = $( '.img-responsive' );
+var ruc               = $('input[name=ruc]');
+var fondo             = $('select[name="idfondo"]');
+var fondoProducto     = $('select[name="fondo_producto[]"]');
+var search_cliente    = $('.cliente-seeker');
+var idamount          = $('#amount');
+var doc_start         = $('.date_start').last();
+var doc_end           = $('.date_end').last();
 var cancel_solicitude = '.cancel-solicitude';
-
-var id_solicitud = $( 'input[name=idsolicitud]' );
-// var _token       = $( 'input[name=_token]' );
-var families = $('#listfamily');
-
-var idState = $("#idState");
+var id_solicitud      = $( 'input[name=idsolicitud]' );
+var families          = $('#listfamily');
+var idState           = $("#idState");
 
 //VALIDACION DE MONTOS DE FAMILIAS
 var amount_error_families = $('#amount_error_families');
@@ -214,15 +206,21 @@ function inversionChange( id_inversion )
 
 
 //TIPO DE ENTREGA
-if( payment.val()!=2 )  
-    ruc.parent().parent().hide();
-
-payment.on('change', function()
+if( payment.val() != 2 )
 {
-    if($(this).val() == 1)
-        ruc.parent().parent().hide();
-    else if($(this).val()== 2)
-        ruc.parent().parent().show();
+    ruc.parent().hide();
+}
+
+payment.on( 'change' , function()
+{
+    if ( $( this ).val() == 1 )
+    {
+        ruc.parent().hide();
+    }
+    else if( $( this ).val() == 2 )
+    {
+        ruc.parent().show();
+    }
 });
 
 title.on('focus', function () {
@@ -258,7 +256,7 @@ date_end.on('focus', function () {
 });
 
 ruc.on('focus', function () {
-    $(this).parent().parent().removeClass('has-error');
+    $(this).parent().removeClass('has-error');
 });
 
 $( document ).on( 'focus' , 'select[name=inversion]' , function()
@@ -1713,10 +1711,10 @@ function validateNewSol()
     }
     if ( payment.val() == 2 )
     {
-        if ( !ruc.val() )
+        if ( ! ruc.val() )
         {
-            ruc.parent().parent().addClass('has-error');
-            ruc.attr('placeholder', 'Ingrese RUC').addClass('input-placeholder-error');
+            ruc.parent().addClass('has-error');
+            ruc.attr( 'placeholder' , 'Ingrese RUC' ).addClass( 'input-placeholder-error' );
             aux = 1;
         }
     }

@@ -22,18 +22,32 @@
     <!-- TIPO DE PAGO -->
     <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4" >
         <label class="control-label">Tipo de Entrega</label>
-        <input class="form-control" value="{{$solicitud->detalle->typePayment->nombre}}" disabled>
+        @if( in_array( Auth::user()->type , array( GER_COM , GER_GER ) ) && $politicStatus )
+            <select name="pago" class="form-control">
+                @foreach( $payments as $payment )
+                    @if( $solicitud->detalle->id_pago == $payment->id )
+                        <option value="{{$payment->id}}" selected style="background-color:yellow">{{$payment->nombre}}</option>
+                    @else
+                        <option value="{{$payment->id}}">{{$payment->nombre}}</option>
+                    @endif
+                @endforeach
+            </select>
+        @else
+            <select name="pago" style="display:none"><option value="{{ $detalle->id_pago }}" selected></option></select>
+            <input class="form-control" value="{{ $detalle->typePayment->nombre }}" disabled>
+        @endif
     </div>
 
-    <!-- PAGO CHEQUE : RUC -->
-    @if( $solicitud->detalle->id_pago == PAGO_CHEQUE )
-        <!-- Ruc -->
-        <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
-            <label class="control-label">Ruc</label>
-            <input type="text" class="form-control input-md" value="{{ $detalle->num_ruc }}" maxlength="11" readonly>
-        </div>
-    @endif
-
+    <!-- PAGO CHEQUE => RUC -->
+    <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+        <label class="control-label">Ruc</label>
+        @if ( in_array( Auth::user()->type , array( GER_COM , GER_GER ) ) && $politicStatus )
+            <input type="text" name="ruc" class="form-control input-md" value="{{ $detalle->num_ruc }}" maxlength="11">
+        @else
+            <input type="text" name="ruc" class="form-control input-md" value="{{ $detalle->num_ruc }}" maxlength="11" readonly>
+        @endif
+    </div>
+    
     <!-- FECHA DE CREACION / FECHA DE ENTREGA -->
     @include('Dmkt.Solicitud.Detail.fecha')
 

@@ -75,6 +75,7 @@ const SUP                                     = 'S';
 const GER_PROD                                = 'P';
 const GER_PROM                                = 'GP';
 const GER_COM                                 = 'G';
+const GER_GER                                 = 'GG';
 const CONT                                    = 'C';
 const TESORERIA                               = 'T';
 const ASIS_GER                                = 'AG';

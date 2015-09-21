@@ -33,10 +33,11 @@
 
     <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
         <label class="control-label" for="ruc">Ruc</label>
-        <div>
-            <input class="form-control input-md" maxlength="11" name="ruc" type="text"
-            value="{{isset($detalle->num_ruc) ? $detalle->num_ruc : null }}">
-        </div>
+        @if( isset( $solicitud ) )
+            <input class="form-control input-md" maxlength="11" name="ruc" type="text" value="{{ $detalle->num_ruc }}">
+        @else
+            <input class="form-control input-md" maxlength="11" name="ruc" type="text">
+        @endif    
     </div>
 
     <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
