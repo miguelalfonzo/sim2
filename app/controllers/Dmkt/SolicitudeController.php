@@ -152,7 +152,6 @@ class SolicitudeController extends BaseController
 //                    $product_found = true;
 //            }
 
-            $solicitud = $solicitud->get();
             $dSol = $this->setRpta( $solicitud , 'SELECCIONE LA ACTIVIDAD' );
             return $this->setRpta( $dSol );
         }
