@@ -38,24 +38,26 @@ class Seat extends Eloquent
         $seat->penclave      = $seatPrefix . str_pad( ( $key + 1 ) , 4 , 0 , STR_PAD_LEFT ); //CLAVE DE BAGO DEL ASIENTO
         $seat->pencodtar1    = '1'; // '1' Codigo Fijo
         $seat->pentipomovim  = 'VS';
-        $seat->penddmovim    = $date->day;// DIA DEL REGISTRO DEL ASIENTO , CIERRE CONTABLE GENERALMENTE 31 o 30 o 29 o 28
-        $seat->penmmmovim    = $date->month;// MES DEL REGISTRO DEL ASIENTO , MES DEL REGISTRO DEL ASIENTO
+        $seat->penddmovim    = str_pad( $date->day , 2 , 0 , STR_PAD_LEFT );// DIA ( TEXTO DOS DIGITOS )DEL REGISTRO DEL ASIENTO , CIERRE CONTABLE GENERALMENTE 31 o 30 o 29 o 28
+        $seat->penmmmovim    = str_pad( $date->month , 2 , 0 , STR_PAD_LEFT );// MES ( TEXTO DOS DIGITOS )DEL REGISTRO DEL ASIENTO , MES DEL REGISTRO DEL ASIENTO
         $seat->penaamovim    = $date->year; //AÑO DE REGISTRO DEL ASIENTO
         $seat->penctaextern  = $systemSeat->num_cuenta; //CUENTA CONTABLE 7 DIGITOS
         $seat->pencodcompor  = Self::blankspace( $systemSeat->cc ); // CODIGO DEL TIPO DE DOCUMENTO ESTABLECIDO POR SUNAT| '00' => NO SUSTENTABLE | CODIGOS DIFERENTES PARA FACTURAS , BOLETAS , TICKET , RECIBO POR HONORARIOS 
-        $seat->penddcomporg  = $systemSeat->fec_origen->day; // DIA DEL DOCUMENTO
-        $seat->penmmcomporg  = $systemSeat->fec_origen->month; // MES DEL DOCUMENTO  
+        $seat->penddcomporg  = str_pad( $systemSeat->fec_origen->day , 2 , 0 , STR_PAD_LEFT ); // DIA DEL DOCUMENTO | texto 2 digitos
+        $seat->penmmcomporg  = str_pad( $systemSeat->fec_origen->month , 2 , 0 , STR_PAD_LEFT ); // MES DEL DOCUMENTO  | texto 2 digitos
         $seat->penaacomporg  = $systemSeat->fec_origen->year; // AÑO DEL DOCUMENTO
         $seat->pencodtar2    = '2'; // SETEADO UNICO VALOR
         $seat->penleyendafi  = Self::blankspace( $systemSeat->leyenda_fj ); // CENTRO DE COSTOS DE BAGO PARA LOS DOCUMENTOS 
-        $seat->penleyendava  = substr( Self::blankspace( $systemSeat->leyenda ) , 50 ); // GLOSA , DESCRIPCION DEL ASIENTO | MAXIMO 50 CARACTERES
+        $seat->penleyendava  = substr( Self::blankspace( $systemSeat->leyenda ) , 0 , 50 ); // GLOSA , DESCRIPCION DEL ASIENTO | MAXIMO 50 CARACTERES
         $seat->pentipoimpor  = $systemSeat->d_c; // CODIGO CONTABLE DE LAS CUENTAS "T" | D => DEBE | H => HABER
-        $seat->penimportemo  = $systemSeat->importe; //MONTO
+        $seat->penimportemo  = ltrim( number_format( $systemSeat->importe , 2 , '.' , '' ) , 0 ); //MONTO SEPARADOR DECIMAL CON PUNTO , SOLO DOS DECIMALES Y SI ES 0 CON DECIMALES QUE NO APAREZCA EL 0.
         $seat->pencodigoiva  = Self::blankspace( $systemSeat->iva ); // Codigo del sistema para los asientos de documentos con IGV | N6 PARA ITEM Y I6 PARA IGB
         $seat->pencodprovee  = Self::blankspace( $systemSeat->cod_pro ); //CODigo del sistema para los asientos de documentos con IGV = "90000"
         $seat->pencoddivisi  = $systemSeat->cod_pro == 90000 ? 1 : ' '; // or '1' 
         $seat->penestado     = $state; //The First line has 'C'
-        $seat->pennrocompro  = is_null( $seat->prefijo ) ? ' ' : str_pad( $seat->prefijo , 0 , 3 ) . $seat->cbte_prov;   // 3 digitos para la serie del comprobante y el numero del Comprobante
+        $seat->pennrocompro  = is_null( $systemSeat->prefijo ) ? ' ' : 
+                               substr( str_pad( $systemSeat->prefijo , 3 , 0 , STR_PAD_LEFT ) , str_pad( $systemSeat->prefijo , 3 , 0 , STR_PAD_LEFT ) - 3 , 3 ) 
+                               . $systemSeat->cbte_prov;   // 3 digitos para la serie del comprobante y el numero del Comprobante
         $seat->pennombrepro  = Self::blankspace( $systemSeat->nom_prov ); // RAZON SOCIAL SOLO PARA DOCUMENTOS
         $seat->pencoddocpro  = Self::blankspace( $systemSeat->cod ); // CODIGO del sistema para documentos con igv = "80"
         $seat->pennrodocpro  = Self::blankspace( $systemSeat->ruc );  // RUC SOLO PARA DOCUMENTOS
