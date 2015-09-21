@@ -141,7 +141,6 @@ class SolicitudeController extends BaseController
 
     public function addFamilyFundSolicitud()
     {
-
         try
         {
             $inputs =   Input::all();
@@ -161,20 +160,6 @@ class SolicitudeController extends BaseController
         {
             return $this->internalException( $e , __FUNCTION__ );
         }
-
-        include(app_path() . '/models/Query/QueryProducts.php');
-        $data = array( 'solicitud'   => Solicitud::where('token', $token)->firstOrFail(),
-            'reasons'     => Reason::all(),
-            'activities'  => Activity::order(),
-            'payments'    => TypePayment::all(),
-            'currencies'  => TypeMoney::all(),
-            'families'    => $qryProducts->get(),
-            'investments' => InvestmentType::orderMkt(),
-            'edit'        => true );
-        $data[ 'detalle'] = $data['solicitud']->detalle;
-        if ( in_array(Auth::user()->type, array( SUP , GER_PROD , ASIS_GER ) ) )
-            $data[ 'reps' ] = Personal::getRms();
-        return View::make('Dmkt.Register.solicitud', $data);
     }
 
     public function viewSolicitude($token)
