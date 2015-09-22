@@ -32,9 +32,7 @@
                                             {{ $product->thisSubFondo->approval_product_name . ' ( Reservado ' . $product->monto_asignado . ' ) ' }}
                                         </option>    
                                         @foreach( $product->getSubFondo( $tipo_usuario , $solicitud ) as $fondoMkt )
-                                            @if ( $fondoMkt->id == $product->id_fondo_marketing )
-                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}" style="background-color:#00FFFF">{{$fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_disponible }}</option>
-                                            @else   
+                                            @if ( $fondoMkt->id != $product->id_fondo_marketing )
                                                 <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}">{{$fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_disponible }}</option>
                                             @endif
                                         @endforeach

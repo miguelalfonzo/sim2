@@ -22,7 +22,7 @@
     <!-- TIPO DE PAGO -->
     <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4" >
         <label class="control-label">Tipo de Entrega</label>
-        @if( in_array( Auth::user()->type , array( GER_COM , GER_GER ) ) && $politicStatus )
+        @if( isset( $payments ) )
             <select name="pago" class="form-control">
                 @foreach( $payments as $payment )
                     @if( $solicitud->detalle->id_pago == $payment->id )
@@ -39,14 +39,16 @@
     </div>
 
     <!-- PAGO CHEQUE => RUC -->
-    <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
-        <label class="control-label">Ruc</label>
-        @if ( in_array( Auth::user()->type , array( GER_COM , GER_GER ) ) && $politicStatus )
-            <input type="text" name="ruc" class="form-control input-md" value="{{ $detalle->num_ruc }}" maxlength="11">
-        @else
-            <input type="text" name="ruc" class="form-control input-md" value="{{ $detalle->num_ruc }}" maxlength="11" readonly>
-        @endif
-    </div>
+    @if ( $politicStatus )
+        <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
+            <label class="control-label">Ruc</label>
+            @if ( in_array( Auth::user()->type , array( GER_PROD , GER_PROM , GER_COM , GER_GER ) ) && $politicStatus )
+                <input type="text" name="ruc" class="form-control input-md" value="{{ $detalle->num_ruc }}" maxlength="11">
+            @else
+                <input type="text" name="ruc" class="form-control input-md" value="{{ $detalle->num_ruc }}" maxlength="11" readonly>
+            @endif
+        </div>
+    @endif
     
     <!-- FECHA DE CREACION / FECHA DE ENTREGA -->
     @include('Dmkt.Solicitud.Detail.fecha')

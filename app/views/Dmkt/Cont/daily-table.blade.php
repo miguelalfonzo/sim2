@@ -2,6 +2,7 @@
 	<table class="table table-bordered table-hover table-condensed tb_style">
 		<thead>
 			<tr>
+				<th>Asiento</th>
 				<th>N° Cuenta</th>
 				<th>CC</th>
 				<th>N° Origen</th>
@@ -23,6 +24,7 @@
 		<tbody>
 			@foreach( $solicitud->dailyEntries as $dailyEntry )
 				<tr>
+					<td>{{{ $dailyEntry->penclave or '' }}}</td>
 					<td>{{ $dailyEntry->num_cuenta }}</td>
 					<td>{{ $dailyEntry->cc }}</td>
 					<td></td>

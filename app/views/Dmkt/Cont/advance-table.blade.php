@@ -2,6 +2,7 @@
 	<table 	class="table table-bordered table-hover table-condensed tb_style">
 		<thead>
 			<tr>
+				<th>Asiento</th>
 				<th>Cuenta</th>
 				<th>N° de Cuenta</th>
 				<th>Fecha de Origen</th>
@@ -13,6 +14,7 @@
 		</thead>
 		<tbody>
 			<tr>
+				<td>{{{ $solicitud->advanceCreditEntry->penclave or '' }}}</td>
 				<td>{{ $solicitud->investment->accountFund->nombre }}</td>
 				<td>{{ $solicitud->investment->accountFund->num_cuenta }}</td> 
 				<td>{{ $solicitud->detalle->deposit->updated_at }}</td>
@@ -30,6 +32,7 @@
 				<td>{{{ $lv or $solicitud->advanceCreditEntry->leyenda }}}</td>
 			</tr>
 			<tr>
+				<td>{{{ $solicitud->advanceDepositEntry->penclave or '' }}}</td>
 				<td>{{ $solicitud->detalle->deposit->bagoAccount->ctanombrecta }}</td>
 				<td>{{ $solicitud->detalle->deposit->num_cuenta }}</td>
 				<td>{{ $solicitud->detalle->deposit->updated_at }}</td>

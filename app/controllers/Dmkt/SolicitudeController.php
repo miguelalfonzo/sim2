@@ -159,7 +159,7 @@ class SolicitudeController extends BaseController
                     && ( array_intersect( array( Auth::user()->id, Auth::user()->tempId() ), $solicitud->managerEdit( $politicType )->lists( 'id_gerprod' ) ) ) ) 
                 {
                     $politicStatus = TRUE;
-                    if ( in_array( $politicType , array( GER_COM , GER_GER ) ) )
+                    if ( in_array( $politicType , array( GER_PROD , GER_PROM , GER_COM , GER_GER ) ) )
                     {
                         $data[ 'payments' ] = TypePayment::all();
                     }
@@ -1292,9 +1292,7 @@ class SolicitudeController extends BaseController
                 {
                     Session::put('state', R_FINALIZADO);
                 }
-                $migrateSeatController = new MigrateSeatController;
-                $data = $migrateSeatController->transactionGenerateSeat( $seats );
-                Log::info( $data );
+                $this->generateBagoSeat( $seats );
                 return $middleRpta;
             }
             DB::rollback();
@@ -1395,10 +1393,7 @@ class SolicitudeController extends BaseController
                         Session::put( 'state' , R_GASTO );
                     }
                     DB::commit();
-
-                    $migrateSeatController = new MigrateSeatController;
-                    $data = $migrateSeatController->transactionGenerateSeat( $seats );
-                    Log::info( $data );
+                    $this->generateBagoSeat( $seats );
                     return $middleRpta;
                 }
                 DB::rollback();
@@ -1409,6 +1404,20 @@ class SolicitudeController extends BaseController
         {
             DB::rollback();
             return $this->internalException($e, __FUNCTION__);
+        }
+    }
+
+    private function generateBagoSeat( $seats )
+    {
+        try
+        {
+            $migrateSeatController = new MigrateSeatController;
+            $data = $migrateSeatController->transactionGenerateSeat( $seats );
+            Log::info( $data );
+        }
+        catch( Exception $e )
+        {
+            $this->internalException( $e , __FUNCTION__ );
         }
     }
 
