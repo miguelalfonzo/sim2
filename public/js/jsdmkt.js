@@ -177,7 +177,6 @@ $(document).on("click", ".btn-delete-family", function ()
 $("#btn-add-family-fondo").on('click',function () {
 
     var family_id = $("#selectfamilyadd").val();
-    alert(solicitud_id);
     $.ajax(
         {
             url: server + 'agregar-familia-fondo',
