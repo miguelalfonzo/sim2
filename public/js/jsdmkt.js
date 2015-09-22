@@ -178,6 +178,7 @@ $("#btn-add-family-fondo").on('click',function () {
 
     var solicitud_id = $("#idsolicitud").val();
     var family_id = $("#selectfamilyadd").val();
+    alert(solicitud_id);
     $.ajax(
         {
             url: server + 'agregar-familia-fondo',
