@@ -1114,7 +1114,7 @@ class SolicitudeController extends BaseController
                         {
                             $total_percepciones += $expense->monto_tributo;
                             $seatList[] = $this->createSeatElement( $cuentaMkt, $solicitud->id, CUENTA_DETRACCION_HABER, '', $fecha_origen, '', '', '', '', '', '', '', 
-                                ASIENTO_GASTO_DEPOSITO, round( $expense->monto_tributo * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN ) , $marca, $description_seat_detraccion_deposit, '', 'DET');
+                                ASIENTO_GASTO_DEPOSITO, round( $expense->monto_tributo * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN ) , '' , $description_seat_detraccion_deposit, '', 'DET');
                         }
                     }
                     else //TODOS LOS OTROS DOCUMENTOS
@@ -1132,7 +1132,7 @@ class SolicitudeController extends BaseController
                         {
                             $total_percepciones += $expense->monto_tributo;
                             $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, CUENTA_RENTA_4TA_HABER, '', $fecha_origen, '', '', '', '', '', '', '', 
-                            ASIENTO_GASTO_DEPOSITO, round( $expense->monto_tributo  * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN ) , $marca, $description_seat_renta4ta_deposit, '', 'RENTA');
+                            ASIENTO_GASTO_DEPOSITO, round( $expense->monto_tributo  * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN ) , '' , $description_seat_renta4ta_deposit, '', 'RENTA');
                         }
                     }
                 }
