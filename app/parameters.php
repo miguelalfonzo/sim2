@@ -1,5 +1,7 @@
 <?php
 
+const PRODUCCION = 1;
+
 const TIPO_ASIENTO_ANTICIPO = 'A';
 const IMAGE_PATH            = 'img/reembolso/';
 const WIDTH                 = 800;
@@ -278,15 +280,15 @@ const MANTENIMIENTO_FONDO = 6;
 | TABLAS
 |--------------------------------------------------------------------------
 */
-if ( ! ( App::environment( 'production' ) || App::environment( 'local' ) ) )
+if ( App::environment( 'production' ) && PRODUCCION )
 {
     define( 'TB_USUARIOS'         , 'USR.USERS' );
     define( 'TB_TIPO_USUARIO'     , 'USR.TIPO_USUARIO' );
     define( 'TB_USER_APP'         , 'USR.USER_APP' );
     define( 'TB_PERSONAL'         , 'USR.PERSONAL' );
     define( 'TB_TIPO_PERSONAL'    , 'USR.TIPO_PERSONAL' );
-    define( 'TB_BAGO_COD_ASIENTO' , 'B30.CXP_CORREL_ASIENTOS' );
-    define( 'TB_BAGO_ASIENTO'     , 'B3O.PENDIEN_DIARIO' );
+    define( 'TB_BAGO_COD_ASIENTO' , 'B3P.CXP_CORREL_ASIENTOS' );
+    define( 'TB_BAGO_ASIENTO'     , 'B3P.PENDIEN_DIARIO' );
 }
 else
 {

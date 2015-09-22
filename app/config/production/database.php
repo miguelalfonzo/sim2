@@ -1,5 +1,14 @@
 <?php
 
+if( PRODUCCION )
+{
+	$default = 'oracle';
+}
+else
+{
+	$default = 'oraclep';
+}
+
 return array(
 
 	/*
@@ -17,8 +26,8 @@ return array(
 	| choice installed on your machine before you begin development.
 	|
 	*/
+	'default' => $default,
 
-	'default' => 'oracle',
 
 	'connections' => array(
 
@@ -27,11 +36,21 @@ return array(
 			'host' => '192.168.1.4',
 			'port' => '1521',
 			'database' => 'BDBAGO',
+			'username' => 'sim',
+			'password' => 'sim',
+			'charset' => 'utf8',
+			'prefix' => '',
+        ),
+        'oraclep' => array(
+			'driver' => 'pdo-via-oci8',
+			'host' => '192.168.1.4',
+			'port' => '1521',
+			'database' => 'BDBAGO',
 			'username' => 'simp',
 			'password' => 'simp',
 			'charset' => 'utf8',
 			'prefix' => '',
-        )
+        ),
 
 	),
 
