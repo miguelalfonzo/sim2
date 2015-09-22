@@ -146,7 +146,6 @@ class SolicitudeController extends BaseController
             $inputs =   Input::all();
 
             $solicitudId =  $inputs['solicitud_id'];
-
             $solicitudProduc    =   SolicitudProduct::where('id_solicitud', $solicitudId)->get();
 
 
