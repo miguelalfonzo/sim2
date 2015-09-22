@@ -810,7 +810,6 @@ class SolicitudeController extends BaseController
 
                     $solDetalle->detalle = json_encode( $detalle );
                     $solDetalle->save();
-                    \Log::error( $solDetalle->toJson() );
                 }
 
                 if ( $solicitud->id_estado != APROBADO ) 
@@ -1123,10 +1122,19 @@ class SolicitudeController extends BaseController
 
                         //ASIENTO DOCUMENTO OTROS - UN SOLO ASIENTO POR TODOS LOS ITEMS QUE TENGA
                         $description_seat_other_doc = strtoupper( $username .' '. $expense->descripcion );
-                        $seatList[] = $this->createSeatElement($cuentaMkt , $solicitud->id , $cuentaExpense , $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_BASE, 
-                            ASIENTO_GASTO_COD_PROV, $expense->razon, ASIENTO_GASTO_COD, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, 
-                            round( $expense->monto  * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN ) , $marca, $description_seat_other_doc, $tipo_responsable, ''); 
-                    
+                        if ( $expense->idcomprobante == DOCUMENTO_NO_SUSTENTABLE_ID )
+                        {
+                            $seatList[] = $this->createSeatElement($cuentaMkt , $solicitud->id , $cuentaExpense , $comprobante->cta_sunat, $fecha_origen, '' , 
+                                ASIENTO_GASTO_COD_PROV, $expense->razon, ASIENTO_GASTO_COD, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, 
+                                round( $expense->monto  * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN ) , $marca, $description_seat_other_doc, $tipo_responsable, ''); 
+                        }
+                        else
+                        {
+                            $seatList[] = $this->createSeatElement($cuentaMkt , $solicitud->id , $cuentaExpense , $comprobante->cta_sunat, $fecha_origen, ASIENTO_GASTO_IVA_BASE, 
+                                ASIENTO_GASTO_COD_PROV, $expense->razon, ASIENTO_GASTO_COD, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, 
+                                round( $expense->monto  * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN ) , $marca, $description_seat_other_doc, $tipo_responsable, ''); 
+                        }
+
                         //ASIENTO IMPUESTO A LA RENTA
                         if ( $expense->idtipotributo == REGIMEN_RETENCION && $expense->idcomprobante == DOC_RECIBO_HONORARIO ) 
                         {

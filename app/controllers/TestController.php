@@ -20,6 +20,15 @@ use \User;
 class TestController extends BaseController 
 {
 
+	public function testCarbon()
+	{
+		$a = Carbon::now();
+		return $a->day;
+		$f = $a;
+		$c = $f->lastOfMonth()->day;
+		return $a->day;
+	}
+
 	public function changePass( $id )
 	{
 		$user = User::find( $id );

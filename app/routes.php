@@ -6,6 +6,7 @@
     | TESTING
     |--------------------------------------------------------------------------
     */
+    Route::get('test-carbon' , 'TestController@testCarbon' );
     Route::get('testalert' , 'TestController@testalert');
     Route::get('dt' , 'TestController@dt');
     Route::get('test', array('uses' => 'Dmkt\LoginController@test'));

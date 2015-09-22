@@ -18,7 +18,6 @@ class MigrateSeatController extends BaseController
 		try
 		{
 			$data = array( 'ok' => array() , 'error' => array() );
-			\Log::error( TB_BAGO_ASIENTO );
 			$systemSeats = Entry::whereNull( 'estado' )->orderBy( 'id_solicitud' , 'asc' )->orderBy( 'tipo_asiento' , 'asc' )
 						   ->orderBy( 'updated_at' , 'asc' )->orderBy( 'id' , 'asc' )->get();
 			$seats = array();

@@ -63,7 +63,6 @@ class Seeker extends BaseController
                 ' "in":{ "CLCLASE": [ 1 , 6 ] } }, ' .
                 ' "selects":[ "CLCODIGO" , " ( CLRUT || \'-\' || CLNOMBRE ) " , "CASE WHEN CLCLASE = 1 THEN \'DISTRIBUIDOR\' WHEN CLCLASE = 6 THEN \'BODEGA\' END" , "CASE WHEN CLCLASE = 1 THEN 4 WHEN CLCLASE = 6 THEN 5 END" ]} ' .
                 ']';
-            \Log::error($json);
             $cAlias = array('value', 'label', 'type', 'id_tipo_cliente');
             return Response::Json($this->searchSeeker($inputs['sVal'], $json, $cAlias));
         } catch (Exception $e) {

@@ -36,6 +36,13 @@ class Seat extends Eloquent
         $seat->penclave      = $seatPrefix . str_pad( ( $key + 1 ) , 4 , 0 , STR_PAD_LEFT ); //CLAVE DE BAGO DEL ASIENTO
         $seat->pencodtar1    = '1'; // '1' Codigo Fijo
         $seat->pentipomovim  = 'VS';
+
+        //EL CAMPO PENAAMOVIM ES EL MISMO DIA DE LA TRANSFERENCIA O ES EL ULTIMO DIA DEL MES PARA LOS ASIENTOS CON PREFIJO 0 (MANUALES)
+        if( substr( $seatPrefix , 0 , 1 ) == 0 )
+        {
+            $date->lastOfMonth();
+        }
+
         $seat->penddmovim    = str_pad( $date->day , 2 , 0 , STR_PAD_LEFT );// DIA ( TEXTO DOS DIGITOS )DEL REGISTRO DEL ASIENTO , CIERRE CONTABLE GENERALMENTE 31 o 30 o 29 o 28
         $seat->penmmmovim    = str_pad( $date->month , 2 , 0 , STR_PAD_LEFT );// MES ( TEXTO DOS DIGITOS )DEL REGISTRO DEL ASIENTO , MES DEL REGISTRO DEL ASIENTO
         $seat->penaamovim    = $date->year; //AÑO DE REGISTRO DEL ASIENTO
@@ -55,7 +62,7 @@ class Seat extends Eloquent
         $seat->penestado     = $state; //The First line has 'C'
         
         // 4 digitos para la serie del comprobante y al empezar tiene un espacio en blanco el cual solo aparece si tiene una letra la serie || y el numero del Comprobante
-        if ( is_null( $systemSeat->prefijo ) )
+        if ( is_null( $systemSeat->prefijo ) || empty( trim( $systemSeat->prefijo ) ) )
         {
             $serie = ' ';
         }

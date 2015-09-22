@@ -233,7 +233,6 @@ class FondoController extends BaseController
                 $middleRpta = $this->processsInstitutionalSolicitud( $inputs );
                 if ( $middleRpta[ status] == ok )
                 {
-                    \Log::error( 'commit' );
                     DB::commit();
                 }
                 else
@@ -404,7 +403,6 @@ class FondoController extends BaseController
 
     private function validateRm( $codrepmed )
     {
-        \Log::error( $codrepmed );
         $repmed = Personal::getRM($codrepmed);
         if ( is_null( $repmed ) )
             return $this->warningException( 'El representante Medico no esta registrado en el sistema. Codigo de Representante: ' . $codrepmed , __FUNCTION__ , __LINE__ , __FILE__ );

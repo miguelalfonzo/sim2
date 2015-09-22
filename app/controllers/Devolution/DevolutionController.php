@@ -67,7 +67,6 @@ class DevolutionController extends BaseController
         $devolutionHistory->user_from     = Auth::user()->type;
         $devolutionHistory->user_to       = $userTo;
         $devolutionHistory->save();
-        \Log::error( $devolutionHistory->toJson() );
     }
 
     public function getPayrollInfo()

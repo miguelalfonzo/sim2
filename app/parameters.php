@@ -14,7 +14,7 @@ const status                = 'Status';
 const description           = 'Description';
 const DB                    = 'Base de Datos';
 const CUENTA_BAGO           = 'B';
-//const DOCUMENTO_NO_SUSTENTABLE_ID = 7;
+const DOCUMENTO_NO_SUSTENTABLE_ID = 7;
 
 const SOLES   = 1;
 const DOLARES = 2;
