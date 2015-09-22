@@ -144,15 +144,10 @@ class SolicitudeController extends BaseController
         try
         {
             $inputs =   Input::all();
-            $solicitud    =   Solicitud::where('token',  $inputs['_token'])->firstOrFail();
+            $solicitudProduc    =   SolicitudProduct::where('id_solicitud',  $inputs['solicitud_id'])->get();
 
-            $product_found = false;
-//            foreach($solicitud->products as $product){
-//                if($product->id == $inputs['solicitud_id'])
-//                    $product_found = true;
-//            }
 
-            $dSol = $this->setRpta( $solicitud , 'SELECCIONE LA ACTIVIDAD' );
+            $dSol = $this->setRpta( $solicitudProduc , 'Agregando producto' );
             return $this->setRpta( $dSol );
         }
         catch( Exception $e )
