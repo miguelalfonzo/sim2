@@ -150,7 +150,7 @@ class SolicitudeController extends BaseController
             $solicitudProduct = SolicitudProduct::where('id_solicitud', $solicitudId)
                 ->where('id_producto', $productoId)
                 ->first();
-            if ($solicitudProduct === null)
+            if (is_null($solicitudProduct))
                 return $this->setRpta( true );
             else
                 return $this->setRpta( false );
