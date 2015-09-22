@@ -172,39 +172,6 @@ $(document).on("click", ".btn-delete-family", function ()
             $(".btn-delete-family").hide();
 });
 
-// add family-fondo
-
-$("#btn-add-family-fondo").on('click',function () {
-
-    var family_id = $("#selectfamilyadd").val();
-    $.ajax(
-        {
-            url: server + 'agregar-familia-fondo',
-            type: 'POST' ,
-            data:
-            {
-                _token       : GBREPORTS.token,
-                solicitud_id : id_solicitud.val() ,
-                family_id : family_id
-            }
-        }).fail( function ( statusCode , errorThrown )
-        {
-            ajaxError( statusCode , errorThrown );
-        }).done( function ( response )
-        {
-            if ( response.Status === 'Ok' )
-            {
-                //filterSelect( activity , response.Data , 'inversion' );
-                alert('ok');
-            }
-            else
-            {
-                bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
-            }
-        });
-
-});
-
 //Validations
 amount.numeric({negative:false});
 invoice_amount.numeric({negative:false});
@@ -2056,6 +2023,40 @@ $( document ).on( 'click' , '.open-details2' , function()
 
 });
 
+
+// add family-fondo
+
+$("#btn-add-family-fondo").on('click',function () {
+
+    var family_id = $("#selectfamilyadd").val();
+    $.ajax(
+        {
+            url: server + 'agregar-familia-fondo',
+            type: 'POST' ,
+            data:
+            {
+                _token       : GBREPORTS.token,
+                solicitud_id : id_solicitud.val() ,
+                family_id : family_id
+            }
+        }).fail( function ( statusCode , errorThrown )
+        {
+            ajaxError( statusCode , errorThrown );
+        }).done( function ( response )
+        {
+            if ( response.Status === 'Ok' )
+            {
+                //filterSelect( activity , response.Data , 'inversion' );
+                alert('ok');
+            }
+            else
+            {
+                bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+            }
+        });
+
+});
+
 $( document ).ready(function() 
 {
     $(".sim_alerta").hide();
@@ -2113,3 +2114,4 @@ $( document ).ready(function()
         listTable( 'solicitudes' );
     });
 });
+
