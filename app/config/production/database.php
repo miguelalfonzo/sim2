@@ -6,7 +6,7 @@ if( PRODUCCION )
 }
 else
 {
-	$default = 'oraclep';
+	$default = 'oracle_dev';
 }
 
 return array(
@@ -32,7 +32,7 @@ return array(
 	'connections' => array(
 
 		'oracle' => array(
-			'driver' => 'pdo-via-oci8',
+			'driver' => 'oracle',
 			'host' => '192.168.1.4',
 			'port' => '1521',
 			'database' => 'BDBAGO',
@@ -40,18 +40,7 @@ return array(
 			'password' => 'sim',
 			'charset' => 'utf8',
 			'prefix' => '',
-        ),
-        'oraclep' => array(
-			'driver' => 'pdo-via-oci8',
-			'host' => '192.168.1.4',
-			'port' => '1521',
-			'database' => 'BDBAGO',
-			'username' => 'simp',
-			'password' => 'simp',
-			'charset' => 'utf8',
-			'prefix' => '',
-        ),
-
-	),
+        )
+	)
 
 );

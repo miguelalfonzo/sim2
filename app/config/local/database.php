@@ -18,22 +18,6 @@ return array(
 	|
 	*/
 
-	'default' => 'oracle_dev',
-
-	'connections' => array(
-
-		'oracle_dev' => array(
-			'driver' => 'oracle',
-			'charset' => 'utf8',
-			'host' => '192.168.1.4',
-			'port' => '1521',
-			'database' => 'BDBAGO',
-			'username' => 'simp',
-			'password' => 'simp',
-			'prefix' => '',
-            //'schema' => 'public'
-		)
-
-	),
+	'default' => 'oracle_dev'
 
 );
