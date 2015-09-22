@@ -2048,7 +2048,7 @@ $("#btn-add-family-fondo").on('click',function () {
             {
                 //filterSelect( activity , response.Data , 'inversion' );
 
-                alert(response.data)
+                alert(response.Data)
             }
             else
             {
