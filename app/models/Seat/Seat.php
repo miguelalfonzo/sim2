@@ -13,8 +13,7 @@ class Seat extends Eloquent
     protected $primaryKey = null;
     public $incrementing = false;
     public $timestamps = false;
-    public $dates = [ 'penfchmod' ]; 
-
+    
     protected static function generateManualSeatCod( $year , $origen )
     {
         $lastSeat = Seat::select( 'substr( penclave , 0 , 5 ) numasiento' )->where( 'penaamovim' , $year )->where( 'penclave' , 'like' , $origen . '%' )
@@ -83,7 +82,7 @@ class Seat extends Eloquent
     	$seat->pennrocompor  = ' '; //CORRELATIVO POR DOCUMENTO DE BAGO PARA CONTROL DOCUMENTARIO , SE INGRESARA EN EL SISTEMA DEV DE BAGO
         $seat->pencodmoneda  = ' '; // CODIGO DE REGISTRO PARA LOS ASIENTOS EN DOLARES => 02 
     	$seat->pentipocambio = ' '; // TIPO DE CAMBIO PARA CUANDO EL ASIENTO ES EN DOLARES
-    	$seat->penfchmod     = Carbon::now();
+    	$seat->penfchmod     = Carbon::now()->format( 'd/m/Y' );;
         //$seat->penimporte2 = ' '; // IMPORTE EN SOLES DEL ASIENTO CUANDO 
     	if ( $seat->save() )
         {

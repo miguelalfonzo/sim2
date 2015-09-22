@@ -23,6 +23,7 @@ class TestController extends BaseController
 	public function testCarbon()
 	{
 		$a = Carbon::now();
+		return $a->format( 'd/m/Y' );
 		return $a->day;
 		$f = $a;
 		$c = $f->lastOfMonth()->day;
