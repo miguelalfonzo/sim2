@@ -17,6 +17,7 @@ class MigrateSeatController extends BaseController
 	{
 		try
 		{
+			$data = array( 'ok' => array() , 'error' => array() );
 			\Log::error( TB_BAGO_ASIENTO );
 			$systemSeats = Entry::whereNull( 'estado' )->orderBy( 'id_solicitud' , 'asc' )->orderBy( 'tipo_asiento' , 'asc' )
 						   ->orderBy( 'updated_at' , 'asc' )->orderBy( 'id' , 'asc' )->get();
@@ -39,7 +40,7 @@ class MigrateSeatController extends BaseController
 		catch( Exception $e )
 		{
 			$this->internalException( $e , __FUNCTION__ );
-			return $this->generateSeatExcel( $penclave , $errors );
+			return $this->generateSeatExcel( $data );
 		}
 	}
 
