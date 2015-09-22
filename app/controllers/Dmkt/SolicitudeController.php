@@ -141,19 +141,19 @@ class SolicitudeController extends BaseController
 
     public function addFamilyFundSolicitud()
     {
-        try
-        {
-            $inputs =   Input::all();
-            $solicitudProduc    =   SolicitudProduct::where('id_solicitud',  $inputs['solicitud_id'])->get();
+//        try
+//        {
+//            $inputs =   Input::all();
+            $solicitudProduct    =   SolicitudProduct::where('id_solicitud',  9)->get();
+            dd($solicitudProduct);
 
-
-            $dSol = $this->setRpta( $solicitudProduc , 'Agregando producto' );
+            $dSol = $this->setRpta( $solicitudProduct , 'Agregando producto' );
             return $this->setRpta( $dSol );
-        }
-        catch( Exception $e )
-        {
-            return $this->internalException( $e , __FUNCTION__ );
-        }
+//        }
+//        catch( Exception $e )
+//        {
+//            return $this->internalException( $e , __FUNCTION__ );
+//        }
     }
 
     public function viewSolicitude($token)
