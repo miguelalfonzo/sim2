@@ -1074,9 +1074,9 @@ class SolicitudeController extends BaseController
                         //ASIENTO DE IGV
                         if ( $expense->igv != 0 )
                         {
-                            $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, $cuentaExpense, $comprobante->cta_sunat, $fecha_origen, 
+                            $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, CUENTA_REPARO_GOBIERNO, $comprobante->cta_sunat, $fecha_origen, 
                                 ASIENTO_GASTO_IVA_IGV, ASIENTO_GASTO_COD_PROV_IGV, $expense->razon, ASIENTO_GASTO_COD_IGV, $expense->ruc, $expense->num_prefijo, 
-                                $expense->num_serie, ASIENTO_GASTO_BASE, round( $expense->igv * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN ) , $marca, $description_seat_igv, $tipo_responsable, 'IGV');
+                                $expense->num_serie, ASIENTO_GASTO_BASE, round( $expense->igv * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN ) , '' , $description_seat_igv, $tipo_responsable, 'IGV');
                         }
 
                         //ASIENTO IMPUESTO SERVICIO
@@ -1097,16 +1097,16 @@ class SolicitudeController extends BaseController
                             $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, CUENTA_REPARO_COMPRAS, '', $fecha_origen , '' , '' , '' , '' , '' , '' , '' , 
                                 ASIENTO_GASTO_BASE, round( $expense->igv  * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN ) , $marca, $description_seat_repair_base, '', 'REP');
                             $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, CUENTA_REPARO_GOBIERNO, '', $fecha_origen, '', '', '', '', '', '', '', 
-                                ASIENTO_GASTO_DEPOSITO, round( $expense->igv  * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN ) , $marca, $description_seat_repair_deposit, '', 'REP');
+                                ASIENTO_GASTO_DEPOSITO, round( $expense->igv  * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN ) , '' , $description_seat_repair_deposit, '', 'REP');
                         }
 
                         //ASIENTO RETENCION
                         if ($expense->idtipotributo == REGIMEN_RETENCION )
                         {
                             $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, CUENTA_RETENCION_DEBE, '', $fecha_origen, '', '', '', '', '', '', '', ASIENTO_GASTO_BASE, 
-                                $expense->monto_tributo  * $tasaCompra , $marca, $description_seat_retencion_base, '', 'RET');
+                                $expense->monto_tributo  * $tasaCompra , '' , $description_seat_retencion_base, '', 'RET');
                             $seatList[] = $this->createSeatElement($cuentaMkt, $solicitud->id, CUENTA_RETENCION_HABER, '', $fecha_origen, '', '', '', '', '', '', '', 
-                                ASIENTO_GASTO_DEPOSITO, round( $expense->monto_tributo  * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN ) , $marca, $description_seat_retencion_deposit, '', 'RET');
+                                ASIENTO_GASTO_DEPOSITO, round( $expense->monto_tributo  * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN ) , '' , $description_seat_retencion_deposit, '', 'RET');
                         }
 
                         //ASIENTO DETRACCION
