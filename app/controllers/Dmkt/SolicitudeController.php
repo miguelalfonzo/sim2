@@ -143,6 +143,12 @@ class SolicitudeController extends BaseController
     {
         try
         {
+            $solicitudProduct = SolicitudProduct::where('id_solicitud', 9)
+                ->where('id_producto', 12)
+                ->first();
+
+            dd($solicitudProduct);
+
             $inputs =   Input::all();
 
             $solicitudId =  $inputs['solicitud_id'];
