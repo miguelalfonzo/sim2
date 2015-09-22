@@ -213,22 +213,26 @@ class FondoMkt extends BaseController
         $start = $inputs[ 'start' ];
         $end   = $inputs[ 'end' ];  
         $subCategory = FondoSubCategoria::find( $inputs[ 'id_subcategoria' ] );
-        
+        \Log::info( $subCategory );
         $subCategoryType = $subCategory->fondoMktType;
-        
+        \Log::info( $subCategoryType );
         $fondoMktHistoriesData = FondoMktHistory::whereRaw( "created_at between to_date( '$start' , 'YYYY/MM/DD' ) and to_date( '$end' , 'YYYY/MM/DD' ) + 1" )
-                                ->where( 'id_tipo_to_fondo' , $subCategory->tipo )
+                                ->where( 'id_tipo_to_fondo' , trim( $subCategory->tipo ) )
                                 ->whereHas( $subCategoryType->relacion , function( $query ) use ( $subCategory )
                                 {
                                     $query->where( 'subcategoria_id' , $subCategory->id );
                                 })->get();
+
+        \Log::info( $fondoMktHistoriesData->toArray() );
         
         $fondoMktHistoriesTotalData = FondoMktHistory::whereRaw( "created_at between to_date( '$start' , 'YYYY/MM/DD' ) and sysdate + 1" )
-                                ->where( 'id_tipo_to_fondo' , $subCategory->tipo )
+                                ->where( 'id_tipo_to_fondo' , trim( $subCategory->tipo ) )
                                 ->whereHas( $subCategoryType->relacion , function( $query ) use ( $subCategory )
                                 {
                                     $query->where( 'subcategoria_id' , $subCategory->id );
                                 })->get();
+
+        \Log::error( json_encode( $fondoMktHistoriesData ) );
 
         $Fondos         = $subCategory->{ $subCategoryType->relacion };
         $FondosTotal    = $Fondos->sum( 'saldo' );
