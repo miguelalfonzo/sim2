@@ -1,7 +1,5 @@
 <?php
 
-const PRODUCCION = 1;
-
 const TIPO_ASIENTO_ANTICIPO = 'A';
 const IMAGE_PATH            = 'img/reembolso/';
 const WIDTH                 = 800;
