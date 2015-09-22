@@ -2047,7 +2047,8 @@ $("#btn-add-family-fondo").on('click',function () {
             if ( response.Status === 'Ok' )
             {
                 //filterSelect( activity , response.Data , 'inversion' );
-                alert('ok');
+
+                alert(response.data)
             }
             else
             {

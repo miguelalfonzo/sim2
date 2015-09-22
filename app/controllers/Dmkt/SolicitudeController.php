@@ -146,10 +146,15 @@ class SolicitudeController extends BaseController
             $inputs =   Input::all();
 
             $solicitudId =  $inputs['solicitud_id'];
-            $solicitudProduct    =   SolicitudProduct::where('id_solicitud', $solicitudId)->get();
+            $productoId=  $inputs['family_id'];
+            $solicitudProduct = SolicitudProduct::where('id_solicitud', $solicitudId)
+                ->where('id_producto', $productoId)
+                ->firstOrFail();
+            if ($solicitudId === null)
+                return $this->setRpta( true );
+            else
+                return $this->setRpta( false );
 
-            $dSol = $this->setRpta( $solicitudProduct , 'Agregando producto' );
-            return $this->setRpta( $dSol );
         }
         catch( Exception $e )
         {
