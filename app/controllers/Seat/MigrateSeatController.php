@@ -18,8 +18,6 @@ class MigrateSeatController extends BaseController
 		try
 		{
 			\Log::error( TB_BAGO_ASIENTO );
-			$penclave = array();
-			$errors   = array();
 			$systemSeats = Entry::whereNull( 'estado' )->orderBy( 'id_solicitud' , 'asc' )->orderBy( 'tipo_asiento' , 'asc' )
 						   ->orderBy( 'updated_at' , 'asc' )->orderBy( 'id' , 'asc' )->get();
 			$seats = array();
@@ -35,21 +33,28 @@ class MigrateSeatController extends BaseController
 					$seats[ $systemSeat->id_solicitud ][ $systemSeat->tipo_asiento ][] = $systemSeat;			
 				}
 			}
-
-			foreach( $seats as $idSolicitud => $seatTypes )
-			{
-				foreach( $seatTypes as $seatType => $seats )
-				{
-					$this->migrateSeat( $seatType , $seats , $idSolicitud , $penclave , $errors );
-				}
-			}
-			return $this->generateSeatExcel( $penclave , $errors );
+			$data = $this->transactionGenerateSeat( $seats );
+			return $this->generateSeatExcel( $data );
 		}
 		catch( Exception $e )
 		{
 			$this->internalException( $e , __FUNCTION__ );
 			return $this->generateSeatExcel( $penclave , $errors );
 		}
+	}
+
+	public function transactionGenerateSeat( $seats )
+	{
+		$penclave = array();
+		$errors   = array();
+		foreach( $seats as $idSolicitud => $seatTypes )
+		{
+			foreach( $seatTypes as $seatType => $seats )
+			{
+				$this->migrateSeat( $seatType , $seats , $idSolicitud , $penclave , $errors );
+			}
+		}
+		return array( 'ok' => $penclave , 'error' => $errors );
 	}
 
 	private function migrateSeat( $seatType , $seats , $idSolicitud , &$penclave , &$errors )
@@ -97,10 +102,8 @@ class MigrateSeatController extends BaseController
 				DB::rollback();
 				return;
 			}
-			
 		}
 		DB::commit();
-		//DB::rollback();
 	}
 
 	private function registerSeatLines( $key , $seat , $seatPrefix )
@@ -113,16 +116,14 @@ class MigrateSeatController extends BaseController
 		{
 			$state = ' ';
 		}
-		\Log::error( $seat->fec_origen );
 		$seatDate = Carbon::createFromFormat( 'Y-m-d H:i:s' , $seat->fec_origen );
 		return Seat::registerSeat( $seat , $seatPrefix , $key , $seatDate , $state );
 	}
 
-	private function generateSeatExcel( $penclave , $errors )
+	private function generateSeatExcel( $data )
 	{
-		\Log::error( $penclave );
 		$date = Carbon::now()->format( 'Y-m-d H-i-s' );
-		$data = array( 'ok' => $penclave , 'error' => $errors );
+		
 		Excel::create( 'Reporte de Asiento '. $date , function( $excel ) use ( $data  )
         {  
             $excel->sheet( 'Asientos' , function( $sheet ) use ( $data )

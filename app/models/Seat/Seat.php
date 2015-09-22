@@ -25,9 +25,7 @@ class Seat extends Eloquent
         }   
         else
         {
-            \Log::error( $origen );
             $seat = $origen . str_pad( ( $lastSeat->numasiento + 1 ) , 4 , 0 , STR_PAD_LEFT );
-            \Log::error( $seat );
         }
         return $seat;
     }
@@ -55,9 +53,19 @@ class Seat extends Eloquent
         $seat->pencodprovee  = Self::blankspace( $systemSeat->cod_pro ); //CODigo del sistema para los asientos de documentos con IGV = "90000"
         $seat->pencoddivisi  = $systemSeat->cod_pro == 90000 ? 1 : ' '; // or '1' 
         $seat->penestado     = $state; //The First line has 'C'
-        $seat->pennrocompro  = is_null( $systemSeat->prefijo ) ? ' ' : 
-                               substr( str_pad( $systemSeat->prefijo , 3 , 0 , STR_PAD_LEFT ) , str_pad( $systemSeat->prefijo , 3 , 0 , STR_PAD_LEFT ) - 3 , 3 ) 
-                               . $systemSeat->cbte_prov;   // 3 digitos para la serie del comprobante y el numero del Comprobante
+        
+        // 4 digitos para la serie del comprobante y al empezar tiene un espacio en blanco el cual solo aparece si tiene una letra la serie || y el numero del Comprobante
+        if ( is_null( $systemSeat->prefijo ) )
+        {
+            $serie = ' ';
+        }
+        else
+        {
+            $tresDigitosSerie = str_pad( $systemSeat->prefijo , 3 , 0 , STR_PAD_LEFT );
+            $cuatroDigitosSerie = str_pad( $tresDigitosSerie , 4 , ' ' , STR_PAD_LEFT );
+            $serie = substr( $cuatroDigitosSerie , strlen( $cuatroDigitosSerie ) - 4 , 4 ) . $systemSeat->cbte_prov;
+        }
+        $seat->pennrocompro  = $serie;
         $seat->pennombrepro  = Self::blankspace( $systemSeat->nom_prov ); // RAZON SOCIAL SOLO PARA DOCUMENTOS
         $seat->pencoddocpro  = Self::blankspace( $systemSeat->cod ); // CODIGO del sistema para documentos con igv = "80"
         $seat->pennrodocpro  = Self::blankspace( $systemSeat->ruc );  // RUC SOLO PARA DOCUMENTOS

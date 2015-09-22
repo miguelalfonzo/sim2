@@ -46,6 +46,7 @@ use \Response;
 use \Carbon\Carbon;
 use \Fondo\FondoMkt;
 use \Fondo\FondoInstitucional;
+use \Seat\MigrateSeatController;
 
 class SolicitudeController extends BaseController
 {
@@ -1227,8 +1228,11 @@ class SolicitudeController extends BaseController
         try {
             DB::beginTransaction();
             $dataInputs = Input::all();
-            if (isset($dataInputs['seatList']))
-                foreach ($dataInputs['seatList'] as $key => $seatItem) {
+            $seats = array();
+            if ( isset( $dataInputs[ 'seatList' ] ) )
+            {
+                foreach ($dataInputs['seatList'] as $key => $seatItem) 
+                {
                     $seat = new Entry;
                     $seat->id = $seat->lastId() + 1;
                     $seat->num_cuenta = $seatItem['numero_cuenta'];
@@ -1250,7 +1254,18 @@ class SolicitudeController extends BaseController
                     $seat->id_solicitud = $seatItem['solicitudId'];
                     $seat->tipo_asiento = ASIENTO_GASTO_TIPO;
                     $seat->save();
+
+                    if( isset( $seats[ $seatItem[ 'solicitudId' ] ][ ASIENTO_GASTO_TIPO ] ) )
+                    {
+                        $seats[ $seatItem[ 'solicitudId' ] ][ ASIENTO_GASTO_TIPO ][] = $seat;   
+                    }
+                    else
+                    {
+                        $seats[ $seatItem[ 'solicitudId' ] ][ ASIENTO_GASTO_TIPO ] = array();
+                        $seats[ $seatItem[ 'solicitudId' ] ][ ASIENTO_GASTO_TIPO ][] = $seat;              
+                    }
                 }
+            }
 
             $solicitud = Solicitud::find($dataInputs['idsolicitud']);
             $oldIdEstado = $solicitud->id_estado;
@@ -1266,12 +1281,20 @@ class SolicitudeController extends BaseController
             else
                 $middleRpta = $this->setStatus($oldIdEstado, GENERADO, $user->id, $user->id, $solicitud->id);
 
-            if ($middleRpta[status] == ok) {
+            if ($middleRpta[status] == ok) 
+            {
                 DB::commit();
-                if ($solicitud->idtiposolicitud == REEMBOLSO)
+                if ($solicitud->idtiposolicitud == REEMBOLSO )
+                {
                     Session::put('state', R_REVISADO);
+                }
                 else
+                {
                     Session::put('state', R_FINALIZADO);
+                }
+                $migrateSeatController = new MigrateSeatController;
+                $data = $migrateSeatController->transactionGenerateSeat( $seats );
+                Log::info( $data );
                 return $middleRpta;
             }
             DB::rollback();
@@ -1333,6 +1356,9 @@ class SolicitudeController extends BaseController
                 }
                 $solicitud->save();
 
+                $seats = array();
+                $seats[ $solicitud->id ][ TIPO_ASIENTO_ANTICIPO ] = array();
+
                 for ( $i = 0 ; $i < count( $inputs[ 'number_account' ] ) ; $i++ ) 
                 {
                     $tbEntry               = new Entry;
@@ -1345,7 +1371,7 @@ class SolicitudeController extends BaseController
                     $tbEntry->id_solicitud = $inputs[ 'idsolicitud' ];
                     $tbEntry->tipo_asiento = TIPO_ASIENTO_ANTICIPO;
                     $tbEntry->save();
-                    \Log::error( $tbEntry->toJson() );
+                    $seats[ $solicitud->id ][ TIPO_ASIENTO_ANTICIPO ][] = $tbEntry;
                 }
 
                 if( $solicitud->idtiposolicitud == REEMBOLSO )
@@ -1369,6 +1395,10 @@ class SolicitudeController extends BaseController
                         Session::put( 'state' , R_GASTO );
                     }
                     DB::commit();
+
+                    $migrateSeatController = new MigrateSeatController;
+                    $data = $migrateSeatController->transactionGenerateSeat( $seats );
+                    Log::info( $data );
                     return $middleRpta;
                 }
                 DB::rollback();
