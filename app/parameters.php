@@ -14,7 +14,6 @@ const status                = 'Status';
 const description           = 'Description';
 const DB                    = 'Base de Datos';
 const CUENTA_BAGO           = 'B';
-const DOCUMENTO_NO_SUSTENTABLE_ID = 7;
 
 const SOLES   = 1;
 const DOLARES = 2;
@@ -105,10 +104,6 @@ const GASTO                                   = 4;
 | TESTING
 |--------------------------------------------------------------------------
 */
-
-
-//TIPO DE DOCUMENTO
-const RECIBO_HONORARIO = 2;
 
 //CODIGO DEL SISTEMA
 const SISTEMA_SIM      = 2;
@@ -395,5 +390,6 @@ const CUENTA_SOLES = 1041100;
 const REGIMEN_RETENCION  = 1;
 const REGIMEN_DETRACCION = 2;
 
-//DOCUMENTOS
+//IDS TIPO DE DOCUMENTO
 const DOC_RECIBO_HONORARIO = 2;
+const DOC_NO_SUSTENTABLE = 7;

@@ -1,7 +1,6 @@
 <?php
 
 namespace Dmkt;
-
 use \Eloquent;
 
 class Solicitud extends Eloquent

@@ -474,7 +474,7 @@ class SolicitudeController extends BaseController
 
     private function textLv($solicitud)
     {
-        return substr( $solicitud->id . ' ' . $solicitud->asignedTo->personal->seat_name . ' ' . strtoupper( $solicitud->titulo ) , 0 , 50 );
+        return substr( $solicitud->id . ' ' . $solicitud->asignedTo->personal->seat_name . ' ' . strtoupper( $solicitud->investment->accountFund->nombre ) , 0 , 50 );
     }
 
     private function textAccepted($solicitud)
@@ -1122,11 +1122,26 @@ class SolicitudeController extends BaseController
 
                         //ASIENTO DOCUMENTO OTROS - UN SOLO ASIENTO POR TODOS LOS ITEMS QUE TENGA
                         $description_seat_other_doc = strtoupper( $username .' '. $expense->descripcion );
-                        if ( $expense->idcomprobante == DOCUMENTO_NO_SUSTENTABLE_ID )
+                        if ( $expense->idcomprobante == DOC_NO_SUSTENTABLE )
                         {
                             $seatList[] = $this->createSeatElement($cuentaMkt , $solicitud->id , $cuentaExpense , $comprobante->cta_sunat, $fecha_origen, '' , 
                                 ASIENTO_GASTO_COD_PROV, $expense->razon, ASIENTO_GASTO_COD, $expense->ruc, $expense->num_prefijo, $expense->num_serie, ASIENTO_GASTO_BASE, 
                                 round( $expense->monto  * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN ) , $marca, $description_seat_other_doc, $tipo_responsable, ''); 
+                        }
+                        else if ( $expense->idcomprobante == DOC_RECIBO_HONORARIO  )
+                        {
+                            if ( $solicitud->id_inversion == 17 ) //Inversion Micromarketing y tipo de documento recibo x honorario
+                            {
+                                $cuentaExpenseDinamic = 6329200;
+                            }
+                            else
+                            {
+                                $cuentaExpenseDinamic = $cuentaExpense;
+                            }
+
+                            $seatList[] = $this->createSeatElement( $cuentaMkt , $solicitud->id , $cuentaExpenseDinamic , '' , $fecha_origen , '' , ASIENTO_GASTO_COD_PROV , $expense->razon , ASIENTO_GASTO_COD , '' , '' , '' , ASIENTO_GASTO_BASE, 
+                                round( $expense->monto  * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN ) , $marca, $description_seat_other_doc, $tipo_responsable, ''); 
+                            
                         }
                         else
                         {

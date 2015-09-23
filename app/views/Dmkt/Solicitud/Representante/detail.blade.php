@@ -110,12 +110,14 @@
     @include( 'Dmkt.Solicitud.Detail.devolucion2')
 
     <!-- Description Solicitude -->
-    <div class="form-group col-sm-12 col-md-12 col-lg-12">
-        <label class="control-label">
-            Descripcion de la Solicitud
-        </label>
-        <textarea class="form-control col-sm-12 col-md-12 col-lg-12" readonly>{{$solicitud->descripcion}}</textarea>
-    </div>
+    @if ( is_null( $solicitud->descripcion ) || empty( trim( $solicitud->descripcion ) ) )
+        <div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
+            <label class="control-label">
+                Descripcion de la Solicitud
+            </label>
+            <textarea class="form-control" style="resize:both" readonly>{{$solicitud->descripcion}}</textarea>
+        </div>
+    @endif
 
     <!-- Observation-->
     @include('Dmkt.Solicitud.Detail.anotation')
