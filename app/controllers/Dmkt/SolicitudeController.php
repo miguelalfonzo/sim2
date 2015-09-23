@@ -156,10 +156,10 @@ class SolicitudeController extends BaseController
                 $politicType = $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario;
                 $fondo_product =  $solicitudProduct->getSubFondo( $politicType , $solicitud, $productoId);
 
-                return $this->setRpta( array( 'cond' => true , 'fondo_product' => $fondo_product  )   );
+                return $this->setRpta( array( 'Cond' => true , 'Fondo_product' => $fondo_product  )   );
             }
             else
-                return $this->setRpta(  array( 'cond' => false ) );
+                return $this->setRpta(  array( 'Cond' => false ) );
 
         }
         catch( Exception $e )
