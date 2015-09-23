@@ -2058,9 +2058,11 @@ $("#btn-add-family-fondo").on('click',function () {
                     '<input name="monto_producto[]" type="text" class="form-control text-right amount_families" value="0" style="padding:0px;text-align:center"></div>'+
                     '<input type="hidden" name="producto[]" value="4"></li>');
 
+
+                    $('#addProduct').modal('toggle');
                 }
 
-                alert(response.Data.Cond)
+
             }
             else
             {
