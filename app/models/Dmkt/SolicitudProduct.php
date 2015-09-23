@@ -22,11 +22,12 @@ class SolicitudProduct extends Eloquent
             return $lastId->id;
     }
 
-    public function getSubFondo( $userType , $solicitud, $id_producto = null )
+    public function getSubFondo( $userType , $solicitud, $productoId = null )
     {
-        if ($id_producto == null)
+        if (isset($productoId))
             $id_producto = $this->id_producto;
-
+        else
+            $id_producto = $productoId;
         if ( $userType == SUP )
         {
             $userid = $solicitud->asigned_to->personal->rmSup->user_id;
