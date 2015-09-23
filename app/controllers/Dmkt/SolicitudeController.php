@@ -1121,7 +1121,7 @@ class SolicitudeController extends BaseController
                         $description_seat_renta4ta_deposit = strtoupper('RENTA 4TA CATEGORIA ' . $desc);
 
                         //ASIENTO DOCUMENTO OTROS - UN SOLO ASIENTO POR TODOS LOS ITEMS QUE TENGA
-                        $description_seat_other_doc = strtoupper( $username .' '. $expense->descripcion );
+                        $description_seat_other_doc = strtoupper( $username .' '. $expense->razon );
                         if ( $expense->idcomprobante == DOC_NO_SUSTENTABLE )
                         {
                             $seatList[] = $this->createSeatElement($cuentaMkt , $solicitud->id , $cuentaExpense , $comprobante->cta_sunat, $fecha_origen, '' , 
@@ -1130,6 +1130,7 @@ class SolicitudeController extends BaseController
                         }
                         else if ( $expense->idcomprobante == DOC_RECIBO_HONORARIO  )
                         {
+                            $descripcion_rh = $description_seat_other_doc . ' ' . 'RH/'.$expense->num_prefijo . '-' . $expense->num_serie;
                             if ( $solicitud->id_inversion == 17 ) //Inversion Micromarketing y tipo de documento recibo x honorario
                             {
                                 $cuentaExpenseDinamic = 6329200;
@@ -1139,8 +1140,8 @@ class SolicitudeController extends BaseController
                                 $cuentaExpenseDinamic = $cuentaExpense;
                             }
 
-                            $seatList[] = $this->createSeatElement( $cuentaMkt , $solicitud->id , $cuentaExpenseDinamic , '' , $fecha_origen , '' , ASIENTO_GASTO_COD_PROV , $expense->razon , ASIENTO_GASTO_COD , '' , '' , '' , ASIENTO_GASTO_BASE, 
-                                round( $expense->monto  * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN ) , $marca, $description_seat_other_doc, $tipo_responsable, ''); 
+                            $seatList[] = $this->createSeatElement( $cuentaMkt , $solicitud->id , $cuentaExpenseDinamic , '' , $fecha_origen , '' , ASIENTO_GASTO_COD_PROV , '' , ASIENTO_GASTO_COD , '' , '' , '' , ASIENTO_GASTO_BASE, 
+                                round( $expense->monto  * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN ) , $marca, $descripcion_rh , $tipo_responsable, ''); 
                             
                         }
                         else
