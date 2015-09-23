@@ -22,8 +22,11 @@ class SolicitudProduct extends Eloquent
             return $lastId->id;
     }
 
-    public function getSubFondo( $userType , $solicitud )
+    public function getSubFondo( $userType , $solicitud, $id_producto = null )
     {
+        if ($id_producto === null)
+            $id_producto = $this->id_producto;
+
         if ( $userType == SUP )
         {
             $userid = $solicitud->asigned_to->personal->rmSup->user_id;
@@ -35,7 +38,7 @@ class SolicitudProduct extends Eloquent
                         ->where('fs.saldo' , '>' , 0 )
                         ->where('trim( fsc.tipo )' , FONDO_SUBCATEGORIA_SUPERVISOR )
                         ->where('fs.supervisor_id' , $userid )->orderBy( 'm.descripcion' , 'asc' )
-                        ->where( 'fs.marca_id' , $this->id_producto )
+                        ->where( 'fs.marca_id' , $id_producto )
                         ->get();
         }
         else if ( in_array( $userType , array( GER_PROD , GER_PROM ) ) )
@@ -50,7 +53,7 @@ class SolicitudProduct extends Eloquent
                 $query->where( 'trim( fsc.tipo )' , $userType );
             })
             ->where( 'f.saldo' , '>' , 0 )->orderBy( 'm.descripcion' , 'asc' )
-            ->where( 'f.marca_id' , $this->id_producto )
+            ->where( 'f.marca_id' , $id_pduducto )
             ->get();
         }
         else if( $userType == ASIS_GER )
