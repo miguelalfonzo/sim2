@@ -53,7 +53,7 @@ class SolicitudProduct extends Eloquent
                 $query->where( 'trim( fsc.tipo )' , $userType );
             })
             ->where( 'f.saldo' , '>' , 0 )->orderBy( 'm.descripcion' , 'asc' )
-            ->where( 'f.marca_id' , $id_pduducto )
+            ->where( 'f.marca_id' , $id_producto )
             ->get();
         }
         else if( $userType == ASIS_GER )
