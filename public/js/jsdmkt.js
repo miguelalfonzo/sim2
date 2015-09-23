@@ -2047,13 +2047,13 @@ $("#btn-add-family-fondo").on('click',function () {
             if ( response.Status === 'Ok' )
             {
                 //filterSelect( activity , response.Data , 'inversion' );
-                if(response.Data == true){
+                if(response.Data.Cond == true){
 
 
 
                 }
 
-                alert(response.Data)
+                alert(response.Data.Cond)
             }
             else
             {
