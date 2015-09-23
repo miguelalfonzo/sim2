@@ -24,7 +24,7 @@ class SolicitudProduct extends Eloquent
 
     public function getSubFondo( $userType , $solicitud, $id_producto = null )
     {
-        if ($id_producto === null)
+        if ($id_producto == null)
             $id_producto = $this->id_producto;
 
         if ( $userType == SUP )
