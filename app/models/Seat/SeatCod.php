@@ -31,13 +31,13 @@ class SeatCod extends Eloquent
 
     private static function registerSeat( $seat , $year , $origen , $i )
     {
-        $seatCod = new SeatCod;
-        $seatCod->anio   = $year;
-        $seatCod->origen = $origen;
+        $seatCod             = new SeatCod;
+        $seatCod->anio       = $year;
+        $seatCod->origen     = $origen;
         $seatCod->numasiento = $seat;
-        $seatCod->usuario = 'JORTIZ';
-        $seatCod->f_proceso = Carbon::now();
-        $seatCod->f_trn = Carbon::now();
+        $seatCod->usuario    = 'MQUIROZ';
+        $seatCod->f_proceso  = Carbon::now();
+        $seatCod->f_trn      = Carbon::now();
         if ( $seatCod->save() )
         {
             return $seatCod->numasiento;

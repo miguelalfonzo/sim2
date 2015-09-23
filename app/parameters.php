@@ -280,8 +280,8 @@ if ( App::environment( 'production' ) && PRODUCCION )
     define( 'TB_USER_APP'         , 'USR.USER_APP' );
     define( 'TB_PERSONAL'         , 'USR.PERSONAL' );
     define( 'TB_TIPO_PERSONAL'    , 'USR.TIPO_PERSONAL' );
-    define( 'TB_BAGO_COD_ASIENTO' , 'B3P.CXP_CORREL_ASIENTOS' );
-    define( 'TB_BAGO_ASIENTO'     , 'B3P.PENDIEN_DIARIO' );
+    define( 'TB_BAGO_COD_ASIENTO' , 'B3O.CXP_CORREL_ASIENTOS' );
+    define( 'TB_BAGO_ASIENTO'     , 'B3O.PENDIEN_DIARIO' );
 }
 else
 {

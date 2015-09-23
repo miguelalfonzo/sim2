@@ -78,7 +78,7 @@ class Seat extends Eloquent
         $seat->pencanthojas  = Self::blankspace( $systemSeat->tipo_responsable ); //CODIGO DE TIPO DE RESPONSABLE 1 , 2, 4 PARA LA SUNAT DE USUARIOS EFECTOS A OPERACION GRAVADA => 1  , NO GRAVADA => 2  O AMBOS = 4
         $seat->pencondiva    = $systemSeat->tipo_responsable == 1 ? 'IN' : ( $seat->tipo_responsable == 2 ? 'NI' : ( $seat->tipo_responsable == 4 ? 'MO' : ' ' ) ); //Depende de la anterior columna para 1 => IN , 2 => NI y 4 => MO
         $seat->pengentarjeta = 'N' ; // Flag 'N' y 'S' . indica estado para el sistema de bago N => NO Y S => SI
-        $seat->penusuario    = 'JORTIZ' ;// USUARIO 
+        $seat->penusuario    = 'MQUIROZ' ;// USUARIO 
     	$seat->pennrocompor  = ' '; //CORRELATIVO POR DOCUMENTO DE BAGO PARA CONTROL DOCUMENTARIO , SE INGRESARA EN EL SISTEMA DEV DE BAGO
         $seat->pencodmoneda  = ' '; // CODIGO DE REGISTRO PARA LOS ASIENTOS EN DOLARES => 02 
     	$seat->pentipocambio = ' '; // TIPO DE CAMBIO PARA CUANDO EL ASIENTO ES EN DOLARES
