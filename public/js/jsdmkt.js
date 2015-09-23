@@ -2048,10 +2048,14 @@ $("#btn-add-family-fondo").on('click',function () {
             {
                 //filterSelect( activity , response.Data , 'inversion' );
                 if(response.Data.Cond == true){
-                    console.log(response.Data.Fondo_product);
-                    //$.each( response.Data.Fondo_product, function( i, val ) {
-                    //    $( "#" + i ).append( document.createTextNode( " - " + val ) );
-                    //});
+
+
+
+                    $.each( response.Data.Fondo_product, function( i, val ) {
+                        //$( "#" + i ).append( document.createTextNode( " - " + val ) );
+                        console.log(i);
+                        console.log(val);
+                    });
 
                 }
 

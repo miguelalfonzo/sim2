@@ -12,7 +12,7 @@
                 </button>
             @endif
         </div>
-        <ul class="list-group">
+        <ul class="list-group" id="list-product">
             @foreach( $solicitud->products as $product )
                 <li class="list-group-item">        
                     @if( $politicStatus )

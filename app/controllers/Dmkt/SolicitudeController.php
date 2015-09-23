@@ -150,16 +150,15 @@ class SolicitudeController extends BaseController
             $solicitudProduct = SolicitudProduct::where('id_solicitud', $solicitudId)
                 ->where('id_producto', $productoId)
                 ->first();
-            if (count($solicitudProduct)){
+            if (count($solicitudProduct))
+                return $this->setRpta( array( 'Cond' =>  false  )   );
 
+            else {
                 $solicitud = Solicitud::where('id', $solicitudId)->first();
                 $politicType = $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario;
                 $fondo_product =  $solicitudProduct->getSubFondo( $politicType , $solicitud, $productoId);
-
-                return $this->setRpta( array( 'Cond' => true , 'Fondo_product' => $fondo_product  )   );
+                return $this->setRpta(  array( 'Cond' => true , 'Fondo_product' => $fondo_product  ) );
             }
-            else
-                return $this->setRpta(  array( 'Cond' => false ) );
 
         }
         catch( Exception $e )
