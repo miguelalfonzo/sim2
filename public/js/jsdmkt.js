@@ -2048,13 +2048,12 @@ $("#btn-add-family-fondo").on('click',function () {
             {
                 //filterSelect( activity , response.Data , 'inversion' );
                 if(response.Data.Cond == true){
-                    var options_val = "";
+                    var options_val = '<option selected="" disabled="" value="0">Seleccione el Fondo</option>';
                     $.each( response.Data.Fondo_product, function( i, val ) {
-                        options_val += '<option selected="" disabled="" value="0">Seleccione el Fondo</option><option value="' +
-                        val.id+',' + val.tipo+'">'+ val.descripcion +' S/.'+ val.saldo_disponible +'</option>';
+                        options_val += '<option value="'+val.id+',' + val.tipo+'">'+ val.descripcion +' S/.'+ val.saldo_disponible +'</option>';
                     });
                     $("#list-product").append('<li class="list-group-item"><div class="input-group input-group-sm"><span class="input-group-addon" style="width:15%;">'+
-                    $("#selectfamilyadd").text() + '</span><select name="fondo_producto[]" class="selectpicker form-control">' +
+                    $("#selectfamilyadd option:selected").text() + '</span><select name="fondo_producto[]" class="selectpicker form-control">' +
                     options_val +'</select><span class="input-group-addon">S/.</span>'+
                     '<input name="monto_producto[]" type="text" class="form-control text-right amount_families" value="0" style="padding:0px;text-align:center"></div>'+
                     '<input type="hidden" name="producto[]" value="4"></li>');
