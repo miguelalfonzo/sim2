@@ -77,7 +77,10 @@ class BaseController extends Controller
     {
         $now = Carbon::now();
         $created = new Carbon( $solicitud->created_at );
-        $expenseDate = $now->subDays( 7 )->max( $created );
+        if ( $solicitud->idtiposolicitud = 3)
+            $expenseDate = (new Carbon('first day of August 2015'))->max( $created );
+        else
+            $expenseDate = $now->subDays( 7 )->max( $created );
         return array( 'startDate' => $expenseDate->subDays( $range )->format('d/m/Y') , 'endDate' => Carbon::now()->addDays( $range )->format('d/m/Y') );
     }
 
