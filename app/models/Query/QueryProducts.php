@@ -11,7 +11,7 @@
         {
 	        $join->on( 'F.tipo' , '=' , TIPO_FAMILIA )->on( 'F.CODIGO' , '=' , 'A.FOFAMILIA' );
         })
-        ->where('F.CODIGO', '!=', 21)
+        ->where('F.CODIGO', '=', 21)
         ->distinct()->orderBy( 'F.NOMBRE' , 'ASC' );
 
 ?>
