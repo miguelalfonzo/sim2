@@ -111,11 +111,12 @@ class SolicitudeController extends BaseController
     public function newSolicitude()
     {
         include(app_path() . '/models/Query/QueryProducts.php');
-        $data = array('reasons' => Reason::all(),
-            'activities' => Activity::order(),
-            'payments' => TypePayment::all(),
-            'currencies' => TypeMoney::all(),
-            'families' => $qryProducts->get(),
+        $data = array(
+            'reasons'     => Reason::all(),
+            'activities'  => Activity::order(),
+            'payments'    => TypePayment::all(),
+            'currencies'  => TypeMoney::all(),
+            'families'    => $qryProducts->get(),
             'investments' => InvestmentType::orderMkt());
         if ( in_array(Auth::user()->type, array( SUP, GER_PROD , ASIS_GER ) ) )
             $data[ 'reps' ] = Personal::getRms();
@@ -125,42 +126,64 @@ class SolicitudeController extends BaseController
     public function editSolicitud($token)
     {
         include(app_path() . '/models/Query/QueryProducts.php');
-        $data = array( 'solicitud'   => Solicitud::where('token', $token)->firstOrFail(),
-                       'reasons'     => Reason::all(),
-                       'activities'  => Activity::order(),
-                       'payments'    => TypePayment::all(),
-                       'currencies'  => TypeMoney::all(),
-                       'families'    => $qryProducts->get(),
-                       'investments' => InvestmentType::orderMkt(),
-                       'edit'        => true );
+        $data = array( 
+           'solicitud'   => Solicitud::where('token', $token)->firstOrFail(),
+           'reasons'     => Reason::all(),
+           'activities'  => Activity::order(),
+           'payments'    => TypePayment::all(),
+           'currencies'  => TypeMoney::all(),
+           'families'    => $qryProducts->get(),
+           'investments' => InvestmentType::orderMkt(),
+           'edit'        => true );
         $data[ 'detalle' ] = $data['solicitud']->detalle;
         if ( in_array(Auth::user()->type, array( SUP , GER_PROD , ASIS_GER ) ) )
             $data[ 'reps' ] = Personal::getRms();
         return View::make('Dmkt.Register.solicitud', $data);
     }
 
+    private function validateApprobationFamily( $inputs )
+    {
+        $rules = array( 'solicitud_id' => 'required|numeric|min:1|exists:solicitud,id' );
+        $validator = Validator::make( $inputs , $rules );
+        if ( $validator->fails() )
+        {
+            return $this->warningException(substr($this->msgValidator($validator), 0, -1), __FUNCTION__, __LINE__, __FILE__);
+        }
+        else
+        {
+            \Log::error( implode( SolicitudProduct::where( 'id_solicitud' , $inputs[ 'solicitud_id' ] )->lists( 'id_producto' ) ) );
+            $rules = array( 
+                'producto' => 'required|numeric|min:1|not_in:'. implode( SolicitudProduct::where( 'id_solicitud' , $inputs[ 'solicitud_id' ] )->lists( 'id_producto' ) , ',' ) );
+            $validator = Validator::make( $inputs , $rules );
+            if ( $validator->fails() )
+            {
+                return $this->warningException( substr($this->msgValidator($validator), 0, -1), __FUNCTION__, __LINE__, __FILE__);
+            }
+            return $this->setRpta();
+        }
+    }
 
     public function addFamilyFundSolicitud()
     {
         try
         {
             $inputs =   Input::all();
-
-            $solicitudId =  $inputs['solicitud_id'];
-            $productoId=  $inputs['family_id'];
-            $solicitudProduct = SolicitudProduct::where('id_solicitud', $solicitudId)
-                ->where('id_producto', $productoId)
-                ->first();
-            if (count($solicitudProduct))
-                return $this->setRpta( array( 'Cond' =>  false  )   );
-
-            else {
-                $solicitudProduct = SolicitudProduct::where('id_solicitud', $solicitudId)->first();
-                $solicitud = Solicitud::where('id', $solicitudId)->first();
-                $politicType = $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario;
-                $fondo_product =  $solicitudProduct->getSubFondo( $politicType , $solicitud, $productoId);
-                return $this->setRpta(  array( 'Cond' => true , 'Fondo_product' => $fondo_product  ) );
+            $middleRpta = $this->validateApprobationFamily( $inputs );
+            if ( $middleRpta[ status ] === ok )
+            {
+                $middleRpta = $this->setProducts( $inputs[ 'solicitud_id' ] , array( $inputs[ 'producto' ] ) );
+                if ( $middleRpta[ status ] === ok )
+                {
+                    DB::beginTransaction();
+                    $solicitudProduct = SolicitudProduct::where( 'id_producto' , $inputs[ 'producto' ] )->where( 'id_solicitud' , $inputs[ 'solicitud_id' ] )->first();
+                    $solicitud = Solicitud::where( 'id' , $inputs[ 'solicitud_id' ] )->first();
+                    $politicType = $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario;
+                    $fondo_product = $solicitudProduct->getSubFondo( $politicType , $solicitud );
+                    DB::commit();
+                    return $this->setRpta(  array( 'Cond' => true , 'Fondo_product' => $fondo_product  ) );
+                }
             }
+            return $middleRpta;
 
         }
         catch( Exception $e )
@@ -173,17 +196,21 @@ class SolicitudeController extends BaseController
     {
         try
         {
-            $solicitud = Solicitud::where('token', $token)->first();
+            $solicitud     = Solicitud::where('token', $token)->first();
             $politicStatus = FALSE;
-            $user = Auth::user();
-            if (is_null($solicitud))
+            $user          = Auth::user();
+            if ( is_null( $solicitud ) )
+            {
                 return $this->warningException('No se encontro la Solicitud con Token: ' . $token, __FUNCTION__, __LINE__, __FILE__);
-
+            }
             $detalle = $solicitud->detalle;
-            include(app_path() . '/models/Query/QueryProducts.php');
-            $data = array('solicitud' => $solicitud, 'detalle' => $detalle,'families'    => $qryProducts->get());
+            include( app_path() . '/models/Query/QueryProducts.php' );
+            $data = array( 
+                'solicitud' => $solicitud , 
+                'detalle' => $detalle );
 
-            if ( $solicitud->idtiposolicitud != SOL_INST && in_array( $solicitud->id_estado, array(PENDIENTE, DERIVADO, ACEPTADO) ) ) {
+            if ( $solicitud->idtiposolicitud != SOL_INST && in_array( $solicitud->id_estado, array( PENDIENTE , DERIVADO , ACEPTADO ) ) ) 
+            {
                 $politicType = $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario;
                 if ( in_array( $politicType , array( Auth::user()->type , Auth::user()->tempType() ) )
                     && ( array_intersect( array( Auth::user()->id, Auth::user()->tempId() ), $solicitud->managerEdit( $politicType )->lists( 'id_gerprod' ) ) ) ) 
@@ -192,6 +219,7 @@ class SolicitudeController extends BaseController
                     if ( in_array( $politicType , array( GER_PROD , GER_PROM , GER_COM , GER_GER ) ) )
                     {
                         $data[ 'payments' ] = TypePayment::all();
+                        $data[ 'families' ] = $qryProducts->get();
                     }
                     $data[ 'tipo_usuario' ] = $politicType;
                     $solicitud->status = BLOCKED;
@@ -199,44 +227,55 @@ class SolicitudeController extends BaseController
                     $solicitud->save();
                     $data[ 'solicitud' ]->status = 1;
                 }
-            } elseif (Auth::user()->type == TESORERIA && $solicitud->id_estado == DEPOSITO_HABILITADO) {
+            } 
+            elseif ( Auth::user()->type == TESORERIA && $solicitud->id_estado == DEPOSITO_HABILITADO ) 
+            {
                 $data['banks'] = Account::banks();
                 $data['deposito'] = $detalle->monto_aprobado;
-            } elseif (Auth::user()->type == CONT) {
+            } 
+            elseif ( Auth::user()->type == CONT ) 
+            {
                 $data['date'] = $this->getDay();
-                if ($solicitud->id_estado == DEPOSITADO)
+                if ($solicitud->id_estado == DEPOSITADO )
+                {
                     $data['lv'] = $this->textLv($solicitud);
+                }
                 elseif ( ! is_null( $solicitud->toDeliveredHistory ) )
                 {
-                    $data                = array_merge( $data , $this->expenseData( $solicitud, $detalle->monto_actual ) );
-                    $data[ 'igv' ]       = Table::getIGV();
-                    $data[ 'regimenes' ] = Regimen::all();
+                    $this->setExpenseData( $solicitud , $detalle , $data );
                 }
-            } elseif (!is_null($solicitud->expenseHistory) && $user->id == $solicitud->id_user_assign) {
-                $data = array_merge($data, $this->expenseData($solicitud, $detalle->monto_actual));
-                $data['igv'] = Table::getIGV();
-                $data['date'] = $this->getExpenseDate($solicitud);
+            } 
+            elseif ( ! is_null( $solicitud->expenseHistory ) && $user->id == $solicitud->id_user_assign ) 
+            {
+                $this->setExpenseData( $solicitud , $detalle , $data );
+                $event = Event::where( 'solicitud_id', $solicitud->id )->get();
+                if ( $event->count() !== 0 )
+                {
+                    $data['event'] = $event[ 0 ];
+                }
             }
-            Session::put('state', $data['solicitud']->state->id_estado);
-            $data['politicStatus'] = $politicStatus;
-            $alert = new AlertController;
-            if (is_null( $data['solicitud']->toDeliveredHistory ) && !in_array($data['solicitud']->id_estado, array(CANCELADO, RECHAZADO)))
-                $data['alert'] = $alert->compareTime($data['solicitud'], 'diffInMonths');
-
-            $event = Event::where('solicitud_id', '=', $solicitud->id)->get();
-            if ($event->count() != 0)
-                $data['event'] = $event[0];
-            return View::make('Dmkt.Solicitud.view', $data);
-        } catch (Exception $e) {
-            return $this->internalException($e, __FUNCTION__);
+            Session::put( 'state' , $data[ 'solicitud' ]->state->id_estado );
+            $data[ 'politicStatus' ] = $politicStatus;
+            return View::make( 'Dmkt.Solicitud.view' , $data );
+        } 
+        catch (Exception $e) 
+        {
+            return $this->internalException( $e, __FUNCTION__ );
         }
     }
 
-    private function expenseData($solicitud, $monto_aprobado)
+    private function setExpenseData( $solicitud , $detalle , &$data )
+    {
+        $data                = array_merge( $data , $this->expenseData( $solicitud, $detalle->monto_actual ) );
+        $data[ 'igv' ]       = Table::getIGV();
+        $data[ 'regimenes' ] = Regimen::all();   
+    }
+
+    private function expenseData( $solicitud , $monto_aprobado )
     {
         $data = array('typeProof' => ProofType::orderBy('id', 'asc')->get(),
             'typeExpense' => ExpenseType::order(),
-            'date' => $this->getExpenseDate($solicitud));
+            'date' => $this->getExpenseDate( $solicitud ) );
         $gastos = $solicitud->expenses;
         if (count($gastos) > 0) {
             $data['expenses'] = $gastos;
@@ -384,7 +423,7 @@ class SolicitudeController extends BaseController
         $fondoMktController->discountBalance( $ids_fondo_mkt , $solicitud->detalle->id_moneda , ChangeRate::getTc() , $solicitud->id );
     }
 
-    private function setProducts($idSolicitud, $idsProducto)
+    private function setProducts( $idSolicitud, $idsProducto )
     {
         $productController = new ProductController;
         foreach ( $idsProducto as $idProducto ) 

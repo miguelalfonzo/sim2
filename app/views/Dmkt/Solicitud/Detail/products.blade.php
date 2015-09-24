@@ -17,7 +17,7 @@
                 <li class="list-group-item">        
                     @if( $politicStatus )
                         <div class="input-group input-group-sm">
-                            <span class="input-group-addon" style="width:15%;">{{{ is_null( $product->marca ) ? '' : $product->marca->descripcion}}}</span>
+                            <span class="input-group-addon" style="width:15%;" data-toggle="modal" data-target="#addProduct">{{{ is_null( $product->marca ) ? '' : $product->marca->descripcion}}}</span>
                             @if ( in_array( $tipo_usuario , array( SUP , GER_PROD , GER_PROM , GER_COM , GER_GER ) ) )
                                 <select name="fondo_producto[]" class="selectpicker form-control">
                                     @if ( is_null( $product->id_fondo_marketing ) )
@@ -64,6 +64,6 @@
     </div>
 </div>
 
-@if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD ) ) )
+@if ( $politicStatus && isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD , GER_PROM , GER_COM , GER_GER ) ) )
     @include('Dmkt.Solicitud.Section.modal-select-producto')
 @endif

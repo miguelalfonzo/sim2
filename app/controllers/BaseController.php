@@ -16,9 +16,7 @@ class BaseController extends Controller
 
     protected function getDateExchangeRate( $date )
     {
-        Log::error( $date );
         $formatDate = Carbon::createFromFormat( 'Y-m-d' , $date )->format( 'Y/m/d' );
-        Log::error( $formatDate );
         $tc = ChangeRate::getDayTc( $formatDate );
         if( is_null( $tc ) )
         {

@@ -2022,52 +2022,66 @@ $( document ).on( 'click' , '.open-details2' , function()
 });
 
 
-// add family-fondo
-
-$("#btn-add-family-fondo").on('click',function () {
-
-    var family_id = $("#selectfamilyadd").val();
+// Add family-fondo
+$( '#btn-add-family-fondo' ).on( 'click' ,function () 
+{
+    var family_id = $( '#selectfamilyadd' ).val();
     $.ajax(
+    {
+        url: server + 'agregar-familia-fondo',
+        type: 'POST' ,
+        data:
         {
-            url: server + 'agregar-familia-fondo',
-            type: 'POST' ,
-            data:
-            {
-                _token       : GBREPORTS.token,
-                solicitud_id : id_solicitud.val() ,
-                family_id : family_id
-            }
-        }).fail( function ( statusCode , errorThrown )
+            _token       : GBREPORTS.token,
+            solicitud_id : id_solicitud.val() ,
+            producto : family_id
+        }
+    }).fail( function ( statusCode , errorThrown )
+    {
+        ajaxError( statusCode , errorThrown );
+    }).done( function ( response )
+    {
+        if ( response.Status === 'Ok' )
         {
-            ajaxError( statusCode , errorThrown );
-        }).done( function ( response )
+            var options_val = '<option selected="" disabled="" value="0">Seleccione el Fondo</option>';
+            $.each( response.Data.Fondo_product, function( i, val ) 
+            {
+                options_val += '<option value="'+val.id+',' + val.tipo+'">'+ val.descripcion +' S/.'+ val.saldo_disponible +'</option>';
+            });
+            $("#list-product").append('<li class="list-group-item"><div class="input-group input-group-sm"><span class="input-group-addon" style="width:15%;">'+
+            $("#selectfamilyadd option:selected").text() + '</span><select name="fondo_producto[]" class="selectpicker form-control">' +
+            options_val +'</select><span class="input-group-addon">S/.</span>'+
+            '<input name="monto_producto[]" type="text" class="form-control text-right amount_families" value="0" style="padding:0px;text-align:center"></div>'+
+            '<input type="hidden" name="producto[]" value="4"></li>');
+            $('#addProduct').modal('toggle');
+        }
+        else
         {
-            if ( response.Status === 'Ok' )
-            {
-                //filterSelect( activity , response.Data , 'inversion' );
-                if(response.Data.Cond == true){
-                    var options_val = '<option selected="" disabled="" value="0">Seleccione el Fondo</option>';
-                    $.each( response.Data.Fondo_product, function( i, val ) {
-                        options_val += '<option value="'+val.id+',' + val.tipo+'">'+ val.descripcion +' S/.'+ val.saldo_disponible +'</option>';
-                    });
-                    $("#list-product").append('<li class="list-group-item"><div class="input-group input-group-sm"><span class="input-group-addon" style="width:15%;">'+
-                    $("#selectfamilyadd option:selected").text() + '</span><select name="fondo_producto[]" class="selectpicker form-control">' +
-                    options_val +'</select><span class="input-group-addon">S/.</span>'+
-                    '<input name="monto_producto[]" type="text" class="form-control text-right amount_families" value="0" style="padding:0px;text-align:center"></div>'+
-                    '<input type="hidden" name="producto[]" value="4"></li>');
+            bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+        }
+    });
+});
 
+// Edit Family Fondo
+$( '.editProduct' ).on( 'click' , function()
+{
+    var id_solicitud_product = $( this ).parent().parent().find( 'input[ name = "producto[]" ]' ).val();
+    $.ajax(
+    {
+        url  : server + 'editar-familia-fondo',
+        type : 'POST' ,
+        data :
+        {
+            _token             : GBREPORTS.token,
+            solicitud_producto : family_id
+        }
+    }).fail( function ( statusCode , errorThrown )
+    {
+        ajaxError( statusCode , errorThrown );
+    }).done( function ( response )
+    {
 
-                    $('#addProduct').modal('toggle');
-                }
-
-
-            }
-            else
-            {
-                bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
-            }
-        });
-
+    });
 });
 
 $( document ).ready(function() 
