@@ -159,7 +159,7 @@ $(function()
     {
         $(".date").datepicker(
         {
-            orientation: "auto",
+            orientation: "top",
             language: 'es',
             startDate: typeof START_DATE === 'undefined' ? '{{}}' : START_DATE ,
             endDate: typeof END_DATE === 'undefined' ? '' : END_DATE ,

@@ -135,15 +135,16 @@ $('#show_leyenda').on('click',function(){
     });
 });
 
-$('#hide_leyenda').on('click',function(){
+$('#hide_leyenda').on( 'click',function()
+{
     $('#leyenda').hide();
     $(this).hide();
     $('#show_leyenda').show();
 });
 
 //add a family
-$("#btn-add-family").on('click', function () {
-
+$("#btn-add-family").on('click', function () 
+{
     $(".btn-delete-family").show();
     $('#listfamily>li:first-child').clone(true, true).appendTo('#listfamily');
 });
