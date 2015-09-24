@@ -10,7 +10,6 @@
         ->leftJoin( TB_VTA_TABLAS.' F' , function( $join )
         {
 	        $join->on( 'F.tipo' , '=' , TIPO_FAMILIA )->on( 'F.CODIGO' , '=' , 'A.FOFAMILIA' );
-        })
-        ->distinct()->orderBy( 'F.NOMBRE' , 'ASC' );
+        })->distinct()->orderBy( 'F.NOMBRE' , 'ASC' );
 
 ?>
