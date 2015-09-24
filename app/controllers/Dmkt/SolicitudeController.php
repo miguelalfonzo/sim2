@@ -139,6 +139,36 @@ class SolicitudeController extends BaseController
         return View::make('Dmkt.Register.solicitud', $data);
     }
 
+
+    public function addFamilyFundSolicitud()
+    {
+        try
+        {
+            $inputs =   Input::all();
+
+            $solicitudId =  $inputs['solicitud_id'];
+            $productoId=  $inputs['family_id'];
+            $solicitudProduct = SolicitudProduct::where('id_solicitud', $solicitudId)
+                ->where('id_producto', $productoId)
+                ->first();
+            if (count($solicitudProduct))
+                return $this->setRpta( array( 'Cond' =>  false  )   );
+
+            else {
+                $solicitudProduct = SolicitudProduct::where('id_solicitud', $solicitudId)->first();
+                $solicitud = Solicitud::where('id', $solicitudId)->first();
+                $politicType = $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario;
+                $fondo_product =  $solicitudProduct->getSubFondo( $politicType , $solicitud, $productoId);
+                return $this->setRpta(  array( 'Cond' => true , 'Fondo_product' => $fondo_product  ) );
+            }
+
+        }
+        catch( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
+    }
+
     public function viewSolicitude($token)
     {
         try

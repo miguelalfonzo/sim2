@@ -212,6 +212,7 @@
         Route::get( 'get-investments-activities' , 'Dmkt\SolicitudeController@getInvestmentsActivities');
         Route::post( 'registrar-solicitud', 'Dmkt\SolicitudeController@registerSolicitud');
         Route::get( 'editar-solicitud/{id}', 'Dmkt\SolicitudeController@editSolicitud');
+        Route::post( 'agregar-familia-fondo', 'Dmkt\SolicitudeController@addFamilyFundSolicitud');
         Route::post( 'search-client', 'Source\Seeker@clientSource');
         Route::post( 'get-client-view' , 'Source\Seeker@getClientView');
         Route::post( 'filtro_cliente' , 'Dmkt\Client@getInvestmentActivity');

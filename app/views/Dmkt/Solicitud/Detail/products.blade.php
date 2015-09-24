@@ -6,13 +6,13 @@
                 <label class="pull-right">Fondo</label>
             @endif
 
-            {{-- @if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD ) ) )
+            @if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD ) ) )
                 <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addProduct">
                     Agregar
                 </button>
-            @endif --}}
+            @endif
         </div>
-        <ul class="list-group">
+        <ul class="list-group" id="list-product">
             @foreach( $solicitud->products as $product )
                 <li class="list-group-item">        
                     @if( $politicStatus )
@@ -63,4 +63,7 @@
         </ul>
     </div>
 </div>
-{{-- include('Dmkt.Solicitud.Section.modal-select-producto') --}}
+
+@if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD ) ) )
+    @include('Dmkt.Solicitud.Section.modal-select-producto')
+@endif
