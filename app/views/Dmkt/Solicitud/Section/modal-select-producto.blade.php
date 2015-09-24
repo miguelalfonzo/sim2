@@ -1,9 +1,9 @@
-<div class="modal fade" id="addProduct" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="approval-product-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Agregar Producto</h4>
+                <h4 class="modal-title">Productos</h4>
             </div>
             <div class="modal-body">
                 <select id="selectfamilyadd"  class="form-control products">
