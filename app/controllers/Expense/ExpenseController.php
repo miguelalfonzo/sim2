@@ -112,12 +112,19 @@ class ExpenseController extends BaseController
 					$expense->id = $expense->lastId() + 1;
 		        }
 		        
-			    $proof = ProofType::find( $inputs[ 'proof_type' ] );
-	    		if( $proof->code != 'N' && ! isset( $inputs[ 'idgasto' ] ) && ! is_null( $inputs[ 'ruc' ] ) && ! is_null( $inputs[ 'number_prefix' ] ) && ! is_null( $inputs[ 'number_serie' ] ) )
+		        $solicitud 		  = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
+				$proof = ProofType::find( $inputs[ 'proof_type' ] );
+	    		
+			    if( $proof->code != 'N' && ! isset( $inputs[ 'idgasto' ] ) && ! is_null( $inputs[ 'ruc' ] ) && ! is_null( $inputs[ 'number_prefix' ] ) && ! is_null( $inputs[ 'number_serie' ] ) )
 		    	{
-		    		$row_expense = Expense::where( 'ruc' , $inputs[ 'ruc' ] )->where( 'num_prefijo' ,$inputs[ 'number_prefix' ] )->where( 'num_serie' , $inputs[ 'number_serie' ] )->get();	
-					if( $row_expense->count() > 0 )
-						return $this->warningException( 'Ya existe un gasto registrado con Ruc: ' . $inputs[ 'ruc' ] . ' numero: '.$inputs[ 'number_prefix' ] . '-' . $inputs[ 'number_serie' ] , __FUNCTION__ , __LINE__ , __FILE__ );
+		    		$row_expense = Expense::where( 'ruc' , $inputs[ 'ruc' ] )->where( 'num_prefijo' ,$inputs[ 'number_prefix' ] )->where( 'num_serie' , $inputs[ 'number_serie' ] )->first();	
+					if ( ! is_null( $row_expense ) )
+					{
+						if ( $solicitud->idtiposolicitud === $row_expense->solicitud->idtiposolicitud )
+						{
+							return $this->warningException( 'Ya existe un gasto registrado con Ruc: ' . $inputs[ 'ruc' ] . ' numero: '.$inputs[ 'number_prefix' ] . '-' . $inputs[ 'number_serie' ] , __FUNCTION__ , __LINE__ , __FILE__ );
+						}
+					}
 				}
 
 				if( $proof->igv == 1 )
@@ -137,7 +144,6 @@ class ExpenseController extends BaseController
 		        list($d, $m, $y)  = explode('/', $date);
 		        $d 				  = mktime(11, 14, 54, $m, $d, $y);
 				$inputs[ 'date' ] = date("Y/m/d", $d );
-				$solicitud 		  = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
 				$inputs[ 'id_solicitud' ] = $solicitud->id;
 				$this->setExpense( $expense , $inputs );
 

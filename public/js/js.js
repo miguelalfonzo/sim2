@@ -951,7 +951,10 @@ $(function()
                                             });
                                         }
                                         else
+                                        {
                                             bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description );
+                                            return false;
+                                        }
                                     });
                                 }
                             });
