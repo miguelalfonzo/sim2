@@ -11,7 +11,7 @@
                     Agregar
                 </button>
             @endif
-            <input type="checkbox" name="modificacion productos" id="is-product-change"> cambiar Fondos
+            <input type="checkbox" name="modificacion-productos" id="is-product-change"> cambiar Fondos
         </div>
         <ul class="list-group" id="list-product">
             @foreach( $solicitud->products as $product )
