@@ -35,7 +35,7 @@ class ProductController extends BaseController
 		$solProduct->save();
     }
 
-    public function unsetSolicitudProducts( $solicitudId , $productId )
+    public function unsetSolicitudProducts( $solicitudId , $productsId )
     {
         $solicitud = Solicitud::find( $solicitudId );
         $solicitudProducts = $solicitud->products;
@@ -53,11 +53,11 @@ class ProductController extends BaseController
         if ( $aux === 1 )
         {
             $solicitudController = new solicitudController;
-            $solicitudController->renovateBalance( $solicitudId )
+            $solicitudController->renovateBalance( $solicitudId );
         }
 
-        $solicitudProducts->delete();
-
+        SolicitudProduct::whereIn( 'id' , $solicitudProducts->lists( 'id' ) )->delete();
+        
         $solicitudProductsId = array();
         foreach( $productsId as $productId )
         {

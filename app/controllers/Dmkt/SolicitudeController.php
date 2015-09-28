@@ -788,7 +788,6 @@ class SolicitudeController extends BaseController
             'idsolicitud'            => 'required|integer|min:1|exists:'.TB_SOLICITUD.',id',
             'monto'                  => 'required|numeric|min:1',
             'anotacion'              => 'sometimes|string|min:1',
-            'producto'               => 'required|array|min:1|each:integer|each:min,1|each:exists,'.TB_SOLICITUD_PRODUCTO.',id',
             'derivacion'             => 'required|numeric|boolean' ,
             'modificacion_productos' => 'required|numeric|boolean' );
         
@@ -819,6 +818,11 @@ class SolicitudeController extends BaseController
         {
             return $input->derivacion == 0;
         });
+        $validator->sometimes( 'producto' , 'required|array|min:1|each:integer|each:min,1|each:exists,'.TB_SOLICITUD_PRODUCTO.',id' , function ( $input ) 
+        {
+            return $input->modificacion_productos == 0;
+        });
+
         $validator->sometimes( 'ruc' , 'required|numeric|digits:11'  , function ( $input ) 
         {
             return $input->pago == PAGO_CHEQUE;
@@ -882,10 +886,10 @@ class SolicitudeController extends BaseController
                     }
 
                     //VALIDAR SI SE MODIFICARAN LOS PRODUCTOS
-                    if ( $inputs[ 'modify_products' ] === 1 )
+                    if ( $inputs[ 'modificacion_productos' ] == 1 )
                     {
                         $productController = new ProductController;
-                        $middleRpta        = $productController->unsetSolicitudProducts( $solicitud->id , $inputs[ 'id_producto' ] );
+                        $middleRpta        = $productController->unsetSolicitudProducts( $solicitud->id , $inputs[ 'producto' ] );
                         if ( $middleRpta[ status ] !== ok )
                         {
                             DB::rollback();
