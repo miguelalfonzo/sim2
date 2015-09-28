@@ -788,7 +788,7 @@ class SolicitudeController extends BaseController
             'monto'                  => 'required|numeric|min:1',
             'anotacion'              => 'sometimes|string|min:1',
             'producto'               => 'required|array|min:1|each:integer|each:min,1|each:exists,'.TB_SOLICITUD_PRODUCTO.',id',
-            'derivacion'             => 'required|numeric|boolean' 
+            'derivacion'             => 'required|numeric|boolean',
             'modificacion_productos' => 'required|numeric|boolean' );
         
         $messages = array();

@@ -10,8 +10,9 @@
                 <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#approval-product-modal">
                     Agregar
                 </button>
+                 <input type="checkbox" name="modificacion-productos" id="is-product-change"> cambiar Fondos
             @endif
-            <input type="checkbox" name="modificacion-productos" id="is-product-change"> cambiar Fondos
+           
         </div>
         <ul class="list-group" id="list-product">
             @foreach( $solicitud->products as $product )
@@ -70,7 +71,7 @@
 
             @endforeach
         </ul>
-
+        @if ( $politicStatus && isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD , GER_PROM , GER_COM , GER_GER ) ) )
         <ul class="list-group" id="list-product2" style="display: none">
             @foreach( $solicitud->products as $product )
                 
@@ -130,6 +131,7 @@
 
             @endforeach
         </ul>
+        @endif
     </div>
 </div>
 @if ( $politicStatus && isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD , GER_PROM , GER_COM , GER_GER ) ) )
