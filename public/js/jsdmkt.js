@@ -515,7 +515,14 @@ idamount.keyup( function ()
     verifySum( this , 2 );
 });
 
-$('.amount_families').keyup( function ()
+$( document).off( 'keyup' , '.amount_families' );
+$( document).on( 'keyup' , '.amount_families' , function ()
+{
+    verifySum( this , 1 );
+});
+
+$( document).off( 'keyup' , '.amount_families2' );
+$( document).on( 'keyup' , '.amount_families2' , function ()
 {
     verifySum( this , 1 );
 });
@@ -525,6 +532,7 @@ function verifySum( element , type )
     amount_error_families.text('');
     var sum_total = 0;
     var precision = 11;
+
     $('.amount_families').each(function(i,v)
     {
         sum_total += parseFloat( $(this).val() );
@@ -2049,12 +2057,18 @@ $( '#btn-add-family-fondo' ).on( 'click' ,function ()
                 {
                     options_val += '<option value="'+val.id+',' + val.tipo+'">'+ val.descripcion +' S/.'+ val.saldo_disponible +'</option>';
                 });
-                $("#list-product").append('<li class="list-group-item"><div class="input-group input-group-sm"><span class="input-group-addon" style="width:15%;">'+
+                $("#list-product2").append('<li class="list-group-item"><div class="input-group input-group-sm"><span class="input-group-addon" style="width:15%;">'+
                 $("#selectfamilyadd option:selected").text() + '</span><select name="fondo_producto[]" class="selectpicker form-control">' +
                 options_val +'</select><span class="input-group-addon">S/.</span>'+
-                '<input name="monto_producto[]" type="text" class="form-control text-right amount_families" value="0" style="padding:0px;text-align:center"></div>'+
-                '<input type="hidden" name="producto[]" value="4"></li>');
-                $('#addProduct').modal('toggle');
+                '<input name="monto_producto[]" type="text" class="form-control text-right amount_families" value="0" style="padding:0px;text-align:center">'+
+                '<button type="button" class="btn-remove-family" style=""><span class="glyphicon glyphicon-remove"></span></button> </div>'+
+                '<input type="hidden" name="producto[]" value="'+id_solicitud.val()+'"></li>');
+
+
+                $( ".btn-remove-family" ).bind( "click", function() {
+                      $(this).closest('li').remove();
+                });
+                $('#approval-product-modal').modal('toggle');
             }
             else
                  bootbox.alert( '<h4 class="red">' + response.Data.Description + '</h4>');
@@ -2064,6 +2078,27 @@ $( '#btn-add-family-fondo' ).on( 'click' ,function ()
             bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
         }
     });
+});
+
+
+$( '.btn-remove-family' ).click( function () {
+
+    $(this).closest('li').remove();
+});
+
+$("#is-product-change").change(function() {
+    if(this.checked) {
+      
+         $("#list-product").hide();
+
+        $('#list-product :input').attr('disabled', true);
+       $("#list-product2").show();
+    }
+    else{
+        $("#list-product2").hide();
+        $('#list-product :input').removeAttr('disabled');
+        $("#list-product").show();
+    }
 });
 
 // Edit Family Fondo

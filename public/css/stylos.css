@@ -63,6 +63,18 @@ selectproduct{
     background: 0;
 }
 
+.btn-remove-family
+{
+    color: rgb(185, 33, 33);
+    font-size: 16px;
+    height: 33px;
+    position: absolute;
+    right: -1.5em;
+    top: 1px;
+    min-width: 25px;
+    border: 0;
+    background: 0;
+}
 .btn-delete-client
 {
     color: rgb(185, 33, 33);
