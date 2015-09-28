@@ -174,20 +174,17 @@ class SolicitudeController extends BaseController
                 //$middleRpta = $this->setProducts( $inputs[ 'solicitud_id' ] , array( $inputs[ 'producto' ] ) );
              
                     //DB::beginTransaction();
-                    $solicitudProduct = SolicitudProduct::where( 'id_solicitud' , $inputs[ 'solicitud_id' ] )
-                                        ->where( 'id_producto' , $inputs[ 'producto' ] )->first();
+                    //$solicitudProduct = SolicitudProduct::where( 'id_solicitud' , $inputs[ 'solicitud_id' ] )
+                    //                    ->where( 'id_producto' , $inputs[ 'producto' ] )->first();
                     $productoId=  $inputs['producto'];
                     $solicitudId =  $inputs['solicitud_id'];
-                    if (count($solicitudProduct)){
-                        return $this->setRpta( array( 'Cond' =>  false , 'Description' => 'El producto ya está agregado en la lista' )   );
-                    }
-                    else{
+                   //
                         $solicitudProduct = SolicitudProduct::where('id_solicitud', $solicitudId)->first();
                         $solicitud = Solicitud::where('id', $solicitudId)->first();
                         $politicType = $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario;
                         $fondo_product =  $solicitudProduct->getSubFondo( $politicType , $solicitud, $productoId);
                         return $this->setRpta(  array( 'Cond' => true , 'Fondo_product' => $fondo_product  ) );
-                    }
+                    //}
                        
                     
                 
@@ -789,7 +786,6 @@ class SolicitudeController extends BaseController
             'monto'                  => 'required|numeric|min:1',
             'anotacion'              => 'sometimes|string|min:1',
             'derivacion'             => 'required|numeric|boolean' ,
-            'derivacion'             => 'required|numeric|boolean',
             'modificacion_productos' => 'required|numeric|boolean' );
         
         $messages = array();
