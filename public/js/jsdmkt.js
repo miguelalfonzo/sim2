@@ -2071,7 +2071,7 @@ $( '#btn-add-family-fondo' ).on( 'click' ,function ()
                 options_val +'</select><span class="input-group-addon">S/.</span>'+
                 '<input name="monto_producto[]" type="text" class="form-control text-right amount_families" value="0" style="padding:0px;text-align:center">'+
                 '<button type="button" class="btn-remove-family" style=""><span class="glyphicon glyphicon-remove"></span></button> </div>'+
-                '<input type="hidden" name="producto[]" value="'+id_solicitud.val()+'"></li>');
+                '<input type="hidden" name="producto[]" value="'+family_id+'"></li>');
 
 
                 $( ".btn-remove-family" ).bind( "click", function() {
