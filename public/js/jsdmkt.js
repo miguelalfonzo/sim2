@@ -909,6 +909,15 @@ function acceptedSolicitude( type )
         formData.append( 'derivacion' , 0 );
     }
 
+    if ( $("#is-product-change").checked())
+    {
+        formData.append( 'modificacion_productos' , 1 );
+    }
+    else
+    {
+        formData.append( 'modificacion_productos' , 0 );
+    }
+
     $.ajax(
     {
         type: 'POST',
