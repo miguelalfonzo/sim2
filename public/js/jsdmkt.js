@@ -909,7 +909,7 @@ function acceptedSolicitude( type )
         formData.append( 'derivacion' , 0 );
     }
 
-    if ( $("#is-product-change").checked())
+    if ( $("#is-product-change").is(':checked'))
     {
         formData.append( 'modificacion_productos' , 1 );
     }
