@@ -789,6 +789,7 @@ class SolicitudeController extends BaseController
             'monto'                  => 'required|numeric|min:1',
             'anotacion'              => 'sometimes|string|min:1',
             'derivacion'             => 'required|numeric|boolean' ,
+            'derivacion'             => 'required|numeric|boolean',
             'modificacion_productos' => 'required|numeric|boolean' );
         
         $messages = array();
