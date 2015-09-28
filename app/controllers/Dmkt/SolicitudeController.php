@@ -395,7 +395,6 @@ class SolicitudeController extends BaseController
         foreach ( $solProductIds as $key => $solProductId ) 
         {
             $solProduct = SolicitudProduct::find( $solProductId );
-            //if( $)///////////////////////
             $old_id_fondo_mkt  = $solProduct->id_fondo_marketing;
             $old_cod_user_type = $solProduct->id_tipo_fondo_marketing;
             $old_ammount       = $solProduct->monto_asignado;
@@ -415,22 +414,11 @@ class SolicitudeController extends BaseController
                 'new'         => $solProduct->id_fondo_marketing,
                 'newMonto'    => $solProduct->monto_asignado );
         }
-        $fondoMktController->discountBalance($ids_fondo_mkt, $moneda, $tc, $detalle->solicitud->id, $userTypeforDiscount);
-        return $fondoMktController->validateBalance( $userTypes, $fondos);
+        $fondoMktController->discountBalance( $ids_fondo_mkt , $moneda, $tc, $detalle->solicitud->id, $userTypeforDiscount);
+        return $fondoMktController->validateBalance( $userTypes, $fondos );
     }
 
-    private function renovateBalance($solicitud)
-    {
-        $fondoMktController = new FondoMkt;
-        $solicitudProducts = $solicitud->products;
-        $ids_fondo_mkt = array();
-        foreach ( $solicitudProducts as $solicitudProduct )
-            $ids_fondo_mkt[] = array(
-                'old'         => $solicitudProduct->id_fondo_marketing,
-                'oldUserType' => $solicitudProduct->id_tipo_fondo_marketing,
-                'oldMonto'    => $solicitudProduct->monto_asignado);
-        $fondoMktController->discountBalance( $ids_fondo_mkt , $solicitud->detalle->id_moneda , ChangeRate::getTc() , $solicitud->id );
-    }
+    
 
     private function setProducts( $idSolicitud, $idsProducto )
     {
@@ -653,6 +641,19 @@ class SolicitudeController extends BaseController
         }
     }
 
+    private function renovateBalance( $solicitud )
+    {
+        $fondoMktController = new FondoMkt;
+        $solicitudProducts = $solicitud->products;
+        $ids_fondo_mkt = array();
+        foreach ( $solicitudProducts as $solicitudProduct )
+            $ids_fondo_mkt[] = array(
+                'old'         => $solicitudProduct->id_fondo_marketing,
+                'oldUserType' => $solicitudProduct->id_tipo_fondo_marketing,
+                'oldMonto'    => $solicitudProduct->monto_asignado);
+        $fondoMktController->discountBalance( $ids_fondo_mkt , $solicitud->detalle->id_moneda , ChangeRate::getTc() , $solicitud->id );
+    }
+
     private function verifyPolicy( $solicitud , $monto )
     {
         $type    = array( Auth::user()->type , Auth::user()->tempType() );
@@ -783,11 +784,12 @@ class SolicitudeController extends BaseController
     {
         $size  = count( $inputs[ 'producto' ] ); 
         $rules = array(
-                    'idsolicitud'    => 'required|integer|min:1|exists:'.TB_SOLICITUD.',id',
-                    'monto'          => 'required|numeric|min:1',
-                    'anotacion'      => 'sometimes|string|min:1',
-                    'producto'       => 'required|array|min:1|each:integer|each:min,1|each:exists,'.TB_SOLICITUD_PRODUCTO.',id',
-                    'derivacion'     => 'required|numeric|boolean' );
+            'idsolicitud'            => 'required|integer|min:1|exists:'.TB_SOLICITUD.',id',
+            'monto'                  => 'required|numeric|min:1',
+            'anotacion'              => 'sometimes|string|min:1',
+            'producto'               => 'required|array|min:1|each:integer|each:min,1|each:exists,'.TB_SOLICITUD_PRODUCTO.',id',
+            'derivacion'             => 'required|numeric|boolean' 
+            'modificacion_productos' => 'required|numeric|boolean' );
         
         $messages = array();
         if ( Auth::user()->type === SUP )
@@ -877,10 +879,23 @@ class SolicitudeController extends BaseController
                     {
                         $detalle->num_ruc = $inputs[ 'ruc' ];
                     }
+
+                    //VALIDAR SI SE MODIFICARAN LOS PRODUCTOS
+                    if ( $inputs[ 'modify_products' ] === 1 )
+                    {
+                        $productController = new ProductController;
+                        $middleRpta        = $productController->unsetSolicitudProducts( $solicitud->id , $inputs[ 'id_producto' ] );
+                        if ( $middleRpta[ status ] !== ok )
+                        {
+                            DB::rollback();
+                            return $middleRpta;
+                        }
+                        $inputs[ 'producto' ] = $middleRpta[ data ];
+                    }
                     
                     $middleRpta = $this->setProductsAmount( $inputs[ 'producto' ] , $inputs[ 'monto_producto' ] , $inputs[ 'fondo_producto' ] , $solDetalle );
-
-                    if ($middleRpta[status] != ok)
+                    
+                    if ( $middleRpta[status] != ok )
                     {
                         DB::rollback();
                         return $middleRpta;
