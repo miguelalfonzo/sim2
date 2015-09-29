@@ -533,10 +533,16 @@ function verifySum( element , type )
     var sum_total = 0;
     var precision = 11;
 
-    $('.amount_families').each(function(i,v)
-    {
-        sum_total += parseFloat( $(this).val() );
-    });
+    if($("#is-product-change").is(':checked'))
+         $('.amount_families2').each(function(i,v)
+        {
+            sum_total += parseFloat( $(this).val() );
+        });
+    else
+        $('.amount_families').each(function(i,v)
+        {
+            sum_total += parseFloat( $(this).val() );
+        });
     
     if( $("#amount").val().trim() === "" )
     {
@@ -2043,56 +2049,70 @@ $( document ).on( 'click' , '.open-details2' , function()
 $( '#btn-add-family-fondo' ).on( 'click' ,function () 
 {
     var family_id = $( '#selectfamilyadd' ).val();
-    $.ajax(
-    {
-        url: server + 'agregar-familia-fondo',
-        type: 'POST' ,
-        data:
+    var family_exist = false;
+    $('.producto_value').each(function(i,v)
         {
-            _token       : GBREPORTS.token,
-            solicitud_id : id_solicitud.val() ,
-            producto : family_id
-        }
-    }).fail( function ( statusCode , errorThrown )
-    {
-        ajaxError( statusCode , errorThrown );
-    }).done( function ( response )
-    {
-        if ( response.Status === 'Ok' )
+            if(family_id == $(this).val() )
+                family_exist = true;
+        });
+
+    if(!family_exist)
+        $.ajax(
         {
-             if(response.Data.Cond == true){
-                var options_val = '<option selected="" disabled="" value="0">Seleccione el Fondo</option>';
-                $.each( response.Data.Fondo_product, function( i, val ) 
-                {
-                    options_val += '<option value="'+val.id+',' + val.tipo+'">'+ val.descripcion +' S/.'+ val.saldo_disponible +'</option>';
-                });
-                $("#list-product2").append('<li class="list-group-item"><div class="input-group input-group-sm"><span class="input-group-addon" style="width:15%;">'+
-                $("#selectfamilyadd option:selected").text() + '</span><select name="fondo_producto[]" class="selectpicker form-control">' +
-                options_val +'</select><span class="input-group-addon">S/.</span>'+
-                '<input name="monto_producto[]" type="text" class="form-control text-right amount_families" value="0" style="padding:0px;text-align:center">'+
-                '<button type="button" class="btn-remove-family" style=""><span class="glyphicon glyphicon-remove"></span></button> </div>'+
-                '<input type="hidden" name="producto[]" value="'+family_id+'"></li>');
+            url: server + 'agregar-familia-fondo',
+            type: 'POST' ,
+            data:
+            {
+                _token       : GBREPORTS.token,
+                solicitud_id : id_solicitud.val() ,
+                producto : family_id
+            }
+        }).fail( function ( statusCode , errorThrown )
+        {
+            ajaxError( statusCode , errorThrown );
+        }).done( function ( response )
+        {
+            if ( response.Status === 'Ok' )
+            {
+                 if(response.Data.Cond == true){
+                    var options_val = '<option selected="" disabled="" value="0">Seleccione el Fondo</option>';
+                    $.each( response.Data.Fondo_product, function( i, val ) 
+                    {
+                        options_val += '<option value="'+val.id+',' + val.tipo+'">'+ val.descripcion +' S/.'+ val.saldo_disponible +'</option>';
+                    });
+                    $("#list-product2").append('<li class="list-group-item"><div class="input-group input-group-sm"><span class="input-group-addon" style="width:15%;">'+
+                    $("#selectfamilyadd option:selected").text() + '</span><select name="fondo_producto[]" class="selectpicker form-control">' +
+                    options_val +'</select><span class="input-group-addon">S/.</span>'+
+                    '<input name="monto_producto[]" type="text" class="form-control text-right amount_families2" value="0" style="padding:0px;text-align:center">'+
+                    '<button type="button" class="btn-remove-family" style=""><span class="glyphicon glyphicon-remove"></span></button> </div>'+
+                    '<input type="hidden" name="producto[]" class="producto_value" value="'+family_id+'"></li>');
 
 
-                $( ".btn-remove-family" ).bind( "click", function() {
-                      $(this).closest('li').remove();
-                });
-                $('#approval-product-modal').modal('toggle');
+                    $( ".btn-remove-family" ).bind( "click", function() {
+                        $(this).prev('input').val(0);
+                        verifySum( $(this).prev('input') , 1 )
+                        $(this).closest('li').remove();
+                        
+                    });
+                    $('#approval-product-modal').modal('toggle');
+                }
+                else
+                     bootbox.alert( '<h4 class="red">' + response.Data.Description + '</h4>');
             }
             else
-                 bootbox.alert( '<h4 class="red">' + response.Data.Description + '</h4>');
-        }
-        else
-        {
-            bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
-        }
-    });
+            {
+                bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+            }
+        });
+    else
+         bootbox.alert( '<h4 class="red">El producto ya se encuentra en la lista</h4>');
 });
 
 
 $( '.btn-remove-family' ).click( function () {
-
-    $(this).closest('li').remove();
+    $(this).prev('input').val(0);
+    verifySum( $(this).prev('input') , 1 );
+    $(this).closest('li').remove();   
 });
 
 $("#is-product-change").change(function() {
@@ -2101,10 +2121,12 @@ $("#is-product-change").change(function() {
          $("#list-product").hide();
 
         $('#list-product :input').attr('disabled', true);
+        $('#list-product2 :input').removeAttr('disabled');
        $("#list-product2").show();
     }
     else{
         $("#list-product2").hide();
+        $('#list-product2 :input').attr('disabled', true);
         $('#list-product :input').removeAttr('disabled');
         $("#list-product").show();
     }
@@ -2188,5 +2210,10 @@ $( document ).ready(function()
     {
         listTable( 'solicitudes' );
     });
+
+
+    /** ---------------------------------------- SET DISABLED INPUTS INIT ------------------------------------------**/
+    $('#list-product2 :input').attr('disabled', true);
+
 });
 

@@ -6,7 +6,7 @@
                 <label class="pull-right">Fondo</label>
             @endif
 
-            @if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD ) ) )
+            @if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD, GER_PROM , GER_COM , GER_GER  ) ) )
                 <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#approval-product-modal">
                     Agregar
                 </button>
@@ -16,13 +16,11 @@
         </div>
         <ul class="list-group" id="list-product">
             @foreach( $solicitud->products as $product )
-                
-
                 <li class="list-group-item">        
                     @if( $politicStatus )
                         <div class="input-group input-group-sm">
                             <span class="input-group-addon" style="width:15%;">{{{ is_null( $product->marca ) ? '' : $product->marca->descripcion}}}</span>
-                            @if ( in_array( $tipo_usuario , array( SUP , GER_PROD , GER_PROM ) ) )
+                            @if ( in_array( $tipo_usuario , array( SUP , GER_PROD , GER_PROM , GER_COM , GER_GER ) ) )
                                 <select name="fondo_producto[]" class="selectpicker form-control">
                                     @if ( is_null( $product->id_fondo_marketing ) )
                                         <option selected disabled value="0">Seleccione el Fondo</option>
@@ -125,7 +123,7 @@
                         @endif
                     @endif
                    
-                    <input type="hidden" name="producto[]" value="{{ $product->id_producto  }}">
+                    <input type="hidden" name="producto[]" class="producto_value" value="{{ $product->id_producto  }}">
                 </li>
 
 
