@@ -3,14 +3,16 @@
         <div class="panel-heading">
             Productos / Montos Asignados
             @if( ! in_array( $solicitud->id_estado , array( PENDIENTE , CANCELADO ) ) )
-                <label class="pull-right">Fondo</label>
+                / Fondo
             @endif
 
             @if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD, GER_PROM , GER_COM , GER_GER  ) ) )
-                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#approval-product-modal">
+                <label class="pull-right">
+                 <input type="checkbox" name="modificacion-productos" id="is-product-change"> Modificar
+                 <button type="button" style="display:none" id="open_modal_add_product" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#approval-product-modal">
                     Agregar
                 </button>
-                 <input type="checkbox" name="modificacion-productos" id="is-product-change"> cambiar Fondos
+                </label>
             @endif
            
         </div>

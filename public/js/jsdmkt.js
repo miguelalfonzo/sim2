@@ -2117,7 +2117,8 @@ $( '.btn-remove-family' ).click( function () {
 
 $("#is-product-change").change(function() {
     if(this.checked) {
-      
+        
+        $("#open_modal_add_product").show();
          $("#list-product").hide();
 
         $('#list-product :input').attr('disabled', true);
@@ -2125,6 +2126,7 @@ $("#is-product-change").change(function() {
        $("#list-product2").show();
     }
     else{
+         $("#open_modal_add_product").hide();
         $("#list-product2").hide();
         $('#list-product2 :input').attr('disabled', true);
         $('#list-product :input').removeAttr('disabled');
