@@ -10,7 +10,7 @@
                 <label class="pull-right">
                  <input type="checkbox" name="modificacion-productos" id="is-product-change"> Modificar
                  <button type="button" style="display:none" id="open_modal_add_product" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#approval-product-modal">
-                    Agregar
+                    Agregar Producto
                 </button>
                 </label>
             @endif
