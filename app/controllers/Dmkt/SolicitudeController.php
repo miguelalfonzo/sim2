@@ -954,7 +954,7 @@ class SolicitudeController extends BaseController
         } 
         catch (Exception $e) 
         {
-            return $this->internalException($e, __FUNCTION__);
+            return $this->internalException( $e, __FUNCTION__ );
         }
     }
 

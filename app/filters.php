@@ -69,6 +69,15 @@ Route::filter( 'cont' , function ()
     }
 });
 
+Route::filter( 'rm' , function () 
+{
+    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
+        return Redirect::to( 'login' );
+    else     
+        if ( Auth::user()->type  !== REP_MED )
+            return Redirect::to( 'show_user' );
+});
+
 Route::filter( 'tes' , function () 
 {
     if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
@@ -109,39 +118,42 @@ Route::filter( 'rm_cont' , function ()
     }
 });
 
-Route::filter( 'sup_gerprod_gercom' , function () 
+Route::filter( 'sup_gerprod_gerprom_gercom_gerger' , function () 
 {
-    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
+    if ( ! Auth::check() || is_null( Auth::user()->simApp ) )
+    {
         return Redirect::to( 'login' );
-    else     
-        if ( ! in_array( Auth::user()->type , array( SUP , GER_PROD , GER_COM ) ) )
+    }
+    else
+    {     
+        if ( ! in_array( Auth::user()->type , array( SUP , GER_PROD , GER_PROM , GER_COM , GER_GER ) ) )
+        {
             return Redirect::to( 'show_user' );
+        }
+    }
 });
 
-Route::filter( 'sup_gerprod_gerprom_gercom' , function () 
+Route::filter( 'gerprod_gerprom_gercom_gerger' , function () 
 {
-    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
+    if ( ! Auth::check() || is_null( Auth::user()->simApp ) )
+    {
         return Redirect::to( 'login' );
-    else     
-        if ( ! in_array( Auth::user()->type , array( SUP , GER_PROD , GER_PROM , GER_COM ) ) )
+    }
+    else
+    {     
+        if ( ! in_array( Auth::user()->type , array( GER_PROD , GER_PROM , GER_COM , GER_GER ) ) )
+        {
             return Redirect::to( 'show_user' );
+        }
+    }
 });
 
-Route::filter( 'rm_sup_gerprod_gerprom_gercom_ager_cont' , function () 
+Route::filter( 'rm_sup_gerprod_gerprom_gercom_gerger_ager_cont' , function () 
 {
     if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
         return Redirect::to( 'login' );
     else     
-        if ( ! in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD , GER_PROM , GER_COM , ASIS_GER , CONT ) ) )
-            return Redirect::to( 'show_user' );
-});
-
-Route::filter( 'rm_ager' , function ()
-{
-    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
-        return Redirect::to( 'login' );
-    else     
-        if ( ! in_array( Auth::user()->type , array( REP_MED , ASIS_GER ) ) )
+        if ( ! in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD , GER_PROM , GER_COM , GER_GER , ASIS_GER , CONT ) ) )
             return Redirect::to( 'show_user' );
 });
 
