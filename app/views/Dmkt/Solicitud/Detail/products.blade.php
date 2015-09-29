@@ -14,7 +14,6 @@
                 </button>
                 </label>
             @endif
-           
         </div>
         <ul class="list-group" id="list-product">
             @foreach( $solicitud->products as $product )
