@@ -113,13 +113,13 @@ class FondoMkt extends BaseController
 
         if(  is_null( $solProduct->id_fondo_marketing ) )
         {
-            if ( ! ( Auth::user()->type == SUP || Auth::user()->type == GER_PROD || Auth::user()->type == GER_PROM ) )
+            if ( ! ( in_array( Auth::user()->type , array( SUP , GER_PROD , GER_PROM , GER_COM , GER_GER ) ) ) )
             {
-                if( $fondoData[ 1 ] == SUP && ! in_array( Auth::user()->type , array( SUP , GER_PROM ) ) )
+                if( $fondoData[ 1 ] == SUP && ! in_array( Auth::user()->type , array( SUP , GER_PROM , GER_COM , GER_GER ) ) )
                     return $this->warningException( 'Cancelado - No existe un fondo asignado y el usuario no puede asignar fondos' , __FUNCTION__ , __LINE__ , __FILE__ );
-                else if( $fondoData[ 1 ] == GER_PROD && ! in_array( Auth::user()->type , array( GER_PROD ) ) )
+                else if( $fondoData[ 1 ] == GER_PROD && ! in_array( Auth::user()->type , array( GER_PROD , GER_COM , GER_GER ) ) )
                     return $this->warningException( 'Cancelado - No existe un fondo asignado y el usuario no puede asignar fondos' , __FUNCTION__ , __LINE__ , __FILE__ );
-                else if( $fondoData[ 1 ] == GER_PROM && ! in_array( Auth::user()->type , array( GER_PROM , GER_COM ) ) )
+                else if( $fondoData[ 1 ] == GER_PROM && ! in_array( Auth::user()->type , array( GER_PROM , GER_COM , GER_GER ) ) )
                     return $this->warningException( 'Cancelado - No existe un fondo asignado y el usuario no puede asignar fondos' , __FUNCTION__ , __LINE__ , __FILE__ );
             }
         }
@@ -212,10 +212,8 @@ class FondoMkt extends BaseController
         $inputs = Input::all();
         $start = $inputs[ 'start' ];
         $end   = $inputs[ 'end' ];  
-        $subCategory = FondoSubCategoria::find( $inputs[ 'id_subcategoria' ] );
-        \Log::info( $subCategory );
-        $subCategoryType = $subCategory->fondoMktType;
-        \Log::info( $subCategoryType );
+        $subCategory           = FondoSubCategoria::find( $inputs[ 'id_subcategoria' ] );
+        $subCategoryType       = $subCategory->fondoMktType;
         $fondoMktHistoriesData = FondoMktHistory::whereRaw( "created_at between to_date( '$start' , 'YYYY/MM/DD' ) and to_date( '$end' , 'YYYY/MM/DD' ) + 1" )
                                 ->where( 'id_tipo_to_fondo' , trim( $subCategory->tipo ) )
                                 ->whereHas( $subCategoryType->relacion , function( $query ) use ( $subCategory )
@@ -321,6 +319,5 @@ class FondoMkt extends BaseController
         }
         $this->setFondoMktHistories( $fondoDataHistories , $solicitud->id );  
     }
-
 
 }

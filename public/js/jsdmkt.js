@@ -31,7 +31,6 @@ var idState           = $("#idState");
 //VALIDACION DE MONTOS DE FAMILIAS
 var amount_error_families = $('#amount_error_families');
 
-var amount_families = $('.amount_families');
 
 //SUB-ESTADOS
 var PENDIENTE     = 1;
@@ -509,14 +508,21 @@ $(document).on('click' , '.delete-fondo' , function (e)
 
 /**------------------------------------------------ SUPERVISOR ---------------------------------------------------*/
 
-amount_families.numeric({negative: false});
+$('.amount_families').numeric({negative: false});
 
 idamount.keyup( function ()
 {
     verifySum( this , 2 );
 });
 
-amount_families.keyup( function ()
+$( document).off( 'keyup' , '.amount_families' );
+$( document).on( 'keyup' , '.amount_families' , function ()
+{
+    verifySum( this , 1 );
+});
+
+$( document).off( 'keyup' , '.amount_families2' );
+$( document).on( 'keyup' , '.amount_families2' , function ()
 {
     verifySum( this , 1 );
 });
@@ -526,10 +532,17 @@ function verifySum( element , type )
     amount_error_families.text('');
     var sum_total = 0;
     var precision = 11;
-    amount_families.each(function(i,v)
-    {
-        sum_total += parseFloat( $(this).val() );
-    });
+
+    if($("#is-product-change").is(':checked'))
+         $('.amount_families2').each(function(i,v)
+        {
+            sum_total += parseFloat( $(this).val() );
+        });
+    else
+        $('.amount_families').each(function(i,v)
+        {
+            sum_total += parseFloat( $(this).val() );
+        });
     
     if( $("#amount").val().trim() === "" )
     {
@@ -900,6 +913,15 @@ function acceptedSolicitude( type )
     else
     {
         formData.append( 'derivacion' , 0 );
+    }
+
+    if ( $("#is-product-change").is(':checked'))
+    {
+        formData.append( 'modificacion_productos' , 1 );
+    }
+    else
+    {
+        formData.append( 'modificacion_productos' , 0 );
     }
 
     $.ajax(
@@ -2027,40 +2049,88 @@ $( document ).on( 'click' , '.open-details2' , function()
 $( '#btn-add-family-fondo' ).on( 'click' ,function () 
 {
     var family_id = $( '#selectfamilyadd' ).val();
-    $.ajax(
-    {
-        url: server + 'agregar-familia-fondo',
-        type: 'POST' ,
-        data:
+    var family_exist = false;
+    $('.producto_value').each(function(i,v)
         {
-            _token       : GBREPORTS.token,
-            solicitud_id : id_solicitud.val() ,
-            producto : family_id
-        }
-    }).fail( function ( statusCode , errorThrown )
-    {
-        ajaxError( statusCode , errorThrown );
-    }).done( function ( response )
-    {
-        if ( response.Status === 'Ok' )
+            if(family_id == $(this).val() )
+                family_exist = true;
+        });
+
+    if(!family_exist)
+        $.ajax(
         {
-            var options_val = '<option selected="" disabled="" value="0">Seleccione el Fondo</option>';
-            $.each( response.Data.Fondo_product, function( i, val ) 
+            url: server + 'agregar-familia-fondo',
+            type: 'POST' ,
+            data:
             {
-                options_val += '<option value="'+val.id+',' + val.tipo+'">'+ val.descripcion +' S/.'+ val.saldo_disponible +'</option>';
-            });
-            $("#list-product").append('<li class="list-group-item"><div class="input-group input-group-sm"><span class="input-group-addon" style="width:15%;">'+
-            $("#selectfamilyadd option:selected").text() + '</span><select name="fondo_producto[]" class="selectpicker form-control">' +
-            options_val +'</select><span class="input-group-addon">S/.</span>'+
-            '<input name="monto_producto[]" type="text" class="form-control text-right amount_families" value="0" style="padding:0px;text-align:center"></div>'+
-            '<input type="hidden" name="producto[]" value="4"></li>');
-            $('#addProduct').modal('toggle');
-        }
-        else
+                _token       : GBREPORTS.token,
+                solicitud_id : id_solicitud.val() ,
+                producto : family_id
+            }
+        }).fail( function ( statusCode , errorThrown )
         {
-            bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
-        }
-    });
+            ajaxError( statusCode , errorThrown );
+        }).done( function ( response )
+        {
+            if ( response.Status === 'Ok' )
+            {
+                 if(response.Data.Cond == true){
+                    var options_val = '<option selected="" disabled="" value="0">Seleccione el Fondo</option>';
+                    $.each( response.Data.Fondo_product, function( i, val ) 
+                    {
+                        options_val += '<option value="'+val.id+',' + val.tipo+'">'+ val.descripcion +' S/.'+ val.saldo_disponible +'</option>';
+                    });
+                    $("#list-product2").append('<li class="list-group-item"><div class="input-group input-group-sm"><span class="input-group-addon" style="width:15%;">'+
+                    $("#selectfamilyadd option:selected").text() + '</span><select name="fondo_producto[]" class="selectpicker form-control">' +
+                    options_val +'</select><span class="input-group-addon">S/.</span>'+
+                    '<input name="monto_producto[]" type="text" class="form-control text-right amount_families2" value="0" style="padding:0px;text-align:center">'+
+                    '<span class="input-group-btn"><button type="button" class="btn btn-default btn-remove-family"><span class="glyphicon glyphicon-remove"></span></button></span></div>'+
+                    '<input type="hidden" name="producto[]" class="producto_value" value="'+family_id+'"></li>');
+
+
+                    $( ".btn-remove-family" ).bind( "click", function() {
+                        $(this).parent().prev('input').val(0);
+                        verifySum( $(this).parent().prev('input') , 1 )
+                        $(this).closest('li').remove();
+                        
+                    });
+                    $('#approval-product-modal').modal('toggle');
+                }
+                else
+                     bootbox.alert( '<h4 class="red">' + response.Data.Description + '</h4>');
+            }
+            else
+            {
+                bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+            }
+        });
+    else
+         bootbox.alert( '<h4 class="red">El producto ya se encuentra en la lista</h4>');
+});
+
+
+$( '.btn-remove-family' ).click( function () {
+    $(this).parent().prev('input').val(0);
+    verifySum( $(this).parent().prev('input') , 1 );
+    $(this).closest('li').remove();   
+});
+
+$("#is-product-change").change(function() {
+    if(this.checked) {        
+        $("#open_modal_add_product").show();
+        $("#list-product").hide();
+        $('#list-product :input').attr('disabled', true);
+        $('#list-product2 :input').removeAttr('disabled');
+        $("#list-product2").show();
+    }
+    else{
+        $("#open_modal_add_product").hide();
+        $("#list-product2").hide();
+        $('#list-product2 :input').attr('disabled', true);
+        $('#list-product :input').removeAttr('disabled');
+        $("#list-product").show();
+    }
+    verifySum( 0 , 0 );
 });
 
 // Edit Family Fondo
@@ -2141,5 +2211,10 @@ $( document ).ready(function()
     {
         listTable( 'solicitudes' );
     });
+
+
+    /** ---------------------------------------- SET DISABLED INPUTS INIT ------------------------------------------**/
+    $('#list-product2 :input').attr('disabled', true);
+
 });
 

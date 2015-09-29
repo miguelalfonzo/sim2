@@ -151,9 +151,9 @@ class SolicitudeController extends BaseController
         }
         else
         {
-            \Log::error( implode( SolicitudProduct::where( 'id_solicitud' , $inputs[ 'solicitud_id' ] )->lists( 'id_producto' ) ) );
+            //\Log::error( implode( SolicitudProduct::where( 'id_solicitud' , $inputs[ 'solicitud_id' ] )->lists( 'id_producto' ) ) );
             $rules = array( 
-                'producto' => 'required|numeric|min:1|not_in:'. implode( SolicitudProduct::where( 'id_solicitud' , $inputs[ 'solicitud_id' ] )->lists( 'id_producto' ) , ',' ) );
+                'producto' => 'required|numeric|min:1|');
             $validator = Validator::make( $inputs , $rules );
             if ( $validator->fails() )
             {
@@ -171,17 +171,23 @@ class SolicitudeController extends BaseController
             $middleRpta = $this->validateApprobationFamily( $inputs );
             if ( $middleRpta[ status ] === ok )
             {
-                $middleRpta = $this->setProducts( $inputs[ 'solicitud_id' ] , array( $inputs[ 'producto' ] ) );
-                if ( $middleRpta[ status ] === ok )
-                {
-                    DB::beginTransaction();
-                    $solicitudProduct = SolicitudProduct::where( 'id_producto' , $inputs[ 'producto' ] )->where( 'id_solicitud' , $inputs[ 'solicitud_id' ] )->first();
-                    $solicitud = Solicitud::where( 'id' , $inputs[ 'solicitud_id' ] )->first();
-                    $politicType = $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario;
-                    $fondo_product = $solicitudProduct->getSubFondo( $politicType , $solicitud );
-                    DB::commit();
-                    return $this->setRpta(  array( 'Cond' => true , 'Fondo_product' => $fondo_product  ) );
-                }
+                //$middleRpta = $this->setProducts( $inputs[ 'solicitud_id' ] , array( $inputs[ 'producto' ] ) );
+             
+                    //DB::beginTransaction();
+                    //$solicitudProduct = SolicitudProduct::where( 'id_solicitud' , $inputs[ 'solicitud_id' ] )
+                    //                    ->where( 'id_producto' , $inputs[ 'producto' ] )->first();
+                    $productoId=  $inputs['producto'];
+                    $solicitudId =  $inputs['solicitud_id'];
+                   //
+                        $solicitudProduct = SolicitudProduct::where('id_solicitud', $solicitudId)->first();
+                        $solicitud = Solicitud::where('id', $solicitudId)->first();
+                        $politicType = $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario;
+                        $fondo_product =  $solicitudProduct->getSubFondo( $politicType , $solicitud, $productoId);
+                        return $this->setRpta(  array( 'Cond' => true , 'Fondo_product' => $fondo_product  ) );
+                    //}
+                       
+                    
+                
             }
             return $middleRpta;
 
@@ -386,7 +392,6 @@ class SolicitudeController extends BaseController
         foreach ( $solProductIds as $key => $solProductId ) 
         {
             $solProduct = SolicitudProduct::find( $solProductId );
-            //if( $)///////////////////////
             $old_id_fondo_mkt  = $solProduct->id_fondo_marketing;
             $old_cod_user_type = $solProduct->id_tipo_fondo_marketing;
             $old_ammount       = $solProduct->monto_asignado;
@@ -406,22 +411,11 @@ class SolicitudeController extends BaseController
                 'new'         => $solProduct->id_fondo_marketing,
                 'newMonto'    => $solProduct->monto_asignado );
         }
-        $fondoMktController->discountBalance($ids_fondo_mkt, $moneda, $tc, $detalle->solicitud->id, $userTypeforDiscount);
-        return $fondoMktController->validateBalance( $userTypes, $fondos);
+        $fondoMktController->discountBalance( $ids_fondo_mkt , $moneda, $tc, $detalle->solicitud->id, $userTypeforDiscount);
+        return $fondoMktController->validateBalance( $userTypes, $fondos );
     }
 
-    private function renovateBalance($solicitud)
-    {
-        $fondoMktController = new FondoMkt;
-        $solicitudProducts = $solicitud->products;
-        $ids_fondo_mkt = array();
-        foreach ( $solicitudProducts as $solicitudProduct )
-            $ids_fondo_mkt[] = array(
-                'old'         => $solicitudProduct->id_fondo_marketing,
-                'oldUserType' => $solicitudProduct->id_tipo_fondo_marketing,
-                'oldMonto'    => $solicitudProduct->monto_asignado);
-        $fondoMktController->discountBalance( $ids_fondo_mkt , $solicitud->detalle->id_moneda , ChangeRate::getTc() , $solicitud->id );
-    }
+    
 
     private function setProducts( $idSolicitud, $idsProducto )
     {
@@ -644,6 +638,19 @@ class SolicitudeController extends BaseController
         }
     }
 
+    public function renovateBalance( $solicitud )
+    {
+        $fondoMktController = new FondoMkt;
+        $solicitudProducts = $solicitud->products;
+        $ids_fondo_mkt = array();
+        foreach ( $solicitudProducts as $solicitudProduct )
+            $ids_fondo_mkt[] = array(
+                'old'         => $solicitudProduct->id_fondo_marketing,
+                'oldUserType' => $solicitudProduct->id_tipo_fondo_marketing,
+                'oldMonto'    => $solicitudProduct->monto_asignado);
+        $fondoMktController->discountBalance( $ids_fondo_mkt , $solicitud->detalle->id_moneda , ChangeRate::getTc() , $solicitud->id );
+    }
+
     private function verifyPolicy( $solicitud , $monto )
     {
         $type    = array( Auth::user()->type , Auth::user()->tempType() );
@@ -656,7 +663,7 @@ class SolicitudeController extends BaseController
         else:
             if ( $solicitud->detalle->id_moneda == DOLARES )
                 $monto = $monto * ChangeRate::getTc()->compra;
-            if ( $monto > $approvalPolicy->hasta )
+            if ( $monto > $approvalPolicy->hasta && ! is_null( $approvalPolicy->hasta ) )
                 return $this->setRpta( ACEPTADO );
             elseif ( $monto < $approvalPolicy->desde )
                 return $this->warningException( 'Por Politica solo puede aceptar para este Tipo de Inversion montos mayores a: ' . $approvalPolicy->desde , __FUNCTION__ , __LINE__ , __FILE__ );
@@ -772,13 +779,14 @@ class SolicitudeController extends BaseController
 
     private function validateInputAcceptSolRep( $inputs )
     {
+        \Log::error( $inputs );
         $size  = count( $inputs[ 'producto' ] ); 
         $rules = array(
-                    'idsolicitud'    => 'required|integer|min:1|exists:'.TB_SOLICITUD.',id',
-                    'monto'          => 'required|numeric|min:1',
-                    'anotacion'      => 'sometimes|string|min:1',
-                    'producto'       => 'required|array|min:1|each:integer|each:min,1|each:exists,'.TB_SOLICITUD_PRODUCTO.',id',
-                    'derivacion'     => 'required|numeric|boolean' );
+            'idsolicitud'            => 'required|integer|min:1|exists:'.TB_SOLICITUD.',id',
+            'monto'                  => 'required|numeric|min:1',
+            'anotacion'              => 'sometimes|string|min:1',
+            'derivacion'             => 'required|numeric|boolean' ,
+            'modificacion_productos' => 'required|numeric|boolean' );
         
         $messages = array();
         if ( Auth::user()->type === SUP )
@@ -807,6 +815,11 @@ class SolicitudeController extends BaseController
         {
             return $input->derivacion == 0;
         });
+        $validator->sometimes( 'producto' , 'required|array|min:1|each:integer|each:min,1|each:exists,'.TB_SOLICITUD_PRODUCTO.',id' , function ( $input ) 
+        {
+            return $input->modificacion_productos == 0;
+        });
+
         $validator->sometimes( 'ruc' , 'required|numeric|digits:11'  , function ( $input ) 
         {
             return $input->pago == PAGO_CHEQUE;
@@ -829,6 +842,7 @@ class SolicitudeController extends BaseController
             if ( $middleRpta[status] == ok )
             {
                 $oldIdEstado          = $solicitud->id_estado;
+                \Log::info( $middleRpta[ data ] );
                 if( $inputs[ 'derivacion'] && Auth::user()->type === SUP )
                 {
                     $solicitud->id_estado = DERIVADO;
@@ -868,10 +882,23 @@ class SolicitudeController extends BaseController
                     {
                         $detalle->num_ruc = $inputs[ 'ruc' ];
                     }
+
+                    //VALIDAR SI SE MODIFICARAN LOS PRODUCTOS
+                    if ( $inputs[ 'modificacion_productos' ] == 1 )
+                    {
+                        $productController = new ProductController;
+                        $middleRpta        = $productController->unsetSolicitudProducts( $solicitud->id , $inputs[ 'producto' ] );
+                        if ( $middleRpta[ status ] !== ok )
+                        {
+                            DB::rollback();
+                            return $middleRpta;
+                        }
+                        $inputs[ 'producto' ] = $middleRpta[ data ];
+                    }
                     
                     $middleRpta = $this->setProductsAmount( $inputs[ 'producto' ] , $inputs[ 'monto_producto' ] , $inputs[ 'fondo_producto' ] , $solDetalle );
-
-                    if ($middleRpta[status] != ok)
+                    
+                    if ( $middleRpta[status] != ok )
                     {
                         DB::rollback();
                         return $middleRpta;
@@ -928,7 +955,7 @@ class SolicitudeController extends BaseController
         } 
         catch (Exception $e) 
         {
-            return $this->internalException($e, __FUNCTION__);
+            return $this->internalException( $e, __FUNCTION__ );
         }
     }
 

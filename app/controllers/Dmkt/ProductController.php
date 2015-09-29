@@ -35,4 +35,39 @@ class ProductController extends BaseController
 		$solProduct->save();
     }
 
+    public function unsetSolicitudProducts( $solicitudId , $productsId )
+    {
+        $solicitud = Solicitud::find( $solicitudId );
+        $solicitudProducts = $solicitud->products;
+        $aux = 0;
+
+        foreach ( $solicitudProducts as $solicitudProduct )
+        {
+            if ( ! is_null( $solicitudProduct->id_fondo_marketing ) && ! is_null( $solicitudProduct->id_tipo_fondo_marketing ) )
+            {
+                $aux = 1;
+                break;
+            }
+        }
+        \Log::info( $aux );
+        if ( $aux === 1 )
+        {
+            $solicitudController = new SolicitudeController;
+            $solicitudController->renovateBalance( $solicitud );
+        }
+
+        SolicitudProduct::whereIn( 'id' , $solicitudProducts->lists( 'id' ) )->delete();
+        
+        $solicitudProductsId = array();
+        foreach( $productsId as $productId )
+        {
+            $data = array(
+                'id_solicitud' => $solicitudId ,
+                'id_producto'  => $productId );
+            $this->newSolicitudProduct( $data );
+            $solicitudProductsId[] = SolicitudProduct::where( 'id_solicitud' , $solicitudId )->where( 'id_producto' , $productId )->first()->id;
+        }
+        return $this->setRpta( $solicitudProductsId );
+    } 
+
 }

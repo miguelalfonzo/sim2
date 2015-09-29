@@ -22,8 +22,9 @@ class SolicitudProduct extends Eloquent
             return $lastId->id;
     }
 
-    public function getSubFondo( $userType , $solicitud )
+    public function getSubFondo( $userType , $solicitud , $productoId = null )
     {
+        $id_producto =  isset($productoId) ? $productoId : $this->id_producto;
         if ( $userType == SUP )
         {
             $userid = $solicitud->asigned_to->personal->rmSup->user_id;
@@ -35,7 +36,7 @@ class SolicitudProduct extends Eloquent
                         ->where('fs.saldo' , '>' , 0 )
                         ->where('trim( fsc.tipo )' , FONDO_SUBCATEGORIA_SUPERVISOR )
                         ->where('fs.supervisor_id' , $userid )->orderBy( 'm.descripcion' , 'asc' )
-                        ->where( 'fs.marca_id' , $this->id_producto )
+                        ->where( 'fs.marca_id' , $id_producto )
                         ->get();
         }
         else if ( in_array( $userType , array( GER_PROD , GER_PROM ) ) )
@@ -50,7 +51,7 @@ class SolicitudProduct extends Eloquent
                 $query->where( 'trim( fsc.tipo )' , $userType );
             })
             ->where( 'f.saldo' , '>' , 0 )->orderBy( 'm.descripcion' , 'asc' )
-            ->where( 'f.marca_id' , $this->id_producto )
+            ->where( 'f.marca_id' , $id_producto )
             ->get();
         }
         else if ( $userType == ASIS_GER )
@@ -71,7 +72,7 @@ class SolicitudProduct extends Eloquent
                         ->leftJoin(TB_PERSONAL.' p' , 'fs.supervisor_id' , '=' , 'p.user_id' )
                         ->where('fs.saldo' , '>' , 0 )
                         ->where('trim( fsc.tipo )' , FONDO_SUBCATEGORIA_SUPERVISOR )
-                        ->where( 'fs.marca_id' , $this->id_producto );
+                        ->where( 'fs.marca_id' , $id_producto );
             $gerFunds = DB::table( TB_FONDO_GERENTE_PRODUCTO.' f' )
                         ->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo - f.retencion saldo_disponible', 'f.id' , 'f.marca_id' , '\'P\' tipo' )
                         ->leftJoin( TB_FONDO_CATEGORIA_SUB.' fsc' , 'f.subcategoria_id' , '=' , 'fsc.id' )
@@ -79,7 +80,7 @@ class SolicitudProduct extends Eloquent
                         ->leftJoin( TB_MARCAS_BAGO.' m' , 'f.marca_id' , '=' , 'm.id' )
                         ->whereIn( 'trim( fsc.tipo )' , array( GER_PROD , GER_PROM ) )
                         ->where( 'f.saldo' , '>' , 0 )
-                        ->where( 'f.marca_id' , $this->id_producto );
+                        ->where( 'f.marca_id' , $id_producto );
             return  $supFunds
                     ->unionAll( $gerFunds )
                     ->orderBy( 'descripcion' , 'asc' )

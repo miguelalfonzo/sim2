@@ -91,8 +91,8 @@
                             @endif
                         </ul>
                     </li>
-                    @if ( in_array(Auth::user()->type, array(SUP, GER_PROD, GER_PROM, GER_COM)) )
-                    <li><a href="{{ URL::to('solicitude/statement')}}">Movimientos</a></li>
+                    @if ( in_array( Auth::user()->type, array( SUP, GER_PROD, GER_PROM, GER_COM , GER_GER ) ) )
+                        <li><a href="{{ URL::to('solicitude/statement')}}">Movimientos</a></li>
                     @endif
                     <li><a href="{{ URL::to('eventos')}}">Eventos</a></li>
                     @if( Auth::user()->type != REP_MED ) 

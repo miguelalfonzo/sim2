@@ -31,7 +31,7 @@ class FondoInstitucional extends Eloquent
             ->select( "fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo - f.retencion saldo_disponible' , 'f.id' , '\'AG\' tipo' )
             ->leftJoin( TB_FONDO_CATEGORIA_SUB.' fsc' , 'f.subcategoria_id' , '=' , 'fsc.id' )
             ->leftJoin( TB_FONDO_CATEGORIA.' fc' , 'fsc.id_fondo_categoria' , '=' , 'fc.id' )
-            ->where( 'fsc.tipo' , FONDO_SUBCATEGORIA_INSTITUCION )->get();
+            ->where( 'trim( fsc.tipo )' , FONDO_SUBCATEGORIA_INSTITUCION )->get();
     }
 
     protected static function order()
