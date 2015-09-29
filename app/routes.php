@@ -212,7 +212,7 @@
         Route::get( 'get-investments-activities' , 'Dmkt\SolicitudeController@getInvestmentsActivities');
         Route::post( 'registrar-solicitud', 'Dmkt\SolicitudeController@registerSolicitud');
         Route::get( 'editar-solicitud/{id}', 'Dmkt\SolicitudeController@editSolicitud');
-        Route::post( 'agregar-familia-fondo', 'Dmkt\SolicitudeController@addFamilyFundSolicitud');
+        
         Route::post( 'search-client', 'Source\Seeker@clientSource');
         Route::post( 'get-client-view' , 'Source\Seeker@getClientView');
         Route::post( 'filtro_cliente' , 'Dmkt\Client@getInvestmentActivity');
@@ -318,3 +318,6 @@ Route::post('testUploadImgSave', 'Dmkt\SolicitudeController@viewTestUploadImgSav
 Route::get('maintenance/newFondos', 'Maintenance\MaintenanceController@fondoView');
     // Route::get('passLogin', 'TestController@passLogin');
     // Route::get('passNewSolicitud' , 'TestController@passNewSolicitud');
+
+//Agregar familias con fondo Modal
+Route::post( 'agregar-familia-fondo', 'Dmkt\SolicitudeController@addFamilyFundSolicitud');

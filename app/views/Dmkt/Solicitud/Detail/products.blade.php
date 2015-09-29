@@ -6,7 +6,7 @@
                 <label class="pull-right">Fondo</label>
             @endif
 
-            @if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD ) ) )
+            @if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD, GER_PROM , GER_COM , GER_GER  ) ) )
                 <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#approval-product-modal">
                     Agregar
                 </button>
@@ -125,7 +125,7 @@
                         @endif
                     @endif
                    
-                    <input type="hidden" name="producto[]" value="{{ $product->id_producto  }}">
+                    <input type="hidden" name="producto[]" class="producto_value" value="{{ $product->id_producto  }}">
                 </li>
 
 
