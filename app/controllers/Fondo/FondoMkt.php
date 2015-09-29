@@ -37,18 +37,18 @@ class FondoMkt extends BaseController
     public function validateBalance( $userTypes , $fondos )
     {
         $userTypes = array_unique( $userTypes );
-        if ( count( $userTypes) != 1 )
+        if ( count( $userTypes ) != 1 )
             return $this->warningException( 'No es posible asignar Fondos de Roles Diferentes' , __FUNCTION__ , __LINE__ , __FILE__ );
         else
             $userType = $userTypes[ 0 ];
 
-        if ( $userType == SUP )
+        /*if ( $userType == SUP )
             $fondoCategoria = array_unique( FondoSupervisor::whereIn( 'id' , array_keys( $fondos ) )->lists( 'subcategoria_id' ) );
         elseif ( $userType == GER_PROD )
             $fondoCategoria = array_unique( FondoGerProd::whereIn( 'id' , array_keys( $fondos ) )->lists( 'subcategoria_id' ) );
 
         if ( count( $fondoCategoria ) != 1 )
-            return $this->warningException( 'No es posible seleccionar Fondos de Diferentes SubCategorias por Solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
+            return $this->warningException( 'No es posible seleccionar Fondos de Diferentes SubCategorias por Solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );*/
         
         $msg = ' el cual no es suficiente para completar el registro , se requiere un saldo de S/.';
         $middleRpta = $this->validateFondoSaldo( $fondos , $userType , $msg , '_disponible' );
