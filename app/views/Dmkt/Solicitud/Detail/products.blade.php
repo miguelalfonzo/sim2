@@ -111,9 +111,12 @@
                             <span class="input-group-addon">{{ $detalle->typemoney->simbolo }}</span>
                             <input name="monto_producto[]" type="text" class="form-control text-right amount_families2" value="{{ isset( $product->monto_asignado ) ? $product->monto_asignado : 
                             round( $detalle->monto_actual / count( $solicitud->products ) , 2 )}}" style="padding:0px;text-align:center">
-                             <button type="button" class="btn-remove-family" style="">
+                            <span class="input-group-btn">
+                                 <button type="button" class="btn btn-default btn-remove-family" >
                                     <span class="glyphicon glyphicon-remove"></span>
-                    </button>   
+                                </button>   
+                            </span>
+                            
                         </div>
                     @else
                         {{{ $product->marca->descripcion or '-' }}}

@@ -2116,22 +2116,21 @@ $( '.btn-remove-family' ).click( function () {
 });
 
 $("#is-product-change").change(function() {
-    if(this.checked) {
-        
+    if(this.checked) {        
         $("#open_modal_add_product").show();
-         $("#list-product").hide();
-
+        $("#list-product").hide();
         $('#list-product :input').attr('disabled', true);
         $('#list-product2 :input').removeAttr('disabled');
-       $("#list-product2").show();
+        $("#list-product2").show();
     }
     else{
-         $("#open_modal_add_product").hide();
+        $("#open_modal_add_product").hide();
         $("#list-product2").hide();
         $('#list-product2 :input').attr('disabled', true);
         $('#list-product :input').removeAttr('disabled');
         $("#list-product").show();
     }
+    verifySum( 0 , 0 );
 });
 
 // Edit Family Fondo
