@@ -1,6 +1,5 @@
 <?php
 
-    Route::get('getSpecialty/{cmp}', 'Expense\ExpenseController@getSpecialty');
     /*
     |--------------------------------------------------------------------------
     | TESTING
@@ -13,22 +12,7 @@
     Route::get('set_status', array('uses' => 'BaseController@setStatus'));
     Route::get('sendmail', array('uses' => 'BaseController@postman'));
     Route::get('prueba', 'Dmkt\FondoController@test');
-    
-    Route::get('clientes-data','TestController@clientsTables');
-    Route::get('hola', 'Expense\ExpenseController@test');
-    Route::get('a/{token}', 'Expense\ExpenseController@reportExpense');
-    Route::get('report-fondo/{token}','Expense\ExpenseController@reportExpenseFondo');
-    Route::get('report', 'ExpenseController@reportExpense');
-    Route::get('tmp','TestController@tm');
-    Route::get('history','TestController@withHistory');
 
-    Route::post( 'get-cell-maintenance-info' , 'Maintenance\TableController@getMaintenanceCellData' );
-    Route::post( 'update-maintenance-info' , 'Maintenance\TableController@updateMaintenanceData' );
-    Route::post( 'save-maintenance-info' , 'Maintenance\TableController@saveMaintenanceData' );
-    Route::post( 'add-maintenance-info' , 'Maintenance\TableController@addMaintenanceData' );
-    Route::post( 'get-table-maintenance-info' , 'Maintenance\TableController@getMaintenanceTableData');
-    Route::post( 'maintenance-enable' , 'Maintenance\TableController@enableRecord');
-    Route::post( 'maintenance-disable' , 'Maintenance\TableController@disableRecord');
     Route::get( 'test-query' , 'TestController@testQuery' );
     Route::get( 'test-fondo-query' , 'TestController@getUserSubFondos' );
     Route::get( 'testcalert' , 'TestController@testcalert');
@@ -37,7 +21,8 @@
     //--- TIME LINE --
 
     Route::get( 'timeline-modal/{id}' , 'Dmkt\SolicitudeController@getTimeLine');
-    
+    Route::post( 'agregar-familia-fondo', 'Dmkt\SolicitudeController@addFamilyFundSolicitud');
+        
     /*
     |--------------------------------------------------------------------------
     | SYSTEM
@@ -67,24 +52,12 @@
 
     /*
     |--------------------------------------------------------------------------
-    | DESCARGOS
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get( 'recharge' , function()
-    {
-        return View::make('recharge');
-    });
-
-    /*
-    |--------------------------------------------------------------------------
     | GERENTE COMERCIAL
     |--------------------------------------------------------------------------
     */
 
-    Route::group( array( 'before' => 'gercom') , function () 
+    Route::group( array( 'before' => 'gercom' ) , function () 
     {
-        Route::post('aprobar-solicitud', 'Dmkt\SolicitudeController@approvedSolicitude');
         Route::post('gercom-mass-approv','Dmkt\SolicitudeController@massApprovedSolicitudes');
         Route::get('maintenance/FondosSupervisor', 'Maintenance\TableController@getSupFunds');
         Route::get('maintenance/FondosGerProd', 'Maintenance\TableController@getGerProdFunds');
@@ -137,7 +110,6 @@
         Route::post( 'deposit-solicitude', 'Deposit\DepositController@depositSolicitudeTes');
         Route::post( 'modal-extorno' , 'Deposit\DepositController@modalExtorno' );
         Route::post( 'confirm-extorno' , 'Deposit\DepositController@confirmExtorno' );
-
     });
 
     /*
@@ -148,6 +120,7 @@
 
     Route::group( array('before' => 'ager' ) , function()
     {
+        Route::get('solicitude/institution', 'Dmkt\SolicitudeController@showSolicitudeInstitution');
         Route::post('registrar-fondo','Dmkt\FondoController@registerInstitutionalApplication');
         Route::get('exportfondos/{date}','Dmkt\FondoController@exportExcelFondos');
         Route::get('endfondos/{date}','Dmkt\FondoController@endfondos');
@@ -160,16 +133,17 @@
 
     /*
     |--------------------------------------------------------------------------
-    | SUPERVISOR , GERENTE DE PRODUCTO - PROMOCION - COMERCIAL
+    | SUPERVISOR , GERENTE DE PRODUCTO - PROMOCION - COMERCIAL - GENERAL
     |--------------------------------------------------------------------------
     */
 
-    Route::group(array('before' => 'sup_gerprod_gerprom_gercom'), function ()
+    Route::group(array('before' => 'sup_gerprod_gerprom_gercom_gerger'), function ()
     {
         Route::post( 'search-users' , 'Source\Seeker@userSource');
         Route::post( 'confirm-temporal-user' , 'User\UserController@assignTemporalUser');
         Route::get( 'remove-temporal-user' , 'User\UserController@removeTemporalUser');
         Route::post('aceptar-solicitud', 'Dmkt\SolicitudeController@acceptedSolicitude');
+        Route::get('solicitude/statement', 'Movements\MoveController@getStatement');
     });
 
     /*
@@ -178,7 +152,7 @@
     |--------------------------------------------------------------------------
     */
 
-    Route::group( array( 'before' => 'rm_cont_test' ), function ()
+    Route::group( array( 'before' => 'rm_cont_tes' ), function ()
     {
         Route::post( 'register-devolution-data' , 'Devolution\DevolutionController@registerDevolutionData' );
         Route::post( 'get-devolution-info' , 'Devolution\DevolutionController@getDevolutionInfo' );
@@ -191,18 +165,17 @@
 
     Route::group( array( 'before' => 'rm_cont' ), function () 
     {
-        Route::post('get-expenses' , 'Expense\ExpenseController@getExpenses');
-        Route::post('edit-expense', 'Expense\ExpenseController@editExpense');
-        Route::post('delete-expense', 'Expense\ExpenseController@deleteExpense');
-        Route::post('register-expense', 'Expense\ExpenseController@registerExpense');
-        Route::get('a/{token}', 'Expense\ExpenseController@reportExpense');
-        Route::get('report-fondo/{token}','Expense\ExpenseController@reportExpenseFondo');
+        Route::post( 'get-expenses' , 'Expense\ExpenseController@getExpenses');
+        Route::post( 'edit-expense', 'Expense\ExpenseController@editExpense');
+        Route::post( 'delete-expense', 'Expense\ExpenseController@deleteExpense');
+        Route::post( 'register-expense', 'Expense\ExpenseController@registerExpense');
+        Route::get( 'a/{token}', 'Expense\ExpenseController@reportExpense');
+        Route::get( 'report-fondo/{token}','Expense\ExpenseController@reportExpenseFondo');
     });
 
     Route::group( array( 'before' => 'rm' ), function ()
     {
-        Route::post('end-expense', 'Expense\ExpenseController@finishExpense');
-        Route::get('ver-gasto/{token}', 'Expense\ExpenseController@viewExpense');
+        Route::post( 'end-expense', 'Expense\ExpenseController@finishExpense');
         Route::post( 'do-inmediate-devolution' , 'Devolution\DevolutionController@doInmediateDevolution' );
     });
 
@@ -212,7 +185,6 @@
         Route::get( 'get-investments-activities' , 'Dmkt\SolicitudeController@getInvestmentsActivities');
         Route::post( 'registrar-solicitud', 'Dmkt\SolicitudeController@registerSolicitud');
         Route::get( 'editar-solicitud/{id}', 'Dmkt\SolicitudeController@editSolicitud');
-        
         Route::post( 'search-client', 'Source\Seeker@clientSource');
         Route::post( 'get-client-view' , 'Source\Seeker@getClientView');
         Route::post( 'filtro_cliente' , 'Dmkt\Client@getInvestmentActivity');
@@ -220,7 +192,7 @@
         
     });
 
-    Route::group( array( 'before' => 'rm_sup_gerprod_gerprom_gercom_ager_cont' ) , function()
+    Route::group( array( 'before' => 'rm_sup_gerprod_gerprom_gercom_gerger_ager_cont' ) , function()
     {
         Route::post('cancelar-solicitud', 'Dmkt\SolicitudeController@cancelSolicitud');
     });
@@ -236,7 +208,8 @@
         Route::get('show-fondo/{token}','Expense\ExpenseController@showFondo');
         Route::post( 'list-table' , 'Movements\MoveController@getTable');
         Route::post( 'detail-solicitud' , 'Movements\MoveController@getSolicitudDetail');
-
+        Route::get('getleyenda', 'BaseController@getLeyenda');
+        
         /*
         |--------------------------------------------------------------------------
         | Alert
@@ -244,44 +217,38 @@
         */
         Route::get( 'alerts' , 'Alert\AlertController@show' );
         Route::post( 'alerts' , 'Alert\AlertController@showAlerts' );
+    
+        /*
+        |--------------------------------------------------------------------------
+        | idkc: REPORT
+        |--------------------------------------------------------------------------
+        */
+        // REPORT MAIN PAGE
+        Route::get('reports', 'Report\ReportController@mainHandler');
+        // GENERATE REPORT TABLE VIEW
+        Route::get('reports/generate_html/{id_reporte}/{fromDate}/{toDate}', 'Report\ReportController@reportViewHandler'); 
+        // CREATE EXCEL
+        Route::post('reports/export/generate','Report\ReportController@reportExcelHandler');
+        // LIST DATASET
+        Route::get('reports/getQuerys', 'Report\ReportController@listDatasetHandler');
+        // LIST COLUMNS OF DATASET
+        Route::get('reports/getColumnsDataSet/{queryId}', 'Report\ReportController@listColumnsDatasetHandler');
+        // SAVE NEW REPORT
+        Route::post('reports/save', 'Report\ReportController@saveReportHandler');
+        // LIST REPORTS OF USERS
+        Route::get('reports/getUserReports', 'Report\ReportController@listReportsUserHandler');
+        // SEND MAIL
+        Route::post('mail_send','PostMan@sendEmailHandler');
+
+        // DOWNLOAD REPORT EXCEL
+        Route::get('reports/export/download/{userId}/{reportId}/{fromDate}/{toDate}', 'Report\ReportController@downloadReportExcelHandler');
+
+
     });
 
     App::missing(function ($exception) 
     {
     });
-
-
-/*
-|--------------------------------------------------------------------------
-| idkc: REPORT
-|--------------------------------------------------------------------------
-*/
-    // REPORT MAIN PAGE
-    Route::get('reports', 'Report\ReportController@mainHandler');
-    // GENERATE REPORT TABLE VIEW
-    Route::get('reports/generate_html/{id_reporte}/{fromDate}/{toDate}', 'Report\ReportController@reportViewHandler'); 
-    // CREATE EXCEL
-    Route::post('reports/export/generate','Report\ReportController@reportExcelHandler');
-    // LIST DATASET
-    Route::get('reports/getQuerys', 'Report\ReportController@listDatasetHandler');
-    // LIST COLUMNS OF DATASET
-    Route::get('reports/getColumnsDataSet/{queryId}', 'Report\ReportController@listColumnsDatasetHandler');
-    // SAVE NEW REPORT
-    Route::post('reports/save', 'Report\ReportController@saveReportHandler');
-    // LIST REPORTS OF USERS
-    Route::get('reports/getUserReports', 'Report\ReportController@listReportsUserHandler');
-    // SEND MAIL
-    Route::post('mail_send','PostMan@sendEmailHandler');
-
-    // DOWNLOAD REPORT EXCEL
-    Route::get('reports/export/download/{userId}/{reportId}/{fromDate}/{toDate}', 'Report\ReportController@downloadReportExcelHandler');
-
-
-Route::get('solicitude/statement', 'Movements\MoveController@getStatement');
-
-Route::get('solicitude/institution', 'Dmkt\SolicitudeController@showSolicitudeInstitution');
-
-Route::get('getleyenda', 'BaseController@getLeyenda');
 /*
 |--------------------------------------------------------------------------
 | MANTENIMIENTO
@@ -309,15 +276,3 @@ Route::get('eventos','Dmkt\SolicitudeController@album');
 Route::post('eventos/list','Dmkt\SolicitudeController@getEventList');
 Route::post('photos', 'Dmkt\SolicitudeController@photos');
 Route::post('testUploadImgSave', 'Dmkt\SolicitudeController@viewTestUploadImgSave');
-
-/*
-|--------------------------------------------------------------------------
-| TEST MANTENIMIENTO
-|--------------------------------------------------------------------------
-*/
-Route::get('maintenance/newFondos', 'Maintenance\MaintenanceController@fondoView');
-    // Route::get('passLogin', 'TestController@passLogin');
-    // Route::get('passNewSolicitud' , 'TestController@passNewSolicitud');
-
-//Agregar familias con fondo Modal
-Route::post( 'agregar-familia-fondo', 'Dmkt\SolicitudeController@addFamilyFundSolicitud');
