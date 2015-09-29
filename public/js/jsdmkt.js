@@ -2084,13 +2084,13 @@ $( '#btn-add-family-fondo' ).on( 'click' ,function ()
                     $("#selectfamilyadd option:selected").text() + '</span><select name="fondo_producto[]" class="selectpicker form-control">' +
                     options_val +'</select><span class="input-group-addon">S/.</span>'+
                     '<input name="monto_producto[]" type="text" class="form-control text-right amount_families2" value="0" style="padding:0px;text-align:center">'+
-                    '<button type="button" class="btn-remove-family" style=""><span class="glyphicon glyphicon-remove"></span></button> </div>'+
+                    '<span class="input-group-btn"><button type="button" class="btn btn-default btn-remove-family"><span class="glyphicon glyphicon-remove"></span></button></span></div>'+
                     '<input type="hidden" name="producto[]" class="producto_value" value="'+family_id+'"></li>');
 
 
                     $( ".btn-remove-family" ).bind( "click", function() {
-                        $(this).prev('input').val(0);
-                        verifySum( $(this).prev('input') , 1 )
+                        $(this).parent().prev('input').val(0);
+                        verifySum( $(this).parent().prev('input') , 1 )
                         $(this).closest('li').remove();
                         
                     });
@@ -2110,8 +2110,8 @@ $( '#btn-add-family-fondo' ).on( 'click' ,function ()
 
 
 $( '.btn-remove-family' ).click( function () {
-    $(this).prev('input').val(0);
-    verifySum( $(this).prev('input') , 1 );
+    $(this).parent().prev('input').val(0);
+    verifySum( $(this).parent().prev('input') , 1 );
     $(this).closest('li').remove();   
 });
 
