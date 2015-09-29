@@ -413,9 +413,7 @@ class SolicitudeController extends BaseController
         }
         $fondoMktController->discountBalance( $ids_fondo_mkt , $moneda, $tc, $detalle->solicitud->id, $userTypeforDiscount);
         return $fondoMktController->validateBalance( $userTypes, $fondos );
-    }
-
-    
+    }    
 
     private function setProducts( $idSolicitud, $idsProducto )
     {
