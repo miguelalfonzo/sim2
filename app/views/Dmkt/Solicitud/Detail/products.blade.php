@@ -12,7 +12,6 @@
                 </button>
                  <input type="checkbox" name="modificacion-productos" id="is-product-change"> cambiar Fondos
             @endif
-           
         </div>
         <ul class="list-group" id="list-product">
             @foreach( $solicitud->products as $product )

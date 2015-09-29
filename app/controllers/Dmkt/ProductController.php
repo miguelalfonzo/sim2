@@ -52,8 +52,8 @@ class ProductController extends BaseController
         \Log::info( $aux );
         if ( $aux === 1 )
         {
-            $solicitudController = new solicitudController;
-            $solicitudController->renovateBalance( $solicitudId );
+            $solicitudController = new SolicitudeController;
+            $solicitudController->renovateBalance( $solicitud );
         }
 
         SolicitudProduct::whereIn( 'id' , $solicitudProducts->lists( 'id' ) )->delete();

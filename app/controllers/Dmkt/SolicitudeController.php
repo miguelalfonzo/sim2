@@ -638,7 +638,7 @@ class SolicitudeController extends BaseController
         }
     }
 
-    private function renovateBalance( $solicitud )
+    public function renovateBalance( $solicitud )
     {
         $fondoMktController = new FondoMkt;
         $solicitudProducts = $solicitud->products;
@@ -663,7 +663,7 @@ class SolicitudeController extends BaseController
         else:
             if ( $solicitud->detalle->id_moneda == DOLARES )
                 $monto = $monto * ChangeRate::getTc()->compra;
-            if ( $monto > $approvalPolicy->hasta )
+            if ( $monto > $approvalPolicy->hasta && ! is_null( $approvalPolicy->hasta ) )
                 return $this->setRpta( ACEPTADO );
             elseif ( $monto < $approvalPolicy->desde )
                 return $this->warningException( 'Por Politica solo puede aceptar para este Tipo de Inversion montos mayores a: ' . $approvalPolicy->desde , __FUNCTION__ , __LINE__ , __FILE__ );
@@ -842,6 +842,7 @@ class SolicitudeController extends BaseController
             if ( $middleRpta[status] == ok )
             {
                 $oldIdEstado          = $solicitud->id_estado;
+                \Log::info( $middleRpta[ data ] );
                 if( $inputs[ 'derivacion'] && Auth::user()->type === SUP )
                 {
                     $solicitud->id_estado = DERIVADO;
