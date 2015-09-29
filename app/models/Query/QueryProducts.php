@@ -11,7 +11,7 @@
         {
 	        $join->on( 'F.tipo' , '=' , TIPO_FAMILIA )->on( 'F.CODIGO' , '=' , 'A.FOFAMILIA' );
         })
-        ->where('F.CODIGO', '!=', 21) /* eliminar este filtro temporar 24/09/2105*/
+        ->whereNotIn( 'F.CODIGO' , array( 21 , 89 ) )/* eliminar este filtro temporar 24/09/2105*/
         ->distinct()->orderBy( 'F.NOMBRE' , 'ASC' );
 
 ?>
