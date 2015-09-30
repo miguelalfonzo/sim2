@@ -906,6 +906,18 @@ function acceptedSolicitude( type )
 {
     var formData = new FormData( form_acepted_solicitude[ 0 ] );
     console.log( type );
+
+    var d_clients = [];
+    var d_clients_type = [];
+
+    clients.children().each( function ()
+    {
+        elem = $(this);
+        d_clients.push( elem.attr("pk") );
+        d_clients_type.push( elem.attr("tipo_cliente") );
+    });
+            
+
     if ( type !== undefined )
     {
         formData.append( 'derivacion' , 1 );
@@ -922,6 +934,25 @@ function acceptedSolicitude( type )
     else
     {
         formData.append( 'modificacion_productos' , 0 );
+    }
+
+    if ( $("#is-client-change").is(':checked'))
+    {
+        formData.append( 'modificacion_clientes' , 1 );        
+
+        d_clients.forEach( function( entry )
+        {
+            formData.append( "clientes[]", entry );
+        });   
+        d_clients_type.forEach( function( entry )
+        {
+            formData.append( "tipos_cliente[]" , entry );
+        });
+    }
+
+    else
+    {
+        formData.append( 'modificacion_clientes' , 0 );
     }
 
     $.ajax(
@@ -2149,6 +2180,15 @@ $("#is-client-change").change(function() {
     }
 });
 
+$("#edit-date-activate").click(function() {
+  $( ".edit-date" ).show();
+  $( ".solicitud-date" ).hide();
+});
+
+$("#edit-date-deactivate").click(function() {
+  $( ".solicitud-date" ).show();
+  $( ".edit-date" ).hide();
+});
 
 
 // Edit Family Fondo
