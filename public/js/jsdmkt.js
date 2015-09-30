@@ -2133,6 +2133,23 @@ $("#is-product-change").change(function() {
     verifySum( 0 , 0 );
 });
 
+
+$("#is-client-change").change(function() {
+    if(this.checked) {        
+        $("#open_modal_add_client").show();
+        $("#list-client").hide();
+        $('#clientes :input').removeAttr('disabled');
+        $("#clientes").show();
+    }
+    else{
+        $("#open_modal_add_client").hide();
+        $("#clientes").hide();
+        $('#clientes :input').attr('disabled', true);
+        $("#list-client").show();
+    }
+    verifySum( 0 , 0 );
+});
+
 // Edit Family Fondo
 $( '.editProduct' ).on( 'click' , function()
 {
