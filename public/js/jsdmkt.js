@@ -2147,8 +2147,9 @@ $("#is-client-change").change(function() {
         $('#clientes :input').attr('disabled', true);
         $("#list-client").show();
     }
-    verifySum( 0 , 0 );
 });
+
+
 
 // Edit Family Fondo
 $( '.editProduct' ).on( 'click' , function()
