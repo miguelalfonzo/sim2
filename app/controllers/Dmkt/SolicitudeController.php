@@ -226,6 +226,7 @@ class SolicitudeController extends BaseController
                     {
                         $data[ 'payments' ] = TypePayment::all();
                         $data[ 'families' ] = $qryProducts->get();
+                        $data[ 'reps' ] = Personal::getRms();    
                     }
                     $data[ 'tipo_usuario' ] = $politicType;
                     $solicitud->status = BLOCKED;
