@@ -2169,27 +2169,42 @@ $("#is-client-change").change(function() {
     if(this.checked) {        
         $("#open_modal_add_client").show();
         $("#list-client").hide();
-        $('#clientes :input').removeAttr('disabled');
+        //$('#clientes :input').removeAttr('disabled');
         $("#clientes").show();
     }
     else{
         $("#open_modal_add_client").hide();
         $("#clientes").hide();
-        $('#clientes :input').attr('disabled', true);
+        //$('#clientes :input').attr('disabled', true);
         $("#list-client").show();
     }
 });
 
 $("#edit-date-activate").click(function() {
   $( ".edit-date" ).show();
+  $( "#fecha-value" ).val("");
+  $( "#fecha-value" ).removeAttr('disabled');
   $( ".solicitud-date" ).hide();
 });
 
 $("#edit-date-deactivate").click(function() {
   $( ".solicitud-date" ).show();
   $( ".edit-date" ).hide();
+  $( "#fecha-value" ).attr('disabled', true);
 });
 
+$("#edit-resp-activate").click(function() {
+  $( ".edit-resp" ).show();
+  $('#resp-value option[value=0]').attr('selected','selected');
+  $('#resp-value').removeAttr('disabled');
+  $( ".solicitud-resp" ).hide();
+});
+
+$("#edit-resp-deactivate").click(function() {
+  $( ".solicitud-resp" ).show();
+  $( ".edit-resp" ).hide();
+  $('#resp-value').attr('disabled', true);
+});
 
 // Edit Family Fondo
 $( '.editProduct' ).on( 'click' , function()
@@ -2273,6 +2288,7 @@ $( document ).ready(function()
 
     /** ---------------------------------------- SET DISABLED INPUTS INIT ------------------------------------------**/
     $('#list-product2 :input').attr('disabled', true);
-
+    $('#resp-value').attr('disabled', true);
+    $( "#fecha-value" ).attr('disabled', true);
 });
 
