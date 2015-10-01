@@ -4,6 +4,28 @@
         <input type="text" class="form-control" maxlength="10" disabled value="{{ date_format( date_create( $solicitud->created_at ) , 'd/m/Y' ) }}">
     </div>
     <div class="input-group col-xs-12 col-sm-6 col-md-6 col-lg-6 pull-left">
-        <input type="text" class="form-control" maxlength="10" disabled value="{{$detalle->fecha_entrega}}">
+    	<div class="input-group solicitud-date" >
+        	<input type="text" class="form-control" maxlength="10" disabled value="{{$detalle->fecha_entrega}}">
+					
+        </div>
+        <div class="input-group date edit-date" style="display: none">
+                
+            <input type="text" name="fecha" class="form-control" maxlength="10" readonly="" value="{{$detalle->fecha_entrega}}" style="background-color: rgb(255, 255, 255);">
+			<span class="input-group-addon">
+				<i class="glyphicon glyphicon-calendar"></i>
+			</span>
+
+        </div>
+		<span  class="input-group-btn solicitud-date">
+			<button class="btn btn-default" type="button" id="edit-date-activate" style="height: 38px;">
+				<i class="glyphicon glyphicon-edit"></i>
+			</button>						
+		</span>
+		<span  class="input-group-btn  edit-date" style="display: none">
+	                <button class="btn btn-default" type="button" id="edit-date-deactivate" style="height: 38px;">
+								<i class="glyphicon glyphicon-ban-circle"></i>
+					</button>
+		</span>
+       	
     </div>
 </div>

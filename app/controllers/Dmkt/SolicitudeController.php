@@ -784,8 +784,8 @@ class SolicitudeController extends BaseController
             'monto'                  => 'required|numeric|min:1',
             'anotacion'              => 'sometimes|string|min:1',
             'derivacion'             => 'required|numeric|boolean' ,
-            'modificacion_productos' => 'required|numeric|boolean' );
-        
+            'modificacion_productos' => 'required|numeric|boolean' ,
+            'modificacion_clientes'  => 'required|numeric|boolean' );
         $messages = array();
         if ( Auth::user()->type === SUP )
         {
@@ -816,6 +816,12 @@ class SolicitudeController extends BaseController
         $validator->sometimes( 'producto' , 'required|array|min:1|each:integer|each:min,1|each:exists,'.TB_SOLICITUD_PRODUCTO.',id' , function ( $input ) 
         {
             return $input->modificacion_productos == 0;
+        });
+
+
+        $validator->sometimes( 'clientes' , 'required|array|min:1|each:integer|each:min,1' , function ( $input ) 
+        {
+            return $input->modificacion_clientes == 1;
         });
 
         $validator->sometimes( 'ruc' , 'required|numeric|digits:11'  , function ( $input ) 
@@ -881,6 +887,18 @@ class SolicitudeController extends BaseController
                         $detalle->num_ruc = $inputs[ 'ruc' ];
                     }
 
+
+                    if( isset( $inputs[ 'fecha' ] ) )
+                    {
+                        $detalle->fecha_entrega = $inputs[ 'fecha' ];
+                    }
+
+                    //VALIDAR SI SE MODIFICARAN LOS CLIENTES
+                    if ( $inputs[ 'modificacion_clientes' ] == 1 )
+                    {
+                        $solicitud->clients()->delete();
+                        $middleRpta = $this->setClients( $solicitud->id, $inputs['clientes'], $inputs['tipos_cliente'] );
+                    }
                     //VALIDAR SI SE MODIFICARAN LOS PRODUCTOS
                     if ( $inputs[ 'modificacion_productos' ] == 1 )
                     {

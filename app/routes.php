@@ -185,8 +185,8 @@
         Route::get( 'get-investments-activities' , 'Dmkt\SolicitudeController@getInvestmentsActivities');
         Route::post( 'registrar-solicitud', 'Dmkt\SolicitudeController@registerSolicitud');
         Route::get( 'editar-solicitud/{id}', 'Dmkt\SolicitudeController@editSolicitud');
-        Route::post( 'search-client', 'Source\Seeker@clientSource');
-        Route::post( 'get-client-view' , 'Source\Seeker@getClientView');
+        //Route::post( 'search-client', 'Source\Seeker@clientSource');
+        //Route::post( 'get-client-view' , 'Source\Seeker@getClientView');
         Route::post( 'filtro_cliente' , 'Dmkt\Client@getInvestmentActivity');
         Route::post( 'filtro-inversion' , 'Dmkt\Client@getActivities');  
         
@@ -276,3 +276,6 @@ Route::get('eventos','Dmkt\SolicitudeController@album');
 Route::post('eventos/list','Dmkt\SolicitudeController@getEventList');
 Route::post('photos', 'Dmkt\SolicitudeController@photos');
 Route::post('testUploadImgSave', 'Dmkt\SolicitudeController@viewTestUploadImgSave');
+
+Route::post( 'search-client', 'Source\Seeker@clientSource');
+Route::post( 'get-client-view' , 'Source\Seeker@getClientView');
