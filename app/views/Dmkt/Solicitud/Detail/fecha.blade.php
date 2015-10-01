@@ -8,24 +8,25 @@
         	<input type="text" class="form-control" maxlength="10" disabled value="{{$detalle->fecha_entrega}}">
 					
         </div>
-        <div class="input-group date edit-date" style="display: none">
-                
-            <input type="text" name="fecha" class="form-control" maxlength="10" readonly="" value="{{$detalle->fecha_entrega}}" style="background-color: rgb(255, 255, 255);">
-			<span class="input-group-addon">
-				<i class="glyphicon glyphicon-calendar"></i>
-			</span>
+        @if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD, GER_PROM , GER_COM , GER_GER  ) ) )
+	        <div class="input-group date edit-date" style="display: none">
+	                
+	            <input type="text" name="fecha" id="fecha-value"class="form-control" maxlength="10" readonly="" value="{{$detalle->fecha_entrega}}" style="background-color: rgb(255, 255, 255);">
+				<span class="input-group-addon">
+					<i class="glyphicon glyphicon-calendar"></i>
+				</span>
 
-        </div>
-		<span  class="input-group-btn solicitud-date">
-			<button class="btn btn-default" type="button" id="edit-date-activate" style="height: 38px;">
-				<i class="glyphicon glyphicon-edit"></i>
-			</button>						
-		</span>
-		<span  class="input-group-btn  edit-date" style="display: none">
-	                <button class="btn btn-default" type="button" id="edit-date-deactivate" style="height: 38px;">
-								<i class="glyphicon glyphicon-ban-circle"></i>
-					</button>
-		</span>
-       	
+	        </div>
+			<span  class="input-group-btn solicitud-date">
+				<button class="btn btn-default" type="button" id="edit-date-activate" style="height: 38px;">
+					<i class="glyphicon glyphicon-edit"></i>
+				</button>						
+			</span>
+			<span  class="input-group-btn  edit-date" style="display: none">
+		                <button class="btn btn-default" type="button" id="edit-date-deactivate" style="height: 38px;">
+									<i class="glyphicon glyphicon-ban-circle"></i>
+						</button>
+			</span>
+       	@endif
     </div>
 </div>
