@@ -1499,8 +1499,14 @@ class SolicitudeController extends BaseController
             {
                 DB::beginTransaction();
                 $solicitud = Solicitud::find( $inputs['idsolicitud'] );
+                \Log::info( $solicitud->id_estado );
+                if ( $solicitud->id_estado != DEPOSITADO )
+                {
+                    return $this->warningException( 'Ya se realizo la operacion de Deposito' , __FUNCTION__ , __LINE__ , __FILE__ );
+                }
+
                 $oldIdEstado = $solicitud->id_estado;
-                
+
                 if( $solicitud->idtiposolicitud == REEMBOLSO )
                 {
                     $solicitud->id_estado = GENERADO;
