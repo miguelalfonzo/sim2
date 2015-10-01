@@ -9,9 +9,7 @@
             @if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD, GER_PROM , GER_COM , GER_GER  ) ) )
                 <label class="pull-right">
                  <input type="checkbox" name="modificacion-productos" id="is-product-change"> Modificar
-                 <button type="button" style="display:none" id="open_modal_add_product" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#approval-product-modal">
-                    Agregar Producto
-                </button>
+                 
                 </label>
             @endif
         </div>
@@ -133,6 +131,9 @@
 
             @endforeach
         </ul>
+        <button type="button" style="display:none" id="open_modal_add_product" class="btn btn-primary btn-sm pull-right" data-toggle="modal" data-target="#approval-product-modal">
+                    Agregar Producto
+                </button>
         @endif
     </div>
 </div>

@@ -829,6 +829,16 @@ class SolicitudeController extends BaseController
         {
             return $input->pago == PAGO_CHEQUE;
         });
+        $validator->sometimes( 'fecha' , 'required|string'  , function ( $input ) 
+        {
+            return isset($input->fecha);
+        });
+
+        $validator->sometimes( 'responsable' , 'required|numeric|exists:'.TB_PERSONAL.',user_id'  , function ( $input ) 
+        {
+            return isset($input->responsable);
+        });
+
         
         if ( $validator->fails() )
             return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
@@ -862,6 +872,13 @@ class SolicitudeController extends BaseController
                 {
                     $solicitud->anotacion = $inputs[ 'anotacion' ];
                 }
+
+
+                if( isset( $inputs[ 'responsable' ] ) )
+                    {
+                        $solicitud->id_user_assign = $inputs['responsable'];
+                    }
+                
                 $solicitud->save();
 
                 if( $solicitud->id_estado != DERIVADO )
@@ -893,6 +910,9 @@ class SolicitudeController extends BaseController
                     {
                         $detalle->fecha_entrega = $inputs[ 'fecha' ];
                     }
+
+
+                    
 
                     //VALIDAR SI SE MODIFICARAN LOS CLIENTES
                     if ( $inputs[ 'modificacion_clientes' ] == 1 )
