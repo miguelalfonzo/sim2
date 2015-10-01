@@ -5,9 +5,7 @@
              @if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD, GER_PROM , GER_COM , GER_GER  ) ) )
                 <label class="pull-right">
                  <input type="checkbox" name="modificacion-clientes" id="is-client-change"> Modificar
-                 <button type="button" style="display:none" id="open_modal_add_client" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#approval-client-modal">
-                    Agregar Clientes
-                </button>
+                 
                 </label>
             @endif
         </div>
@@ -23,7 +21,7 @@
                 </li>
             @endforeach
         </ul>
-
+        @if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD, GER_PROM , GER_COM , GER_GER  ) ) )
         <ul class="list-group" id="clientes" style="display: none">                 
             @foreach( $solicitud->clients as $client )
              @if ( is_null( $client->id_cliente) )
@@ -39,6 +37,10 @@
                 @endif
             @endforeach
         </ul>
+        <button type="button" style="display:none" id="open_modal_add_client" class="btn btn-primary btn-sm pull-right" data-toggle="modal" data-target="#approval-client-modal">
+                Agregar Clientes
+        </button>
+        @endif
     </div>
 </div>
 @if ( $politicStatus && isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD , GER_PROM , GER_COM , GER_GER ) ) )
