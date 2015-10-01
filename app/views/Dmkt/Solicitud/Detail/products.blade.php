@@ -1,6 +1,6 @@
 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
     <div class="panel panel-default">
-        <div class="panel-heading clearfix">
+        <div class="panel-heading">
             Productos / Montos Asignados
             @if( ! in_array( $solicitud->id_estado , array( PENDIENTE , CANCELADO ) ) )
                 / Fondo

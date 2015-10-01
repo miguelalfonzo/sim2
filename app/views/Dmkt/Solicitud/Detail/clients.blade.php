@@ -1,6 +1,6 @@
 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
     <div class="panel panel-default">
-        <div class="panel-heading clearfix">Clientes
+        <div class="panel-heading">Clientes
 
              @if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD, GER_PROM , GER_COM , GER_GER  ) ) )
                 <label class="pull-right">
