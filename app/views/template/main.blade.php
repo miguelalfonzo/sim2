@@ -183,14 +183,10 @@
 
 <script type="text/javascript">
     URL_BASE = '{{ asset('/') }}';
-    @if( isset( $solicitud ) && in_array( $solicitud->id_estado , array ( GASTO_HABILITADO , REGISTRADO ) ) && isset( $date ) )
+    @if( isset( $solicitud ) && in_array( $solicitud->id_estado , array ( GASTO_HABILITADO , ENTREGADO ) ) && isset( $date ) )
         START_DATE = '{{ $date[ "startDate" ] }}';
         END_DATE = '{{ $date[ "endDate" ] }}';
     @endif
-    $(document).ready( function() 
-    {
-        
-    });
 </script>
 
 {{ HTML::script('js/jquery.blockUI.js') }}
