@@ -194,7 +194,7 @@
 	
 			<section class="row reg-expense align-center" style="margin:1.5em 0">
 				<div class="col-xs-12 col-sm-12 col-md-12">
-					<a id="saveSeatExpense" class="btn btn-success" style="margin:-2em 2em .5em 0">Generar Asiento Diario</a>
+					<a id="saveSeatExpense" data-loading-text="Generando..."  class="btn btn-success" style="margin:-2em 2em .5em 0">Generar Asiento Diario</a>
 					<a id="cancel-seat-cont" href="{{URL::to('show_user')}}" class="btn btn-danger" style="margin:-2em 2em .5em 0">Atras</a>
 				</div>
 			</section>

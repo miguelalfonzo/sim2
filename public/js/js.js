@@ -359,6 +359,7 @@ $(function()
     
     //Generate Seat Solicitude
     $("#seat-solicitude").on("click",function(e){
+        var $btn = $(this).button('loading');
         e.preventDefault();
         var data = {};
         data._token = $("input[name=_token]").val();
@@ -408,6 +409,9 @@ $(function()
                     else
                         bootbox.alert("<h4 class='red'>" + data.Status + ": " + data.Description + "</h4>");
                 });
+            }
+            else{
+                $btn.button('reset')
             }
         });
     });
@@ -1304,32 +1308,48 @@ $(function()
     $( document ).off( 'click' , '#saveSeatExpense' );
     $( document ).on( 'click' , '#saveSeatExpense' , function()
     {
+        var $btn = $(this).button('loading');
         var button = $(this);
         var data = {};
         data.seatList = GBDMKT.seatsList;
         data._token   = $("input[name=_token]").val();
         data.idsolicitud = $('#idsolicitud').attr("rel");
-        $.ajax(
+
+
+
+        bootbox.confirm("¿Esta seguro que desea Generar el Asiento de Gasto (Diario)?", function(result) 
         {
-            type: 'post',
-            url: server + 'guardar-asiento-gasto',
-            data: data
-        }).fail( function( statusCode , errorThrown)
-        {
-            bootbox.alert('<h4 class="red"> No se pudo acceder al servidor </h4>');
-        }).done( function ( result ) 
-        {
-            if( result.Status != 'Ok')
-                bootbox.alert('<h4>' + result.Status + ': ' + result.Description + '</h4>');
-            else if ( result.Status == 'Ok' )
+            if(result)
             {
-                responseUI( "Asiento Diario Registrado" , "green" );
-                setTimeout( function()
-                { 
-                    window.location.href = server + 'show_user'; 
-                }, 2000);
+                $.ajax(
+                {
+                    type: 'post',
+                    url: server + 'guardar-asiento-gasto',
+                    data: data
+                }).fail( function( statusCode , errorThrown)
+                {
+                    bootbox.alert('<h4 class="red"> No se pudo acceder al servidor </h4>');
+                }).done( function ( result ) 
+                {
+                    if( result.Status != 'Ok')
+                        bootbox.alert('<h4>' + result.Status + ': ' + result.Description + '</h4>');
+                    else if ( result.Status == 'Ok' )
+                    {
+                        responseUI( "Asiento Diario Registrado" , "green" );
+                        setTimeout( function()
+                        { 
+                            window.location.href = server + 'show_user'; 
+                        }, 2000);
+                    }
+                });
+            }
+            else{
+                $btn.button('reset');
             }
         });
+
+
+        
     });
 
     // EDIT SEAT CONT

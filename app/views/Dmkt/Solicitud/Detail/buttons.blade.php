@@ -28,7 +28,7 @@
                 @endif
             @endif
             @if( $solicitud->id_estado == DEPOSITADO )
-                <a id="seat-solicitude" class="btn btn-success">Generar Asiento</a>
+                <a id="seat-solicitude" data-loading-text="Generando..." class="btn btn-success">Generar Asiento</a>
             @elseif( $solicitud->id_estado == ENTREGADO )
                 @if( $solicitud->idtiposolicitud != REEMBOLSO )
                     @if ( $solicitud->devolutions()->whereIn( 'id_estado_devolucion' , array( DEVOLUCION_POR_REALIZAR , DEVOLUCION_POR_VALIDAR ) )->get()->count() === 0 )
