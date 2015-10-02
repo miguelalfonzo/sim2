@@ -1382,10 +1382,20 @@ class SolicitudeController extends BaseController
     // IDKC: CHANGE STATUS => GENERADO
     public function saveSeatExpense()
     {
-        try {
+        try 
+        {
             DB::beginTransaction();
             $dataInputs = Input::all();
             $seats = array();
+
+            $solicitud = Solicitud::find( $dataInputs[ 'idsolicitud' ] );
+            if ( ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , SOL_INST ) ) && $solicitud->id_estado == GENERADO ) || 
+                ( $solicitud->idtiposolicitud == REEMBOLSO  && $solicitud->id_estado == DEPOSITO_HABILITADO ) )
+            {
+                DB::rollback();
+                return $this->warningException( 'La solicitud ya ha sido procesada' , __FUNCTION__ , __LINE__ , __FILE__ );
+            }
+
             if ( isset( $dataInputs[ 'seatList' ] ) )
             {
                 foreach ($dataInputs['seatList'] as $key => $seatItem) 
@@ -1424,7 +1434,6 @@ class SolicitudeController extends BaseController
                 }
             }
 
-            $solicitud = Solicitud::find($dataInputs['idsolicitud']);
             $oldIdEstado = $solicitud->id_estado;
             if ($solicitud->idtiposolicitud == REEMBOLSO)
                 $solicitud->id_estado = DEPOSITO_HABILITADO;
