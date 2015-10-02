@@ -102,10 +102,6 @@
     <!-- CLIENTES -->
     @include('Dmkt.Solicitud.Detail.clients')
         
-    <div class="form-group col-sm-12 col-md-12 col-lg-12">
-        <span id="amount_error_families"></span>
-    </div>
-    
     <!-- Lista de Devoluciones -->
     @include( 'Dmkt.Solicitud.Detail.devolucion2')
 

@@ -1518,7 +1518,7 @@ class SolicitudeController extends BaseController
                 \Log::info( $solicitud->id_estado );
                 if ( $solicitud->id_estado != DEPOSITADO )
                 {
-                    return $this->warningException( 'Ya se realizo la operacion de Deposito' , __FUNCTION__ , __LINE__ , __FILE__ );
+                    return $this->warningException( 'Ya se realizo la Operación' , __FUNCTION__ , __LINE__ , __FILE__ );
                 }
 
                 $oldIdEstado = $solicitud->id_estado;

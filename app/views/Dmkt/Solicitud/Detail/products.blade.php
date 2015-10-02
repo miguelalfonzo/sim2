@@ -1,17 +1,26 @@
+
 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
     <div class="panel panel-default">
         <div class="panel-heading">
+        <div class="row"> 
+         <div class=" col-xs-12 col-sm-12 col-md-5">
             Productos / Montos Asignados
             @if( ! in_array( $solicitud->id_estado , array( PENDIENTE , CANCELADO ) ) )
                 / Fondo
             @endif
-
+            </div>
+            <div class="col-xs-8 col-sm-10 col-md-5">
+        <span id="amount_error_families"></span>
+    </div>
+     <div class="col-xs-4 col-sm-2 col-md-2">
             @if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD, GER_PROM , GER_COM , GER_GER  ) ) )
                 <label class="pull-right">
                  <input type="checkbox" name="modificacion-productos" id="is-product-change"> Modificar
                  
                 </label>
             @endif
+            </div>
+            </div>
         </div>
         <ul class="list-group" id="list-product">
             @foreach( $solicitud->products as $product )
