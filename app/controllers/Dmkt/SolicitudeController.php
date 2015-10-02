@@ -725,32 +725,37 @@ class SolicitudeController extends BaseController
 
     public function massApprovedSolicitudes()
     {
-        try {
+        try 
+        {
             $inputs = Input::all();
             $rules = array('solicitudes' => 'required');
             $validator = Validator::make($inputs, $rules);
-            if ($validator->fails())
+            if ( $validator->fails() )
                 return $this->warningException($this->msg2Validator($validator), __FUNCTION__, __LINE__, __FILE__);
-            else {
-                $status = array(ok => array(), error => array());
+            else 
+            {
+                $status = array( ok => array() , error => array() );
                 $message = '';
-                foreach ($inputs['solicitudes'] as $solicitud) {
+                foreach ( $inputs[ 'solicitudes' ] as $solicitud ) 
+                {
                     $solicitud = Solicitud::where('token', $solicitud)->first();
                     $solicitudProducts = $solicitud->orderProducts;
                     $fondo = array();
 
-                    foreach ($solicitudProducts as $solicitudProduct)
+                    foreach ( $solicitudProducts as $solicitudProduct )
                         $fondo[] = $solicitudProduct->id_fondo_marketing . ',' . $solicitudProduct->id_tipo_fondo_marketing;
 
                     $inputs = array(
-                        'idsolicitud'    => $solicitud->id,
-                        'monto'          => $solicitud->detalle->monto_actual ,
-                        'producto'       => $solicitud->orderProducts()->lists('id') ,
-                        'anotacion'      => $solicitud->anotacion ,
-                        'fondo_producto' => $fondo ,
-                        'derivacion'     => 0 ,
-                        'pago'           => $solicitud->detalle->id_pago , 
-                        'ruc'            => $solicitud->detalle->num_ruc );
+                        'idsolicitud'            => $solicitud->id,
+                        'monto'                  => $solicitud->detalle->monto_actual ,
+                        'producto'               => $solicitud->orderProducts()->lists('id') ,
+                        'anotacion'              => $solicitud->anotacion ,
+                        'fondo_producto'         => $fondo ,
+                        'derivacion'             => 0 ,
+                        'pago'                   => $solicitud->detalle->id_pago , 
+                        'ruc'                    => $solicitud->detalle->num_ruc ,
+                        'modificacion_productos' => 0 ,
+                        'modificacion_clientes'  => 0 ); 
 
                     $solProducts = $solicitud->orderProducts();
                     if ($solicitud->id_estado == DERIVADO)
@@ -771,7 +776,9 @@ class SolicitudeController extends BaseController
                 else
                     return array(status => warning, 'token' => $status, description => substr($message, 0, -1));
             }
-        } catch (Exception $e) {
+        } 
+        catch (Exception $e) 
+        {
             return $this->internalException($e, __FUNCTION__);
         }
     }
@@ -1382,10 +1389,20 @@ class SolicitudeController extends BaseController
     // IDKC: CHANGE STATUS => GENERADO
     public function saveSeatExpense()
     {
-        try {
+        try 
+        {
             DB::beginTransaction();
             $dataInputs = Input::all();
             $seats = array();
+
+            $solicitud = Solicitud::find( $dataInputs[ 'idsolicitud' ] );
+            if ( ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , SOL_INST ) ) && $solicitud->id_estado == GENERADO ) || 
+                ( $solicitud->idtiposolicitud == REEMBOLSO  && $solicitud->id_estado == DEPOSITO_HABILITADO ) )
+            {
+                DB::rollback();
+                return $this->warningException( 'La solicitud ya ha sido procesada' , __FUNCTION__ , __LINE__ , __FILE__ );
+            }
+
             if ( isset( $dataInputs[ 'seatList' ] ) )
             {
                 foreach ($dataInputs['seatList'] as $key => $seatItem) 
@@ -1424,7 +1441,6 @@ class SolicitudeController extends BaseController
                 }
             }
 
-            $solicitud = Solicitud::find($dataInputs['idsolicitud']);
             $oldIdEstado = $solicitud->id_estado;
             if ($solicitud->idtiposolicitud == REEMBOLSO)
                 $solicitud->id_estado = DEPOSITO_HABILITADO;
@@ -1499,8 +1515,14 @@ class SolicitudeController extends BaseController
             {
                 DB::beginTransaction();
                 $solicitud = Solicitud::find( $inputs['idsolicitud'] );
+                \Log::info( $solicitud->id_estado );
+                if ( $solicitud->id_estado != DEPOSITADO )
+                {
+                    return $this->warningException( 'Ya se realizo la operacion de Deposito' , __FUNCTION__ , __LINE__ , __FILE__ );
+                }
+
                 $oldIdEstado = $solicitud->id_estado;
-                
+
                 if( $solicitud->idtiposolicitud == REEMBOLSO )
                 {
                     $solicitud->id_estado = GENERADO;
