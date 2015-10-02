@@ -1,7 +1,7 @@
 <section class="row" style="padding:0.3em 1em">
     <!-- TITULO -->
     <div class="page-header">
-        <h2>{{$solicitud->titulo}} <span class="label label-default">{{$solicitud->activity->nombre}}</span></h2>
+        <h2>#{{ $solicitud->id}} {{$solicitud->titulo}} <span class="label label-default">{{$solicitud->activity->nombre}}</span></h2>
     </div>
     
     <!-- MOTIVO  -->
