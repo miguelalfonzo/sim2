@@ -725,32 +725,37 @@ class SolicitudeController extends BaseController
 
     public function massApprovedSolicitudes()
     {
-        try {
+        try 
+        {
             $inputs = Input::all();
             $rules = array('solicitudes' => 'required');
             $validator = Validator::make($inputs, $rules);
-            if ($validator->fails())
+            if ( $validator->fails() )
                 return $this->warningException($this->msg2Validator($validator), __FUNCTION__, __LINE__, __FILE__);
-            else {
-                $status = array(ok => array(), error => array());
+            else 
+            {
+                $status = array( ok => array() , error => array() );
                 $message = '';
-                foreach ($inputs['solicitudes'] as $solicitud) {
+                foreach ( $inputs[ 'solicitudes' ] as $solicitud ) 
+                {
                     $solicitud = Solicitud::where('token', $solicitud)->first();
                     $solicitudProducts = $solicitud->orderProducts;
                     $fondo = array();
 
-                    foreach ($solicitudProducts as $solicitudProduct)
+                    foreach ( $solicitudProducts as $solicitudProduct )
                         $fondo[] = $solicitudProduct->id_fondo_marketing . ',' . $solicitudProduct->id_tipo_fondo_marketing;
 
                     $inputs = array(
-                        'idsolicitud'    => $solicitud->id,
-                        'monto'          => $solicitud->detalle->monto_actual ,
-                        'producto'       => $solicitud->orderProducts()->lists('id') ,
-                        'anotacion'      => $solicitud->anotacion ,
-                        'fondo_producto' => $fondo ,
-                        'derivacion'     => 0 ,
-                        'pago'           => $solicitud->detalle->id_pago , 
-                        'ruc'            => $solicitud->detalle->num_ruc );
+                        'idsolicitud'            => $solicitud->id,
+                        'monto'                  => $solicitud->detalle->monto_actual ,
+                        'producto'               => $solicitud->orderProducts()->lists('id') ,
+                        'anotacion'              => $solicitud->anotacion ,
+                        'fondo_producto'         => $fondo ,
+                        'derivacion'             => 0 ,
+                        'pago'                   => $solicitud->detalle->id_pago , 
+                        'ruc'                    => $solicitud->detalle->num_ruc ,
+                        'modificacion_productos' => 0 ,
+                        'modificacion_clientes'  => 0 ); 
 
                     $solProducts = $solicitud->orderProducts();
                     if ($solicitud->id_estado == DERIVADO)
@@ -771,7 +776,9 @@ class SolicitudeController extends BaseController
                 else
                     return array(status => warning, 'token' => $status, description => substr($message, 0, -1));
             }
-        } catch (Exception $e) {
+        } 
+        catch (Exception $e) 
+        {
             return $this->internalException($e, __FUNCTION__);
         }
     }
