@@ -24,16 +24,24 @@
         @if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD, GER_PROM , GER_COM , GER_GER  ) ) )
         <ul class="list-group" id="clientes" style="display: none">                 
             @foreach( $solicitud->clients as $client )
-             @if ( is_null( $client->id_cliente) )
-                       No hay cliente Asignado
-                    @else
-                <li class="list-group-item" tipo_cliente="{{ $client->clientType->id }}" pk="{{ $client->id_cliente }}">
-                        <b>{{ $client->{$client->clientType->relacion}->full_name }}</b>
-                        <span class="badge" >{{$client->clientType->descripcion}}</span>
-                        <button type="button" class="btn-delete-client" style="z-index:2">
-                            <span class="glyphicon glyphicon-remove red" style="margin-left:20px ; float:right;"></span>
-                        </button>
-                </li>
+                @if ( is_null( $client->id_cliente) )
+                   No hay cliente Asignado
+                @else
+                    <li class="list-group-item clearfix" tipo_cliente="{{ $client->clientType->id }}" pk="{{ $client->id_cliente }}">
+                        <div class="row" >
+                            <div class="col-8 col-sm-8 col-lg-8">
+                                <b>{{ $client->{$client->clientType->relacion}->full_name }}</b>                            
+                            </div>
+                            <div  class="col-8 col-sm-4 col-lg-4">
+                                <span class="pull-right">
+                                  <span class="badge">{{$client->clientType->descripcion}}</span>
+                                  <button type='button' class="btn btn-xs btn-default btn-delete-client">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                  </button>
+                                </span>
+                            </div>
+                        </div>
+                    </li>
                 @endif
             @endforeach
         </ul>

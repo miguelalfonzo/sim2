@@ -533,10 +533,14 @@ function verifySum( element , type )
     var sum_total = 0;
     var precision = 11;
 
+    var margin_error = 0.01;
+
     if($("#is-product-change").is(':checked'))
          $('.amount_families2').each(function(i,v)
         {
             sum_total += parseFloat( $(this).val() );
+            sum_total.toFixed(2);
+            console.log(sum_total);
         });
     else
         $('.amount_families').each(function(i,v)
@@ -569,22 +573,22 @@ function verifySum( element , type )
         amount_error_families.text('El monto de la familia no debe ser menora 0').css('color', 'red');
         idamount.parent().parent().removeClass("has-success").addClass("has-error");
     }
-    else if ( type == 1 && ( parseFloat( $( element ).val() ) > parseFloat( idamount.val() ) ) )
+    else if ( type == 1 && ( parseFloat( $( element ).val()  - margin_error ) > parseFloat( idamount.val() ) ) )
     {
         amount_error_families.text('El monto de la familia supera al monto especificado').css('color', 'red');
         idamount.parent().parent().removeClass("has-success").addClass("has-error");
     }
-    else if ( parseFloat( sum_total ) > parseFloat( idamount.val() ) )
+    else if ( parseFloat( sum_total - margin_error) > parseFloat( idamount.val() ) )
     {
         amount_error_families.text('El monto total de las familias supera al monto especificado').css('color', 'red');
         idamount.parent().parent().removeClass("has-success").addClass("has-error");
     }
-    else if ( parseFloat( sum_total ) < parseFloat( idamount.val() ) )
+    else if ( parseFloat( sum_total  + margin_error) < parseFloat( idamount.val() ) )
     {
         amount_error_families.text('El monto total de las familias es menor al monto especificado').css('color', 'red');
         idamount.parent().parent().removeClass("has-success").addClass("has-error");
     }
-    else if ( parseFloat( sum_total ) == parseFloat( idamount.val() ) )
+    else if ( parseFloat( sum_total - margin_error )  <= parseFloat( idamount.val() ) && parseFloat( sum_total + margin_error )  >= parseFloat( idamount.val() )  )
     {
         amount_error_families.text('Los montos asignados son iguales al monto especificado').css('color', 'green');    
         idamount.parent().parent().removeClass("has-error").addClass("has-success");
@@ -1673,7 +1677,7 @@ function fillInvestmentsActivities()
 $(document).off( 'click' , '.btn-delete-client' );
 $(document).on( 'click' , '.btn-delete-client' , function () 
 {
-    var li = $(this).parent();
+    var li = $(this).closest('li');
     var ul = li.parent();
     if ( li.index() == 0 && ul.children().length > 1 )
     {
