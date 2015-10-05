@@ -1,22 +1,35 @@
 <table cellpadding="0" cellspacing="0" border="0" style="width:100%" id="table_solicitudes" class="table table-striped table-hover table-bordered" >
     <thead>
         <tr>
-            <th></th>
             <th>#</th>
             <th>Solicitud</th>
-            <th>Solicitado por</th>
-            <th>Fecha de Solicitud</th>
+            <th>
+                @if( Auth::user()->type == TESORERIA )
+                    Responsable
+                @else
+                    Solicitado por
+                @endif
+            </th>
+            <th>
+                @if( in_array( Auth::user()->type , array( TESORERIA , CONT ) )) 
+                    Fecha de Depósito
+                @else
+                    Fecha de Solicitud
+                @endif
+            </th>
             <th>Aprobado por</th>
             <th>Fecha de Aprobación</th>
-            @if(Auth::user()->type == TESORERIA)
-                <th>Deposito</th>
-            @else
-                <th>Monto</th>
-            @endif
+            <th>
+                @if( Auth::user()->type == TESORERIA )
+                    Deposito
+                @else
+                    Monto
+                @endif
+            </th>
             <th>Estado</th>
             <th>Tipo</th>
             <th class="col-xs-2 col-sm-2">Edicion</th>
-            @if (Auth::user()->type == GER_COM)
+            @if ( in_array( Auth::user()->type , array( GER_COM , CONT ) ) )
                 <th data-checkbox="true">Marcar</th>
             @endif
         </tr>
@@ -24,11 +37,6 @@
     <tbody>
         @foreach( $solicituds as $solicitud )
             <tr>
-                <td class="text-center open-details" data-id="{{$solicitud->id}}">
-                    <a class="btn btn-default">
-                        <span class="glyphicon glyphicon-eye-open"></span>
-                    </a>
-                </td>
                 @if($solicitud->state->id_estado == R_NO_AUTORIZADO )
                     <input type="hidden" id="timeLineStatus" value="{{$solicitud->id_estado}}" data-rejected="{{$solicitud->rejectedHist->user_from}}">
                 @elseif( ! is_null( $solicitud->state ) && $solicitud->id_estado != TODOS )
@@ -51,10 +59,40 @@
                     @endif
                     <label>{{$solicitud->titulo}}</label>
                 </td>
+
                 <td class="text-center">
-                    {{ $solicitud->createdBy->personal->getFullName() }}
+                    @if( Auth::user()->type == TESORERIA )
+                        {{ $solicitud->asignedTo->personal->full_name }}    
+                    @else
+                        {{ $solicitud->createdBy->personal->full_name }}
+                    @endif
                 </td>
-                <td class="text-center">{{$solicitud->created_at}}</td>
+                 @if( in_array( Auth::user()->type , array( TESORERIA, CONT ) ))
+                    
+                    <?php $now =  Carbon\Carbon::now();
+                     $fecha_entrega = Carbon\Carbon::createFromFormat( 'd/m/Y' , $solicitud->detalle->fecha_entrega );
+                     $fecha_deposito = Carbon\Carbon::createFromFormat( 'd/m/Y' , $solicitud->detalle->fecha_entrega )->format( 'Y-m-d' ); ?>
+
+                    @if($now >  $fecha_entrega)
+                    <td class="text-center alert-danger">
+                     <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>  
+                     {{ $fecha_deposito}}
+                     </td>  
+                    @elseif ($now->diffInDays($fecha_entrega) <= 1 ) 
+                     <td class="text-center alert-warning">
+                        <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+                        <strong>{{ $fecha_deposito}}</strong>
+                    </td>  
+                    @else
+                     <td class="text-center">
+                    {{ $fecha_deposito}}
+                    </td>  
+                    @endif
+                @else
+                <td class="text-center">
+                    {{ $solicitud->created_at }}
+                    </td>
+                @endif
                 <td class="text-center">
                     @if ( $solicitud->id_estado != PENDIENTE )
                         @if( $solicitud->lastHistory->count() != 0 )
@@ -90,14 +128,22 @@
                 
                 @include('template.List.icons')
                 
-                @if ( Auth::user()->type == GER_COM )
+                @if ( in_array( Auth::user()->type , array( GER_COM , CONT ) ) )
                     <td class="text-center">
-                        @if ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) )
-                        && $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario === Auth::user()->type
-                        && in_array( Auth::user()->id , $solicitud->managerEdit( $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario )->lists( 'id_gerprod' ) ) )
-                            <input type="checkbox" name="mass-aprov">
-                        @else
-                            <input type="checkbox" name="mass-aprov" disabled>
+                        @if( Auth::user()->type === GER_COM )
+                            @if ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) ) && 
+                                $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario === Auth::user()->type && 
+                                in_array( Auth::user()->id , $solicitud->managerEdit( $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario )->lists( 'id_gerprod' ) ) )
+                                <input type="checkbox" name="mass-aprov">
+                            @else
+                                <input type="checkbox" name="mass-aprov" disabled>
+                            @endif
+                        @elseif( Auth::user()->type == CONT )
+                            @if( $solicitud->id_estado == APROBADO )
+                                <input type="checkbox" name="mass-aprov">
+                            @else
+                                <input type="checkbox" name="mass-aprov" disabled>    
+                            @endif
                         @endif
                     </td>
                 @endif

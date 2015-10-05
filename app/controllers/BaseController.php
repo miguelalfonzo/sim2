@@ -100,7 +100,7 @@ class BaseController extends Controller
         return $date;
     }
 
-    protected function msgValidator($validator)
+    protected function msgValidator( $validator )
     {
         $rpta = '';
         foreach ($validator->messages()->all() as $msg)

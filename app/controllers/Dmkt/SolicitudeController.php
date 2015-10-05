@@ -728,53 +728,63 @@ class SolicitudeController extends BaseController
         try 
         {
             $inputs = Input::all();
-            $rules = array('solicitudes' => 'required');
-            $validator = Validator::make($inputs, $rules);
+            $rules = array( 'solicitudes' => 'required|array|min:1' );
+            $validator = Validator::make( $inputs , $rules);
             if ( $validator->fails() )
+            {
                 return $this->warningException($this->msg2Validator($validator), __FUNCTION__, __LINE__, __FILE__);
+            }
             else 
             {
                 $status = array( ok => array() , error => array() );
                 $message = '';
                 foreach ( $inputs[ 'solicitudes' ] as $solicitud ) 
                 {
-                    $solicitud = Solicitud::where('token', $solicitud)->first();
-                    $solicitudProducts = $solicitud->orderProducts;
-                    $fondo = array();
+                    $solicitud = Solicitud::where( 'token' , $solicitud[ 'token' ] )->first();
+                    
+                    if ( Auth::user()->type == GER_COM )
+                    {
+                        $solicitudProducts = $solicitud->orderProducts;
+                        $fondo = array();
 
-                    foreach ( $solicitudProducts as $solicitudProduct )
-                        $fondo[] = $solicitudProduct->id_fondo_marketing . ',' . $solicitudProduct->id_tipo_fondo_marketing;
+                        foreach ( $solicitudProducts as $solicitudProduct )
+                            $fondo[] = $solicitudProduct->id_fondo_marketing . ',' . $solicitudProduct->id_tipo_fondo_marketing;
 
-                    $inputs = array(
-                        'idsolicitud'            => $solicitud->id,
-                        'monto'                  => $solicitud->detalle->monto_actual ,
-                        'producto'               => $solicitud->orderProducts()->lists('id') ,
-                        'anotacion'              => $solicitud->anotacion ,
-                        'fondo_producto'         => $fondo ,
-                        'derivacion'             => 0 ,
-                        'pago'                   => $solicitud->detalle->id_pago , 
-                        'ruc'                    => $solicitud->detalle->num_ruc ,
-                        'modificacion_productos' => 0 ,
-                        'modificacion_clientes'  => 0 ); 
+                        $inputs = array(
+                            'idsolicitud'            => $solicitud->id,
+                            'monto'                  => $solicitud->detalle->monto_actual ,
+                            'producto'               => $solicitud->orderProducts()->lists('id') ,
+                            'anotacion'              => $solicitud->anotacion ,
+                            'fondo_producto'         => $fondo ,
+                            'derivacion'             => 0 ,
+                            'pago'                   => $solicitud->detalle->id_pago , 
+                            'ruc'                    => $solicitud->detalle->num_ruc ,
+                            'modificacion_productos' => 0 ,
+                            'modificacion_clientes'  => 0 ); 
 
-                    $solProducts = $solicitud->orderProducts();
-                    if ($solicitud->id_estado == DERIVADO)
-                        $inputs['monto_producto'] = array_fill(0, count($solProducts->get()), $inputs['monto'] / count($solProducts->get()));
-                    else
-                        $inputs['monto_producto'] = $solProducts->lists('monto_asignado');
-                    $rpta = $this->acceptedSolicitudTransaction($solicitud->id, $inputs);
+                        $solProducts = $solicitud->orderProducts();
+                        if ($solicitud->id_estado == DERIVADO)
+                            $inputs['monto_producto'] = array_fill(0, count($solProducts->get()), $inputs['monto'] / count($solProducts->get()));
+                        else
+                            $inputs['monto_producto'] = $solProducts->lists('monto_asignado');
+                        $rpta = $this->acceptedSolicitudTransaction( $solicitud->id , $inputs );
+                    }
+                    elseif( Auth::user()->type == CONT )
+                    {
+                        $rpta = $this->checkSolicitudTransaction( $solicitud[ 'token' ] );
+                    }
                     if ($rpta[status] != ok) {
                         $status[error][] = $solicitud['token'];
                         $message .= $message . 'No se pudo procesar la Solicitud N°: ' . $solicitud->id . ': ' . $rpta[description] . '. ';
                     } else
                         $status[ok][] = $solicitud['token'];
                 }
-                if (empty($status[error]))
-                    return array(status => ok, 'token' => $status, description => 'Se aprobaron las solicitudes seleccionadas');
-                else if (empty($status[ok]))
-                    return array(status => danger, 'token' => $status, description => substr($message, 0, -1));
+                if ( empty( $status[ error ] ) )
+                    return array( status => ok , 'token' => $status , description => 'Se aprobaron las solicitudes seleccionadas' );
+                else if ( empty( $status[ ok ] ) )
+                    return array( status => danger , 'token' => $status , description => substr( $message , 0, -1 ) );
                 else
-                    return array(status => warning, 'token' => $status, description => substr($message, 0, -1));
+                    return array( status => warning , 'token' => $status , description => substr( $message , 0, -1 ) );
             }
         } 
         catch (Exception $e) 
@@ -853,7 +863,7 @@ class SolicitudeController extends BaseController
             return $this->setRpta();
     }
 
-    private function acceptedSolicitudTransaction( $idSolicitud, $inputs )
+    private function acceptedSolicitudTransaction( $idSolicitud , $inputs )
     {
         DB::beginTransaction();
         $middleRpta = $this->validateInputAcceptSolRep( $inputs );
@@ -1003,43 +1013,63 @@ class SolicitudeController extends BaseController
         }
     }
 
-    public function checkSolicitud()
+    public function ckeckSolicitud()
     {
-        try {
-            DB::beginTransaction();
+        try
+        {
             $inputs = Input::all();
-            $solicitud = Solicitud::find($inputs['idsolicitud']);
-            if (is_null($solicitud))
-                return $this->warningException('Cancelado - No se encontro la solicitud con Id: ' . $inputs['idsolicitud'], __FUNCTION__, __LINE__, __FILE__);
-
-            if ($solicitud->id_estado != APROBADO)
-                return $this->warningException('Cancelado - No se puede procesar una solicitud que no ha sido Aprobada', __FUNCTION__, __LINE__, __FILE__);
-
-            $oldIdEstado = $solicitud->id_estado;
-            if ($solicitud->idtiposolicitud == REEMBOLSO) {
-                $solicitud->id_estado = GASTO_HABILITADO;
-                $toUser = $solicitud->id_user_assign;
-                $state = R_GASTO;
-            } else {
-                $solicitud->id_estado = DEPOSITO_HABILITADO;
-                $toUser = USER_TESORERIA;
-                $state = R_REVISADO;
-            }
-            $solicitud->save();
-
-            $middleRpta = $this->setStatus($oldIdEstado, $solicitud->id_estado, Auth::user()->id, $toUser, $solicitud->id);
-            if ($middleRpta[status] == ok) {
-                Session::put('state', $state);
-                DB::commit();
-                return $middleRpta;
-            }
-
-            DB::rollback();
-            return $middleRpta;
-        } catch (Exception $e) {
-            DB::rollback();
-            return $this->internalException($e, __FUNCTION__);
+            return $this->checkSolicitudTransaction( $inputs[ 'token' ] );
         }
+        catch( Eception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
+    }
+
+    public function checkSolicitudTransaction( $solicitudToken )
+    {
+        DB::beginTransaction();
+        $rules = array( 'token' => 'required|min:1|size:40|exists:'.TB_SOLICITUD.',token' );
+        $inputs = array( 'token' => $solicitudToken );
+        $validator = Validator::make( $inputs , $rules );
+        if ( $validator->fails() )
+        {
+            return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
+
+        $solicitud = Solicitud::where( 'token' , $solicitudToken )->first();
+        
+        if ( is_null( $solicitud ) )
+        {
+            return $this->warningException( 'Cancelado - No se encontro la solicitud con Id: ' . $inputs[ 'idsolicitud' ] , __FUNCTION__, __LINE__, __FILE__ );
+        }
+        if ( $solicitud->id_estado != APROBADO )
+            return $this->warningException( 'Cancelado - La solicitud no ha sido Aprobada o ya se ha procesado' , __FUNCTION__ , __LINE__ , __FILE__ );
+
+        $oldIdEstado = $solicitud->id_estado;
+        if ( $solicitud->idtiposolicitud == REEMBOLSO )
+        {
+            $solicitud->id_estado = GASTO_HABILITADO;
+            $toUser               = $solicitud->id_user_assign;
+            $state                = R_GASTO;
+        }
+        else
+        {
+            $solicitud->id_estado = DEPOSITO_HABILITADO;
+            $toUser               = USER_TESORERIA;
+            $state                = R_REVISADO;
+        }
+        $solicitud->save();
+
+        $middleRpta = $this->setStatus( $oldIdEstado , $solicitud->id_estado , Auth::user()->id , $toUser, $solicitud->id );
+        if ( $middleRpta[ status ] == ok ) 
+        {
+            Session::put( 'state' , $state );
+            DB::commit();
+            return $middleRpta;
+        }
+        DB::rollback();
+        return $middleRpta;
     }
 
     /** ---------------------------------------------  Contabilidad -------------------------------------------------*/

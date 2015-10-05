@@ -29,8 +29,8 @@
             @endforeach
         </select>
     </div>
-    @if (Auth::user()->type == GER_COM )
-        <div class="form-group col-sm-3 col-md-3 button-new-solicitude" style="text-align: left">
+    @if ( in_array( Auth::user()->type , array( GER_COM , CONT ) ) )
+        <div class="form-group col-sm-3 col-md-3" style="text-align:left">
             <div>
                 <a id="btn-mass-approve" class="btn btn-primary">
                     Aprobación

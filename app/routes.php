@@ -56,14 +56,18 @@
     |--------------------------------------------------------------------------
     */
 
-    Route::group( array( 'before' => 'gercom' ) , function () 
+    Route::group( array( 'before' => 'gercom' ) , function() 
     {
-        Route::post('gercom-mass-approv','Dmkt\SolicitudeController@massApprovedSolicitudes');
         Route::get('maintenance/FondosSupervisor', 'Maintenance\TableController@getSupFunds');
         Route::get('maintenance/FondosGerProd', 'Maintenance\TableController@getGerProdFunds');
         Route::get('maintenance/FondosInstitution', 'Maintenance\TableController@getInstitutionFunds');
         Route::get( 'fondoHistorial' , 'Fondo\FondoMkt@getFondoHistorial' );
         Route::post( 'fondo-subcategoria-history' , 'Fondo\FondoMkt@getFondoSubCategoryHistory' );
+    });
+
+    Route::group( array( 'before' => 'gercom_cont' ) , function()
+    {
+        Route::post( 'gercom-mass-approv' ,'Dmkt\SolicitudeController@massApprovedSolicitudes');
     });
 
     /*
