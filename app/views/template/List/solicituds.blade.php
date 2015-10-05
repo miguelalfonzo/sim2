@@ -12,7 +12,7 @@
                 @endif
             </th>
             <th>
-                @if( Auth::user()->type == CONT )
+                @if( in_array( Auth::user()->type , array( TESORERIA , CONT ) )) 
                     Fecha de Depósito
                 @else
                     Fecha de Solicitud
@@ -72,14 +72,33 @@
                     @else
                         {{ $solicitud->createdBy->personal->full_name }}
                     @endif
-                <td class="text-center">
-                    @if( Auth::user()->type == CONT )
-                        {{ Carbon\Carbon::createFromFormat( 'd/m/Y' , $solicitud->detalle->fecha_entrega )->format( 'Y-m-d' ) }}    
-                    @else
-                        {{ $solicitud->created_at }}
-                    @endif
                 </td>
+                 @if( in_array( Auth::user()->type , array( TESORERIA, CONT ) ))
+                    
+                    <?php $now =  Carbon\Carbon::now();
+                     $fecha_entrega = Carbon\Carbon::createFromFormat( 'd/m/Y' , $solicitud->detalle->fecha_entrega );
+                     $fecha_deposito = Carbon\Carbon::createFromFormat( 'd/m/Y' , $solicitud->detalle->fecha_entrega )->format( 'Y-m-d' ); ?>
 
+                    @if($now >  $fecha_entrega)
+                    <td class="text-center alert-danger">
+                     <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>  
+                     {{ $fecha_deposito}}
+                     </td>  
+                    @elseif ($now->diffInDays($fecha_entrega) <= 5 ) 
+                     <td class="text-center alert-warning">
+                        <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+                        <strong>{{ $fecha_deposito}}</strong>
+                    </td>  
+                    @else
+                     <td class="text-center">
+                    {{ $fecha_deposito}}
+                    </td>  
+                    @endif
+                @else
+                <td class="text-center">
+                    {{ $solicitud->created_at }}
+                    </td>
+                @endif
                 <td class="text-center">
                     @if ( $solicitud->id_estado != PENDIENTE )
                         @if( $solicitud->lastHistory->count() != 0 )
