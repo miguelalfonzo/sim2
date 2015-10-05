@@ -30,7 +30,7 @@
             <th>Estado</th>
             <th>Tipo</th>
             <th class="col-xs-2 col-sm-2">Edicion</th>
-            @if (Auth::user()->type == GER_COM)
+            @if ( in_array( Auth::user()->type , array( GER_COM , CONT ) ) )
                 <th data-checkbox="true">Marcar</th>
             @endif
         </tr>
@@ -134,14 +134,22 @@
                 
                 @include('template.List.icons')
                 
-                @if ( Auth::user()->type == GER_COM )
+                @if ( in_array( Auth::user()->type , array( GER_COM , CONT ) ) )
                     <td class="text-center">
-                        @if ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) )
-                        && $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario === Auth::user()->type
-                        && in_array( Auth::user()->id , $solicitud->managerEdit( $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario )->lists( 'id_gerprod' ) ) )
-                            <input type="checkbox" name="mass-aprov">
-                        @else
-                            <input type="checkbox" name="mass-aprov" disabled>
+                        @if( Auth::user()->type === GER_COM )
+                            @if ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) ) && 
+                                $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario === Auth::user()->type && 
+                                in_array( Auth::user()->id , $solicitud->managerEdit( $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario )->lists( 'id_gerprod' ) ) )
+                                <input type="checkbox" name="mass-aprov">
+                            @else
+                                <input type="checkbox" name="mass-aprov" disabled>
+                            @endif
+                        @elseif( Auth::user()->type == CONT )
+                            @if( $solicitud->id_estado == APROBADO )
+                                <input type="checkbox" name="mass-aprov">
+                            @else
+                                <input type="checkbox" name="mass-aprov" disabled>    
+                            @endif
                         @endif
                     </td>
                 @endif
