@@ -1,7 +1,6 @@
 <table cellpadding="0" cellspacing="0" border="0" style="width:100%" id="table_solicitudes" class="table table-striped table-hover table-bordered" >
     <thead>
         <tr>
-            <th></th>
             <th>#</th>
             <th>Solicitud</th>
             <th>
@@ -12,7 +11,7 @@
                 @endif
             </th>
             <th>
-                @if( Auth::user()->type == CONT )
+                @if( in_array( Auth::user()->type , array( TESORERIA , CONT ) )) 
                     Fecha de Depósito
                 @else
                     Fecha de Solicitud
@@ -38,11 +37,6 @@
     <tbody>
         @foreach( $solicituds as $solicitud )
             <tr>
-                <td class="text-center open-details" data-id="{{$solicitud->id}}">
-                    <a class="btn btn-default">
-                        <span class="glyphicon glyphicon-eye-open"></span>
-                    </a>
-                </td>
                 @if($solicitud->state->id_estado == R_NO_AUTORIZADO )
                     <input type="hidden" id="timeLineStatus" value="{{$solicitud->id_estado}}" data-rejected="{{$solicitud->rejectedHist->user_from}}">
                 @elseif( ! is_null( $solicitud->state ) && $solicitud->id_estado != TODOS )
@@ -72,14 +66,33 @@
                     @else
                         {{ $solicitud->createdBy->personal->full_name }}
                     @endif
-                <td class="text-center">
-                    @if( Auth::user()->type == CONT )
-                        {{ Carbon\Carbon::createFromFormat( 'd/m/Y' , $solicitud->detalle->fecha_entrega )->format( 'Y-m-d' ) }}    
-                    @else
-                        {{ $solicitud->created_at }}
-                    @endif
                 </td>
+                 @if( in_array( Auth::user()->type , array( TESORERIA, CONT ) ))
+                    
+                    <?php $now =  Carbon\Carbon::now();
+                     $fecha_entrega = Carbon\Carbon::createFromFormat( 'd/m/Y' , $solicitud->detalle->fecha_entrega );
+                     $fecha_deposito = Carbon\Carbon::createFromFormat( 'd/m/Y' , $solicitud->detalle->fecha_entrega )->format( 'Y-m-d' ); ?>
 
+                    @if($now >  $fecha_entrega)
+                    <td class="text-center alert-danger">
+                     <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>  
+                     {{ $fecha_deposito}}
+                     </td>  
+                    @elseif ($now->diffInDays($fecha_entrega) <= 1 ) 
+                     <td class="text-center alert-warning">
+                        <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+                        <strong>{{ $fecha_deposito}}</strong>
+                    </td>  
+                    @else
+                     <td class="text-center">
+                    {{ $fecha_deposito}}
+                    </td>  
+                    @endif
+                @else
+                <td class="text-center">
+                    {{ $solicitud->created_at }}
+                    </td>
+                @endif
                 <td class="text-center">
                     @if ( $solicitud->id_estado != PENDIENTE )
                         @if( $solicitud->lastHistory->count() != 0 )
