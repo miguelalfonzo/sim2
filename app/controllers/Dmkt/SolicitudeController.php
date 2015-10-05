@@ -1013,12 +1013,20 @@ class SolicitudeController extends BaseController
         }
     }
 
-    public function ckeckSolicitud()
+    public function checkSolicitud()
     {
         try
         {
             $inputs = Input::all();
-            return $this->checkSolicitudTransaction( $inputs[ 'token' ] );
+            $rules  = array( 'idsolicitud' => 'required|min:1|exists:'.TB_SOLICITUD.',id' );
+            $validator = Validator::make( $inputs , $rules );
+            if ( $validator->fails() )
+            {
+                return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
+            }
+
+            $solicitud = Solicitud::find( $inputs[ 'idsolicitud' ] );
+            return $this->checkSolicitudTransaction( $solicitud->token );
         }
         catch( Eception $e )
         {
@@ -1026,7 +1034,7 @@ class SolicitudeController extends BaseController
         }
     }
 
-    public function checkSolicitudTransaction( $solicitudToken )
+    private function checkSolicitudTransaction( $solicitudToken )
     {
         DB::beginTransaction();
         $rules = array( 'token' => 'required|min:1|size:40|exists:'.TB_SOLICITUD.',token' );
