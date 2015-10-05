@@ -4,15 +4,29 @@
             <th></th>
             <th>#</th>
             <th>Solicitud</th>
-            <th>Solicitado por</th>
-            <th>Fecha de Solicitud</th>
+            <th>
+                @if( Auth::user()->type == TESORERIA )
+                    Responsable
+                @else
+                    Solicitado por
+                @endif
+            </th>
+            <th>
+                @if( Auth::user()->type == CONT )
+                    Fecha de Depósito
+                @else
+                    Fecha de Solicitud
+                @endif
+            </th>
             <th>Aprobado por</th>
             <th>Fecha de Aprobación</th>
-            @if(Auth::user()->type == TESORERIA)
-                <th>Deposito</th>
-            @else
-                <th>Monto</th>
-            @endif
+            <th>
+                @if( Auth::user()->type == TESORERIA )
+                    Deposito
+                @else
+                    Monto
+                @endif
+            </th>
             <th>Estado</th>
             <th>Tipo</th>
             <th class="col-xs-2 col-sm-2">Edicion</th>
@@ -51,10 +65,21 @@
                     @endif
                     <label>{{$solicitud->titulo}}</label>
                 </td>
+
                 <td class="text-center">
-                    {{ $solicitud->createdBy->personal->getFullName() }}
+                    @if( Auth::user()->type == TESORERIA )
+                        {{ $solicitud->asignedTo->personal->full_name }}    
+                    @else
+                        {{ $solicitud->createdBy->personal->full_name }}
+                    @endif
+                <td class="text-center">
+                    @if( Auth::user()->type == CONT )
+                        {{ Carbon\Carbon::createFromFormat( 'd/m/Y' , $solicitud->detalle->fecha_entrega )->format( 'Y-m-d' ) }}    
+                    @else
+                        {{ $solicitud->created_at }}
+                    @endif
                 </td>
-                <td class="text-center">{{$solicitud->created_at}}</td>
+
                 <td class="text-center">
                     @if ( $solicitud->id_estado != PENDIENTE )
                         @if( $solicitud->lastHistory->count() != 0 )
