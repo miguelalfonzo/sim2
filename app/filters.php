@@ -112,7 +112,19 @@ Route::filter( 'rm_cont' , function ()
     { 
         return Redirect::to( 'login' );
     }
-    elseif ( ! in_array( Auth::user()->type , array( REP_MED , CONT , ASIS_GER ) ) )
+    elseif ( ! in_array( Auth::user()->type , array( REP_MED , CONT ) ) )
+    {
+        return Redirect::to( 'show_user' );
+    }
+});
+
+Route::filter( 'gercom_cont' , function () 
+{
+    if ( ! Auth::check() || is_null( Auth::user()->simApp ) )
+    { 
+        return Redirect::to( 'login' );
+    }
+    elseif ( ! in_array( Auth::user()->type , array( GER_COM, CONT ) ) )
     {
         return Redirect::to( 'show_user' );
     }
