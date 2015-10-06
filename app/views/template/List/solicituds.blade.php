@@ -68,25 +68,28 @@
                     @endif
                 </td>
                  @if( in_array( Auth::user()->type , array( TESORERIA, CONT ) ))
-                    
-                    <?php $now =  Carbon\Carbon::now();
-                     $fecha_entrega = Carbon\Carbon::createFromFormat( 'd/m/Y' , $solicitud->detalle->fecha_entrega );
-                     $fecha_deposito = Carbon\Carbon::createFromFormat( 'd/m/Y' , $solicitud->detalle->fecha_entrega )->format( 'Y-m-d' ); ?>
-
-                    @if($now >  $fecha_entrega)
-                    <td class="text-center alert-danger">
-                     <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>  
-                     {{ $fecha_deposito}}
-                     </td>  
-                    @elseif ($now->diffInDays($fecha_entrega) <= 1 ) 
-                     <td class="text-center alert-warning">
-                        <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
-                        <strong>{{ $fecha_deposito}}</strong>
-                    </td>  
+                    <?php $now =  Carbon\Carbon::now(); ?>
+                    @if ( $solicitud->idtiposolicitud == SOL_INST )
+                        <?php $fecha_entrega = Carbon\Carbon::createFromFormat( 'Ym' , $solicitud->detalle->fecha_entrega );
+                        $fecha_deposito = Carbon\Carbon::createFromFormat( 'Ym' , $solicitud->detalle->fecha_entrega )->firstOfMonth()->format( 'Y-m-d' ); ?>
                     @else
-                     <td class="text-center">
-                    {{ $fecha_deposito}}
-                    </td>  
+                        <?php $fecha_entrega = Carbon\Carbon::createFromFormat( 'd/m/Y' , $solicitud->detalle->fecha_entrega );
+                        $fecha_deposito = Carbon\Carbon::createFromFormat( 'd/m/Y' , $solicitud->detalle->fecha_entrega )->format( 'Y-m-d' ); ?>
+                    @endif
+                    @if( $now >  $fecha_entrega )
+                        <td class="text-center alert-danger">
+                            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>  
+                            {{ $fecha_deposito}}
+                         </td>  
+                    @elseif ($now->diffInDays($fecha_entrega) <= 1 ) 
+                         <td class="text-center alert-warning">
+                            <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+                            <strong>{{ $fecha_deposito}}</strong>
+                        </td>  
+                    @else
+                         <td class="text-center">
+                            {{ $fecha_deposito }}
+                        </td>  
                     @endif
                 @else
                 <td class="text-center">
