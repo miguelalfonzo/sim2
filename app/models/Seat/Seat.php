@@ -72,7 +72,7 @@ class Seat extends Eloquent
             $serie = substr( $cuatroDigitosSerie , strlen( $cuatroDigitosSerie ) - 4 , 4 ) . $systemSeat->cbte_prov;
         }
         $seat->pennrocompro  = $serie;
-        $seat->pennombrepro  = Self::blankspace( $systemSeat->nom_prov ); // RAZON SOCIAL SOLO PARA DOCUMENTOS
+        $seat->pennombrepro  = substr( Self::blankspace( $systemSeat->nom_prov ) , 0 , 50 ); // RAZON SOCIAL SOLO PARA DOCUMENTOS | maximo 50 digitos.
         $seat->pencoddocpro  = Self::blankspace( $systemSeat->cod ); // CODIGO del sistema para documentos con igv = "80"
         $seat->pennrodocpro  = Self::blankspace( $systemSeat->ruc );  // RUC SOLO PARA DOCUMENTOS
         $seat->pencanthojas  = Self::blankspace( $systemSeat->tipo_responsable ); //CODIGO DE TIPO DE RESPONSABLE 1 , 2, 4 PARA LA SUNAT DE USUARIOS EFECTOS A OPERACION GRAVADA => 1  , NO GRAVADA => 2  O AMBOS = 4

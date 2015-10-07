@@ -462,7 +462,7 @@ class FondoController extends BaseController
     {
         try
         {
-            $periodo = $this->period($start);
+            $periodo  = $this->period( $start );
             $periodos = Periodo::where('aniomes', $periodo )->first();
             if ( is_null( $periodos ) )
                 return $this->setRpta( View::make('Tables.solicitud_institucional')->with( 'total' , '' )->render() );
