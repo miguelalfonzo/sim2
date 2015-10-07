@@ -1078,7 +1078,7 @@ $(function()
                 }
                 if(response.error == undefined)
                 {
-                    $( '#razon' ).val( 2 ).html( response['razon_social'] ).parent().parent().addClass( 'has-success' ).removeClass( 'has-error' );;
+                    $( '#razon' ).val( 2 ).html( response['razon_social'].substring(0,50)).parent().parent().addClass( 'has-success' ).removeClass( 'has-error' );;
                     $("#ruc-hide").val( ruc );
                 }
                 else
