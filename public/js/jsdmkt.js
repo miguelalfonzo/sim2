@@ -500,8 +500,8 @@ $(document).on('click' , '.delete-fondo' , function (e)
     e.preventDefault();
     var data = 
     {
-        idsolicitud: $( this ).parent().parent().parent().children().first().text().trim() ,
-        _token: _token
+        idsolicitud : $( this ).parent().parent().parent().children().first().text().trim() ,
+        _token      : _token
     };
     cancelDialog( data , '¿Esta seguro de anular el registro del fondo?' );
 });

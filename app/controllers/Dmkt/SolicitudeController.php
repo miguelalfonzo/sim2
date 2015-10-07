@@ -1646,30 +1646,26 @@ class SolicitudeController extends BaseController
 
     public function showSolicitudeInstitution()
     {
-        if (in_array(Auth::user()->type, array(ASIS_GER)))
+        if ( in_array( Auth::user()->type, array( ASIS_GER ) ) )
             $state = R_PENDIENTE;
         $mWarning = array();
-        if (Session::has('warnings')) {
-            $warnings = Session::pull('warnings');
-            $mWarning[status] = ok;
-            if (!is_null($warnings))
-                foreach ($warnings as $key => $warning)
-                    $mWarning[data] = $warning[0] . ' ';
-            $mWarning[data] = substr($mWarning[data], 0, -1);
+        if ( Session::has( 'warnings' ) ) 
+        {
+            $warnings = Session::pull( 'warnings' );
+            $mWarning[ status ] = ok;
+            if ( ! is_null( $warnings ) )
+                foreach ( $warnings as $key => $warning )
+                    $mWarning[ data ] = $warning[ 0 ] . ' ';
+            $mWarning[ data ] = substr( $mWarning[ data ] , 0 , -1 );
         }
-        $data = array('state' => $state, 'states' => StateRange::order(), 'warnings' => $mWarning);
-        if (Auth::user()->type == ASIS_GER) 
+        
+        $data = array( 'state' => $state , 'states' => StateRange::order() , 'warnings' => $mWarning );
+        
+        if ( Auth::user()->type == ASIS_GER ) 
         {
             $data[ 'investments' ] = InvestmentType::orderInst();
-            $data[ 'subFondos' ]  = FondoInstitucional::getSubFondo();
+            $data[ 'subFondos' ]   = FondoInstitucional::getSubFondo();
         }
-        if (Session::has('id_solicitud')) {
-            $solicitud = Solicitud::find(Session::pull('id_solicitud'));
-            $solicitud->status = ACTIVE;
-            $solicitud->save();
-        }
-        $alert = new AlertController;
-        $data['alert'] = $alert->alertConsole();
         return View::make('template.User.institucion', $data);
     }
 
