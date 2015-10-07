@@ -33,7 +33,9 @@ class MigrateSeatController extends BaseController
 					$seats[ $systemSeat->id_solicitud ][ $systemSeat->tipo_asiento ][] = $systemSeat;			
 				}
 			}
+			DB::beginTransaction();	
 			$data = $this->transactionGenerateSeat( $seats );
+			DB::commit();
 			return $this->generateSeatExcel( $data );
 		}
 		catch( Exception $e )
@@ -51,15 +53,13 @@ class MigrateSeatController extends BaseController
 		{
 			foreach( $seatTypes as $seatType => $seats )
 			{
-				DB::beginTransaction();
 				$this->migrateSeat( $seatType , $seats , $idSolicitud , $penclave , $errors );
-				DB::commit();
 			}
 		}
 		return array( 'ok' => $penclave , 'error' => $errors );
 	}
 
-	private function migrateSeat( $seatType , $seats , $idSolicitud , &$penclave , &$errors )
+	public function migrateSeat( $seatType , $seats , $idSolicitud , &$penclave , &$errors )
 	{
 		$origen = $seatType == 'A' ? 7 : ( $seatType == 'G' ? 0 : NULL );
 		$year   = Carbon::now()->year;

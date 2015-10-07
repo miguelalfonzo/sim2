@@ -31,11 +31,11 @@ class Solicitud extends Eloquent
     {
         return Solicitud::orderBy('id','desc')->whereHas('detalle' , function ( $q ) use ( $periodo )
         {
-            $q->whereHas(TB_PERIODO , function ( $t ) use ( $periodo )
+            $q->whereHas( TB_PERIODO , function ( $t ) use ( $periodo )
             {
                 $t->where( 'aniomes' , $periodo );
             });
-        })->where( 'id_estado' , '<>' , CANCELADO )->get();
+        })->whereNotIn( 'id_estado' , array( CANCELADO , RECHAZADO ) )->get();
     }
 
     public function state()
