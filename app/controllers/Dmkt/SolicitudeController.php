@@ -1494,7 +1494,6 @@ class SolicitudeController extends BaseController
 
             if ($middleRpta[status] == ok) 
             {
-                DB::commit();
                 if ($solicitud->idtiposolicitud == REEMBOLSO )
                 {
                     Session::put('state', R_REVISADO);
@@ -1504,6 +1503,7 @@ class SolicitudeController extends BaseController
                     Session::put('state', R_FINALIZADO);
                 }
                 $this->generateBagoSeat( $seats );
+                DB::commit();
                 return $middleRpta;
             }
             DB::rollback();
@@ -1609,8 +1609,8 @@ class SolicitudeController extends BaseController
                     {
                         Session::put( 'state' , R_GASTO );
                     }
-                    DB::commit();
                     $this->generateBagoSeat( $seats );
+                    DB::commit();
                     return $middleRpta;
                 }
                 DB::rollback();
@@ -1626,16 +1626,9 @@ class SolicitudeController extends BaseController
 
     private function generateBagoSeat( $seats )
     {
-        try
-        {
             $migrateSeatController = new MigrateSeatController;
             $data = $migrateSeatController->transactionGenerateSeat( $seats );
             Log::info( $data );
-        }
-        catch( Exception $e )
-        {
-            $this->internalException( $e , __FUNCTION__ );
-        }
     }
 
     public function findDocument()
