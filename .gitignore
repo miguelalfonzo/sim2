@@ -1,4 +1,6 @@
 /bootstrap/compiled.php
+/public/uploads/*
+/public/files/*
 /vendor/*
 .idea/*
 .iml
