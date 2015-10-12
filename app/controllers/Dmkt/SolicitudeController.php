@@ -284,10 +284,11 @@ class SolicitudeController extends BaseController
             'typeExpense' => ExpenseType::order(),
             'date' => $this->getExpenseDate( $solicitud ) );
         $gastos = $solicitud->expenses;
-        if (count($gastos) > 0) {
+        if ( count( $gastos ) > 0 ) 
+        {
             $data['expenses'] = $gastos;
             $balance = $gastos->sum('monto');
-            $data['balance'] = $monto_aprobado - $balance;
+            $data['balance'] = round( ( $monto_aprobado - $balance ) , 2 );
         }
         return $data;
     }
