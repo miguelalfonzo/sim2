@@ -1003,7 +1003,7 @@ $(function()
     function rechargeViewExpense()
     {
         $("#save-expense").html("Registrar");
-        var tot_expenses = calculateTot($(".total").parent() , '.total_expense' );
+        var tot_expenses = calculateTot($(".total").parent() , '.total_expense' ).toFixed( 2 );
         var balance = deposit - tot_expenses;
         $("#balance").val(balance);
         cleanExpenseView();
