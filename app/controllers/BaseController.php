@@ -144,7 +144,7 @@ class BaseController extends Controller
         {
             Mail::send('soporte', array( 'exception' => $exception ), function( $message ) use( $function )
             {
-                $message->to( array( SOPORTE_EMAIL_1 => POSTMAN_USER_NAME_1 , SOPORTE_EMAIL_2 => POSTMAN_USER_NAME_2 , 'jatuncar@bagoperu.com.pe' => 'José Atuncar' ) )
+                $message->to( array( SOPORTE_EMAIL_1 => POSTMAN_USER_NAME_1 , SOPORTE_EMAIL_2 => POSTMAN_USER_NAME_2 ) )
                 ->subject( error.' - Function: '.$function );
             });
         }
