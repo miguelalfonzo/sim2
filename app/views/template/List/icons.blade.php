@@ -81,7 +81,7 @@
             @endif
         @endif
 
-         @if( $solicitud->id_estado == ENTREGADO && Auth::user()->id == $solicitud->id_user_assign )
+        @if ( ! is_null( $solicitud->toDeliveredHistory ) && ( Auth::user()->id === $solicitud->id_user_assign || Auth::user()->type === CONT ) )
             <a class="btn btn-default" target="_blank" href="{{URL::to('a'.'/'.$solicitud->token)}}">
                 <span  class="glyphicon glyphicon-print"></span>
             </a>

@@ -24,13 +24,14 @@
         <label class="control-label">Tipo de Entrega</label>
         @if( isset( $payments ) )
             <select name="pago" class="form-control">
-                @foreach( $payments as $payment )
+                <!--@foreach( $payments as $payment )
                     @if( $solicitud->detalle->id_pago == $payment->id )
                         <option value="{{$payment->id}}" selected style="background-color:yellow">{{$payment->nombre}}</option>
                     @else
                         <option value="{{$payment->id}}">{{$payment->nombre}}</option>
                     @endif
-                @endforeach
+                @endforeach-->
+                <option value="1">TRANSFERENCIA</option>
             </select>
         @else
             <select name="pago" style="display:none"><option value="{{ $detalle->id_pago }}" selected></option></select>
