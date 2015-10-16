@@ -164,6 +164,10 @@ class ExpenseController extends BaseController
 					$expense_detail->importe = $inputs['total_item'][$i] / $pIGV ;
 					$expense_detail->save();				
 				}
+				if ( Auth::user()->type === CONT )
+				{
+					$this->postman( $solicitud->id , ENTREGADO , ENTREGADO , array( $solicitud->asignedTo ) );
+				}
 				DB::commit();
 				return $this->setRpta();
 			}
