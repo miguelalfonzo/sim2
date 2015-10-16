@@ -301,15 +301,11 @@ $(function()
                 }
             }
         });
-        console.log( type );
         if( type === 'ID' || type === 'I' )
         {
-            console.log( 'type');
             activity = $('select[name=actividad]');
-            console.log( $('select[name=inversion]'));
             $('select[name=inversion]').on( 'change' , function()
             {
-                console.log( 'invchange');
                 inversionChange( $(this).val() );
             });
         }
@@ -902,6 +898,7 @@ $(function()
                     });
                 }
                 else
+                {
                     if ( validateVoucher(ruc,voucher_number) === true || ( proof_type_sel.attr( 'marca' ) == 'N' && btn_save === 'Registrar' ) )
                     {
                         ajaxExpense(data).done(function( response )
@@ -913,6 +910,7 @@ $(function()
                         });
                     }
                     else
+                    {
                         if( btn_save === 'Registrar' )
                         {
                             $(".message-expense").text( 'El Documento ya se encuentra registrado.' ).css( 'color' , 'red' ).show();
@@ -920,57 +918,57 @@ $(function()
                         }
                         else
                         {
-                            var rows = $( ".total" ).parent();
-                            $.each(rows,function(index)
+                            data.idgasto = $('input[name=idgasto]').val();
+                            $.ajax(
                             {
-                                if( $( this ).find( '.voucher_number' ).html() === voucher_number && $( this ).find( ".ruc" ).html() === ruc )
+                                type: 'post' ,
+                                url: server + 'register-expense' ,
+                                data: data,
+                                beforeSend: function()
                                 {
-                                    data.idgasto = $('input[name=idgasto]').val();
-                                    $.ajax(
+                                    loadingUI('Actualizando ...');
+                                }
+                            }).fail( function ( statusCode , errorThrown )
+                            {
+                                $.unblockUI();
+                                ajaxError( statusCode , errorThrown );
+                            }).done( function ( response ) 
+                            {
+                                $.unblockUI();
+                                if( response.Status == 'Ok' )
+                                {
+                                    responseUI("Gasto Actualizado","green");
+                                    $( 'input[ name=idgasto ]' ).val('');
+                                    rechargeExpense().done( function ( data ) 
                                     {
-                                        type: 'post' ,
-                                        url: server + 'register-expense' ,
-                                        data: data,
-                                        beforeSend: function()
+                                        if ( data.Status === 'Ok' )
                                         {
-                                            loadingUI('Actualizando ...');
-                                        }
-                                    }).fail( function ( statusCode , errorThrown )
-                                    {
-                                        $.unblockUI();
-                                        ajaxError( statusCode , errorThrown );
-                                    }).done( function ( response ) 
-                                    {
-                                        $.unblockUI();
-                                        if( response.Status == 'Ok' )
-                                        {
-                                            responseUI("Gasto Actualizado","green");
-                                            $( 'input[ name=idgasto ]' ).val('');
-                                            rechargeExpense().done( function ( data ) 
-                                            {
-                                                if ( data.Status === 'Ok' )
-                                                    reloadExpenseView( data.Data );
-                                                else
-                                                    bootbox.alert('<h4 class="red">No se ha podido recargar la ventana, recarge la pagina (CTRL + F5)</h4>');
-                                            });
+                                            reloadExpenseView( data.Data );
                                         }
                                         else
                                         {
-                                            bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description );
-                                            return false;
+                                            bootbox.alert('<h4 class="red">No se ha podido recargar la ventana, recarge la pagina (CTRL + F5)</h4>');
                                         }
                                     });
                                 }
+                                else
+                                {
+                                    bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>' );
+                                    return false;
+                                }
                             });
                         }
+                    }
+                }
             }
-            else{
+            else
+            {
                 //$("html, body").animate({scrollTop:200},'500','swing');
-                    $("#expense-register").animate({
+                $("#expense-register").animate(
+                {
                     scrollTop: $("#proof-type").parent().parent().offset().top
                 } , 300 );
                 bootbox.alert('<h4 class="red">Llene los Campos Obligatorios</h4>');
-
                 return false;
             }
         }
@@ -1180,13 +1178,11 @@ $(function()
     {
         var balance;
         var tot_expenses = calculateTot($(".total").parent(),'.total_expense');
-        console.log( tot_expenses );
         var btn_save = $("#save-expense").html();
         var tot_item_expense = parseFloat($("#total-expense").val());
         var imp_serv = parseFloat($("#imp-ser").val());
         if( ! $.isNumeric( imp_serv ) ) imp_serv = 0 ;
         if( ! $.isNumeric( tot_item_expense ) ) tot_item_expense = 0 ;
-        console.log( tot_item_expense );
         
         if(btn_save === "Registrar")
         {
@@ -1216,7 +1212,6 @@ $(function()
         //Total variables Proof
         var total_item = $(".total-item input");
         var proof_type_sel = $("#proof-type :selected");
-        console.log( proof_type_sel );
         var sub_total_expense = 0;
         var imp_service = parseFloat($("#imp-ser").val());
         var igv_percent = $('#igv').attr('igv') / 100;
@@ -1928,8 +1923,6 @@ $(function()
     function registerDoInmediateDevolution( data , response )
     {
         data.numero_operacion_devolucion = $( '#numero_operacion_devolucion' ).val();
-        console.log( data );
-        console.log( response );
         registerDevolutionData( data , response , data.numero_operacion_devolucion + '</h4>' );
     }
 
