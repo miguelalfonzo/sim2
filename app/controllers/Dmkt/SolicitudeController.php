@@ -1158,7 +1158,7 @@ class SolicitudeController extends BaseController
     {
         $result = array();
         $seatList = array();
-
+        $detalle = $solicitud->detalle;
         $middleRpta = $this->searchFundAccount($solicitud);
         if ($middleRpta[status] == ok) 
         {
@@ -1359,6 +1359,14 @@ class SolicitudeController extends BaseController
                 }
                 else
                 {
+                    if ( $solicitud->id_inversion == 36 && $detalle->id_moneda == SOLES )
+                    {
+                        $cuentaMkt = 1893000;
+                    }
+                    elseif( $solicitud->id_inversion == 36 && $detalle->id_moneda == DOLARES )
+                    {
+                        $cuentaMkt = 1894000;
+                    }
                     $seatList[] = $this->createSeatElement( $cuentaMkt, $solicitud->id, $cuentaMkt, '', Carbon::now()->format( 'd/m/Y' ) , '', '', '', '', '', '', '', ASIENTO_GASTO_DEPOSITO,
                     round( ( $solicitud->detalle->monto_aprobado - $total_percepciones )  * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN ) , '', $description_seat_back, '', 'CAN');
                 }
