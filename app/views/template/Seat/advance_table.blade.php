@@ -20,7 +20,16 @@
 								{{ $solicitud->investment->accountFund->nombre }}
 							</td>
 							<td class="number_account">
-								{{ $solicitud->investment->accountFund->num_cuenta }}</td>
+								@if ($solicitud->investment->id==36)
+									@if ($solicitud->detalle->deposit->account->typeMoney->id == 2)
+										1894000
+									@elseif	($solicitud->detalle->deposit->account->typeMoney->id ==1)
+										1893000
+									@endif
+								@else
+								{{ $solicitud->investment->accountFund->num_cuenta }}
+								@endif
+							</td>
 							<td class="date_ini">{{ $solicitud->detalle->deposit->updated_at }}</td>
 							<td class="dc">D</td>
 							<td>S/.</td>
