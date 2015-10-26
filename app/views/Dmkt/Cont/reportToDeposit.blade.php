@@ -57,7 +57,13 @@
                                     @endif
                                 </td>
                                 <td>
-                                    @if ( $solicitud->detalle->id_pago != PAGO_CHEQUE )
+                                    @if( $solicitud->id_inversion == 36 )
+                                        @if( $solicitud->detalle->id_moneda == 1 )
+                                            194-1732292-098
+                                        @elseif( $solicitud->detalle->id_moneda == 2 )
+                                            194-1809102-167
+                                        @endif
+                                    @elseif ( $solicitud->detalle->id_pago != PAGO_CHEQUE )
                                         @if ( $solicitud->asignedTo->type == REP_MED && ! is_null( $solicitud->asignedTo->personal->bagoVisitador ) && ! is_null( $solicitud->asignedTo->personal->bagoVisitador->cuenta ) )
                                             {{ $solicitud->asignedTo->personal->bagoVisitador->cuenta->cuenta }}
                                         @endif
