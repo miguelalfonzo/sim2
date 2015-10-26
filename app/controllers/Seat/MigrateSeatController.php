@@ -10,6 +10,7 @@ use \Expense\Entry;
 use \Carbon\Carbon;
 use \DB;
 use \Excel;
+use \Dmkt\Solicitud;
 
 class MigrateSeatController extends BaseController
 {
@@ -61,7 +62,15 @@ class MigrateSeatController extends BaseController
 
 	public function migrateSeat( $seatType , $seats , $idSolicitud , &$penclave , &$errors )
 	{
-		$origen = $seatType == 'A' ? 7 : ( $seatType == 'G' ? 0 : NULL );
+		$solicitud = Solicitud::find( $idSolicitud );
+		if ( $solicitud->id_inversion == 36 && $seatType == 'G' )
+		{
+			$origen = 4;
+		}
+		else
+		{	
+			$origen = $seatType == 'A' ? 7 : ( $seatType == 'G' ? 0 : NULL );
+		}
 		$year   = Carbon::now()->year;
 		
 		if ( is_null( $origen ) )
@@ -81,9 +90,10 @@ class MigrateSeatController extends BaseController
 				return;		
 			}
 		}
-		else if( $origen === 0 )
+		else if( $origen === 0 || $origen === 4 )
 		{
 			$penclave[ $idSolicitud ][ $seatType ] = Seat::generateManualSeatCod( $year , $origen );
+
 			if ( $penclave[ $idSolicitud ][ $seatType ] === 0 )
 			{
 				unset( $penclave[ $idSolicitud ][ $seatType ] );
