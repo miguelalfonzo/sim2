@@ -147,7 +147,11 @@
         Route::post( 'confirm-temporal-user' , 'User\UserController@assignTemporalUser');
         Route::get( 'remove-temporal-user' , 'User\UserController@removeTemporalUser');
         Route::post('aceptar-solicitud', 'Dmkt\SolicitudeController@acceptedSolicitude');
-        Route::get('solicitude/statement', 'Movements\MoveController@getStatement');
+    });
+
+    Route::group(array('before' => 'rm_sup_gerprod_gerprom_gercom_gerger'), function ()
+    {
+        Route::get('solicitude/statement', 'Movements\MoveController@getStatement');    
     });
 
     /*

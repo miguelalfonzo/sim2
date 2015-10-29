@@ -302,6 +302,9 @@ class MoveController extends BaseController
             $fondos = FondoSubCategoria::all();
         elseif( in_array( Auth::user()->type , array( SUP , GER_PROD ) ) )
             $fondos = FondoSubCategoria::where( 'tipo' , Auth::user()->type )->get();
-        return View::make('template.tb_estado_cuenta' , array( 'fondosMkt' => $fondos ) );
+        elseif( in_array( Auth::user()->type , array( REP_MED ) ) )
+            $fondos = FondoSubCategoria::all();
+        
+        return View::make( 'template.tb_estado_cuenta' , array( 'fondosMkt' => $fondos ) );
     }
 }
