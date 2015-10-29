@@ -216,16 +216,22 @@ class MoveController extends BaseController
         elseif( $type == 'MOVIMIENTOS' )
         {
             if ( in_array( Auth::user()->type , array ( SUP ) ) )
+            {
                 $solicituds->where( function ( $query )
                 {
                     $query->whereHas( 'gerente' , function( $query )
                     {
-                        $query->whereIn( 'id_gerprod' , array( Auth::user()->id , Auth::user()->tempId() ) );
+                        $query->whereIn( 'id_gerprod' , array( Auth::user()->id , Auth::user()->tempId() ) )->where( 'tipo_usuario' , SUP );
                     })->orWhereIn( 'created_by' , array( Auth::user()->id , Auth::user()->tempId() ) )
                     ->orWhereIn( 'id_user_assign' , array( Auth::user()->id , Auth::user()->tempId() ) )
                     ->orWhereIn( 'created_by' , Auth::user()->personal->employees->lists( 'user_id' ) )
                     ->orWhereIn( 'id_user_assign' , Auth::user()->personal->employees->lists( 'user_id' ) );
                 });
+            }
+            elseif( in_array( Auth::user()->type , array( REP_MED ) ) ) 
+            {
+                $solicituds->where( 'id_user_assign' , Auth::user()->id );
+            }
 
             if ( $filter != 0 )
             {
@@ -246,14 +252,14 @@ class MoveController extends BaseController
                                 });
                             });
                         });
-                    });
-                })->orWhere( function( $query ) use( $filter )
-                {
-                    $query->where( 'idtiposolicitud' , SOL_INST )->whereHas( 'detalle' , function( $query ) use( $filter )
+                    })->orWhere( function( $query ) use( $filter )
                     {
-                        $query->whereHas( 'thisSubFondo' , function( $query ) use( $filter )
+                        $query->where( 'idtiposolicitud' , SOL_INST )->whereHas( 'detalle' , function( $query ) use( $filter )
                         {
-                            $query->where( 'subcategoria_id' , $filter );
+                            $query->whereHas( 'thisSubFondo' , function( $query ) use( $filter )
+                            {
+                                $query->where( 'subcategoria_id' , $filter );
+                            });
                         });
                     });
                 });
@@ -301,7 +307,10 @@ class MoveController extends BaseController
         elseif( Auth::user()->type == GER_PROM )
             $fondos = FondoSubCategoria::all();
         elseif( in_array( Auth::user()->type , array( SUP , GER_PROD ) ) )
-            $fondos = FondoSubCategoria::where( 'tipo' , Auth::user()->type )->get();
-        return View::make('template.tb_estado_cuenta' , array( 'fondosMkt' => $fondos ) );
+            $fondos = FondoSubCategoria::where( 'trim( tipo )' , Auth::user()->type )->get();
+        elseif( in_array( Auth::user()->type , array( REP_MED ) ) )
+            $fondos = FondoSubCategoria::all();
+        
+        return View::make( 'template.tb_estado_cuenta' , array( 'fondosMkt' => $fondos ) );
     }
 }
