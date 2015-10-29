@@ -14,7 +14,7 @@ class SeatCod extends Eloquent
     public $timestamps = false;
     public $dates = [ 'f_proceso' , 'f_trn' ]; 
     
-    protected static function generateTelecreditoSeatCod( $year , $origen )
+    protected static function generateSeatCod( $year , $origen )
     {
     	$lastSeat = SeatCod::where( 'anio' , $year )->where( 'origen' , $origen )->orderBy( 'numasiento' , 'desc' )->first();
     	if ( is_null( $lastSeat ) )
