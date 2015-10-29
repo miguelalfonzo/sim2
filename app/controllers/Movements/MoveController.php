@@ -216,6 +216,7 @@ class MoveController extends BaseController
         elseif( $type == 'MOVIMIENTOS' )
         {
             if ( in_array( Auth::user()->type , array ( SUP ) ) )
+            {
                 $solicituds->where( function ( $query )
                 {
                     $query->whereHas( 'gerente' , function( $query )
@@ -226,6 +227,11 @@ class MoveController extends BaseController
                     ->orWhereIn( 'created_by' , Auth::user()->personal->employees->lists( 'user_id' ) )
                     ->orWhereIn( 'id_user_assign' , Auth::user()->personal->employees->lists( 'user_id' ) );
                 });
+            }
+            elseif( in_array( Auth::user()->type , array( REP_MED ) ) ) 
+            {
+                $solicituds->where( 'id_user_assign' , Auth::user()->id );
+            }
 
             if ( $filter != 0 )
             {
