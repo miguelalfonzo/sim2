@@ -252,14 +252,14 @@ class MoveController extends BaseController
                                 });
                             });
                         });
-                    });
-                })->orWhere( function( $query ) use( $filter )
-                {
-                    $query->where( 'idtiposolicitud' , SOL_INST )->whereHas( 'detalle' , function( $query ) use( $filter )
+                    })->orWhere( function( $query ) use( $filter )
                     {
-                        $query->whereHas( 'thisSubFondo' , function( $query ) use( $filter )
+                        $query->where( 'idtiposolicitud' , SOL_INST )->whereHas( 'detalle' , function( $query ) use( $filter )
                         {
-                            $query->where( 'subcategoria_id' , $filter );
+                            $query->whereHas( 'thisSubFondo' , function( $query ) use( $filter )
+                            {
+                                $query->where( 'subcategoria_id' , $filter );
+                            });
                         });
                     });
                 });
