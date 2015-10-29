@@ -65,11 +65,11 @@ class MigrateSeatController extends BaseController
 		$solicitud = Solicitud::find( $idSolicitud );
 		if ( $solicitud->id_inversion == 36 && $seatType == 'G' )
 		{
-			$origen = 4;
+			$origen = 4; // CODIGO PARA EL ASIENTO DE DOCUMENTOS SOLO PARA LA INVERSION VMJ
 		}
 		else
 		{	
-			$origen = $seatType == 'A' ? 7 : ( $seatType == 'G' ? 0 : NULL );
+			$origen = $seatType == 'A' ? 7 : ( $seatType == 'G' ? 1 : NULL );// ASIENTO DE DEPOSITO => 7 ( EXCEPCION CHEQUES ) | ASIENTO DE DOCUMENTO => 1 ( EXCEPCION PROVEEDORES ) 
 		}
 		$year   = Carbon::now()->year;
 		
@@ -79,9 +79,9 @@ class MigrateSeatController extends BaseController
 			DB::rollback();
 			return;
 		}
-		else if( $origen === 7 )
+		else if( $origen === 7 || $origen === 4 )
 		{
-			$penclave[ $idSolicitud ][ $seatType ] = SeatCod::generateTelecreditoSeatCod( $year , $origen );
+			$penclave[ $idSolicitud ][ $seatType ] = SeatCod::generateSeatCod( $year , $origen );
 			if ( $penclave[ $idSolicitud ][ $seatType ] === 0 )
 			{
 				unset( $penclave[ $idSolicitud ][ $seatType ] );
@@ -90,7 +90,7 @@ class MigrateSeatController extends BaseController
 				return;		
 			}
 		}
-		else if( $origen === 0 || $origen === 4 )
+		else if( $origen === 1 )
 		{
 			$penclave[ $idSolicitud ][ $seatType ] = Seat::generateManualSeatCod( $year , $origen );
 
