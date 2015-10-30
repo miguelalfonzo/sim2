@@ -1874,15 +1874,33 @@ class SolicitudeController extends BaseController
         $data['events'] =   Event::whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
         if ( $user != 0 )
         {
-            $data[ 'events' ]->whereHas( 'solicitud' , function( $query )
+            $data[ 'events' ]->whereHas( 'solicitud' , function( $query ) use( $user , $zona )
             {
                 $query->where( 'id_user_assign' , $user );
-                if ( $zona != 0 )
+                /*if ( $zona != 0 )
                 {
-                    $data['events']->whereHas( 'visitador' , $user )->get();  
-                }
+                    $data['events']->whereHas( 'visitador' , $ 
+                }*/
             });
         }
+        else
+        {
+            $data[ 'events' ]->whereHas( 'solicitud' , function( $query ) use( $zona )
+            {
+                $query->where( 'id_user_assign' , Auth::user()->id );
+                if ( $zona != 0 )
+                {
+                    $query->whereHas( 'personal' , function( $query ) use( $zona )
+                    {
+                        $query->whereHas( 'bagoVisitador' , function( $query ) use( $zona )
+                        {
+                            $query->where( 'visnivel3geog' , $zona );
+                        });
+                    });  
+                }
+            });   
+        }
+        $data[ 'events' ] = $data[ 'events' ]->get();
         return View::make('Event.album', $data);
     }
 
