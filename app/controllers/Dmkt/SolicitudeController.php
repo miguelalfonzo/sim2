@@ -1858,7 +1858,9 @@ class SolicitudeController extends BaseController
 
     public function album()
     {
-        return View::make('Event.show');
+        $data = array(
+            'reps' => Personal::getRms() );
+        return View::make( 'Event.show' , $data );
     }
 
     public function getEventList()
