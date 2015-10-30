@@ -166,7 +166,7 @@ class ExpenseController extends BaseController
 				}
 				if ( Auth::user()->type === CONT )
 				{
-					$this->postman( $solicitud->id , ENTREGADO , ENTREGADO , array( $solicitud->asignedTo ) );
+					$this->postman( $solicitud->id , ENTREGADO , ENTREGADO , array( $solicitud->assignedTo ) );
 				}
 				DB::commit();
 				return $this->setRpta();
@@ -500,7 +500,7 @@ class ExpenseController extends BaseController
 		$jDetalle  = json_decode( $solicitud->detalle->detalle );
 		$expenses  = $solicitud->expenses;
 		$dni       = new BagoUser;
-		$dni       = $dni->dni( $solicitud->asignedTo->username );
+		$dni       = $dni->dni( $solicitud->assignedTo->username );
 
 		if ( $dni[ status ] == ok )
 		{

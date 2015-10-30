@@ -47,7 +47,7 @@
                 @if ( in_array( Auth::user()->type , array( TESORERIA , GER_COM, CONT ) ) )
                     <input type="hidden" id="sol_token" class="i-tokens" value="{{$solicitud->token}}">
                     @if( ! is_null( $solicitud->id_user_assign ) )
-                        <input type="hidden" value="{{ $solicitud->asignedTo->personal->full_name }}" class="benef">
+                        <input type="hidden" value="{{ $solicitud->assignedTo->personal->full_name }}" class="benef">
                     @endif
                 @endif
                 <td class="text-center id_solicitud detail-control">{{$solicitud->id}}</td>
@@ -62,7 +62,7 @@
 
                 <td class="text-center">
                     @if( Auth::user()->type == TESORERIA )
-                        {{ $solicitud->asignedTo->personal->full_name }}    
+                        {{ $solicitud->assignedTo->personal->full_name }}    
                     @else
                         {{ $solicitud->createdBy->personal->full_name }}
                     @endif

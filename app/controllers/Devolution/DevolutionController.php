@@ -45,7 +45,7 @@ class DevolutionController extends BaseController
         $solicitud = Solicitud::find( $solicitud_id );
         if( $id_estado_devolucion == 1 )
         {
-            return $solicitud->asignedTo->type;
+            return $solicitud->assignedTo->type;
         }
         elseif( $id_estado_devolucion == 2 )
         {
@@ -210,7 +210,7 @@ class DevolutionController extends BaseController
 		//REGISTRO DE LA DEVOLUCION
 		$this->setDevolucion( $solicitud->id , null , $inputs[ 'monto_devolucion' ] , DEVOLUCION_POR_REALIZAR , DEVOLUCION_INMEDIATA );
 
-        $middleRpta = $this->postman( $solicitud->id , $solicitud->id_estado , $solicitud->id_estado , array( $solicitud->asignedTo ) );
+        $middleRpta = $this->postman( $solicitud->id , $solicitud->id_estado , $solicitud->id_estado , array( $solicitud->assignedTo ) );
         if ( $middleRpta[ status ] == ok )
         {
             Session::put( 'state' , R_GASTO );

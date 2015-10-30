@@ -3,7 +3,7 @@
     <div class="input-group">
         <span class="input-group-addon">{{$solicitud->createdBy->type}}</span>
         <input id="textinput" class="form-control" name="titulo" type="text" disabled value="{{ $solicitud->createdBy->personal->getFullName() }}">
-        <span class="input-group-addon">{{$solicitud->asignedTo->type}}</span>
-        <input type="text" class="form-control input-md" disabled value="{{ $solicitud->asignedTo->personal->getFullName() }}">
+        <span class="input-group-addon">{{$solicitud->assignedTo->type}}</span>
+        <input type="text" class="form-control input-md" disabled value="{{ $solicitud->assignedTo->personal->getFullName() }}">
 	</div>
 </div>

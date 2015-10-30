@@ -43,9 +43,9 @@ class Solicitud extends Eloquent
         return $this->hasOne( 'Common\State' , 'id' , 'id_estado' );
     }
 
-    public function asignedTo()
+    public function assignedTo()
     {
-        return $this->hasOne('User','id','id_user_assign');
+        return $this->belongsTo( 'User' , 'id_user_assign' );
     }
 
     public function toAcceptedApprovedHistories()
@@ -213,4 +213,5 @@ class Solicitud extends Eloquent
     {
         return $this->hasMany( 'Devolution\Devolution' , 'id_solicitud' );
     }
+
 }

@@ -16,9 +16,9 @@
                     <tbody>
                         <tr>
                             <th class="sin-border text-right">Colaborador Bagó:</th>
-                            <td class="sin-border text-left">{{ $fondo->asignedTo->personal->full_name }}</td>     
+                            <td class="sin-border text-left">{{ $fondo->assignedTo->personal->full_name }}</td>     
                             <th class="sin-border text-right">Cargo:</th>
-                            <td class="sin-border text-left">{{ $fondo->asignedTo->userType->descripcion }}</td>     
+                            <td class="sin-border text-left">{{ $fondo->assignedTo->userType->descripcion }}</td>     
                             <th class="sin-border text-right">Ciudad:</th>
                             <td class="sin-border text-left">{{ $zona }}</td>    
                             <th class="sin-border text-right">Fecha:</th>
@@ -77,7 +77,7 @@
                                                 <table style="margin: 0 auto; min-width: 200px">
                                                     <tbody>
                                                         <tr>
-                                                            <td style="border-top: 1px solid;">{{ $fondo->asignedTo->personal->full_name }}</td>
+                                                            <td style="border-top: 1px solid;">{{ $fondo->assignedTo->personal->full_name }}</td>
                                                         </tr>
                                                         <tr>
                                                             <td class="text-left">DNI: {{$dni}}</td>

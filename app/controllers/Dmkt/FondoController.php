@@ -56,7 +56,7 @@ class FondoController extends BaseController
             $solInst = Solicitud::find( $inputs['idsolicitud']);
             $detalle = $solInst->detalle;
             $jDetalle = json_decode($detalle->detalle);
-            $rm = $solInst->asignedTo->personal;
+            $rm = $solInst->assignedTo->personal;
             $institution = $solInst->clients()->where( 'id_tipo_cliente' , 3)->first();
             $data = array( 'rm'              => strtoupper( $rm->nombres.' '.$rm->apellidos ) ,
                            'idrm'            => $rm->bago_id ,
@@ -127,7 +127,7 @@ class FondoController extends BaseController
                 return $middleRpta;
             
             $inputs = array( 'institucion-cod' => $solicitud->clients()->where( 'id_tipo_cliente' , 3 )->first()->id_cliente ,
-                             'codrepmed'       => $solicitud->asignedTo->personal->bago_id,
+                             'codrepmed'       => $solicitud->assignedTo->personal->bago_id,
                              'total'           => $solicitud->detalle->monto_aprobado,
                              'fondo_producto'  => $solicitud->detalle->id_fondo,
                              'mes'             => $this->nextPeriod( $solicitud->detalle->periodo->aniomes ) ,
@@ -317,7 +317,7 @@ class FondoController extends BaseController
             $detalle  = $solicitud->detalle;
             $data     = array();
             $data[]   = ( isset( $solicitud->clients()->where( 'id_tipo_cliente' , 3 )->first()->institution->pejrazon ) ? $solicitud->clients()->where( 'id_tipo_cliente' , 3 )->first()->institution->pejrazon : $solicitud->titulo );
-            $data[]   = $solicitud->asignedTo->personal->full_name;
+            $data[]   = $solicitud->assignedTo->personal->full_name;
             $data[]   = $detalle->num_cuenta;
             $data[]   = 'S/.' . $detalle->monto_actual;
             $rpta[]   = $data ;

@@ -20,7 +20,7 @@
                     <td style="text-align:center">
                         {{{ $solicitud->clients()->where( 'id_tipo_cliente' , 3 )->first()->institution->pejrazon  or $solicitud->titulo  }}}
                     </td>
-                    <td style="text-align:center">{{$solicitud->asignedTo->rm->full_name}}</td>
+                    <td style="text-align:center">{{$solicitud->assignedTo->rm->full_name}}</td>
                     <td style="text-align:center">
                         {{json_decode($solicitud->detalle->detalle)->num_cuenta}}
                     </td>

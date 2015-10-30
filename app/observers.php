@@ -31,6 +31,7 @@ use \Fondo\FondoMktPeriodHistory;
 use \System\FondoMktHistory;
 use \Devolution\Devolution;
 use \Devolution\DevolutionHistory;
+use \Event\Event;
 	
 	//SAVE USER_ID FOR CREATED_BY & UPDATED_BY
 	Solicitud::observe(				new Transaction());
@@ -58,6 +59,7 @@ use \Devolution\DevolutionHistory;
 	FondoMktPeriodHistory::observe( new Transaction());
 	Devolution::observe( 			new Transaction());
 	DevolutionHistory::observe(     new Transaction());
+	Event::observe( 				new Transaction());
 	//FileStorage::observe(			new Transaction());
 	
 	//SOFT DELETE
