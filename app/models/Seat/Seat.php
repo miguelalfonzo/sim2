@@ -24,7 +24,7 @@ class Seat extends Eloquent
         }   
         else
         {
-            $seat = $origen . str_pad( ( $lastSeat->numasiento + 1 ) , 4 , 0 , STR_PAD_LEFT );
+            $seat = $origen . substr( str_pad( ( $lastSeat->numasiento + 1 ) , 4 , 0 , STR_PAD_LEFT ) , -4 );
         }
         return $seat;
     }
