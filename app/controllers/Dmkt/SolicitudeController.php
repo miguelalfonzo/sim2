@@ -1889,7 +1889,7 @@ class SolicitudeController extends BaseController
             {
                 $query->where( 'id_user_assign' , Auth::user()->id );
                 if ( $zona != 0 )
-                {
+                {   
                     $query->whereHas( 'personal' , function( $query ) use( $zona )
                     {
                         $query->whereHas( 'bagoVisitador' , function( $query ) use( $zona )

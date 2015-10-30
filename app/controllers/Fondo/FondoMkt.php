@@ -9,6 +9,7 @@ use \View;
 use \Input;
 use \Expense\ChangeRate;
 use \Carbon\Carbon;
+use \Dmkt\Solicitud;
 
 class FondoMkt extends BaseController
 {
@@ -65,7 +66,10 @@ class FondoMkt extends BaseController
             $tasaCompra = 1;
         elseif ( $moneda == DOLARES )
             $tasaCompra = $tc->compra;
-
+        \Log::info( $tasaCompra );
+        $history = Solicitud::find( $idSolicitud )->lastHistory;
+        $tasaCompraAntigua = ChangeRate::where( 'fecha' ,  Carbon::createFromFormat( 'Y-m-d H:i' , $history->updated_at )->subDay()->format( 'Y:m:d') )->first()->compra;
+        \Log::info( $tasaCompraAntigua );
         $historiesFondoMkt = array();
         foreach( $ids_fondo as $id_fondo )
         {
@@ -75,7 +79,7 @@ class FondoMkt extends BaseController
                     $fondoMkt = FondoSupervisor::find( $id_fondo[ 'old' ] );
                 else
                     $fondoMkt = FondoGerProd::find( $id_fondo[ 'old' ] );
-                $this->setHistoryData( $historiesFondoMkt , $fondoMkt , $tasaCompra , $id_fondo[ 'oldMonto'] , $id_fondo[ 'oldUserType' ] , FONDO_LIBERACION );
+                $this->setHistoryData( $historiesFondoMkt , $fondoMkt , $tasaCompraAntigua , $id_fondo[ 'oldMonto'] , $id_fondo[ 'oldUserType' ] , FONDO_LIBERACION );
                 
             }
             if ( ! is_null( $userType ) )
