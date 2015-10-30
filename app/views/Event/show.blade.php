@@ -23,7 +23,9 @@
 			</select>
 		</div>
 		<div>
-			<span class="glyphicon glyphicon-search btn btn-primary"></span>
+			<button id="search-events" class="btn btn-primary ladda-button" data-style="zoom-out">
+				<span class="glyphicon glyphicon-search"></span>
+			</button>
 		</div>
 		</div>
 
@@ -33,11 +35,13 @@
 		$( document ).ready( function()
 		{	
 			getEvents();
-			GBREPORTS.changeDateRange('M');
+			GBREPORTS.changeDateRange( 'M' );
 		});
 		function getEvents()
 		{
-		    var url = URL_BASE + "eventos/list";
+		    var url   = URL_BASE + 'eventos/list';
+		    var spin = Ladda.create( document.querySelector( '#search-events' ) );
+		    spin.start();
 		    $.ajax(
 		    {
 		        type        : 'POST',
@@ -54,8 +58,13 @@
 		    	}
 		    }).done( function( dataResult )
 		    {
+		    	spin.stop();
 		    	$( "#container-event" ).empty();
 		     	$( "#container-event" ).html(dataResult);
+		    }).fail( function( statusCode , errorThrown )
+		    {
+		    	spin.stop();
+		    	ajaxError( statusCode , errorThrown );
 		    });
 		}
 	</script>

@@ -1871,23 +1871,33 @@ class SolicitudeController extends BaseController
         $end   = Input::get("date_end");
         $user  = Input::get( 'usuario' );
         $zona  = Input::get( 'zona' );
-        $data['events'] =   Event::whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
-        if ( $user != 0 )
+        if ( $user == 0 )
         {
-            $data[ 'events' ]->whereHas( 'solicitud' , function( $query ) use( $user , $zona )
+            if ( Auth::user()->type == REP_MED )
             {
-                $query->where( 'id_user_assign' , $user );
-                /*if ( $zona != 0 )
-                {
-                    $data['events']->whereHas( 'visitador' , $ 
-                }*/
-            });
+                $user = array( Auth::user()->id );
+            }
+            elseif( Auth::user()->type == SUP )
+            {
+                $user = Auth::user()->sup->reps->lists( 'user_id' );
+            }
+            else
+            {
+                $user = null;
+            }
         }
         else
         {
-            $data[ 'events' ]->whereHas( 'solicitud' , function( $query ) use( $zona )
+            $user = array( $user );
+        }
+        $data['events'] =   Event::whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
+        
+            $data[ 'events' ]->whereHas( 'solicitud' , function( $query ) use( $user , $zona )
             {
-                $query->where( 'id_user_assign' , Auth::user()->id );
+                if ( ! is_null( $user ) )
+                {
+                    $query->whereIn( 'id_user_assign' , $user );
+                }
                 if ( $zona != 0 )
                 {   
                     $query->whereHas( 'personal' , function( $query ) use( $zona )
@@ -1898,8 +1908,9 @@ class SolicitudeController extends BaseController
                         });
                     });  
                 }
-            });   
-        }
+            });
+        
+        
         $data[ 'events' ] = $data[ 'events' ]->get();
         return View::make('Event.album', $data);
     }

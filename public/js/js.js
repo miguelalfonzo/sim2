@@ -2158,5 +2158,8 @@ $(function()
         listTable( 'movimientos' , null );
     });
 
-
+    $( '#search-events' ).click( function()
+    {
+        getEvents();
+    });
 });
