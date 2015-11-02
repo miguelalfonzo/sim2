@@ -2139,7 +2139,7 @@ $(function()
                 {
                     if ( response.Status == 'Ok' )
                     {
-                        bootbox.alert( '<h4 class="green">Registro de Gastos Culimando</h4>' , function()
+                        bootbox.alert( '<h4 class="green">Registro de Gastos Culminado</h4>' , function()
                         {
                             window.location.href = server + 'show_user';
                         });
