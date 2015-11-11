@@ -6,7 +6,7 @@
         <a class="btn btn-default timeLine" data-id="{{ $solicitud->id }}">
             <span class="glyphicon glyphicon-time"></span>
         </a>
-        
+            
         @if ( in_array( $solicitud->histories()->orderBy( 'updated_at' , 'DESC' )->first()->user_to , array( Auth::user()->type , Auth::user()->tempType() ) ) 
         && $solicitud->state->id_estado != R_NO_AUTORIZADO && $solicitud->id_estado != GENERADO )
             @if( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) &&  in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) ) )
@@ -51,16 +51,26 @@
                     <span  class="glyphicon glyphicon-pencil"></span>
                 </a>
             @endif
+        @elseif ( Auth::user()->type == CONT )
+            @if( $solicitud->idtiposolicitud != REEMBOLSO && in_array( $solicitud->id_estado , array( DEPOSITADO , GASTO_HABILITADO ) ) )
+                <a class="btn btn-default modal_liquidacion">
+                    <span class="glyphicon glyphicon-inbox"></span>
+                </a>
+            @elseif( $solicitud->id_estado == APROBADO || $solicitud->id_estado == DEPOSITO_HABILITADO ) )
+                <a class="btn btn-default cancel-solicitude" data-idsolicitude="{{ $solicitud->id }}" data-token="{{csrf_token()}}">
+                    <span  class="glyphicon glyphicon-remove"></span>
+                </a>
+            @endif
         @endif
         
         @if( $solicitud->id_estado == ENTREGADO )
-            @if( Auth::user()->type == CONT && $solicitud->devolutions()->whereIn( 'id_estado_devolucion' , array( DEVOLUCION_POR_REALIZAR , DEVOLUCION_POR_VALIDAR ) )->get()->count() == 0 )
-                <a class="btn btn-default" href="{{URL::to('ver-solicitud/'.$solicitud->token)}}">
-                    <span  class="glyphicon glyphicon-edit"></span>
-                </a>
-            @elseif( Auth::user()->type == TESORERIA && $solicitud->devolutions()->where( 'id_estado_devolucion' , DEVOLUCION_POR_VALIDAR )->get()->count() !== 0 )
+            @if( Auth::user()->type == TESORERIA && $solicitud->devolutions()->where( 'id_estado_devolucion' , DEVOLUCION_POR_VALIDAR )->get()->count() !== 0 )
                 <a class="btn btn-default get-devolution-info" data-type="confirm-inmediate-devolution">
                     <span  class="glyphicon glyphicon-transfer"></span>
+                </a>
+            @elseif( Auth::user()->type == CONT && $solicitud->devolutions()->whereIn( 'id_estado_devolucion' , array( DEVOLUCION_POR_REALIZAR , DEVOLUCION_POR_VALIDAR ) )->get()->count() == 0 )
+                <a class="btn btn-default" href="{{URL::to('ver-solicitud/'.$solicitud->token)}}">
+                    <span  class="glyphicon glyphicon-edit"></span>
                 </a>
             @elseif( Auth::user()->id == $solicitud->id_user_assign && $solicitud->devolutions()->where( 'id_estado_devolucion' , DEVOLUCION_POR_REALIZAR )->get()->count() !== 0 )
                 <a class="btn btn-default" href="{{URL::to('ver-solicitud/'.$solicitud->token)}}">
@@ -69,19 +79,7 @@
             @endif
         @endif
 
-        @if ( Auth::user()->type == CONT )
-            @if( $solicitud->idtiposolicitud != REEMBOLSO && in_array( $solicitud->id_estado , array( DEPOSITADO , GASTO_HABILITADO ) ) )
-                <a class="btn btn-default modal_liquidacion">
-                    <span class="glyphicon glyphicon-inbox"></span>
-                </a>
-            @elseif( $solicitud->id_estado == APROBADO || ( $solicitud->idtiposolicitud != REEMBOLSO && $solicitud->id_estado == DEPOSITO_HABILITADO ) )
-                <a class="btn btn-default cancel-solicitude" data-idsolicitude="{{ $solicitud->id }}" data-token="{{csrf_token()}}">
-                    <span  class="glyphicon glyphicon-remove"></span>
-                </a>
-            @endif
-        @endif
-
-        @if ( ! is_null( $solicitud->toDeliveredHistory ) && ( Auth::user()->id === $solicitud->id_user_assign || Auth::user()->type === CONT ) )
+        @if ( ! is_null( $solicitud->toDeliveredHistory ) && ( Auth::user()->type === CONT || Auth::user()->id === $solicitud->id_user_assign ) )
             <a class="btn btn-default" target="_blank" href="{{URL::to('a'.'/'.$solicitud->token)}}">
                 <span  class="glyphicon glyphicon-print"></span>
             </a>

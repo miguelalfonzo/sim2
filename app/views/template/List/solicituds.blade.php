@@ -36,40 +36,117 @@
     </thead>
     <tbody>
         @foreach( $solicituds as $solicitud )
+             <?php \Log::info( 'each start' ) ?>    
             <tr>
-                <input type="hidden" id="timeLineStatus" value="{{$solicitud->id_estado}}">
+                <?php \Log::info( microtime() ) ?>
+                @if ( in_array( Auth::user()->type , array( TESORERIA , GER_COM, CONT ) ) )
+                    <input type="hidden" id="sol_token" class="i-tokens" value="{{$solicitud->token}}">
+                    @if( ! is_null( $solicitud->id_user_assign ) )
+                        <input type="hidden" value="{{ $solicitud->assignedTo->personal->full_name }}" class="benef">
+                    @endif
+                @endif
                 <td class="text-center id_solicitud detail-control">{{$solicitud->id}}</td>
                 <td class="text-left sol_titulo">
+                    @if (! is_null( $solicitud->id_actividad ) )
+                        <span class="label" style="margin-right:1em;background-color:{{$solicitud->activityTrash->color}}">
+                            {{$solicitud->activityTrash->nombre}}
+                        </span>
+                    @endif
                     <label>{{$solicitud->titulo}}</label>
                 </td>
-
+                <?php \Log::info( microtime() . 'ASIGNADO' ) ?>        
                 <td class="text-center">
+                    @if( Auth::user()->type == TESORERIA )
+                        {{ $solicitud->assignedTo->personal->full_name }}    
+                    @else
                         {{ $solicitud->createdBy->personal->full_name }}
+                    @endif
                 </td>
+                <?php \Log::info( microtime() . 'CARBON' ) ?>                
+                @if( in_array( Auth::user()->type , array( TESORERIA, CONT ) ))
+                    <?php $now =  Carbon\Carbon::now(); ?>
+                    @if ( $solicitud->idtiposolicitud == SOL_INST )
+                        <?php $fecha_entrega = Carbon\Carbon::createFromFormat( 'Ym' , $solicitud->detalle->fecha_entrega );
+                        $fecha_deposito = Carbon\Carbon::createFromFormat( 'Ym' , $solicitud->detalle->fecha_entrega )->firstOfMonth()->format( 'Y-m-d' ); ?>
+                    @else
+                        <?php $fecha_entrega = Carbon\Carbon::createFromFormat( 'd/m/Y' , $solicitud->detalle->fecha_entrega );
+                        $fecha_deposito = Carbon\Carbon::createFromFormat( 'd/m/Y' , $solicitud->detalle->fecha_entrega )->format( 'Y-m-d' ); ?>
+                    @endif
+                    @if( $now >  $fecha_entrega )
+                        <td class="text-center alert-danger">
+                            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>  
+                            {{ $fecha_deposito}}
+                         </td>  
+                    @elseif ($now->diffInDays($fecha_entrega) <= 1 ) 
+                         <td class="text-center alert-warning">
+                            <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+                            <strong>{{ $fecha_deposito}}</strong>
+                        </td>  
+                    @else
+                         <td class="text-center">
+                            {{ $fecha_deposito }}
+                        </td>  
+                    @endif
+                @else
+                <?php \Log::info( microtime() . 'FECHA DE CREACION' ) ?> 
                 <td class="text-center">
                     {{ $solicitud->created_at }}
-                </td>
+                    </td>
+                @endif
+                <?php \Log::info( microtime() . 'USUARIO APROBADOR' ) ?>  
                 <td class="text-center">
+                    @if ( $solicitud->id_estado != PENDIENTE )
+                        {{ $solicitud->lastHistory->user->personal->full_name }}
+                    @else
                         -
+                    @endif
                 </td>
-               <td class="text-center">
-                        -
-                </td>
+                <?php \Log::info( microtime() . 'FECHA DE APROBACION') ?>
+                @include('template.List.lastdate')
+                <?php \Log::info( microtime() ) ?>
+                @if( Auth::user()->type == TESORERIA )
+                    <input type="hidden" class="total_deposit" value="{{ $solicitud->detalle->monto_actual }}">
+                    <td class="text-center deposit">
+                        @if ( is_null( $solicitud->detalle->id_deposito ) )
+                            {{ $solicitud->detalle->typemoney->simbolo .' '. $solicitud->detalle->monto_actual }}    
+                        @else
+                            {{ $solicitud->detalle->deposit->account->typeMoney->simbolo . ' ' . $solicitud->detalle->deposit->total }}
+                        @endif
+                    </td>
+                @else
                     <td class="text-center total_deposit">
                         {{ $solicitud->detalle->typeMoney->simbolo . ' ' . $solicitud->detalle->monto_actual }}
                     </td>
-                
-                <td class="text-center">
-                        -
-                </td>
-                
+                @endif
+                <?php \Log::info( microtime() . 'ESTADOS' ) ?>
+                @include('template.List.states')
+                <?php \Log::info( microtime() . 'TIPO DE SOLICITUD' ) ?>
                 <td class="text-center">{{ $solicitud->typeSolicitude->nombre }}</td>
-                
-                <td class="text-center">
-                        -
-                </td>
-                
+                <?php \Log::info( microtime() . ' ICONOS') ?>
+                @include('template.List.icons')
+                <?php \Log::info( microtime() . ' CHECKBOX' ) ?>
+                @if ( in_array( Auth::user()->type , array( GER_COM , CONT ) ) )
+                    <td class="text-center">
+                        @if( Auth::user()->type === GER_COM )
+                            @if ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) ) && 
+                                $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario === Auth::user()->type && 
+                                in_array( Auth::user()->id , $solicitud->managerEdit( $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario )->lists( 'id_gerprod' ) ) )
+                                <input type="checkbox" name="mass-aprov">
+                            @else
+                                <input type="checkbox" name="mass-aprov" disabled>
+                            @endif
+                        @elseif( Auth::user()->type == CONT )
+                            @if( $solicitud->id_estado == APROBADO )
+                                <input type="checkbox" name="mass-aprov">
+                            @else
+                                <input type="checkbox" name="mass-aprov" disabled>    
+                            @endif
+                        @endif
+                    </td>
+                @endif
+                <?php \Log::info( microtime() ) ?>
             </tr>
+            <?php \Log::info( 'each end' ) ?> 
         @endforeach
     </tbody>
 </table>
