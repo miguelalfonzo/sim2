@@ -124,6 +124,7 @@ class MoveController extends BaseController
     {
         try
         {
+            \Log::info( microtime() );
             $inputs = Input::all();
             switch( $inputs['type'] )
             {
@@ -168,6 +169,7 @@ class MoveController extends BaseController
             if ( Auth::user()->type == TESORERIA )
                 $data['tc'] = ChangeRate::getTc();
             Session::put( 'state' , $estado );
+            \Log::info( microtime() );
             return $this->setRpta( array( 'View' => View::make('template.List.solicituds')->with( $data )->render() ) );
         }
         return $middleRpta;
@@ -274,8 +276,9 @@ class MoveController extends BaseController
                     $t->where( 'id' , $estado );
                 });
             });    
-        
-        $solicituds = $solicituds->orderBy('id', 'ASC')->get();     
+        \Log::info( microtime() );
+        $solicituds = $solicituds->orderBy('id', 'ASC')->get();
+        \Log::info( microtime() );    
         return $this->setRpta( $solicituds );
     }
 
