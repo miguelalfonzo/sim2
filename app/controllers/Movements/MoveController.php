@@ -170,7 +170,9 @@ class MoveController extends BaseController
                 $data['tc'] = ChangeRate::getTc();
             Session::put( 'state' , $estado );
             \Log::info( microtime() );
-            return $this->setRpta( array( 'View' => View::make('template.List.solicituds')->with( $data )->render() ) );
+            $view = array( 'View' => View::make('template.List.solicituds')->with( $data )->render() );
+            \Log::info( microtime() );
+            return $this->setRpta( $view  );
         }
         return $middleRpta;
     }
