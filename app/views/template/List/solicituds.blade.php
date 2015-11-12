@@ -35,6 +35,7 @@
         </tr>
     </thead>
     <tbody>
+        <?php $now =  Carbon\Carbon::now(); ?>
         @foreach( $solicituds as $solicitud )
              <?php \Log::info( 'each start' ) ?>    
             <tr>
@@ -42,7 +43,7 @@
                 @if ( in_array( Auth::user()->type , array( TESORERIA , GER_COM, CONT ) ) )
                     <input type="hidden" id="sol_token" class="i-tokens" value="{{$solicitud->token}}">
                     @if( ! is_null( $solicitud->id_user_assign ) )
-                        <input type="hidden" value="{{ $solicitud->assignedTo->personal->full_name }}" class="benef">
+                        <input type="hidden" value="{{ $solicitud->personalTo->full_name }}" class="benef">
                     @endif
                 @endif
                 <td class="text-center id_solicitud detail-control">{{$solicitud->id}}</td>
@@ -57,14 +58,13 @@
                 <?php \Log::info( microtime() . 'ASIGNADO' ) ?>        
                 <td class="text-center">
                     @if( Auth::user()->type == TESORERIA )
-                        {{ $solicitud->assignedTo->personal->full_name }}    
+                        {{ $solicitud->personalTo->full_name }}    
                     @else
-                        {{ $solicitud->createdBy->personal->full_name }}
+                        {{ $solicitud->createdPersonal->full_name }}
                     @endif
                 </td>
                 <?php \Log::info( microtime() . 'CARBON' ) ?>                
                 @if( in_array( Auth::user()->type , array( TESORERIA, CONT ) ))
-                    <?php $now =  Carbon\Carbon::now(); ?>
                     @if ( $solicitud->idtiposolicitud == SOL_INST )
                         <?php $fecha_entrega = Carbon\Carbon::createFromFormat( 'Ym' , $solicitud->detalle->fecha_entrega );
                         $fecha_deposito = Carbon\Carbon::createFromFormat( 'Ym' , $solicitud->detalle->fecha_entrega )->firstOfMonth()->format( 'Y-m-d' ); ?>
@@ -96,7 +96,7 @@
                 <?php \Log::info( microtime() . 'USUARIO APROBADOR' ) ?>  
                 <td class="text-center">
                     @if ( $solicitud->id_estado != PENDIENTE )
-                        {{ $solicitud->lastHistory->user->personal->full_name }}
+                        {{ $solicitud->lastHistory->createdPersonal->full_name }}
                     @else
                         -
                     @endif
@@ -115,7 +115,7 @@
                     </td>
                 @else
                     <td class="text-center total_deposit">
-                        {{ $solicitud->detalle->typeMoney->simbolo . ' ' . $solicitud->detalle->monto_actual }}
+                        {{ $solicitud->detalle->currencyMoney }}
                     </td>
                 @endif
                 <?php \Log::info( microtime() . 'ESTADOS' ) ?>

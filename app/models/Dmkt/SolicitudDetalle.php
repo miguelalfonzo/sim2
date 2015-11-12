@@ -70,6 +70,11 @@ class SolicitudDetalle extends Eloquent
             return null;
     }
 
+    protected function getCurrencyMoneyAttribute()
+    {
+        return $this->typeMoney->simbolo . ' ' . $this->monto_actual;
+    }
+
     protected function getMontoSolicitadoAttribute()
     {
         return json_decode( $this->detalle )->monto_solicitado;
