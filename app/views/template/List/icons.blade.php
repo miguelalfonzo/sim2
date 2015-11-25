@@ -1,12 +1,12 @@
 <td style="text-align: center">
     <div class="btn-group btn-group-icon-md" role="group" >  
         <a class="btn btn-default open-details" data-id="{{$solicitud->id}}">
-                        <span class="glyphicon glyphicon-eye-open"></span>
-                    </a>
+            <span class="glyphicon glyphicon-eye-open"></span>
+        </a>
         <a class="btn btn-default timeLine" data-id="{{ $solicitud->id }}">
             <span class="glyphicon glyphicon-time"></span>
         </a>
-            
+        <?php \Log::info( microtime() . ' AUTORIZADO') ?>
         @if ( in_array( $solicitud->histories()->orderBy( 'updated_at' , 'DESC' )->first()->user_to , array( Auth::user()->type , Auth::user()->tempType() ) ) 
         && $solicitud->state->id_estado != R_NO_AUTORIZADO && $solicitud->id_estado != GENERADO )
             @if( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) &&  in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) ) )
@@ -31,7 +31,7 @@
                 @endif         
             @endif    
         @endif
-        
+        <?php \Log::info( microtime() . ' USUARIOS') ?>
         @if( in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD , ASIS_GER ) ) )
             @if( $solicitud->id_estado == PENDIENTE && $solicitud->created_by == Auth::user()->id && $solicitud->status == 1 )
                 <a class="btn btn-default" href="{{ URL::to( 'editar-solicitud' ) . '/' . $solicitud->token }}">
@@ -62,7 +62,8 @@
                 </a>
             @endif
         @endif
-        
+        <?php \Log::info( microtime() . ' DEVOLUCION') ?>
+                
         @if( $solicitud->id_estado == ENTREGADO )
             @if( Auth::user()->type == TESORERIA && $solicitud->devolutions()->where( 'id_estado_devolucion' , DEVOLUCION_POR_VALIDAR )->get()->count() !== 0 )
                 <a class="btn btn-default get-devolution-info" data-type="confirm-inmediate-devolution">
@@ -78,7 +79,8 @@
                 </a>
             @endif
         @endif
-
+        <?php \Log::info( microtime() . ' IMPRESORA') ?>
+                
         @if ( ! is_null( $solicitud->toDeliveredHistory ) && ( Auth::user()->type === CONT || Auth::user()->id === $solicitud->id_user_assign ) )
             <a class="btn btn-default" target="_blank" href="{{URL::to('a'.'/'.$solicitud->token)}}">
                 <span  class="glyphicon glyphicon-print"></span>
