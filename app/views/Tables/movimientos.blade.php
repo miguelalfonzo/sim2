@@ -28,7 +28,7 @@
                         <label>{{ $solicitud->titulo }}</label>
                     </td>
                     <td class="text-center">
-                        {{ $solicitud->asignedTo->personal->full_name }}
+                        {{ $solicitud->assignedTo->personal->full_name }}
                     </td>
                     <td class="text-center">
                         @if ( $solicitud->idtiposolicitud == SOL_INST )

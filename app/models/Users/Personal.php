@@ -68,6 +68,10 @@ class Personal extends Eloquent
         {
             $rms->where( 'referencia_id' , Auth::user()->sup->bago_id );
         }
+        elseif ( Auth::user()->type == REP_MED )
+        {
+            $rms->where( 'user_id' , Auth::user()->id );
+        }
         
         return $rms->get();
     }

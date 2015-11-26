@@ -50,10 +50,10 @@
                                     @endif
                                 </td>
                                 <td>
-                                    @if ( is_null ( $solicitud->asignedTo->personal ) )
+                                    @if ( is_null ( $solicitud->assignedTo->personal ) )
                                         Sin Rol o No Autorizado
                                     @else
-                                        {{ $solicitud->asignedTo->personal->full_name }}
+                                        {{ $solicitud->assignedTo->personal->full_name }}
                                     @endif
                                 </td>
                                 <td>
@@ -64,8 +64,8 @@
                                             194-1809102-167
                                         @endif
                                     @elseif ( $solicitud->detalle->id_pago != PAGO_CHEQUE )
-                                        @if ( $solicitud->asignedTo->type == REP_MED && ! is_null( $solicitud->asignedTo->personal->bagoVisitador ) && ! is_null( $solicitud->asignedTo->personal->bagoVisitador->cuenta ) )
-                                            {{ $solicitud->asignedTo->personal->bagoVisitador->cuenta->cuenta }}
+                                        @if ( $solicitud->assignedTo->type == REP_MED && ! is_null( $solicitud->assignedTo->personal->bagoVisitador ) && ! is_null( $solicitud->assignedTo->personal->bagoVisitador->cuenta ) )
+                                            {{ $solicitud->assignedTo->personal->bagoVisitador->cuenta->cuenta }}
                                         @endif
                                     @else
                                         RUC: {{ $solicitud->detalle->num_ruc }}         

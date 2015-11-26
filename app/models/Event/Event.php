@@ -28,5 +28,10 @@ class Event extends Eloquent
         }
         return array();
     }
+
+    public function solicitud()
+    {
+        return $this->belongsTo( 'Dmkt\Solicitud' , 'solicitud_id' );
+    }
     
 }

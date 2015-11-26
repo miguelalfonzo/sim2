@@ -16,12 +16,16 @@ use \Dmkt\Marca;
 use \Parameter\Parameter;
 use \Carbon\Carbon;
 use \User;
+use \Expense\ChangeRate;
 
 class TestController extends BaseController 
 {
 
 	public function testCarbon()
 	{
+		$history = Solicitud::find( 3 )->lastHistory;
+		return  ChangeRate::where( 'fecha' ,  Carbon::createFromFormat( 'Y-m-d H:i' , $history->updated_at )->subDay()->format( 'Y:m:d') )->first();
+        
 		$a = Carbon::now();
 		return $a->format( 'd/m/Y' );
 		return $a->day;

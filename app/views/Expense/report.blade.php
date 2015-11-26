@@ -16,9 +16,9 @@
                     <tbody>
                         <tr>
                             <th class="sin-border text-right">Colaborador Bagó:</th>
-                            <td class="sin-border text-left">{{ $solicitud->asignedTo->personal->getFullName() }}</td>  
+                            <td class="sin-border text-left">{{ $solicitud->assignedTo->personal->getFullName() }}</td>  
                             <th class="sin-border text-right">Cargo:</th>
-                            <td class="sin-border text-left">{{ ucwords( strtolower( $solicitud->asignedTo->userType->descripcion ) ) }}</td>
+                            <td class="sin-border text-left">{{ ucwords( strtolower( $solicitud->assignedTo->userType->descripcion ) ) }}</td>
                             
                             <th class="sin-border text-right">Ciudad:</th>
                             <td class="sin-border text-left">{{ $zona }}</td>
@@ -81,7 +81,7 @@
                                                 <table style="margin: 0 auto; min-width: 200px">
                                                     <tbody>
                                                         <tr>
-                                                            <td style="border-top: 1px solid;">{{ $solicitud->asignedTo->personal->full_name }}</td>
+                                                            <td style="border-top: 1px solid;">{{ $solicitud->assignedTo->personal->full_name }}</td>
                                                         </tr>
                                                         <tr>
                                                             <td class="text-left">DNI: {{$dni}}</td>

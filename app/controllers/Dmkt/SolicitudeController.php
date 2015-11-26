@@ -47,6 +47,7 @@ use \Carbon\Carbon;
 use \Fondo\FondoMkt;
 use \Fondo\FondoInstitucional;
 use \Seat\MigrateSeatController;
+use \VisitZone\Zone;
 
 class SolicitudeController extends BaseController
 {
@@ -112,7 +113,7 @@ class SolicitudeController extends BaseController
     {
         include(app_path() . '/models/Query/QueryProducts.php');
         $data = array(
-            'reasons'     => Reason::all(),
+            'reasons'     => SolicitudType::where( 'code' , '<>' , 'F' )->orderBy( 'id' )->get(),
             'activities'  => Activity::order(),
             'payments'    => TypePayment::all(),
             'currencies'  => TypeMoney::all(),
@@ -128,7 +129,7 @@ class SolicitudeController extends BaseController
         include(app_path() . '/models/Query/QueryProducts.php');
         $data = array( 
            'solicitud'   => Solicitud::where('token', $token)->firstOrFail(),
-           'reasons'     => Reason::all(),
+           'reasons'     => SolicitudType::where( 'code' , '<>' , 'F' )->orderBy( 'id' )->get(),
            'activities'  => Activity::order(),
            'payments'    => TypePayment::all(),
            'currencies'  => TypeMoney::all(),
@@ -298,7 +299,7 @@ class SolicitudeController extends BaseController
 
         $rules = array(
             'idsolicitud'   => 'integer|min:1|exists:'.TB_SOLICITUD.',id',
-            'motivo'        => 'required|integer|min:1|exists:'.TB_MOTIVO.',id',
+            'motivo'        => 'required|integer|min:1|exists:'.TB_SOLICITUD_TIPO.',id',
             'inversion'     => 'required|integer|min:1|exists:'.TB_TIPO_INVERSION.',id',
             'actividad'     => 'required|integer|min:1|exists:'.TB_TIPO_ACTIVIDAD.',id',
             'titulo'        => 'required|string|min:1|max:50',
@@ -537,7 +538,7 @@ class SolicitudeController extends BaseController
 
     private function textLv($solicitud)
     {
-        return substr( $solicitud->id . ' ' . $solicitud->asignedTo->personal->seat_name . ' ' . strtoupper( $solicitud->investment->accountFund->nombre ) , 0 , 50 );
+        return substr( $solicitud->id . ' ' . $solicitud->assignedTo->personal->seat_name . ' ' . strtoupper( $solicitud->investment->accountFund->nombre ) , 0 , 50 );
     }
 
     private function textAccepted($solicitud)
@@ -1181,7 +1182,7 @@ class SolicitudeController extends BaseController
                 else
                     $result['error'][] = $accountResult['error'];
             }
-            $userElement = $solicitud->asignedTo;
+            $userElement = $solicitud->assignedTo;
             $tipo_responsable = $userElement->tipo_responsable;
             $username = '';
 
@@ -1345,7 +1346,7 @@ class SolicitudeController extends BaseController
                     $tasaCompra = $this->getExpenseChangeRate( $solicitud , $devolution->updated_at );
                     $seatList[] = $this->createSeatElement( $cuentaMkt , $solicitud->id , CUENTA_SOLES , '' , date( 'd/m/Y' , strtotime( $devolution->updated_at ) ) , '' , '' , '' ,
                         '' , '' , '' , '' , ASIENTO_GASTO_BASE , $devolution->monto  * $tasaCompra , '' , 
-                        'DEVOLUCION ' . $devolution->type->descripcion . ' - ' . $devolution->numero_operacion . ' - ' . strtoupper( $solicitud->asignedTo->personal->full_name ) , ' ' , 'DEVOLUCION' );
+                        'DEVOLUCION ' . $devolution->type->descripcion . ' - ' . $devolution->numero_operacion . ' - ' . strtoupper( $solicitud->assignedTo->personal->full_name ) , ' ' , 'DEVOLUCION' );
                 }
 
                 // CONTRAPARTE ASIENTO DE ANTICIPO
@@ -1786,7 +1787,7 @@ class SolicitudeController extends BaseController
 
                 if( $key == 'status_id' && $value == GASTO_HABILITADO )
                 {
-                    $line[ 'info' ] = is_null( $solicitud->id_user_assign ) ? $line[ 'info' ] : strtoupper( $solicitud->asignedTo->personal->full_name );
+                    $line[ 'info' ] = is_null( $solicitud->id_user_assign ) ? $line[ 'info' ] : strtoupper( $solicitud->assignedTo->personal->full_name );
                 }
 
                 if ( $key == 'cond' ) 
@@ -1858,16 +1859,59 @@ class SolicitudeController extends BaseController
 
     public function album()
     {
-        return View::make('Event.show');
+        $data = array(
+            'reps'  => Personal::getRms() ,
+            'zones' => Zone::orderBy( 'N3GDESCRIPCION' , 'asc' )->get() );
+        return View::make( 'Event.show' , $data );
     }
 
     public function getEventList()
     {
-        // dd(Input::all());
-        $start          = Input::get("date_start");
-        $end            = Input::get("date_end");
-        $data           = array();
-        $data['events'] = Event::whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1")->get();
+        $start = Input::get("date_start");
+        $end   = Input::get("date_end");
+        $user  = Input::get( 'usuario' );
+        $zona  = Input::get( 'zona' );
+        if ( $user == 0 )
+        {
+            if ( Auth::user()->type == REP_MED )
+            {
+                $user = array( Auth::user()->id );
+            }
+            elseif( Auth::user()->type == SUP )
+            {
+                $user = Auth::user()->sup->reps->lists( 'user_id' );
+            }
+            else
+            {
+                $user = null;
+            }
+        }
+        else
+        {
+            $user = array( $user );
+        }
+        $data['events'] =   Event::whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
+        
+            $data[ 'events' ]->whereHas( 'solicitud' , function( $query ) use( $user , $zona )
+            {
+                if ( ! is_null( $user ) )
+                {
+                    $query->whereIn( 'id_user_assign' , $user );
+                }
+                if ( $zona != 0 )
+                {   
+                    $query->whereHas( 'personal' , function( $query ) use( $zona )
+                    {
+                        $query->whereHas( 'bagoVisitador' , function( $query ) use( $zona )
+                        {
+                            $query->where( 'visnivel3geog' , $zona );
+                        });
+                    });  
+                }
+            });
+        
+        
+        $data[ 'events' ] = $data[ 'events' ]->get();
         return View::make('Event.album', $data);
     }
 
