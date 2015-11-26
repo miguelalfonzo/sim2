@@ -107,7 +107,7 @@
     @include( 'Dmkt.Solicitud.Detail.devolucion2')
 
     <!-- Description Solicitude -->
-    @if ( is_null( $solicitud->descripcion ) || empty( trim( $solicitud->descripcion ) ) )
+    @if ( ! is_null( $solicitud->descripcion ) && ! empty( trim( $solicitud->descripcion ) ) )
         <div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
             <label class="control-label">
                 Descripcion de la Solicitud
