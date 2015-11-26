@@ -299,7 +299,7 @@ class SolicitudeController extends BaseController
 
         $rules = array(
             'idsolicitud'   => 'integer|min:1|exists:'.TB_SOLICITUD.',id',
-            'motivo'        => 'required|integer|min:1|exists:'.TB_MOTIVO.',id',
+            'motivo'        => 'required|integer|min:1|exists:'.TB_SOLICITUD_TIPO.',id',
             'inversion'     => 'required|integer|min:1|exists:'.TB_TIPO_INVERSION.',id',
             'actividad'     => 'required|integer|min:1|exists:'.TB_TIPO_ACTIVIDAD.',id',
             'titulo'        => 'required|string|min:1|max:50',
