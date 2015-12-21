@@ -198,25 +198,36 @@ $(function()
             token  : token
         };
         data = $.extend( data , otherData );
-        endExpenseAjax( data ).done( function ( response ) 
+
+        bootbox.confirm("<h3><strong>¿Esta seguro que desea Terminar la Fase del Registro de Gasto?</strong><h3>", function(result) 
         {
-            if ( response.Status == 'Ok' )
+            if(result)
             {
-                bootbox.alert( '<h4 class="green">Descargo Registrado</h4>' , function()
-                {
-                    window.location.href = server + 'show_user';
-                });
+                endExpenseAjax( data ).done( function ( response ) 
+                    {
+                        if ( response.Status == 'Ok' )
+                        {
+                            bootbox.alert( '<h4 class="green">Descargo Registrado</h4>' , function()
+                            {
+                                window.location.href = server + 'show_user';
+                            });
+                        }
+                        else if( response.Status == 'Info' )
+                        {
+                            bootboxExpense( response.Title , response.View , response.Type );
+                        }
+                        else
+                        {
+                            //return false;
+                            bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+                        }
+                    });
             }
-            else if( response.Status == 'Info' )
-            {
-                bootboxExpense( response.Title , response.View , response.Type );
-            }
-            else
-            {
-                //return false;
-                bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+            else{
+                $btn.button('reset');
             }
         });
+        
     }
 
     function bootboxExpense( title , view , type )
