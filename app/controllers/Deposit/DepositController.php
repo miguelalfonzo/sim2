@@ -176,14 +176,14 @@ class DepositController extends BaseController
                 $fondoMktController->setPeriodHistoryData( $fondo->subcategoria_id , $data );
                 $fondo->save();
             }       
-            $middleRpta = $fondoMktController->validateFondoSaldo( $fondosData , $fondo_type , $msg );
+            // EL DEPOSITO SE REGISTRARA AUNQUE EL SALDO DEL FONDO QUEDE EN NEGATIVO SE COMENTA LA FUNCION DE VALIDACION DEL SALDO
+            /* $middleRpta = $fondoMktController->validateFondoSaldo( $fondosData , $fondo_type , $msg );
             if ( $middleRpta[ status] != ok )
-                return $middleRpta;
+                return $middleRpta; */
         }
         elseif ( $solicitud->idtiposolicitud == SOL_INST )
         {    
             $detalle          = $solicitud->detalle;
-
             $fondo            = $detalle->thisSubFondo;
             $oldSaldo         = $fondo->saldo;
             $oldRetencion     = $fondo->retencion;
