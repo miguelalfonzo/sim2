@@ -199,32 +199,29 @@ $(function()
         };
         data = $.extend( data , otherData );
 
-        bootbox.confirm("<h3><strong>¿Esta seguro que desea Terminar la Fase del Registro de Gasto?</strong><h3>", function(result) 
+        bootbox.confirm( '<h3 class="red"><strong>¿Esta seguro que desea Terminar la Fase del Registro de Gasto?</strong><h3>' , function(result) 
         {
             if(result)
             {
                 endExpenseAjax( data ).done( function ( response ) 
+                {
+                    if ( response.Status == 'Ok' )
                     {
-                        if ( response.Status == 'Ok' )
+                        bootbox.alert( '<h4 class="green">Descargo Registrado</h4>' , function()
                         {
-                            bootbox.alert( '<h4 class="green">Descargo Registrado</h4>' , function()
-                            {
-                                window.location.href = server + 'show_user';
-                            });
-                        }
-                        else if( response.Status == 'Info' )
-                        {
-                            bootboxExpense( response.Title , response.View , response.Type );
-                        }
-                        else
-                        {
-                            //return false;
-                            bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
-                        }
-                    });
-            }
-            else{
-                $btn.button('reset');
+                            window.location.href = server + 'show_user';
+                        });
+                    }
+                    else if( response.Status == 'Info' )
+                    {
+                        bootboxExpense( response.Title , response.View , response.Type );
+                    }
+                    else
+                    {
+                        //return false;
+                        bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+                    }
+                });
             }
         });
         
