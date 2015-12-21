@@ -62,18 +62,21 @@ class FondoMkt extends BaseController
 
     public function discountBalance( $ids_fondo , $moneda , $tc , $idSolicitud , $userType = NULL )
     {
-        if ( $moneda == SOLES )
-            $tasaCompra = 1;
-        elseif ( $moneda == DOLARES )
-            $tasaCompra = $tc->compra;
-        \Log::info( $tasaCompra );
-        $history = Solicitud::find( $idSolicitud )->lastHistory;
-        $tasaCompraAntigua = ChangeRate::where( 'fecha' ,  Carbon::createFromFormat( 'Y-m-d H:i' , $history->updated_at )->subDay()->format( 'Y:m:d') )->first()->compra;
-        \Log::info( $tasaCompraAntigua );
+        if( $moneda == SOLES )
+        {
+            $tasaCompra        = 1;
+            $tasaCompraAntigua = 1;
+        }
+        elseif( $moneda == DOLARES )
+        {
+            $tasaCompra        = $tc->compra;
+            $history           = Solicitud::find( $idSolicitud )->lastHistory;
+            $tasaCompraAntigua = ChangeRate::where( 'fecha' ,  Carbon::createFromFormat( 'Y-m-d H:i' , $history->updated_at )->subDay()->format( 'Y:m:d') )->first()->compra;
+        }
         $historiesFondoMkt = array();
         foreach( $ids_fondo as $id_fondo )
         {
-            if ( ! is_null( $id_fondo[ 'old' ] ) )
+            if( ! is_null( $id_fondo[ 'old' ] ) )
             {
                 if ( $id_fondo[ 'oldUserType' ] == SUP )
                     $fondoMkt = FondoSupervisor::find( $id_fondo[ 'old' ] );
@@ -82,7 +85,7 @@ class FondoMkt extends BaseController
                 $this->setHistoryData( $historiesFondoMkt , $fondoMkt , $tasaCompraAntigua , $id_fondo[ 'oldMonto'] , $id_fondo[ 'oldUserType' ] , FONDO_LIBERACION );
                 
             }
-            if ( ! is_null( $userType ) )
+            if( ! is_null( $userType ) )
             {
                 if ( $userType == SUP )
                     $fondoMkt = FondoSupervisor::find( $id_fondo[ 'new' ] );
