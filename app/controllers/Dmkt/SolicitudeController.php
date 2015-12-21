@@ -1733,10 +1733,12 @@ class SolicitudeController extends BaseController
         $flujo1 = $solicitud->investment->approvalInstance->approvalPolicies()
             ->orderBy( 'orden' , 'ASC' )->get();
         $flujo = array();
-        foreach($flujo1 as $fl){
+        foreach($flujo1 as $fl)
+        {
+            \Log::info( json_encode( $fl ) );
             if($fl->desde == null)
                 $flujo[] = $fl;
-            elseif($fl->desde < ( $solicitud->detalle->monto_actual * $tasa ) )
+            elseif( $fl->desde < ( $solicitud->detalle->monto_actual * $tasa ) || ( $solicitud->id_estado == DERIVADO && $fl->tipo_usuario == GER_PROD ) )
                 $flujo[] = $fl;
         }
         $type_user = TypeUser::all();

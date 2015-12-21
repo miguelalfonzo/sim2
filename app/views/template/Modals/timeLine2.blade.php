@@ -6,16 +6,8 @@
                 {{ ''; $history = $solicitud_history[$i] }}
                 <div class="stage col-md-3 col-sm-3 @if( in_array( $history->status_to , array( 8 , 9 , 30 ) ) ) rejected @else success @endif">
                     <div class="stage-header @if( in_array( $history->status_to , array( 8 , 9 , 30 ) ) ) stage-rejected @else stage-success @endif"></div>
-                    {{--<p>{{ $history->status_from }}</p>--}}
-
-                    {{--<p>{{ $history->orden }}</p>--}}
-
-                    {{--<p>{{ $history->count }}</p>--}}
-
                     <div class="stage-content">
-
-                        <h3 class="stage-title"
-                            style="white-space:nowrap">
+                        <h3 class="stage-title" style="white-space:nowrap">
                             @if($i==0)
                                 @if($solicitud->idtiposolicitud == SOL_INST )
                                     Inicio de Fondo Institucional
@@ -36,23 +28,11 @@
                                 {{ $history->statusFrom->descripcion_min }}
                             @endif
                         </h3>
-
-                        <span class="label label-info">
-                            {{ strtoupper($history->createdBy->getName())}}
-                        </span>
-                        
-                        {{--<span class="label label-default">--}}
-                        {{--{{ $history->user_from}}--}}
-                        {{--</span>--}}
-                        {{--<span class="label label-default">--}}
-                        {{--{{ $history->status_from}}--}}
-                        {{--</span>--}}
+                        <span class="label label-info">{{ strtoupper( $history->createdBy->personal->full_name ) }} </span>
                         
                         @if($history->estimed_time)
                             <div class="time-estimated">
-                                <span class="label label-primary">
-                                    {{ $history->estimed_time}}
-                                </span>
+                                <span class="label label-primary">{{ $history->estimed_time}}</span>
                             </div>
                         @endif
                         <span class="label label-info">{{ $history->created_at}}</span>
