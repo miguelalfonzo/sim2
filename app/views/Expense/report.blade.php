@@ -23,7 +23,7 @@
                             <th class="sin-border text-right">Ciudad:</th>
                             <td class="sin-border text-left">{{ $zona }}</td>
                             <th class="sin-border text-right">Fecha:</th>
-                            <td class="sin-border text-left">{{$date['toDay']}}</td>
+                            <td class="sin-border text-left">{{ \Carbon\Carbon::now()->format( 'Y-m-d H:i') }}</td>
                         </tr>
                         <tr>
                             <th class="sin-border text-right">Autorizado por:</th>
