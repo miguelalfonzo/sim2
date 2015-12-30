@@ -118,10 +118,6 @@ class Solicitud extends Eloquent
         return $this->hasOne( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->where( 'user_from' , $userFrom )->first();
     }
 
-    public function rejectedHist(){
-        return $this->hasOne('System\SolicitudHistory','id_solicitud','id')->where( 'status_to' , RECHAZADO )->orWhere( 'status_to' , CANCELADO );
-    }
-
     public function histories(){
         return $this->hasMany('System\SolicitudHistory','id_solicitud');
     }

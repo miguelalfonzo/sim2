@@ -4,8 +4,8 @@
         <div class="stage-container">
             @for ($i = 0; $i < count($solicitud_history); $i++)
                 {{ ''; $history = $solicitud_history[$i] }}
-                <div class="stage col-md-3 col-sm-3 @if( in_array( $history->status_to , array( 8 , 9 , 30 ) ) ) rejected @else success @endif">
-                    <div class="stage-header @if( in_array( $history->status_to , array( 8 , 9 , 30 ) ) ) stage-rejected @else stage-success @endif"></div>
+                <div class="stage col-md-3 col-sm-3 @if( in_array( $history->status_to , array( 8 , 9 , 30 , 29 ) ) ) rejected @else success @endif">
+                    <div class="stage-header @if( in_array( $history->status_to , array( 8 , 9 , 30 , 29 ) ) ) stage-rejected @else stage-success @endif"></div>
                     <div class="stage-content">
                         <h3 class="stage-title" style="white-space:nowrap">
                             @if($i==0)
@@ -20,8 +20,8 @@
                                 @else
                                     Aprobacion {{ $history->user_from }}
                                 @endif  
-                            @elseif ( $history->status_to == 30 )
-                                Termino por Cese
+                            @elseif ( $history->status_to == 30 || $history->status_to == 29 )
+                                {{ $history->toState->nombre }}
                             @elseif( $history->status_to == 8 )
                                 Cancelado
                             @else 
