@@ -28,8 +28,14 @@ class SolicitudHistory extends Eloquent{
         return $this->belongsTo('Dmkt/Solicitud');
     }
 
-    public function user(){
-    	return $this->hasOne('User','id','created_by');
+    public function user()
+    {
+    	return $this->belongsTo( 'User', 'created_by' );
+    }
+
+    public function createdPersonal()
+    {
+        return $this->hasOne( 'Users\Personal' , 'user_id' , 'created_by' );
     }
 
     public function createdBy()

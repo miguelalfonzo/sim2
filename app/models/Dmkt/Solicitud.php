@@ -48,6 +48,11 @@ class Solicitud extends Eloquent
         return $this->belongsTo( 'User' , 'id_user_assign' );
     }
 
+    public function personalTo()
+    {
+        return $this->hasOne( 'Users\Personal' , 'user_id' , 'id_user_assing' );
+    }
+
     public function toAcceptedApprovedHistories()
     {
         return $this->hasMany( 'System\SolicitudHistory' , 'id_solicitud' , 'id' )->whereIn( 'status_to' , array( ACEPTADO , APROBADO ) );
@@ -127,7 +132,7 @@ class Solicitud extends Eloquent
 
     public function detalle()
     {
-        return $this->hasOne( 'Dmkt\SolicitudDetalle' , 'id' , 'id_detalle' );
+        return $this->belongsTo( 'Dmkt\SolicitudDetalle' , 'id_detalle' );
     }
 
     protected function typeSolicitude()
@@ -149,6 +154,11 @@ class Solicitud extends Eloquent
         return $this->belongsTo( 'User' , 'created_by' );
     }
 
+    public function createdPersonal()
+    {
+        return $this->hasOne( 'Users\Personal' , 'user_id' , 'created_by' );
+    }
+
     public function updatedBy()
     {
         return $this->belongsTo( 'User' , 'updated_by' );
@@ -156,7 +166,7 @@ class Solicitud extends Eloquent
 
     public function gerente()
     {
-        return $this->hasMany( 'Dmkt\SolicitudGer' , 'id_solicitud' , 'id' );
+        return $this->hasMany( 'Dmkt\SolicitudGer' , 'id_solicitud' );
     }
 
     public function managerEdit( $userType )
