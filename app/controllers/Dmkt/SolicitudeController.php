@@ -1735,7 +1735,6 @@ class SolicitudeController extends BaseController
         $flujo = array();
         foreach($flujo1 as $fl)
         {
-            \Log::info( json_encode( $fl ) );
             if($fl->desde == null)
                 $flujo[] = $fl;
             elseif( $fl->desde < ( $solicitud->detalle->monto_actual * $tasa ) || ( $solicitud->id_estado == DERIVADO && $fl->tipo_usuario == GER_PROD ) )

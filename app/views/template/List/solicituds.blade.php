@@ -37,9 +37,7 @@
     <tbody>
         <?php $now =  Carbon\Carbon::now(); ?>
         @foreach( $solicituds as $solicitud )
-             <?php \Log::info( 'each start' ) ?>    
             <tr>
-                <?php \Log::info( microtime() ) ?>
                 @if ( in_array( Auth::user()->type , array( TESORERIA , GER_COM, CONT ) ) )
                     <input type="hidden" id="sol_token" class="i-tokens" value="{{$solicitud->token}}">
                     @if( ! is_null( $solicitud->id_user_assign ) )
@@ -55,7 +53,6 @@
                     @endif
                     <label>{{$solicitud->titulo}}</label>
                 </td>
-                <?php \Log::info( microtime() . 'ASIGNADO' ) ?>        
                 <td class="text-center">
                     @if( Auth::user()->type == TESORERIA )
                         {{ $solicitud->personalTo->full_name }}    
@@ -63,7 +60,6 @@
                         {{ $solicitud->createdPersonal->full_name }}
                     @endif
                 </td>
-                <?php \Log::info( microtime() . 'CARBON' ) ?>                
                 @if( in_array( Auth::user()->type , array( TESORERIA, CONT ) ))
                     @if ( $solicitud->idtiposolicitud == SOL_INST )
                         <?php $fecha_entrega = Carbon\Carbon::createFromFormat( 'Ym' , $solicitud->detalle->fecha_entrega );
@@ -88,12 +84,10 @@
                         </td>  
                     @endif
                 @else
-                <?php \Log::info( microtime() . 'FECHA DE CREACION' ) ?> 
                 <td class="text-center">
                     {{ $solicitud->created_at }}
                     </td>
                 @endif
-                <?php \Log::info( microtime() . 'USUARIO APROBADOR' ) ?>  
                 <td class="text-center">
                     @if ( $solicitud->id_estado != PENDIENTE )
                         {{ $solicitud->lastHistory->createdPersonal->full_name }}
@@ -101,9 +95,7 @@
                         -
                     @endif
                 </td>
-                <?php \Log::info( microtime() . 'FECHA DE APROBACION') ?>
                 @include('template.List.lastdate')
-                <?php \Log::info( microtime() ) ?>
                 @if( Auth::user()->type == TESORERIA )
                     <input type="hidden" class="total_deposit" value="{{ $solicitud->detalle->monto_actual }}">
                     <td class="text-center deposit">
@@ -118,13 +110,9 @@
                         {{ $solicitud->detalle->currencyMoney }}
                     </td>
                 @endif
-                <?php \Log::info( microtime() . 'ESTADOS' ) ?>
                 @include('template.List.states')
-                <?php \Log::info( microtime() . 'TIPO DE SOLICITUD' ) ?>
                 <td class="text-center">{{ $solicitud->typeSolicitude->nombre }}</td>
-                <?php \Log::info( microtime() . ' ICONOS') ?>
                 @include('template.List.icons')
-                <?php \Log::info( microtime() . ' CHECKBOX' ) ?>
                 @if ( in_array( Auth::user()->type , array( GER_COM , CONT ) ) )
                     <td class="text-center">
                         @if( Auth::user()->type === GER_COM )
@@ -144,9 +132,7 @@
                         @endif
                     </td>
                 @endif
-                <?php \Log::info( microtime() ) ?>
             </tr>
-            <?php \Log::info( 'each end' ) ?> 
         @endforeach
     </tbody>
 </table>

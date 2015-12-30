@@ -56,13 +56,12 @@
                 <a class="btn btn-default modal_liquidacion">
                     <span class="glyphicon glyphicon-inbox"></span>
                 </a>
-            @elseif( $solicitud->id_estado == APROBADO || $solicitud->id_estado == DEPOSITO_HABILITADO ) )
+            @elseif( $solicitud->id_estado == APROBADO || $solicitud->id_estado == DEPOSITO_HABILITADO )
                 <a class="btn btn-default cancel-solicitude" data-idsolicitude="{{ $solicitud->id }}" data-token="{{csrf_token()}}">
                     <span  class="glyphicon glyphicon-remove"></span>
                 </a>
             @endif
         @endif
-        <?php \Log::info( microtime() . ' DEVOLUCION') ?>
                 
         @if( $solicitud->id_estado == ENTREGADO )
             @if( Auth::user()->type == TESORERIA && $solicitud->devolutions()->where( 'id_estado_devolucion' , DEVOLUCION_POR_VALIDAR )->get()->count() !== 0 )
@@ -79,7 +78,6 @@
                 </a>
             @endif
         @endif
-        <?php \Log::info( microtime() . ' IMPRESORA') ?>
                 
         @if ( ! is_null( $solicitud->toDeliveredHistory ) && ( Auth::user()->type === CONT || Auth::user()->id === $solicitud->id_user_assign ) )
             <a class="btn btn-default" target="_blank" href="{{URL::to('a'.'/'.$solicitud->token)}}">
