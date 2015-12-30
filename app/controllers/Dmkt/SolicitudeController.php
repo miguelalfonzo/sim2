@@ -666,7 +666,7 @@ class SolicitudeController extends BaseController
                 $monto = $monto * ChangeRate::getTc()->compra;
             if ( $monto > $approvalPolicy->hasta && ! is_null( $approvalPolicy->hasta ) )
                 return $this->setRpta( ACEPTADO );
-            elseif ( $monto < $approvalPolicy->desde )
+            elseif ( $monto <= $approvalPolicy->desde )
                 return $this->warningException( 'Por Politica solo puede aceptar para este Tipo de Inversion montos mayores a: ' . $approvalPolicy->desde , __FUNCTION__ , __LINE__ , __FILE__ );
             else
                 return $this->setRpta( APROBADO );
@@ -1733,36 +1733,57 @@ class SolicitudeController extends BaseController
         $flujo1 = $solicitud->investment->approvalInstance->approvalPolicies()
             ->orderBy( 'orden' , 'ASC' )->get();
         $flujo = array();
-        foreach($flujo1 as $fl)
-        {
-            if($fl->desde == null)
-                $flujo[] = $fl;
-            elseif( $fl->desde < ( $solicitud->detalle->monto_actual * $tasa ) || ( $solicitud->id_estado == DERIVADO && $fl->tipo_usuario == GER_PROD ) )
-                $flujo[] = $fl;
-        }
-        $type_user = TypeUser::all();
-        foreach ($flujo as $fl) {
 
-            foreach ($type_user as $type) {
-                if ($fl->tipo_usuario == $type->codigo) {
+        if( is_null( $solicitud->approvedHistory ) )
+        {
+            foreach($flujo1 as $fl)
+            {
+                if($fl->desde == null)
+                    $flujo[] = $fl;
+                elseif( $fl->desde < ( $solicitud->detalle->monto_actual * $tasa ) || ( $solicitud->id_estado == DERIVADO && $fl->tipo_usuario == GER_PROD ) )
+                    $flujo[] = $fl;
+            }
+        }
+        else
+        {
+            foreach( $solicitud->histories()->whereIn( 'status_to' , array( DERIVADO , ACEPTADO , APROBADO ) )->orderBy( 'created_at' , 'id' )->get() as $approvalFlow )
+            {
+                $approvalFlow->tipo_usuario = $approvalFlow->user_to;
+                $flujo[] = $approvalFlow;
+            }
+        }
+
+
+        $type_user = TypeUser::all();
+        foreach( $flujo as $fl ) 
+        {
+            foreach( $type_user as $type ) 
+            {
+                if( $fl->tipo_usuario == $type->codigo ) 
+                {
                     $fl->nombre_usuario = $type->descripcion;
                     break;
                 }
             }
-
         }
+
         $status_flow = null;
-        foreach ($flujo as $fl) {
+        foreach( $flujo as $fl ) 
+        {
             if(isset($status_flow))
             {
                 $fl->status = 2;
-            }else{
+            }
+            else
+            {
                 $status_flow = 1;
                 $fl->status = 1;
             }
 
-            foreach ($time_flow_event as $time_flow){
-                if ($time_flow->status_id == $fl->status && $time_flow->to_user_type == $fl->tipo_usuario){
+            foreach( $time_flow_event as $time_flow )
+            {
+                if ($time_flow->status_id == $fl->status && $time_flow->to_user_type == $fl->tipo_usuario)
+                {
                     $fl->estimed_time = $time_flow->hours;
                     break;
                 }
