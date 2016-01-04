@@ -198,5 +198,6 @@ return array(
         'PDF'               => 'Thujohn\Pdf\PdfFacade',
         'Excel'             => 'Maatwebsite\Excel\Facades\Excel',
         'PDF2'              => 'Barryvdh\DomPDF\Facade'
-	),
+	)
+
 );
