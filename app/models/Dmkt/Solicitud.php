@@ -50,7 +50,7 @@ class Solicitud extends Eloquent
 
     public function personalTo()
     {
-        return $this->hasOne( 'Users\Personal' , 'user_id' , 'id_user_assing' );
+        return $this->hasOne( 'Users\Personal' , 'user_id' , 'id_user_assign' );
     }
 
     public function toAcceptedApprovedHistories()
