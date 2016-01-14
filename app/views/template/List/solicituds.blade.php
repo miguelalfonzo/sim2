@@ -17,8 +17,10 @@
                     Fecha de Solicitud
                 @endif
             </th>
-            <th>Aprobado por</th>
-            <th>Fecha de Aprobación</th>
+             @if( Auth::user()->type !== TESORERIA )   
+                <th>Aprobado por</th>                
+                <th>Fecha de Aprobación</th>
+            @endif
             <th>
                 @if( Auth::user()->type == TESORERIA )
                     Deposito
@@ -88,14 +90,16 @@
                     {{ $solicitud->created_at }}
                     </td>
                 @endif
-                <td class="text-center">
-                    @if ( $solicitud->id_estado != PENDIENTE )
-                        {{ $solicitud->lastHistory->createdPersonal->full_name }}
-                    @else
-                        -
-                    @endif
-                </td>
-                @include('template.List.lastdate')
+                @if( Auth::user()->type !== TESORERIA )
+                    <td class="text-center">
+                        @if ( $solicitud->id_estado != PENDIENTE )
+                            {{ $solicitud->lastHistory->createdPersonal->full_name }}
+                        @else
+                            -
+                        @endif
+                    </td>
+                    @include('template.List.lastdate')
+                @endif
                 @if( Auth::user()->type == TESORERIA )
                     <input type="hidden" class="total_deposit" value="{{ $solicitud->detalle->monto_actual }}">
                     <td class="text-center deposit">
