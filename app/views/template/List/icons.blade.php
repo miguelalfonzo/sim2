@@ -6,7 +6,6 @@
         <a class="btn btn-default timeLine" data-id="{{ $solicitud->id }}">
             <span class="glyphicon glyphicon-time"></span>
         </a>
-        <?php \Log::info( microtime() . ' AUTORIZADO') ?>
         @if ( in_array( $solicitud->histories()->orderBy( 'updated_at' , 'DESC' )->first()->user_to , array( Auth::user()->type , Auth::user()->tempType() ) ) 
         && $solicitud->state->id_estado != R_NO_AUTORIZADO && $solicitud->id_estado != GENERADO )
             @if( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) &&  in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) ) )
@@ -31,7 +30,6 @@
                 @endif         
             @endif    
         @endif
-        <?php \Log::info( microtime() . ' USUARIOS') ?>
         @if( in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD , ASIS_GER ) ) )
             @if( $solicitud->id_estado == PENDIENTE && $solicitud->created_by == Auth::user()->id && $solicitud->status == 1 )
                 <a class="btn btn-default" href="{{ URL::to( 'editar-solicitud' ) . '/' . $solicitud->token }}">
