@@ -55,8 +55,10 @@ const USER_TESORERIA                          = 42;
 // EMAIL DE PRUEBAS
 const POSTMAN_USER_NAME_1                     = 'Jhonattan Ortiz';
 const SOPORTE_EMAIL_1                         = 'jortiz@esinergy.com';
-const POSTMAN_USER_NAME_2                     = 'Marco Manrique';
-const SOPORTE_EMAIL_2                         = 'mmanrique@esinergy.com';
+const POSTMAN_USER_NAME_2                     = 'Soporte';
+const SOPORTE_EMAIL_2                         = 'pelimsoporte@bagoperu.com.pe';
+const POSTMAN_USER_NAME_3                     = 'Elias Ruiz';
+const SOPORTE_EMAIL_3                         = 'elruiz@bagoperu.com.pe';
 
 
 //ESTADO RANGOS
