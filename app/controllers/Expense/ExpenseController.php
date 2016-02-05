@@ -46,10 +46,10 @@ class ExpenseController extends BaseController
     {
         $rules = array( 'token'    		   => 'required|string|size:40|exists:'.TB_SOLICITUD.',token' ,
                         'proof_type'       => 'required|integer|min:1|exists:'.TB_TIPO_COMPROBANTE.',id' ,
-                        'desc_expense'     => 'required|string|min:1',
+                        'desc_expense'     => 'required|string|min:1|max:100',
                         'tipo_gasto'	   => 'required|array|min:1|each:integer|each:min,1|each:exists,'.TB_TIPO_GASTO.',id',
                         'quantity'		   => 'required|array|min:1|each:integer|each:min,1',
-                        'description'	   => 'required|array|min:1|each:string|each:min,1',
+                        'description'	   => 'required|array|min:1|each:string|each:min,1|each:max,100',
                         'total_item'	   => 'required|array|min:1|each:numeric|each:min,1',
                         'total_expense'    => 'required|numeric|min:1' );  
 
@@ -225,7 +225,7 @@ class ExpenseController extends BaseController
 			$inputs = Input::all();
 			$expense = Expense::find( $inputs['gastoId'] );
 			if ( is_null( $expense ) )
-				return $this->warninException( 'No se encontro el registro del gasto con Id: '.$inputs['gastoId'] , __FUNCTION__ , __LINE__ , __FILE__ );
+				return $this->warningException( 'No se encontro el registro del gasto con Id: '.$inputs['gastoId'] , __FUNCTION__ , __LINE__ , __FILE__ );
 			ExpenseItem::where( 'id_gasto' , $inputs[ 'gastoId' ] )->delete();
 			$expense->delete();
 			DB::commit();
@@ -245,7 +245,7 @@ class ExpenseController extends BaseController
 			$inputs 	  = Input::all();
 			$expense      = Expense::find( $inputs[ 'idgasto' ] );
 			if ( is_null( $expense ) )
-				return $this->warninException( 'No existe registro del gasto con Id: ' . $inputs[ 'idgasto' ] , __FUNCTION__ , __LINE__ , __FILE__ );
+				return $this->warningException( 'No existe registro del gasto con Id: ' . $inputs[ 'idgasto' ] , __FUNCTION__ , __LINE__ , __FILE__ );
 			return $this->setRpta( array( 'expenseItems' => $expense->items , 'expense' => $expense ) );
 		}
 		catch ( Exception $e )
@@ -269,7 +269,7 @@ class ExpenseController extends BaseController
 			$solicitud  = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
 			
 			if( is_null( $solicitud ) )
-				return $this->warninException( 'No se encontro la solicitud con token: '.$inputs['token'] , __FUNCTION__ , __LINE__ , __FILE__ );
+				return $this->warningException( 'No se encontro la solicitud con token: '.$inputs['token'] , __FUNCTION__ , __LINE__ , __FILE__ );
 
 			$oldIdEstado = $solicitud->id_estado;
 		
@@ -441,7 +441,7 @@ class ExpenseController extends BaseController
 				$document->igv = $input['igv'];
 			}
 			if ( !$document->save() )
-				return $this->warninException( __FUNCTION__ , 'No se pudo procesar el documento');
+				return $this->warningException( __FUNCTION__ , 'No se pudo procesar el documento');
 			else
 			{
 				DB::commit();
@@ -613,7 +613,7 @@ class ExpenseController extends BaseController
 		    elseif ( $mBalance == 0 )
 				return array( 'bussiness' => 0 , 'employed' => 0 );
 			else
-				return $this->warninException( __FUNCTION__ , 'No se pudo procesar el Balance( '.$mBalance.' )' );
+				return $this->warningException( __FUNCTION__ , 'No se pudo procesar el Balance( '.$mBalance.' )' );
 		}
 	}
 
@@ -641,7 +641,7 @@ class ExpenseController extends BaseController
 			$inputs = Input::all();
 			$document = Expense::find( $inputs['id'] );
 			if ( is_null( $document ) )
-				return $this->warninException( __FUNCTION__ , 'No se encontro el documento con Id: '.$inputs['id'] );
+				return $this->warningException( __FUNCTION__ , 'No se encontro el documento con Id: '.$inputs['id'] );
 			else
 			{
 				$document->moneda = $document->solicitud->detalle->typeMoney->simbolo ;
@@ -661,7 +661,7 @@ class ExpenseController extends BaseController
 			$inputs = Input::all();
 			$document = Expense::find( $inputs['id'] );
 			if ( is_null( $document ) )
-				return $this->warninException( __FUNCTION__ , 'No se encontro el documento con Id: '.$inputs['id'] );
+				return $this->warningException( __FUNCTION__ , 'No se encontro el documento con Id: '.$inputs['id'] );
 			else
 			{
 				$regimenes = Regimen::lists( 'id' );
@@ -676,9 +676,9 @@ class ExpenseController extends BaseController
 					$document->monto_tributo = null;		
 				}
 				else
-					return $this->warninException( __FUNCTION__ , 'No esta registrado la retencion o detracción con Id: '.$inputs['idregimen'] );
+					return $this->warningException( __FUNCTION__ , 'No esta registrado la retencion o detracción con Id: '.$inputs['idregimen'] );
 				if ( !$document->save() )
-					return $this->warninException( __FUNCTION__ , 'No se pudo actualizar el documento' );
+					return $this->warningException( __FUNCTION__ , 'No se pudo actualizar el documento' );
 				else
 					return $this->setRpta();
 			}	

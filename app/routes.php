@@ -141,7 +141,7 @@
     |--------------------------------------------------------------------------
     */
 
-    Route::group(array('before' => 'sup_gerprod_gerprom_gercom_gerger'), function ()
+    Route::group(array('before' => 'sup_gerprod_gerprom_gercom_gerger'), function()
     {
         Route::post( 'search-users' , 'Source\Seeker@userSource');
         Route::post( 'confirm-temporal-user' , 'User\UserController@assignTemporalUser');
@@ -149,7 +149,13 @@
         Route::post('aceptar-solicitud', 'Dmkt\SolicitudeController@acceptedSolicitude');
     });
 
-    Route::group(array('before' => 'rm_sup_gerprod_gerprom_gercom_gerger'), function ()
+    /*
+    |--------------------------------------------------------------------------
+    | REPRESENTANTE , SUPERVISOR , GERENTE DE PRODUCTO - PROMOCION - COMERCIAL - GENERAL , CONTABILIDAD
+    |--------------------------------------------------------------------------
+    */    
+
+    Route::group( array( 'before' => 'rm_sup_gerprod_gerprom_gercom_gerger_cont' ) , function()
     {
         Route::get('solicitude/statement', 'Movements\MoveController@getStatement');    
     });

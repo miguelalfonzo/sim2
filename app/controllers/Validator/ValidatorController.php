@@ -29,7 +29,7 @@ class ValidatorController extends \Illuminate\Validation\Validator
 
         $newAttribute = $attribute.'_total';
 
-        $this->data[ $newAttribute ] = $total;
+        $this->data[ $newAttribute ] = (string) $total;
         $this->validate( $newAttribute , 'same:monto' );
         return true;
     }
