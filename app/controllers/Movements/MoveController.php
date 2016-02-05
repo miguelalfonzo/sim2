@@ -307,14 +307,10 @@ class MoveController extends BaseController
 
     public function getStatement()
     {
-        if ( Auth::user()->type == GER_COM )
-            $fondos = FondoSubCategoria::all();
-        elseif( Auth::user()->type == GER_PROM )
+        if ( in_array( Auth::user()->type , array( REP_MED , GER_PROM , GER_COM , CONT ) ) )
             $fondos = FondoSubCategoria::all();
         elseif( in_array( Auth::user()->type , array( SUP , GER_PROD ) ) )
             $fondos = FondoSubCategoria::where( 'trim( tipo )' , Auth::user()->type )->get();
-        elseif( in_array( Auth::user()->type , array( REP_MED ) ) )
-            $fondos = FondoSubCategoria::all();
         
         return View::make( 'template.tb_estado_cuenta' , array( 'fondosMkt' => $fondos ) );
     }
