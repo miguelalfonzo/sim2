@@ -1922,7 +1922,7 @@ class SolicitudeController extends BaseController
                 }
                 if ( $zona != 0 )
                 {   
-                    $query->whereHas( 'personal' , function( $query ) use( $zona )
+                    $query->whereHas( 'personalTo' , function( $query ) use( $zona )
                     {
                         $query->whereHas( 'bagoVisitador' , function( $query ) use( $zona )
                         {

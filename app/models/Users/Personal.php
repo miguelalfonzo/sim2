@@ -128,8 +128,7 @@ class Personal extends Eloquent
         return Personal::whereIn( 'bago_id' , $uniqueIdsGerProd )->whereNull( 'user_id' )->get()->lists( 'full_name' );
     }
 
-
-    protected function bagoVisitador()
+    public function bagoVisitador()
     {
         return $this->hasOne( 'Users\Visitador' , 'visvisitador' , 'bago_id' );
     }
