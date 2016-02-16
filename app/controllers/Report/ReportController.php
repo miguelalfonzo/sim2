@@ -40,7 +40,6 @@ class ReportController extends BaseController
         }catch (Exception $e) {
             $result["status"]  = 'ERROR';
             $result["message"] = REPORT_MESSAGE_EXCEPTION;
-            Log::error('['.__FUNCTION__.'] '. $e);
         }
         finally
         {
@@ -87,7 +86,6 @@ class ReportController extends BaseController
                 $error            = $validator->messages();
                 $result['status'] = 'ERROR';
                 $result['data']   = $error;
-                Log::error($error);
             }else{
 
                 $data = $this->reportViewProcess($configReport);
@@ -104,7 +102,6 @@ class ReportController extends BaseController
 
                         Session::put('reportFileName', $filename);
                         Session::put('reportData', $data);
-                        Log::error($data['analytics']);
                         $result = $data;
                     }else{
                         $result = $data;
@@ -112,7 +109,6 @@ class ReportController extends BaseController
                 }else{
                     $result["status"]  = 'ERROR';
                     $result["message"] = REPORT_MESSAGE_EXCEPTION;
-                    Log::error('['.__FUNCTION__.'] '. $e);
                 }
             }
         }
@@ -120,7 +116,6 @@ class ReportController extends BaseController
         {
             $result["status"]  = 'ERROR';
             $result["message"] = REPORT_MESSAGE_EXCEPTION;
-            Log::error('['.__FUNCTION__.'] '. $e);
         }
         finally
         {
@@ -162,7 +157,6 @@ class ReportController extends BaseController
         }
         catch (Exception $e)
         {
-            Log::error('['.__FUNCTION__.'] '. $e);
             $result['status'] = 'ERROR';
             $result['message'] = $e;
         }finally{
@@ -178,7 +172,6 @@ class ReportController extends BaseController
     //     {
     //         $reportFileName = Session::get('reportFileName');
     //         $reportData     = Session::get('reportData');
-    //         Log::error($reportData);
     //         $report         = $this->createReportExcel($reportData, $reportFileName);
     //         if($report['status'] == 'OK'){
     //             $file    = public_path() . '/files/'. $reportFileName;
@@ -192,7 +185,6 @@ class ReportController extends BaseController
     //     }
     //     catch (Exception $e)
     //     {
-    //         Log::error('['.__FUNCTION__.'] '. $e);
     //         return $e;
     //     }
     // }
@@ -201,7 +193,6 @@ class ReportController extends BaseController
     public function reportViewProcess($configReport)
     {   
         set_time_limit(REPORT_TIME_LIMIT);
-        // Log::error($configReport);
         $result = array();
         try{
             $result['status'] = 'OK';
@@ -210,8 +201,6 @@ class ReportController extends BaseController
 
             if(!isset($dataReport['message'])){
                 $dataReport  = DataGroup::arrayCastRecursive((array) $dataReport);
-                // Log::error("DataGroup::arrayCastRecursive");
-                // Log::error($dataReport);
                 // // idkc : Validacion de inputs
                 $rules  = array(
                     'reportName' => 'required|string',
@@ -225,9 +214,7 @@ class ReportController extends BaseController
                     $result['status'] = 'ERROR';
                     $result['data']   = $error;
                     
-                    Log::error('['.__FUNCTION__.'] '. $error);
                 }else if(isset($dataReport['dataset'])){
-                    Log::error("=================> 1");
                     $data = $dataReport['dataset'];
                     // $data['formula'] = $dataReport['formula'];
                     // $formula         = DataGroup::arrayCastRecursive((array) json_decode($dataReport['formula']));
@@ -238,16 +225,13 @@ class ReportController extends BaseController
                         'rows'   => 'required|array',
                         'values' => 'required|array'
                     );
-                    Log::error("=================> 2");
                     $validator = Validator::make($dataReport['formula'], $rules);
                     if ($validator->fails()){
                         $error            = $validator->messages();
                         $result['status'] = 'ERROR';
                         $result['data']   = $error;
 
-                        Log::error('['.__FUNCTION__.'] '. $error);
                     }else{
-        Log::error("=================> 3");
                         $newData = array(
                             'head' => array()
                         );
@@ -261,7 +245,6 @@ class ReportController extends BaseController
                             $columns = array_unique($columns);
                         }
 
-        Log::error("=================> 4");
                         // GENERATE List OF VALUES NAME
                         $values_list = array();
                         foreach ($dataReport['formula']['values'] as $key => $value) 
@@ -269,20 +252,15 @@ class ReportController extends BaseController
                             $values_array = explode(":",$value);
                             array_push($values_list, $values_array[1]);
                         }
-       Log::error("=================> 5");
                         // GENERATE HEADERS WITH ROWS AND COLUMNS
                         $newData['head'][0] = array_merge(array_merge($dataReport['formula']['rows'], $columns), $values_list);
                         sort($columns, SORT_NATURAL | SORT_FLAG_CASE);
-                        Log::error("=================> 6");                   
                         $resultAddcolumns = $this->addColumns(array(
                             'data'    => $dataReport['dataset']['body'],
                             'columns' => $columns
                         ));
-                        Log::error("=================> 7");
                         $dataReport['dataset']['body'] = $resultAddcolumns['status'] == 'OK' ? $resultAddcolumns['data'] : null;
-                        Log::error("=================> 8");
                     }
-                    Log::error("=================> 9");
                     $resultProcess = DataGroup::process(array(
                         'body'       => $dataReport['dataset']['body'], 
                         'rows'       => $dataReport['formula']['rows'], 
@@ -290,19 +268,13 @@ class ReportController extends BaseController
                         'values'     => $dataReport['formula']['values'], 
                         'keyColumns'    => $dataReport['formula']['columns']
                     ));
-                    Log::error(json_encode($resultProcess));
-                    Log::error("=================> 10");
                     $newData['body'] = $resultProcess['status'] == 'OK' ? $resultProcess['data'] : null;
-                    Log::error("=================> 11");
                     $total           =  $resultProcess['status'] == 'OK' ? $resultProcess['total'] : null;
                     // unset($newData['body'][count($newData['body']) - 1]);
                     $filter          = DataGroup::sortByFields($dataReport['formula']['rows']);
-Log::error("=================> 12");
-Log::error(json_encode($newData));
                     $newData['body'] = DataGroup::array_orderby($newData['body'], $filter);
                     // array_push($newData['body'], $total);
                     $dataReport['analytics']['outputs'] = count($newData['body'])-1;
-                   Log::error("=================> 13");
                     // idkc : thead - generacion de cabecera de tabla
                     $theadList   = $dataReport['formula']['rows'];
                     count($values_list) > 1 ? $theadList[] = 'Valores' : null;
@@ -310,25 +282,19 @@ Log::error(json_encode($newData));
                     $theadList[] = 'Total';
                     
                     
-Log::error("=================> 14");
                     // idkc : tbody - generacion de datos de tabla
-                    Log::error(json_encode($newData['body']));
                     $tbodyList = $this->convertObjectToArray($newData['body'], array(
                         'columns' => $columns,
                         'rows'    => $dataReport['formula']['rows'],
                         'valores' => $values_list
                     ));
-Log::error("=================> 15");
-                    // Log::error(json_encode($tbodyList));
                     // idkc : tfoot - generacion de pie de tabla
                     $tfootList = $this->convertObjectToArray(array($total), array(
                         'columns' => $columns,
                         'rows'    => $dataReport['formula']['rows'],
                         'valores' => $values_list
                     ));
-                    // Log::error(json_encode($theadList));
                     $columnDataTable = $this->convertColumnsToDataTable($theadList);
-                    Log::error("=================> 16");
                     $result = array(
                         'title'     => $this->generateTitleReport($dataReport['reportName'], $configReport['fromDate'], $configReport['toDate']),
                         'theadList' => $theadList,
@@ -362,7 +328,6 @@ Log::error("=================> 15");
         {
             $result["status"]  = 'ERROR';
             $result["message"] = REPORT_MESSAGE_EXCEPTION;
-            Log::error('['.__FUNCTION__.'] '. $e);
         }
         finally{
             return $result;
@@ -431,7 +396,6 @@ Log::error("=================> 15");
             $result['status'] = 'ERROR';
             $result['data']   = $error;
             
-            Log::error('['.__FUNCTION__.'] '. $error);
         }else{
             foreach ($parameters['data'] as $key => $data_temp) 
             {
@@ -473,7 +437,6 @@ Log::error("=================> 15");
         {
             $result['status'] = 'ERROR';
             $result['message'] = $e;
-            Log::error($e);
         }finally{
             return $result;
         }
@@ -497,7 +460,6 @@ Log::error("=================> 15");
         {
             $result["status"]  = 'ERROR';
             $result["message"] = REPORT_MESSAGE_EXCEPTION;
-            Log::error('['.__FUNCTION__.'] '. $e);
         }
         finally{
             return $result;
@@ -522,7 +484,6 @@ Log::error("=================> 15");
                 $error            = $validator->messages();
                 $result['status'] = 'ERROR';
                 $result['data']   = $error;
-                Log::error($error);
             }else{
                 $reportElement = TbReporte::find($configReport['reportId']);
                 
@@ -537,7 +498,6 @@ Log::error("=================> 15");
                     'frecuency' => $intervalo->frecuency
                 ));
                 $info = $info['data'];
-                // Log::error($info);
 
                 unset($intervalo);
                 if(count($info) > 0) {
@@ -569,7 +529,6 @@ Log::error("=================> 15");
         {
             $result['status'] = 'ERROR';
             $result['message']   = $e;
-            Log::error($e);
         }
         finally
         {
@@ -588,7 +547,6 @@ Log::error("=================> 15");
             $headers        = array('Content-Type: application/vnd.ms-excel');
             return Response::download($file . '.xls', $desc . '-' . $fromDate . '-' . $toDate . '.xls', $headers);
         }catch(Exception $e){
-            Log::error($e);
             return $e;
         }
     }
@@ -699,7 +657,6 @@ Log::error("=================> 15");
         {
             $result["status"]  = 'ERROR';
             $result["message"] = REPORT_MESSAGE_EXCEPTION;
-            Log::error('['.__FUNCTION__.'] '. $e);
         }
         finally{
             return $result;
@@ -722,7 +679,6 @@ Log::error("=================> 15");
                 $error            = $validator->messages();
                 $result['status'] = 'ERROR';
                 $result['data']   = $error;
-                Log::error($error);
             }else{
                 $resultQuery     = TbQuery::find($queryId);
                 $date            = new DateTime(); 
@@ -752,7 +708,6 @@ Log::error("=================> 15");
         {
             $result["status"]  = 'ERROR';
             $result["message"] = REPORT_MESSAGE_EXCEPTION;
-            Log::error('['.__FUNCTION__.'] '. $e);
         }
         finally{
             return $result;
@@ -785,22 +740,18 @@ Log::error("=================> 15");
                         $error            = $validator->messages();
                         $result['status'] = 'ERROR';
                         $result['data']   = $error;
-                        Log::error($error);
                     }else{
-                        // Log::error("inicio");
                         $reporte              = new TbReporte;
                         $reporte->id_reporte  = $reporte->nextId();
                         $reporte->descripcion = $value['descripcion'];
                         $reporte->formula     = $value['formula'];
                         $reporte->query_id    = $value['queryId'];
                         $reporte->save();            
-                        // Log::error("userReport");
                         $usuarioReporte             = new UserReport;
                         $usuarioReporte->id         = $usuarioReporte->nextId();
                         $usuarioReporte->id_reporte = $reporte->id_reporte;
                         $usuarioReporte->id_usuario = Auth::user()->id;
                         $usuarioReporte->save();
-                        // Log::error("fin");
                     }
                 }
                 DB::commit();
@@ -814,7 +765,6 @@ Log::error("=================> 15");
         {
             $result["status"]  = 'ERROR';
             $result["message"] = REPORT_MESSAGE_EXCEPTION;
-            Log::error('['.__FUNCTION__.'] '. $e);
             DB::rollback();
         }
         finally{

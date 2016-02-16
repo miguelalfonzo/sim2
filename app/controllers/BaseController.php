@@ -139,7 +139,6 @@ class BaseController extends Controller
     protected function internalException( $exception , $function , $type = 'System' )
     {
         Log::error( $exception );
-        Log::error( $exception->getMessage() );
         if ( $exception->getCode() != 1 )
         {
             Mail::send('soporte', array( 'exception' => $exception ), function( $message ) use( $function )

@@ -72,7 +72,6 @@ class SolicitudeController extends BaseController
             else if ( ! is_null( Auth::user()->simApp ) )
                 $state = R_PENDIENTE;
         }
-
         $mWarning = array();
         if ( Session::has( 'warnings' ) )
         {
@@ -99,11 +98,12 @@ class SolicitudeController extends BaseController
             $data['proofTypes'] = ProofType::order();
             $data['regimenes']  = Regimen::all();
         endif;
-
+        
         if ( Session::has( 'id_solicitud' ) ) 
         {
             $solicitud = Solicitud::find(Session::pull('id_solicitud'));
             $solicitud->status = ACTIVE;
+            
             $solicitud->save();
         }
         return View::make('template.User.show', $data);
@@ -152,7 +152,6 @@ class SolicitudeController extends BaseController
         }
         else
         {
-            //\Log::error( implode( SolicitudProduct::where( 'id_solicitud' , $inputs[ 'solicitud_id' ] )->lists( 'id_producto' ) ) );
             $rules = array( 
                 'producto' => 'required|numeric|min:1|');
             $validator = Validator::make( $inputs , $rules );
@@ -797,7 +796,6 @@ class SolicitudeController extends BaseController
 
     private function validateInputAcceptSolRep( $inputs )
     {
-        \Log::error( $inputs );
         $size  = count( $inputs[ 'producto' ] ); 
         $rules = array(
             'idsolicitud'            => 'required|integer|min:1|exists:'.TB_SOLICITUD.',id',
@@ -876,7 +874,6 @@ class SolicitudeController extends BaseController
             if ( $middleRpta[status] == ok )
             {
                 $oldIdEstado          = $solicitud->id_estado;
-                \Log::info( $middleRpta[ data ] );
                 if( $inputs[ 'derivacion'] && Auth::user()->type === SUP )
                 {
                     $solicitud->id_estado = DERIVADO;
@@ -1563,7 +1560,6 @@ class SolicitudeController extends BaseController
             {
                 DB::beginTransaction();
                 $solicitud = Solicitud::find( $inputs['idsolicitud'] );
-                \Log::info( $solicitud->id_estado );
                 if ( $solicitud->id_estado != DEPOSITADO )
                 {
                     return $this->warningException( 'Ya se realizo la Operación' , __FUNCTION__ , __LINE__ , __FILE__ );
@@ -1638,7 +1634,6 @@ class SolicitudeController extends BaseController
     {
             $migrateSeatController = new MigrateSeatController;
             $data = $migrateSeatController->transactionGenerateSeat( $seats );
-            Log::info( $data );
     }
 
     public function findDocument()

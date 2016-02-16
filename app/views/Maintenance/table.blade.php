@@ -4,7 +4,9 @@
             @foreach( $columns as $column )
                 <th>{{$column->name}}</th>
             @endforeach
-            <th>Edición</th>
+            @if( ! isset( $export ) )
+                <th>Edición</th>
+            @endif
         </tr>
     </thead>
     <tbody>
@@ -19,22 +21,24 @@
                         @endif
                     </td>
                 @endforeach
-                <td editable=2 style="text-align:center">
-                    <a class="maintenance-edit" href="#">
-                        <span class="glyphicon glyphicon-pencil"></span>
-                    </a>
-                    @if( ! in_array( $type , array( 'Parametro' , 'Fondo_Supervisor' , 'Fondo_Gerente_Producto' , 'Fondo_Institucion' , 'Fondo_Contable' , 'Cuenta_Gasto_Marca' , 'Inversion_Actividad' ) ) )
-                        @if ( is_null( $record->deleted_at ) )
-                            <a class="maintenance-disable" href="#">
-                                <span class="glyphicon glyphicon-remove red"></span>
-                            </a>
-                        @else
-                            <a class="maintenance-enable" href="#">
-                                <span class="glyphicon glyphicon-ok green"></span>
-                            </a>
+                @if( ! isset( $export ) )
+                    <td editable=2 style="text-align:center">
+                        <a class="maintenance-edit" href="#">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </a>
+                        @if( ! in_array( $type , array( 'Parametro' , 'Fondo_Supervisor' , 'Fondo_Gerente_Producto' , 'Fondo_Institucion' , 'Fondo_Contable' , 'Cuenta_Gasto_Marca' , 'Inversion_Actividad' ) ) )
+                            @if ( is_null( $record->deleted_at ) )
+                                <a class="maintenance-disable" href="#">
+                                    <span class="glyphicon glyphicon-remove red"></span>
+                                </a>
+                            @else
+                                <a class="maintenance-enable" href="#">
+                                    <span class="glyphicon glyphicon-ok green"></span>
+                                </a>
+                            @endif
                         @endif
-                    @endif
-                </td>
+                    </td>
+                @endif
             </tr>
         @endforeach
     </tbody>

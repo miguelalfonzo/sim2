@@ -49,7 +49,6 @@ class ProductController extends BaseController
                 break;
             }
         }
-        \Log::info( $aux );
         if ( $aux === 1 )
         {
             $solicitudController = new SolicitudeController;

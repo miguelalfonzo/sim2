@@ -26,6 +26,8 @@ use \Fondo\FondoGerProd;
 use \Fondo\FondoInstitucional;
 use \System\FondoMktHistory;
 use \Policy\ApprovalInstanceType;
+use \Excel;
+use \Carbon\Carbon;
 
 class TableController extends BaseController
 {
@@ -40,11 +42,11 @@ class TableController extends BaseController
 			case 'Parametro':
 				return array( 'model' => new Parameter , 'id' => 2 , 'add' => false );
 			case 'Fondo_Supervisor':
-				return array( 'model' => new FondoSupervisor , 'id' => 3 , 'add' => true );
+				return array( 'model' => new FondoSupervisor , 'id' => 3 , 'add' => false );
 			case 'Fondo_Gerente_Producto':
-				return array( 'model' => new FondoGerProd , 'id' => 4 , 'add' => true );
+				return array( 'model' => new FondoGerProd , 'id' => 4 , 'add' => false );
 			case 'Fondo_Institucion':
-				return array( 'model' => new FondoInstitucional , 'id' => 5 , 'add' => true );
+				return array( 'model' => new FondoInstitucional , 'id' => 5 , 'add' => false );
 			case 'Tipo_Inversion':
 				return array( 'model' => new InvestmentType , 'id' => 7 , 'key' => 'nombre' , 'add' => true );
 			case 'Tipo_Actividad':
@@ -68,13 +70,52 @@ class TableController extends BaseController
 			return substr( $function , 3 );
 	}
 
+	public function export( $type )
+	{
+		$vData       = $this->getModel( $type );
+		$model  	 = $vData[ 'model' ];
+		$id          = $vData[ 'id' ];
+		
+		$records = $model::orderWithTrashed();
+
+		$maintenance = Maintenance::find( $id );
+		$columns = json_decode( $maintenance->formula );
+		$data = array( 
+			'records' => $records , 
+			'columns' => $columns , 
+			'titulo'  => 'Mantenimiento de ' . $maintenance->descripcion , 
+			'type'    => $type , 
+			'add'	  => $vData[ 'add' ] ,
+			'export'  => true
+		);
+		$now = Carbon::now();
+		Excel::create( $maintenance->descripcion . ' ' . $now->format( 'YmdHi' ) , function( $excel ) use( $data )
+		{
+		    $excel->sheet( 'Data' , function( $sheet ) use ( $data )
+		    {
+        		$sheet->loadView( 'Maintenance.table' , $data );
+        	});
+		})->store( 'xls' , storage_path( 'maintenance' ) )->export( 'xls' );
+
+	/*	return View::make( 'Maintenance.table' , 
+			array( 
+				'records' => $records , 
+				'columns' => $columns , 
+				'titulo'  => 'Mantenimiento de ' . $maintenance->descripcion , 
+				'type'    => $type , 
+				'add'	  => $vData[ 'add' ] ,
+				'export'  => true
+			) 
+		);		*/
+	}
+
 	public function getMaintenanceCellData()
 	{
 		try
 		{
 			$inputs = Input::all();
-			$vData = $this->getModel( $inputs[ 'type'] );
-			$data = array( 'datos' => $vData[ 'model']::all() , 'val' => $inputs[ 'val' ] , 'key' => $vData[ 'key' ] );
+			$vData  = $this->getModel( $inputs[ 'type'] );
+			$data   = array( 'datos' => $vData[ 'model']::all() , 'val' => $inputs[ 'val' ] , 'key' => $vData[ 'key' ] );
 			return $this->setRpta( View::make( 'Maintenance.td' , $data )->render() );
 		}
 		catch( Exception $e )

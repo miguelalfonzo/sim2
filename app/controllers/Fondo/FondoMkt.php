@@ -228,7 +228,6 @@ class FondoMkt extends BaseController
                                     $query->where( 'subcategoria_id' , $subCategory->id );
                                 })->get();
 
-        \Log::info( $fondoMktHistoriesData->toArray() );
         
         $fondoMktHistoriesTotalData = FondoMktHistory::whereRaw( "created_at between to_date( '$start' , 'YYYY/MM/DD' ) and sysdate + 1" )
                                 ->where( 'id_tipo_to_fondo' , trim( $subCategory->tipo ) )
@@ -237,7 +236,6 @@ class FondoMkt extends BaseController
                                     $query->where( 'subcategoria_id' , $subCategory->id );
                                 })->get();
 
-        \Log::error( json_encode( $fondoMktHistoriesData ) );
 
         $Fondos         = $subCategory->{ $subCategoryType->relacion };
         $FondosTotal    = $Fondos->sum( 'saldo' );

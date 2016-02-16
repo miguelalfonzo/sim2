@@ -1,6 +1,6 @@
 <?php
 
-define( 'PRODUCCION' , 1 );
+define( 'PRODUCCION' , 0 );
 
 /*
 |--------------------------------------------------------------------------
@@ -27,8 +27,8 @@ $app = new Illuminate\Foundation\Application;
 */
 
 $env = $app->detectEnvironment(array(
-	'local' 	 => array('homestead' , 'Sinergy02', 'Dev-Francisco', 'Lenovo-PC', 'usuario-PC', 'idkc-pc'),
-	'production' => array('ubuntu') ,
+	'local' 	 => array('homestead' ,  'Dev-Francisco', 'Lenovo-PC', 'usuario-PC', 'idkc-pc', 'Sinergy02'),
+	'production' => array('ubuntu' ) ,
 	'remote' 	 => array('Jhonattan-PC')
 ));
 
