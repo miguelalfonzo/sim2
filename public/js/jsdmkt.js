@@ -1170,6 +1170,11 @@ $(document).on( 'click' , '.maintenance-cancel' , function()
     listMaintenanceTable( tr.attr('type')  );
 });
 
+$( '#maintenance-export' ).on( 'click' , function()
+{
+    window.location.href = server + 'maintenance-export/' + this.dataset.type; 
+});
+
 $(document).off( 'click' , '.maintenance-edit' );
 $(document).on( 'click' , '.maintenance-edit' , function()
 {
@@ -2267,7 +2272,7 @@ $( document ).ready(function()
             }         
         });
     }
-    getAlerts();
+    //getAlerts();
 
     seeker( $( '.cliente-seeker' ) , 'clients' , 'search-client' );
     seeker( $( '.institucion-seeker' ) , 'institutions' , 'search-institution' );

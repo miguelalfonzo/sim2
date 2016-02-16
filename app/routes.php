@@ -63,6 +63,7 @@
         Route::get('maintenance/FondosInstitution', 'Maintenance\TableController@getInstitutionFunds');
         Route::get( 'fondoHistorial' , 'Fondo\FondoMkt@getFondoHistorial' );
         Route::post( 'fondo-subcategoria-history' , 'Fondo\FondoMkt@getFondoSubCategoryHistory' );
+        Route::get( 'maintenance-export/{type}' , 'Maintenance\TableController@export' );
     });
 
     Route::group( array( 'before' => 'gercom_cont' ) , function()
@@ -229,7 +230,7 @@
         | Alert
         |--------------------------------------------------------------------------
         */
-        Route::get( 'alerts' , 'Alert\AlertController@show' );
+        //Route::get( 'alerts' , 'Alert\AlertController@show' );
         Route::post( 'alerts' , 'Alert\AlertController@showAlerts' );
     
         /*
