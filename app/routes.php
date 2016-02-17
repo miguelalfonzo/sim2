@@ -231,7 +231,7 @@
         |--------------------------------------------------------------------------
         */
         //Route::get( 'alerts' , 'Alert\AlertController@show' );
-        Route::post( 'alerts' , 'Alert\AlertController@showAlerts' );
+        //Route::post( 'alerts' , 'Alert\AlertController@showAlerts' );
     
         /*
         |--------------------------------------------------------------------------

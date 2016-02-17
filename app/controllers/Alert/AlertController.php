@@ -13,7 +13,7 @@ use \View;
 
 class AlertController extends BaseController
 {
-	public function show()
+	/*public function show()
 	{
 		$data = array('alerts' => $this->alertConsole2());
 		return View::make('template.User.alerts', $data);
@@ -21,7 +21,7 @@ class AlertController extends BaseController
 
 	public function showAlerts(){
 		return array('status' => 'OK', 'alerts' => $this->alertConsole2());
-	}
+	}*/
 
 	private function intersectRecords( $rs1 , $rs2 )
     {
