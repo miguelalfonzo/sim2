@@ -16,6 +16,7 @@ use \Log;
 use \DB;
 use \Input;
 use \Session;
+use \Carbon\Carbon;
 
 class ReportController extends BaseController
 {
@@ -454,6 +455,7 @@ class ReportController extends BaseController
             
             
             eval('$query = '. $dataArray['query'] .';');
+            \Log::info( $query );
             $resultData  = DB::select($query);
             $result['data'] = $resultData;
         }catch(Exception $e)
@@ -681,10 +683,10 @@ class ReportController extends BaseController
                 $result['data']   = $error;
             }else{
                 $resultQuery     = TbQuery::find($queryId);
-                $date            = new DateTime(); 
+                $nowDate         = Carbon::now(); 
                 
-                $toDate          = $date->format('Y/m/d');
-                $fromDate        = $date->format('m') == 1 ? $date->format('Y') - 1 : $date->format('Y')-1 . '/' . ($date->format('m') == 1 ? 12 : $date->format('m') - 1) . '/' . $date->format('d');
+                $toDate          = $nowDate->format('Y/m/d');
+                $fromDate        = $nowDate->subMonth()->format('Y/m/d');
 
                 $resultQueryExec = $this->processQuery(array(
                     'query'     => $resultQuery->query,
