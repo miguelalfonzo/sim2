@@ -113,7 +113,7 @@
             <label class="control-label">
                 Descripcion de la Solicitud
             </label>
-            <textarea class="form-control" style="resize:both" readonly>{{$solicitud->descripcion}}</textarea>
+            <textarea class="form-control" rows="5" style="resize:both" readonly>{{$solicitud->descripcion}}</textarea>
         </div>
     @endif
 

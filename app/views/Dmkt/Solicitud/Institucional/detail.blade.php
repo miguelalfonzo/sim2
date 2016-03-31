@@ -85,7 +85,7 @@
 		<div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
 			<label class="control-label"><strong>Observación</strong></label>
 			<div>
-				<textarea class="form-control" disabled>{{$solicitud->observacion}}</textarea>
+				<textarea class="form-control" rows="5" disabled>{{$solicitud->observacion}}</textarea>
 			</div>
 		</div>
 	endif --}}
