@@ -295,7 +295,7 @@ function listMaintenanceTable( type )
 function listDocuments()
 {
     var l = Ladda.create( $( "#search-documents" )[ 0 ] );
-    
+    l.start();
     $.ajax({
         url: server + 'list-documents',
         type: 'POST',
@@ -309,9 +309,11 @@ function listDocuments()
         }
     }).fail( function ( statusCode , errorThrown)
     {
+        l.stop();
         ajaxError( statusCode , errorThrown );
     }).done(function (data)
     {
+        l.stop();
         if ( data.Status == 'Ok' )
             dataTable( 'documents' , data.Data, 'registros' );
         else

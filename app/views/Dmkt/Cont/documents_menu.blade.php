@@ -1,7 +1,7 @@
 @extends('template.main')
 @section('solicitude')
 <div class="page-header">
-  <h3>Busqueda de Documentos Reigstrados</h3>
+  <h3>Busqueda de Documentos Registrados</h3>
 </div>
 <div class="panel-body" id="documents">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
