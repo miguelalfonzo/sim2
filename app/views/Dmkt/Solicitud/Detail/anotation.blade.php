@@ -7,12 +7,12 @@
         @endif
         @if ( is_null( $solicitud->observacion ) )
             @if ( isset( $politicStatus ) && $politicStatus )
-                <textarea class="form-control" rows="5" name="anotacion" maxlength="200">{{ $solicitud->anotacion }}</textarea>
+                <textarea class="form-control" rows="5" name="anotacion" maxlength="500">{{ $solicitud->anotacion }}</textarea>
             @else
-                <textarea class="form-control" rows="5" name="anotacion" maxlength="200" disabled style="resize:both">{{ $solicitud->anotacion }}</textarea>
+                <textarea class="form-control" rows="5" name="anotacion" maxlength="500" disabled style="resize:both">{{ $solicitud->anotacion }}</textarea>
             @endif
         @else
-            <textarea class="form-control" rows="5" name="anotacion" maxlength="200" disabled style="resize:both">{{ $solicitud->observacion }}</textarea>
+            <textarea class="form-control" rows="5" name="anotacion" maxlength="500" disabled style="resize:both">{{ $solicitud->observacion }}</textarea>
         @endif        
     </div>
 @endif

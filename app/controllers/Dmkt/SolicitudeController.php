@@ -309,7 +309,7 @@ class SolicitudeController extends BaseController
             'productos'     => 'required|array|min:1|each:integer|each:min,1|each:exists,'.TB_MARCAS_BAGO.',id',
             'clientes'      => 'required|array|min:1|each:integer|each:min,1',
             'tipos_cliente' => 'required|array|min:1|each:integer|each:min,1|each:exists,tipo_cliente,id',
-            'descripcion'   => 'string|max:200'
+            'descripcion'   => 'string|max:500'
         );
 
         if ( in_array( Auth::user()->type , array( SUP, GER_PROD ) ) )
