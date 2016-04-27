@@ -542,7 +542,6 @@ function verifySum( element , type )
         {
             sum_total += parseFloat( $(this).val() );
             sum_total.toFixed(2);
-            console.log(sum_total);
         });
     else
         $('.amount_families').each(function(i,v)
@@ -2157,15 +2156,23 @@ $( '.btn-remove-family' ).click( function () {
     $(this).closest('li').remove();   
 });
 
-$("#is-product-change").change(function() {
-    if(this.checked) {        
+$("#is-product-change").change( function()
+{
+    productChange( this )
+});
+
+function productChange( element )
+{
+    if( element.checked ) 
+    {        
         $("#open_modal_add_product").show();
         $("#list-product").hide();
         $('#list-product :input').attr('disabled', true);
         $('#list-product2 :input').removeAttr('disabled');
         $("#list-product2").show();
     }
-    else{
+    else
+    {
         $("#open_modal_add_product").hide();
         $("#list-product2").hide();
         $('#list-product2 :input').attr('disabled', true);
@@ -2173,8 +2180,7 @@ $("#is-product-change").change(function() {
         $("#list-product").show();
     }
     verifySum( 0 , 0 );
-});
-
+}
 
 $("#is-client-change").change(function() {
     if(this.checked) {        

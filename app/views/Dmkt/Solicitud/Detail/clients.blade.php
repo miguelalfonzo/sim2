@@ -1,11 +1,9 @@
 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
     <div class="panel panel-default">
         <div class="panel-heading">Clientes
-
-             @if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD, GER_PROM , GER_COM , GER_GER  ) ) )
+             @if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( SUP , GER_PROD, GER_PROM , GER_COM , GER_GER ) ) )
                 <label class="pull-right">
-                 <input type="checkbox" name="modificacion-clientes" id="is-client-change"> Modificar
-                 
+                    <input type="checkbox" name="modificacion-clientes" id="is-client-change"> Modificar
                 </label>
             @endif
         </div>
@@ -21,36 +19,36 @@
                 </li>
             @endforeach
         </ul>
-        @if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD, GER_PROM , GER_COM , GER_GER  ) ) )
-        <ul class="list-group" id="clientes" style="display: none">                 
-            @foreach( $solicitud->clients as $client )
-                @if ( is_null( $client->id_cliente) )
-                   No hay cliente Asignado
-                @else
-                    <li class="list-group-item clearfix" tipo_cliente="{{ $client->clientType->id }}" pk="{{ $client->id_cliente }}">
-                        <div class="row" >
-                            <div class="col-8 col-sm-8 col-lg-8">
-                                <b>{{ $client->{$client->clientType->relacion}->full_name }}</b>                            
+        @if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( SUP , GER_PROD, GER_PROM , GER_COM , GER_GER ) ) )
+            <ul class="list-group" id="clientes" style="display: none">                 
+                @foreach( $solicitud->clients as $client )
+                    @if ( is_null( $client->id_cliente) )
+                       No hay cliente Asignado
+                    @else
+                        <li class="list-group-item clearfix" tipo_cliente="{{ $client->clientType->id }}" pk="{{ $client->id_cliente }}">
+                            <div class="row" >
+                                <div class="col-8 col-sm-8 col-lg-8">
+                                    <b>{{ $client->{$client->clientType->relacion}->full_name }}</b>                            
+                                </div>
+                                <div  class="col-8 col-sm-4 col-lg-4">
+                                    <span class="pull-right">
+                                        <span class="badge">{{$client->clientType->descripcion}}</span>
+                                        <button type='button' class="btn btn-xs btn-default btn-delete-client">
+                                            <span class="glyphicon glyphicon-remove"></span>
+                                        </button>
+                                    </span>
+                                </div>
                             </div>
-                            <div  class="col-8 col-sm-4 col-lg-4">
-                                <span class="pull-right">
-                                  <span class="badge">{{$client->clientType->descripcion}}</span>
-                                  <button type='button' class="btn btn-xs btn-default btn-delete-client">
-                                    <span class="glyphicon glyphicon-remove"></span>
-                                  </button>
-                                </span>
-                            </div>
-                        </div>
-                    </li>
-                @endif
-            @endforeach
-        </ul>
-        <button type="button" style="display:none" id="open_modal_add_client" class="btn btn-primary btn-sm pull-right" data-toggle="modal" data-target="#approval-client-modal">
+                        </li>
+                    @endif
+                @endforeach
+            </ul>
+            <button type="button" style="display:none" id="open_modal_add_client" class="btn btn-primary btn-sm pull-right" data-toggle="modal" data-target="#approval-client-modal">
                 Agregar Clientes
-        </button>
+            </button>
         @endif
     </div>
 </div>
-@if ( $politicStatus && isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD , GER_PROM , GER_COM , GER_GER ) ) )
+@if ( $politicStatus && isset( $tipo_usuario ) && in_array( $tipo_usuario , array( SUP , GER_PROD , GER_PROM , GER_COM , GER_GER ) ) )
     @include('Dmkt.Solicitud.Section.modal-select-client')
 @endif

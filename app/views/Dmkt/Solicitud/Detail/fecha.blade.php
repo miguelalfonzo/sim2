@@ -5,10 +5,8 @@
     </div>
     <div class="input-group col-xs-12 col-sm-7 col-md-7 col-lg-7 pull-left">
     	<div class="input-group solicitud-date" >
-        	<input type="text" class="form-control" maxlength="10" disabled value="{{$detalle->fecha_entrega}}">
-					
+        	<input type="text" class="form-control" maxlength="10" disabled value="{{$detalle->fecha_entrega}}">				
         </div>
-        @if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD, GER_PROM , GER_COM , GER_GER  ) ) )
         <div class="input-group date edit-date" style="display: none">
                 
             <input type="text" name="fecha" id="fecha-value"class="form-control" maxlength="10" readonly="" value="{{$detalle->fecha_entrega}}" style="background-color: rgb(255, 255, 255);">
@@ -22,11 +20,10 @@
 				<i class="glyphicon glyphicon-edit"></i>
 			</button>						
 		</span>
-		<span  class="input-group-btn  edit-date" style="display: none">
-	                <button class="btn btn-default" type="button" id="edit-date-deactivate" style="height: 38px;">
-								<i class="glyphicon glyphicon-ban-circle"></i>
-					</button>
+		<span  class="input-group-btn  edit-date" style="display:none">
+            <button class="btn btn-default" type="button" id="edit-date-deactivate" style="height: 38px;">
+				<i class="glyphicon glyphicon-ban-circle"></i>
+			</button>
 		</span>
-       	@endif
     </div>
 </div>

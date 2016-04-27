@@ -119,8 +119,10 @@ class SolicitudeController extends BaseController
             'currencies'  => TypeMoney::all(),
             'families'    => $qryProducts->get(),
             'investments' => InvestmentType::orderMkt());
-        if ( in_array(Auth::user()->type, array( SUP, GER_PROD , ASIS_GER ) ) )
+        if ( Auth::user()->type != REP_MED )
+        {
             $data[ 'reps' ] = Personal::getRms();
+        }
         return View::make('Dmkt.Register.solicitud', $data);
     }
 
@@ -222,12 +224,9 @@ class SolicitudeController extends BaseController
                     && ( array_intersect( array( Auth::user()->id, Auth::user()->tempId() ), $solicitud->managerEdit( $politicType )->lists( 'id_gerprod' ) ) ) ) 
                 {
                     $politicStatus = TRUE;
-                    if ( in_array( $politicType , array( GER_PROD , GER_PROM , GER_COM , GER_GER ) ) )
-                    {
-                        $data[ 'payments' ] = TypePayment::all();
-                        $data[ 'families' ] = $qryProducts->get();
-                        $data[ 'reps' ] = Personal::getRms();    
-                    }
+                    $data[ 'payments' ] = TypePayment::all();
+                    $data[ 'families' ] = $qryProducts->get();
+                    $data[ 'reps' ] = Personal::getRms();    
                     $data[ 'tipo_usuario' ] = $politicType;
                     $solicitud->status = BLOCKED;
                     Session::put( 'id_solicitud' , $solicitud->id );
