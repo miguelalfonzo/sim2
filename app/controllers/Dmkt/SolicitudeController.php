@@ -888,11 +888,10 @@ class SolicitudeController extends BaseController
                     $solicitud->anotacion = $inputs[ 'anotacion' ];
                 }
 
-
                 if( isset( $inputs[ 'responsable' ] ) )
-                    {
-                        $solicitud->id_user_assign = $inputs['responsable'];
-                    }
+                {
+                    $solicitud->id_user_assign = $inputs['responsable'];
+                }
                 
                 $solicitud->save();
 
@@ -925,9 +924,6 @@ class SolicitudeController extends BaseController
                     {
                         $detalle->fecha_entrega = $inputs[ 'fecha' ];
                     }
-
-
-                    
 
                     //VALIDAR SI SE MODIFICARAN LOS CLIENTES
                     if ( $inputs[ 'modificacion_clientes' ] == 1 )

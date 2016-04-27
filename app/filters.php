@@ -201,11 +201,21 @@ Route::filter( 'sys_user' , function ()
 
 Route::filter( 'rm_sup_gerprod_ager' , function () 
 {
-    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
-        return Redirect::to( 'login' );
-    else     
-        if ( ! in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD , ASIS_GER ) ) )
-            return Redirect::to( 'show_user' );
+    if ( ! Auth::check() || is_null( Auth::user()->simApp ) )
+    {
+        if ( Request::ajax() )
+        { 
+            return App::make('BaseController')->callAction( 'warningException' , array( 'Su sesion ha expirado vuelva a iniciar sesion' , __FUNCTION__ , __LINE__ , __FILE__ ) );
+        }
+        else
+        {
+            return Redirect::guest( 'login' );
+        }
+    }
+    elseif ( ! in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD , ASIS_GER ) ) )
+    {
+        return Redirect::to( 'show_user' );
+    }
 });
 
 Route::filter( 'rm_cont_tes' , function()
@@ -250,6 +260,8 @@ Route::filter( 'developer' , function()
 */
 Route::filter( 'csrf' , function () 
 {
-    if (Session::token() !== Input::get('_token')) 
-        throw new Illuminate\Session\TokenMismatchException;
+    if (Session::token() !== Input::get('_token') )
+    { 
+        return App::make('BaseController')->callAction( 'warningException' , array( 'Su sesion ha expirado vuelva a iniciar sesion' , __FUNCTION__ , __LINE__ , __FILE__ ) );
+    }
 });

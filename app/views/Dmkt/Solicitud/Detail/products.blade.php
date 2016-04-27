@@ -138,9 +138,33 @@
 @if ( $politicStatus && isset( $tipo_usuario ) && in_array( $tipo_usuario , array( SUP , GER_PROD , GER_PROM , GER_COM , GER_GER ) ) )
     @include('Dmkt.Solicitud.Section.modal-select-producto')
     <script>
+        function productChange( element )
+        {
+            if( element.checked ) 
+            { 
+                $("#open_modal_add_product").show();
+                $("#list-product").hide();
+                $('#list-product :input').attr('disabled', true);
+                $('#list-product2 :input').removeAttr( 'disabled' );
+                $("#list-product2").show();
+            }
+            else
+            {
+                $("#open_modal_add_product").hide();
+                $("#list-product2").hide();
+                $('#list-product2 :input').attr('disabled', true);
+                $('#list-product :input').removeAttr('disabled');
+                $("#list-product").show();
+            }
+            verifySum( 0 , 0 );
+        }
+        $("#is-product-change").change( function()
+        {
+            productChange( this )
+        });
         $( document ).ready( function()
         {
-            productChange( $( '#is-product-change' )[ 0 ] );
+            productChange( document.getElementById( 'is-product-change' ) );
         });
     </script>
 @endif

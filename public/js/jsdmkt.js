@@ -910,8 +910,7 @@ $( '#derivar_solicitud' ).on( 'click' , function()
 function acceptedSolicitude( type )
 {
     var formData = new FormData( form_acepted_solicitude[ 0 ] );
-    console.log( type );
-
+    
     var d_clients = [];
     var d_clients_type = [];
 
@@ -922,7 +921,6 @@ function acceptedSolicitude( type )
         d_clients_type.push( elem.attr("tipo_cliente") );
     });
             
-
     if ( type !== undefined )
     {
         formData.append( 'derivacion' , 1 );
@@ -2156,47 +2154,6 @@ $( '.btn-remove-family' ).click( function () {
     $(this).closest('li').remove();   
 });
 
-$("#is-product-change").change( function()
-{
-    productChange( this )
-});
-
-function productChange( element )
-{
-    if( element.checked ) 
-    {        
-        $("#open_modal_add_product").show();
-        $("#list-product").hide();
-        $('#list-product :input').attr('disabled', true);
-        $('#list-product2 :input').removeAttr('disabled');
-        $("#list-product2").show();
-    }
-    else
-    {
-        $("#open_modal_add_product").hide();
-        $("#list-product2").hide();
-        $('#list-product2 :input').attr('disabled', true);
-        $('#list-product :input').removeAttr('disabled');
-        $("#list-product").show();
-    }
-    verifySum( 0 , 0 );
-}
-
-$("#is-client-change").change(function() {
-    if(this.checked) {        
-        $("#open_modal_add_client").show();
-        $("#list-client").hide();
-        //$('#clientes :input').removeAttr('disabled');
-        $("#clientes").show();
-    }
-    else{
-        $("#open_modal_add_client").hide();
-        $("#clientes").hide();
-        //$('#clientes :input').attr('disabled', true);
-        $("#list-client").show();
-    }
-});
-
 $("#edit-date-activate").click(function() {
   $( ".edit-date" ).show();
   $( "#fecha-value" ).val("");
@@ -2304,7 +2261,7 @@ $( document ).ready(function()
 
 
     /** ---------------------------------------- SET DISABLED INPUTS INIT ------------------------------------------**/
-    $('#list-product2 :input').attr('disabled', true);
+    //$('#list-product2 :input').attr('disabled', true);
     $('#resp-value').attr('disabled', true);
     $( "#fecha-value" ).attr('disabled', true);
 });

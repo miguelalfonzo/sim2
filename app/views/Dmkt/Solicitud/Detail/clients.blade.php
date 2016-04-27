@@ -51,4 +51,31 @@
 </div>
 @if ( $politicStatus && isset( $tipo_usuario ) && in_array( $tipo_usuario , array( SUP , GER_PROD , GER_PROM , GER_COM , GER_GER ) ) )
     @include('Dmkt.Solicitud.Section.modal-select-client')
+    <script>
+        function clientChange( element )
+        {
+            if( element.checked ) 
+            {        
+                $("#open_modal_add_client").show();
+                $("#list-client").hide();
+                //$('#clientes :input').removeAttr('disabled');
+                $("#clientes").show();
+            }
+            else
+            {
+                $("#open_modal_add_client").hide();
+                $("#clientes").hide();
+                //$('#clientes :input').attr('disabled', true);
+                $("#list-client").show();
+            }
+        }
+        $("#is-client-change").change( function()
+        {
+            clientChange( this )
+        });
+        $( document ).ready( function()
+        {
+            clientChange( document.getElementById( 'is-client-change' ) );
+        });
+    </script>
 @endif
