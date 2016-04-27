@@ -398,6 +398,7 @@ $(function()
             data.idsolicitud = $("input[name=idsolicitud]").val();
         bootbox.confirm("¿Esta seguro que desea Generar el Asiento Contable?", function(result) 
         {
+            $( '.bootbox button[ data-bb-handler=confirm ]' ).attr( 'disabled' , true );
             if(result)
             {
                 $.post(url, data)
