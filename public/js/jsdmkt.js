@@ -678,6 +678,7 @@ function cancelDialog  ( data , message )
                     }
                     else
                     {
+                        $( '.bootbox button[ data-bb-handler=success' ).attr( 'disabled' , true );
                         if ( result )
                         {
                             data['observacion'] = $('.sol-obs').val();
@@ -700,8 +701,19 @@ function cancelDialog  ( data , message )
                                     });
                                 }
                                 else
+                                {
                                     bootbox.alert('<h4 style="color:red">' + data.Status + ': ' + data.Description +'</h4>');
+                                    $( '.bootbox button[ data-bb-handler=success' ).attr( 'disabled' , false );
+                                }
+                            }).fail( function( statusCode , errorThrown )
+                            {
+                                $( '.bootbox button[ data-bb-handler=success' ).attr( 'disabled' , false );
+                                ajaxError( statusCode , errorThrown );
                             });
+                        }
+                        else
+                        {
+                            $( '.bootbox button[ data-bb-handler=success' ).attr( 'disabled' , false );
                         }
                     }
                 }
