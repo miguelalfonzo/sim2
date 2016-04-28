@@ -121,7 +121,7 @@ class SolicitudeController extends BaseController
             'investments' => InvestmentType::orderMkt());
         if ( Auth::user()->type != REP_MED )
         {
-            $data[ 'reps' ] = Personal::getRms();
+            $data[ 'reps' ] = Personal::getResponsible();
         }
         return View::make('Dmkt.Register.solicitud', $data);
     }
@@ -140,7 +140,7 @@ class SolicitudeController extends BaseController
            'edit'        => true );
         $data[ 'detalle' ] = $data['solicitud']->detalle;
         if ( in_array(Auth::user()->type, array( SUP , GER_PROD , ASIS_GER ) ) )
-            $data[ 'reps' ] = Personal::getRms();
+            $data[ 'reps' ] = Personal::getResponsible();
         return View::make('Dmkt.Register.solicitud', $data);
     }
 
@@ -221,7 +221,7 @@ class SolicitudeController extends BaseController
                     $politicStatus = TRUE;
                     $data[ 'payments' ] = TypePayment::all();
                     $data[ 'families' ] = $qryProducts->get();
-                    $data[ 'reps' ] = Personal::getRms();    
+                    $data[ 'reps' ] = Personal::getResponsible();    
                     $data[ 'tipo_usuario' ] = $politicType;
                     $solicitud->status = BLOCKED;
                     Session::put( 'id_solicitud' , $solicitud->id );
@@ -1867,7 +1867,7 @@ class SolicitudeController extends BaseController
     public function album()
     {
         $data = array(
-            'reps'  => Personal::getRms() ,
+            'reps'  => Personal::getResponsible() ,
             'zones' => Zone::orderBy( 'N3GDESCRIPCION' , 'asc' )->get() );
         return View::make( 'Event.show' , $data );
     }

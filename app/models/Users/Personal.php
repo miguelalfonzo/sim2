@@ -57,23 +57,26 @@ class Personal extends Eloquent
         })->first();
     }
 
-    protected function getRms()
+    protected function getResponsible()
     {
         $user = Auth::user();
-        $rms = Personal::wherehas( 'user' , function( $query )
+        $personals = Personal::orderBy( 'nombres' , 'ASC' , 'apellidos' , 'ASC' );
+        if( $user->type === REP_MED )
         {
-            $query->where( 'type' , REP_MED );
-        })->orderBy( 'nombres' , 'ASC' , 'apellidos' , 'ASC' );
-        
-        if ( $user->type == SUP )
-        {
-            $rms->where( 'referencia_id' , $user->sup->bago_id )->orWhere( 'user_id' , $user->id );
+            $personals->where( 'user_id' , $user->id );
         }
-        elseif ( $user->type == REP_MED )
+        elseif( $user->type === SUP )
         {
-            $rms->where( 'user_id' , $user->id );
+            $personals->where( 'user_id' , $user->id )->orWhere( 'referencia_id' , $user->sup->bago_id );
         }
-        return $rms->get();
+        elseif( in_array( $user->type , [ GER_PROD , GER_PROM , GER_COM , GER_GER ] ) )
+        {
+            $personals->whereHas( 'user' , function( $query )
+            {
+                $query->whereIn( 'type' , [ REP_MED , SUP ] );
+            });
+        }
+        return $personals->get();
     }
 
     public function employees()

@@ -205,7 +205,7 @@ Route::filter( 'rm_sup_gerprod_ager' , function ()
     {
         if ( Request::ajax() )
         { 
-            return App::make('BaseController')->callAction( 'warningException' , array( 'Su sesion ha expirado vuelva a iniciar sesion' , __FUNCTION__ , __LINE__ , __FILE__ ) );
+            return App::make('BaseController')->callAction( 'warningException' , array( 'Vuelva a acceder al sistema ( La sesion expiro )' , __FUNCTION__ , __LINE__ , __FILE__ ) );
         }
         else
         {
@@ -260,8 +260,8 @@ Route::filter( 'developer' , function()
 */
 Route::filter( 'csrf' , function () 
 {
-    if (Session::token() !== Input::get('_token') )
+    if( Session::token() !== Input::get('_token') )
     { 
-        return App::make('BaseController')->callAction( 'warningException' , array( 'Su sesion ha expirado vuelva a iniciar sesion' , __FUNCTION__ , __LINE__ , __FILE__ ) );
+        return App::make('BaseController')->callAction( 'warningException' , array( 'Es necesario que vuelva a cargar la pagina debido a sesion inactiva o acceso desde otro dispositivo' , __FUNCTION__ , __LINE__ , __FILE__ ) );
     }
 });
