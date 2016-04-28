@@ -16,7 +16,7 @@ class Supervisor extends Eloquent
 
     protected function cuenta()
     {
-    	return $this->hasOne( 'Dmkt\CtaRm' , 'codbeneficiario' , 'suplegajo' );
+    	return $this->hasOne( 'Dmkt\CtaRm' , 'codbeneficiario' , 'suplegajo' )->where( 'tipo' , CUENTA_BAGO );
     }
 
 }

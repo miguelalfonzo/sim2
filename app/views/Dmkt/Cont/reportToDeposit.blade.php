@@ -63,9 +63,9 @@
                                         @elseif( $solicitud->detalle->id_moneda == 2 )
                                             194-1809102-167
                                         @endif
-                                    @elseif ( $solicitud->detalle->id_pago != PAGO_CHEQUE )
-                                        @if ( $solicitud->assignedTo->type == REP_MED && ! is_null( $solicitud->assignedTo->personal->bagoVisitador ) && ! is_null( $solicitud->assignedTo->personal->bagoVisitador->cuenta ) )
-                                            {{ $solicitud->assignedTo->personal->bagoVisitador->cuenta->cuenta }}
+                                    @elseif( $solicitud->detalle->id_pago != PAGO_CHEQUE )
+                                        @if( in_array( $solicitud->assignedTo->type , [ REP_MED , SUP ] , 1 ) )
+                                            {{ $solicitud->personalTo->getAccount()  }}
                                         @endif
                                     @else
                                         RUC: {{ $solicitud->detalle->num_ruc }}         

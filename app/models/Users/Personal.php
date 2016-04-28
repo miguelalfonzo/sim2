@@ -91,10 +91,33 @@ class Personal extends Eloquent
     // idkc : SOLO RM
     protected function rmSup()
     {
-        return $this->belongsTo( '\Users\Personal' , 'referencia_id' , 'bago_id' )->whereHas( 'user' , function( $query )
+        return $this->belongsTo( 'Users\Personal' , 'referencia_id' , 'bago_id' )->whereHas( 'user' , function( $query )
         {
             $query->where( 'type' , SUP );
         });
+    }
+
+    public function getAccount()
+    {
+        if( $this->tipo === 'RM' || $this->tipo === 'RI' )
+        {
+            $visitador = $this->bagoVisitador;
+            $account = $visitador->cuenta;
+            if( ! is_null( $account ) )
+            {
+                return $account->cuenta;
+            }
+        }
+        elseif( $this->tipo === SUP )
+        {
+            $supervisor = $this->bagoSupervisor;
+            $account = $supervisor->cuenta;
+            if( ! is_null( $account ) )
+            {
+                return $account->cuenta;
+            }
+        }
+        return null;   
     }
 
     public function userSup()
@@ -147,6 +170,11 @@ class Personal extends Eloquent
     public function bagoVisitador()
     {
         return $this->hasOne( 'Users\Visitador' , 'visvisitador' , 'bago_id' );
+    }
+
+    public function bagoSupervisor()
+    {
+        return $this->hasOne( 'Users\Supervisor' , 'supsupervisor' , 'bago_id' );
     }
 
     public function user()
