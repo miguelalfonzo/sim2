@@ -59,20 +59,20 @@ class Personal extends Eloquent
 
     protected function getRms()
     {
+        $user = Auth::user();
         $rms = Personal::wherehas( 'user' , function( $query )
         {
             $query->where( 'type' , REP_MED );
-        })->orderBy( 'nombres' , 'ASC' );
+        })->orderBy( 'nombres' , 'ASC' , 'apellidos' , 'ASC' );
         
-        if ( Auth::user()->type == SUP )
+        if ( $user->type == SUP )
         {
-            $rms->where( 'referencia_id' , Auth::user()->sup->bago_id );
+            $rms->where( 'referencia_id' , $user->sup->bago_id )->orWhere( 'user_id' , $user->id );
         }
-        elseif ( Auth::user()->type == REP_MED )
+        elseif ( $user->type == REP_MED )
         {
-            $rms->where( 'user_id' , Auth::user()->id );
+            $rms->where( 'user_id' , $user->id );
         }
-        
         return $rms->get();
     }
 
@@ -89,12 +89,28 @@ class Personal extends Eloquent
     }
 
     // idkc : SOLO RM
-    public function rmSup()
+    protected function rmSup()
     {
         return $this->belongsTo( '\Users\Personal' , 'referencia_id' , 'bago_id' )->whereHas( 'user' , function( $query )
         {
             $query->where( 'type' , SUP );
         });
+    }
+
+    public function userSup()
+    {
+        if( $this->tipo === 'RM' || $this->tipo === 'RI' )
+        {
+            return $this->rmSup->user_id;
+        }
+        elseif( $this->tipo === SUP )
+        {
+            return $this->user_id;
+        }
+        else
+        {
+            return null;
+        }
     }
 
     // idkc : SOLO SUPERVISOR

@@ -173,26 +173,21 @@ class SolicitudeController extends BaseController
             $middleRpta = $this->validateApprobationFamily( $inputs );
             if ( $middleRpta[ status ] === ok )
             {
-                //$middleRpta = $this->setProducts( $inputs[ 'solicitud_id' ] , array( $inputs[ 'producto' ] ) );
-             
-                    //DB::beginTransaction();
-                    //$solicitudProduct = SolicitudProduct::where( 'id_solicitud' , $inputs[ 'solicitud_id' ] )
-                    //                    ->where( 'id_producto' , $inputs[ 'producto' ] )->first();
-                    $productoId=  $inputs['producto'];
-                    $solicitudId =  $inputs['solicitud_id'];
-                   //
-                        $solicitudProduct = SolicitudProduct::where('id_solicitud', $solicitudId)->first();
-                        $solicitud = Solicitud::where('id', $solicitudId)->first();
-                        $politicType = $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario;
-                        $fondo_product =  $solicitudProduct->getSubFondo( $politicType , $solicitud, $productoId);
-                        return $this->setRpta(  array( 'Cond' => true , 'Fondo_product' => $fondo_product  ) );
-                    //}
-                       
-                    
                 
+                //$middleRpta = $this->setProducts( $inputs[ 'solicitud_id' ] , array( $inputs[ 'producto' ] ) );
+                //DB::beginTransaction();
+                //$solicitudProduct = SolicitudProduct::where( 'id_solicitud' , $inputs[ 'solicitud_id' ] )
+                //                    ->where( 'id_producto' , $inputs[ 'producto' ] )->first();
+                
+                $productoId=  $inputs['producto'];
+                $solicitudId =  $inputs['solicitud_id'];
+                $solicitudProduct = SolicitudProduct::where('id_solicitud', $solicitudId)->first();
+                $solicitud = Solicitud::where('id', $solicitudId)->first();
+                $politicType = $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario;
+                $fondo_product =  $solicitudProduct->getSubFondo( $politicType , $solicitud, $productoId);
+                return $this->setRpta(  array( 'Cond' => true , 'Fondo_product' => $fondo_product  ) );   
             }
             return $middleRpta;
-
         }
         catch( Exception $e )
         {
@@ -313,7 +308,7 @@ class SolicitudeController extends BaseController
 
         if ( in_array( Auth::user()->type , array( SUP, GER_PROD ) ) )
         {
-            $rules['responsable'] = 'required|numeric|min:1|exists:' . TB_USUARIOS . ',id,type,' . REP_MED ;
+            $rules[ 'responsable' ] = 'required|numeric|min:1|exists:' . TB_USUARIOS . ',id' ;
         }
 
         $validator = Validator::make($inputs, $rules);
