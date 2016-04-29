@@ -167,7 +167,7 @@
     |--------------------------------------------------------------------------
     */
 
-    Route::group( array( 'before' => 'rm_cont_tes' ), function ()
+    Route::group( array( 'before' => 'rm_sup_cont_tes' ), function ()
     {
         Route::post( 'register-devolution-data' , 'Devolution\DevolutionController@registerDevolutionData' );
         Route::post( 'get-devolution-info' , 'Devolution\DevolutionController@getDevolutionInfo' );

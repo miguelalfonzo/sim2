@@ -28,204 +28,37 @@ Route::filter('guest', function ()
 | integrates HTTP Basic authentication for quick, simple checking.
 |
 */
-Route::filter('auth', function () 
-{
-    if ( Auth::guest() )
-        if ( Request::ajax() )
-            return Response::make( 'Unauthorized' , 401 );
-        else
-            return Redirect::guest( 'login' );
-});
+Route::filter( 'rm_sup' , 'Filter\FilterController@rep_sup' );
+Route::filter( 'rm_sup_cont_tes' , 'Filter\FilterController@rep_sup_cont_tes' );
+Route::filter( 'rm_sup_gerprod_ager' , 'Filter\FilterController@rep_sup_gerProd_asisGer' ); 
+Route::filter( 'rm_sup_cont_gerprod_gerprom_gercom_gergen' , 'Filter\FilterController@rep_sup_cont_gerProd_gerProm_gerCom_gerGen' );
+Route::filter( 'rm_sup_cont_gerprod_gerprom_gercom_gergen_ager' , 'Filter\FilterController@rep_sup_cont_gerProd_gerProm_gerCom_gerGen_aGer' );
 
-Route::filter( 'auth.basic' , function () 
-{
-    return Auth::basic();
-});
+Route::filter( 'sup' , 'Filter\FilterController@supervisor' );
+Route::filter( 'sup_gerprod_gerprom_gercom_gergen' , 'Filter\FilterController@sup_gerProd_gerProm_gerCom_gerGen' );
 
-Route::filter('active-user',function()
-{
-    if( Auth::user()->active === 0 )
-        return Redirect::to('login');
-});
+Route::filter( 'cont' , 'Filter\FilterController@contabilidad' );
 
-Route::filter( 'rm_sup' , 'Filter\FilterController@representante_supervisor' );
+Route::filter( 'tes' , 'Filter\FilterController@tesoreria' );
 
-Route::filter('sup', function () 
-{
-    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
-        return Redirect::to( 'login' );
-    else     
-        if ( Auth::user()->type  !== SUP )
-            return Redirect::to( 'show_user' );
-});
+Route::filter( 'gerprod_gerprom_gercom_gerger' , 'Filter\FilterController@gerentes' );
 
+Route::filter( 'gercom' , 'Filter\FilterController@gerenteComercial' );
+Route::filter( 'gercom_cont' , 'Filter\FilterController@gerCom_cont' );
 
-Route::filter( 'cont' , function () 
-{
-    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
-        return Redirect::to( 'login' );
-    else
-    {
-        if ( Auth::user()->type  !== CONT )
-            return Redirect::to( 'show_user' );
-    }
-});
+Route::filter( 'ager' , 'FIlter\FilterController@asistenteGerencia');
 
-
-Route::filter( 'tes' , function () 
-{
-    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
-        return Redirect::to( 'login' );
-    else     
-        if ( Auth::user()->type  !== TESORERIA )
-            return Redirect::to( 'show_user' );
-});
-
-Route::filter( 'gercom' , function ()
-{
-    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
-        return Redirect::to( 'login' );
-    else     
-        if ( Auth::user()->type  !== GER_COM )
-            return Redirect::to( 'show_user' );
-});
-
-//Asistente de Gerencia
-Route::filter( 'ager' , function()
-{
-    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
-        return Redirect::to( 'login' );
-    else     
-        if ( Auth::user()->type  !== ASIS_GER )
-            return Redirect::to( 'show_user' );
-});
-
-Route::filter( 'rm' , 'Filter\FilterController@representante_supervisor_contabilidad' );
-
-Route::filter( 'gercom_cont' , function () 
-{
-    if ( ! Auth::check() || is_null( Auth::user()->simApp ) )
-    { 
-        return Redirect::to( 'login' );
-    }
-    elseif ( ! in_array( Auth::user()->type , array( GER_COM, CONT ) ) )
-    {
-        return Redirect::to( 'show_user' );
-    }
-});
-
-Route::filter( 'sup_gerprod_gerprom_gercom_gerger' , function () 
-{
-    if ( ! Auth::check() || is_null( Auth::user()->simApp ) )
-    {
-        return Redirect::to( 'login' );
-    }
-    else
-    {     
-        if ( ! in_array( Auth::user()->type , array( SUP , GER_PROD , GER_PROM , GER_COM , GER_GER ) ) )
-        {
-            return Redirect::to( 'show_user' );
-        }
-    }
-});
-
-Route::filter( 'rm_sup_gerprod_gerprom_gercom_gerger' , function () 
-{
-    if ( ! Auth::check() || is_null( Auth::user()->simApp ) )
-    {
-        return Redirect::to( 'login' );
-    }
-    else
-    {     
-        if ( ! in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD , GER_PROM , GER_COM , GER_GER ) ) )
-        {
-            return Redirect::to( 'show_user' );
-        }
-    }
-});
-
-Route::filter( 'gerprod_gerprom_gercom_gerger' , function () 
-{
-    if ( ! Auth::check() || is_null( Auth::user()->simApp ) )
-    {
-        return Redirect::to( 'login' );
-    }
-    else
-    {     
-        if ( ! in_array( Auth::user()->type , array( GER_PROD , GER_PROM , GER_COM , GER_GER ) ) )
-        {
-            return Redirect::to( 'show_user' );
-        }
-    }
-});
-
-Route::filter( 'rm_sup_gerprod_gerprom_gercom_gerger_ager_cont' , function () 
-{
-    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
-        return Redirect::to( 'login' );
-    else     
-        if ( ! in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD , GER_PROM , GER_COM , GER_GER , ASIS_GER , CONT ) ) )
-            return Redirect::to( 'show_user' );
-});
-
-Route::filter( 'rm_sup_gerprod_gerprom_gercom_gerger_cont' , function () 
-{
-    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
-        return Redirect::to( 'login' );
-    else     
-        if ( ! in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD , GER_PROM , GER_COM , GER_GER , CONT ) ) )
-            return Redirect::to( 'show_user' );
-});
-
-Route::filter( 'sys_user' , function () 
-{
-    if ( ( ! Auth::check() ) || ( ! is_null( Auth::user()->simApp ) && is_null( Auth::user()->simApp ) ) )
-        return Redirect::to('login');
-});
-
-Route::filter( 'rm_sup_gerprod_ager' , function () 
-{
-    if ( ! Auth::check() || is_null( Auth::user()->simApp ) )
-    {
-        if ( Request::ajax() )
-        { 
-            return App::make('BaseController')->callAction( 'warningException' , array( 'Vuelva a acceder al sistema ( La sesion expiro )' , __FUNCTION__ , __LINE__ , __FILE__ ) );
-        }
-        else
-        {
-            return Redirect::guest( 'login' );
-        }
-    }
-    elseif ( ! in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD , ASIS_GER ) ) )
-    {
-        return Redirect::to( 'show_user' );
-    }
-});
-
-Route::filter( 'rm_cont_tes' , function()
-{
-    if ( ! Auth::check() || is_null( Auth::user()->simApp ) )
-    {
-        return Redirect::to( 'login' );
-    }
-    else
-    {     
-        if ( ! in_array( Auth::user()->type , array( REP_MED , CONT , TESORERIA ) ) )
-        {
-            return Redirect::to( 'show_user' ); 
-        }
-    }
-});
+Route::filter( 'sys_user' , 'Filter\FilterController@system' ); 
 
 Route::filter( 'developer' , function()
 {
-    if ( ! Auth::check() || is_null( Auth::user()->simApp ) )
+    if( ! Auth::check() || is_null( Auth::user()->simApp ) )
     {
         return Redirect::to( 'login' );
     }
     else
     {     
-        if ( Auth::user()->id != 39 )
+        if( Auth::user()->type != 'A' )
         {
             return Redirect::to( 'show_user' ); 
         }

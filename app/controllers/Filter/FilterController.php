@@ -46,18 +46,73 @@ class FilterController
 	    }
   	}
 
-  	public function representante()
-  	{
-  		return $this->rolFilter( [ REP_MED ] );
-  	}
-
-  	public function representante_supervisor()
+  	public function rep_sup()
   	{
   		return $this->rolFilter( [ REP_MED , SUP ] );
   	}
 
-  	public function representante_supervisor_contabilidad()
+  	public function rep_sup_cont_tes()
   	{
-  		return $this->rolFilter( [ REP_MED , SUP , CONTABILIDAD ] );
+  		return $this->rolFilter( [ REP_MED , SUP , CONT , TESORERIA ] );
+  	}
+
+	public function rep_sup_gerProd_asisGer()
+  	{
+  		return $this->rolFilter( [ REP_MED , SUP , GER_PROD , ASIS_GER ] );
+  	}  	
+
+  	public function rep_sup_cont_gerProd_gerProm_gerCom_gerGen()
+  	{
+  		return $this->rolFilter( [ REP_MED , SUP , CONT , GER_PROD , GER_PROM , GER_COM , GER_GER ] );
+  	}
+
+  	public function rep_sup_cont_gerProd_gerProm_gerCom_gerGen_aGer()
+  	{
+  		return $this->rolFilter( [ REP_MED , SUP , CONT , GER_PROD , GER_PROM , GER_COM , GER_GER , ASIS_GER ] );
+  	}
+
+  	public function supervisor()
+  	{
+  		return $this->rolFilter( [ SUP ] );
+  	}
+
+  	public function sup_gerProd_gerProm_gerCom_gerGen()
+  	{
+  		return $this->rolFilter( [ SUP , GER_PROD , GER_PROM , GER_COM , GER_GER ] );
+  	}
+
+  	public function contabilidad()
+  	{
+  		return $this->rolFilter( [ CONT ] );
+  	}
+
+  	public function tesoreria()
+  	{
+  		return $this->rolFilter( [ TESORERIA ] );
+  	}
+
+  	public function gerentes()
+  	{
+  		return $this->rolFilter( [ GER_PROD , GER_PROM , GER_COM , GER_GER ] );
+  	}
+
+  	public function gerenteComercial()
+  	{
+  		return $this->rolFilter( [ GER_COM ] );
+  	}
+
+  	public function gerCom_cont()
+  	{
+  		return $this->rolFilter( [ GER_COM , CONT ] );
+  	}
+
+  	public function asistenteGerencia()
+  	{
+  		return $this->rolFilter( [ ASIS_GER ] );
+  	}
+
+  	public function system()
+  	{
+  		return $this->rolFilter( [ REP_MED , SUP , GER_PROD , GER_PROM , GER_COM , GER_GER , CONT , TESORERIA , ASIS_GER ] );
   	}
 }
