@@ -178,7 +178,13 @@
         Route::post( 'confirm-payroll-discount' , 'Devolution\DevolutionController@confirmPayrollDiscount' );
     });
 
-    Route::group( array( 'before' => 'rm_cont' ), function () 
+    Route::group( array( 'before' => 'rm_sup' ), function ()
+    {
+        Route::post( 'end-expense', 'Expense\ExpenseController@finishExpense');
+        Route::post( 'do-inmediate-devolution' , 'Devolution\DevolutionController@doInmediateDevolution' );
+    });
+
+    Route::group( array( 'before' => 'rm_sup_cont' ), function () 
     {
         Route::post( 'get-expenses' , 'Expense\ExpenseController@getExpenses');
         Route::post( 'edit-expense', 'Expense\ExpenseController@editExpense');
@@ -186,12 +192,6 @@
         Route::post( 'register-expense', 'Expense\ExpenseController@registerExpense');
         Route::get( 'a/{token}', 'Expense\ExpenseController@reportExpense');
         Route::get( 'report-fondo/{token}','Expense\ExpenseController@reportExpenseFondo');
-    });
-
-    Route::group( array( 'before' => 'rm' ), function ()
-    {
-        Route::post( 'end-expense', 'Expense\ExpenseController@finishExpense');
-        Route::post( 'do-inmediate-devolution' , 'Devolution\DevolutionController@doInmediateDevolution' );
     });
 
     Route::group( array( 'before' => 'rm_sup_gerprod_ager' ), function ()

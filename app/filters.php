@@ -48,6 +48,8 @@ Route::filter('active-user',function()
         return Redirect::to('login');
 });
 
+Route::filter( 'rm_sup' , 'Filter\FilterController@representante_supervisor' );
+
 Route::filter('sup', function () 
 {
     if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
@@ -69,14 +71,6 @@ Route::filter( 'cont' , function ()
     }
 });
 
-Route::filter( 'rm' , function () 
-{
-    if ( ! Auth::check() || is_null( Auth::user()->simApp ) ) 
-        return Redirect::to( 'login' );
-    else     
-        if ( Auth::user()->type  !== REP_MED )
-            return Redirect::to( 'show_user' );
-});
 
 Route::filter( 'tes' , function () 
 {
@@ -106,17 +100,7 @@ Route::filter( 'ager' , function()
             return Redirect::to( 'show_user' );
 });
 
-Route::filter( 'rm_cont' , function () 
-{
-    if ( ! Auth::check() || is_null( Auth::user()->simApp ) )
-    { 
-        return Redirect::to( 'login' );
-    }
-    elseif ( ! in_array( Auth::user()->type , array( REP_MED , CONT ) ) )
-    {
-        return Redirect::to( 'show_user' );
-    }
-});
+Route::filter( 'rm' , 'Filter\FilterController@representante_supervisor_contabilidad' );
 
 Route::filter( 'gercom_cont' , function () 
 {

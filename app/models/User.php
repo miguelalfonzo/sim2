@@ -122,5 +122,21 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
         else
             return $tempUser->userTemp->type;
     }
+
+    public function getResponsibleIds()
+    {
+        $userIds = [];
+        if( $this->type ===  SUP )
+        {
+            $userIds = $this->sup->reps->lists( 'user_id' );
+        }
+        elseif( in_array( $this->type , [ GER_PROD , GER_PROM , GER_COM , GER_GER ] ) )
+        {
+            $userIds = User::whereIn( 'type' , [ REP_MED , SUP ] )->lists( 'id' );
+        }  
+        $userIds[] = $this->id;
+
+        return $userIds;
+    }
     
 }

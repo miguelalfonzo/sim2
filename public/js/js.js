@@ -709,8 +709,10 @@ $(function()
                 }, 500 );         
             }
             else
+            {
+                $.unblockUI();
                 bootbox.alert('<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
-
+            }
                     
         });
 

@@ -148,7 +148,6 @@ class Personal extends Eloquent
         });
     }
 
-
     public function getType()
     {
         return $this->hasOne('Users\PersonalType', 'id', 'tipo_personal_id');

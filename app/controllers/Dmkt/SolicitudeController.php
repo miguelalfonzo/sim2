@@ -1874,37 +1874,28 @@ class SolicitudeController extends BaseController
 
     public function getEventList()
     {
-        $start = Input::get("date_start");
-        $end   = Input::get("date_end");
-        $user  = Input::get( 'usuario' );
-        $zona  = Input::get( 'zona' );
-        if ( $user == 0 )
+        try
         {
-            if ( Auth::user()->type == REP_MED )
+            $start = Input::get("date_start");
+            $end   = Input::get("date_end");
+            $user  = Input::get( 'usuario' );
+            $zona  = Input::get( 'zona' );
+            
+            if ( $user == 0 )
             {
-                $user = array( Auth::user()->id );
-            }
-            elseif( Auth::user()->type == SUP )
-            {
-                $user = Auth::user()->sup->reps->lists( 'user_id' );
+                $authUser = Auth::user();
+                
+                $userIds = $authUser->getResponsibleIds();
             }
             else
             {
-                $user = null;
+                $userIds = [ $user ];
             }
-        }
-        else
-        {
-            $user = array( $user );
-        }
-        $data['events'] =   Event::whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
-        
-            $data[ 'events' ]->whereHas( 'solicitud' , function( $query ) use( $user , $zona )
+
+            $data[ 'events' ] =   Event::whereRaw( "created_at between to_date( '$start' , 'DD-MM-YY' ) and to_date( '$end' , 'DD-MM-YY' ) +1" );
+            $data[ 'events' ]->whereHas( 'solicitud' , function( $query ) use( $userIds , $zona )
             {
-                if ( ! is_null( $user ) )
-                {
-                    $query->whereIn( 'id_user_assign' , $user );
-                }
+                $query->whereIn( 'id_user_assign' , $userIds );
                 if ( $zona != 0 )
                 {   
                     $query->whereHas( 'personalTo' , function( $query ) use( $zona )
@@ -1916,10 +1907,15 @@ class SolicitudeController extends BaseController
                     });  
                 }
             });
-        
-        
-        $data[ 'events' ] = $data[ 'events' ]->get();
-        return View::make('Event.album', $data);
+            
+            
+            $data[ 'events' ] = $data[ 'events' ]->get();
+            return View::make('Event.album', $data);
+        }
+        catch( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
     }
 
     public function photos()

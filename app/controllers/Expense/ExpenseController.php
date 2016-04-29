@@ -269,7 +269,14 @@ class ExpenseController extends BaseController
 			$solicitud  = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
 			
 			if( is_null( $solicitud ) )
+			{
 				return $this->warningException( 'No se encontro la solicitud con token: '.$inputs['token'] , __FUNCTION__ , __LINE__ , __FILE__ );
+			}
+
+			if( $solicitud->id_estado != GASTO_HABILITADO )
+			{
+				return $this->warningException( 'Ya finalizo el registro de documentos para esta solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
+			}
 
 			$oldIdEstado = $solicitud->id_estado;
 		
