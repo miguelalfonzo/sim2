@@ -4,7 +4,7 @@
         <input type="text" class="form-control" maxlength="10" disabled value="{{ date_format( date_create( $solicitud->created_at ) , 'd/m/Y' ) }}">
     </div>
     <div class="input-group col-xs-12 col-sm-7 col-md-7 col-lg-7 pull-left">
-    	<div class="input-group solicitud-date" >
+    	<div class="input-group solicitud-date" style="width:100%">
         	<input type="text" class="form-control" maxlength="10" disabled value="{{$detalle->fecha_entrega}}">				
         </div>
         @if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( SUP , GER_PROD, GER_PROM , GER_COM , GER_GER ) ) )
