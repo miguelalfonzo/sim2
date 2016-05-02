@@ -98,34 +98,11 @@ $('#show_leyenda').on('click',function(){
     });
 });
 
-$('#hide_leyenda').on( 'click',function()
+$( '#hide_leyenda' ).on( 'click' ,function()
 {
-    $('#leyenda').hide();
-    $(this).hide();
-    $('#show_leyenda').show();
-});
-
-//add a family
-$("#btn-add-family").on('click', function () 
-{
-    $(".btn-delete-family").show();
-    $('#listfamily>li:first-child').clone(true, true).appendTo('#listfamily');
-});
-
-//delete a family
-$( document ).off( 'click' , '.btn-delete-family' );
-$(document).on("click", ".btn-delete-family", function () 
-{
-    $('#listfamily>li .porcentaje_error').css({"border": "0"});
-    $(".option-des-1").removeClass('error');
-    $('.families_repeat').text('');
-    var k = $("#listfamily li").size();
-    if (k > 1)
-        var other = $(".btn-delete-family").index(this);
-        $("#listfamily li").eq(other).remove();
-        var p = $("#listfamily li").size();
-        if (p == 1)
-            $(".btn-delete-family").hide();
+    $( '#leyenda').hide();
+    $( this ).hide();
+    $( '#show_leyenda' ).show();
 });
 
 //Validations

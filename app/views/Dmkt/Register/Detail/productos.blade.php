@@ -38,3 +38,28 @@
     <span class="col-sm-10 col-md-10 families_repeat" style="margin-bottom: 10px ; margin-top: -10px"></span>
     <button type="button" class="btn btn-default" id="btn-add-family" style="margin-top:10px">Agregar Otra Familia</button>
 </div>
+<script>
+    $( '#btn-add-family' ).on( 'click' , function() 
+    {
+        $( '.btn-delete-family' ).show();
+        $( '#listfamily>li:first-child' ).clone(true, true).appendTo( '#listfamily' );
+    });
+    $( document ).off( 'click' , '.btn-delete-family' );
+    $( document ).on( 'click', '.btn-delete-family' , function() 
+    {
+        $( '#listfamily>li .porcentaje_error' ).css( { border: 0 } );
+        $( '.option-des-1' ).removeClass( 'error' );
+        $( '.families_repeat' ).text( '' );
+        var k = $( '#listfamily li' ).size();
+        if ( k > 1 )
+        {
+            var other = $( '.btn-delete-family' ).index( this );
+            $( '#listfamily li' ).eq( other ).remove();
+            var p = $("#listfamily li").size();
+            if( p === 1 )
+            {
+                $( '.btn-delete-family' ).hide();
+            }
+        }
+    });
+</script>
