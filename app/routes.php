@@ -200,8 +200,6 @@
         Route::get( 'get-investments-activities' , 'Dmkt\SolicitudeController@getInvestmentsActivities');
         Route::post( 'registrar-solicitud', 'Dmkt\SolicitudeController@registerSolicitud');
         Route::get( 'editar-solicitud/{id}', 'Dmkt\SolicitudeController@editSolicitud');
-        Route::post( 'search-client', 'Source\Seeker@clientSource');
-        Route::post( 'get-client-view' , 'Source\Seeker@getClientView');
         Route::post( 'filtro_cliente' , 'Dmkt\Client@getInvestmentActivity');
         Route::post( 'filtro-inversion' , 'Dmkt\Client@getActivities');  
         
@@ -210,6 +208,12 @@
     Route::group( array( 'before' => 'rm_sup_gerprod_gerprom_gercom_gerger_ager_cont' ) , function()
     {
         Route::post('cancelar-solicitud', 'Dmkt\SolicitudeController@cancelSolicitud');
+    });
+
+    Route::group( array( 'before' => 'rm_sup_gerprod_gerprom_gercom_gerger_ager' ) , function()
+    {
+        Route::post( 'search-client', 'Source\Seeker@clientSource');
+        Route::post( 'get-client-view' , 'Source\Seeker@getClientView');
     });
 
     Route::group(array('before' => 'sys_user'), function ()

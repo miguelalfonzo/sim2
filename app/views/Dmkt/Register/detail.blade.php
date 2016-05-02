@@ -82,13 +82,13 @@
             <ul class="list-group" id="clientes">
                 @if ( isset( $solicitud ) )
                     @foreach ( $solicitud->clients as $client )
-                        <li class="list-group-item" tipo_cliente="{{$client->id_tipo_cliente}}" pk="{{$client->id_cliente}}">
-                            <b>{{ $client->{$client->clientType->relacion}->full_name }}</b>
-                            <button type='button' class='btn-delete-client' style="z-index:2">
-                                <span class="glyphicon glyphicon-remove red" style="margin-left:20px ; float:right;"></span>
-                            </button>
-                            <span class="badge">{{$client->clientType->descripcion}}</span>
-                        </li>
+                        @include( 'Seeker.client' ,  
+                        [ 
+                            'label' => $client->{$client->clientType->relacion}->full_name  ,
+                            'type'  => $client->clientType->descripcion ,
+                            'value' => $client->id_cliente ,
+                            'id_tipo_cliente' => $client->id_tipo_cliente
+                        ])
                     @endforeach
                 @endif
             </ul>

@@ -31,6 +31,7 @@ Route::filter('guest', function ()
 Route::filter( 'rm_sup' , 'Filter\FilterController@rep_sup' );
 Route::filter( 'rm_sup_cont_tes' , 'Filter\FilterController@rep_sup_cont_tes' );
 Route::filter( 'rm_sup_gerprod_ager' , 'Filter\FilterController@rep_sup_gerProd_asisGer' ); 
+Route::filter( 'rm_sup_gerprod_gerprom_gercom_gerger_ager' , 'Filter\FilterController@rep_sup_gerProd_gerProm_gerCom_gerGen_asisGer' );
 Route::filter( 'rm_sup_cont_gerprod_gerprom_gercom_gergen' , 'Filter\FilterController@rep_sup_cont_gerProd_gerProm_gerCom_gerGen' );
 Route::filter( 'rm_sup_cont_gerprod_gerprom_gercom_gergen_ager' , 'Filter\FilterController@rep_sup_cont_gerProd_gerProm_gerCom_gerGen_aGer' );
 

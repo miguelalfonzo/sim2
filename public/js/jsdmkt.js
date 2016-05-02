@@ -869,7 +869,7 @@ function acceptedSolicitude( type )
 {
     var formData = new FormData( form_acepted_solicitude[ 0 ] );
     
-    var d_clients = [];
+    /*var d_clients = [];
     var d_clients_type = [];
 
     clients.children().each( function ()
@@ -877,7 +877,7 @@ function acceptedSolicitude( type )
         elem = $(this);
         d_clients.push( elem.attr("pk") );
         d_clients_type.push( elem.attr("tipo_cliente") );
-    });
+    });*/
             
     if ( type !== undefined )
     {
@@ -901,14 +901,14 @@ function acceptedSolicitude( type )
     {
         formData.append( 'modificacion_clientes' , 1 );        
 
-        d_clients.forEach( function( entry )
+/*        d_clients.forEach( function( entry )
         {
             formData.append( "clientes[]", entry );
         });   
         d_clients_type.forEach( function( entry )
         {
             formData.append( "tipos_cliente[]" , entry );
-        });
+        });*/
     }
 
     else
@@ -918,12 +918,12 @@ function acceptedSolicitude( type )
 
     $.ajax(
     {
-        type: 'POST',
-        url :  server + 'aceptar-solicitud',
-        data: formData,
-        cache: false,
-        contentType: false,
-        processData: false
+        type        : 'POST',
+        url         :  server + 'aceptar-solicitud',
+        data        : formData,
+        cache       : false,
+        contentType : false,
+        processData : false
     }).fail(function (statusCode,errorThrown) 
     {
         ajaxError(statusCode,errorThrown);
@@ -1742,32 +1742,23 @@ function bootboxMessage( data )
 //Validate send register solicitude
 $( '#registrar' ).on( 'click' , function () 
 {
-    var aux = 0;
-    /*var d_clients = [];
-    var d_clients_type = [];*/
+    var aux            = 0;
+    aux                = validateNewSol();
     var families_input = [];
-    aux = validateNewSol();
     
     //Validate fields client are correct
-    /*clients.children().each( function ()
-    {
-        elem = $(this);
-        d_clients.push( elem.attr("pk") );
-        d_clients_type.push( elem.attr("tipo_cliente") );
-    });*/
     var products      = $('.products');
     products.each( function (index) 
     {
         families_input[index] = $(this).val();
     });
-
     for ( var i = 0 ; i < families_input.length ; i++ ) 
     {
         products.each( function ( index ) 
         {
             if ( index != i && families_input[i] === $( this ).val() ) 
             {
-                var ind = families_input.indexOf( $( this ).val() );
+                var ind               = families_input.indexOf( $( this ).val() );
                 families_input[index] = '';
                 $(this).css('border-color', 'red');
                 $(".families_repeat").text('Datos Repetidos').css('color', 'red');
@@ -1779,15 +1770,9 @@ $( '#registrar' ).on( 'click' , function ()
     if ( aux == 0 ) 
     {
         var form = $('#form-register-solicitude');
-        var formData = new FormData( form[ 0 ] );
-        /*d_clients.forEach( function( entry )
-        {
-            formData.append( "clientes[]", entry );
-        });   
-        d_clients_type.forEach( function( entry )
-        {
-            formData.append( "tipos_cliente[]" , entry );
-        });*/
+        var formData = form.serialize();
+        //var formData = new FormData( form[ 0 ] );
+
         var route = form.attr('action');
         var message1 = 'Registrando';
         if ( id_solicitud ) 
@@ -1799,9 +1784,6 @@ $( '#registrar' ).on( 'click' , function ()
             url         : server + route,
             type        : 'POST',
             data        : formData,
-            cache       : false,
-            contentType : false,
-            processData : false,
             beforeSend: function()
             {
                 loadingUI(message1);
