@@ -84,7 +84,7 @@ class FondoController extends BaseController
         {
             $detalle = $sol->detalle;
             //$typeMoney = $detalle->fondo->typeMoney;
-            $totales[ 'S/.'] += $detalle->monto_actual ;
+            $totales[ 'S/.' ] += $detalle->monto_actual ;
         }
         return $this->setRpta( $totales );
     }
@@ -111,8 +111,7 @@ class FondoController extends BaseController
                 return $this->warningException( 'No se cuenta con saldo en el fondo ' . $fondo->subCategoria->descripcion . ' para terminar los Fondos Institucionales.'  , __FUNCTION__ , __LINE__ , __FILE__ );
             else
                 $fondoMktController->setHistoryData( $historiesFondoMkt , $fondo , 1 , $detalle->monto_solicitado , 'I' , FONDO_RETENCION );
-               // $fondoMktController->decreaseFondoInstitucional( $fondo , $detalle->monto_solicitado );
-            
+               
             $jDetalle                 = json_decode( $detalle->detalle );
             $jDetalle->monto_aprobado = $jDetalle->monto_solicitado;
             $detalle->detalle         = json_encode( $jDetalle );

@@ -70,8 +70,12 @@ class FondoMkt extends BaseController
         elseif( $moneda == DOLARES )
         {
             $tasaCompra          = $tc->compra;
+            
             $lastApprovedHistory = Solicitud::find( $idSolicitud )->lastApprovedHistory;
-            $tasaCompraAntigua   = ChangeRate::getLastDayDolar( $lastApprovedHistory->created_at );
+            if( ! is_null( $lastApprovedHistory ) )
+            {
+                $tasaCompraAntigua   = ChangeRate::getLastDayDolar( $lastApprovedHistory->created_at );
+            }
         }
         $historiesFondoMkt = array();
         foreach( $ids_fondo as $id_fondo )

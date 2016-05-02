@@ -1002,8 +1002,10 @@ function acceptedSolicitude( type )
     });
 }
 
-$(document).on('click','#terminate-fondo',function(e)
+$( document ).off( 'click' , '#terminate-fondo' );
+$( document ).on( 'click' , '#terminate-fondo' , function(e)
 {
+    var ladda = Ladda.create( this );
     e.preventDefault();
     var date = date_reg_fondo.val();
     bootbox.confirm(
@@ -1018,10 +1020,12 @@ $(document).on('click','#terminate-fondo',function(e)
         {
             if (result) 
             {
+                ladda.start();
                 var url = server + 'endfondos/' + date;
                 $.get(url).done(function(data)
                 {
-                    id_solicitud.val('');
+                    id_solicitud.val( '' );
+                    ladda.stop();
                     if (data.Status == 'Ok')
                     {
                         bootbox.alert('<h4 class="green">Fondos Terminados</h4>' , function()
@@ -1030,7 +1034,9 @@ $(document).on('click','#terminate-fondo',function(e)
                         });
                     }
                     else
+                    {
                         bootbox.alert("<h4 style='color:red'>No se pudo terminar los fondos - " + data.Description + "</h4>");   
+                    };
                 });
             }
         }
