@@ -110,9 +110,9 @@
     <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px">
         <div style="text-align: center">
             @if( isset( $solicitud ) && $solicitud->blocked == 0 )
-                <input type="button" id="registrar" class="btn btn-success" value="Actualizar">
+                <button type="button" id="registrar" class="btn btn-success">Actualizar</button>
             @else
-                <input type="button" id="registrar" class="btn btn-success" value="Crear">
+                <button type="button" id="registrar" class="btn btn-success">Crear</button>
             @endif
             <a href="{{ URL::to('show_user') }}" class="btn btn-primary">Regresar</a>    
         </div>

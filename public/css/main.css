@@ -150,15 +150,15 @@ table thead th, table th
 	font-weight: bold;
 }
 
-.quantity input
+.quantity input 
 {
 	text-align: center;
 }
 
-/*.red
+.red
 {
 	color: red;
-}*/
+}
 
 .reg-expense
 {

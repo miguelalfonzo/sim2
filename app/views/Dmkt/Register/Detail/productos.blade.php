@@ -62,4 +62,28 @@
             }
         }
     });
+    $(document).off( 'click' , '.btn-delete-client' );
+    $(document).on( 'click' , '.btn-delete-client' , function () 
+    {
+        var li = $(this).closest('li');
+        var ul = li.parent();
+        if ( li.index() === 0 && ul.children().length > 1 )
+        {
+            var clientType = li.find( 'input[ name="tipos_cliente[]"]' ).val();
+            li.remove();
+            var old_clientType = ul.children().first().find( 'input[ name="tipos_cliente[]"]' ).val();
+            if( clientType !== old_clientType )
+            {
+                clientFilter( old_clientType , 'eliminacion' );    
+            }
+        }
+        else
+        {
+            li.remove();
+        }
+        if ( ul.children().length === 0 )
+        {
+            fillInvestmentsActivities();
+        }
+});
 </script>

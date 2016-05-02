@@ -3,6 +3,11 @@
 var date_start = $('.date_start').first();
 var date_end = $('.date_end').first();
 
+//Status
+var ok = 'Ok';
+var warning = 'Warning';
+var error = 'Error';
+
 //NEW SOLICITUD
 var reason        = $('select[name=motivo]');
 var investment    = $('select[name=inversion]');
@@ -1434,18 +1439,18 @@ $(document).on("click", ".elementBack", function()
 
 function seeker( element , name , url )
 {
-    if (element.length != 0)
+    if ( element.length !== 0 )
     {
         element.typeahead(
         {
-            minLength: 3,
-            hightligth: true,
-            hint: true
+            minLength  : 3,
+            hightligth : true,
+            hint       : true
         },
         {
-            name: name,
-            displayKey: 'label',
-            templates:  
+            name       : name,
+            displayKey : 'label',
+            templates  :  
             {
                 empty: 
                 [
@@ -1636,33 +1641,6 @@ function fillInvestmentsActivities()
     });
 }
 
-
-$(document).off( 'click' , '.btn-delete-client' );
-$(document).on( 'click' , '.btn-delete-client' , function () 
-{
-    var li = $(this).closest('li');
-    var ul = li.parent();
-    if ( li.index() == 0 && ul.children().length > 1 )
-    {
-        var table = li.attr('tipo_cliente');
-        li.remove();
-        var old_li2 = ul.children().first();
-        if ( table !== old_li2.attr( 'tipo_cliente' ) )
-        {
-            clientFilter( old_li2.attr( 'tipo_cliente' ) , 'eliminacion' );    
-        }
-    }
-    else
-    {
-        li.remove();
-    }
-    if ( ul.children().length === 0 )
-    {
-        fillInvestmentsActivities();
-    }
-});
-
-
 function ajaxError(statusCode,errorThrown)
 {
     if ( statusCode.status == 0 )
@@ -1742,22 +1720,41 @@ function validateNewSol()
     return aux;
 }
 
+function bootboxMessage( data )
+{
+    var colorClass = '';
+    if( data.Status === ok )
+    {
+        colorClass = 'text-success';
+    }
+    else if( data.Status === warning )
+    {
+        colorClass = 'text-warning';
+    }
+    else if( data.Status === error )
+    {
+        colorClass = 'text-danger';
+    }
+    bootbox.alert( '<h4 class="' + colorClass + '">' + data.Status + ': ' + data.Description + '</h4>' );
+
+}
+
 //Validate send register solicitude
 $( '#registrar' ).on( 'click' , function () 
 {
     var aux = 0;
-    var d_clients = [];
-    var d_clients_type = [];
+    /*var d_clients = [];
+    var d_clients_type = [];*/
     var families_input = [];
     aux = validateNewSol();
     
     //Validate fields client are correct
-    clients.children().each( function ()
+    /*clients.children().each( function ()
     {
         elem = $(this);
         d_clients.push( elem.attr("pk") );
         d_clients_type.push( elem.attr("tipo_cliente") );
-    });
+    });*/
     var products      = $('.products');
     products.each( function (index) 
     {
@@ -1783,30 +1780,28 @@ $( '#registrar' ).on( 'click' , function ()
     {
         var form = $('#form-register-solicitude');
         var formData = new FormData( form[ 0 ] );
-        d_clients.forEach( function( entry )
+        /*d_clients.forEach( function( entry )
         {
             formData.append( "clientes[]", entry );
         });   
         d_clients_type.forEach( function( entry )
         {
             formData.append( "tipos_cliente[]" , entry );
-        });
-        var rute = form.attr('action');
+        });*/
+        var route = form.attr('action');
         var message1 = 'Registrando';
-        var message2 = '<strong style="color: green">Solicitud Registrada</strong>';
         if ( id_solicitud ) 
         {
             message1 = 'Actualizando';
-            message2 = '<strong style="color: green">Solicitud Actualizada</strong>';
         }
         $.ajax(
         {
-            url: server + rute,
-            type: 'POST',
-            data: formData,
-            cache: false,
-            contentType: false,
-            processData: false,
+            url         : server + route,
+            type        : 'POST',
+            data        : formData,
+            cache       : false,
+            contentType : false,
+            processData : false,
             beforeSend: function()
             {
                 loadingUI(message1);
@@ -1814,16 +1809,18 @@ $( '#registrar' ).on( 'click' , function ()
         }).done(function ( data )
         {
             $.unblockUI();
-            if(data.Status == 'Ok' )
+            if( data.Status === ok )
             {
-                responseUI('Solicitud Registrada', 'green');
+                responseUI( 'Solicitud Registrada' , 'green' );
                 setTimeout( function()
                 {
                     window.location.href = server + 'show_user';
-                },500);
+                },900);
             }
             else
-                bootbox.alert('<h4 class="red">' + data.Status + ': ' + data.Description + '</h4>');
+            {
+                bootboxMessage( data );
+            }
         }).fail( function ( statusCode , errorThrown ) 
         {
             $.unblockUI();
@@ -1831,7 +1828,9 @@ $( '#registrar' ).on( 'click' , function ()
         });
     }
     else
+    {
         responseUI( 'Verifique los Datos' , 'red' );
+    }
 });
 
 $(document).off("click",".sol-obs");
