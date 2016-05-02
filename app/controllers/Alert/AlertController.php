@@ -70,7 +70,6 @@ class AlertController extends BaseController
 
     public function clientalert2()
     {
-    	\Log::info( 'inicio de alerta2');
     	$msg = '';
     	$tipo_cliente_requerido = array( MEDICO , INSTITUCION );
     	$tiempo = Parameter::find( ALERTA_INSTITUCION_CLIENTE );
@@ -129,9 +128,7 @@ class AlertController extends BaseController
 			}
 			$compare_second_id = array();
 			$compare_initial_id[] = $solicitud_inicial->id;
-		}
-		\Log::info( 'fin de alerta2');
-    	
+		}    	
 		return array( 'type' => 'warning' , 'msg' => $msg, 'data' => $result, 'typeData' => 'clientAlert');
 	}
 

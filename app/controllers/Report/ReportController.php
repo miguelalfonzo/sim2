@@ -452,10 +452,7 @@ class ReportController extends BaseController
             $toDate      = $dataArray['toDate'];
             $zona        = $dataArray['zona'];
             $frecuency   = $dataArray['frecuency'];
-            
-            
             eval('$query = '. $dataArray['query'] .';');
-            \Log::info( $query );
             $resultData  = DB::select($query);
             $result['data'] = $resultData;
         }catch(Exception $e)

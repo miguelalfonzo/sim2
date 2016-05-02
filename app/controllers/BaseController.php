@@ -104,7 +104,7 @@ class BaseController extends Controller
     {
         $rpta = '';
         foreach ($validator->messages()->all() as $msg)
-            $rpta .= $msg.'-';
+            $rpta .= $msg.'<br> ';
         return $rpta;
     }
 

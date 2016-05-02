@@ -3,16 +3,27 @@
 namespace Fondo;
 
 use \Eloquent;
+use \Carbon\Carbon;
 
 class FondoMktPeriodHistory extends Eloquent
 {
-
 	protected $table      = 'FONDO_MKT_PERIODO_HISTORIA';
 	protected $primaryKey = 'id';
-
+	
 	protected static function getFondoMktPeriod( $period , $subCategoryId )
 	{
 		return FondoMktPeriodHistory::where( 'periodo' , $period )->where( 'subcategoria_id' , $subCategoryId )->first();
+	}
+
+	protected static function getNowFondoMktPeriod( $subCategoryId )
+	{
+		$nowPeriod = Carbon::now()->format( 'Ym' ); 
+		return FondoMktPeriodHistory::where( 'subcategoria_id' , $subCategoryId )->where( 'periodo' , $nowPeriod )->orderBy( 'periodo' , 'DESC' )->first();
+	}
+
+	protected static function getLastFondoMktPeriod( $subCategoryId )
+	{
+		return FondoMktPeriodHistory::where( 'subcategoria_id' , $subCategoryId )->orderBy( 'periodo' , 'DESC' )->first();
 	}
 
 	public function nextId()

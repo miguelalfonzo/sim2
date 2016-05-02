@@ -45,10 +45,10 @@
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/', array('uses' => 'Dmkt\LoginController@showLogin'));
-    Route::get('login', array('uses' => 'Dmkt\LoginController@showLogin'));
-    Route::post('login', array('uses' => 'Dmkt\LoginController@doLogin'));
-    Route::get('logout', array('uses' => 'Dmkt\LoginController@doLogout'));
+    Route::get( '/', array( 'uses' => 'Dmkt\LoginController@showLogin'));
+    Route::get( 'login', array('uses' => 'Dmkt\LoginController@showLogin'));
+    Route::post( 'login', array('uses' => 'Dmkt\LoginController@doLogin'));
+    Route::get( 'logout', array('uses' => 'Dmkt\LoginController@doLogout'));
 
     /*
     |--------------------------------------------------------------------------

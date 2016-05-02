@@ -10,29 +10,40 @@ var dateactual = (datef.getMonth()+1)+'-'+datef.getFullYear();
 
 function loadingUI(message)
 {
-    $.blockUI({ css: {
-        border: 'none',
-        padding: '15px',
-        backgroundColor: '#000',
-        '-webkit-border-radius': '10px',
-        '-moz-border-radius': '10px',
-        opacity: 0.5,
-        color: '#fff'
-    }, message: '<h2><img style="margin-right: 30px" src="' + server + 'img/spiffygif.gif" >' + message + '</h2>'});
+    $.blockUI(
+        {
+            baseZ: 2000,
+            css: 
+            {
+                border                  : 'none',
+                padding                 : '15px',
+                backgroundColor         : '#000',
+                '-webkit-border-radius' : '10px',
+                '-moz-border-radius'    : '10px',
+                opacity                 : 0.5,
+                color                   : '#fff'
+            }, 
+            message: '<h2><img style="margin-right: 30px" src="' + server + 'img/spiffygif.gif" >' + message + '</h2>'
+        });
 }
 
 function responseUI( message,color )
 {
-    $.unblockUI();
-    $.blockUI({ css: {
-        border: 'none',
-        padding: '15px',
-        backgroundColor: color,
-        '-webkit-border-radius': '10px',
-        '-moz-border-radius': '10px',
-        opacity: 0.5,
-        color: '#fff'
-    }, message: '<h2>' + message + '</h2>'});
+    $.blockUI(
+        {
+            baseZ: 2000, 
+            css: 
+            {
+                border: 'none',
+                padding: '15px',
+                backgroundColor: color,
+                '-webkit-border-radius': '10px',
+                '-moz-border-radius': '10px',
+                opacity: 0.5,
+                color: '#fff'
+            }, 
+            message: '<h2>' + message + '</h2>'
+        });
     setTimeout(function(){
         $.unblockUI();
     },2000);
@@ -719,13 +730,13 @@ $(function()
     });
 
     $( "#open-expense-register" ).click( function(){
-        rechargeViewExpense()
+        rechargeViewExpense();
     });
     //Validation spending record button
     $( "#save-expense" ).click( function( e )
     {
         e.preventDefault();
-        var btn_save = $(this).html().trim();
+        var btn_save         = $(this).html().trim();
         var proof_type_sel   = $("#proof-type option:selected");
         var ruc              = $("#ruc").val();
         var ruc_hide         = $("#ruc-hide").val();
@@ -945,10 +956,10 @@ $(function()
                                 ajaxError( statusCode , errorThrown );
                             }).done( function ( response ) 
                             {
-                                $.unblockUI();
                                 if( response.Status == 'Ok' )
                                 {
                                     responseUI("Gasto Actualizado","green");
+                                    $( '#expense-register' ).modal( 'hide' );
                                     $( 'input[ name=idgasto ]' ).val('');
                                     rechargeExpense().done( function ( data ) 
                                     {
@@ -964,6 +975,7 @@ $(function()
                                 }
                                 else
                                 {
+                                    $.unblockUI();
                                     bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>' );
                                     return false;
                                 }
@@ -987,7 +999,7 @@ $(function()
 
     function ajaxExpenseDone( response , msg )
     {
-        $.unblockUI();
+        $( '#expense-register' ).modal( 'hide' );
         if( response.Status !== 'Ok' )
             bootbox.alert( '<h4 class="red">' + response.Status + ' : ' + response.Description + '</h4>' );
         else
@@ -1320,11 +1332,9 @@ $(function()
         data.seatList = GBDMKT.seatsList;
         data._token   = $("input[name=_token]").val();
         data.idsolicitud = $('#idsolicitud').attr("rel");
-
-
-
         bootbox.confirm("¿Esta seguro que desea Generar el Asiento de Gasto (Diario)?", function(result) 
         {
+            $( '.bootbox button[ data-bb-handler=confirm ]' ).attr( 'disabled' , true );
             if(result)
             {
                 $.ajax(

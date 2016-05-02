@@ -2,11 +2,10 @@
 
 namespace Dmkt;
 use \Eloquent;
-use \Auth;
 use \DB;
 use \Fondo\FondoGerProd;
 use \Fondo\FondoSupervisor;
-use \Log;
+use \Expense\ChangeRate;
 
 class SolicitudProduct extends Eloquent
 {
@@ -132,6 +131,12 @@ class SolicitudProduct extends Eloquent
     public function user()
     {
         return $this->hasOne( 'User' , 'id' , 'id_fondo_user');
+    }
+
+    protected function getMontoAsignadoSolesAttribute()
+    {
+        $compra = ChangeRate::getLastDayDolar( $this->updated_at );
+        return round( $this->monto_asignado * $compra , 2 , PHP_ROUND_HALF_DOWN );
     }
 
     protected function setMontoAsignadoAttribute( $value )

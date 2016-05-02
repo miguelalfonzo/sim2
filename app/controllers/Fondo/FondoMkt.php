@@ -69,9 +69,9 @@ class FondoMkt extends BaseController
         }
         elseif( $moneda == DOLARES )
         {
-            $tasaCompra        = $tc->compra;
-            $history           = Solicitud::find( $idSolicitud )->lastHistory;
-            $tasaCompraAntigua = ChangeRate::where( 'fecha' ,  Carbon::createFromFormat( 'Y-m-d H:i' , $history->updated_at )->subDay()->format( 'Y:m:d') )->first()->compra;
+            $tasaCompra          = $tc->compra;
+            $lastApprovedHistory = Solicitud::find( $idSolicitud )->lastApprovedHistory;
+            $tasaCompraAntigua   = ChangeRate::getLastDayDolar( $lastApprovedHistory->created_at );
         }
         $historiesFondoMkt = array();
         foreach( $ids_fondo as $id_fondo )
@@ -154,15 +154,15 @@ class FondoMkt extends BaseController
 
     public function setPeriodHistoryData( $subCategoryId , $data )
     {
-        $now     = Carbon::now();
-        $period  = $now->format( 'Ym' );
-        $fondoPeriodHistory = FondoMktPeriodHistory::getFondoMktPeriod( $period , $subCategoryId );
+        //$now    = Carbon::now();
+        //$period = $now->format( 'Ym' );
+        $fondoPeriodHistory = FondoMktPeriodHistory::getNowFondoMktPeriod( $subCategoryId );
 
         if ( is_null( $fondoPeriodHistory ) ):
-            $lastFondoPeriodHistory      = FondoMktPeriodHistory::getFondoMktPeriod( $now->subMonth()->format( 'Ym' ) , $subCategoryId );
+            $lastFondoPeriodHistory      = FondoMktPeriodHistory::getLastFondoMktPeriod( $subCategoryId );
             $fondoPeriodHistory          = new FondoMktPeriodHistory;
             $fondoPeriodHistory->id      = $fondoPeriodHistory->nextId();
-            $fondoPeriodHistory->periodo = $period;
+            //$fondoPeriodHistory->periodo = $period;
             $fondoPeriodHistory->subcategoria_id = $subCategoryId;
             if ( is_null( $lastFondoPeriodHistory ) ):
                 $fondoSubCategory                      = FondoSubCategoria::find( $subCategoryId );

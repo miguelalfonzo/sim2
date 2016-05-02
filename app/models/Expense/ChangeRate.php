@@ -3,6 +3,7 @@
 namespace Expense;
 
 use \Eloquent;
+use \Carbon\Carbon;
 
 class ChangeRate extends Eloquent
 {
@@ -21,6 +22,11 @@ class ChangeRate extends Eloquent
     protected static function getDayTc( $date )
     {
         return ChangeRate::where( 'moneda' , 'DO' )->where( 'fecha' , $date )->first();
+    }
+
+    protected static function getLastDayDolar( $date )
+    {
+        return ChangeRate::where( 'moneda' , 'DO' )->where( 'fecha + 1' , $date->startOfDay() )->first()->compra;
     }
 
 }

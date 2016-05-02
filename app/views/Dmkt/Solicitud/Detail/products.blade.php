@@ -37,7 +37,7 @@
                                         @endforeach
                                     @else
                                         <option value="{{ $product->id_fondo_marketing . ',' . $product->id_tipo_fondo_marketing }}" style="background-color:gold" selected>
-                                            {{ $product->thisSubFondo->approval_product_name . ' ( Reservado ' . $product->monto_asignado . ' ) ' }}
+                                            {{ $product->thisSubFondo->approval_product_name . ' ( Reservado S/. ' . $product->monto_asignado_soles . ' ) ' }}
                                         </option>    
                                         @foreach( $product->getSubFondo( $tipo_usuario , $solicitud ) as $fondoMkt )
                                             @if ( $fondoMkt->id == $product->id_fondo_marketing )
@@ -50,7 +50,7 @@
                                 </select>
                             @else
                                 <span class="input-group-addon" style="max-width:350px;overflow:hidden">
-                                    {{ $product->thisSubFondo->approval_product_name . ' ( Reservado ' . $product->monto_asignado . ' )' }}
+                                    {{ $product->thisSubFondo->approval_product_name . ' ( Reservado S/. ' . $product->monto_asignado_soles . ' )' }}
                                 </span>
                                 <input type="hidden" value="{{ $product->id_fondo_marketing . ',' . $product->id_tipo_fondo_marketing }}" name="fondo_producto[]">
                             @endif
@@ -89,7 +89,7 @@
                                             @endforeach
                                         @else
                                             <option value="{{ $product->id_fondo_marketing . ',' . $product->id_tipo_fondo_marketing }}" style="background-color:gold" selected>
-                                                {{ $product->thisSubFondo->approval_product_name . ' ( Reservado ' . $product->monto_asignado . ' ) ' }}
+                                                {{ $product->thisSubFondo->approval_product_name . ' ( Reservado S/. ' . $product->monto_asignado . ' ) ' }}
                                             </option>    
                                             @foreach( $product->getSubFondo( $tipo_usuario , $solicitud ) as $fondoMkt )
                                                 @if ( $fondoMkt->id == $product->id_fondo_marketing )
@@ -102,7 +102,7 @@
                                     </select>
                                 @else
                                     <span class="input-group-addon" style="max-width:350px;overflow:hidden">
-                                        {{ $product->thisSubFondo->approval_product_name . ' ( Reservado ' . $product->monto_asignado . ' )' }}
+                                        {{ $product->thisSubFondo->approval_product_name . ' ( Reservado S/. ' . $product->monto_asignado . ' )' }}
                                     </span>
                                     <input type="hidden" value="{{ $product->id_fondo_marketing . ',' . $product->id_tipo_fondo_marketing }}" name="fondo_producto[]">
                                 @endif
@@ -114,7 +114,6 @@
                                         <span class="glyphicon glyphicon-remove"></span>
                                     </button>   
                                 </span>
-                                
                             </div>
                         @else
                             {{{ $product->marca->descripcion or '-' }}}

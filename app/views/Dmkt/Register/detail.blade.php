@@ -58,7 +58,7 @@
             <label class="control-label" for="fecha">Asignar A</label>
             <div>
                 <select name="responsable" class="form-control">
-                    <option value="0" selected disabled>Seleccione el Representante Responsable</option>    
+                    <option value="0" selected disabled>Seleccione el Empleado Responsable</option>    
                     @foreach( $reps as $rep )
                         @if( isset( $solicitud ) && $solicitud->id_user_assign == $rep->user_id )
                             <option value="{{ $rep->user_id }}" selected>{{ $rep->full_name }}</option>
