@@ -109,12 +109,10 @@
     <!-- Button (Double) -->
     <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px">
         <div style="text-align: center">
-            @if ( isset( $solicitud ) )
-                @if( $solicitud->blocked == 0 )
-                    <button id="registrar" class="btn btn-primary">Actualizar</button>
-                @endif
+            @if( isset( $solicitud ) && $solicitud->blocked == 0 )
+                <input type="button" id="registrar" class="btn btn-success" value="Actualizar">
             @else
-                <button id="registrar" class="btn btn-primary">Crear</button>
+                <input type="button" id="registrar" class="btn btn-success" value="Crear">
             @endif
             <a href="{{ URL::to('show_user') }}" class="btn btn-primary">Regresar</a>    
         </div>

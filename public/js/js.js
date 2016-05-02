@@ -3,50 +3,51 @@ var pathname = document.location.pathname;
 var pathnameArray= pathname.split("/public/");
 
 server =  pathnameArray.length >0 ? pathnameArray[0]+"/public/" : "";
-//var IGV = 0.18;
-//Funciones Globales
+
 var datef = new Date();
 var dateactual = (datef.getMonth()+1)+'-'+datef.getFullYear();
 
 function loadingUI(message)
 {
     $.blockUI(
+    {
+        baseZ: 2000,
+        css: 
         {
-            baseZ: 2000,
-            css: 
-            {
-                border                  : 'none',
-                padding                 : '15px',
-                backgroundColor         : '#000',
-                '-webkit-border-radius' : '10px',
-                '-moz-border-radius'    : '10px',
-                opacity                 : 0.5,
-                color                   : '#fff'
-            }, 
-            message: '<h2><img style="margin-right: 30px" src="' + server + 'img/spiffygif.gif" >' + message + '</h2>'
-        });
+            border                  : 'none',
+            padding                 : '15px',
+            backgroundColor         : '#000',
+            '-webkit-border-radius' : '10px',
+            '-moz-border-radius'    : '10px',
+            opacity                 : 0.5,
+            color                   : '#fff'
+        }, 
+        message: '<h2><img style="margin-right: 30px" src="' + server + 'img/spiffygif.gif" >' + message + '</h2>'
+    });
 }
 
 function responseUI( message,color )
 {
     $.blockUI(
+    {
+        baseZ: 2000, 
+        css: 
         {
-            baseZ: 2000, 
-            css: 
-            {
-                border: 'none',
-                padding: '15px',
-                backgroundColor: color,
-                '-webkit-border-radius': '10px',
-                '-moz-border-radius': '10px',
-                opacity: 0.5,
-                color: '#fff'
-            }, 
-            message: '<h2>' + message + '</h2>'
-        });
-    setTimeout(function(){
+            border: 'none',
+            padding: '15px',
+            backgroundColor: color,
+            '-webkit-border-radius': '10px',
+            '-moz-border-radius': '10px',
+            opacity: 0.5,
+            color: '#fff'
+        }, 
+        message: '<h2>' + message + '</h2>'
+    });
+
+    setTimeout(function()
+    {
         $.unblockUI();
-    },2000);
+    } , 2000 );
 }
 
 $(function()
@@ -55,15 +56,16 @@ $(function()
     function ajaxError(statusCode,errorThrown)
     {
         if (statusCode.status == 0) 
-            bootbox.alert('<h4 class="yellow">Internet: Problemas de Conexion</h4>');    
+            bootbox.alert('<h4 class="text-warning">Internet: Problemas de Conexion</h4>');    
         else
-            bootbox.alert('<h4 class="red">Error del Sistema</h4>');  
+            bootbox.alert('<h4 class="text-danger">Error del Sistema</h4>');  
     }
 
     //Vars
     var token          = $('input[name=token]').val();
-    var type_money     = $("#type-money").html();
-    var proof_type;
+    var row_item_first = $("#table-items tbody tr:eq(0)").clone();
+    var deposit        = parseFloat($('#amount').val());
+    /*var proof_type;
     var proof_type_sel;
     var ruc;
     var ruc_hide;
@@ -86,40 +88,10 @@ $(function()
     var quantity;
     var description;
     var total_item;
-    var row_item_first = $("#table-items tbody tr:eq(0)").clone();
-    var deposit        = parseFloat($('#amount').val());
     var row_expense_first;
     var data          = {};
-    var data_response = {};
-    //Submit Events
-    $(document).on("click","#token-reg-expense",function(e){
-        e.preventDefault();
-        var token = $(this).attr('data-url');
-        if($(this).attr('data-cont'))
-            window.location.href = server+'revisar-gasto/'+token;
-        else
-            window.location.href = server+'registrar-gasto/'+token;
-    });
-    $(document).on("click","#token-solicitude",function(e){
-        e.preventDefault();
-        var token = $(this).attr('data-url');
-        window.location.href = server+'generar-asiento-solicitud/'+token;
-    });
-    $(document).on("click","#token-expense",function(e){
-        e.preventDefault();
-        var token = $(this).attr('data-url');
-        window.location.href = server+'generar-asiento-gasto/'+token;
-    });
+    var data_response = {};*/
     
-    $("#regimen").on("change" , function()
-    {
-        if ( $(this).val() == 0 )
-            $("#monto-regimen").parent().parent().css("visibility" , "hidden" );
-        else
-            $("#monto-regimen").parent().parent().css("visibility" , "show" );        
-    });
-
-    //Default events
     //Calculate the IGV loading
     if( parseFloat( $( ".total-item" ).val() ) ) 
         calcularIGV();
@@ -166,18 +138,19 @@ $(function()
     // Datepicker date all classes
     // FIX COLOR IN INPUTS READONLY
     $('.date>input[readonly]').css('background-color', "#fff");
-    if(!($('.date>input:not([disabled])').length == 0))
+    if( $( '.date>input:not( [ disabled ] )' ).length !== 0 )
     {
-        $(".date").datepicker(
+        $( '.date' ).datepicker(
         {
-            orientation: "top",
-            language: 'es',
-            startDate: typeof START_DATE === 'undefined' ? '{{}}' : START_DATE ,
-            endDate: typeof END_DATE === 'undefined' ? '' : END_DATE ,
-            format: 'dd/mm/yyyy'
+            orientation : "top",
+            language    : 'es',
+            startDate   : typeof START_DATE === 'undefined' ? '{{}}' : START_DATE ,
+            endDate     : typeof END_DATE === 'undefined' ? '' : END_DATE ,
+            format      : 'dd/mm/yyyy'
         });
         //selected a date hide the datepicker
-        $(".date").on("change",function(){
+        $(".date").on("change",function()
+        {
             $(this).datepicker('hide');
         });
     }
@@ -1467,8 +1440,8 @@ $(function()
     $(document).off( 'click' , '.modal-document');
     $(document).on( 'click' , '.modal-document' , function(e)
     {
-        var tr = $(this).parent().parent().parent();
-        var view_type = $(this).children().attr('data-type');
+        var tr = $( this ).closest( 'tr' );
+        var view_type = $( this ).children().attr('data-type');
         $.ajax(
         {
             type: 'post',
@@ -1518,12 +1491,12 @@ $(function()
                 if ( response.Data.idtipotributo == null )
                 {
                     modal.find('#regimen').val( 0 );
-                    modal.find('#monto-regimen').val( response.Data.monto_tributo ).parent().parent().css( 'visibility' , 'hidden' ); 
+                    modal.find('#monto-regimen').val( response.Data.monto_tributo ).closest( '.form-group' ).css( 'visibility' , 'hidden' ); 
                 }
                 else
                 {
                     modal.find('#regimen').val( response.Data.idtipotributo );
-                    modal.find('#monto-regimen').val( response.Data.monto_tributo ).parent().parent().css( 'visibility' , 'show' );
+                    modal.find('#monto-regimen').val( response.Data.monto_tributo ).closest( '.form-group' ).css( 'visibility' , 'show' );
                 }
                 modal.modal();
             }

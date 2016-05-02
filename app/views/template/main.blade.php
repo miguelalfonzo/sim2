@@ -185,7 +185,7 @@
     URL_BASE = '{{ asset('/') }}';
     @if( isset( $solicitud ) && in_array( $solicitud->id_estado , array ( GASTO_HABILITADO , ENTREGADO ) ) && isset( $date ) )
         START_DATE = '{{ $date[ "startDate" ] }}';
-        END_DATE = '{{ $date[ "endDate" ] }}';
+        END_DATE   = '{{ $date[ "endDate" ] }}';
     @endif
 </script>
 

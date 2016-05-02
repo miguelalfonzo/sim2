@@ -31,47 +31,13 @@ var idState           = $("#idState");
 //VALIDACION DE MONTOS DE FAMILIAS
 var amount_error_families = $('#amount_error_families');
 
-
-//SUB-ESTADOS
-var PENDIENTE     = 1;
-var ACEPTADO      = 2;
-var APROBADO      = 3;
-var DEPOSITADO    = 4;
-var REGISTRADO    = 5;
-var ENTREGADO     = 6;
-var GENERADO      = 7;
-var CANCELADO     = 8;
-var RECHAZADO     = 9;
-var TODOS         = 10;
-var DERIVADO      = 11;
-var POR_DEPOSITAR = 13;
-var POR_REGISTRAR = 12;
-
-//NUEVOS ESTADOS
-var R_PENDIENTE = 1;
-var R_APROBADO = 2;
-var R_REVISADO = 3;
-var R_GASTOS = 4;
-var R_FINALIZADO = 5;
-var R_NO_AUTORIZADO = 6;
-var R_TODOS = 10;
-//USERS
-var REP_MED   = 'R';
-var SUP       = 'S';
-var GER_PROD  = 'P';
-var GER_COM   = 'G';
-var CONT      = 'C';
-var TESORERIA = 'T';
-var ASIS_GER  = 'AG';
-var GER_PROM  = 'GP';
-
 var date_options2 = 
 {
-    format: 'mm-yyyy',
-    minViewMode: 1,
-    language: "es",
-    orientation: "top",
-    autoclose: true
+    format      : 'mm-yyyy',
+    minViewMode : 1,
+    language    : "es",
+    orientation : "top",
+    autoclose   : true
 };
 
 $(document).off( 'click' , '.timeLine' );
@@ -80,27 +46,25 @@ $(document).on( 'click' , '.timeLine' , function(e)
     e.preventDefault();
     var element = $(this);
     element.removeClass( 'timeLine' );
-    var state = parseInt($(this).parent().parent().parent().find('#timeLineStatus').val(), 10);
-    var accept = $(this).parent().parent().parent().find('#timeLineStatus').data('accept');
-    var rejected = $(this).parent().parent().parent().find('#timeLineStatus').data('rejected');
+    //var state = parseInt($(this).parent().parent().parent().find('#timeLineStatus').val(), 10);
+    //var accept = $(this).parent().parent().parent().find('#timeLineStatus').data('accept');
+    //var rejected = $(this).parent().parent().parent().find('#timeLineStatus').data('rejected');
     
     $.get( server + 'timeline-modal/' + $(this).attr('data-id') ).done( function( response ) 
     {
         element.addClass( 'timeLine' );
-        var html = response; 
-        var html = $(html);
-        html.find('.container-fluid').removeClass('hide');
-        var h     = html;
+        var view = $( response ); 
+        view.find( '.container-fluid' ).removeClass('hide');
         bootbox.dialog(
         {
-            message: h,
-            title: "Línea del Tiempo",
+            message : view,
+            title   : "Línea del Tiempo",
             buttons: 
             {
                 danger: 
                 {
-                    label: "Cancelar",
-                    className: "btn-default"
+                    label     : "Cancelar",
+                    className : "btn-default"
                 }
             },
             size: "large"
@@ -1802,10 +1766,8 @@ function validateNewSol()
 }
 
 //Validate send register solicitude
-$( '#registrar' ).off( 'click' );
-$( '#registrar' ).on( 'click' , function ( e ) 
+$( '#registrar' ).on( 'click' , function () 
 {
-    e.preventDefault();
     var aux = 0;
     var d_clients = [];
     var d_clients_type = [];
