@@ -119,7 +119,7 @@ class Seeker extends BaseController
         $inputs    = Input::all();
         $userTypes = $this->getHierarchyType();
         $personal  = Personal::select( 'NOMBRES , APELLIDOS , USER_ID' )
-            ->whereRaw( "NOMBRES || ' ' || APELLIDOS like UPPER( '%" . $inputs[ 'sVal' ] . "%' )" )
+            ->whereRaw( "UPPER( NOMBRES || ' ' || APELLIDOS ) like UPPER( '%" . $inputs[ 'sVal' ] . "%' )" )
             ->whereHas( 'user' , function( $query ) use( $userTypes )
             {
                 $query->whereIn( 'type' , $userTypes );

@@ -207,8 +207,7 @@ $(function()
                     }
                 });
             }
-        });
-        
+        });      
     }
 
     function bootboxExpense( title , view , type )
