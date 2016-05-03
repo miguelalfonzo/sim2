@@ -147,7 +147,14 @@ class BaseController extends Controller
                 ->subject( error.' - Function: '.$function );
             });
         }
-        return array( status => error , description => $type. ': '.$exception->getMessage() );
+        else
+        {
+            if( strpos( $exception->getMessage() , 'ORA-00001' ) )
+            {
+                return array( status => error , description => $type . ':  No puede repetir la informacion de la tabla' );
+            }
+        }
+        return array( status => error , description => $type . ': ' . $exception->getMessage() );
     }
 
     private function validateJson()

@@ -146,10 +146,7 @@ class TableController extends BaseController
 		$model  	 = $vData[ 'model' ];
 		$id          = $vData[ 'id' ];
 		
-		if( $type == 'Inversion_Actividad' )
-			$records = $model::has( 'activity' )->has('investment' )->get();
-		else
-			$records = $model::orderWithTrashed();
+		$records = $model::orderWithTrashed();
 		
 		$maintenance = Maintenance::find( $id );
 		$columns = json_decode( $maintenance->formula );
@@ -476,7 +473,7 @@ class TableController extends BaseController
 
 	private function addInversionActividad()
 	{
-		$data = array( 'actividades' => Activity::withTrashed()->get() , 'inversiones' => InvestmentType::withTrashed()->get() );
+		$data = array( 'actividades' => Activity::withTrashed()->orderBy( 'nombre' )->get() , 'inversiones' => InvestmentType::withTrashed()->orderBy( 'nombre' )->get() );
 		return $this->setRpta( View::make( 'Maintenance.InvestmentActivity.tr')->with( $data )->render() );	
 	}
 
