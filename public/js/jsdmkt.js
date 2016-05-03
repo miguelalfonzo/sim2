@@ -1821,6 +1821,14 @@ $(document).on("click",".sol-obs", function()
     $(this).removeAttr("placeholder").parent().parent().removeClass("has-error");
 });
 
+function preventDoubleCLick( element )
+{
+    element.on( 'click' , 'button[ data-bb-handler=confirm ]' , function()
+    {
+        this.setAttribute( 'disabled' , true );
+    });
+}
+
 $("#btn-mass-approve").click( function()
 {
     var checks = $("input[name=mass-aprov]:checked").length;
@@ -1828,7 +1836,7 @@ $("#btn-mass-approve").click( function()
         bootbox.alert("<h4>No hay solicitudes seleccionadas</h4>")
     else
     {    
-        bootbox.confirm("<h4 style='color:blue'>Esta seguro de aprobar todas las solicitudes seleccionadas</h4>" , function(result)
+        bbox = bootbox.confirm("<h4 style='color:blue'>Esta seguro de aprobar todas las solicitudes seleccionadas</h4>" , function(result)
         {
             if (result)
             {
@@ -1880,6 +1888,7 @@ $("#btn-mass-approve").click( function()
                 });
             }
         });
+        preventDoubleCLick( bbox );
     }
 });
 

@@ -130,7 +130,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
         {
             $userIds = $this->sup->reps->lists( 'user_id' );
         }
-        elseif( in_array( $this->type , [ GER_PROD , GER_PROM , GER_COM , GER_GER ] ) )
+        elseif( in_array( $this->type , [ GER_PROD , GER_PROM , GER_COM , GER_GER , CONT , ASIS_GER ] ) )
         {
             $userIds = User::whereIn( 'type' , [ REP_MED , SUP ] )->lists( 'id' );
         }  
