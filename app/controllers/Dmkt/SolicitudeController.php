@@ -865,11 +865,11 @@ class SolicitudeController extends BaseController
     {
         DB::beginTransaction();
         $middleRpta = $this->validateInputAcceptSolRep( $inputs );
-        if ( $middleRpta[status] === ok ) 
+        if ( $middleRpta[ status ] === ok ) 
         {
             $solicitud  = Solicitud::find( $idSolicitud );
             $middleRpta = $this->verifyPolicy( $solicitud , $inputs[ 'monto' ] );
-            if ( $middleRpta[status] == ok )
+            if ( $middleRpta[ status ] == ok )
             {
                 $oldIdEstado          = $solicitud->id_estado;
                 if( $inputs[ 'derivacion'] && Auth::user()->type === SUP )
@@ -918,7 +918,6 @@ class SolicitudeController extends BaseController
                         $detalle->num_ruc = $inputs[ 'ruc' ];
                     }
 
-
                     if( isset( $inputs[ 'fecha' ] ) )
                     {
                         $detalle->fecha_entrega = $inputs[ 'fecha' ];
@@ -945,7 +944,7 @@ class SolicitudeController extends BaseController
                     
                     $middleRpta = $this->setProductsAmount( $inputs[ 'producto' ] , $inputs[ 'monto_producto' ] , $inputs[ 'fondo_producto' ] , $solDetalle );
                     
-                    if ( $middleRpta[status] != ok )
+                    if ( $middleRpta[ status ] != ok )
                     {
                         DB::rollback();
                         return $middleRpta;

@@ -58,21 +58,6 @@ class BaseController extends Controller
         return $tasa;
     }
 
-    protected function fondoName( $fondo )
-    {
-        try{
-            if ( ! is_null ( $fondo->marca ) && ! is_null( $fondo->supervisor_id ) && ! is_null( $fondo->subcategoria_id ) ){
-                return $fondo->subCategoria->descripcion . ' | ' . $fondo->marca->descripcion . ' | ' . $fondo->sup->getFullName();
-            }elseif ( ! is_null( $fondo->marca ) && ! is_null( $fondo->subcategoria_id ) ){
-                return $fondo->subCategoria->descripcion . ' | ' . $fondo->marca->descripcion;
-            }elseif( ! is_null( $fondo->subcategoria_id ) ){
-                return $fondo->subCategoria->descripcion;
-            }
-        }catch(Exception $e){
-            return $e;
-        }
-    }
-
     protected function getExpenseDate( $solicitud , $range = 0 )
     {
         $now = Carbon::now();

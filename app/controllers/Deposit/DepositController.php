@@ -191,7 +191,7 @@ class DepositController extends BaseController
             $fondo->retencion -= $detalle->monto_aprobado * $tasaCompraAprobacion;
 
             if ( $fondo->saldo < 0 )
-                return $this->warningException( 'El Fondo ' . $this->fondoName( $fondo ) . ' solo cuenta con S/.' . ( $fondo->saldo + $fondoMonto ) . 
+                return $this->warningException( 'El Fondo ' . $fondo->full_name . ' solo cuenta con S/.' . ( $fondo->saldo + $fondoMonto ) . 
                                                 $msg . $fondoMonto . ' en total' , __FUNCTION__ , __FILE__ , __LINE__ );
             $data = array(
                 'idFondo'      => $fondo->id , 

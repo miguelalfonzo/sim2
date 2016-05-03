@@ -68,4 +68,13 @@ class FondoSupervisor extends Eloquent
 		return $this->subCategoria->descripcion . ' | ' . $this->marca->descripcion . ' S/.' . $this->saldo_disponible ;
 	}
 
+	protected static function totalAmount( $subcategory , $supervisorId )
+	{
+		$model  =	FondoSupervisor::select( 'sum( saldo ) saldo , sum( retencion ) retencion , sum( saldo - retencion ) saldo_disponible , subcategoria_id' )
+				  		->where( 'subcategoria_id' , $subcategory )->where( 'supervisor_id' , $supervisorId )
+						->groupBy( 'subcategoria_id' )
+						->first();
+		return $model;
+	}
+
 }

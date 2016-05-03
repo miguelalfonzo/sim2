@@ -103,16 +103,47 @@ class FondoMkt extends BaseController
 
     public function validateFondoSaldo( $fondosData , $fondoType , $msg , $tipo = '' )
     {
+        $totalAmountSup = [];
         foreach( $fondosData as $idFondo => $fondoMonto )
         {
             if ( $fondoType == SUP )
+            {
                 $fondo = FondoSupervisor::find( $idFondo );
+                
+                if( isset( $totalAmountSup[ $fondo->subcategoria_id ][ $fondo->supervisor_id ] ) )
+                {
+                    $totalAmountSup[ $fondo->subcategoria_id ][ $fondo->supervisor_id ] += $fondoMonto;  
+                }
+                else
+                {
+                    $totalAmountSup[ $fondo->subcategoria_id ][ $fondo->supervisor_id ] = $fondoMonto;  
+                }
+            }
             elseif ( $fondoType == GER_PROD )
+            {
                 $fondo = FondoGerProd::find( $idFondo );
+                if ( $fondo->{ 'saldo' . $tipo } < 0 )
+                {
+                    return $this->warningException( 'El Fondo ' . $fondo->full_name . ' solo cuenta con S/.' . ( $fondo->{ 'saldo' . $tipo } + $fondoMonto ) . 
+                                                    $msg . $fondoMonto . ' en total' , __FUNCTION__ , __FILE__ , __LINE__ );
+                }
+            }
+        }
 
-            if ( $fondo->{ 'saldo' . $tipo } < 0 ){
-                return $this->warningException( 'El Fondo ' .  $this->fondoName( $fondo ) . ' solo cuenta con S/.' . ( $fondo->{ 'saldo' . $tipo } + $fondoMonto ) . 
-                                                $msg . $fondoMonto . ' en total' , __FUNCTION__ , __FILE__ , __LINE__ );
+        if( ! empty( $totalAmountSup ) )
+        {
+            foreach( $totalAmountSup as $subCategoryId => $sups )
+            {
+                foreach( $sups as $supId => $amount )
+                {
+                    $fondoSup = FondoSupervisor::totalAmount( $subCategoryId , $supId );
+                    $fondoSubCategory = fondoSubCategoria::find( $subCategoryId );
+                    if( $fondoSup->{ 'saldo' . $tipo } < 0 )
+                    {
+                        return $this->warningException( 'El Fondo ' . $fondoSubCategory->descripcion . ' solo cuenta con S/.' . ( $fondoSup->{ 'saldo' . $tipo } + $amount ) . 
+                                                    $msg . $amount . ' en total' , __FUNCTION__ , __FILE__ , __LINE__ );
+                    }
+                } 
             }
         }
         return $this->setRpta();
