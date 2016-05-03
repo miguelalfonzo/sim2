@@ -2129,8 +2129,11 @@ $(function()
         {    
             if ( response ) 
             {
-                data._token   = GBREPORTS.token;
-                data.token    = $( 'input[ name=token ]' ).val();
+                var data =
+                {
+                    _token : GBREPORTS.token,
+                    token  : $( 'input[ name=token ]' ).val()
+                }
                 $.post( server + 'end-expense-record' , data )
                 .done(function ( response ) 
                 {
