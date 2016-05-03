@@ -2175,7 +2175,7 @@ $( document ).ready(function()
             }         
         });
     }
-    //getAlerts();
+    getAlerts();
 
     seeker( $( '.cliente-seeker' ) , 'clients' , 'search-client' );
     seeker( $( '.institucion-seeker' ) , 'institutions' , 'search-institution' );

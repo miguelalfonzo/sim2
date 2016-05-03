@@ -13,15 +13,16 @@ use \View;
 
 class AlertController extends BaseController
 {
-	/*public function show()
+	public function show()
 	{
 		$data = array('alerts' => $this->alertConsole2());
 		return View::make('template.User.alerts', $data);
 	}
 
-	public function showAlerts(){
+	public function showAlerts()
+	{
 		return array('status' => 'OK', 'alerts' => $this->alertConsole2());
-	}*/
+	}
 
 	private function intersectRecords( $rs1 , $rs2 )
     {
@@ -44,27 +45,38 @@ class AlertController extends BaseController
     {
     	$result = array();
     	$result['alert'] = array();
-    	$clientAlert = $this->clientAlert2();
+    	
+    	//$clientAlert = $this->clientAlert2();
+    	/*if($clientAlert[ 'msg' ] != "" )
+    		$result['alert'][] = $clientAlert;*/
+    	
     	$expenseAlert = $this->expenseAlert2();
-    	$timeAlert = $this->compareTime2();
-    	if($clientAlert[ 'msg' ] != "" )
-    		$result['alert'][] = $clientAlert;
     	if($expenseAlert[ 'msg' ] != "")
     		$result['alert'][] = $expenseAlert;
+    	
+    	$timeAlert = $this->compareTime2();
     	if($timeAlert[ 'msg' ] != "")
     		$result['alert'][] = $timeAlert;
+    	
     	return $result['alert'];
     }
     public function alertConsole()
     {
     	$result = array();
     	$result['alert'] = array();
-    	$clientAlert = $this->clientAlert();
-    	$expenseAlert = $this->expenseAlert();
+    	
+    	/*$clientAlert = $this->clientAlert();
     	if($clientAlert[ 'msg' ] != "" )
-    		$result['alert'][] = $clientAlert;
+    		$result['alert'][] = $clientAlert;*/
+    	
+    	$expenseAlert = $this->expenseAlert();
     	if($expenseAlert[ 'msg' ] != "")
     		$result['alert'][] = $expenseAlert;
+
+    	$timeAlert = $this->compareTime();
+    	if($timeAlert[ 'msg' ] != "")
+    		$result['alert'][] = $timeAlert;
+
     	return $result['alert'];
     }
 

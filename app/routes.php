@@ -234,8 +234,8 @@
         | Alert
         |--------------------------------------------------------------------------
         */
-        //Route::get( 'alerts' , 'Alert\AlertController@show' );
-        //Route::post( 'alerts' , 'Alert\AlertController@showAlerts' );
+        Route::get( 'alerts' , 'Alert\AlertController@show' );
+        Route::post( 'alerts' , 'Alert\AlertController@showAlerts' );
     
         /*
         |--------------------------------------------------------------------------
