@@ -5,6 +5,7 @@ namespace Filter;
 use \Auth;
 use \Request;
 use \App;
+use \Redirect;
 
 class FilterController
 {

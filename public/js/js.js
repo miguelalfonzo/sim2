@@ -406,15 +406,17 @@ $(function()
     });
 
     //Enable deposit
-    $("#enable-deposit").on("click",function(e){
-        e.preventDefault();
-        bootbox.confirm("<h4>Para Confirmar presione OK</h4>", function( result ) 
+    $("#enable-deposit").on("click",function()
+    {
+        bootbox.confirm( '<h4 class="text-info">Para Confirmar presione OK</h4>' , function( result ) 
         {
-            if(result)
+            if( result )
             {
-                data._token      = $("input[name=_token]").val();
-                data.idsolicitud = $("input[name=idsolicitud]").val();
-                
+                var data =
+                {
+                    _token      : GBREPORTS.token ,
+                    idsolicitud : $("input[name=idsolicitud]").val()
+                }
                 $.post( server + 'revisar-solicitud' , data ).done( function ( data )
                 {
                     if(data.Status == "Ok")
@@ -425,7 +427,9 @@ $(function()
                         });
                     }
                     else
-                        bootbox.alert("<h4 class='red'>" + data.Status + ": " + data.Description +  "</h4>");
+                    {
+                        bootboxMessage( data );
+                    }
                 });
             }
         });
