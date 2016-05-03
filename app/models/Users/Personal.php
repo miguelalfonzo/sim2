@@ -104,20 +104,16 @@ class Personal extends Eloquent
     {
         if( $this->tipo === 'RM' || $this->tipo === 'RI' )
         {
-            $visitador = $this->bagoVisitador;
-            $account = $visitador->cuenta;
-            if( ! is_null( $account ) )
+            if( isset( $this->bagoVisitador->cuenta->cuenta ) )
             {
-                return $account->cuenta;
+                return $this->bagoVisitador->cuenta->cuenta;
             }
         }
         elseif( $this->tipo === SUP )
         {
-            $supervisor = $this->bagoSupervisor;
-            $account = $supervisor->cuenta;
-            if( ! is_null( $account ) )
+            if( isset( $this->bagoSupervisor->cuenta->cuenta ) )
             {
-                return $account->cuenta;
+                return $this->bagoSupervisor->cuenta->cuenta;
             }
         }
         return null;   
