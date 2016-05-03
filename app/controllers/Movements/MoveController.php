@@ -91,7 +91,10 @@ class MoveController extends BaseController
             if ( $validator->fails() ) 
                 return $this->warningException( substr($this->msgValidator($validator), 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
             
-            $middleRpta = $this->getDocs( $inputs['idProof'] , $inputs['date_start'] , $inputs['date_end'] , $inputs['val'] );
+            $middleRpta = $this->getDocs( $inputs[ 'idProof' ] , $inputs[ 'date_start' ] , $inputs[ 'date_end' ] , $inputs[ 'val' ] );
+            $db = \DB::getQueryLog();
+        \Log::info( last( $db ) );   
+        
             if ( $middleRpta[status] == ok )
                 return $this->setRpta( View::make('Dmkt.Cont.list_documents')->with( 'proofs' , $middleRpta[data] )->render() );
             else
@@ -109,13 +112,14 @@ class MoveController extends BaseController
         $documents->where( 'idcomprobante' , $idProof );
 
         if ( ! empty( trim( $val ) ) )
+        {
             $documents->where( function ( $q ) use ( $val )
             {
                 if ( is_numeric( $val) )
-                    $q->where( 'num_prefijo' , $val )->orWhere( 'num_serie' , $val )->orWhere( 'RUC' , $val )->orWhere( 'UPPER( razon )' , 'like' , '%strtoupper( $val )%' );
-                $q->orWhere( 'UPPER( razon )' , 'like' , '%'.strtoupper( $val ).'%' );
+                    $q->where( 'num_serie' , 'like' , '%' . $val . '%' )->orWhere( 'RUC' , 'like' , '%' . $val . '%' );
+                $q->orWhere( 'UPPER( razon )' , 'like' , '%' . mb_strtoupper( $val ) . '%' )->orWhere( 'UPPER( num_prefijo )' , 'LIKE' , '%' . mb_strtoupper( $val ) . '%' );
             });
-            
+        }
         $documents->whereRaw( "fecha_movimiento between to_date('$start','DD/MM/YYYY') and to_date('$end','DD/MM/YYYY') ");
         return $this->setRpta( $documents->get() );
     }
