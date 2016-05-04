@@ -10,50 +10,36 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-xs-12 col-sm-6 col-md-6">
-                        <div class="form-expense">
-                            <label>Solicitud</label>
-                            <div class="input-group">
-                                <div id="id-solicitude" class="input-group-addon" value=""></div>
-                                <input id="sol-titulo" class="form-control" type="text" disabled>
-                                <input name="token" type="hidden">
-                            </div>
+                    <div class="col-xs-12 col-sm-6 col-md-6 form-group">
+                        <label>Solicitud</label>
+                        <div class="input-group">
+                            <div id="id-solicitude" class="input-group-addon" value=""></div>
+                            <input id="sol-titulo" class="form-control" type="text" disabled>
+                            <input name="token" type="hidden">
                         </div>
                     </div>
-                    <div class="col-xs-12 col-sm-6 col-md-6">
-                        <div class="form-expense">
-                            <label>Beneficiario</label>
-                            <input id="beneficiario" class="form-control" type="text" disabled>
-                        </div>
+                    <div class="col-xs-12 col-sm-6 col-md-6 form-group">
+                        <label>Beneficiario</label>
+                        <input id="beneficiario" class="form-control" type="text" disabled>
                     </div>
-                    <div class="col-xs-12 col-sm-6 col-md-6">
-                        <div class="form-expense">
-                            <label>Monto a Depositar</label>
-                            <input id="total-deposit" class="form-control" type="text" disabled>
-                        </div>
+                    <div class="col-xs-12 col-sm-6 col-md-6 form-group">
+                        <label>Monto a Depositar</label>
+                        <input id="total-deposit" class="form-control" type="text" disabled>
                     </div>
-                    <div class="col-xs-12 col-sm-6 col-md-6">
-                        <div class="form-expense">
-                            <label>Bancos</label>
-                            <div>
-                                <select id="bank_account" name="bank_account" class="form-control">
-                                    @foreach ( $banks as $bank )
-                                        <option value="{{$bank->num_cuenta}}">
-                                            {{ $bank->typeMoney->simbolo . '-' . $bank->bagoAccount->ctanombrecta}}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
+                    <div class="col-xs-12 col-sm-6 col-md-6 form-group">
+                        <label>Bancos</label>
+                        <select id="bank_account" name="bank_account" class="form-control">
+                            @foreach ( $banks as $bank )
+                                <option value="{{$bank->num_cuenta}}">
+                                    {{ $bank->typeMoney->simbolo . '-' . $bank->bagoAccount->ctanombrecta}}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
-                </div>
-                <div class="row">
-                     <div class="col-xs-12 col-sm-12 col-md-12">
-                        <div class="form-expense">
-                            <label for="op-number">Número de Operación, Transacción, Cheque</label>
-                            <input id="op-number" type="text" class="form-control" maxlength="200">
-                            <p id="message-op-number" style="margin-top:1em;color:#a94442;"></p> 
-                        </div>
+                    <div class="col-xs-12 col-sm-12 col-md-12 form-group">
+                        <label for="op-number">Número de Operación, Transacción, Cheque</label>
+                        <input id="op-number" type="text" class="form-control" maxlength="200">
+                        <p id="message-op-number" style="margin-top:1em;color:#a94442;"></p> 
                     </div>
                 </div>
             </div>
