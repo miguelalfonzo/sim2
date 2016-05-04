@@ -4,6 +4,7 @@ namespace Fondo;
 
 use \Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletingTrait;
+use \Auth;
 
 class FondoSupervisor extends Eloquent
 {
@@ -75,6 +76,11 @@ class FondoSupervisor extends Eloquent
 						->groupBy( 'subcategoria_id' )
 						->first();
 		return $model;
+	}
+
+	protected static function getSupFund()
+	{
+		return FondoSupervisor::where( 'supervisor_id' , Auth::user()->id )->orderBy( 'subcategoria_id' )->get();
 	}
 
 }

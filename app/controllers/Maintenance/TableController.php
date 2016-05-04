@@ -97,17 +97,6 @@ class TableController extends BaseController
         		$sheet->loadView( 'Maintenance.export' , $data );
         	});
 		})->store( 'xls' , storage_path( 'maintenance' ) )->export( 'xls' );
-
-	/*	return View::make( 'Maintenance.table' , 
-			array( 
-				'records' => $records , 
-				'columns' => $columns , 
-				'titulo'  => 'Mantenimiento de ' . $maintenance->descripcion , 
-				'type'    => $type , 
-				'add'	  => $vData[ 'add' ] ,
-				'export'  => true
-			) 
-		);		*/
 	}
 
 	public function getMaintenanceCellData()
@@ -150,7 +139,7 @@ class TableController extends BaseController
 		$records = $model::orderWithTrashed();
 		
 		$maintenance = Maintenance::find( $id );
-		$columns = json_decode( $maintenance->formula );
+		$columns     = json_decode( $maintenance->formula );
 		return View::make( 'Maintenance.view' , 
 			array( 
 				'records' => $records , 

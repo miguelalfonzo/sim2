@@ -57,15 +57,15 @@ class FilterController
 		return $this->rolFilter( [ REP_MED , SUP , CONT , TESORERIA ] );
 	}
 
-  public function rep_sup_gerProd_asisGer()
+    public function rep_sup_gerProd_asisGer()
 	{
 		return $this->rolFilter( [ REP_MED , SUP , GER_PROD , ASIS_GER ] );
 	}
 
-  public function rep_sup_gerProd_gerProm_gerCom_gerGen_asisGer()
-  {
-    return $this->rolFilter( [ REP_MED , SUP , GER_PROD , GER_PROM , GER_COM , GER_GER , ASIS_GER ] );
-  }
+	public function rep_sup_gerProd_gerProm_gerCom_gerGen_asisGer()
+	{
+	    return $this->rolFilter( [ REP_MED , SUP , GER_PROD , GER_PROM , GER_COM , GER_GER , ASIS_GER ] );
+	}
 
 	public function rep_sup_cont_gerProd_gerProm_gerCom_gerGen()
 	{
