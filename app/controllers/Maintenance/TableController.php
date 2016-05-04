@@ -28,6 +28,7 @@ use \System\FondoMktHistory;
 use \Policy\ApprovalInstanceType;
 use \Excel;
 use \Carbon\Carbon;
+use \Fondo\FondoMkt;
 
 class TableController extends BaseController
 {
@@ -199,12 +200,15 @@ class TableController extends BaseController
 		$middleRpta = $this->updateGeneric( $inputs );
 		$data   = $middleRpta[ data ];
 		$middleRpta = $this->validateFondoSaldoNeto( $data[ 'newRecord' ] );
-		if ( $middleRpta[ status ] == ok ):
+		if ( $middleRpta[ status ] == ok )
+		{
 			$this->setFondoMktHistory( $data , $inputs[ 'type' ] );
 			DB::commit();
-		else:
+		}
+		else
+		{
 			DB::rollback();
-		endif;
+		}
 		return $middleRpta;
 	}
 
@@ -252,6 +256,7 @@ class TableController extends BaseController
 
 	private function setFondoMktHistory( $fondos , $type )
 	{
+		//REGISTRO DEL MOVIMIENTO DE SALDOS EN EL HISTORIAL DE FONDOS
 		$fondoMktHistory                          = new FondoMktHistory;
 		$fondoMktHistory->id                      = $fondoMktHistory->nextId();
 		$fondoMktHistory->id_to_fondo             = $fondos[ 'newRecord' ]->id ;
@@ -262,6 +267,17 @@ class TableController extends BaseController
 		$fondoMktHistory->id_fondo_history_reason = FONDO_AJUSTE;
 		$fondoMktHistory->id_tipo_to_fondo        = $this->getFondoType( $type );
 		$fondoMktHistory->save();
+
+		//CREACION DE ARRAY CON LOS SALDOS Y RETENCIONES ANTES Y DEPUES DE LA ACTUALIZACION
+		$data  =   array( 
+            'oldSaldo'     => $fondos[ 'oldRecord' ]->saldo , 
+            'newSaldo'     => $fondos[ 'newRecord' ]->saldo ,
+            'oldRetencion' => $fondos[ 'oldRecord' ]->retencion , 
+            'newRetencion' => $fondos[ 'newRecord' ]->retencion );
+
+		//LLAMANDO A LA FUNCION DE ACTUALIZACION DEL HISTORIAL DEL FONDO POR PERIODO
+		$fondoMkt = new FondoMkt;
+		$fondoMkt->setPeriodHistoryData( $fondos[ 'newRecord' ]->subcategoria_id , $data );	
 	}
 
 	private function getFondoType( $type )

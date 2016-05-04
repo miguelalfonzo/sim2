@@ -189,8 +189,6 @@ class FondoMkt extends BaseController
 
     public function setPeriodHistoryData( $subCategoryId , $data )
     {
-        //$now    = Carbon::now();
-        //$period = $now->format( 'Ym' );
         $fondoPeriodHistory = FondoMktPeriodHistory::getNowFondoMktPeriod( $subCategoryId );
 
         if ( is_null( $fondoPeriodHistory ) ):
