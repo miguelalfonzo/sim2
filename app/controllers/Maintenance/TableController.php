@@ -93,7 +93,7 @@ class TableController extends BaseController
 		{
 		    $excel->sheet( 'Data' , function( $sheet ) use ( $data )
 		    {
-        		$sheet->loadView( 'Maintenance.table' , $data );
+        		$sheet->loadView( 'Maintenance.export' , $data );
         	});
 		})->store( 'xls' , storage_path( 'maintenance' ) )->export( 'xls' );
 
