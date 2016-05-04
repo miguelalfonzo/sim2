@@ -587,7 +587,7 @@ class ExpenseController extends BaseController
 		if ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) )
 		{	
 			$aproved_user = User::where( 'id' , $solicitud->approvedHistory->updated_by )->firstOrFail();
-			$name_aproved = $aproved_user->personal->getFullName();
+			$name_aproved = $aproved_user->personal->full_name;
 			$charge = $aproved_user->userType->descripcion;
 			
 			$data  = array( 

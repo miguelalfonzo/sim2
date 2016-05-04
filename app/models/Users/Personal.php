@@ -24,12 +24,6 @@ class Personal extends Eloquent
         else
             return $lastId->id;
     }
-    public function getFullName()
-    {
-        $name = $this->nombres .' '. $this->apellidos;
-        $name =ucwords(strtolower($name));
-        return $name;
-    }
 
     protected function getSeatNameAttribute()
     {
@@ -38,7 +32,7 @@ class Personal extends Eloquent
 
     public function getFullNameAttribute()
     {
-        return ucwords( strtolower( $this->nombres . ' ' . $this->apellidos ) );
+        return ucwords( mb_strtolower( $this->nombres . ' ' . $this->apellidos ) );
     }
 
     // idkc : RETORNA MODELO DE SUPERVISOR

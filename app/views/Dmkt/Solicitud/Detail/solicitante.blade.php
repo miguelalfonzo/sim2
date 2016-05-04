@@ -3,7 +3,7 @@
     <div class="input-group">
         @if( ! is_null( $solicitud->createdBy ) )
             <span class="input-group-addon">{{$solicitud->createdBy->type}}</span>
-            <input id="textinput" class="form-control" name="titulo" type="text" readonly value="{{ $solicitud->createdBy->personal->getFullName() }}">
+            <input id="textinput" class="form-control" name="titulo" type="text" readonly value="{{ $solicitud->createdBy->personal->full_name }}">
         @endif
     </div>
 </div>

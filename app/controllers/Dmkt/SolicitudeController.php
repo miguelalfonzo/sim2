@@ -537,9 +537,9 @@ class SolicitudeController extends BaseController
     private function textAccepted($solicitud)
     {
         if ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) )
-            return $solicitud->approvedHistory->user->personal->getFullName();
+            return $solicitud->approvedHistory->user->personal->full_name;
         else if ($solicitud->idtiposolicitud == SOL_INST)
-            return $solicitud->createdBy->personal->getFullName();
+            return $solicitud->createdBy->personal->full_name;
     }
 
     private function textClients($solicitud)
