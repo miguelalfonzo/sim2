@@ -6,19 +6,31 @@ use \BaseController;
 use \View;
 use \Input;
 use \Fondo\FondoSupervisor;
+use \Fondo\FondoSubCategoria;
 
 class Funds extends BaseController
 {
 
 	public function show( $type )
 	{
-		return View::make( 'Report.view' , [ 'type' => $type ] ); 
+		$typeCode 	   = $this->getTypeCode( $type );
+		$fondoCategory = FondoSubCategoria::getRolFunds( $typeCode );
+		return View::make( 'Report.view' , [ 'type' => $type , 'funds' => $fondoCategory ] ); 
 	}
 
 	public function source()
 	{
 		$inputs = Input::all();
 		return $this->getData( $inputs[ 'type' ] );
+	}
+
+	private function getTypeCode( $type )
+	{
+		if( $type === 'Fondo_Supervisor' )
+		{
+			return SUP;
+		}
+
 	}
 
 	private function getData( $type )
@@ -28,8 +40,12 @@ class Funds extends BaseController
 			$data = FondoSupervisor::getSupFund();
 			$columns =
                 [ 
-                        [ 'title' => 'Id' , 'data' => 'id' ],
-                        [ 'title' => 'Saldo' , 'data' => 'saldo' , 'className' => 'sum' ]
+                        [ 'data' => 'subcategoria.descripcion' ],
+                        [ 'data' => 'marca.descripcion' ],
+                        [ 'data' => 'saldo' , 'className' => 'sum-saldo' ],
+                        [ 'data' => 'retencion' , 'className' => 'sum-retencion' ],
+                        [ 'data' => 'saldo_disponible' , 'className' => 'sum-saldo-disponible' ]
+                        
                 ];
 			$rpta = $this->setRpta( $data );
 			$rpta[ 'columns' ] = $columns;

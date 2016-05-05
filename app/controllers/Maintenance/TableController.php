@@ -29,6 +29,8 @@ use \Policy\ApprovalInstanceType;
 use \Excel;
 use \Carbon\Carbon;
 use \Fondo\FondoMkt;
+use \Expense\BagoMarcaGasto;
+
 
 class TableController extends BaseController
 {
@@ -61,14 +63,6 @@ class TableController extends BaseController
 			case 'Documento':
 				return array( 'model' => new Proof , 'key' => 'codigo' , 'add' => false );
 		endswitch;
-	}
-
-	private function getName( $function , $type )
-	{
-		if( $type === 1 )
-			return substr( $function , 7 );
-		elseif ( $type === 4 )
-			return substr( $function , 3 );
 	}
 
 	public function export( $type )
@@ -114,20 +108,20 @@ class TableController extends BaseController
 		}
 	}
 
-	public function getTableDailySeatRelation()
-	{
-		$records = MarkProofAccounts::all();
-		$columns = Maintenance::find(1);
-		$columns = json_decode( $columns->formula );
-		return View::make( 'Maintenance.table' )->with( array( 'records' => $records , 'columns' => $columns , 'type' => 'cuentasMarca' , 'titulo' => 'Mantenimiento de Cuentas - Marca' ) );
-	}
-
 	public function getTableParameter()
 	{
 		$records = Parameter::all();
 		$columns = Maintenance::find(2);
 		$columns = json_decode( $columns->formula );
 		return View::make( 'Maintenance.table' )->with( array( 'records' => $records , 'columns' => $columns , 'type' => 'parametro' , 'titulo' => 'Mantenimiento de Parametros' ) );
+	}
+
+	public function getTableDailySeatRelation()
+	{
+		$records = MarkProofAccounts::all();
+		$columns = Maintenance::find(1);
+		$columns = json_decode( $columns->formula );
+		return View::make( 'Maintenance.table' )->with( array( 'records' => $records , 'columns' => $columns , 'type' => 'cuentasMarca' , 'titulo' => 'Mantenimiento de Cuentas - Marca' ) );
 	}
 
 	public function getView( $type )
@@ -201,6 +195,76 @@ class TableController extends BaseController
 		return $middleRpta;
 	}
 
+	private function registerAccount( $inputs )
+	{
+		$bagoAccount = PlanCta::find( $inputs->num_cuenta );
+		if( is_null( $bagoAccount ) )
+		{
+			return $this->warningException( 'La cuenta no esta registrada en el Plan de Cuenta' , __FUNCTION__ , __LINE__ , __FILE__ );
+		}
+		else
+		{
+			$account = Account::getAccount( $inputs->num_cuenta );
+			if( is_null( $account ) )
+			{
+				$account               = new Account;
+				$account->id           = $account->lastId() + 1 ;
+				$account->num_cuenta   = $inputs->num_cuenta;
+				$account->idtipocuenta = 1;
+				$account->idtipomoneda = SOLES;
+				$account->save();
+			}
+			return $this->setRpta();
+		}
+	}
+
+	private function saveFondoContable( $inputs )
+	{
+		DB::beginTransaction();
+		$middleRpta = $this->saveMaintenance( $inputs );
+		if ( $middleRpta[ status ] == ok )
+		{
+			$middleRpta = $this->registerAccount( $middleRpta[ data ] );
+			if ( $middleRpta[ status ] == ok )
+			{
+				DB::commit();
+			}
+			else
+			{
+				DB::rollback();
+			}
+		}
+		else
+		{
+			DB::rollback();
+		}
+		return $middleRpta;
+		
+	}
+
+	private function updateFondoContable( $inputs )
+	{
+		DB::beginTransaction();
+		$middleRpta = $this->updateGeneric( $inputs );
+		if ( $middleRpta[ status ] === ok )
+		{
+			$middleRpta = $this->registerAccount( $middleRpta[ data ][ 'newRecord' ] );
+			if ( $middleRpta[ status ] === ok )
+			{
+				DB::commit();
+			}
+			else
+			{
+				DB::rollback();
+			}
+		}
+		else
+		{
+			DB::rollback();
+		}
+		return $middleRpta;
+	}
+
 	public function updateMaintenanceData()
 	{
 		try
@@ -213,6 +277,10 @@ class TableController extends BaseController
 					return $this->updateFondoMkt( $inputs );
 				case 'Fondo_Supervisor':
 					return $this->updateFondoMkt( $inputs );
+				case 'Fondo_Contable':
+					return $this->updateFondoContable( $inputs );
+				case 'Cuenta_Gasto_Marca':
+					return $this->updateCuentaGastoMarca( $inputs );
 			endswitch;
 			$this->updateGeneric( $inputs );
 			return $this->setRpta();
@@ -287,8 +355,7 @@ class TableController extends BaseController
 		foreach ( $inputs[ data ] as $column => $data )
 			$record->$column = $data;
 		$record->save();
-		DB::commit();
-		return $this->setRpta();
+		return $this->setRpta( $record );
 	}
 
 	public function saveMaintenanceData()
@@ -296,6 +363,12 @@ class TableController extends BaseController
 		try
 		{
 			$inputs = Input::all();
+			switch( $inputs[ 'type' ] ):
+				case 'Fondo_Contable':
+					return $this->saveFondoContable( $inputs );
+				case 'Cuenta_Gasto_Marca':
+					return $this->saveCuentaGastoMarca( $inputs );
+			endswitch;
 			return $this->saveMaintenance( $inputs );
 		}
 		catch( Exception $e )
@@ -345,129 +418,10 @@ class TableController extends BaseController
 		return $this->setRpta( View::make( 'Maintenance.table' )->with( array( 'records' => $records , 'columns' => $columns , 'type' => 'cuentasMarca' ) )->render() );
 	}
 
-	private function getAccount( $val )
-	{
-		$account = Account::where('num_cuenta' , $val )->first();
-		return $this->setRpta( $account->id );
-	}
-
-	private function getMark( $val )
-	{
-		$mark = Mark::where('codigo' , $val )->first();
-		return $this->setRpta( $mark->id );
-	}
-
-	private function updateCuentasMarca( $val )
-	{
-		$accountsMark = MarkProofAccounts::find($val['id'] );
-		foreach ( $val[data] as $key => $data )
-			$accountsMark->$key = $data;
-		$accountsMark->save();
-		return $this->setRpta();
-	}	
-	
-	private function maintenanceSaveCuentasMarca( $val )
-	{
-		$middleRpta = $this->processAccount( $val[data]['num_cuenta_fondo'] , 1 );
-		if ( $middleRpta[status] == ok )
-		{
-			$middleRpta = $this->processAccount( $val[data]['num_cuenta_gasto'] , 4 );
-			if ( $middleRpta[status] == ok )
-			{
-				$middleRpta = $this->processMark( $val[data]['marca_codigo'] );
-				if ( $middleRpta[status] == ok )
-				{
-					$accountsMark = MarkProofAccounts::orderBy('id');
-					foreach ( $val[data] as $key => $data)
-						$accountsMark->where( $key , $data );
-					$accountsMark->get();
-					if ( $accountsMark->count() == 1 )
-						return $this->warningException( 'La Relacion ya existe' , __FUNCTION__ , __LINE__ , __FILE__ );
-					elseif ( $accountsMark->count() == 0 )
-					{
-						$accountsMark = new MarkProofAccounts;
-						$accountsMark->id = $accountsMark->lastId() + 1 ;
-						foreach ( $val[data] as $key => $data )
-							$accountsMark->$key = $data;
-						$accountsMark->save();
-						DB::commit();
-						return $this->setRpta();
-						
-					}
-				}
-			}
-		}
-		return $middleRpta;
-	}
-
-	private function processMark( $val )
-	{
-		try
-		{
-			$mark = Mark::where( 'codigo' , $val )->get();
-			if ( $mark->count() == 1 )
-				return $this->setRpta();
-			elseif ( $mark->count() == 0 )
-			{
-				$mark = new Mark;
-				$mark->id = $mark->lastId() + 1;
-				$mark->codigo = $val;
-				if ( substr( $val , 0 , 1 ) == 4 )
-					$mark->idtipomarca == 1;
-				elseif ( substr( $val , 0 , 1) == 6 )
-					$mark->idtipomarca == 2;
-				$mark->save();
-				
-				return $this->setRpta();
-			}
-		}
-		catch ( Exception $e )
-		{
-			return $this->internalException( $e , __FUNCTION__ );
-		}
-	}
-
-
-	private function processAccount( $val , $tipocuenta )
-	{
-		try
-		{
-			$account = Account::where('num_cuenta' , $val )->get();
-			if ( $account->count() == 1 )
-				return $this->setRpta();
-			elseif ( $account->count() == 0 )
-			{
-				$bagoAccount = PlanCta::find( $val );
-				if ( is_null( $bagoAccount ) )
-					return $this->warningException( 'La cuenta N°: '.$val.' no existe' , __FUNCTION__ , __LINE__ , __FILE__ );
-				else
-				{
-					$account = new Account;
-					$account->id = $account->lastId() + 1 ;
-					$account->num_cuenta = $bagoAccount->ctactaextern;
-					$account->idtipocuenta = $tipocuenta;
-
-					$account->save();
-					return $this->setRpta();
-				}
-			}	
-		}
-		catch( Exception $e )
-		{
-			return $this->internalException( $e , __FUNCTION__ );
-		}
-	}
-
 	private function addcuentasMarca()
 	{
 		$data = array( 'Tipos_Documento' => Proof::all() );
 		return $this->setRpta( View::make( 'Maintenance.Cuentasmarca.tr' , $data )->render() );
-	}
-
-	private function addfondo()
-	{
-		$data = array( 'datos' => TypeUser::dmkt() );
-		return $this->setRpta( View::make( 'Maintenance.Fondo.tr')->with( $data )->render() );
 	}
 
 	private function addInversion()
@@ -509,6 +463,130 @@ class TableController extends BaseController
 		catch( Exception $e )
 		{
 			return $this->internalException();
+		}
+	}
+
+	private function processMark( $markNumber )
+	{
+		$markRow = Mark::where( 'codigo' , $markNumber )->first();
+		if ( is_null( $markRow ) )
+		{
+			$bagoMark = BagoMarcaGasto::getRegister( $markNumber );
+			if( is_null( $bagoMark ) )
+			{
+				return $this->warningException( 'La marca no esta registrada en el sistema contable' , __FUNCTION__ , __LINE__ , __FILE__ );
+			}
+			else
+			{
+				$markModel = Mark::getMark( $markNumber );
+				if( is_null( $markModel ) )
+				{
+					$tipoMarca;
+					if ( substr( $markNumber , 0 , 1 )    == 4 )
+					{
+						$tipoMarca = 1;
+					}
+					elseif ( substr( $markNumber , 0 , 1 ) == 6 )
+					{
+						$tipoMarca = 2;
+					}
+					$mark                = new Mark;
+					$mark->id            = $mark->lastId() + 1;
+					$mark->codigo        = $markNumber;
+					$mark->id_tipo_marca = $tipoMarca;
+					$mark->save();
+				}
+				return $this->setRpta();	
+			}
+		}
+		else
+		{
+			return $this->setRpta();
+		}
+	}
+
+
+	private function processAccount( $accountNumber )
+	{
+		$account = Account::getFirstExpenseAccount( $accountNumber );
+		if ( is_null( $account ) )
+		{
+			$bagoAccount = PlanCta::find( $accountNumber );
+			if ( is_null( $bagoAccount ) )
+			{
+				return $this->warningException( 'La cuenta #'. $accountNumber . ' no esta registrada en el sistema contable' , __FUNCTION__ , __LINE__ , __FILE__ );
+			}
+			else
+			{
+				$account = new Account;
+				$account->id = $account->lastId() + 1 ;
+				$account->num_cuenta = $bagoAccount->ctactaextern;
+				$account->idtipocuenta = 4;
+				$account->idtipomoneda = SOLES;
+				$account->save();
+				return $this->setRpta();
+			}
+		}
+		else
+		{
+			return $this->setRpta();
+		}	
+	}
+
+	private function updateCuentaGastoMarca( $inputs )
+	{
+		DB::beginTransaction();
+		$middleRpta = $this->validateAdvanceAccount( $inputs[ data ][ 'num_cuenta_fondo' ] );
+		if ( $middleRpta[status] === ok )
+		{
+			$middleRpta = $this->processAccount( $inputs[ data ][ 'num_cuenta_gasto' ] );
+			if ( $middleRpta[status] === ok )
+			{
+				$middleRpta = $this->processMark( $inputs[ data ][ 'marca_codigo' ] );
+				if ( $middleRpta[status] === ok )
+				{
+					$this->updateGeneric( $inputs );
+					DB::commit();
+					return $middleRpta;
+				}
+			}
+		}
+		DB::rollback();
+		return $middleRpta;
+	}
+
+	private function saveCuentaGastoMarca( $inputs )
+	{
+		DB::beginTransaction();
+		$middleRpta = $this->validateAdvanceAccount( $inputs[ data ][ 'num_cuenta_fondo' ] );
+		if ( $middleRpta[status] === ok )
+		{
+			$middleRpta = $this->processAccount( $inputs[ data ][ 'num_cuenta_gasto' ] );
+			if ( $middleRpta[status] === ok )
+			{
+				$middleRpta = $this->processMark( $inputs[ data ][ 'marca_codigo' ] );
+				if ( $middleRpta[status] === ok )
+				{
+					$this->saveMaintenance( $inputs );
+					DB::commit();
+					return $middleRpta;
+				}
+			}
+		}
+		DB::rollback();
+		return $middleRpta;
+	}
+
+	private function validateAdvanceAccount( $accountNumber )
+	{
+		$fund = Fondo::getContableFund( $accountNumber );
+		if( is_null( $fund ) )
+		{
+			return $this->warningException( 'La cuenta de anticipo no esta registrada en el sistema' , __FUNCTION__ , __LINE__ , __FILE__ );
+		}
+		else
+		{
+			return $this->setRpta();
 		}
 	}
 

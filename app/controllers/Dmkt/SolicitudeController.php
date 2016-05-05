@@ -1108,30 +1108,6 @@ class SolicitudeController extends BaseController
         return MarkProofAccounts::listData($accountFondo->num_cuenta);
     }
 
-    public function getCuentaCont($cuentaMkt)
-    {
-        $result = array();
-        if (!empty($cuentaMkt)) {
-            $accountElement = Account::getExpenseAccount($cuentaMkt);
-            $account = count($accountElement) == 0 ? array() : json_decode($accountElement->toJson());
-            if (count($account) > 0)
-                $result['account'] = $account;
-            else {
-                $errorTemp = array(
-                    'error' => ERROR_NOT_FOUND_MATCH_ACCOUNT_MKT_CNT,
-                    'msg' => MESSAGE_NOT_FOUND_MATCH_ACCOUNT_MKT_CNT
-                );
-                if (!isset($result['error']) || !in_array($errorTemp, $result['error']))
-                    $result['error'][] = $errorTemp;
-            }
-
-        } else {
-            $result['error'] = ERROR_INVALID_ACCOUNT_MKT;
-            $result['msg'] = MSG_INVALID_ACCOUNT_MKT;
-        }
-        return $result;
-    }
-
     private function searchFundAccount($solicitud)
     {
         $fondo = $solicitud->investment->accountFund;

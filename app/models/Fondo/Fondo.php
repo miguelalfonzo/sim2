@@ -57,4 +57,9 @@ class Fondo extends Eloquent
         return $this->hasOne( 'Dmkt\Account' , 'num_cuenta' , 'num_cuenta' );
     }
 
+    protected static function getContableFund( $accountNumber )
+    {
+        return Fondo::where( 'num_cuenta' , $accountNumber )->first();
+    }
+
 }

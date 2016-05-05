@@ -80,7 +80,8 @@ class FondoSupervisor extends Eloquent
 
 	protected static function getSupFund()
 	{
-		return FondoSupervisor::where( 'supervisor_id' , Auth::user()->id )->orderBy( 'subcategoria_id' )->get();
+		return FondoSupervisor::select( 'subcategoria_id , marca_id , round( saldo , 2 ) saldo , retencion , ( saldo - retencion ) saldo_disponible' )
+				   ->where( 'supervisor_id' , Auth::user()->id )->orderBy( 'subcategoria_id' )->with( 'subcategoria' , 'marca' )->get();
 	}
 
 }

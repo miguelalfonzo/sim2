@@ -2,19 +2,34 @@
 @section('solicitude')
     <div class="page-header">
         <h3>Reporte {{ str_replace( '_' , ' ' , $type ) }}</h3>
+        <select class="form-control">
+            @foreach( $funds as $fund )
+                <option>{{ $fund->descripcion }}</option>
+            @endforeach
+        </select>
+        <button type="button" class="btn btn-primary">Exportar</button>
+        <button type="button" class="btn btn-primary">
+            <span class="glyphicon glyphicon-search"></span>
+        </button>
         <input type="hidden" id="report-type" value="{{ $type }}">
     </div>
     <div id="reporte_{{ $type }}" class="container-fluid">
         <table id="table_reporte_{{ $type }}" class="table table-striped table-hover table-bordered text-center" cellspacing="0" width="100%">
             <thead>
                 <tr>
-                    <th>Id</th>
-                    <th>Saldo</th>
+                    <th>Nombre</th>
+                    <th>Familia</th>
+                    <th>Saldo S/.</th>
+                    <th>Retencion S/.</th>
+                    <th>Saldo Disponible S/.</th>
                 </tr>
             </thead>
             <tfoot>
                 <tr>
+                    <th></th>
                     <th>Total</th>
+                    <th></th>
+                    <th></th>
                     <th></th>
                 </tr>
             </tfoot>
@@ -37,7 +52,7 @@
                 dom             : "<'row'<'col-xs-6'><'col-xs-6 pull-right'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
                 stateSave       : true,
                 bScrollCollapse : true,
-                iDisplayLength  : 10 ,
+                iDisplayLength  : 20 ,
                 language        :
                 {
                     search       : 'Buscar',
@@ -55,11 +70,29 @@
                 },
                 footerCallback: function() 
                 {
-                    this.api().column( '.sum' , { page: 'current'} ).every( function () 
+                    this.api().column( '.sum-saldo' , { search: 'applied' } ).every( function () 
+                    {
+                        var sum  =  this.data().reduce( function ( a , b ) 
+                                    {
+                                        return ( Number( a ) + Number( b ) ).toFixed( 2 );
+                                    });
+                        $( this.footer() ).html( sum );
+                    });
+
+                    this.api().column( '.sum-retencion' , { search: 'applied' } ).every( function () 
                     {
                         var sum  =  this.data().reduce( function ( a , b ) 
                                     {
                                         return Number( a ) + Number( b );
+                                    });
+                        $( this.footer() ).html( sum );
+                    });
+
+                    this.api().column( '.sum-saldo-disponible' , { search: 'applied' } ).every( function () 
+                    {
+                        var sum  =  this.data().reduce( function ( a , b ) 
+                                    {
+                                        return ( Number( a ) + Number( b ) ).toFixed( 2 );
                                     });
                         $( this.footer() ).html( sum );
                     });

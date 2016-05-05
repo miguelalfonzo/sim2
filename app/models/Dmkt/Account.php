@@ -57,4 +57,14 @@ class Account extends Eloquent
         ->leftJoin(TB_CUENTA.' c' , 'c.num_cuenta' , '=' , 'b.num_cuenta_gasto' )->select('c.*')->where('cuenta.num_cuenta' , $cuenta_mkt )->get();
     }
 
+    protected static function getAccount( $cuenta )
+    {
+        return Account::where( 'num_cuenta' , $cuenta )->first();
+    }
+
+    protected static function getFirstExpenseAccount( $accountNumber )
+    {
+        return Account::where( 'num_cuenta' , $accountNumber )->where( 'idtipocuenta' , 4 )->first();
+    }
+
 }

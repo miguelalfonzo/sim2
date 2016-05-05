@@ -35,7 +35,7 @@ class FondoSubCategoria extends Eloquent
 		return $this->hasMany( 'Fondo\FondoInstitucional' , 'subcategoria_id' );
 	}
 
-	protected function fund()
+	public function fund()
 	{
 		if ( trim( $this->tipo ) == SUP )
 		{
@@ -49,6 +49,11 @@ class FondoSubCategoria extends Eloquent
 		{
 			return $this->hasMany( 'Fondo\FondoInstitucional' , 'subcategoria_id' );
 		}
+	}
+
+	protected function getRolFunds( $typeCode )
+	{
+		return FondoSubCategoria::where( 'trim( tipo )' , $typeCode )->get();
 	}
 
 }
