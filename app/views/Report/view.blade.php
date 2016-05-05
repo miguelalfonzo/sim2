@@ -2,15 +2,20 @@
 @section('solicitude')
     <div class="page-header">
         <h3>Reporte {{ str_replace( '_' , ' ' , $type ) }}</h3>
-        <select class="form-control">
-            @foreach( $funds as $fund )
-                <option>{{ $fund->descripcion }}</option>
-            @endforeach
-        </select>
-        <button type="button" class="btn btn-primary">Exportar</button>
-        <button type="button" class="btn btn-primary">
-            <span class="glyphicon glyphicon-search"></span>
-        </button>
+        <div class="col-xs-6 col-md-6 col-sm-6 col-lg-6 form-group">
+            <select class="form-control input-lg">
+                <option value="0">TODOS</option>
+                @foreach( $funds as $fund )
+                    <option value="{{ $fund->id }}">{{ $fund->descripcion }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group">
+            <button type="button" class="btn btn-primary btn-lg">Exportar</button>
+            <button type="button" class="btn btn-primary btn-lg">
+                <span class="glyphicon glyphicon-search"></span>
+            </button>
+        </div>
         <input type="hidden" id="report-type" value="{{ $type }}">
     </div>
     <div id="reporte_{{ $type }}" class="container-fluid">
