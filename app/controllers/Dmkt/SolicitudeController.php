@@ -1942,7 +1942,7 @@ class SolicitudeController extends BaseController
         }
     }
 
-    public function viewTestUploadImgSave()
+    public function uploadImgSave()
     {
 
         $fileList = Input::file('image');

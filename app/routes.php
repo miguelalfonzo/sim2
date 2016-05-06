@@ -1,28 +1,5 @@
 <?php
-
-    /*
-    |--------------------------------------------------------------------------
-    | TESTING
-    |--------------------------------------------------------------------------
-    */
-    Route::get('test-carbon' , 'TestController@testCarbon' );
-    Route::get('testalert' , 'TestController@testalert');
-    Route::get('dt' , 'TestController@dt');
-    Route::get('test', array('uses' => 'Dmkt\LoginController@test'));
-    Route::get('set_status', array('uses' => 'BaseController@setStatus'));
-    Route::get('sendmail', array('uses' => 'BaseController@postman'));
-    Route::get('prueba', 'Dmkt\FondoController@test');
-
-    Route::get( 'test-query' , 'TestController@testQuery' );
-    Route::get( 'test-fondo-query' , 'TestController@getUserSubFondos' );
-    Route::get( 'testcalert' , 'TestController@testcalert');
-    Route::get( 'changePass/{id}' , 'TestController@changePass' );
-
-    //--- TIME LINE --
-
-    Route::get( 'timeline-modal/{id}' , 'Dmkt\SolicitudeController@getTimeLine');
-    Route::post( 'agregar-familia-fondo', 'Dmkt\SolicitudeController@addFamilyFundSolicitud');
-        
+    
     /*
     |--------------------------------------------------------------------------
     | SYSTEM
@@ -61,7 +38,6 @@
         Route::get( 'report/view/{type}' , 'Report\Funds@show' );
         Route::post( 'report/data' , 'Report\Funds@source' );
         Route::get( 'report/export-{type}-{category}' , 'Report\Funds@export' );
-    
     });
 
     /*
@@ -83,6 +59,22 @@
     Route::group( array( 'before' => 'gercom_cont' ) , function()
     {
         Route::post( 'gercom-mass-approv' ,'Dmkt\SolicitudeController@massApprovedSolicitudes');
+
+        /*
+        |--------------------------------------------------------------------------
+        | MANTENIMIENTO
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get( 'maintenance/view/{type}' , 'Maintenance\TableController@getView' );
+        Route::post( 'get-cell-maintenance-info' , 'Maintenance\TableController@getMaintenanceCellData' );
+        Route::post( 'update-maintenance-info' , 'Maintenance\TableController@updateMaintenanceData' );
+        Route::post( 'save-maintenance-info' , 'Maintenance\TableController@saveMaintenanceData' );
+        Route::post( 'add-maintenance-info' , 'Maintenance\TableController@addMaintenanceData' );
+        Route::post( 'get-table-maintenance-info' , 'Maintenance\TableController@getMaintenanceTableData');
+        Route::post( 'maintenance-enable' , 'Maintenance\TableController@enableRecord');
+        Route::post( 'maintenance-disable' , 'Maintenance\TableController@disableRecord');
+
     });
 
     /*
@@ -115,7 +107,8 @@
 
         Route::post( 'modal-liquidation' , 'Deposit\DepositController@modalLiquidation' );
         Route::post( 'confirm-liquidation' , 'Deposit\DepositController@confirmLiquidation' );
-
+        Route::get('maintenance/finddocument', 'Dmkt\SolicitudeController@findDocument');
+        Route::get('maintenance/documenttype', 'Dmkt\FondoController@listDocuments');
     });
 
     /*
@@ -162,6 +155,8 @@
         Route::post( 'confirm-temporal-user' , 'User\UserController@assignTemporalUser');
         Route::get( 'remove-temporal-user' , 'User\UserController@removeTemporalUser');
         Route::post('aceptar-solicitud', 'Dmkt\SolicitudeController@acceptedSolicitude');
+        Route::post( 'agregar-familia-fondo', 'Dmkt\SolicitudeController@addFamilyFundSolicitud');
+    
     });
 
     /*
@@ -196,6 +191,9 @@
     {
         Route::post( 'end-expense', 'Expense\ExpenseController@finishExpense');
         Route::post( 'do-inmediate-devolution' , 'Devolution\DevolutionController@doInmediateDevolution' );
+        Route::post( 'createEvent', 'Dmkt\SolicitudeController@createEventHandler');
+        Route::post( 'testUploadImgSave', 'Dmkt\SolicitudeController@uploadImgSave');
+
     });
 
     Route::group( array( 'before' => 'rm_sup_cont' ), function () 
@@ -242,6 +240,14 @@
         Route::post( 'list-table' , 'Movements\MoveController@getTable');
         Route::post( 'detail-solicitud' , 'Movements\MoveController@getSolicitudDetail');
         Route::get('getleyenda', 'BaseController@getLeyenda');
+
+        /*
+        |--------------------------------------------------------------------------
+        | TIME LINE
+        |--------------------------------------------------------------------------
+        */
+        
+        Route::get( 'timeline-modal/{id}' , 'Dmkt\SolicitudeController@getTimeLine');
         
         /*
         |--------------------------------------------------------------------------
@@ -276,45 +282,15 @@
         // DOWNLOAD REPORT EXCEL
         Route::get('reports/export/download/{userId}/{reportId}/{fromDate}/{toDate}', 'Report\ReportController@downloadReportExcelHandler');
 
+        /*
+        |--------------------------------------------------------------------------
+        | EVENTOS
+        |--------------------------------------------------------------------------
+        */
+        Route::get('eventos','Dmkt\SolicitudeController@album');
+        Route::post('eventos/list','Dmkt\SolicitudeController@getEventList');
+        Route::post('photos', 'Dmkt\SolicitudeController@photos');
+        
 
     });
-
-    App::missing(function ($exception) 
-    {
-    });
-/*
-|--------------------------------------------------------------------------
-| MANTENIMIENTO
-|--------------------------------------------------------------------------
-*/
-Route::get('maintenance/dailyseatrelation' , 'Maintenance\TableController@getMaintenanceTableDailySeatRelation');
-Route::get('maintenance/fondos' , 'Maintenance\TableController@getMaintenanceTableDataFondos');
-Route::get('maintenance/fondoaccount' , 'Maintenance\TableController@getViewFondoCuenta');
-Route::get('maintenance/inversion' , 'Maintenance\TableController@getMaintenanceTableDataInversion');
-Route::get('maintenance/activity' , 'Maintenance\TableController@getMaintenanceTableDataActivity');
-Route::get('maintenance/investmentactivity' , 'Maintenance\TableController@getMaintenanceTableDataInvestmentActivity');
-Route::get('maintenance/finddocument', 'Dmkt\SolicitudeController@findDocument');
-Route::get('maintenance/documenttype', 'Dmkt\FondoController@listDocuments');
-Route::get('maintenance/parameters', 'Maintenance\TableController@getMaintenanceTableParameter');
-Route::get( 'maintenance/view/{type}' , 'Maintenance\TableController@getView' );
-
-
-Route::post( 'get-cell-maintenance-info' , 'Maintenance\TableController@getMaintenanceCellData' );
-Route::post( 'update-maintenance-info' , 'Maintenance\TableController@updateMaintenanceData' );
-Route::post( 'save-maintenance-info' , 'Maintenance\TableController@saveMaintenanceData' );
-Route::post( 'add-maintenance-info' , 'Maintenance\TableController@addMaintenanceData' );
-Route::post( 'get-table-maintenance-info' , 'Maintenance\TableController@getMaintenanceTableData');
-Route::post( 'maintenance-enable' , 'Maintenance\TableController@enableRecord');
-Route::post( 'maintenance-disable' , 'Maintenance\TableController@disableRecord');
-
-/*
-|--------------------------------------------------------------------------
-| EVENTOS
-|--------------------------------------------------------------------------
-*/
-Route::post('createEvent', 'Dmkt\SolicitudeController@createEventHandler');
-Route::get('eventos','Dmkt\SolicitudeController@album');
-Route::post('eventos/list','Dmkt\SolicitudeController@getEventList');
-Route::post('photos', 'Dmkt\SolicitudeController@photos');
-Route::post('testUploadImgSave', 'Dmkt\SolicitudeController@viewTestUploadImgSave');
 

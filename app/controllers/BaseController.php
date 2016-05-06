@@ -260,58 +260,6 @@ class BaseController extends Controller
         return array( status => ok , data => $data , description => $description );
     }
 
-    public function viewTestUploadImg(){
-        return View::make('test.testUploadImg');
-    }
-    public function viewTestUploadImgSave() {
-
-        $fileList = Input::file('image');
-
-        // $input = array('image' => $file);
-        // $rules = array(
-        //     'image' => 'image'
-        // );
-
-        // $validator = Validator::make($input, $rules);
-        if ( count($fileList) == 0 )
-        {
-            return Response::json(array(
-                'success'   => false,
-                'errors'    => 'No se pudo Cargar Archivo'
-            ));
-        }
-        else {
-            $resultFileList = array();
-            
-            foreach ($fileList as $fileKey => $fileItem) {
-                
-                $destinationPath    = FILESTORAGE_DIR;
-                $fileName           = pathinfo($fileItem->getClientOriginalName(), PATHINFO_FILENAME);
-                $fileExt            = pathinfo($fileItem->getClientOriginalName(), PATHINFO_EXTENSION);
-                $fileNameMD5        = md5(uniqid(rand(), true));
-
-                $fileStorage                = new FotoEventos;
-                $fileStorage->id            = $fileNameMD5;
-                $fileStorage->name          = pathinfo($fileItem->getClientOriginalName(), PATHINFO_FILENAME);
-                $fileStorage->extension     = $fileExt;
-                $fileStorage->directory     = $destinationPath;
-                $fileStorage->app           = APP_ID;
-                $fileStorage->save();
-
-                $fileItem->move($destinationPath, $fileNameMD5.'.'.$fileExt);
-                $resultFileList[] = array(
-                    'id'   => $fileNameMD5,
-                    'name'      => asset($destinationPath.$fileNameMD5.'.'.$fileExt)
-                );
-
-            }
-            return Response::json(array(
-                'success'   => true,
-                'fileList'  => $resultFileList
-            ));
-        }
-    }
-
     public function getLeyenda()
     {
         $data = array('states' => StateRange::order());
