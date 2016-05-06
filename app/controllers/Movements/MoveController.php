@@ -92,8 +92,6 @@ class MoveController extends BaseController
                 return $this->warningException( substr($this->msgValidator($validator), 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
             
             $middleRpta = $this->getDocs( $inputs[ 'idProof' ] , $inputs[ 'date_start' ] , $inputs[ 'date_end' ] , $inputs[ 'val' ] );
-            $db = \DB::getQueryLog();
-        \Log::info( last( $db ) );   
         
             if ( $middleRpta[status] == ok )
                 return $this->setRpta( View::make('Dmkt.Cont.list_documents')->with( 'proofs' , $middleRpta[data] )->render() );

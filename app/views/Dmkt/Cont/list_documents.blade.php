@@ -1,4 +1,4 @@
-<table class="table table-hover table-bordered table-condensed dataTable" id="table_documents">
+<table class="table table-hover table-bordered table-condensed dataTable" id="table_documents" width="100%">
     <thead>
         <tr>
             <th>#</th>
