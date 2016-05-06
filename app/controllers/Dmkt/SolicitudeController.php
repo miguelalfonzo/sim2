@@ -1879,15 +1879,26 @@ class SolicitudeController extends BaseController
                 {   
                     $query->whereHas( 'personalTo' , function( $query ) use( $zona )
                     {
-                        $query->whereHas( 'bagoVisitador' , function( $query ) use( $zona )
+                        $query->where( function( $query ) use( $zona )
                         {
-                            $query->where( 'visnivel3geog' , $zona );
+                            $query->where( function( $query ) use( $zona )
+                            {
+                                $query->whereIn( 'tipo' , [ 'RM' , 'RI' , 'RF' ] )->whereHas( 'bagoVisitador' , function( $query ) use( $zona )
+                                {
+                                    $query->where( 'visnivel3geog' , $zona );
+                                });
+                            })->orWhere( function( $query ) use( $zona )
+                            {
+                                $query->whereIn( 'tipo' , [ SUP ] )->whereHas( 'bagoSupervisor' , function( $query ) use( $zona )
+                                {
+                                    $query->where( 'supnivel3geog' , $zona );
+                                });
+                            });
                         });
                     });  
                 }
             });
-            
-            
+                        
             $data[ 'events' ] = $data[ 'events' ]->get();
             return View::make('Event.album', $data);
         }
