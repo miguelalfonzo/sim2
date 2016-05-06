@@ -1043,7 +1043,7 @@ $(function()
         else
         {
             var l = Ladda.create( document.getElementById( 'razon' ) );
-            data._token = $("input[name=_token]").val();
+            var data = { _token : $("input[name=_token]").val() };
             $.ajax({
                 type: 'get',
                 url: rout_ruc + ruc + '/',
@@ -1065,7 +1065,7 @@ $(function()
                     }
                 }
             }).done(function (response){
-                if(response == undefined || response == null || response == "")
+                if( typeof response === 'undefined' || response == null || response == "")
                 {
                     alert("No se puede realizar la consulta. Por favor, ingrese la razon social");
                     $("#ruc").addClass("error-incomplete");
@@ -1073,7 +1073,7 @@ $(function()
                     $("#razon-val").hide();
                     $("#manual-razon").show();
                 }
-                if(response.error == undefined)
+                if( typeof response.error === 'undefined' && typeof response[ 'razon_social' ] !== 'undefined' )
                 {
                     $( '#razon' ).val( 2 ).html( response['razon_social'].substring(0,50)).parent().parent().addClass( 'has-success' ).removeClass( 'has-error' );;
                     $("#ruc-hide").val( ruc );
