@@ -644,19 +644,19 @@ class ExpenseController extends BaseController
     private function reportBalance( $solicitud , $detalle , $jDetalle , $mGasto )
 	{
 		if ( is_null( $detalle->deposit ) )
-			return array( 'bussiness' => '-' , 'employed' => '-' );
+		{
+			return array( 'bussiness' => '-' , 'employed' => $mGasto );
+		}
 		else
 		{
 			$mDeposit = $detalle->deposit->total;
 		    if ( $detalle->deposit->account->idtipomoneda == DOLARES )
+		    {
 	    		$mDeposit = $mDeposit * $jDetalle->tcv;
-		    
-		    if ( isset( $jDetalle->monto_retencion ) )
-		    	$monto_retencion = $jDetalle->monto_retencion ;
-		    else
-		    	$monto_retencion = 0;
-		    $mBalance = $mDeposit - ( $mGasto - $monto_retencion );  // - $monto_retencion );
-		    if ( $mBalance > 0)
+		    }
+
+		    $mBalance = $mDeposit - $mGasto;
+			if ( $mBalance > 0)
 		    	return array( 'bussiness' => round( $mBalance , 2 , PHP_ROUND_HALF_DOWN ) , 'employed' => 0 );
 		    elseif ( $mBalance < 0 )
 		    	return array( 'bussiness' => 0 , 'employed' => round( $mBalance*-1 , 2 , PHP_ROUND_HALF_DOWN ) );
