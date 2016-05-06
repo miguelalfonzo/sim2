@@ -137,7 +137,7 @@ class FondoMkt extends BaseController
                 foreach( $sups as $supId => $amount )
                 {
                     $fondoSup = FondoSupervisor::totalAmount( $subCategoryId , $supId );
-                    $fondoSubCategory = fondoSubCategoria::find( $subCategoryId );
+                    $fondoSubCategory = FondoSubCategoria::find( $subCategoryId );
                     if( $fondoSup->{ 'saldo' . $tipo } < 0 )
                     {
                         return $this->warningException( 'El Fondo ' . $fondoSubCategory->descripcion . ' solo cuenta con S/.' . ( $fondoSup->{ 'saldo' . $tipo } + $amount ) . 
