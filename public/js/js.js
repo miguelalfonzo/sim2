@@ -1033,7 +1033,7 @@ $(function()
         if( ruc.length === 0 )
         {
             $("#ruc").addClass("error-incomplete");
-            $( '#razon' ).css( 'color","#5c5c5c' ).html( 'No ha ingresado el RUC.').parent().parent().addClass( 'has-error' ).removeClass( 'has-success' );
+            $( '#razon' ).css( { color : "#5c5c5c" } ).html( 'No ha ingresado el RUC.').parent().parent().addClass( 'has-error' ).removeClass( 'has-success' );
         }
         else if( ruc.length > 0 && ruc.length < 11 )
         {
