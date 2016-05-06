@@ -83,7 +83,6 @@ class FondoController extends BaseController
         foreach ( $solicitud as $sol )
         {
             $detalle = $sol->detalle;
-            //$typeMoney = $detalle->fondo->typeMoney;
             $totales[ 'S/.' ] += $detalle->monto_actual ;
         }
         return $this->setRpta( $totales );
