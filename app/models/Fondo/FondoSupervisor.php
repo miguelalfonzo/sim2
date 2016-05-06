@@ -78,10 +78,28 @@ class FondoSupervisor extends Eloquent
 		return $model;
 	}
 
-	protected static function getSupFund()
+	protected static function getSupFund( $category )
 	{
-		return FondoSupervisor::select( 'subcategoria_id , marca_id , round( saldo , 2 ) saldo , retencion , ( saldo - retencion ) saldo_disponible' )
-				   ->where( 'supervisor_id' , Auth::user()->id )->orderBy( 'subcategoria_id' )->with( 'subcategoria' , 'marca' )->get();
+		$supFunds = FondoSupervisor::select( 'subcategoria_id , marca_id , round( saldo , 2 ) saldo , retencion , ( saldo - retencion ) saldo_disponible' )
+				   ->where( 'supervisor_id' , Auth::user()->id )->orderBy( 'subcategoria_id' )->with( 'subcategoria' , 'marca' );
+
+		if( $category != 0 )
+		{
+			$supFunds = $supFunds->where( 'subcategoria_id' , $category );
+		}
+		
+		return $supFunds->get();
+	}
+
+	protected static function getReportSupFund( $category )
+	{
+		$supFunds = FondoSupervisor::where( 'supervisor_id' , Auth::user()->id )->orderBy( 'subcategoria_id' );
+		if( $category != 0 )
+		{
+			$supFunds = $supFunds->where( 'subcategoria_id' , $category );
+		}
+		
+		return $supFunds->get();
 	}
 
 }

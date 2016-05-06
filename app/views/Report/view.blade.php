@@ -2,8 +2,8 @@
 @section('solicitude')
     <div class="page-header">
         <h3>Reporte {{ str_replace( '_' , ' ' , $type ) }}</h3>
-        <div class="col-xs-6 col-md-6 col-sm-6 col-lg-6 form-group">
-            <select class="form-control input-lg">
+        <div class="col-xs-6 col-md-6 col-sm-4 col-lg-4 form-group">
+            <select id="fund-category" class="form-control input-md">
                 <option value="0">TODOS</option>
                 @foreach( $funds as $fund )
                     <option value="{{ $fund->id }}">{{ $fund->descripcion }}</option>
@@ -11,8 +11,8 @@
             </select>
         </div>
         <div class="form-group">
-            <button type="button" class="btn btn-primary btn-lg">Exportar</button>
-            <button type="button" class="btn btn-primary btn-lg">
+            <button type="button" id="report-export" class="btn btn-primary btn-md ladda-button" data-style="zoom-in">Exportar</button>
+            <button type="button" id="search-report" class="btn btn-primary btn-md ladda-button" data-style="zoom-in">
                 <span class="glyphicon glyphicon-search"></span>
             </button>
         </div>
@@ -104,19 +104,6 @@
                 }
             });
 
-            /*dataTable.column( '.sum' ).every( function () 
-            {
-                var sum  =  this.data().reduce( function ( a , b ) 
-                            {
-                                console.log( a );
-                                console.log( b );
-                                return Number( a ) + Number( b );
-                            });
-                $( this.footer() ).html( sum );
-            });*/
-    
-            //yadcf.init( dataTable , [ { column_number : 0 } , { column_number : 1 }  , { column_number : 2 } , { column_number : 3 } , { column_number : 4 } , { column_number : 5 }] );
-        
         }
     
         function getReportData()
@@ -124,24 +111,45 @@
             var eType = $( '#report-type' );
             if( eType.length !== 0 )
             {
-                eType = eType.val();
+                var spin = Ladda.create( $( '#search-report' )[ 0 ] );
+                eType    = eType.val();
+                spin.start();
                 $.ajax(
                 {
                     type : 'post' ,
                     url  : server + 'report/data' ,
                     data : 
                     {
-                        _token : GBREPORTS.token,
-                        type   : eType
+                        _token   : GBREPORTS.token,
+                        type     : eType,
+                        category : $( '#fund-category' ).val()
                     }
                 }).done( function( response )
                 {
+                    spin.stop();
                     name = '#table_reporte_' + eType;
                     var element = $( name );
                     columnDataTable( element , response.Data , response.columns , response.message );
+                }).fail( function( statusCode , errorThrow )
+                {
+                    spin.stop();
+                    ajaxError( statusCode , errorThrow );
                 });
             }
         }
+
+        $( '#search-report' ).on( 'click' , function()
+        {
+            getReportData();
+        });
+
+        $( '#report-export' ).on( 'click' , function()
+        {
+            var url = 'report/export-';
+            url += $( '#report-type' ).val() + '-';
+            url += $( '#fund-category' ).val();
+            window.location.href = server + url;
+        });
 
         $(document).on( 'ready' , function()
         {

@@ -5,6 +5,7 @@ namespace Report;
 use \BaseController;
 use \View;
 use \Input;
+use \Excel;
 use \Fondo\FondoSupervisor;
 use \Fondo\FondoSubCategoria;
 
@@ -21,7 +22,19 @@ class Funds extends BaseController
 	public function source()
 	{
 		$inputs = Input::all();
-		return $this->getData( $inputs[ 'type' ] );
+		return $this->getData( $inputs[ 'type' ] , $inputs[ 'category' ] );
+	}
+
+	public function export( $type , $category )
+	{
+		$data = $this->getData( $type , $category );
+		Excel::create( 'Reporte '. $type , function( $excel ) use ( $data  )
+        {  
+            $excel->sheet( 'Data' , function( $sheet ) use ( $data )
+            {
+                $sheet->loadView( 'Report.table' , $data );
+            });  
+        })->export( 'xls' ); 
 	}
 
 	private function getTypeCode( $type )
@@ -33,18 +46,18 @@ class Funds extends BaseController
 
 	}
 
-	private function getData( $type )
+	private function getData( $type , $category )
 	{
 		if( $type === 'Fondo_Supervisor' )
 		{
-			$data = FondoSupervisor::getSupFund();
+			$data = FondoSupervisor::getSupFund( $category );
 			$columns =
                 [ 
-                        [ 'data' => 'subcategoria.descripcion' ],
-                        [ 'data' => 'marca.descripcion' ],
-                        [ 'data' => 'saldo' , 'className' => 'sum-saldo' ],
-                        [ 'data' => 'retencion' , 'className' => 'sum-retencion' ],
-                        [ 'data' => 'saldo_disponible' , 'className' => 'sum-saldo-disponible' ]
+                        [ 'data' => 'subcategoria.descripcion' , 'name' => 'Nombre' , 'relations' => [ 'subcategoria' , 'descripcion' ] ],
+                        [ 'data' => 'marca.descripcion' , 'name' => 'Familia' , 'relations' => [ 'marca' , 'descripcion' ] ], 
+                        [ 'data' => 'saldo' , 'className' => 'sum-saldo' , 'name' => 'Saldo S/.' ],
+                        [ 'data' => 'retencion' , 'className' => 'sum-retencion' , 'name' => 'Retencion S/.' ],
+                        [ 'data' => 'saldo_disponible' , 'className' => 'sum-saldo-disponible' , 'name' => 'Saldo Disponible S/.' ]
                         
                 ];
 			$rpta = $this->setRpta( $data );
@@ -52,7 +65,5 @@ class Funds extends BaseController
 			$rpta[ 'message' ] = 'registros';
 			return $rpta;
 		}
-
 	}
-
 }

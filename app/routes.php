@@ -60,6 +60,7 @@
     {
         Route::get( 'report/view/{type}' , 'Report\Funds@show' );
         Route::post( 'report/data' , 'Report\Funds@source' );
+        Route::get( 'report/export-{type}-{category}' , 'Report\Funds@export' );
     
     });
 
