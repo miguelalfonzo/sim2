@@ -29,30 +29,152 @@ class AlertController extends BaseController
     public function alertConsole2()
     {
     	$result = array();
-    	$result['alert'] = array();
+    	$result[ 'alert' ] = array();
     	
-    	$clientAlert = $this->clientAlert2();
-    	if($clientAlert[ 'msg' ] != "" )
-    		$result['alert'][] = $clientAlert;
-    	
+    	if( in_array( Auth::user()->type , [ REP_MED , SUP , GER_PROD , GER_PROM , GER_COM ] , 1 ) )
+    	{
+	    	$clientAlert = $this->newClientAlert();
+	    	if( ! empty( $clientAlert[ 'data' ] ) )
+	    	{
+	    		$result[ 'alert' ][] = $clientAlert;
+    		}
+    	}
     	$expenseAlert = $this->expenseAlert2();
-    	if($expenseAlert[ 'msg' ] != "")
+    	if( ! empty( $expenseAlert[ 'data' ] ) )
+    	{
     		$result['alert'][] = $expenseAlert;
-    	
+    	}
     	$timeAlert = $this->compareTime2();
-    	if($timeAlert[ 'msg' ] != "")
+    	if( ! empty( $timeAlert[ 'data' ] ) )
+    	{
     		$result['alert'][] = $timeAlert;
-    	
+    	}
+
     	return $result['alert'];
     }
 
-    public function clientalert2()
+    public function expenseAlert2()
+	{
+		$result = array();
+		$solicituds = Solicitud::where( 'id_user_assign' , Auth::user()->id )->where( 'id_estado' , GASTO_HABILITADO )->get();
+		$tiempo = Parameter::find( ALERTA_TIEMPO_ESPERA_POR_DOCUMENTO );
+		foreach ( $solicituds as $solicitud )
+		{
+			$expenseHistory = $solicitud->expenseHistory;
+			$lastExpense = $solicitud->lastExpense;
+			if ( is_null( $lastExpense ) && ! is_null( $expenseHistory ) && $this->timeAlert( $expenseHistory , 'diffInDays' , 'updated_at' ) >= $tiempo->valor ){
+				$result[] = array(
+					"solicitude" => $solicitud->id,
+					"msg" => $tiempo->mensaje,
+					);
+			}
+			else if ( ( ! is_null( $lastExpense ) ) && $this->timeAlert( $lastExpense , 'diffInDays' , 'updated_at' ) >= $tiempo->valor ){
+				$result[] = array(
+					"solicitude" => $solicitud->id,
+					"msg" => $tiempo->mensaje,
+					);
+			}
+		}
+		return array( 'type' => 'warning' , 'typeData' => 'expenseAlert', 'data' => $result );
+	}
+
+	public function compareTime2()
+	{
+		$solicituds = Solicitud::where( 'id_user_assign' , Auth::user()->id )->where( 'id_estado' , GASTO_HABILITADO )->get();
+		$result = array();
+		$tiempo = Parameter::find( ALERTA_TIEMPO_REGISTRO_GASTO );
+		foreach ( $solicituds as $solicitud )
+		{
+			if ( $this->timeAlert( $solicitud , 'diffInDays' , 'created_at' ) >= $tiempo->valor )
+			{
+				$result[] = array(
+					"solicitude" => $solicitud->id,
+					"msg" => $tiempo->mensaje,
+					);
+			}
+		}
+		return array( 'type' => 'warning' , 'typeData' => 'expenseAlert' , 'data' => $result );
+	}
+
+	private function timeAlert( $record , $method , $date )
+	{
+		$now = Carbon::now();
+		$updated = new Carbon( $record->$date );
+		return $updated->$method( $now );
+	}
+
+
+	public function newClientAlert()
+	{
+		$user = Auth::user();
+		$tiempo = Parameter::find( ALERTA_INSTITUCION_CLIENTE );
+	    	
+		$add         = false;
+		$result      = [];
+		$clientArray = [];
+		$data        = \DB::table( 'VALIDACION_CLIENTE' )->get();
+		foreach( $data as $key1 => $register1 )
+		{
+			$ids_solicitud1 = explode( ',' , $register1->ids_solicitud );
+			foreach( $data as $key2 => $register2 )
+			{
+				if( $key1 != $key2 && $register1->id_tipo_cliente != $register2->id_tipo_cliente )
+				{
+					$ids_solicitud2 = explode( ',' , $register2->ids_solicitud );
+					$intersect = array_intersect( $ids_solicitud1 , $ids_solicitud2 );
+					if( count( $intersect ) >= 3 )
+					{
+						foreach( $intersect as $id_solicitud )
+						{
+							$sol = Solicitud::find( $id_solicitud );
+							if( $user->type === REP_MED && $sol->id_user_assign == $user->id )
+							{
+
+								$add = true;
+								break;
+							}
+							else
+							{
+								$ids = $sol->gerente->lists( 'id_gerprod' );
+								if( in_array( $user->id , $ids ) )
+								{
+									$add = true;
+									break;
+								}	
+							}
+						}
+						if( $add )
+						{
+							$index = $register1->id_cliente . ',' . $register1->id_tipo_cliente . '|' . $register2->id_cliente . ',' . $register2->id_tipo_cliente;
+							$sol_cli1 = SolicitudClient::where( 'id_cliente' , $register1->id_cliente )->where( 'id_tipo_cliente' , $register1->id_tipo_cliente )->first();
+							$sol_cli_fn_1 = $sol_cli1->{$sol_cli1->clientType->relacion}->full_name;
+
+							$sol_cli2 = SolicitudClient::where( 'id_cliente' , $register2->id_cliente )->where( 'id_tipo_cliente' , $register2->id_tipo_cliente )->first();
+							$sol_cli_fn_2 = $sol_cli2->{$sol_cli2->clientType->relacion}->full_name;
+
+							$clientArray = [ $sol_cli_fn_1 , $sol_cli_fn_2 ];
+							$result[] = 
+			    			[
+								'cliente'    => $clientArray,
+								'solicitude' => $intersect,
+								'msg'        => $tiempo->mensaje
+							];
+						}
+					}
+				}
+			}
+			unset( $data[ $key1 ] );
+		}
+		return array( 'type' => 'warning' , 'data' => $result, 'typeData' => 'clientAlert');
+	}
+
+
+	/* public function clientalert2()
     {
     	$user = Auth::user();
     	if( in_array( $user->type , [ REP_MED , SUP , GER_PROD , GER_PROM , GER_COM , CONT ] ) )
     	{
 	    	$add;
-	    	$msg;
 	    	$result = [];				
 	    	$clienteArray;
 	    	$solicitudArray;
@@ -60,8 +182,7 @@ class AlertController extends BaseController
 	    	$tiempo = Parameter::find( ALERTA_INSTITUCION_CLIENTE );
 	    	foreach( $data as $register )
 	    	{
-	    		$msg = 'Las solicitudes ' . $register->ids_solicitud  . ' ' . $tiempo->mensaje ;
-	 			$add = false;
+	    		$add = false;
 	    		$ids_solicitud = explode( ',' , $register->ids_solicitud );
 	    		foreach( $ids_solicitud as $id_solicitud )
 	    		{
@@ -99,8 +220,7 @@ class AlertController extends BaseController
 					} 
 					$cliente = rtrim( $cliente , ', ' );
 					$cliente .= ' ).';
-					$msg .= ' ' . $cliente;
-	    			$solicitudArray = $ids_solicitud;
+					$solicitudArray = $ids_solicitud;
 	    			$result[]= 
 	    			[
 						'cliente'    => $clienteArray,
@@ -111,62 +231,6 @@ class AlertController extends BaseController
 				}
 	    	}
 	    }
-	    return array( 'type' => 'warning' , 'msg' => $msg , 'data' => $result, 'typeData' => 'clientAlert');
-	}
-
-    public function expenseAlert2()
-	{
-		$result = array();
-		$solicituds = Solicitud::where( 'id_user_assign' , Auth::user()->id )->where( 'id_estado' , GASTO_HABILITADO )->get();
-		$msg = '';
-		$tiempo = Parameter::find( ALERTA_TIEMPO_ESPERA_POR_DOCUMENTO );
-		foreach ( $solicituds as $solicitud )
-		{
-			$expenseHistory = $solicitud->expenseHistory;
-			$lastExpense = $solicitud->lastExpense;
-			if ( is_null( $lastExpense ) && ! is_null( $expenseHistory ) && $this->timeAlert( $expenseHistory , 'diffInDays' , 'updated_at' ) >= $tiempo->valor ){
-				$msg .= 'La solicitud N° ' .  $solicitud->id . $tiempo->mensaje;
-				$result[] = array(
-					"solicitude" => $solicitud->id,
-					"msg" => $tiempo->mensaje,
-					);
-			}
-			else if ( ( ! is_null( $lastExpense ) ) && $this->timeAlert( $lastExpense , 'diffInDays' , 'updated_at' ) >= $tiempo->valor ){
-				$msg .= 'La solicitud N° ' .  $solicitud->id . ' ' .  $tiempo->mensaje;	
-				$result[] = array(
-					"solicitude" => $solicitud->id,
-					"msg" => $tiempo->mensaje,
-					);
-			}
-		}
-		return array( 'type' => 'warning' , 'msg' => $msg, 'typeData' => 'expenseAlert', 'data' => $result );
-	}
-
-
-	public function timeAlert( $record , $method , $date )
-	{
-		$now = Carbon::now();
-		$updated = new Carbon( $record->$date );
-		return $updated->$method( $now );
-	}
-
-	public function compareTime2()
-	{
-		$solicituds = Solicitud::where( 'id_user_assign' , Auth::user()->id )->where( 'id_estado' , GASTO_HABILITADO )->get();
-		$msg = '';
-		$result = array();
-		$tiempo = Parameter::find( ALERTA_TIEMPO_REGISTRO_GASTO );
-		foreach ( $solicituds as $solicitud )
-		{
-			if ( $this->timeAlert( $solicitud , 'diffInDays' , 'created_at' ) >= $tiempo->valor )
-			{
-				$msg .= 'La solicitud N° ' .  $solicitud->id . $tiempo->mensaje;
-				$result[] = array(
-					"solicitude" => $solicitud->id,
-					"msg" => $tiempo->mensaje,
-					);
-			}
-		}
-		return array( 'type' => 'warning' , 'msg' => $msg, 'typeData' => 'expenseAlert' , 'data' => $result );
-	}
+	    return array( 'type' => 'warning' , 'data' => $result, 'typeData' => 'clientAlert');
+	}*/
 }
