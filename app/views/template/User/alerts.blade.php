@@ -6,7 +6,7 @@
 </div>
 
 <div class="panel panel-default">
- 	<ul class="list-group">
+ 	<ul class="list-group" style="overflow-y:scroll;max-height:400px">
 		<!-- List group -->
 		@if(count($alerts)>0)
   			@foreach($alerts as $alert)

@@ -12,6 +12,7 @@ use \Illuminate\Database\Eloquent\Collection;
 use \Parameter\Parameter;
 use \View;
 use \DB;
+use \System\SolicitudHistory;
 
 class AlertController extends BaseController
 {
@@ -80,7 +81,13 @@ class AlertController extends BaseController
 
 	public function compareTime2()
 	{
-		$solicituds = Solicitud::where( 'id_user_assign' , Auth::user()->id )->where( 'id_estado' , GASTO_HABILITADO )->get();
+		$solicituds =   Solicitud::where( 'id_user_assign' , Auth::user()->id )
+						->where( 'id_user_assign' , Auth::user()->id )->whereNotIn( 'id' , function( $query )
+						{
+							$query->select( 'id_solicitud' )
+							->from( with( new SolicitudHistory )->getTable() )
+							->whereIn( 'status_to' , [ CANCELADO , RECHAZADO , ENTREGADO ] );
+						})->get();
 		$result = array();
 		$tiempo = Parameter::find( ALERTA_TIEMPO_REGISTRO_GASTO );
 		foreach ( $solicituds as $solicitud )
