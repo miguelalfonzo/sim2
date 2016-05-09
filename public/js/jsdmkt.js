@@ -2184,8 +2184,10 @@ $( document ).ready(function()
             }         
         });
     }
-    getAlerts();
-
+    if( window.location.href.match( 'public/show_user' ) !== null )
+    {
+        getAlerts();
+    }
     seeker( $( '.cliente-seeker' ) , 'clients' , 'search-client' );
     seeker( $( '.institucion-seeker' ) , 'institutions' , 'search-institution' );
     seeker( $( '.rep-seeker' ) , 'reps' , 'search-rep' );

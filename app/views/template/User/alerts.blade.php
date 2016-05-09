@@ -17,7 +17,7 @@
 							@foreach($clientAlert['solicitude'] as $id )
 								<span class="label label-success open-details2" rel="{{$id}}" style="cursor:pointer">Solicitud N° {{$id}}</span>
 							@endforeach 
-							{{ $clientAlert[ 'msg' ] }} 
+							{{ $clientAlert[ 'msg' ] }}</br>
 							@foreach( $clientAlert[ 'cliente' ] as $client )
 								<span class="label label-info">{{$client }}</span>
 							@endforeach
