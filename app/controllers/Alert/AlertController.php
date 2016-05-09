@@ -82,6 +82,7 @@ class AlertController extends BaseController
 	public function compareTime2()
 	{
 		$solicituds =   Solicitud::where( 'id_user_assign' , Auth::user()->id )
+						->where( 'idtiposolicitud' , '<>' , SOL_INST )
 						->where( 'id_user_assign' , Auth::user()->id )->whereNotIn( 'id' , function( $query )
 						{
 							$query->select( 'id_solicitud' )
