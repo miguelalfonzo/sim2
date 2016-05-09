@@ -166,6 +166,7 @@ class AlertController extends BaseController
 								'solicitude' => $intersect,
 								'msg'        => $tiempo->mensaje
 							];
+							$add = false;
 						}
 					}
 				}
