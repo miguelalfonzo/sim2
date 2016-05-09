@@ -47,7 +47,7 @@ Route::filter( 'gerprod_gerprom_gercom_gerger' , 'Filter\FilterController@gerent
 Route::filter( 'gercom' , 'Filter\FilterController@gerenteComercial' );
 Route::filter( 'gercom_cont' , 'Filter\FilterController@gerCom_cont' );
 
-Route::filter( 'ager' , 'FIlter\FilterController@asistenteGerencia');
+Route::filter( 'ager' , 'Filter\FilterController@asistenteGerencia');
 
 Route::filter( 'sys_user' , 'Filter\FilterController@system' ); 
 
