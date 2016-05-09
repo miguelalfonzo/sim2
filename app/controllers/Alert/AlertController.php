@@ -111,7 +111,7 @@ class AlertController extends BaseController
 	}
 
 
-	public function newClientAlert()
+	private function newClientAlert()
 	{
 		$user = Auth::user();
 		$tiempo = Parameter::find( ALERTA_INSTITUCION_CLIENTE );
