@@ -87,7 +87,7 @@ class AlertController extends BaseController
 						{
 							$query->select( 'id_solicitud' )
 							->from( with( new SolicitudHistory )->getTable() )
-							->whereIn( 'status_to' , [ CANCELADO , RECHAZADO , ENTREGADO ] );
+							->whereIn( 'status_to' , [ CANCELADO , RECHAZADO , ENTREGADO , 29 , 30 ] );
 						})->get();
 		$result = array();
 		$tiempo = Parameter::find( ALERTA_TIEMPO_REGISTRO_GASTO );
