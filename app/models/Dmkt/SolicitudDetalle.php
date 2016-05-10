@@ -52,7 +52,7 @@ class SolicitudDetalle extends Eloquent
     {
         $idSup = json_decode( $this->detalle )->supervisor;
 //        return \Users\Sup::where( 'iduser' , $idSup )->first()->full_name;
-        return Personal::where( 'user_id' , $idSup)->first()->getFullName();
+        return Personal::where( 'user_id' , $idSup)->first()->full_name;
     }    
 
     protected function getMontoActualAttribute()

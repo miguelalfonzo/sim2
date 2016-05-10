@@ -58,21 +58,6 @@ class BaseController extends Controller
         return $tasa;
     }
 
-    protected function fondoName( $fondo )
-    {
-        try{
-            if ( ! is_null ( $fondo->marca ) && ! is_null( $fondo->supervisor_id ) && ! is_null( $fondo->subcategoria_id ) ){
-                return $fondo->subCategoria->descripcion . ' | ' . $fondo->marca->descripcion . ' | ' . $fondo->sup->getFullName();
-            }elseif ( ! is_null( $fondo->marca ) && ! is_null( $fondo->subcategoria_id ) ){
-                return $fondo->subCategoria->descripcion . ' | ' . $fondo->marca->descripcion;
-            }elseif( ! is_null( $fondo->subcategoria_id ) ){
-                return $fondo->subCategoria->descripcion;
-            }
-        }catch(Exception $e){
-            return $e;
-        }
-    }
-
     protected function getExpenseDate( $solicitud , $range = 0 )
     {
         $now = Carbon::now();
@@ -104,7 +89,7 @@ class BaseController extends Controller
     {
         $rpta = '';
         foreach ($validator->messages()->all() as $msg)
-            $rpta .= $msg.'-';
+            $rpta .= $msg.'<br> ';
         return $rpta;
     }
 
@@ -147,7 +132,14 @@ class BaseController extends Controller
                 ->subject( error.' - Function: '.$function );
             });
         }
-        return array( status => error , description => $type. ': '.$exception->getMessage() );
+        else
+        {
+            if( strpos( $exception->getMessage() , 'ORA-00001' ) )
+            {
+                return array( status => error , description => $type . ':  No puede repetir la informacion de la tabla' );
+            }
+        }
+        return array( status => error , description => $type . ': ' . $exception->getMessage() );
     }
 
     private function validateJson()
@@ -266,58 +258,6 @@ class BaseController extends Controller
     protected function setRpta( $data='' , $description = '' )
     {
         return array( status => ok , data => $data , description => $description );
-    }
-
-    public function viewTestUploadImg(){
-        return View::make('test.testUploadImg');
-    }
-    public function viewTestUploadImgSave() {
-
-        $fileList = Input::file('image');
-
-        // $input = array('image' => $file);
-        // $rules = array(
-        //     'image' => 'image'
-        // );
-
-        // $validator = Validator::make($input, $rules);
-        if ( count($fileList) == 0 )
-        {
-            return Response::json(array(
-                'success'   => false,
-                'errors'    => 'No se pudo Cargar Archivo'
-            ));
-        }
-        else {
-            $resultFileList = array();
-            
-            foreach ($fileList as $fileKey => $fileItem) {
-                
-                $destinationPath    = FILESTORAGE_DIR;
-                $fileName           = pathinfo($fileItem->getClientOriginalName(), PATHINFO_FILENAME);
-                $fileExt            = pathinfo($fileItem->getClientOriginalName(), PATHINFO_EXTENSION);
-                $fileNameMD5        = md5(uniqid(rand(), true));
-
-                $fileStorage                = new FotoEventos;
-                $fileStorage->id            = $fileNameMD5;
-                $fileStorage->name          = pathinfo($fileItem->getClientOriginalName(), PATHINFO_FILENAME);
-                $fileStorage->extension     = $fileExt;
-                $fileStorage->directory     = $destinationPath;
-                $fileStorage->app           = APP_ID;
-                $fileStorage->save();
-
-                $fileItem->move($destinationPath, $fileNameMD5.'.'.$fileExt);
-                $resultFileList[] = array(
-                    'id'   => $fileNameMD5,
-                    'name'      => asset($destinationPath.$fileNameMD5.'.'.$fileExt)
-                );
-
-            }
-            return Response::json(array(
-                'success'   => true,
-                'fileList'  => $resultFileList
-            ));
-        }
     }
 
     public function getLeyenda()

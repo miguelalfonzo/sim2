@@ -131,6 +131,8 @@
                                 <li><a href="{{ URL::to('maintenance/documenttype') }}">Mantenimiento de Tipo de Documentos</a></li>
                                 <li><a href="{{ URL::to('maintenance/view/Fondo_Contable' ) }}">Mantenimiento de Fondo de Contabilidad</a></li>
                                 <li><a href="{{ URL::to('maintenance/view/Cuenta_Gasto_Marca') }}">Mantenimiento de Cuentas - Marcas</a></li>
+                            @elseif( Auth::user()->type === SUP )
+                                <li><a href="{{ URL::to( 'report/view/Fondo_Supervisor' ) }}">Reporte de Fondos de Supervisor</a></li>
                             @endif
                         </ul>
                     </li>
@@ -185,7 +187,7 @@
     URL_BASE = '{{ asset('/') }}';
     @if( isset( $solicitud ) && in_array( $solicitud->id_estado , array ( GASTO_HABILITADO , ENTREGADO ) ) && isset( $date ) )
         START_DATE = '{{ $date[ "startDate" ] }}';
-        END_DATE = '{{ $date[ "endDate" ] }}';
+        END_DATE   = '{{ $date[ "endDate" ] }}';
     @endif
 </script>
 

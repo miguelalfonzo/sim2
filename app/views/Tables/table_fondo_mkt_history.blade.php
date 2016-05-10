@@ -1,4 +1,4 @@
-<table class="table table-hover table-bordered table-condensed dataTable" id="table_fondo_mkt_history">
+<table class="table table-hover table-bordered table-condensed dataTable" id="table_fondo_mkt_history" width="100%">
     <thead>
         <tr>
             <th>#</th>

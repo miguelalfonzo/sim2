@@ -9,7 +9,7 @@
 </div>
 @if( isset( $state ) && $state == ACTIVE )
     <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4 pull-right fondo_r" >
-        <a id="terminate-fondo" class="btn btn-sm btn-danger" data-style="zoom-in" data-size="l">
+        <a id="terminate-fondo" class="btn btn-sm btn-danger ladda-button" data-style="zoom-in" data-size="l">
             <i class="glyphicon glyphicon-download"></i> 
             Terminar
         </a>

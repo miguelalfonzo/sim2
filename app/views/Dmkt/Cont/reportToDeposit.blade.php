@@ -28,33 +28,20 @@
                     <tbody>
                         @foreach( $solicituds as $solicitud )
                             <tr>
-                                
                                 <td>{{ $solicitud->id }}</td>
                                 <td>{{ $solicitud->titulo }} 
                                     @if( $solicitud->idtiposolicitud != SOL_INST )
                                         - {{ $solicitud->clients[ 0 ]->clientType->descripcion }} : {{{ $solicitud->clients[ 0 ]->{ $solicitud->clients[ 0 ]->clientType->relacion }->full_name or '' }}}</td>
                                     @endif
-                                <td>{{ $solicitud->detalle->fecha_entrega }} </td>
+                                <td>{{ $solicitud->detalle->fecha_entrega }}</td>
                                 <td>
-                                    @if ( isset( $solicitud->clients[ 0 ] ) && ! is_null( $solicitud->clients[ 0 ] ) )
-                                        {{ $solicitud->clients[ 0 ]->{ $solicitud->clients[ 0 ]->clientType->relacion }->full_name }}
-                                    @else
-                                        -
-                                    @endif
+                                    {{{ $solicitud->clients[ 0 ]->{ $solicitud->clients[ 0 ]->clientType->relacion }->full_name or '-' }}}
                                 </td>
                                 <td>
-                                    @if ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) )
-                                        {{ $solicitud->detalle->typePayment->nombre }}
-                                    @else
-                                        Transferencia
-                                    @endif
+                                    {{ $solicitud->detalle->typePayment->nombre or 'TRANSFERENCIA' }}
                                 </td>
                                 <td>
-                                    @if ( is_null ( $solicitud->assignedTo->personal ) )
-                                        Sin Rol o No Autorizado
-                                    @else
-                                        {{ $solicitud->assignedTo->personal->full_name }}
-                                    @endif
+                                    {{ $solicitud->personalTo->full_name }}
                                 </td>
                                 <td>
                                     @if( $solicitud->id_inversion == 36 )
@@ -63,9 +50,9 @@
                                         @elseif( $solicitud->detalle->id_moneda == 2 )
                                             194-1809102-167
                                         @endif
-                                    @elseif ( $solicitud->detalle->id_pago != PAGO_CHEQUE )
-                                        @if ( $solicitud->assignedTo->type == REP_MED && ! is_null( $solicitud->assignedTo->personal->bagoVisitador ) && ! is_null( $solicitud->assignedTo->personal->bagoVisitador->cuenta ) )
-                                            {{ $solicitud->assignedTo->personal->bagoVisitador->cuenta->cuenta }}
+                                    @elseif( $solicitud->detalle->id_pago != PAGO_CHEQUE )
+                                        @if( in_array( $solicitud->assignedTo->type , [ REP_MED , SUP ] , 1 ) )
+                                            {{ $solicitud->personalTo->getAccount()  }}
                                         @endif
                                     @else
                                         RUC: {{ $solicitud->detalle->num_ruc }}         
@@ -77,7 +64,7 @@
                     </tbody>
                 </table>
             </section>
-            <footer>
+            <footer style="bottom:0">
                 <p class="firma">V°B° Contabilidad</p>
                 <div style="width:120px;text-align:center" ><span class="dni">{{ Auth::user()->personal->full_name }}</span></div>
             </footer>

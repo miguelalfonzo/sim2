@@ -16,7 +16,7 @@ class FondoGerProd extends Eloquent
 
 	protected function getSaldoDisponibleAttribute()
 	{
-		return $this->saldo - $this->retencion;
+		return round( $this->saldo - $this->retencion , 2 , PHP_ROUND_HALF_DOWN );
 	}
 
 	public function fondosSubCategorias()

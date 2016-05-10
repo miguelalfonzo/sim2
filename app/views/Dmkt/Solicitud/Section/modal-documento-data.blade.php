@@ -236,9 +236,10 @@
 		
       </div>
       <div class="modal-footer">
-        <button id="save-expense" type="button" class="btn btn-primary" data-dismiss="modal">Registrar</button>
+        <button id="save-expense" type="button" class="btn btn-primary">Registrar</button>
 		<button id="cancel-expense" type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
       </div>
     </div>
   </div>
 </div>
+@include( 'Script.Cont.retencion_detraccion' )

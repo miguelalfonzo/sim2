@@ -3,16 +3,15 @@
         <label class="control-label"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Asignado a</label>
         <div class="input-group">
             <span class="input-group-addon">{{ $solicitud->assignedTo->type }}</span>
-            <input type="text" class="form-control input-md solicitud-resp" readonly value="{{ $solicitud->assignedTo->personal->getFullName() }}">        
-        
-        	@if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( GER_PROD, GER_PROM , GER_COM , GER_GER  ) ) )
-		        <select name="responsable" id="resp-value" class="form-control edit-resp" style="display:none">
-					<option value="0" selected="" readonly>Seleccione el Representante Responsable</option>    
-					@foreach ($reps as $rep)
-						<option value="{{ $rep->user_id }}">{{ $rep->full_name }}</option>
-					@endforeach
+            <input type="text" class="form-control input-md solicitud-resp" readonly value="{{ $solicitud->assignedTo->personal->full_name }}">
+            @if ( isset( $tipo_usuario ) && in_array( $tipo_usuario , array( SUP , GER_PROD, GER_PROM , GER_COM , GER_GER  ) ) )    
+	    	    <select name="responsable" id="resp-value" class="form-control edit-resp" style="display:none">
+					<option value="0" selected="" readonly>Seleccione el Empleado Responsable</option>    
+						@foreach ($reps as $rep)
+							<option value="{{ $rep->user_id }}">{{ $rep->full_name }}</option>
+						@endforeach
 				</select>
-					<span  class="input-group-btn solicitud-resp">
+				<span  class="input-group-btn solicitud-resp">
 					<button class="btn btn-default" type="button" id="edit-resp-activate" style="height: 38px;">
 						<i class="glyphicon glyphicon-edit"></i>
 					</button>						

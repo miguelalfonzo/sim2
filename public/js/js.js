@@ -3,39 +3,51 @@ var pathname = document.location.pathname;
 var pathnameArray= pathname.split("/public/");
 
 server =  pathnameArray.length >0 ? pathnameArray[0]+"/public/" : "";
-//var IGV = 0.18;
-//Funciones Globales
+
 var datef = new Date();
 var dateactual = (datef.getMonth()+1)+'-'+datef.getFullYear();
 
 function loadingUI(message)
 {
-    $.blockUI({ css: {
-        border: 'none',
-        padding: '15px',
-        backgroundColor: '#000',
-        '-webkit-border-radius': '10px',
-        '-moz-border-radius': '10px',
-        opacity: 0.5,
-        color: '#fff'
-    }, message: '<h2><img style="margin-right: 30px" src="' + server + 'img/spiffygif.gif" >' + message + '</h2>'});
+    $.blockUI(
+    {
+        baseZ: 2000,
+        css: 
+        {
+            border                  : 'none',
+            padding                 : '15px',
+            backgroundColor         : '#000',
+            '-webkit-border-radius' : '10px',
+            '-moz-border-radius'    : '10px',
+            opacity                 : 0.5,
+            color                   : '#fff'
+        }, 
+        message: '<h2><img style="margin-right: 30px" src="' + server + 'img/spiffygif.gif" >' + message + '</h2>'
+    });
 }
 
 function responseUI( message,color )
 {
-    $.unblockUI();
-    $.blockUI({ css: {
-        border: 'none',
-        padding: '15px',
-        backgroundColor: color,
-        '-webkit-border-radius': '10px',
-        '-moz-border-radius': '10px',
-        opacity: 0.5,
-        color: '#fff'
-    }, message: '<h2>' + message + '</h2>'});
-    setTimeout(function(){
+    $.blockUI(
+    {
+        baseZ: 2000, 
+        css: 
+        {
+            border: 'none',
+            padding: '15px',
+            backgroundColor: color,
+            '-webkit-border-radius': '10px',
+            '-moz-border-radius': '10px',
+            opacity: 0.5,
+            color: '#fff'
+        }, 
+        message: '<h2>' + message + '</h2>'
+    });
+
+    setTimeout(function()
+    {
         $.unblockUI();
-    },2000);
+    } , 2000 );
 }
 
 $(function()
@@ -44,15 +56,16 @@ $(function()
     function ajaxError(statusCode,errorThrown)
     {
         if (statusCode.status == 0) 
-            bootbox.alert('<h4 class="yellow">Internet: Problemas de Conexion</h4>');    
+            bootbox.alert('<h4 class="text-warning">Internet: Problemas de Conexion</h4>');    
         else
-            bootbox.alert('<h4 class="red">Error del Sistema</h4>');  
+            bootbox.alert('<h4 class="text-danger">Error del Sistema</h4>');  
     }
 
     //Vars
     var token          = $('input[name=token]').val();
-    var type_money     = $("#type-money").html();
-    var proof_type;
+    var row_item_first = $("#table-items tbody tr:eq(0)").clone();
+    var deposit        = parseFloat($('#amount').val());
+    /*var proof_type;
     var proof_type_sel;
     var ruc;
     var ruc_hide;
@@ -75,40 +88,10 @@ $(function()
     var quantity;
     var description;
     var total_item;
-    var row_item_first = $("#table-items tbody tr:eq(0)").clone();
-    var deposit        = parseFloat($('#amount').val());
     var row_expense_first;
     var data          = {};
-    var data_response = {};
-    //Submit Events
-    $(document).on("click","#token-reg-expense",function(e){
-        e.preventDefault();
-        var token = $(this).attr('data-url');
-        if($(this).attr('data-cont'))
-            window.location.href = server+'revisar-gasto/'+token;
-        else
-            window.location.href = server+'registrar-gasto/'+token;
-    });
-    $(document).on("click","#token-solicitude",function(e){
-        e.preventDefault();
-        var token = $(this).attr('data-url');
-        window.location.href = server+'generar-asiento-solicitud/'+token;
-    });
-    $(document).on("click","#token-expense",function(e){
-        e.preventDefault();
-        var token = $(this).attr('data-url');
-        window.location.href = server+'generar-asiento-gasto/'+token;
-    });
+    var data_response = {};*/
     
-    $("#regimen").on("change" , function()
-    {
-        if ( $(this).val() == 0 )
-            $("#monto-regimen").parent().parent().css("visibility" , "hidden" );
-        else
-            $("#monto-regimen").parent().parent().css("visibility" , "show" );        
-    });
-
-    //Default events
     //Calculate the IGV loading
     if( parseFloat( $( ".total-item" ).val() ) ) 
         calcularIGV();
@@ -155,18 +138,19 @@ $(function()
     // Datepicker date all classes
     // FIX COLOR IN INPUTS READONLY
     $('.date>input[readonly]').css('background-color', "#fff");
-    if(!($('.date>input:not([disabled])').length == 0))
+    if( $( '.date>input:not( [ disabled ] )' ).length !== 0 )
     {
-        $(".date").datepicker(
+        $( '.date' ).datepicker(
         {
-            orientation: "top",
-            language: 'es',
-            startDate: typeof START_DATE === 'undefined' ? '{{}}' : START_DATE ,
-            endDate: typeof END_DATE === 'undefined' ? '' : END_DATE ,
-            format: 'dd/mm/yyyy'
+            orientation : "top",
+            language    : 'es',
+            startDate   : typeof START_DATE === 'undefined' ? '{{}}' : START_DATE ,
+            endDate     : typeof END_DATE === 'undefined' ? '' : END_DATE ,
+            format      : 'dd/mm/yyyy'
         });
         //selected a date hide the datepicker
-        $(".date").on("change",function(){
+        $(".date").on("change",function()
+        {
             $(this).datepicker('hide');
         });
     }
@@ -223,8 +207,7 @@ $(function()
                     }
                 });
             }
-        });
-        
+        });      
     }
 
     function bootboxExpense( title , view , type )
@@ -422,15 +405,17 @@ $(function()
     });
 
     //Enable deposit
-    $("#enable-deposit").on("click",function(e){
-        e.preventDefault();
-        bootbox.confirm("<h4>Para Confirmar presione OK</h4>", function( result ) 
+    $("#enable-deposit").on("click",function()
+    {
+        bootbox.confirm( '<h4 class="text-info">Para Confirmar presione OK</h4>' , function( result ) 
         {
-            if(result)
+            if( result )
             {
-                data._token      = $("input[name=_token]").val();
-                data.idsolicitud = $("input[name=idsolicitud]").val();
-                
+                var data =
+                {
+                    _token      : GBREPORTS.token ,
+                    idsolicitud : $("input[name=idsolicitud]").val()
+                }
                 $.post( server + 'revisar-solicitud' , data ).done( function ( data )
                 {
                     if(data.Status == "Ok")
@@ -441,7 +426,9 @@ $(function()
                         });
                     }
                     else
-                        bootbox.alert("<h4 class='red'>" + data.Status + ": " + data.Description +  "</h4>");
+                    {
+                        bootboxMessage( data );
+                    }
                 });
             }
         });
@@ -709,21 +696,23 @@ $(function()
                 }, 500 );         
             }
             else
+            {
+                $.unblockUI();
                 bootbox.alert('<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
-
+            }
                     
         });
 
     });
 
     $( "#open-expense-register" ).click( function(){
-        rechargeViewExpense()
+        rechargeViewExpense();
     });
     //Validation spending record button
     $( "#save-expense" ).click( function( e )
     {
         e.preventDefault();
-        var btn_save = $(this).html().trim();
+        var btn_save         = $(this).html().trim();
         var proof_type_sel   = $("#proof-type option:selected");
         var ruc              = $("#ruc").val();
         var ruc_hide         = $("#ruc-hide").val();
@@ -943,10 +932,10 @@ $(function()
                                 ajaxError( statusCode , errorThrown );
                             }).done( function ( response ) 
                             {
-                                $.unblockUI();
                                 if( response.Status == 'Ok' )
                                 {
                                     responseUI("Gasto Actualizado","green");
+                                    $( '#expense-register' ).modal( 'hide' );
                                     $( 'input[ name=idgasto ]' ).val('');
                                     rechargeExpense().done( function ( data ) 
                                     {
@@ -962,6 +951,7 @@ $(function()
                                 }
                                 else
                                 {
+                                    $.unblockUI();
                                     bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>' );
                                     return false;
                                 }
@@ -985,7 +975,7 @@ $(function()
 
     function ajaxExpenseDone( response , msg )
     {
-        $.unblockUI();
+        $( '#expense-register' ).modal( 'hide' );
         if( response.Status !== 'Ok' )
             bootbox.alert( '<h4 class="red">' + response.Status + ' : ' + response.Description + '</h4>' );
         else
@@ -1043,7 +1033,7 @@ $(function()
         if( ruc.length === 0 )
         {
             $("#ruc").addClass("error-incomplete");
-            $( '#razon' ).css( 'color","#5c5c5c' ).html( 'No ha ingresado el RUC.').parent().parent().addClass( 'has-error' ).removeClass( 'has-success' );
+            $( '#razon' ).css( { color : "#5c5c5c" } ).html( 'No ha ingresado el RUC.').parent().parent().addClass( 'has-error' ).removeClass( 'has-success' );
         }
         else if( ruc.length > 0 && ruc.length < 11 )
         {
@@ -1053,7 +1043,7 @@ $(function()
         else
         {
             var l = Ladda.create( document.getElementById( 'razon' ) );
-            data._token = $("input[name=_token]").val();
+            var data = { _token : $("input[name=_token]").val() };
             $.ajax({
                 type: 'get',
                 url: rout_ruc + ruc + '/',
@@ -1075,7 +1065,7 @@ $(function()
                     }
                 }
             }).done(function (response){
-                if(response == undefined || response == null || response == "")
+                if( typeof response === 'undefined' || response == null || response == "")
                 {
                     alert("No se puede realizar la consulta. Por favor, ingrese la razon social");
                     $("#ruc").addClass("error-incomplete");
@@ -1083,7 +1073,7 @@ $(function()
                     $("#razon-val").hide();
                     $("#manual-razon").show();
                 }
-                if(response.error == undefined)
+                if( typeof response.error === 'undefined' && typeof response[ 'razon_social' ] !== 'undefined' )
                 {
                     $( '#razon' ).val( 2 ).html( response['razon_social'].substring(0,50)).parent().parent().addClass( 'has-success' ).removeClass( 'has-error' );;
                     $("#ruc-hide").val( ruc );
@@ -1318,11 +1308,9 @@ $(function()
         data.seatList = GBDMKT.seatsList;
         data._token   = $("input[name=_token]").val();
         data.idsolicitud = $('#idsolicitud').attr("rel");
-
-
-
         bootbox.confirm("¿Esta seguro que desea Generar el Asiento de Gasto (Diario)?", function(result) 
         {
+            $( '.bootbox button[ data-bb-handler=confirm ]' ).attr( 'disabled' , true );
             if(result)
             {
                 $.ajax(
@@ -1455,8 +1443,8 @@ $(function()
     $(document).off( 'click' , '.modal-document');
     $(document).on( 'click' , '.modal-document' , function(e)
     {
-        var tr = $(this).parent().parent().parent();
-        var view_type = $(this).children().attr('data-type');
+        var tr = $( this ).closest( 'tr' );
+        var view_type = $( this ).children().attr('data-type');
         $.ajax(
         {
             type: 'post',
@@ -1506,12 +1494,12 @@ $(function()
                 if ( response.Data.idtipotributo == null )
                 {
                     modal.find('#regimen').val( 0 );
-                    modal.find('#monto-regimen').val( response.Data.monto_tributo ).parent().parent().css( 'visibility' , 'hidden' ); 
+                    modal.find('#monto-regimen').val( response.Data.monto_tributo ).closest( '.form-group' ).css( 'visibility' , 'hidden' ); 
                 }
                 else
                 {
                     modal.find('#regimen').val( response.Data.idtipotributo );
-                    modal.find('#monto-regimen').val( response.Data.monto_tributo ).parent().parent().css( 'visibility' , 'show' );
+                    modal.find('#monto-regimen').val( response.Data.monto_tributo ).closest( '.form-group' ).css( 'visibility' , 'show' );
                 }
                 modal.modal();
             }
@@ -2141,8 +2129,11 @@ $(function()
         {    
             if ( response ) 
             {
-                data._token   = GBREPORTS.token;
-                data.token    = $( 'input[ name=token ]' ).val();
+                var data =
+                {
+                    _token : GBREPORTS.token,
+                    token  : $( 'input[ name=token ]' ).val()
+                }
                 $.post( server + 'end-expense-record' , data )
                 .done(function ( response ) 
                 {

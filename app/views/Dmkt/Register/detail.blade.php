@@ -58,7 +58,7 @@
             <label class="control-label" for="fecha">Asignar A</label>
             <div>
                 <select name="responsable" class="form-control">
-                    <option value="0" selected disabled>Seleccione el Representante Responsable</option>    
+                    <option value="0" selected disabled>Seleccione el Empleado Responsable</option>    
                     @foreach( $reps as $rep )
                         @if( isset( $solicitud ) && $solicitud->id_user_assign == $rep->user_id )
                             <option value="{{ $rep->user_id }}" selected>{{ $rep->full_name }}</option>
@@ -82,13 +82,13 @@
             <ul class="list-group" id="clientes">
                 @if ( isset( $solicitud ) )
                     @foreach ( $solicitud->clients as $client )
-                        <li class="list-group-item" tipo_cliente="{{$client->id_tipo_cliente}}" pk="{{$client->id_cliente}}">
-                            <b>{{ $client->{$client->clientType->relacion}->full_name }}</b>
-                            <button type='button' class='btn-delete-client' style="z-index:2">
-                                <span class="glyphicon glyphicon-remove red" style="margin-left:20px ; float:right;"></span>
-                            </button>
-                            <span class="badge">{{$client->clientType->descripcion}}</span>
-                        </li>
+                        @include( 'Seeker.client' ,  
+                        [ 
+                            'label' => $client->{$client->clientType->relacion}->full_name  ,
+                            'type'  => $client->clientType->descripcion ,
+                            'value' => $client->id_cliente ,
+                            'id_tipo_cliente' => $client->id_tipo_cliente
+                        ])
                     @endforeach
                 @endif
             </ul>
@@ -109,12 +109,10 @@
     <!-- Button (Double) -->
     <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px">
         <div style="text-align: center">
-            @if ( isset( $solicitud ) )
-                @if( $solicitud->blocked == 0 )
-                    <button id="registrar" class="btn btn-primary">Actualizar</button>
-                @endif
+            @if( isset( $solicitud ) && $solicitud->blocked == 0 )
+                <button type="button" id="registrar" class="btn btn-success">Actualizar</button>
             @else
-                <button id="registrar" class="btn btn-primary">Crear</button>
+                <button type="button" id="registrar" class="btn btn-success">Crear</button>
             @endif
             <a href="{{ URL::to('show_user') }}" class="btn btn-primary">Regresar</a>    
         </div>

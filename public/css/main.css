@@ -118,10 +118,10 @@ table thead th, table th
 	font-weight: 200;
 }
 
-.form-expense
+/*.form-expense
 {
 	margin-bottom: 1em;
-}
+}*/
 
 .green
 {
@@ -150,7 +150,7 @@ table thead th, table th
 	font-weight: bold;
 }
 
-.quantity input
+.quantity input 
 {
 	text-align: center;
 }

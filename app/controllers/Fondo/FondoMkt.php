@@ -69,9 +69,13 @@ class FondoMkt extends BaseController
         }
         elseif( $moneda == DOLARES )
         {
-            $tasaCompra        = $tc->compra;
-            $history           = Solicitud::find( $idSolicitud )->lastHistory;
-            $tasaCompraAntigua = ChangeRate::where( 'fecha' ,  Carbon::createFromFormat( 'Y-m-d H:i' , $history->updated_at )->subDay()->format( 'Y:m:d') )->first()->compra;
+            $tasaCompra          = $tc->compra;
+            
+            $lastApprovedHistory = Solicitud::find( $idSolicitud )->lastApprovedHistory;
+            if( ! is_null( $lastApprovedHistory ) )
+            {
+                $tasaCompraAntigua   = ChangeRate::getLastDayDolar( $lastApprovedHistory->created_at );
+            }
         }
         $historiesFondoMkt = array();
         foreach( $ids_fondo as $id_fondo )
@@ -99,16 +103,47 @@ class FondoMkt extends BaseController
 
     public function validateFondoSaldo( $fondosData , $fondoType , $msg , $tipo = '' )
     {
+        $totalAmountSup = [];
         foreach( $fondosData as $idFondo => $fondoMonto )
         {
             if ( $fondoType == SUP )
+            {
                 $fondo = FondoSupervisor::find( $idFondo );
+                
+                if( isset( $totalAmountSup[ $fondo->subcategoria_id ][ $fondo->supervisor_id ] ) )
+                {
+                    $totalAmountSup[ $fondo->subcategoria_id ][ $fondo->supervisor_id ] += $fondoMonto;  
+                }
+                else
+                {
+                    $totalAmountSup[ $fondo->subcategoria_id ][ $fondo->supervisor_id ] = $fondoMonto;  
+                }
+            }
             elseif ( $fondoType == GER_PROD )
+            {
                 $fondo = FondoGerProd::find( $idFondo );
+                if ( $fondo->{ 'saldo' . $tipo } < 0 )
+                {
+                    return $this->warningException( 'El Fondo ' . $fondo->full_name . ' solo cuenta con S/.' . ( $fondo->{ 'saldo' . $tipo } + $fondoMonto ) . 
+                                                    $msg . $fondoMonto . ' en total' , __FUNCTION__ , __FILE__ , __LINE__ );
+                }
+            }
+        }
 
-            if ( $fondo->{ 'saldo' . $tipo } < 0 ){
-                return $this->warningException( 'El Fondo ' .  $this->fondoName( $fondo ) . ' solo cuenta con S/.' . ( $fondo->{ 'saldo' . $tipo } + $fondoMonto ) . 
-                                                $msg . $fondoMonto . ' en total' , __FUNCTION__ , __FILE__ , __LINE__ );
+        if( ! empty( $totalAmountSup ) )
+        {
+            foreach( $totalAmountSup as $subCategoryId => $sups )
+            {
+                foreach( $sups as $supId => $amount )
+                {
+                    $fondoSup = FondoSupervisor::totalAmount( $subCategoryId , $supId );
+                    $fondoSubCategory = FondoSubCategoria::find( $subCategoryId );
+                    if( $fondoSup->{ 'saldo' . $tipo } < 0 )
+                    {
+                        return $this->warningException( 'El Fondo ' . $fondoSubCategory->descripcion . ' solo cuenta con S/.' . ( $fondoSup->{ 'saldo' . $tipo } + $amount ) . 
+                                                    $msg . $amount . ' en total' , __FUNCTION__ , __FILE__ , __LINE__ );
+                    }
+                } 
             }
         }
         return $this->setRpta();
@@ -154,15 +189,13 @@ class FondoMkt extends BaseController
 
     public function setPeriodHistoryData( $subCategoryId , $data )
     {
-        $now     = Carbon::now();
-        $period  = $now->format( 'Ym' );
-        $fondoPeriodHistory = FondoMktPeriodHistory::getFondoMktPeriod( $period , $subCategoryId );
+        $fondoPeriodHistory = FondoMktPeriodHistory::getNowFondoMktPeriod( $subCategoryId );
 
         if ( is_null( $fondoPeriodHistory ) ):
-            $lastFondoPeriodHistory      = FondoMktPeriodHistory::getFondoMktPeriod( $now->subMonth()->format( 'Ym' ) , $subCategoryId );
+            $lastFondoPeriodHistory      = FondoMktPeriodHistory::getLastFondoMktPeriod( $subCategoryId );
             $fondoPeriodHistory          = new FondoMktPeriodHistory;
             $fondoPeriodHistory->id      = $fondoPeriodHistory->nextId();
-            $fondoPeriodHistory->periodo = $period;
+            //$fondoPeriodHistory->periodo = $period;
             $fondoPeriodHistory->subcategoria_id = $subCategoryId;
             if ( is_null( $lastFondoPeriodHistory ) ):
                 $fondoSubCategory                      = FondoSubCategoria::find( $subCategoryId );

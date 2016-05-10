@@ -126,6 +126,10 @@ class Solicitud extends Eloquent
         return $this->hasOne( 'System\SolicitudHistory' , 'id_solicitud' )->orderBy( 'updated_at' , 'desc' );
     }
 
+    public function lastApprovedHistory(){
+        return $this->hasOne( 'System\SolicitudHistory' , 'id_solicitud' )->whereIn( 'status_to' , [ ACEPTADO , APROBADO ] )->orderBy( 'updated_at' , 'desc' );
+    }
+
     public function detalle()
     {
         return $this->belongsTo( 'Dmkt\SolicitudDetalle' , 'id_detalle' );

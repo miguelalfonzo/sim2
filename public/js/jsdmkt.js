@@ -3,6 +3,11 @@
 var date_start = $('.date_start').first();
 var date_end = $('.date_end').first();
 
+//Status
+var ok = 'Ok';
+var warning = 'Warning';
+var error = 'Error';
+
 //NEW SOLICITUD
 var reason        = $('select[name=motivo]');
 var investment    = $('select[name=inversion]');
@@ -31,47 +36,13 @@ var idState           = $("#idState");
 //VALIDACION DE MONTOS DE FAMILIAS
 var amount_error_families = $('#amount_error_families');
 
-
-//SUB-ESTADOS
-var PENDIENTE     = 1;
-var ACEPTADO      = 2;
-var APROBADO      = 3;
-var DEPOSITADO    = 4;
-var REGISTRADO    = 5;
-var ENTREGADO     = 6;
-var GENERADO      = 7;
-var CANCELADO     = 8;
-var RECHAZADO     = 9;
-var TODOS         = 10;
-var DERIVADO      = 11;
-var POR_DEPOSITAR = 13;
-var POR_REGISTRAR = 12;
-
-//NUEVOS ESTADOS
-var R_PENDIENTE = 1;
-var R_APROBADO = 2;
-var R_REVISADO = 3;
-var R_GASTOS = 4;
-var R_FINALIZADO = 5;
-var R_NO_AUTORIZADO = 6;
-var R_TODOS = 10;
-//USERS
-var REP_MED   = 'R';
-var SUP       = 'S';
-var GER_PROD  = 'P';
-var GER_COM   = 'G';
-var CONT      = 'C';
-var TESORERIA = 'T';
-var ASIS_GER  = 'AG';
-var GER_PROM  = 'GP';
-
 var date_options2 = 
 {
-    format: 'mm-yyyy',
-    minViewMode: 1,
-    language: "es",
-    orientation: "top",
-    autoclose: true
+    format      : 'mm-yyyy',
+    minViewMode : 1,
+    language    : "es",
+    orientation : "top",
+    autoclose   : true
 };
 
 $(document).off( 'click' , '.timeLine' );
@@ -80,27 +51,25 @@ $(document).on( 'click' , '.timeLine' , function(e)
     e.preventDefault();
     var element = $(this);
     element.removeClass( 'timeLine' );
-    var state = parseInt($(this).parent().parent().parent().find('#timeLineStatus').val(), 10);
-    var accept = $(this).parent().parent().parent().find('#timeLineStatus').data('accept');
-    var rejected = $(this).parent().parent().parent().find('#timeLineStatus').data('rejected');
+    //var state = parseInt($(this).parent().parent().parent().find('#timeLineStatus').val(), 10);
+    //var accept = $(this).parent().parent().parent().find('#timeLineStatus').data('accept');
+    //var rejected = $(this).parent().parent().parent().find('#timeLineStatus').data('rejected');
     
     $.get( server + 'timeline-modal/' + $(this).attr('data-id') ).done( function( response ) 
     {
         element.addClass( 'timeLine' );
-        var html = response; 
-        var html = $(html);
-        html.find('.container-fluid').removeClass('hide');
-        var h     = html;
+        var view = $( response ); 
+        view.find( '.container-fluid' ).removeClass('hide');
         bootbox.dialog(
         {
-            message: h,
-            title: "Línea del Tiempo",
+            message : view,
+            title   : "Línea del Tiempo",
             buttons: 
             {
                 danger: 
                 {
-                    label: "Cancelar",
-                    className: "btn-default"
+                    label     : "Cancelar",
+                    className : "btn-default"
                 }
             },
             size: "large"
@@ -134,34 +103,11 @@ $('#show_leyenda').on('click',function(){
     });
 });
 
-$('#hide_leyenda').on( 'click',function()
+$( '#hide_leyenda' ).on( 'click' ,function()
 {
-    $('#leyenda').hide();
-    $(this).hide();
-    $('#show_leyenda').show();
-});
-
-//add a family
-$("#btn-add-family").on('click', function () 
-{
-    $(".btn-delete-family").show();
-    $('#listfamily>li:first-child').clone(true, true).appendTo('#listfamily');
-});
-
-//delete a family
-$( document ).off( 'click' , '.btn-delete-family' );
-$(document).on("click", ".btn-delete-family", function () 
-{
-    $('#listfamily>li .porcentaje_error').css({"border": "0"});
-    $(".option-des-1").removeClass('error');
-    $('.families_repeat').text('');
-    var k = $("#listfamily li").size();
-    if (k > 1)
-        var other = $(".btn-delete-family").index(this);
-        $("#listfamily li").eq(other).remove();
-        var p = $("#listfamily li").size();
-        if (p == 1)
-            $(".btn-delete-family").hide();
+    $( '#leyenda').hide();
+    $( this ).hide();
+    $( '#show_leyenda' ).show();
 });
 
 //Validations
@@ -542,7 +488,6 @@ function verifySum( element , type )
         {
             sum_total += parseFloat( $(this).val() );
             sum_total.toFixed(2);
-            console.log(sum_total);
         });
     else
         $('.amount_families').each(function(i,v)
@@ -679,6 +624,7 @@ function cancelDialog  ( data , message )
                     }
                     else
                     {
+                        $( '.bootbox button[ data-bb-handler=success' ).attr( 'disabled' , true );
                         if ( result )
                         {
                             data['observacion'] = $('.sol-obs').val();
@@ -701,8 +647,19 @@ function cancelDialog  ( data , message )
                                     });
                                 }
                                 else
+                                {
                                     bootbox.alert('<h4 style="color:red">' + data.Status + ': ' + data.Description +'</h4>');
+                                    $( '.bootbox button[ data-bb-handler=success' ).attr( 'disabled' , false );
+                                }
+                            }).fail( function( statusCode , errorThrown )
+                            {
+                                $( '.bootbox button[ data-bb-handler=success' ).attr( 'disabled' , false );
+                                ajaxError( statusCode , errorThrown );
                             });
+                        }
+                        else
+                        {
+                            $( '.bootbox button[ data-bb-handler=success' ).attr( 'disabled' , false );
                         }
                     }
                 }
@@ -911,9 +868,8 @@ $( '#derivar_solicitud' ).on( 'click' , function()
 function acceptedSolicitude( type )
 {
     var formData = new FormData( form_acepted_solicitude[ 0 ] );
-    console.log( type );
-
-    var d_clients = [];
+    
+    /*var d_clients = [];
     var d_clients_type = [];
 
     clients.children().each( function ()
@@ -921,9 +877,8 @@ function acceptedSolicitude( type )
         elem = $(this);
         d_clients.push( elem.attr("pk") );
         d_clients_type.push( elem.attr("tipo_cliente") );
-    });
+    });*/
             
-
     if ( type !== undefined )
     {
         formData.append( 'derivacion' , 1 );
@@ -946,14 +901,14 @@ function acceptedSolicitude( type )
     {
         formData.append( 'modificacion_clientes' , 1 );        
 
-        d_clients.forEach( function( entry )
+/*        d_clients.forEach( function( entry )
         {
             formData.append( "clientes[]", entry );
         });   
         d_clients_type.forEach( function( entry )
         {
             formData.append( "tipos_cliente[]" , entry );
-        });
+        });*/
     }
 
     else
@@ -963,12 +918,12 @@ function acceptedSolicitude( type )
 
     $.ajax(
     {
-        type: 'POST',
-        url :  server + 'aceptar-solicitud',
-        data: formData,
-        cache: false,
-        contentType: false,
-        processData: false
+        type        : 'POST',
+        url         :  server + 'aceptar-solicitud',
+        data        : formData,
+        cache       : false,
+        contentType : false,
+        processData : false
     }).fail(function (statusCode,errorThrown) 
     {
         ajaxError(statusCode,errorThrown);
@@ -993,8 +948,10 @@ function acceptedSolicitude( type )
     });
 }
 
-$(document).on('click','#terminate-fondo',function(e)
+$( document ).off( 'click' , '#terminate-fondo' );
+$( document ).on( 'click' , '#terminate-fondo' , function(e)
 {
+    var ladda = Ladda.create( this );
     e.preventDefault();
     var date = date_reg_fondo.val();
     bootbox.confirm(
@@ -1009,10 +966,12 @@ $(document).on('click','#terminate-fondo',function(e)
         {
             if (result) 
             {
+                ladda.start();
                 var url = server + 'endfondos/' + date;
                 $.get(url).done(function(data)
                 {
-                    id_solicitud.val('');
+                    id_solicitud.val( '' );
+                    ladda.stop();
                     if (data.Status == 'Ok')
                     {
                         bootbox.alert('<h4 class="green">Fondos Terminados</h4>' , function()
@@ -1021,7 +980,9 @@ $(document).on('click','#terminate-fondo',function(e)
                         });
                     }
                     else
+                    {
                         bootbox.alert("<h4 style='color:red'>No se pudo terminar los fondos - " + data.Description + "</h4>");   
+                    };
                 });
             }
         }
@@ -1478,18 +1439,18 @@ $(document).on("click", ".elementBack", function()
 
 function seeker( element , name , url )
 {
-    if (element.length != 0)
+    if ( element.length !== 0 )
     {
         element.typeahead(
         {
-            minLength: 3,
-            hightligth: true,
-            hint: true
+            minLength  : 3,
+            hightligth : true,
+            hint       : true
         },
         {
-            name: name,
-            displayKey: 'label',
-            templates:  
+            name       : name,
+            displayKey : 'label',
+            templates  :  
             {
                 empty: 
                 [
@@ -1680,33 +1641,6 @@ function fillInvestmentsActivities()
     });
 }
 
-
-$(document).off( 'click' , '.btn-delete-client' );
-$(document).on( 'click' , '.btn-delete-client' , function () 
-{
-    var li = $(this).closest('li');
-    var ul = li.parent();
-    if ( li.index() == 0 && ul.children().length > 1 )
-    {
-        var table = li.attr('tipo_cliente');
-        li.remove();
-        var old_li2 = ul.children().first();
-        if ( table !== old_li2.attr( 'tipo_cliente' ) )
-        {
-            clientFilter( old_li2.attr( 'tipo_cliente' ) , 'eliminacion' );    
-        }
-    }
-    else
-    {
-        li.remove();
-    }
-    if ( ul.children().length === 0 )
-    {
-        fillInvestmentsActivities();
-    }
-});
-
-
 function ajaxError(statusCode,errorThrown)
 {
     if ( statusCode.status == 0 )
@@ -1786,37 +1720,45 @@ function validateNewSol()
     return aux;
 }
 
-//Validate send register solicitude
-$( '#registrar' ).off( 'click' );
-$( '#registrar' ).on( 'click' , function ( e ) 
+function bootboxMessage( data )
 {
-    e.preventDefault();
-    var aux = 0;
-    var d_clients = [];
-    var d_clients_type = [];
+    var colorClass = '';
+    if( data.Status === ok )
+    {
+        colorClass = 'text-success';
+    }
+    else if( data.Status === warning )
+    {
+        colorClass = 'text-warning';
+    }
+    else if( data.Status === error )
+    {
+        colorClass = 'text-danger';
+    }
+    bootbox.alert( '<h4 class="' + colorClass + '">' + data.Status + ': ' + data.Description + '</h4>' );
+
+}
+
+//Validate send register solicitude
+$( '#registrar' ).on( 'click' , function () 
+{
+    var aux            = 0;
+    aux                = validateNewSol();
     var families_input = [];
-    aux = validateNewSol();
     
     //Validate fields client are correct
-    clients.children().each( function ()
-    {
-        elem = $(this);
-        d_clients.push( elem.attr("pk") );
-        d_clients_type.push( elem.attr("tipo_cliente") );
-    });
     var products      = $('.products');
     products.each( function (index) 
     {
         families_input[index] = $(this).val();
     });
-
     for ( var i = 0 ; i < families_input.length ; i++ ) 
     {
         products.each( function ( index ) 
         {
             if ( index != i && families_input[i] === $( this ).val() ) 
             {
-                var ind = families_input.indexOf( $( this ).val() );
+                var ind               = families_input.indexOf( $( this ).val() );
                 families_input[index] = '';
                 $(this).css('border-color', 'red');
                 $(".families_repeat").text('Datos Repetidos').css('color', 'red');
@@ -1828,31 +1770,20 @@ $( '#registrar' ).on( 'click' , function ( e )
     if ( aux == 0 ) 
     {
         var form = $('#form-register-solicitude');
-        var formData = new FormData( form[ 0 ] );
-        d_clients.forEach( function( entry )
-        {
-            formData.append( "clientes[]", entry );
-        });   
-        d_clients_type.forEach( function( entry )
-        {
-            formData.append( "tipos_cliente[]" , entry );
-        });
-        var rute = form.attr('action');
+        var formData = form.serialize();
+        //var formData = new FormData( form[ 0 ] );
+
+        var route = form.attr('action');
         var message1 = 'Registrando';
-        var message2 = '<strong style="color: green">Solicitud Registrada</strong>';
         if ( id_solicitud ) 
         {
             message1 = 'Actualizando';
-            message2 = '<strong style="color: green">Solicitud Actualizada</strong>';
         }
         $.ajax(
         {
-            url: server + rute,
-            type: 'POST',
-            data: formData,
-            cache: false,
-            contentType: false,
-            processData: false,
+            url         : server + route,
+            type        : 'POST',
+            data        : formData,
             beforeSend: function()
             {
                 loadingUI(message1);
@@ -1860,16 +1791,18 @@ $( '#registrar' ).on( 'click' , function ( e )
         }).done(function ( data )
         {
             $.unblockUI();
-            if(data.Status == 'Ok' )
+            if( data.Status === ok )
             {
-                responseUI('Solicitud Registrada', 'green');
+                responseUI( 'Solicitud Registrada' , 'green' );
                 setTimeout( function()
                 {
                     window.location.href = server + 'show_user';
-                },500);
+                },900);
             }
             else
-                bootbox.alert('<h4 class="red">' + data.Status + ': ' + data.Description + '</h4>');
+            {
+                bootboxMessage( data );
+            }
         }).fail( function ( statusCode , errorThrown ) 
         {
             $.unblockUI();
@@ -1877,7 +1810,9 @@ $( '#registrar' ).on( 'click' , function ( e )
         });
     }
     else
+    {
         responseUI( 'Verifique los Datos' , 'red' );
+    }
 });
 
 $(document).off("click",".sol-obs");
@@ -1886,6 +1821,14 @@ $(document).on("click",".sol-obs", function()
     $(this).removeAttr("placeholder").parent().parent().removeClass("has-error");
 });
 
+function preventDoubleCLick( element )
+{
+    element.on( 'click' , 'button[ data-bb-handler=confirm ]' , function()
+    {
+        this.setAttribute( 'disabled' , true );
+    });
+}
+
 $("#btn-mass-approve").click( function()
 {
     var checks = $("input[name=mass-aprov]:checked").length;
@@ -1893,7 +1836,7 @@ $("#btn-mass-approve").click( function()
         bootbox.alert("<h4>No hay solicitudes seleccionadas</h4>")
     else
     {    
-        bootbox.confirm("<h4 style='color:blue'>Esta seguro de aprobar todas las solicitudes seleccionadas</h4>" , function(result)
+        bbox = bootbox.confirm("<h4 style='color:blue'>Esta seguro de aprobar todas las solicitudes seleccionadas</h4>" , function(result)
         {
             if (result)
             {
@@ -1945,6 +1888,7 @@ $("#btn-mass-approve").click( function()
                 });
             }
         });
+        preventDoubleCLick( bbox );
     }
 });
 
@@ -2157,40 +2101,6 @@ $( '.btn-remove-family' ).click( function () {
     $(this).closest('li').remove();   
 });
 
-$("#is-product-change").change(function() {
-    if(this.checked) {        
-        $("#open_modal_add_product").show();
-        $("#list-product").hide();
-        $('#list-product :input').attr('disabled', true);
-        $('#list-product2 :input').removeAttr('disabled');
-        $("#list-product2").show();
-    }
-    else{
-        $("#open_modal_add_product").hide();
-        $("#list-product2").hide();
-        $('#list-product2 :input').attr('disabled', true);
-        $('#list-product :input').removeAttr('disabled');
-        $("#list-product").show();
-    }
-    verifySum( 0 , 0 );
-});
-
-
-$("#is-client-change").change(function() {
-    if(this.checked) {        
-        $("#open_modal_add_client").show();
-        $("#list-client").hide();
-        //$('#clientes :input').removeAttr('disabled');
-        $("#clientes").show();
-    }
-    else{
-        $("#open_modal_add_client").hide();
-        $("#clientes").hide();
-        //$('#clientes :input').attr('disabled', true);
-        $("#list-client").show();
-    }
-});
-
 $("#edit-date-activate").click(function() {
   $( ".edit-date" ).show();
   $( "#fecha-value" ).val("");
@@ -2274,8 +2184,10 @@ $( document ).ready(function()
             }         
         });
     }
-    //getAlerts();
-
+    if( window.location.href.match( 'public/show_user' ) !== null )
+    {
+        getAlerts();
+    }
     seeker( $( '.cliente-seeker' ) , 'clients' , 'search-client' );
     seeker( $( '.institucion-seeker' ) , 'institutions' , 'search-institution' );
     seeker( $( '.rep-seeker' ) , 'reps' , 'search-rep' );
@@ -2298,7 +2210,7 @@ $( document ).ready(function()
 
 
     /** ---------------------------------------- SET DISABLED INPUTS INIT ------------------------------------------**/
-    $('#list-product2 :input').attr('disabled', true);
+    //$('#list-product2 :input').attr('disabled', true);
     $('#resp-value').attr('disabled', true);
     $( "#fecha-value" ).attr('disabled', true);
 });

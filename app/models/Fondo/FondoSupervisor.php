@@ -4,6 +4,7 @@ namespace Fondo;
 
 use \Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletingTrait;
+use \Auth;
 
 class FondoSupervisor extends Eloquent
 {
@@ -15,7 +16,7 @@ class FondoSupervisor extends Eloquent
 
 	protected function getSaldoDisponibleAttribute()
 	{
-		return $this->saldo - $this->retencion;
+		return round( $this->saldo - $this->retencion , 2 , PHP_ROUND_HALF_DOWN );
 	}
 
 	public function subCategoria()
@@ -66,6 +67,39 @@ class FondoSupervisor extends Eloquent
 	protected function getApprovalProductNameAttribute()
 	{
 		return $this->subCategoria->descripcion . ' | ' . $this->marca->descripcion . ' S/.' . $this->saldo_disponible ;
+	}
+
+	protected static function totalAmount( $subcategory , $supervisorId )
+	{
+		$model  =	FondoSupervisor::select( 'sum( saldo ) saldo , sum( retencion ) retencion , sum( saldo - retencion ) saldo_disponible , subcategoria_id' )
+				  		->where( 'subcategoria_id' , $subcategory )->where( 'supervisor_id' , $supervisorId )
+						->groupBy( 'subcategoria_id' )
+						->first();
+		return $model;
+	}
+
+	protected static function getSupFund( $category )
+	{
+		$supFunds = FondoSupervisor::select( 'subcategoria_id , marca_id , round( saldo , 2 ) saldo , retencion , ( saldo - retencion ) saldo_disponible' )
+				   ->where( 'supervisor_id' , Auth::user()->id )->orderBy( 'subcategoria_id' )->with( 'subcategoria' , 'marca' );
+
+		if( $category != 0 )
+		{
+			$supFunds = $supFunds->where( 'subcategoria_id' , $category );
+		}
+		
+		return $supFunds->get();
+	}
+
+	protected static function getReportSupFund( $category )
+	{
+		$supFunds = FondoSupervisor::where( 'supervisor_id' , Auth::user()->id )->orderBy( 'subcategoria_id' );
+		if( $category != 0 )
+		{
+			$supFunds = $supFunds->where( 'subcategoria_id' , $category );
+		}
+		
+		return $supFunds->get();
 	}
 
 }

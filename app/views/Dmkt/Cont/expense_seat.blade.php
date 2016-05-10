@@ -41,7 +41,7 @@
 						<label>Nombre del Solicitante</label>
 						<div class="input-group">
 	            			<span class="input-group-addon">{{ $solicitud->createdBy->type }}</span>
-	                        <input id="textinput" name="titulo" type="text" placeholder="" value="{{ $solicitud->createdBy->personal->getFullName() }}" class="form-control" disabled>
+	                        <input id="textinput" name="titulo" type="text" placeholder="" value="{{ $solicitud->createdBy->personal->full_name }}" class="form-control" disabled>
 	                    </div>							
 					</div>
 				</div>
@@ -51,11 +51,11 @@
 						<div class="input-group">
 							@if ( $solicitud->createdBy->type == ASIS_GER )
 		                        <span class="input-group-addon">{{ $solicitud->createdBy->type }}</span>
-		                        <input id="textinput" name="titulo" type="text" placeholder="" value="{{ $solicitud->createdBy->personal->getFullName() }}" class="form-control" disabled>   
+		                        <input id="textinput" name="titulo" type="text" placeholder="" value="{{ $solicitud->createdBy->personal->full_name }}" class="form-control" disabled>   
 	                        @else
 		                        <span class="input-group-addon">{{ $solicitud->approvedHistory->user->type }}</span>
 		                        <input id="textinput" name="titulo" type="text" placeholder=""
-	                            value="{{ $solicitud->approvedHistory->updatedBy->personal->getFullName() }}" class="form-control" disabled>
+	                            value="{{ $solicitud->approvedHistory->updatedBy->personal->full_name }}" class="form-control" disabled>
 	                        @endif
 	                    </div>							
 					</div>

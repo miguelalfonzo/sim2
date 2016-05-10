@@ -2,11 +2,10 @@
 
 namespace Dmkt;
 use \Eloquent;
-use \Auth;
 use \DB;
 use \Fondo\FondoGerProd;
 use \Fondo\FondoSupervisor;
-use \Log;
+use \Expense\ChangeRate;
 
 class SolicitudProduct extends Eloquent
 {
@@ -27,7 +26,7 @@ class SolicitudProduct extends Eloquent
         $id_producto =  isset($productoId) ? $productoId : $this->id_producto;
         if ( $userType == SUP )
         {
-            $userid = $solicitud->assignedTo->personal->rmSup->user_id;
+            $userid = $solicitud->personalTo->userSup();
             return DB::table(TB_FONDO_SUPERVISOR.' fs')
                         ->select("m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'fs.saldo - fs.retencion saldo_disponible' , 'fs.id' , 'fs.marca_id' , '\'S\' tipo' )
                         ->leftJoin(TB_FONDO_CATEGORIA_SUB.' fsc' , 'fsc.id' , '=' , 'fs.subcategoria_id' )
@@ -132,6 +131,12 @@ class SolicitudProduct extends Eloquent
     public function user()
     {
         return $this->hasOne( 'User' , 'id' , 'id_fondo_user');
+    }
+
+    protected function getMontoAsignadoSolesAttribute()
+    {
+        $compra = ChangeRate::getLastDayDolar( $this->updated_at );
+        return round( $this->monto_asignado * $compra , 2 , PHP_ROUND_HALF_DOWN );
     }
 
     protected function setMontoAsignadoAttribute( $value )

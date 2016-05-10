@@ -17,7 +17,7 @@
         @if ( $solicitud->id_user_assign == Auth::user()->id ) 
             @if ( $solicitud->id_estado == GASTO_HABILITADO )
                 <a id="finish-expense" class="btn btn-success">Terminar</a>
-            @else( $solicitud->id_estado == ENTREGADO && $solicitud->devolutions()->where( 'id_estado_devolucion' , DEVOLUCION_POR_REALIZAR )->get()->count() !== 0 )
+            @elseif( $solicitud->id_estado == ENTREGADO && $solicitud->devolutions()->where( 'id_estado_devolucion' , DEVOLUCION_POR_REALIZAR )->get()->count() !== 0 )
                 <a class="btn btn-info get-devolution-info" data-type="do-inmediate-devolution">Registro de la Devolución</a>
             @endif
         @endif

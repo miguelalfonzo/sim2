@@ -24,12 +24,6 @@ class Personal extends Eloquent
         else
             return $lastId->id;
     }
-    public function getFullName()
-    {
-        $name = $this->nombres .' '. $this->apellidos;
-        $name =ucwords(strtolower($name));
-        return $name;
-    }
 
     protected function getSeatNameAttribute()
     {
@@ -38,7 +32,7 @@ class Personal extends Eloquent
 
     public function getFullNameAttribute()
     {
-        return ucwords( strtolower( $this->nombres . ' ' . $this->apellidos ) );
+        return ucwords( mb_strtolower( $this->nombres . ' ' . $this->apellidos ) );
     }
 
     // idkc : RETORNA MODELO DE SUPERVISOR
@@ -57,23 +51,26 @@ class Personal extends Eloquent
         })->first();
     }
 
-    protected function getRms()
+    protected function getResponsible()
     {
-        $rms = Personal::wherehas( 'user' , function( $query )
+        $user = Auth::user();
+        $personals = Personal::orderBy( 'nombres' , 'ASC' , 'apellidos' , 'ASC' );
+        if( $user->type === REP_MED )
         {
-            $query->where( 'type' , REP_MED );
-        })->orderBy( 'nombres' , 'ASC' );
-        
-        if ( Auth::user()->type == SUP )
-        {
-            $rms->where( 'referencia_id' , Auth::user()->sup->bago_id );
+            $personals->where( 'user_id' , $user->id );
         }
-        elseif ( Auth::user()->type == REP_MED )
+        elseif( $user->type === SUP )
         {
-            $rms->where( 'user_id' , Auth::user()->id );
+            $personals->where( 'user_id' , $user->id )->orWhere( 'referencia_id' , $user->sup->bago_id );
         }
-        
-        return $rms->get();
+        elseif( in_array( $user->type , [ GER_PROD , GER_PROM , GER_COM , GER_GER ] ) )
+        {
+            $personals->whereHas( 'user' , function( $query )
+            {
+                $query->whereIn( 'type' , [ REP_MED , SUP ] );
+            });
+        }
+        return $personals->get();
     }
 
     public function employees()
@@ -89,12 +86,47 @@ class Personal extends Eloquent
     }
 
     // idkc : SOLO RM
-    public function rmSup()
+    protected function rmSup()
     {
-        return $this->belongsTo( '\Users\Personal' , 'referencia_id' , 'bago_id' )->whereHas( 'user' , function( $query )
+        return $this->belongsTo( 'Users\Personal' , 'referencia_id' , 'bago_id' )->whereHas( 'user' , function( $query )
         {
             $query->where( 'type' , SUP );
         });
+    }
+
+    public function getAccount()
+    {
+        if( $this->tipo === 'RM' || $this->tipo === 'RI' )
+        {
+            if( isset( $this->bagoVisitador->cuenta->cuenta ) )
+            {
+                return $this->bagoVisitador->cuenta->cuenta;
+            }
+        }
+        elseif( $this->tipo === SUP )
+        {
+            if( isset( $this->bagoSupervisor->cuenta->cuenta ) )
+            {
+                return $this->bagoSupervisor->cuenta->cuenta;
+            }
+        }
+        return null;   
+    }
+
+    public function userSup()
+    {
+        if( $this->tipo === 'RM' || $this->tipo === 'RI' )
+        {
+            return $this->rmSup->user_id;
+        }
+        elseif( $this->tipo === SUP )
+        {
+            return $this->user_id;
+        }
+        else
+        {
+            return null;
+        }
     }
 
     // idkc : SOLO SUPERVISOR
@@ -105,7 +137,6 @@ class Personal extends Eloquent
             $query->where( 'type' , REP_MED );
         });
     }
-
 
     public function getType()
     {
@@ -131,6 +162,11 @@ class Personal extends Eloquent
     public function bagoVisitador()
     {
         return $this->hasOne( 'Users\Visitador' , 'visvisitador' , 'bago_id' );
+    }
+
+    public function bagoSupervisor()
+    {
+        return $this->hasOne( 'Users\Supervisor' , 'supsupervisor' , 'bago_id' );
     }
 
     public function user()

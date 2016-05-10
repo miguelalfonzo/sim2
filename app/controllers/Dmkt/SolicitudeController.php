@@ -119,8 +119,10 @@ class SolicitudeController extends BaseController
             'currencies'  => TypeMoney::all(),
             'families'    => $qryProducts->get(),
             'investments' => InvestmentType::orderMkt());
-        if ( in_array(Auth::user()->type, array( SUP, GER_PROD , ASIS_GER ) ) )
-            $data[ 'reps' ] = Personal::getRms();
+        if ( Auth::user()->type != REP_MED )
+        {
+            $data[ 'reps' ] = Personal::getResponsible();
+        }
         return View::make('Dmkt.Register.solicitud', $data);
     }
 
@@ -138,7 +140,7 @@ class SolicitudeController extends BaseController
            'edit'        => true );
         $data[ 'detalle' ] = $data['solicitud']->detalle;
         if ( in_array(Auth::user()->type, array( SUP , GER_PROD , ASIS_GER ) ) )
-            $data[ 'reps' ] = Personal::getRms();
+            $data[ 'reps' ] = Personal::getResponsible();
         return View::make('Dmkt.Register.solicitud', $data);
     }
 
@@ -171,26 +173,21 @@ class SolicitudeController extends BaseController
             $middleRpta = $this->validateApprobationFamily( $inputs );
             if ( $middleRpta[ status ] === ok )
             {
-                //$middleRpta = $this->setProducts( $inputs[ 'solicitud_id' ] , array( $inputs[ 'producto' ] ) );
-             
-                    //DB::beginTransaction();
-                    //$solicitudProduct = SolicitudProduct::where( 'id_solicitud' , $inputs[ 'solicitud_id' ] )
-                    //                    ->where( 'id_producto' , $inputs[ 'producto' ] )->first();
-                    $productoId=  $inputs['producto'];
-                    $solicitudId =  $inputs['solicitud_id'];
-                   //
-                        $solicitudProduct = SolicitudProduct::where('id_solicitud', $solicitudId)->first();
-                        $solicitud = Solicitud::where('id', $solicitudId)->first();
-                        $politicType = $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario;
-                        $fondo_product =  $solicitudProduct->getSubFondo( $politicType , $solicitud, $productoId);
-                        return $this->setRpta(  array( 'Cond' => true , 'Fondo_product' => $fondo_product  ) );
-                    //}
-                       
-                    
                 
+                //$middleRpta = $this->setProducts( $inputs[ 'solicitud_id' ] , array( $inputs[ 'producto' ] ) );
+                //DB::beginTransaction();
+                //$solicitudProduct = SolicitudProduct::where( 'id_solicitud' , $inputs[ 'solicitud_id' ] )
+                //                    ->where( 'id_producto' , $inputs[ 'producto' ] )->first();
+                
+                $productoId=  $inputs['producto'];
+                $solicitudId =  $inputs['solicitud_id'];
+                $solicitudProduct = SolicitudProduct::where('id_solicitud', $solicitudId)->first();
+                $solicitud = Solicitud::where('id', $solicitudId)->first();
+                $politicType = $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario;
+                $fondo_product =  $solicitudProduct->getSubFondo( $politicType , $solicitud, $productoId );
+                return $this->setRpta(  array( 'Cond' => true , 'Fondo_product' => $fondo_product  ) );   
             }
             return $middleRpta;
-
         }
         catch( Exception $e )
         {
@@ -222,12 +219,9 @@ class SolicitudeController extends BaseController
                     && ( array_intersect( array( Auth::user()->id, Auth::user()->tempId() ), $solicitud->managerEdit( $politicType )->lists( 'id_gerprod' ) ) ) ) 
                 {
                     $politicStatus = TRUE;
-                    if ( in_array( $politicType , array( GER_PROD , GER_PROM , GER_COM , GER_GER ) ) )
-                    {
-                        $data[ 'payments' ] = TypePayment::all();
-                        $data[ 'families' ] = $qryProducts->get();
-                        $data[ 'reps' ] = Personal::getRms();    
-                    }
+                    $data[ 'payments' ] = TypePayment::all();
+                    $data[ 'families' ] = $qryProducts->get();
+                    $data[ 'reps' ] = Personal::getResponsible();    
                     $data[ 'tipo_usuario' ] = $politicType;
                     $solicitud->status = BLOCKED;
                     Session::put( 'id_solicitud' , $solicitud->id );
@@ -314,7 +308,7 @@ class SolicitudeController extends BaseController
 
         if ( in_array( Auth::user()->type , array( SUP, GER_PROD ) ) )
         {
-            $rules['responsable'] = 'required|numeric|min:1|exists:' . TB_USUARIOS . ',id,type,' . REP_MED ;
+            $rules[ 'responsable' ] = 'required|numeric|min:1|exists:' . TB_USUARIOS . ',id' ;
         }
 
         $validator = Validator::make($inputs, $rules);
@@ -543,9 +537,9 @@ class SolicitudeController extends BaseController
     private function textAccepted($solicitud)
     {
         if ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) )
-            return $solicitud->approvedHistory->user->personal->getFullName();
+            return $solicitud->approvedHistory->user->personal->full_name;
         else if ($solicitud->idtiposolicitud == SOL_INST)
-            return $solicitud->createdBy->personal->getFullName();
+            return $solicitud->createdBy->personal->full_name;
     }
 
     private function textClients($solicitud)
@@ -584,8 +578,12 @@ class SolicitudeController extends BaseController
             elseif ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) )
             {
                 if ( ! in_array( $solicitud->id_estado , State::getCancelStates() ) )
-                    return $this->warningException( 'No se puede cancelar las solicitudes en esta etapa: ' . $solicitud->state->nombre , __FUNCTION__, __LINE__, __FILE__ );
-                
+                {
+                    if( ! ( $solicitud->idtiposolicitud == REEMBOLSO && $solicitud->id_estado == GASTO_HABILITADO ) )
+                    {
+                        return $this->warningException( 'No se puede cancelar las solicitudes en esta etapa: ' . $solicitud->state->nombre , __FUNCTION__, __LINE__, __FILE__ );
+                    }
+                }
                 if( Auth::user()->type != CONT )
                 {
                     $politicType = $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario;
@@ -867,11 +865,11 @@ class SolicitudeController extends BaseController
     {
         DB::beginTransaction();
         $middleRpta = $this->validateInputAcceptSolRep( $inputs );
-        if ( $middleRpta[status] === ok ) 
+        if ( $middleRpta[ status ] === ok ) 
         {
             $solicitud  = Solicitud::find( $idSolicitud );
             $middleRpta = $this->verifyPolicy( $solicitud , $inputs[ 'monto' ] );
-            if ( $middleRpta[status] == ok )
+            if ( $middleRpta[ status ] == ok )
             {
                 $oldIdEstado          = $solicitud->id_estado;
                 if( $inputs[ 'derivacion'] && Auth::user()->type === SUP )
@@ -889,11 +887,10 @@ class SolicitudeController extends BaseController
                     $solicitud->anotacion = $inputs[ 'anotacion' ];
                 }
 
-
                 if( isset( $inputs[ 'responsable' ] ) )
-                    {
-                        $solicitud->id_user_assign = $inputs['responsable'];
-                    }
+                {
+                    $solicitud->id_user_assign = $inputs['responsable'];
+                }
                 
                 $solicitud->save();
 
@@ -921,14 +918,10 @@ class SolicitudeController extends BaseController
                         $detalle->num_ruc = $inputs[ 'ruc' ];
                     }
 
-
                     if( isset( $inputs[ 'fecha' ] ) )
                     {
                         $detalle->fecha_entrega = $inputs[ 'fecha' ];
                     }
-
-
-                    
 
                     //VALIDAR SI SE MODIFICARAN LOS CLIENTES
                     if ( $inputs[ 'modificacion_clientes' ] == 1 )
@@ -951,7 +944,7 @@ class SolicitudeController extends BaseController
                     
                     $middleRpta = $this->setProductsAmount( $inputs[ 'producto' ] , $inputs[ 'monto_producto' ] , $inputs[ 'fondo_producto' ] , $solDetalle );
                     
-                    if ( $middleRpta[status] != ok )
+                    if ( $middleRpta[ status ] != ok )
                     {
                         DB::rollback();
                         return $middleRpta;
@@ -1113,30 +1106,6 @@ class SolicitudeController extends BaseController
         $dataInputs = Input::all();
         $accountFondo = Account::where('num_cuenta', $dataInputs['cuentaMkt'])->first();
         return MarkProofAccounts::listData($accountFondo->num_cuenta);
-    }
-
-    public function getCuentaCont($cuentaMkt)
-    {
-        $result = array();
-        if (!empty($cuentaMkt)) {
-            $accountElement = Account::getExpenseAccount($cuentaMkt);
-            $account = count($accountElement) == 0 ? array() : json_decode($accountElement->toJson());
-            if (count($account) > 0)
-                $result['account'] = $account;
-            else {
-                $errorTemp = array(
-                    'error' => ERROR_NOT_FOUND_MATCH_ACCOUNT_MKT_CNT,
-                    'msg' => MESSAGE_NOT_FOUND_MATCH_ACCOUNT_MKT_CNT
-                );
-                if (!isset($result['error']) || !in_array($errorTemp, $result['error']))
-                    $result['error'][] = $errorTemp;
-            }
-
-        } else {
-            $result['error'] = ERROR_INVALID_ACCOUNT_MKT;
-            $result['msg'] = MSG_INVALID_ACCOUNT_MKT;
-        }
-        return $result;
     }
 
     private function searchFundAccount($solicitud)
@@ -1877,59 +1846,66 @@ class SolicitudeController extends BaseController
     public function album()
     {
         $data = array(
-            'reps'  => Personal::getRms() ,
+            'reps'  => Personal::getResponsible() ,
             'zones' => Zone::orderBy( 'N3GDESCRIPCION' , 'asc' )->get() );
         return View::make( 'Event.show' , $data );
     }
 
     public function getEventList()
     {
-        $start = Input::get("date_start");
-        $end   = Input::get("date_end");
-        $user  = Input::get( 'usuario' );
-        $zona  = Input::get( 'zona' );
-        if ( $user == 0 )
+        try
         {
-            if ( Auth::user()->type == REP_MED )
+            $start = Input::get("date_start");
+            $end   = Input::get("date_end");
+            $user  = Input::get( 'usuario' );
+            $zona  = Input::get( 'zona' );
+            
+            if ( $user == 0 )
             {
-                $user = array( Auth::user()->id );
-            }
-            elseif( Auth::user()->type == SUP )
-            {
-                $user = Auth::user()->sup->reps->lists( 'user_id' );
+                $authUser = Auth::user();
+                
+                $userIds = $authUser->getResponsibleIds();
             }
             else
             {
-                $user = null;
+                $userIds = [ $user ];
             }
-        }
-        else
-        {
-            $user = array( $user );
-        }
-        $data['events'] =   Event::whereRaw("created_at between to_date('$start','DD-MM-YY') and to_date('$end','DD-MM-YY')+1");
-        
-            $data[ 'events' ]->whereHas( 'solicitud' , function( $query ) use( $user , $zona )
+
+            $data[ 'events' ] =   Event::whereRaw( "created_at between to_date( '$start' , 'DD-MM-YY' ) and to_date( '$end' , 'DD-MM-YY' ) +1" );
+            $data[ 'events' ]->whereHas( 'solicitud' , function( $query ) use( $userIds , $zona )
             {
-                if ( ! is_null( $user ) )
-                {
-                    $query->whereIn( 'id_user_assign' , $user );
-                }
+                $query->whereIn( 'id_user_assign' , $userIds );
                 if ( $zona != 0 )
                 {   
                     $query->whereHas( 'personalTo' , function( $query ) use( $zona )
                     {
-                        $query->whereHas( 'bagoVisitador' , function( $query ) use( $zona )
+                        $query->where( function( $query ) use( $zona )
                         {
-                            $query->where( 'visnivel3geog' , $zona );
+                            $query->where( function( $query ) use( $zona )
+                            {
+                                $query->whereIn( 'tipo' , [ 'RM' , 'RI' , 'RF' ] )->whereHas( 'bagoVisitador' , function( $query ) use( $zona )
+                                {
+                                    $query->where( 'visnivel3geog' , $zona );
+                                });
+                            })->orWhere( function( $query ) use( $zona )
+                            {
+                                $query->whereIn( 'tipo' , [ SUP ] )->whereHas( 'bagoSupervisor' , function( $query ) use( $zona )
+                                {
+                                    $query->where( 'supnivel3geog' , $zona );
+                                });
+                            });
                         });
                     });  
                 }
             });
-        
-        
-        $data[ 'events' ] = $data[ 'events' ]->get();
-        return View::make('Event.album', $data);
+                        
+            $data[ 'events' ] = $data[ 'events' ]->get();
+            return View::make('Event.album', $data);
+        }
+        catch( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
     }
 
     public function photos()
@@ -1977,7 +1953,7 @@ class SolicitudeController extends BaseController
         }
     }
 
-    public function viewTestUploadImgSave()
+    public function uploadImgSave()
     {
 
         $fileList = Input::file('image');

@@ -16,7 +16,7 @@
                     <tbody>
                         <tr>
                             <th class="sin-border text-right">Colaborador Bagó:</th>
-                            <td class="sin-border text-left">{{ $solicitud->assignedTo->personal->getFullName() }}</td>  
+                            <td class="sin-border text-left">{{ $solicitud->assignedTo->personal->full_name }}</td>  
                             <th class="sin-border text-right">Cargo:</th>
                             <td class="sin-border text-left">{{ ucwords( strtolower( $solicitud->assignedTo->userType->descripcion ) ) }}</td>
                             
@@ -27,7 +27,7 @@
                         </tr>
                         <tr>
                             <th class="sin-border text-right">Autorizado por:</th>
-                            <td class="sin-border text-left">{{ $solicitud->approvedHistory->updatedBy->personal->getFullName() }}</td>
+                            <td class="sin-border text-left">{{ $solicitud->approvedHistory->updatedBy->personal->full_name }}</td>
                             <th class="sin-border text-right">Cargo:</th>
                             <td class="sin-border text-left">{{ ucwords( strtolower( $solicitud->approvedHistory->updatedBy->userType->descripcion ) ) }}</td>
                             <th class="sin-border text-right">Fondo:</th>

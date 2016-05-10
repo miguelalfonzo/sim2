@@ -7,8 +7,8 @@ const HEIGHT                = 600;
 const data                  = 'Data';
 const ok                    = 'Ok';
 const warning               = 'Warning';
-const danger                = 'Danger';
 const error                 = 'Error';
+const danger                = 'Danger';
 const desc_error            = 'Hubo un error al procesar la informacion';
 const status                = 'Status';
 const description           = 'Description';
@@ -395,3 +395,6 @@ const REGIMEN_DETRACCION = 2;
 //IDS TIPO DE DOCUMENTO
 const DOC_RECIBO_HONORARIO = 2;
 const DOC_NO_SUSTENTABLE = 7;
+
+//FONDOS
+const FONDO_AREK_MEDICOS = 12;

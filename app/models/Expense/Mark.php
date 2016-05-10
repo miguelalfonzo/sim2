@@ -16,5 +16,10 @@ class Mark extends Eloquent
    			return 0;
    		else
    			return $mark->id;
-   	} 
+   	}
+
+    protected static function getMark( $markCode )
+    {
+      return Mark::where( 'codigo' , $markCode )->first();
+    }
 }

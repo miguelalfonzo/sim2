@@ -4,7 +4,7 @@
         <div>
             <div class="input-group">
                 <span class="input-group-addon">{{ $solicitud->approvedHistory->user->type }}</span>  
-                <input type="text" class="form-control input-md"  readonly value="{{ $solicitud->approvedHistory->user->personal->getFullName() }}">
+                <input type="text" class="form-control input-md"  readonly value="{{ $solicitud->approvedHistory->user->personal->full_name }}">
             </div>
         </div>
     </div>
