@@ -2068,7 +2068,7 @@ $( '#btn-add-family-fondo' ).on( 'click' ,function ()
                     });
                     $("#list-product2").append('<li class="list-group-item"><div class="input-group input-group-sm"><span class="input-group-addon" style="width:15%;">'+
                     $("#selectfamilyadd option:selected").text() + '</span><select name="fondo_producto[]" class="selectpicker form-control">' +
-                    options_val +'</select><span class="input-group-addon">S/.</span>'+
+                    options_val +'</select><span class="input-group-addon">' + $( '#type-money' ).html().trim() + '</span>'+
                     '<input name="monto_producto[]" type="text" class="form-control text-right amount_families2" value="0" style="padding:0px;text-align:center">'+
                     '<span class="input-group-btn"><button type="button" class="btn btn-default btn-remove-family"><span class="glyphicon glyphicon-remove"></span></button></span></div>'+
                     '<input type="hidden" name="producto[]" class="producto_value" value="'+family_id+'"></li>');

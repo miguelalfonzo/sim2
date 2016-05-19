@@ -27,7 +27,7 @@
 										1893000
 									@endif
 								@else
-								{{ $solicitud->investment->accountFund->num_cuenta }}
+									{{ $solicitud->investment->accountFund->num_cuenta }}
 								@endif
 							</td>
 							<td class="date_ini">{{ $solicitud->detalle->deposit->updated_at }}</td>
