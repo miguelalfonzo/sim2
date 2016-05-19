@@ -69,7 +69,7 @@ class FondoMkt extends BaseController
         }
         elseif( $moneda == DOLARES )
         {
-            $tasaCompra          = $tc->compra;
+            $tasaCompra          = $tc->venta;
             
             $lastApprovedHistory = Solicitud::find( $idSolicitud )->lastApprovedHistory;
             if( ! is_null( $lastApprovedHistory ) )
@@ -172,7 +172,7 @@ class FondoMkt extends BaseController
             $fondoMkt = FondoGerProd::find( $fondoData[ 0 ] );
 
         if ( $detalle->id_moneda == DOLARES )
-            $monto_soles = round( $solProduct->monto_asignado * $tc->compra , 2 , PHP_ROUND_HALF_DOWN );
+            $monto_soles = round( $solProduct->monto_asignado * $tc->venta , 2 , PHP_ROUND_HALF_DOWN );
         elseif ( $detalle->id_moneda == SOLES )
             $monto_soles = $solProduct->monto_asignado;
 

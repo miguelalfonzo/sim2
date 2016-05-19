@@ -660,7 +660,7 @@ class SolicitudeController extends BaseController
             return $this->setRpta( ACEPTADO );
         else:
             if ( $solicitud->detalle->id_moneda == DOLARES )
-                $monto = $monto * ChangeRate::getTc()->compra;
+                $monto = $monto * ChangeRate::getTc()->venta;
             if ( $monto > $approvalPolicy->hasta && ! is_null( $approvalPolicy->hasta ) )
                 return $this->setRpta( ACEPTADO );
             elseif ( $monto <= $approvalPolicy->desde )
@@ -1993,11 +1993,11 @@ class SolicitudeController extends BaseController
             $tc = ChangeRate::getDayTc( $date );
             if ( is_null( $tc ) )
             {
-                $tasaCompra = ChangeRate::getTc()->compra;
+                $tasaCompra = ChangeRate::getTc()->venta;
             }
             else
             {
-                $tasaCompra = $tc->compra;
+                $tasaCompra = $tc->venta;
             }
         }
         return $tasaCompra;

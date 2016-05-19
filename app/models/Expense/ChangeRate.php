@@ -26,7 +26,7 @@ class ChangeRate extends Eloquent
 
     protected static function getLastDayDolar( $date )
     {
-        return ChangeRate::where( 'moneda' , 'DO' )->where( 'fecha + 1' , $date->startOfDay() )->first()->compra;
+        return ChangeRate::where( 'moneda' , 'DO' )->where( 'fecha + 1' , $date->startOfDay() )->first()->venta;
     }
 
 }

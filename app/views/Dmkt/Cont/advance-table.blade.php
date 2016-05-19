@@ -22,7 +22,7 @@
 				<td>S/.</td>
 				<td>
 					@if ( $solicitud->detalle->id_moneda == DOLARES )
-						{{ round( $detalle->monto_actual * $detalle->tcc , 2 , PHP_ROUND_HALF_DOWN ) }}
+						{{ round( $detalle->monto_actual * $detalle->tcv , 2 , PHP_ROUND_HALF_DOWN ) }}
 					@elseif ( $solicitud->detalle->id_moneda == SOLES )
 						{{ $detalle->monto_actual }}
 					@else
