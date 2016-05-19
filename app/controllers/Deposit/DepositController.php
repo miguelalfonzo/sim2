@@ -49,23 +49,15 @@ class DepositController extends BaseController
         if ( $solIdMoneda != $bankIdMoneda )
         {
             if ( $solIdMoneda == SOLES )
-                $monto = $monto / $tc->venta;
+                $monto = $monto / $tc->compra;
             elseif ( $solIdMoneda == DOLARES )
-                $monto = $monto * $tc->compra;
+                $monto = $monto * $tc->venta;
             else
                 return $this->warningException( 'Tipo de Moneda no Registrada con Id: '.$solIdMoneda , __FUNCTION__ , __LINE__ , __FILE__ );
             return $this->setRpta( array( 'monto' => $monto , 'jDetalle' => $jDetalle ) );
         }
         else
             return $this->setRpta( array( 'monto' => $monto , 'jDetalle' => $jDetalle ) );
-    }
-
-    private function amountRate( $jDetalle , $tc , $type )
-    {
-        if ( $type == 1 )
-            return ( ( ( $jDetalle->monto_aprobado / $tc->venta ) - $jDetalle->monto_retencion ) * $tc->venta );
-        elseif ( $type == 2 )
-            return ( ( ( $jDetalle->monto_aprobado * $tc->compra ) - $jDetalle->monto_retencion ) / $tc->compra );
     }
 
     private function getBankAmount( $detalle , $bank , $tc )

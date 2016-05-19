@@ -27,7 +27,7 @@
 										1893000
 									@endif
 								@else
-								{{ $solicitud->investment->accountFund->num_cuenta }}
+									{{ $solicitud->investment->accountFund->num_cuenta }}
 								@endif
 							</td>
 							<td class="date_ini">{{ $solicitud->detalle->deposit->updated_at }}</td>
@@ -35,7 +35,7 @@
 							<td>S/.</td>
 							<td class="total">
 								@if ( $solicitud->detalle->id_moneda == DOLARES )
-									{{ round( $detalle->monto_actual * $detalle->tcc , 2 , PHP_ROUND_HALF_DOWN ) }}
+									{{ round( $detalle->monto_actual * $detalle->tcv , 2 , PHP_ROUND_HALF_DOWN ) }}
 								@elseif ( $solicitud->detalle->id_moneda == SOLES )
 									{{ $detalle->monto_actual }}
 								@else

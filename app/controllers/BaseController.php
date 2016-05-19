@@ -22,7 +22,7 @@ class BaseController extends Controller
         {
             $tc = ChangeRate::getTc();
         }
-        $tasa = $tc->compra;
+        $tasa = $tc->venta;
         return $tasa;
     }
 
@@ -33,7 +33,7 @@ class BaseController extends Controller
         elseif( $solicitud->detalle->id_moneda == DOLARES )
         {
             $tc = ChangeRate::getTc();
-            $tasa = $tc->compra;
+            $tasa = $tc->venta;
         }
         return $tasa;
     }
@@ -53,7 +53,7 @@ class BaseController extends Controller
             {
                 $tc = ChangeRate::getTc();
             }
-            $tasa = $tc->compra;
+            $tasa = $tc->venta;
         }
         return $tasa;
     }
