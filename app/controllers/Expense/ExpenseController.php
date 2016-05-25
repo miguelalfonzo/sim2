@@ -355,8 +355,8 @@ class ExpenseController extends BaseController
 		$detalle              = $solicitud->detalle;
 		$monto_aprobado       = $detalle->monto_aprobado;
 		$totalGasto           = $solicitud->expenses->sum( 'monto' );
-		$totalGasto 		  = (string)$totalGasto;				
-		$balance              = $monto_aprobado - $totalGasto;
+		$totalGasto 		  = $totalGasto;				
+		$balance              = bcsub( $monto_aprobado , $totalGasto , 2 );
 		$payrollAmount        = Parameter::find( 4 )->valor;
 
 		$tasa = $this->getExchangeRate( $solicitud );
