@@ -138,9 +138,11 @@ class Seeker extends BaseController
 
     private function searchSeeker($inputs, $json, $cAlias, $type = 1)
     {
-        if (!empty($inputs)) {
+        if ( ! empty( $inputs ) ) 
+        {
             $json = json_decode($json);
-            if (json_last_error() == JSON_ERROR_NONE) {
+            if (json_last_error() == JSON_ERROR_NONE) 
+            {
                 $array = array();
                 foreach ($json as $table) {
                     $select = '';
@@ -153,23 +155,38 @@ class Seeker extends BaseController
                         }
                     }
 
-                    foreach ($table->wheres as $key => $where) {
-                        if ($key == 'likes') {
-                            foreach ($where as $key => $like)
-                                $query->orWhereRaw(" UPPER(" . $like . ") like '%" . strtoupper($inputs) . "%' ");
-                        } else if ($key == 'equal') {
+                    foreach ($table->wheres as $key => $where) 
+                    {
+                        if ($key == 'likes') 
+                        {
+                            $query->where( function( $query ) use( $where , $inputs )
+                            {
+                                foreach ( $where as $key => $like )
+                                {
+                                    $query->orWhereRaw( "UPPER(" . $like . ") like q'[%" . mb_strtoupper( $inputs ) . "%]'" );
+                                }
+                            });
+                        } 
+                        else if ($key == 'equal') 
+                        {
                             foreach ($where as $key => $equal)
                                 $query->where($key, $equal);
-                        } else if ($key == 'in') {
+                        } 
+                        else if ($key == 'in') 
+                        {
                             foreach ($where as $key => $in)
                                 $query->whereIn($key, $in);
-                        } else if ($key === 'notnull') {
+                        } 
+                        else if ($key === 'notnull') 
+                        {
                             foreach ($where as $key => $field)
                                 $query->whereNotNull($field);
                         }
                     }
-                    for ($i = 0; $i < count($cAlias); $i++)
+
+                    for( $i = 0 ; $i < count( $cAlias ) ; $i++ )
                         $select = $select . ' ' . $table->selects[$i] . ' as "' . $cAlias[$i] . '",';
+                    
                     $select = substr($select, 0, -1);
                     $query->select(DB::raw($select));
                     $query->take(50);
@@ -178,19 +195,28 @@ class Seeker extends BaseController
                         $tm->table = $table->name;
                     $array = array_merge($tms, $array);
                 }
-                if ($type == 1)
+                if ( $type == 1 )
+                {
                     return $this->setRpta($array);
-                else {
+                }
+                else 
+                {
                     $arrayfilter = array_filter($array, array($this, 'filterUserType'));
                     $rpta = array();
                     foreach ($arrayfilter as $array)
                         $rpta[] = $array;
                     return $this->setRpta($rpta);
                 }
-            } else
+            } 
+            else
+            {
                 return $this->warningException('Json: Formato Incorrecto', __FUNCTION__, __LINE__, __FILE__);
-        } else
+            }
+        } 
+        else
+        {
             return $this->warningException('Input Vacio (Post: "Json" Vacio)', __FUNCTION__, __LINE__, __FILE__);
+        }
     }
 
     private function filterUserType($var)
