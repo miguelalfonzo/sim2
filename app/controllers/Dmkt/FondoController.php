@@ -403,12 +403,27 @@ class FondoController extends BaseController
     {
         $repmed = Personal::getRM($codrepmed);
         if ( is_null( $repmed ) )
+        {
             return $this->warningException( 'El representante Medico no esta registrado en el sistema. Codigo de Representante: ' . $codrepmed , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
+        $bagoRepmed = $repmed->bagoVisitador;
+        if( is_null( $repmed->bagoVisitador ) )
+        {
+            return $this->warningException( 'No se ha encontrado el codigo de representante en el Fichero Medico. Codigo del Representante: ' . $codrepmed , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
+        $bagoRepmedCuenta = $bagoRepmed->cuenta;
+        if( is_null( $bagoRepmedCuenta ) ) 
+        {
+            return $this->warningException( 'No se ha encontrado el registro de la cuenta BAGO del representante. Codigo del Representante: ' . $codrepmed , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
+
         $codsup = $repmed->referencia_id;
         $sup = Personal::getSupvervisor( $codsup );
         if ( is_null( $sup) )
+        {
             return $this->warningException( 'El Supervisor no esta registrado en el sistema. Codigo de Supervisor: ' . $codsup , __FUNCTION__ , __LINE__ , __FILE__ );
-        return $this->setRpta( array( 'rm' => $repmed->user_id , 'sup' => $sup->user_id , 'codsup' => $codsup , 'cuentaRep' => $repmed->bagoVisitador->cuenta->cuenta ) );
+        }
+        return $this->setRpta( array( 'rm' => $repmed->user_id , 'sup' => $sup->user_id , 'codsup' => $codsup , 'cuentaRep' => $bagoRepmedCuenta->cuenta ) );
     }
 
     private function verifyPeriodo( $periodo )
