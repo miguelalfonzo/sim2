@@ -89,10 +89,10 @@ class SolicitudProduct extends Eloquent
             return array();
     }
 
-    protected function getSolProducts( $idSolProduct )
+    /*protected function getSolProducts( $idSolProduct )
     {
         return SolicitudProduct::whereIn( 'id' , $idSolProduct )->lists( 'id_producto' );
-    }
+    }*/
 
     public function thisSubFondo()
     {
