@@ -32,7 +32,7 @@ class SolicitudProduct extends Eloquent
                         ->leftJoin(TB_FONDO_CATEGORIA_SUB.' fsc' , 'fsc.id' , '=' , 'fs.subcategoria_id' )
                         ->leftJoin(TB_FONDO_CATEGORIA.' fc' , 'fc.id' , '=' , 'fsc.id_fondo_categoria' )
                         ->leftJoin(TB_MARCAS_BAGO.' m' , 'fs.marca_id' , '=' , 'm.id' )
-                        ->where('fs.saldo' , '>' , 0 )
+                        //->where('fs.saldo' , '>' , 0 )
                         ->where('trim( fsc.tipo )' , FONDO_SUBCATEGORIA_SUPERVISOR )
                         ->where('fs.supervisor_id' , $userid )->orderBy( 'm.descripcion' , 'asc' )
                         ->where( 'fs.marca_id' , $id_producto )
