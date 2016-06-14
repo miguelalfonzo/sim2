@@ -355,9 +355,12 @@ class SolicitudeController extends BaseController
 
     private function setGerProd($idsGerProd, $idSolicitud, $usersType)
     {
-        if (Session::has('maxRepeatIdsGerProd'))
+        if ( Session::has( 'maxRepeatIdsGerProd' ) )
+        {
             $maxRepeatIdsGerProd = Session::pull('maxRepeatIdsGerProd');
-        foreach ($idsGerProd as $idGerProd) {
+        }
+        foreach( $idsGerProd as $idGerProd )
+        {
             $solGer = new SolicitudGer;
             $solGer->id = $solGer->lastId() + 1;
             $solGer->id_solicitud = $idSolicitud;
@@ -694,7 +697,20 @@ class SolicitudeController extends BaseController
             }
             else if ( in_array( Auth::user()->type , array( GER_PROD , ASIS_GER ) ) )
             {
-                $idsUser = array( Personal::getSup( $responsable )->user_id );
+                $responsibleUserRegister = User::find( $responsable );
+                
+                if( $responsibleUserRegister->type == REP_MED )
+                {
+                    $idsUser = array( Personal::getSup( $responsable )->user_id );            
+                }
+                elseif( $responsibleUserRegister->type == SUP )
+                {
+                    $idsUser = array( $responsable );
+                }
+                else
+                {
+                    return $this->warningException( 'Solo se puede asignar como responsables de la solicitud a los Representantes o Supervisores' , __FUNCTION__ , __LINE__ , __FILE__ );
+                }
             }
             else
             {
@@ -703,6 +719,7 @@ class SolicitudeController extends BaseController
         elseif ( $userType == GER_PROD ):
             $idsGerProd = Marca::whereIn( 'id' , $idsProducto )->lists( 'gerente_id' );
             $uniqueIdsGerProd = array_unique( $idsGerProd );
+            
             $repeatIds = array_count_values( $idsGerProd );
             $maxNumberRepeat = max( $repeatIds );
             Session::put( 'maxRepeatIdsGerProd' , Personal::getGerProd( array_keys( $repeatIds , $maxNumberRepeat ) )->lists( 'user_id' ) );
@@ -719,6 +736,7 @@ class SolicitudeController extends BaseController
             else
                 $idsUser = $user;
         endif;
+            
         return $this->setRpta( array( 'iduser' => $idsUser , 'tipousuario' => $userType ) );
     }
 
@@ -853,8 +871,7 @@ class SolicitudeController extends BaseController
         {
             return isset($input->responsable);
         });
-
-        
+     
         if ( $validator->fails() )
             return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
         else
@@ -956,7 +973,9 @@ class SolicitudeController extends BaseController
 
                 if ( $solicitud->id_estado != APROBADO ) 
                 {
-                    $middleRpta = $this->toUser( $solicitud->investment->approvalInstance , SolicitudProduct::getSolProducts( $inputs['producto'] ), $solicitud->histories->count() + 1 );
+                    $familiesId = $solicitud->products->lists( 'id_producto' );
+                    
+                    $middleRpta = $this->toUser( $solicitud->investment->approvalInstance , $familiesId , $solicitud->histories->count() + 1 );
                     if ( $middleRpta[ status] != ok )
                     {
                         return $middleRpta;
