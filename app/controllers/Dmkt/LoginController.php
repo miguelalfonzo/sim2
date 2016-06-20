@@ -38,20 +38,26 @@ class LoginController extends BaseController{
         // create our user data for the authentication
         $userdata = array(
             'username' 	=> Input::get('username'),
-            'password' 	=> Input::get('password')
+            'password' 	=> Input::get('password'),
+            'active'    => 1
         );
-        if ( Auth::attempt( $userdata ) && Auth::user()->active == 1 )
+        if ( Auth::attempt( $userdata ) )
         {
-            if ( is_null(Auth::user()->simApp))
+            if ( is_null( Auth::user()->simApp ) )
             {
+                Auth::logout();
                 return View::make( 'Dmkt.login' )->with( array( 'message' => 'Usuario no autorizado' ) );
-            }else{
+            }
+            else
+            {
+                Auth::user()->touch();
                 return Redirect::to( 'show_user' );
             }
         }
         else
+        {
             return Redirect::to( 'login' )->with( 'error_login' , true );
-        
+        }  
     }
 
     public function doLogout()
