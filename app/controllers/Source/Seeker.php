@@ -234,26 +234,24 @@ class Seeker extends BaseController
 
     public function getClientView()
     {
-        try {
-            $inputs = Input::all();
-            $rules = array('id_tipo_cliente' => 'required|min:1|in:' . implode(',', ClientType::lists('id')));
-            $validator = Validator::make($inputs['data'], $rules);
-            if ($validator->fails())
-                return $this->warningException(substr($this->msgValidator($validator), 0, -1), __FUNCTION__, __LINE__, __FILE__);
-            else {
-                $tipo_cliente = $inputs['data']['id_tipo_cliente'];
+        try 
+        {
+            $inputs    = Input::all();
+            
+            $actModel = Activity::getClientActivities( $inputs[ 'data' ][ 'id_tipo_cliente' ] );
+            $actIds   = $actModel->lists( 'id' );
+            $invIds   = InvestmentActivity::getActivitiesInvestments( $actIds )->lists( 'id_inversion' );
+            
+            return $this->setRpta(array(
+                'View' => View::make( 'Seeker.client' )->with( $inputs[ 'data' ] )->render(),
+                'id_actividad' => $actIds,
+                'id_inversion' => $invIds
+            ));
 
-                $act = Activity::where('tipo_cliente', $tipo_cliente)->lists('id');
-                $inv = InvestmentActivity::whereIn('id_actividad', $act)->lists('id_inversion');
-
-                return $this->setRpta(array(
-                    'View' => View::make('Seeker.client')->with($inputs['data'])->render(),
-                    'id_actividad' => $act,
-                    'id_inversion' => $inv
-                ));
-            }
-        } catch (Exception $e) {
-            return $this->internalException($e, __FUNCTION__);
+        } 
+        catch( Exception $e ) 
+        {
+            return $this->internalException( $e , __FUNCTION__ );
         }
     }
 }

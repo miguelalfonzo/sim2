@@ -1514,7 +1514,7 @@ function seeker( element , name , url )
                 {
                     if ( data.Status != 'Ok')
                     {
-                        responseUI( 'Problema de Conexion' , 'red' );
+                        bootboxMessage( data );
                     }
                     else if ( data.Status == 'Ok' )
                     {
