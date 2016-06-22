@@ -17,6 +17,7 @@ use \DB;
 use \Input;
 use \Session;
 use \Carbon\Carbon;
+use \Exception;
 
 class ReportController extends BaseController
 {
@@ -55,7 +56,7 @@ class ReportController extends BaseController
 
     // REPORT VIEW HANDLER
     public function reportViewHandler($id_reporte, $fromDate, $toDate)
-    {   
+    {  
         set_time_limit(REPORT_TIME_LIMIT);
 
         try
@@ -83,16 +84,19 @@ class ReportController extends BaseController
             );
 
             $validator = Validator::make($configReport, $rules, $messages);
-            if ($validator->fails()){
+            if( $validator->fails() )
+            {
                 $error            = $validator->messages();
                 $result['status'] = 'ERROR';
                 $result['data']   = $error;
-            }else{
-
+            }
+            else
+            {
                 $data = $this->reportViewProcess($configReport);
-
-                if($data['status']=='OK'){
-                    if(!isset($data['message'])){
+                if($data['status']=='OK')
+                {
+                    if( ! isset( $data[ 'message' ] ) )
+                    {
                         $data['reportId'] = $id_reporte;
                         $data['fromDate'] = $fromDate;
                         $data['toDate']   = $toDate;
@@ -104,26 +108,29 @@ class ReportController extends BaseController
                         Session::put('reportFileName', $filename);
                         Session::put('reportData', $data);
                         $result = $data;
-                    }else{
+                    }
+                    else
+                    {
                         $result = $data;
                     }
-                }else{
+                }
+                else
+                {
                     $result["status"]  = 'ERROR';
                     $result["message"] = REPORT_MESSAGE_EXCEPTION;
                 }
             }
         }
-        catch (Exception $e)
+        catch( Exception $e )
         {
+            \Log::error( $e );
+            
             $result["status"]  = 'ERROR';
             $result["message"] = REPORT_MESSAGE_EXCEPTION;
         }
         finally
         {
-
             return $result;
-            /*unset($id_reporte,$fromDate,$toDate,$fromDateString,$toDateString,$data,$filename,$e);
-            return json_encode($rpta);    */
         }
         
     }
@@ -193,146 +200,126 @@ class ReportController extends BaseController
     // PROCESS REPORT VIEW
     public function reportViewProcess($configReport)
     {   
-        set_time_limit(REPORT_TIME_LIMIT);
-        $result = array();
-        try{
-            $result['status'] = 'OK';
+        $result = array( status => ok );
+        
+        $dataReport = $this->getDataReport($configReport);
 
-            $dataReport = $this->getDataReport($configReport);
+        if( ! isset( $dataReport[ 'message' ] ) )
+        {
+            $dataReport  = DataGroup::arrayCastRecursive((array) $dataReport);
+            // // idkc : Validacion de inputs
+            $rules  = array(
+                'reportName' => 'required|string',
+                'formula'    => 'required',
+                'dataset'    => 'required'
+            );
 
-            if(!isset($dataReport['message'])){
-                $dataReport  = DataGroup::arrayCastRecursive((array) $dataReport);
-                // // idkc : Validacion de inputs
+            $validator = Validator::make($dataReport, $rules);
+
+            if( $validator->fails() )
+            {
+                $error            = $validator->messages();
+                $result['status'] = 'ERROR';
+                $result['data']   = $error;
+                
+            }
+            else if( isset( $dataReport[ 'dataset' ] ) )
+            {
+                $data = $dataReport['dataset'];
+
+                // idkc : Validacion de Formula
                 $rules  = array(
-                    'reportName' => 'required|string',
-                    'formula'    => 'required',
-                    'dataset'    => 'required'
+                    'rows'   => 'required|array',
+                    'values' => 'required|array'
                 );
-
-                $validator = Validator::make($dataReport, $rules);
+                $validator = Validator::make($dataReport['formula'], $rules);
                 if ($validator->fails()){
                     $error            = $validator->messages();
                     $result['status'] = 'ERROR';
                     $result['data']   = $error;
-                    
-                }else if(isset($dataReport['dataset'])){
-                    $data = $dataReport['dataset'];
-                    // $data['formula'] = $dataReport['formula'];
-                    // $formula         = DataGroup::arrayCastRecursive((array) json_decode($dataReport['formula']));
-                    // $title = $this->generateTitleReport($reportName, $configReport['fromDate'], $configReport['toDate']);      
 
-                    // idkc : Validacion de Formula
-                    $rules  = array(
-                        'rows'   => 'required|array',
-                        'values' => 'required|array'
+                }else{
+                    $newData = array(
+                        'head' => array()
                     );
-                    $validator = Validator::make($dataReport['formula'], $rules);
-                    if ($validator->fails()){
-                        $error            = $validator->messages();
-                        $result['status'] = 'ERROR';
-                        $result['data']   = $error;
-
-                    }else{
-                        $newData = array(
-                            'head' => array()
-                        );
-                        $columns    = array();
-                        if (count($dataReport['formula']['columns']) > 0) 
-                        {    
-                            $filter       = DataGroup::sortByFields($dataReport['formula']['columns']);
-                            // dd(json_encode(array('data'=>$dataReport['dataset']['body'], 'filter'=>$filter)));
-                            $dataReport['dataset']['body'] = DataGroup::array_orderby($dataReport['dataset']['body'], $filter);
-                            $columns = array_fetch($dataReport['dataset']['body'], $dataReport['formula']['columns'][0]);
-                            $columns = array_unique($columns);
-                        }
-
-                        // GENERATE List OF VALUES NAME
-                        $values_list = array();
-                        foreach ($dataReport['formula']['values'] as $key => $value) 
-                        {
-                            $values_array = explode(":",$value);
-                            array_push($values_list, $values_array[1]);
-                        }
-                        // GENERATE HEADERS WITH ROWS AND COLUMNS
-                        $newData['head'][0] = array_merge(array_merge($dataReport['formula']['rows'], $columns), $values_list);
-                        sort($columns, SORT_NATURAL | SORT_FLAG_CASE);
-                        $resultAddcolumns = $this->addColumns(array(
-                            'data'    => $dataReport['dataset']['body'],
-                            'columns' => $columns
-                        ));
-                        $dataReport['dataset']['body'] = $resultAddcolumns['status'] == 'OK' ? $resultAddcolumns['data'] : null;
+                    $columns    = array();
+                    if (count($dataReport['formula']['columns']) > 0) 
+                    {    
+                        $filter       = DataGroup::sortByFields($dataReport['formula']['columns']);
+                        // dd(json_encode(array('data'=>$dataReport['dataset']['body'], 'filter'=>$filter)));
+                        $dataReport['dataset']['body'] = DataGroup::array_orderby($dataReport['dataset']['body'], $filter);
+                        $columns = array_fetch($dataReport['dataset']['body'], $dataReport['formula']['columns'][0]);
+                        $columns = array_unique($columns);
                     }
-                    $resultProcess = DataGroup::process(array(
-                        'body'       => $dataReport['dataset']['body'], 
-                        'rows'       => $dataReport['formula']['rows'], 
-                        'columns' => $columns, 
-                        'values'     => $dataReport['formula']['values'], 
-                        'keyColumns'    => $dataReport['formula']['columns']
+
+                    // GENERATE List OF VALUES NAME
+                    $values_list = array();
+                    foreach ($dataReport['formula']['values'] as $key => $value) 
+                    {
+                        $values_array = explode(":",$value);
+                        array_push($values_list, $values_array[1]);
+                    }
+                    // GENERATE HEADERS WITH ROWS AND COLUMNS
+                    $newData['head'][0] = array_merge(array_merge($dataReport['formula']['rows'], $columns), $values_list);
+                    sort($columns, SORT_NATURAL | SORT_FLAG_CASE);
+                    $resultAddcolumns = $this->addColumns(array(
+                        'data'    => $dataReport['dataset']['body'],
+                        'columns' => $columns
                     ));
-                    $newData['body'] = $resultProcess['status'] == 'OK' ? $resultProcess['data'] : null;
-                    $total           =  $resultProcess['status'] == 'OK' ? $resultProcess['total'] : null;
-                    // unset($newData['body'][count($newData['body']) - 1]);
-                    $filter          = DataGroup::sortByFields($dataReport['formula']['rows']);
-                    $newData['body'] = DataGroup::array_orderby($newData['body'], $filter);
-                    // array_push($newData['body'], $total);
-                    $dataReport['analytics']['outputs'] = count($newData['body'])-1;
-                    // idkc : thead - generacion de cabecera de tabla
-                    $theadList   = $dataReport['formula']['rows'];
-                    count($values_list) > 1 ? $theadList[] = 'Valores' : null;
-                    $theadList   = array_merge($theadList, $columns);
-                    $theadList[] = 'Total';
-                    
-                    
-                    // idkc : tbody - generacion de datos de tabla
-                    $tbodyList = $this->convertObjectToArray($newData['body'], array(
-                        'columns' => $columns,
-                        'rows'    => $dataReport['formula']['rows'],
-                        'valores' => $values_list
-                    ));
-                    // idkc : tfoot - generacion de pie de tabla
-                    $tfootList = $this->convertObjectToArray(array($total), array(
-                        'columns' => $columns,
-                        'rows'    => $dataReport['formula']['rows'],
-                        'valores' => $values_list
-                    ));
-                    $columnDataTable = $this->convertColumnsToDataTable($theadList);
-                    $result = array(
-                        'title'     => $this->generateTitleReport($dataReport['reportName'], $configReport['fromDate'], $configReport['toDate']),
-                        'theadList' => $theadList,
-                        'tbodyList' => $tbodyList,
-                        'tfootList' => $tfootList,
-                        'columns'   => $columnDataTable,
-                        'analytics' => $dataReport['analytics'],
-                        'valores'   => $values_list,
-                        'rows'      => $dataReport['formula']['rows'],
-                        'status'    => 'OK'
-                    );
-                    // $result = array(
-                    //     'head'      => $newData['head'],
-                    //     'body'      => $newData['body'],
-                    //     'head_size' => count($newData['head'][0]),
-                    //     'title'     => $this->generateTitleReport($dataReport['reportName'], $configReport['fromDate'], $configReport['toDate']),
-                    //     'rows'      => $dataReport['formula']['rows'],
-                    //     'columns'   => $columns,
-                    //     'valores'   => $values_list,
-                    //     'total'     => $total,
-                    //     'analytics' => $dataReport['analytics'],
-                    //     'status'    => 'OK'
-                    // );
-     
+                    $dataReport['dataset']['body'] = $resultAddcolumns['status'] == 'OK' ? $resultAddcolumns['data'] : null;
                 }
-            }else{
-                $result = $dataReport;
+                $resultProcess = DataGroup::process(array(
+                    'body'       => $dataReport['dataset']['body'], 
+                    'rows'       => $dataReport['formula']['rows'], 
+                    'columns' => $columns, 
+                    'values'     => $dataReport['formula']['values'], 
+                    'keyColumns'    => $dataReport['formula']['columns']
+                ));
+                $newData['body'] = $resultProcess['status'] == 'OK' ? $resultProcess['data'] : null;
+                $total           =  $resultProcess['status'] == 'OK' ? $resultProcess['total'] : null;
+                // unset($newData['body'][count($newData['body']) - 1]);
+                $filter          = DataGroup::sortByFields($dataReport['formula']['rows']);
+                $newData['body'] = DataGroup::array_orderby($newData['body'], $filter);
+                // array_push($newData['body'], $total);
+                $dataReport['analytics']['outputs'] = count($newData['body'])-1;
+                // idkc : thead - generacion de cabecera de tabla
+                $theadList   = $dataReport['formula']['rows'];
+                count($values_list) > 1 ? $theadList[] = 'Valores' : null;
+                $theadList   = array_merge($theadList, $columns);
+                $theadList[] = 'Total';
+                
+                
+                // idkc : tbody - generacion de datos de tabla
+                $tbodyList = $this->convertObjectToArray($newData['body'], array(
+                    'columns' => $columns,
+                    'rows'    => $dataReport['formula']['rows'],
+                    'valores' => $values_list
+                ));
+                // idkc : tfoot - generacion de pie de tabla
+                $tfootList = $this->convertObjectToArray(array($total), array(
+                    'columns' => $columns,
+                    'rows'    => $dataReport['formula']['rows'],
+                    'valores' => $values_list
+                ));
+                $columnDataTable = $this->convertColumnsToDataTable($theadList);
+                $result = array(
+                    'title'     => $this->generateTitleReport($dataReport['reportName'], $configReport['fromDate'], $configReport['toDate']),
+                    'theadList' => $theadList,
+                    'tbodyList' => $tbodyList,
+                    'tfootList' => $tfootList,
+                    'columns'   => $columnDataTable,
+                    'analytics' => $dataReport['analytics'],
+                    'valores'   => $values_list,
+                    'rows'      => $dataReport['formula']['rows'],
+                    'status'    => 'OK'
+                );
             }
         }
-        catch (Exception $e)
+        else
         {
-            $result["status"]  = 'ERROR';
-            $result["message"] = REPORT_MESSAGE_EXCEPTION;
+            $result = $dataReport;
         }
-        finally{
-            return $result;
-        }
+        return $result;
     }
     public function convertColumnsToDataTable($theadList){
         $result = array();
@@ -443,96 +430,95 @@ class ReportController extends BaseController
         }
     }
 
-    public function processQuery($dataArray){
-        set_time_limit(REPORT_TIME_LIMIT);
+    private function processQuery( $dataArray )
+    {
         $result = array("status" => 'OK');
-        try{
-            // idkc : PARAMETER FOR SQL QUERY
-            $fromDate    = $dataArray['fromDate'];
-            $toDate      = $dataArray['toDate'];
-            $zona        = $dataArray['zona'];
-            $frecuency   = $dataArray['frecuency'];
-            eval('$query = '. $dataArray['query'] .';');
-            $resultData  = DB::select($query);
-            $result['data'] = $resultData;
-        }catch(Exception $e)
+        // idkc : PARAMETER FOR SQL QUERY
+        $fromDate    = $dataArray['fromDate'];
+        $toDate      = $dataArray['toDate'];
+        $zona        = $dataArray['zona'];
+        $frecuency   = $dataArray['frecuency'];
+        eval('$query = '. $dataArray['query'] .';');
+        \Log::info( $query );
+        $resultData  = DB::select( $query );
+        //\Log::info( $resultData );
+        $result['data'] = $resultData;
+        $test = [];
+        foreach( $result[ 'data' ] as $data )
         {
-            $result["status"]  = 'ERROR';
-            $result["message"] = REPORT_MESSAGE_EXCEPTION;
+            if( $data->inversion === 'EVENTOS MEDICOS' && ! is_null( $data->monto_aprobado ) )
+            {
+                $test[] = [ 'id' => $data->titulo , 'monto' => $data->monto_aprobado ];
+            }
         }
-        finally{
-            return $result;
-        }
+        \Log::info( $test );
+        //\Log::info( array_pluck( $test , 'monto' ) );
+        return $result;
     }
 
     // GET DATA REPORT
-    public function getDataReport($configReport)
+    public function getDataReport( $configReport )
     {
-        set_time_limit(REPORT_TIME_LIMIT);
         $result = array();
-        try 
+            
+        $rules  = array(
+            'reportId' => 'required',
+            'fromDate' => 'date_format:Y/m/d',
+            'toDate'   => 'date_format:Y/m/d'
+        );
+
+        $validator = Validator::make($configReport, $rules);
+        
+        if ($validator->fails())
         {
-            $rules  = array(
-                'reportId' => 'required',
-                'fromDate' => 'date_format:Y/m/d',
-                'toDate'   => 'date_format:Y/m/d'
-            );
+            $error            = $validator->messages();
+            $result['status'] = 'ERROR';
+            $result['data']   = $error;
+        }
+        else
+        {
+            $reportElement = TbReporte::find($configReport['reportId']);
+            
+            $intervalo     = json_decode($reportElement->formula);
+            $info = $this->processQuery(array(
+                'query'     => $reportElement->tbQuery->query,
+                'fromDate'  => $configReport['fromDate'],
+                'toDate'    => $configReport['toDate'],
+                'zona'      => $this->getZona(),
+                'frecuency' => $intervalo->frecuency
+            ));
+            $info = $info['data'];
 
-            $validator = Validator::make($configReport, $rules);
-            if ($validator->fails()){
-                $error            = $validator->messages();
-                $result['status'] = 'ERROR';
-                $result['data']   = $error;
-            }else{
-                $reportElement = TbReporte::find($configReport['reportId']);
-                
-                $intervalo     = json_decode($reportElement->formula);
-                // dd("hola@#%&!!!");
-                // dd($this->getZona());
-                $info = $this->processQuery(array(
-                    'query'     => $reportElement->tbQuery->query,
-                    'fromDate'  => $configReport['fromDate'],
-                    'toDate'    => $configReport['toDate'],
-                    'zona'      => $this->getZona(),
-                    'frecuency' => $intervalo->frecuency
-                ));
-                $info = $info['data'];
+            unset($intervalo);
+            if( count( $info ) > 0 ) 
+            {
+                $result['reportName'] = $reportElement->descripcion;
+                $result['formula']    = DataGroup::arrayCastRecursive((array) json_decode($reportElement->formula));
 
-                unset($intervalo);
-                if(count($info) > 0) {
-                    $result['reportName'] = $reportElement->descripcion;
-                    $result['formula']    = DataGroup::arrayCastRecursive((array) json_decode($reportElement->formula));
-
-                    $result['dataset']    = array(
+                $result['dataset']    = 
+                    array(
                         'head' => $this->setHead(head($info)),
                         'body' => $this->setBody($info)
                     );
 
-                    $result["status"]    = 'OK';
-                    $result['analytics'] = array(
+                $result["status"]    = 'OK';
+                $result['analytics'] = array(
                         'inputs' => count($info)
                     );
-                }else{
-                    $result['reportName'] = $reportElement->descripcion;
-                    $result['formula']    = DataGroup::arrayCastRecursive((array) json_decode($reportElement->formula));
-                    
-                    $result["status"]     = 'OK';
-                    $result["message"]    = REPORT_DATA_NOT_FOUND;
-                    $result['analytics']  = array('inputs' => count($info));
-                }
-                unset($reportElement, $info);
             }
-            unset($rules, $validator);
+            else
+            {
+                $result['reportName'] = $reportElement->descripcion;
+                $result['formula']    = DataGroup::arrayCastRecursive((array) json_decode($reportElement->formula));
+                
+                $result["status"]     = 'OK';
+                $result["message"]    = REPORT_DATA_NOT_FOUND;
+                $result['analytics']  = array('inputs' => count($info));
+            }
+            unset($reportElement, $info);
         }
-        catch (Exception $e) 
-        {
-            $result['status'] = 'ERROR';
-            $result['message']   = $e;
-        }
-        finally
-        {
-            return $result;
-        }
+        unset($rules, $validator);    
+        return $result;
     }
     
     public function downloadReportExcelHandler($userId, $reportId, $fromDate, $toDate)
@@ -663,7 +649,7 @@ class ReportController extends BaseController
     }
 
     // LIST COLUMNS DATASET HANDLER
-    public function listColumnsDatasetHandler($queryId)
+    public function listColumnsDatasetHandler( $queryId )
     {
         set_time_limit(REPORT_TIME_LIMIT);
         $result = array('status' => 'OK');
