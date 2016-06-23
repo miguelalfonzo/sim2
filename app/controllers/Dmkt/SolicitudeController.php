@@ -880,7 +880,8 @@ class SolicitudeController extends BaseController
 
     private function acceptedSolicitudTransaction( $idSolicitud , $inputs )
     {
-        DB::beginTransaction();
+        DB::beginTransaction();   
+
         $middleRpta = $this->validateInputAcceptSolRep( $inputs );
         if ( $middleRpta[ status ] === ok ) 
         {
@@ -1015,8 +1016,17 @@ class SolicitudeController extends BaseController
     {
         try 
         {
+            if( Session::has( 'approvalTransaction' ) )
+            {
+                return $this->warningException( 'Ya se esta ejecutandose su proceso de aprobacion espero unos segundos si no aparece el mensaje de confirmacion recarge la pagina' , __FUNCTION__ , __LINE__ , __FILE__ );
+            }        
+            Session::put( 'approvalTransaction' , 1 );
+            
             $inputs = Input::all();
-            return $this->acceptedSolicitudTransaction($inputs['idsolicitud'], $inputs);
+
+            $rpta = $this->acceptedSolicitudTransaction($inputs['idsolicitud'], $inputs);
+            Session::pull( 'approvalTransaction' );
+            return $rpta;
         } 
         catch (Exception $e) 
         {

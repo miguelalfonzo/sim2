@@ -11,6 +11,7 @@ use \Auth;
 use \Validator;
 use User;
 use \Exception;
+use \Session;
 
 class LoginController extends BaseController{
 
@@ -63,6 +64,7 @@ class LoginController extends BaseController{
     public function doLogout()
     {
         Auth::logout(); // log the user out of our application
+        Session::flush();
         return Redirect::to('login'); // redirect the user to the login screen
     }
 
