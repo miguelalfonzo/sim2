@@ -432,27 +432,14 @@ class ReportController extends BaseController
 
     private function processQuery( $dataArray )
     {
-        $result = array("status" => 'OK');
-        // idkc : PARAMETER FOR SQL QUERY
-        $fromDate    = $dataArray['fromDate'];
-        $toDate      = $dataArray['toDate'];
-        $zona        = $dataArray['zona'];
-        $frecuency   = $dataArray['frecuency'];
-        eval('$query = '. $dataArray['query'] .';');
-        \Log::info( $query );
-        $resultData  = DB::select( $query );
-        //\Log::info( $resultData );
-        $result['data'] = $resultData;
-        $test = [];
-        foreach( $result[ 'data' ] as $data )
-        {
-            if( $data->inversion === 'EVENTOS MEDICOS' && ! is_null( $data->monto_aprobado ) )
-            {
-                $test[] = [ 'id' => $data->titulo , 'monto' => $data->monto_aprobado ];
-            }
-        }
-        \Log::info( $test );
-        //\Log::info( array_pluck( $test , 'monto' ) );
+        $result         = array("status" => 'OK');
+        // idkc         : PARAMETER FOR SQL QUERY
+        $fromDate       = $dataArray['fromDate'];
+        $toDate         = $dataArray['toDate'];
+        $zona           = $dataArray['zona'];
+        $frecuency      = $dataArray['frecuency'];
+        eval('$query    = '. $dataArray['query'] .';');
+        $result['data'] = DB::select( $query );
         return $result;
     }
 
