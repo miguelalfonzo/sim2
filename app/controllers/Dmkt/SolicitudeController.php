@@ -1016,17 +1016,8 @@ class SolicitudeController extends BaseController
     {
         try 
         {
-            if( Session::has( 'approvalTransaction' ) )
-            {
-                return $this->warningException( 'Ya se esta ejecutandose su proceso de aprobacion espero unos segundos si no aparece el mensaje de confirmacion recarge la pagina' , __FUNCTION__ , __LINE__ , __FILE__ );
-            }        
-            Session::put( 'approvalTransaction' , 1 );
-            
             $inputs = Input::all();
-
-            $rpta = $this->acceptedSolicitudTransaction($inputs['idsolicitud'], $inputs);
-            Session::pull( 'approvalTransaction' );
-            return $rpta;
+            return $this->acceptedSolicitudTransaction($inputs['idsolicitud'], $inputs);
         } 
         catch (Exception $e) 
         {
