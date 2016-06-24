@@ -852,32 +852,32 @@ function registerFondoInstitucional()
 
 $( '#search_responsable' ).on( 'click' , function(e)
 {
+    var spin      = Ladda.create( this );
+    spin.start();
     var div_monto = $( 'label[for=monto]' ).parent();
     if ( div_monto.hasClass( 'has-success' ) )
-        acceptedSolicitude();
+    {
+        acceptedSolicitude( spin );
+    }
     else
+    {
+        spin.stop();
         return false;
+    }
 });
+
 
 $( '#derivar_solicitud' ).on( 'click' , function()
 {
-    acceptedSolicitude( 'derivacion' );   
+    var spin = Ladda.create( this );
+    spin.start();
+    acceptedSolicitude( spin , 'derivacion' );   
 });
 
 
-function acceptedSolicitude( type )
+function acceptedSolicitude( spin , type )
 {
     var formData = new FormData( form_acepted_solicitude[ 0 ] );
-    
-    /*var d_clients = [];
-    var d_clients_type = [];
-
-    clients.children().each( function ()
-    {
-        elem = $(this);
-        d_clients.push( elem.attr("pk") );
-        d_clients_type.push( elem.attr("tipo_cliente") );
-    });*/
             
     if ( type !== undefined )
     {
@@ -900,17 +900,7 @@ function acceptedSolicitude( type )
     if ( $("#is-client-change").is(':checked'))
     {
         formData.append( 'modificacion_clientes' , 1 );        
-
-/*        d_clients.forEach( function( entry )
-        {
-            formData.append( "clientes[]", entry );
-        });   
-        d_clients_type.forEach( function( entry )
-        {
-            formData.append( "tipos_cliente[]" , entry );
-        });*/
     }
-
     else
     {
         formData.append( 'modificacion_clientes' , 0 );
@@ -926,9 +916,11 @@ function acceptedSolicitude( type )
         processData : false
     }).fail(function (statusCode,errorThrown) 
     {
+        spin.stop();
         ajaxError(statusCode,errorThrown);
     }).done(function (data)
     {
+        spin.stop();
         if (data.Status == 'Error' )
         {
             responseUI('Hubo un error al procesar la solicitud','red');

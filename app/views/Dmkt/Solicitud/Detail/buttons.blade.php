@@ -1,11 +1,11 @@
 <div class="form-group col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px">
     <div class="col-sm-12 col-md-12 col-lg-12" style="text-align: center">  
         @if ( $politicStatus ) 
-            <a class="btn btn-success" id="search_responsable">
+            <a id="search_responsable" class="btn btn-success ladda-button" data-style="slide-up">
                 Aceptar
             </a>
             @if ( $tipo_usuario === SUP )
-                <a class="btn btn-warning" id="derivar_solicitud">
+                <a id="derivar_solicitud" class="btn btn-warning ladda-button" data-style="slide-up">
                     Derivar
                 </a>
             @endif
