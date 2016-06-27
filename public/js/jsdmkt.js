@@ -2215,9 +2215,9 @@ function listSolicituds()
     var data =
     {
         //_token     : GBREPORTS.token,
-        date_start : $('#drp_menubar').data('daterangepicker').startDate.format("L"),
-        date_end   : $('#drp_menubar').data('daterangepicker').endDate.format("L") ,
-        idstate    : $('#idState').val()
+        fecha_inicio : $('#drp_menubar').data('daterangepicker').startDate.format("L"),
+        fecha_final  : $('#drp_menubar').data('daterangepicker').endDate.format("L") ,
+        estado       : $('#idState').val()
     };
     if( $.fn.dataTable.isDataTable( $( '#table_' + 'solicituds' ) ) )
     {
@@ -2287,10 +2287,73 @@ function processData( data )
     }*/
 
     var x = data.length - 1;
-    
+    var modelRegister;
+    var htmlActvidad;
+    var modelActividad;
+    var modelDetalle;
+    var modelSubEstado;
+    var jsonDetalle;
     do
     {
-        data[ x ].id_inversion = '<button class="btn btn-success">' + data[ x ].id_inversion + '</button>';
+        modelRegister  = data[ x ];
+        modelActividad = modelRegister.activity;
+        modelDetalle   = modelRegister.detalle;
+        if( modelActividad === null )
+        {
+            htmlActvidad = '';
+        }
+        else
+        {
+            htmlActvidad = '<span class="label" style="margin-right:1em;background-color:' + modelRegister.activity.color + '">' + 
+                                data[ x ].activity.nombre +
+                            '</span>';        
+        }
+        modelRegister.actividad_titulo =    htmlActvidad +
+                                        '<label>' +
+                                            modelRegister.titulo +
+                                        '</label>';
+        modelSubEstado   = modelRegister.state;
+        modelRegister.estado =  '<span class="label" style="background-color:' + modelSubEstado.range_state.color + '">' + 
+                                modelSubEstado.nombre + 
+                            '</span>';
+
+        modelRegister.opciones =    '<div class="btn-group btn-group-icon-md">' + 
+                                        '<a class="btn btn-default open-details" data-id="' + modelRegister.id + '">' +
+                                            '<span class="glyphicon glyphicon-eye-open"></span>' +
+                                        '</a>' +
+                                        '<a class="btn btn-default timeLine" data-id="' + modelRegister.id + '">' +
+                                            '<span class="glyphicon glyphicon-time"></span>' +
+                                        '</a>' +
+                                    '</div>';
+        
+        if( modelDetalle.monto_aprobado !== null )
+        {
+            modelRegister.monto = modelDetalle.type_money.simbolo + ' ' + modelDetalle.monto_aprobado;
+        }
+        else if( modelDetalle.monto_aceptado !== null )
+        {
+            modelRegister.monto = modelDetalle.type_money.simbolo + ' ' + modelDetalle.monto_aceptado;
+        }
+        else
+        {
+            modelRegister.monto = modelDetalle.type_money.simbolo + ' ' + modelDetalle.monto_solicitado;
+        }
+        /*jsonDetalle = JSON.parse( modelDetalle.detalle );
+        if( typeof jsonDetalle.monto_aprobado !== 'undefined' )
+        {
+            data[ x ].monto = jsonDetalle.monto_aprobado;
+        }
+        else if( typeof jsonDetalle.monto_aceptado !== 'undefined' )
+        {
+            data[ x ].monto = jsonDetalle.monto_aceptado;
+        }
+        else
+        {
+            data[ x ].monto = jsonDetalle.monto_solicitado;
+        }
+        data[ x ].monto = modelDetalle.type_money.simbolo + ' ' + data[ x ].monto;*/
+
+        //data[ x ].id_inversion = '<button class="btn btn-success">' + data[ x ].id_inversion + '</button>';
     }   
     while( x-- );
 

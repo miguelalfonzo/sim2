@@ -32,43 +32,41 @@ class MoveController extends BaseController
     {
     	
         $dates = $this->setDates( $start , $end );
-        $middleRpta = $this->searchSolicituds( R_TODOS , $dates , $subCategoriaId , 'MOVIMIENTOS' );
-        if ($middleRpta[status] == ok)
-        {
-            foreach ( $middleRpta[data] as $solicitud )
-            { 
-                $detalle = $solicitud->detalle;
-                $jDetalle = json_decode($detalle->detalle);
-                $deposito = $detalle->deposit;
-                
-                    if ( $detalle->id_moneda == DOLARES )
-                        $solicitud->saldo = $detalle->typeMoney->simbolo . ' ' . ( $detalle->monto_actual - $solicitud->expenses->sum('monto') );
-                    elseif ( $detalle->id_moneda == SOLES )
-                        $solicitud->saldo = $detalle->typeMoney->simbolo . ' ' . ( $detalle->monto_actual - $solicitud->expenses->sum('monto') );
-                    else
-                        $solicitud->saldo = 'El Tipo de Moneda es: '.$detalle->id_moneda ;
-            }
-            $view = View::make('Tables.movimientos')->with( array( 'solicituds' => $middleRpta[data] , 'subCategoriaId' =>$subCategoriaId ) )->render();
-            if ( Auth::user()->type == TESORERIA )
-            {
-                $soles = $middleRpta[data]->sum( function( $solicitud )
-                {
-                    $deposito = $solicitud->detalle->deposit;
-                    $moneda = $deposito->account->typeMoney;
-                    if ( $moneda->id == SOLES )
-                        return $solicitud->detalle->deposit->total;
-                });
-                $dolares = $middleRpta[data]->sum( function( $solicitud )
-                {
-                    $deposito = $solicitud->detalle->deposit;
-                    $moneda = $deposito->account->typeMoney;
-                    if ( $moneda->id == DOLARES )
-                        return $solicitud->detalle->deposit->total;
-                });
-                $middleRpta[data]['Total'] = array( 'Soles' => $soles , 'Dolares' => $dolares );
-            }
-            $middleRpta[data]['View'] = $view;
+        $data = $this->searchSolicituds( R_TODOS , $dates , $subCategoriaId , 'MOVIMIENTOS' );
+        
+        foreach ( $data as $solicitud )
+        { 
+            $detalle = $solicitud->detalle;
+            $jDetalle = json_decode($detalle->detalle);
+            $deposito = $detalle->deposit;
+            
+                if ( $detalle->id_moneda == DOLARES )
+                    $solicitud->saldo = $detalle->typeMoney->simbolo . ' ' . ( $detalle->monto_actual - $solicitud->expenses->sum('monto') );
+                elseif ( $detalle->id_moneda == SOLES )
+                    $solicitud->saldo = $detalle->typeMoney->simbolo . ' ' . ( $detalle->monto_actual - $solicitud->expenses->sum('monto') );
+                else
+                    $solicitud->saldo = 'El Tipo de Moneda es: '.$detalle->id_moneda ;
         }
+        $view = View::make('Tables.movimientos')->with( array( 'solicituds' => $middleRpta[data] , 'subCategoriaId' =>$subCategoriaId ) )->render();
+        if ( Auth::user()->type == TESORERIA )
+        {
+            $soles = $middleRpta[data]->sum( function( $solicitud )
+            {
+                $deposito = $solicitud->detalle->deposit;
+                $moneda = $deposito->account->typeMoney;
+                if ( $moneda->id == SOLES )
+                    return $solicitud->detalle->deposit->total;
+            });
+            $dolares = $middleRpta[data]->sum( function( $solicitud )
+            {
+                $deposito = $solicitud->detalle->deposit;
+                $moneda = $deposito->account->typeMoney;
+                if ( $moneda->id == DOLARES )
+                    return $solicitud->detalle->deposit->total;
+            });
+            $middleRpta[data]['Total'] = array( 'Soles' => $soles , 'Dolares' => $dolares );
+        }
+        $middleRpta[data]['View'] = $view;
         return $middleRpta;
     }
 
@@ -146,33 +144,46 @@ class MoveController extends BaseController
         $today = getdate();
         $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];      
         
-        if ( Input::has('idstate'))
+        if ( Input::has( 'idstate' ) )
+        {
             $estado = $inputs['idstate'];
+        }
         else
+        {
             $estado = R_TODOS;
-        
+        }
+
         if ( Input::has('date_start'))
+        {
             $start = $inputs['date_start'];
+        }
         else
-            $start = date('01-m-Y', strtotime($m));
-        
+        {
+            $start = Carbon::now()->format( '01-m-Y' );
+            //$start = date('01-m-Y', strtotime($m));
+        }
+
         if (Input::has('date_end'))
+        {
             $end = $inputs['date_end'];
+        }
         else
-            $end = date('t-m-Y', strtotime($m));
-    
+        {
+            $end = Carbon::now()->format( 'd-m-Y' );
+            //$end = date('t-m-Y', strtotime($m));
+        }
+
         $dates = array( 'start' => $start , 'end' => $end );    
 
-        $middleRpta = $this->searchSolicituds( $estado , $dates , null );
-        if ( $middleRpta[status] == ok )
-        {
-            $data = array( 'solicituds' => $middleRpta[data] );
-            if ( Auth::user()->type == TESORERIA )
-                $data['tc'] = ChangeRate::getTc();
-            Session::put( 'state' , $estado );
-            $view = array( 'View' => View::make('template.List.solicituds')->with( $data )->render() );
-            return $this->setRpta( $view  );
-        }
+        $data = $this->searchSolicituds( $estado , $dates , null );
+        
+        $data = array( 'solicituds' => $data );
+        if ( Auth::user()->type == TESORERIA )
+            $data['tc'] = ChangeRate::getTc();
+        Session::put( 'state' , $estado );
+        $view = array( 'View' => View::make('template.List.solicituds')->with( $data )->render() );
+        return $this->setRpta( $view  );
+        
         return $middleRpta;
     }
 
@@ -181,7 +192,7 @@ class MoveController extends BaseController
         return Carbon::createFromFormat( 'd/m/Y' , $date )->format( 'Ym' );
     }
 
-    protected function searchSolicituds( $estado , $dates , $filter , $type = 'FLUJO' )
+    protected function searchSolicituds( $estado , array $dates , $filter , $type = 'FLUJO' )
     {
         $solicituds = Solicitud::where( function( $query ) use( $dates )
         {
@@ -276,9 +287,9 @@ class MoveController extends BaseController
                 {
                     $t->where( 'id' , $estado );
                 });
-            });    
-        $solicituds = $solicituds->orderBy('id', 'ASC')->get();
-        return $this->setRpta( $solicituds );
+            });
+        $solicituds->with( 'activity' );
+        return $solicituds->orderBy('id', 'ASC')->get();
     }
 
     public function getSolicitudDetail()
@@ -316,14 +327,27 @@ class MoveController extends BaseController
     {
         try
         {
+            $inputs = Input::all();
+            $dates  = [ 'start' => $inputs[ 'fecha_inicio' ] , 'end' => $inputs[ 'fecha_final' ] ];
+            $data   = $this->searchUserSolicituds( $inputs[ 'estado' ] , $dates , null );
+
             $columns =
                 [
-                    [ 'title' => 'Id' , 'data' => 'id' ],
-                    [ 'title' => 'Solicitud' , 'data' => 'titulo' ],
-                    [ 'title' => 'Edicion' , 'defaultContent' => '<button class="btn btn-primary">Test</button>' ],
-                    [ 'title' => 'Test' , 'data' => 'id_inversion' ]
+                    [ 'title' => '#' , 'data' => 'id' , 'className' => 'text-center' ],
+                    [ 'title' => 'Solicitud' , 'data' => 'actividad_titulo' ],
+                    [ 'title' => 'Solicitador por' , 'data' => 'personal_to.full_name' , 'className' => 'text-center' ],
+                    [ 'title' => 'Fecha de Solicitud' , 'data' => 'created_at' , 'className' => 'text-center' ],
+                    [ 'title' => 'Aprobado por' , 'data' => 'last_history.updated_personal.full_name' , 'className' => 'text-center' ],
+                    [ 'title' => 'Fecha de Aprobación' , 'data' => 'last_history.updated_at' , 'className' => 'text-center' ],
+                    [ 'title' => 'Monto' , 'data' => 'monto' , 'className' => 'text-center' ],
+                    [ 'title' => 'Estado' , 'data' => 'estado' , 'className' => 'text-center' ],
+                    [ 'title' => 'Edicion' , 'data' => 'opciones' , 'className' => 'text-center' ],
+                    
+                    //[ 'title' => 'Edicion' , 'defaultContent' => '<button class="btn btn-primary">Test</button>' ],
+                    //[ 'title' => 'Test' , 'data' => 'id_inversion' ]
                 ];
-            $data = Solicitud::select( 'id , titulo, id_inversion' )->get();
+            
+            //$data = Solicitud::select( 'id , titulo, id_inversion' )->get();
 
             $rpta = $this->setRpta( $data );
             $rpta[ 'columns' ] = $columns;
@@ -338,4 +362,91 @@ class MoveController extends BaseController
         }
 
     }
+
+     protected function searchUserSolicituds( $estado , array $dates , $filter , $type = 'FLUJO' )
+    {
+        \Log::info( microtime() );
+        
+        $solicituds = Solicitud::where( function( $query ) use( $dates )
+        {
+            $query->where( function( $query ) use( $dates )
+            {
+                $query->where( 'idtiposolicitud' , '<>' , SOL_INST )->whereRaw( "created_at between to_date( '" . $dates[ 'start' ] . "','DD-MM-YY') and to_date( '" . $dates[ 'end' ] . "' ,'DD-MM-YY')+1" );
+            })->orWhere( function( $query ) use( $dates )
+            {
+                $query->where( 'idtiposolicitud' , SOL_INST )->wherehas( 'detalle' , function ( $query ) use( $dates )
+                {
+                    $query->whereHas( TB_PERIODO , function( $query ) use( $dates )
+                    {
+                        $query->where( 'aniomes' , '>=' , $this->formatAnioMes( $dates[ 'start' ] ) )->where( 'aniomes' , '<=' , $this->formatAnioMes( $dates[ 'end' ] ) );
+                    });
+                });  
+            });
+        });
+   
+
+   /*     if ( $estado != R_TODOS )
+        {
+            $solicituds->whereHas( 'state' , function ( $q ) use( $estado )
+            {
+                $q->whereHas( 'rangeState' , function ( $t ) use( $estado )
+                {
+                    $t->where( 'id' , $estado );
+                });
+            });
+        }*/
+/*
+        if ( in_array( Auth::user()->type , array ( REP_MED , SUP , GER_PROD , GER_PROM , ASIS_GER ) ) )
+                $solicituds->where( function ( $query )
+                {
+                    $query->whereHas( 'gerente' , function( $query )
+                    {
+                        $query->whereIn( 'id_gerprod' , array( Auth::user()->id , Auth::user()->tempId() ) );
+                    })->orWhereIn( 'created_by' , array( Auth::user()->id , Auth::user()->tempId() ) )
+                    ->orWhereIn( 'id_user_assign' , array( Auth::user()->id , Auth::user()->tempId() ) );
+                });
+            elseif ( Auth::user()->type == TESORERIA ) 
+                if ( $estado == R_REVISADO )
+                    $solicituds->whereIn( 'id_estado' , array( DEPOSITO_HABILITADO , DEPOSITADO ) );
+                else if( $estado == R_GASTO )
+                    $solicituds->where( 'id_estado' , ENTREGADO );
+                */
+        $solicituds->select( [ 'id' , 'titulo' , 'id_actividad' , 'id_user_assign' , 'created_at' , 'id_detalle' , 'id_estado' ] );
+        $solicituds->with( [ 'activity' => function( $query )
+        {
+            $query->select( [ 'id' , 'nombre' , 'color' ] );
+        } , 'personalTo' => function( $query )
+        {
+            $query->select( [ 'user_id' , 'nombres' , 'apellidos' , 'initcap( nombres || \' \' || apellidos ) full_name' ] );
+        } , 'lastHistory' => function( $query )
+        {
+            $query->select( [ 'id_solicitud' , 'updated_by' , 'updated_at' ] )
+                ->with( [ 'updatedPersonal' => function( $query )
+                {
+                    $query->select( [ 'user_id' , 'nombres' , 'apellidos' , 'initcap( nombres || \' \' || apellidos ) full_name' ] );
+                }]);
+        } , 'detalle' => function( $query )
+        {
+            $query->select( [ 'id' , 'detalle' , 'id_moneda' , 
+                'ltrim( regexp_substr( detalle , \'"monto_aprobado":([[:digit:]]*)(\\.[[:digit:]]*)*\' ) , \'"monto_aprobado":\' ) valor_aprobado',
+                'ltrim( regexp_substr( detalle , \'"monto_aceptado":([[:digit:]]*)(\\.[[:digit:]]*)*\' ) , \'"monto_aceptado":\' ) valor_aceptado',
+                'ltrim( regexp_substr( detalle , \'"monto_solicitado":([[:digit:]]*)(\\.[[:digit:]]*)*\' ) , \'"monto_solicitado":\' ) valor_solicitado' ] )
+                ->with( [ 'typeMoney' => function( $query )
+                {
+                    $query->select( [ 'id' , 'simbolo' ] );
+                }]);;
+        } , 'state' => function( $query )
+        {
+            $query->select( [ 'id' , 'nombre' , 'id_estado' ] )
+                ->with( [ 'rangeState' => function( $query )
+                {
+                    $query->select( [ 'id' , 'color' ] );
+                }]);;
+        }]);
+        \Log::info( microtime() );
+        $data = $solicituds->orderBy('id', 'ASC')->get();
+        \Log::info( microtime() );
+        return $data;   
+    }
+
 }

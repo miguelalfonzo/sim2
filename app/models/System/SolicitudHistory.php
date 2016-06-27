@@ -38,6 +38,11 @@ class SolicitudHistory extends Eloquent{
         return $this->hasOne( 'Users\Personal' , 'user_id' , 'created_by' );
     }
 
+    public function updatedPersonal()
+    {
+        return $this->hasOne( 'Users\Personal' , 'user_id' , 'updated_by' );
+    }
+
     public function createdBy()
     {
         return $this->hasOne( 'User' , 'id' , 'created_by' );
