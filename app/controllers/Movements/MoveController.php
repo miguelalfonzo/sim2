@@ -311,4 +311,31 @@ class MoveController extends BaseController
         
         return View::make( 'template.tb_estado_cuenta' , array( 'fondosMkt' => $fondos ) );
     }
+
+    public function getSolicituds()
+    {
+        try
+        {
+            $columns =
+                [
+                    [ 'title' => 'Id' , 'data' => 'id' ],
+                    [ 'title' => 'Solicitud' , 'data' => 'titulo' ],
+                    [ 'title' => 'Edicion' , 'defaultContent' => '<button class="btn btn-primary">Test</button>' ],
+                    [ 'title' => 'Test' , 'data' => 'id_inversion' ]
+                ];
+            $data = Solicitud::select( 'id , titulo, id_inversion' )->get();
+
+            $rpta = $this->setRpta( $data );
+            $rpta[ 'columns' ] = $columns;
+            return $rpta;
+
+
+
+        }
+        catch( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
+
+    }
 }

@@ -1645,6 +1645,7 @@ function ajaxError(statusCode,errorThrown)
         console.log( errorThrown );
         bootbox.alert('<h4 class="red">Error del Sistema</h4>');  
     }
+    Ladda.stopAll();
 }
 
 $(".date_month").datepicker(date_options2).on('changeDate', function (e) {
@@ -2207,3 +2208,91 @@ $( document ).ready(function()
     $( "#fecha-value" ).attr('disabled', true);
 });
 
+function listSolicituds()
+{
+    var d = new Date();
+    console.log( d.getTime() );
+    var data =
+    {
+        //_token     : GBREPORTS.token,
+        date_start : $('#drp_menubar').data('daterangepicker').startDate.format("L"),
+        date_end   : $('#drp_menubar').data('daterangepicker').endDate.format("L") ,
+        idstate    : $('#idState').val()
+    };
+    if( $.fn.dataTable.isDataTable( $( '#table_' + 'solicituds' ) ) )
+    {
+        $( '#table_' + 'solicituds' ).DataTable().clear();
+        $( '#table_' + 'solicituds' ).DataTable().destroy();
+    }
+        
+    customAjax( 'GET' , 'list-solicituds' , data ).done(function ( response ) 
+    {
+        if ( response.Status === 'Ok' )
+        {
+            var Data = processData( response.Data )
+            var dataTable = $( '#table_' + 'solicituds' ).DataTable(
+            {
+                bDestroy        : true ,
+                scrollX         : 99,
+                columns         : response.columns,
+                data            : Data ,
+                dom             : "<'row'<'col-xs-6'><'col-xs-6 pull-right'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
+                stateSave       : true,
+                bScrollCollapse : true,
+                iDisplayLength  : 10,
+                language        :
+                {
+                    search       : 'Buscar',
+                    zeroRecords  : 'No hay ' + 'solicitudes' ,
+                    infoEmpty    : 'No ha encontrado ' + 'solicitudes' +' disponibles',
+                    info         : 'Mostrando _END_ de _TOTAL_ ' + 'solicitudes' ,
+                    lengthMenu   : "Mostrando _MENU_ registros por página",
+                    infoEmpty    : "No ha encontrado información disponible",
+                    infoFiltered : "(filtrado de _MAX_ regitros en total)",
+                    paginate     : 
+                    {
+                        sPrevious : 'Anterior',
+                        sNext     : 'Siguiente'
+                    }
+                }
+            });
+            var d = new Date();
+            console.log( d.getTime() );
+        }
+        else
+        {
+            bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+        }
+    });   
+}
+
+function customAjax( type , url , data )
+{
+    return $.ajax(
+    {
+        type : type ,
+        url  : url ,
+        data : data 
+    }).fail( function( statusCode , errorThrow )
+    {
+        ajaxError( statusCode , errorThrow )
+    });
+}
+
+function processData( data )
+{
+    /*for( var i = 0 ; i < data.length ; i++ )
+    {
+        data[ i ].id_inversion = '<button class="btn btn-success">' + data[ i ].id_inversion + '</button>'; 
+    }*/
+
+    var x = data.length - 1;
+    
+    do
+    {
+        data[ x ].id_inversion = '<button class="btn btn-success">' + data[ x ].id_inversion + '</button>';
+    }   
+    while( x-- );
+
+    return data;    
+}

@@ -56,5 +56,7 @@
             </h4>
         </div>
     @endif
-    <div class="container-fluid table_solicitudes" id="solicitudes"></div>
+    <div class="table-responsive">
+        <table id="table_solicituds" class="table table-striped table-hover table-bordered" cellspacing="0" width="100%"></table>
+    </div>
 </div>
