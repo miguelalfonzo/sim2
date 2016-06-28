@@ -2229,6 +2229,7 @@ function listSolicituds()
     {
         if ( response.Status === 'Ok' )
         {
+            response.columns[ 0 ].createdCell = function(td, cellData, rowData, row, col ) { console.log( cellData ) };
             var Data = processData( response.Data )
             var dataTable = $( '#table_' + 'solicituds' ).DataTable(
             {
@@ -2281,40 +2282,28 @@ function customAjax( type , url , data )
 
 function processData( data )
 {
-    /*for( var i = 0 ; i < data.length ; i++ )
-    {
-        data[ i ].id_inversion = '<button class="btn btn-success">' + data[ i ].id_inversion + '</button>'; 
-    }*/
-
     var x = data.length - 1;
     var modelRegister;
     var htmlActvidad;
-    var modelActividad;
-    var modelDetalle;
-    var modelSubEstado;
-    var jsonDetalle;
     do
     {
         modelRegister  = data[ x ];
-        modelActividad = modelRegister.activity;
-        modelDetalle   = modelRegister.detalle;
-        if( modelActividad === null )
+        if( modelRegister.actividad === null )
         {
             htmlActvidad = '';
         }
         else
         {
-            htmlActvidad = '<span class="label" style="margin-right:1em;background-color:' + modelRegister.activity.color + '">' + 
-                                data[ x ].activity.nombre +
+            htmlActvidad = '<span class="label" style="margin-right:1em;background-color:' + modelRegister.color_actividad + '">' + 
+                                modelRegister.actividad +
                             '</span>';        
         }
         modelRegister.actividad_titulo =    htmlActvidad +
-                                        '<label>' +
+                                        '<label style="display:block">' +
                                             modelRegister.titulo +
                                         '</label>';
-        modelSubEstado   = modelRegister.state;
-        modelRegister.estado =  '<span class="label" style="background-color:' + modelSubEstado.range_state.color + '">' + 
-                                modelSubEstado.nombre + 
+        modelRegister.estado =  '<span class="label" style="background-color:' + modelRegister.color_estado + '">' + 
+                                modelRegister.estado + 
                             '</span>';
 
         modelRegister.opciones =    '<div class="btn-group btn-group-icon-md">' + 
@@ -2326,34 +2315,18 @@ function processData( data )
                                         '</a>' +
                                     '</div>';
         
-        if( modelDetalle.monto_aprobado !== null )
+        if( modelRegister.monto_aprobado !== null )
         {
-            modelRegister.monto = modelDetalle.type_money.simbolo + ' ' + modelDetalle.monto_aprobado;
+            modelRegister.monto = modelRegister.moneda + ' ' + modelRegister.monto_aprobado;
         }
-        else if( modelDetalle.monto_aceptado !== null )
+        else if( modelRegister.monto_aceptado !== null )
         {
-            modelRegister.monto = modelDetalle.type_money.simbolo + ' ' + modelDetalle.monto_aceptado;
-        }
-        else
-        {
-            modelRegister.monto = modelDetalle.type_money.simbolo + ' ' + modelDetalle.monto_solicitado;
-        }
-        /*jsonDetalle = JSON.parse( modelDetalle.detalle );
-        if( typeof jsonDetalle.monto_aprobado !== 'undefined' )
-        {
-            data[ x ].monto = jsonDetalle.monto_aprobado;
-        }
-        else if( typeof jsonDetalle.monto_aceptado !== 'undefined' )
-        {
-            data[ x ].monto = jsonDetalle.monto_aceptado;
+            modelRegister.monto = modelRegister.moneda + ' ' + modelRegister.monto_aceptado;
         }
         else
         {
-            data[ x ].monto = jsonDetalle.monto_solicitado;
+            modelRegister.monto = modelRegister.moneda + ' ' + modelRegister.monto_solicitado;
         }
-        data[ x ].monto = modelDetalle.type_money.simbolo + ' ' + data[ x ].monto;*/
-
-        //data[ x ].id_inversion = '<button class="btn btn-success">' + data[ x ].id_inversion + '</button>';
     }   
     while( x-- );
 

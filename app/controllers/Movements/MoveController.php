@@ -329,18 +329,19 @@ class MoveController extends BaseController
         {
             $inputs = Input::all();
             $dates  = [ 'start' => $inputs[ 'fecha_inicio' ] , 'end' => $inputs[ 'fecha_final' ] ];
-            $data   = $this->searchUserSolicituds( $inputs[ 'estado' ] , $dates , null );
+            $data   = $this->searchUserSolicituds2( $inputs[ 'estado' ] , $dates , null );
 
             $columns =
                 [
                     [ 'title' => '#' , 'data' => 'id' , 'className' => 'text-center' ],
                     [ 'title' => 'Solicitud' , 'data' => 'actividad_titulo' ],
-                    [ 'title' => 'Solicitador por' , 'data' => 'personal_to.full_name' , 'className' => 'text-center' ],
-                    [ 'title' => 'Fecha de Solicitud' , 'data' => 'created_at' , 'className' => 'text-center' ],
-                    [ 'title' => 'Aprobado por' , 'data' => 'last_history.updated_personal.full_name' , 'className' => 'text-center' ],
-                    [ 'title' => 'Fecha de Aprobación' , 'data' => 'last_history.updated_at' , 'className' => 'text-center' ],
+                    [ 'title' => 'Solicitador por' , 'data' => 'responsable' , 'className' => 'text-center' ],
+                    [ 'title' => 'Fecha de Solicitud' , 'data' => 'fecha_creacion' , 'className' => 'text-center' ],
+                    [ 'title' => 'Aprobado por' , 'data' => 'aprobador' , 'className' => 'text-center' ],
+                    [ 'title' => 'Fecha de Aprobación' , 'data' => 'fecha_aprobacion' , 'className' => 'text-center' ],
                     [ 'title' => 'Monto' , 'data' => 'monto' , 'className' => 'text-center' ],
                     [ 'title' => 'Estado' , 'data' => 'estado' , 'className' => 'text-center' ],
+                    [ 'title' => 'Tipo' , 'data' => 'tipo_solicitud' , 'className' => 'text-center' ],
                     [ 'title' => 'Edicion' , 'data' => 'opciones' , 'className' => 'text-center' ],
                     
                     //[ 'title' => 'Edicion' , 'defaultContent' => '<button class="btn btn-primary">Test</button>' ],
@@ -360,13 +361,21 @@ class MoveController extends BaseController
         {
             return $this->internalException( $e , __FUNCTION__ );
         }
-
     }
 
-     protected function searchUserSolicituds( $estado , array $dates , $filter , $type = 'FLUJO' )
+    protected function searchUserSolicituds2( $estado , array $dates , $filter , $type = 'FLUJO' )
+    {
+        return Solicitud::getUserSolicituds();
+      
+    }
+
+    protected function searchUserSolicituds( $estado , array $dates , $filter , $type = 'FLUJO' )
     {
         \Log::info( microtime() );
         
+        $str = 'ltrim( regexp_substr( detalle , \'"monto_aprobado":([[:digit:]]*)\' ) , \'"monto_aprobado":\' ) valor_aprobado';
+        \Log::info( $str );
+
         $solicituds = Solicitud::where( function( $query ) use( $dates )
         {
             $query->where( function( $query ) use( $dates )
@@ -428,9 +437,9 @@ class MoveController extends BaseController
         } , 'detalle' => function( $query )
         {
             $query->select( [ 'id' , 'detalle' , 'id_moneda' , 
-                'ltrim( regexp_substr( detalle , \'"monto_aprobado":([[:digit:]]*)(\\.[[:digit:]]*)*\' ) , \'"monto_aprobado":\' ) valor_aprobado',
-                'ltrim( regexp_substr( detalle , \'"monto_aceptado":([[:digit:]]*)(\\.[[:digit:]]*)*\' ) , \'"monto_aceptado":\' ) valor_aceptado',
-                'ltrim( regexp_substr( detalle , \'"monto_solicitado":([[:digit:]]*)(\\.[[:digit:]]*)*\' ) , \'"monto_solicitado":\' ) valor_solicitado' ] )
+                'ltrim( regexp_substr( detalle , \'"monto_aprobado":"{0,1}[[:digit:]]+(\.[[:digit:]]+){0,1}\' ) , \'"monto_aprobado":\' ) valor_aprobado',
+                'ltrim( regexp_substr( detalle , \'"monto_aceptado":"{0,1}[[:digit:]]+(\.[[:digit:]]+){0,1}\' ) , \'"monto_aceptado":\' ) valor_aceptado',
+                'ltrim( regexp_substr( detalle , \'"monto_solicitado":"{0,1}[[:digit:]]+(\.[[:digit:]]+){0,1}\' ) , \'"monto_solicitado":\' ) valor_solicitado' ] )
                 ->with( [ 'typeMoney' => function( $query )
                 {
                     $query->select( [ 'id' , 'simbolo' ] );

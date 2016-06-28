@@ -224,4 +224,9 @@ class Solicitud extends Eloquent
         return $this->hasMany( 'Devolution\Devolution' , 'id_solicitud' );
     }
 
+    protected static function getUserSolicituds()
+    {
+        return \DB::table( 'LISTADO_SOLICITUD' )->where( 'rownum' , '<=' , 1000 )->get();
+    }
+
 }
