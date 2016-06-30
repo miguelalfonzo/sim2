@@ -102,7 +102,8 @@
         Route::post('get-document-detail' , 'Expense\ExpenseController@getDocument');
         Route::post('update-document' , 'Expense\ExpenseController@updateDocument');
 
-        Route::get( 'export/solicitudToDeposit' , 'Export\ExportController@exportSolicitudToDeposit' );
+        Route::get( 'export/solicitudToDeposit-pdf' , 'Export\ExportController@exportSolicitudToDepositPDF' );
+        Route::get( 'export/solicitudToDeposit-excel' , 'Export\ExportController@exportSolicitudToDepositExcel' );
         Route::post( 'end-expense-record' , 'Expense\ExpenseController@endExpenseRecord' );
 
         Route::post( 'modal-liquidation' , 'Deposit\DepositController@modalLiquidation' );

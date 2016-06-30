@@ -224,4 +224,9 @@ class Solicitud extends Eloquent
         return $this->hasMany( 'Devolution\Devolution' , 'id_solicitud' );
     }
 
+    protected function getDepositSolicituds()
+    {
+        return Solicitud::select( [ 'id' ] )->where( 'id_estado' , DEPOSITO_HABILITADO )->orderBy( 'id' , 'ASC' )->get();
+    }
+
 }

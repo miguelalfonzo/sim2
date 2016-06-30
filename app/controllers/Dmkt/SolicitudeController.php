@@ -92,6 +92,7 @@ class SolicitudeController extends BaseController
         if (Auth::user()->type == TESORERIA):
             $data['tc']    = ChangeRate::getTc();
             $data['banks'] = Account::banks();
+            $data[ 'depositIds' ] = Solicitud::getDepositSolicituds();
         elseif (Auth::user()->type == ASIS_GER):
             $data['activities'] = Activity::order();
         elseif (Auth::user()->type == CONT):
