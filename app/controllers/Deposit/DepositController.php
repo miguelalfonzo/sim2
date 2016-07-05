@@ -19,6 +19,8 @@ use \User;
 use \Devolution\DevolutionController;
 use \Carbon\Carbon;
 use \Excel;
+use \File;
+use \Response;
 
 class DepositController extends BaseController
 {
@@ -63,7 +65,7 @@ class DepositController extends BaseController
                 'operacion' => 'required|string|min:1' 
             );
         $messages = array(
-                'token.exists' => 'La solicitud ya ha sido procesada o no existe'
+                'token.exists' => 'La solicitud no se encuentra en la etapa de deposito'
             );
         $validator = Validator::make( $inputs , $rules , $messages );
         if ( $validator->fails() )
@@ -92,6 +94,7 @@ class DepositController extends BaseController
                 {
                     $middleRpta = $this->depositOperation( $data[ 'token' ] , $data[ 'operacion' ] , $inputs[ 'cuenta' ] );
                 }
+                $middleRpta[ description ]  = trim( $middleRpta[ description ] , '<br>' );
                 $middleRpta[ 'operacion' ]  = $data[ 'operacion' ];
                 $responses[ $data[ 'id' ] ] = $middleRpta;
             }
@@ -251,7 +254,7 @@ class DepositController extends BaseController
 
             if ( $fondo->saldo < 0 )
                 return $this->warningException( 'El Fondo ' . $fondo->full_name . ' solo cuenta con S/.' . ( $fondo->saldo + $fondoMonto ) . 
-                                                $msg . $fondoMonto . ' en total' , __FUNCTION__ , __FILE__ , __LINE__ );
+                                                $msg . $fondoMonto . ' en total' , __FUNCTION__ , __LINE__ , __FILE__ );
             $data = array(
                 'idFondo'      => $fondo->id , 
                 'idFondoTipo'  => INVERSION_INSTITUCIONAL ,
@@ -273,7 +276,7 @@ class DepositController extends BaseController
         $inputs = Input::all();
         $solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
         if ( is_null ( $solicitud ) )
-            return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ , __FILE__ , __LINE__ );
+            return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
         else
             return $this->setRpta( array( 'View' => View::make( 'template.Modals.extorno' , array( 'solicitud' => $solicitud ) )->render() ) );
     }
@@ -290,9 +293,9 @@ class DepositController extends BaseController
         $solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
         
         if ( is_null( $solicitud ) )
-            return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ , __FILE__ , __LINE__ );
+            return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ ,  __LINE__ , __FILE__ );
         elseif( $solicitud->id_estado != DEPOSITADO )
-            return $this->warningException( 'La solicitud ya ha sido validada por contabilidad' , __FUNCTION__ , __FILE__ , __LINE__ );
+            return $this->warningException( 'La solicitud ya ha sido validada por contabilidad' , __FUNCTION__ , __LINE__ , __FILE__ );
         else
         {
             $deposito = $solicitud->detalle->deposit;
@@ -379,18 +382,33 @@ class DepositController extends BaseController
     {
         try
         {
-            if( Session::has( 'depositos' ) )
+            $now  = Carbon::now();
+            $date = $now->toDateString();
+            $title = 'Detalle del Deposito-';
+            $directoryPath  = 'files/depositos';
+            $filePath = $directoryPath . '/' . $title . $date . '.xls';
+            
+            $data = [];
+            if( File::exists( public_path( $filePath ) ) )
             {
-                $deposits = Session::get( 'depositos' );
-            }
-            else
-            {
-                return $this->warningException( 'No se pudo exportar el excel con las observaciones del deposito' , __FUNCTION__ , __LINE__ , __FILE__ );
+                $oldResponses = Excel::load( public_path( $filePath ) )->get();
+                $data[ 'oldResponses' ] = $oldResponses;
             }
 
-            Excel::create( 'Detalle del Deposito' , function( $excel ) use( $deposits )
+            if( Session::has( 'depositos' ) )
             {
-                $excel->sheet( 'solicitudes' , function( $sheet ) use( $deposits )
+                $responses = Session::pull( 'depositos' );
+                $data[ 'responses' ] = $responses;
+            }
+
+            if( ! isset( $oldResponses ) && ! isset( $responses ) )
+            {
+                return $this->warningException( 'No se pudo exportar el excel con las observaciones del deposito' , __FUNCTION__ , __FILE__ , __LINE__ );
+            }
+            
+            Excel::create( $title . $date , function( $excel ) use( $data )
+            {
+                $excel->sheet( 'solicitudes' , function( $sheet ) use( $data )
                 {
                     $sheet->freezeFirstRow();
                     $sheet->setStyle( 
@@ -401,9 +419,10 @@ class DepositController extends BaseController
                                 )
                             )
                         );
-                    $sheet->loadView( 'Dmkt.Treasury.excelDepositDetail' , [ 'depositos' => $deposits ] );
+                    $sheet->loadView( 'Dmkt.Treasury.excelDepositDetail' , $data );
                 });
-            })->download( 'xls' );
+            })->store( 'xls' , public_path( $directoryPath ) );
+            return Response::download( $filePath );
         }
         catch( Exception $e )
         {

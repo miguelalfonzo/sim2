@@ -10,34 +10,45 @@
                     <th></th>
                     <th>Solicitud</th>
                     <th>N. Operacion</th>
+                    <th>Estado</th>
                     <th>Observacion</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach( $depositos as $idSolicitud => $deposit )
-                    @if( $deposit[ status ] === ok )
+                @if( isset( $oldResponses ) )
+                    @foreach( $oldResponses as $oldResponse )
                         <tr>
-                            <td style="background-color:#00dd0d"></td>
-                            <td>{{ $idSolicitud }}</td>
-                            <td>{{{ $deposit[ 'operacion' ] or '' }}}</td>
-                            <td>Ok</td>
+                            @if( $oldResponse->estado === ok )
+                                <td style="background-color:#00dd0d"></td>
+                            @elseif( $oldResponse->estado === warning )
+                                <td  style="background-color:#f5f904"></td>
+                            @else
+                                <td style="background-color:#f90404"></td>
+                            @endif
+                            <td>{{ $oldResponse->solicitud }}</td>
+                            <td>{{ $oldResponse->n_operacion }}</td>
+                            <td>{{ $oldResponse->estado }}</td>
+                            <td>{{ $oldResponse->observacion }}</td>
                         </tr>    
-                    @elseif( $deposit[ status ] === warning )
+                    @endforeach
+                @endif
+                @if( isset( $responses ) )
+                    @foreach( $responses as $idSolicitud => $response )
                         <tr>
-                            <td  style="background-color:#f5f904"></td>
+                            @if( $response[ status ] === ok )
+                                <td style="background-color:#00dd0d"></td>
+                            @elseif( $response[ status ] === warning )
+                                <td  style="background-color:#f5f904"></td>
+                            @else
+                                <td style="background-color:#f90404"></td>
+                            @endif
                             <td>{{ $idSolicitud }}</td>
-                            <td>{{ $deposit{ 'operacion' } }}</td>
-                            <td>{{ $deposit[ description ] }}</td>
+                            <td>{{ $response[ 'operacion' ] }}</td>
+                            <td>{{ $response[ status ] }}</td>
+                            <td>{{{ $response[ description ] or '' }}}</td>
                         </tr>       
-                    @else
-                        <tr>
-                            <td style="background-color:#f90404"></td>
-                            <td>{{ $idSolicitud }}</td>
-                            <td>{{ $deposit[ 'operacion' ] }}</td>
-                            <td>{{ $deposit[ description ] }}</td>
-                        </tr>       
-                    @endif
-                @endforeach
+                    @endforeach
+                @endif
             </tbody>
         </table>
     </body>
