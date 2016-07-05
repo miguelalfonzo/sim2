@@ -226,7 +226,7 @@ class Solicitud extends Eloquent
 
     protected static function getUserSolicituds()
     {
-        return \DB::table( 'LISTADO_SOLICITUD' )->where( 'rownum' , '<=' , 1000 )->get();
+        return \DB::table( 'LISTADO_SOLICITUD' )->where( 'rownum' , '<=' , 10 )->get();
     }
 
 }

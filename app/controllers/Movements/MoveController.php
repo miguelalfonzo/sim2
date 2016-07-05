@@ -351,6 +351,8 @@ class MoveController extends BaseController
             //$data = Solicitud::select( 'id , titulo, id_inversion' )->get();
 
             $rpta = $this->setRpta( $data );
+            $user = Auth::user();
+            $rpta[ 'usuario' ] = [ 'id' => $user->id , 'tipo' => $user->type ];
             $rpta[ 'columns' ] = $columns;
             return $rpta;
 

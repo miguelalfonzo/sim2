@@ -2229,8 +2229,8 @@ function listSolicituds()
     {
         if ( response.Status === 'Ok' )
         {
-            response.columns[ 0 ].createdCell = function(td, cellData, rowData, row, col ) { console.log( cellData ) };
-            var Data = processData( response.Data )
+            //response.columns[ 0 ].createdCell = function(td, cellData, rowData, row, col ) { console.log( td , cellData , rowData , row , col ) };
+            var Data = processData( response.Data , response.usuario )
             var dataTable = $( '#table_' + 'solicituds' ).DataTable(
             {
                 bDestroy        : true ,
@@ -2280,11 +2280,12 @@ function customAjax( type , url , data )
     });
 }
 
-function processData( data )
+function processData( data , usuario )
 {
     var x = data.length - 1;
     var modelRegister;
     var htmlActvidad;
+    var reporteOpcion;
     do
     {
         modelRegister  = data[ x ];
@@ -2306,15 +2307,13 @@ function processData( data )
                                 modelRegister.estado + 
                             '</span>';
 
-        modelRegister.opciones =    '<div class="btn-group btn-group-icon-md">' + 
-                                        '<a class="btn btn-default open-details" data-id="' + modelRegister.id + '">' +
-                                            '<span class="glyphicon glyphicon-eye-open"></span>' +
-                                        '</a>' +
-                                        '<a class="btn btn-default timeLine" data-id="' + modelRegister.id + '">' +
-                                            '<span class="glyphicon glyphicon-time"></span>' +
-                                        '</a>' +
-                                    '</div>';
-        
+        modelRegister.opciones =    '<a class="btn btn-default open-details" data-id="' + modelRegister.id + '">' +
+                                        '<span class="glyphicon glyphicon-eye-open"></span>' +
+                                    '</a>' +
+                                    '<a class="btn btn-default timeLine" data-id="' + modelRegister.id + '">' +
+                                        '<span class="glyphicon glyphicon-time"></span>' +
+                                    '</a>';
+
         if( modelRegister.monto_aprobado !== null )
         {
             modelRegister.monto = modelRegister.moneda + ' ' + modelRegister.monto_aprobado;
@@ -2327,6 +2326,21 @@ function processData( data )
         {
             modelRegister.monto = modelRegister.moneda + ' ' + modelRegister.monto_solicitado;
         }
+
+        //console.log( 1 );
+        if( modelRegister.reporte && usuario.tipo == 'C' )
+        {
+            //console.log( 2 );
+            reporteOpcion = '<a class="btn btn-default" target="_blank">' +
+                                '<span  class="glyphicon glyphicon-print"></span>' +
+                            '</a>';
+            modelRegister.opciones += reporteOpcion ;
+            //console.log( modelRegister.ip)
+        }
+
+        modelRegister.opciones =    '<div class="btn-group btn-group-icon-md">' +
+                                        modelRegister.opciones +
+                                    '</div>'; 
     }   
     while( x-- );
 
