@@ -16,7 +16,7 @@ class ExportController extends BaseController
 	{
 		try
 		{
-			$data = array( 'solicituds' => Solicitud::getDepositSolicituds(); );
+			$data = array( 'solicituds' => Solicitud::getDepositSolicituds() );
 			$view = View::make( 'Dmkt.Cont.reportToDeposit' , $data )->render();
 			return PDF::load( $view , 'A4' , 'landscape' )->show();
 		}
@@ -30,7 +30,8 @@ class ExportController extends BaseController
 	{
 		try
 		{
-			$data = array( 'solicituds' => Solicitud::where( 'id_estado' , DEPOSITO_HABILITADO )->orderBy( 'id' , 'ASC' )->limit( 10 )->get() );
+			$solicituds = Solicitud::getDepositSolicituds();
+			$data = array( 'solicituds' => $solicituds );
 			Excel::create( 'Solicitudes a Depositar' , function( $excel ) use( $data )
 			{
 				$excel->sheet( 'solicitudes' , function( $sheet ) use( $data )

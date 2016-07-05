@@ -226,7 +226,12 @@ class Solicitud extends Eloquent
 
     protected function getDepositSolicituds()
     {
-        return Solicitud::select( [ 'id' ] )->where( 'id_estado' , DEPOSITO_HABILITADO )->orderBy( 'id' , 'ASC' )->get();
+        return Solicitud::select( [ 'id' , 'token' , 'id_detalle' , 'id_user_assign' ] )->where( 'id_estado' , DEPOSITO_HABILITADO )->orderBy( 'id' , 'ASC' )->get();
+    }
+
+    protected static function findByToken( $token )
+    {
+        return Solicitud::where( 'token' , $token )->first();
     }
 
 }

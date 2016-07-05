@@ -9,9 +9,29 @@
                 <h4 class="modal-title" id="myModalLabel">Registro del Depósito - Masivo</h4>
             </div>
             <div class="modal-body">
-                <label>Busqueda ( Presionar Enter )</label>
-                <input type="text" id="filter-solicitud-id" class="form-control">
-                <div style="max-height:400px;overflow-y:scroll">
+                <div class="form-group" style="display:none">
+                    <label>Bancos</label>
+                    <select id="massive-bank-account" class="form-control">
+                        @foreach ( $banks as $bank )
+                            @if( $bank->typeMoney->simbolo == 'S/.' )
+                                <option value="{{ $bank->num_cuenta }}" selected>
+                                    {{ $bank->typeMoney->simbolo . '-' . $bank->bagoAccount->ctanombrecta }}
+                                </option>
+                            {{-- 
+                            @else
+                                <option value="{{ $bank->num_cuenta }}">
+                                    {{ $bank->typeMoney->simbolo . '-' . $bank->bagoAccount->ctanombrecta }}
+                                </option>
+                            --}}
+                            @endif
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Busqueda ( Presionar Enter )</label>
+                    <input type="text" id="filter-solicitud-id" class="form-control" style="font-weight:bold">
+                </div>
+                <div style="max-height:300px;overflow-y:scroll">
                 	<table id="massive-deposit-table" class="table table-striped table-hover table-bordered table-condensed" cellspacing="0" width="100%">
                 		<thead>
                 			<tr>
@@ -23,17 +43,18 @@
                 		<tbody>
                             @foreach( $depositIds as $key => $depositId )
                     			<tr>
-                                    <td>{{ $key + 1 }}</td>
-                    				<td class="deposit-solicitud-cell">{{ $depositId->id }}</td>
-                    				<td class="deposit-operacion-cell"><input type="text" class="form-control"></td>
+                                    <td><b>{{ $key + 1 }}</b></td>
+                    				<td class="deposit-solicitud-cell"><b>{{ $depositId->id }}</b></td>
+                    				<td class="deposit-operacion-cell"><b><input type="text" class="form-control" autocomplete="off"></b></td>
+                                    <input type="hidden" class="deposit-solicitud-token" value="{{ $depositId->token }}"> 
                     			</tr>
                             @endforeach
-                		<tbody>
+                		</tbody>
                 	</table>
                 </div>
             </div>
             <div class="modal-footer">
-        	    <a href="#" class="btn btn-success register-deposit-massive" data-deposit="S" style="margin-right: 1em;">Confirmar</a>
+        	    <button type="button" id="register-deposit-massive" class="btn btn-success ladda-button" data-style="zoom-in">Confirmar</a>
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
@@ -48,6 +69,128 @@
                     '</tr>';
         $( '#massive-deposit-table' ).append( newTr );
     });*/
+
+    $( '#register-deposit-massive' ).click( function()
+    {
+        var spin = Ladda.create( this );
+        var solicituds = [];
+        var indexs     = [];
+        var depositTableTrs = $( '#massive-deposit-table tbody tr' );
+        var depositTableTr;
+        var depositTableTd;
+        var solicitudCount = depositTableTrs.length;
+        var solicitud;
+        var depositNumber;
+        for( var i = 0 ; i < solicitudCount ; i++ )
+        {
+            depositTableTr    = depositTableTrs.eq( i );
+            depositTableTds   = depositTableTr.find( 'td' );
+            depositNumberCell = depositTableTds.eq( 2 ).find( 'input' );
+            if( depositNumberCell.length !== 0 )
+            {
+                depositNumber = depositNumberCell.val().trim();
+                if( depositNumber != '' )
+                {
+                    solicitud = 
+                    { 
+                        id        : depositTableTds.eq( 1 ).text(),
+                        token     : depositTableTr.find( '.deposit-solicitud-token' ).val(),
+                        operacion : depositNumber
+                    };
+                    solicituds.push( solicitud );
+                    indexs.push( i );
+                }
+            }
+        }
+        if( solicituds.length == 0 )
+        {
+            //spin.stop();
+            bootbox.alert( '<h4 class="text-warning"><b>No ingreso al menos un numero de operacion</b></h4>' );
+        }
+        else
+        {
+            bootbox.confirm( '<h4 class="text-info"><b>¿ Esta seguro de registrar los depositos ?</b></h4>' , function( result )
+            {
+                var button = this.find( 'button[ data-bb-handler=confirm ]' )[ 0 ];
+                button.disabled = true;
+
+                if( result )
+                {
+                    spin.start();
+        
+                    $.ajax(
+                    {
+                        url  : 'massive-solicitud-deposit',
+                        type : 'POST',
+                        data : 
+                        {
+                            _token : GBREPORTS.token,
+                            cuenta : $( '#massive-bank-account' ).val(),
+                            data   : solicituds
+                        }
+                    }).fail( function( statusCode , errorThrow )
+                    {
+                        ajaxError( statusCode , errorThrow );
+                    }).done( function( response )
+                    {
+                        if( response.Status === ok )
+                        {
+                            //bootboxMessage( response );
+                            var rowStatus;
+                            for( var i = 0 ; i < indexs.length ; i++ )
+                            {
+                                depositTableTr = depositTableTrs.eq( indexs[ i ] );
+                                depositTableTds = depositTableTr.find( 'td' );
+                                id = depositTableTds.eq( 1 ).text();
+                                rowStatus = response[ data ][ id ];
+                                if( rowStatus.Status === ok )
+                                {
+                                    depositTableTr.addClass( 'success' ).attr( 'title' , 'Ok' );
+                                    depositTableTds.eq( 2 ).find( 'b' ).text( rowStatus.operacion );
+                                }
+                                else
+                                {
+                                    depositTableTr.addClass( 'danger' ).attr( 'title' , rowStatus.Description );
+                                }
+                            }
+                            spin.stop();
+                            window.location.href = 'deposit-export';
+                            getSolicitudList();
+                        }
+                        else if( response.Status === warning )
+                        {
+                            //bootboxMessage( response );
+                            var rowStatus;
+                            for( var i = 0 ; i < indexs.length ; i++ )
+                            {
+                                depositTableTr = depositTableTrs.eq( indexs[ i ] );
+                                depositTableTds = depositTableTr.find( 'td' );
+                                id = depositTableTds.eq( 1 ).text();
+                                rowStatus = response[ data ][ id ];
+                                if( rowStatus.Status === ok )
+                                {
+                                    depositTableTr.addClass( 'success' ).attr( 'title' , 'Ok' );
+                                    depositTableTds.eq( 2 ).find( 'b' ).text( rowStatus.operacion );
+                                }
+                                else
+                                {
+                                    depositTableTr.addClass( 'danger' ).attr( 'title' , rowStatus.Description );
+                                }
+                            }
+                            spin.stop();
+                            window.location.href = 'deposit-export';
+                            getSolicitudList();
+                        }
+                        else
+                        {
+                            spin.stop();
+                            bootboxMessage( response );
+                        }
+                    });
+                }
+            });
+        }
+    });
 
     $( '#filter-solicitud-id' ).on( 'keypress' , function( event )
     {

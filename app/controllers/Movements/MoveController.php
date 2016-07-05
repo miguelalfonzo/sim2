@@ -212,7 +212,7 @@ class MoveController extends BaseController
                 });
             elseif ( Auth::user()->type == TESORERIA ) 
                 if ( $estado == R_REVISADO )
-                    $solicituds->whereIn( 'id_estado' , array( DEPOSITO_HABILITADO , DEPOSITADO ) );
+                    $solicituds->whereIn( 'id_estado' , array( DEPOSITADO ) );
                 else if( $estado == R_GASTO )
                     $solicituds->where( 'id_estado' , ENTREGADO );
         }

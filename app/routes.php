@@ -120,7 +120,9 @@
 
     Route::group( array( 'before' => 'tes' ), function()
     {
-        Route::post( 'deposit-solicitude', 'Deposit\DepositController@depositSolicitudeTes');
+        Route::post( 'solicitud-deposit' , 'Deposit\DepositController@solicitudDeposit' );
+        Route::post( 'massive-solicitud-deposit' , 'Deposit\DepositController@massiveSolicitudDeposit' );
+        Route::get( 'deposit-export' , 'Deposit\DepositController@depositExport' );
         Route::post( 'modal-extorno' , 'Deposit\DepositController@modalExtorno' );
         Route::post( 'confirm-extorno' , 'Deposit\DepositController@confirmExtorno' );
     });

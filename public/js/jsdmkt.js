@@ -4,9 +4,10 @@ var date_start = $('.date_start').first();
 var date_end = $('.date_end').first();
 
 //Status
-var ok = 'Ok';
+var ok      = 'Ok';
 var warning = 'Warning';
-var error = 'Error';
+var error   = 'Error';
+var data    = 'Data';
 
 //NEW SOLICITUD
 var reason        = $('select[name=motivo]');
@@ -411,14 +412,17 @@ $(document).on( "click" , ".register-deposit" , function( e )
 {
     e.preventDefault();
     var url = 'deposit-solicitude';
-    var data = {};
-    data._token         = _token;
-    data.token          = $("input[name=token]").val();
-    data.op_number      = $("#op-number").val();
-    data.num_cuenta     = $("#bank_account").val();
-
-    if ($("#op-number").val().trim() === "")
-        $("#message-op-number").text("Ingrese el número de Operación");
+    var data = 
+    {
+        _token    : GBREPORTS.token,
+        token     : $("input[name=token]").val(),
+        operacion : $("#op-number").val(),
+        cuenta    : $("#bank_account").val()
+    };
+    if( $( "#op-number" ).val().trim() === "" )
+    {
+        $( "#message-op-number" ).text( "Ingrese el número de Operación" );
+    }
     else
     {
         $.post(server + url, data)
@@ -431,17 +435,28 @@ $(document).on( "click" , ".register-deposit" , function( e )
                 $("#op-number").val('');
                 bootbox.alert("<h4 class='green'>Se registro el codigo de deposito correctamente.</h4>", function()
                 {
-                    if ( $('.table_solicitudes').length == 0 )
-                        window.location.href = server +"show_user";
-                    else
-                        listTable( 'solicitudes' );
+                    getSolicitudList();
                 });
             }
             else
+            {
                 bootbox.alert("<h4 class='red'>" + data.Status + ': ' + data.Description + "</h4>") ;    
+            }
         });
     }
 });
+
+function getSolicitudList()
+{
+    if ( $('.table_solicitudes').length === 0 )
+    {
+        window.location.href = server +"show_user";
+    }
+    else
+    {
+        listTable( 'solicitudes' );
+    }
+}
 
 $(document).on('click' , '.delete-fondo' , function (e)
 {
@@ -1712,22 +1727,22 @@ function validateNewSol()
     return aux;
 }
 
-function bootboxMessage( data )
+function bootboxMessage( response )
 {
     var colorClass = '';
-    if( data.Status === ok )
+    if( response.Status === ok )
     {
         colorClass = 'text-success';
     }
-    else if( data.Status === warning )
+    else if( response.Status === warning )
     {
         colorClass = 'text-warning';
     }
-    else if( data.Status === error )
+    else if( response.Status === error )
     {
         colorClass = 'text-danger';
     }
-    bootbox.alert( '<h4 class="' + colorClass + '">' + data.Status + ': ' + data.Description + '</h4>' );
+    bootbox.alert( '<h4 class="' + colorClass + '">' + response.Status + ': ' + response.Description + '</h4>' );
 
 }
 
