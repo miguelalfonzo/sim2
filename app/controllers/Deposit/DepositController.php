@@ -310,7 +310,7 @@ class DepositController extends BaseController
         $inputs = Input::all();
         $solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
         if ( is_null ( $solicitud ) )
-            return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ , __FILE__ , __LINE__ );
+            return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
         else
             return $this->setRpta( array( 'View' => View::make( 'template.Modals.liquidation' , array( 'solicitud' => $solicitud ) )->render() ) );
     }
@@ -325,11 +325,11 @@ class DepositController extends BaseController
 
             if ( is_null( $solicitud ) )
             {
-                return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ , __FILE__ , __LINE__ );
+                return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
             }
             elseif( ! in_array( $solicitud->id_estado, [DEPOSITADO, GASTO_HABILITADO] ) ) 
             {
-                return $this->warningException( 'No se puede Cancelar por Liquidacion' , __FUNCTION__ , __FILE__ , __LINE__ );
+                return $this->warningException( 'No se puede Cancelar por Liquidacion' , __FUNCTION__ , __LINE__ , __FILE__ );
             }
             else
             {
@@ -403,7 +403,7 @@ class DepositController extends BaseController
 
             if( ! isset( $oldResponses ) && ! isset( $responses ) )
             {
-                return $this->warningException( 'No se pudo exportar el excel con las observaciones del deposito' , __FUNCTION__ , __FILE__ , __LINE__ );
+                return $this->warningException( 'No se pudo exportar el excel con las observaciones del deposito' , __FUNCTION__ , __LINE__ , __FILE__ );
             }
             
             Excel::create( $title . $date , function( $excel ) use( $data )
