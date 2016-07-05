@@ -170,6 +170,7 @@ class MoveController extends BaseController
             if ( Auth::user()->type == TESORERIA )
                 $data['tc'] = ChangeRate::getTc();
             Session::put( 'state' , $estado );
+            $data[ 'user' ] = Auth::user();
             $view = array( 'View' => View::make('template.List.solicituds')->with( $data )->render() );
             return $this->setRpta( $view  );
         }
