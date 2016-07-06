@@ -227,8 +227,9 @@ class Solicitud extends Eloquent
 
     protected static function getUserSolicituds()
     {
-        return \DB::table( 'LISTADO_SOLICITUD' )->where( 'rownum' , '<=' , 500 )
-            ->whereIn( 'estado_id' , [ 1 ] )
+        return \DB::table( 'LISTADO_SOLICITUD' )
+            //->where( 'rownum' , '<=' , 1000 )
+            //->whereIn( 'estado_id' , [ 1  ] )
             //->where( 'responsable_id' , Auth::user()->id )
             ->get();
     }

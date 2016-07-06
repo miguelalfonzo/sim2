@@ -2218,24 +2218,26 @@ function listSolicituds()
         fecha_final  : $('#drp_menubar').data('daterangepicker').endDate.format("L") ,
         estado       : $('#idState').val()
     };
-    if( $.fn.dataTable.isDataTable( $( '#table_' + 'solicituds' ) ) )
+    /*if( $.fn.dataTable.isDataTable( $( '#table_' + 'solicituds' ) ) )
     {
-        $( '#table_' + 'solicituds' ).DataTable().clear();
-        $( '#table_' + 'solicituds' ).DataTable().destroy( true );
-    }
+        $( '#table_' + 'solicituds' ).DataTable().clear().destroy();
+    }*/
         
     customAjax( 'GET' , 'list-solicituds' , data ).done(function ( response ) 
     {
         if ( response.Status === 'Ok' )
         {
             //response.columns[ 0 ].createdCell = function(td, cellData, rowData, row, col ) { console.log( td , cellData , rowData , row , col ) };
-            var Data = processData( response.Data , response.usuario )
+            var Data = processData( response.Data , response.usuario , response.usuario_temporal )
             var dataTable = $( '#table_' + 'solicituds' ).DataTable(
             {
+                autoWidth       : false,
                 columns         : response.columns,
                 data            : Data ,
                 dom             : "<'row'<'col-xs-6'><'col-xs-6 pull-right'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
+                destroy         : true,
                 pageLength      : 10,
+                stateSave       : true,
                 language        :
                 {
                     search       : 'Buscar',
@@ -2275,21 +2277,27 @@ function customAjax( type , url , data )
     });
 }
 
-function processData( data , usuario )
+function processData( data , usuario , usuario_temporal )
 {
-    var x = data.length - 1;
+    var i = data.length + 1;
     var modelRegister;
     var htmlActvidad;
     var reporteOpcion;
     var PENDIENTE = 1;
     var ACEPTADO  = 2;
+    var APROBADO  = 3;
     var DERIVADO  = 11;
     var DESCARGO = 12;
+    var GER_COM = 'G';
+    var CONT    = 'C';
+    var aprobacionCheckBox = '<input name="mass-aprov" type="checkbox"/>';
     var aprobadores;
     var ESTADOS_APROBACION = [ PENDIENTE , DERIVADO , ACEPTADO ];
-    do
+    
+    //for( i = 0 ; i <= x ; i++ )
+    while( --i )
     {
-        modelRegister  = data[ x ];
+        modelRegister  = data[ i ];
         if( modelRegister.actividad === null )
         {
             htmlActvidad = '';
@@ -2340,14 +2348,6 @@ function processData( data , usuario )
             //console.log( modelRegister.ip)
         }
 
-        if( modelRegister.estado_id == DESCARGO && usuario.id == modelRegister.responsable_id )
-        {
-            descargoOpcion = '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.token + '">' +
-                                '<span class="glyphicon glyphicon-edit"></span>' +
-                            '</a>';
-            modelRegister.opciones += descargoOpcion ;
-        }
-
         if( modelRegister.estado_id == PENDIENTE && usuario.id == modelRegister.solicitador_id )
         {
             creationOptions =   '<a class="btn btn-default" href="editar-solicitud/' + modelRegister.token + '">' +
@@ -2358,17 +2358,49 @@ function processData( data , usuario )
                                 '</button>';
             modelRegister.opciones += creationOptions;
         }
+
         if( modelRegister.aprobadores != null && ESTADOS_APROBACION.indexOf( parseInt( modelRegister.estado_id ) ) != -1 )
         {
             aprobadores = modelRegister.aprobadores.split( '|' );
-            if( aprobadores.indexOf( usuario.id ) != -1 )
+            if( aprobadores.indexOf( usuario.id ) != -1 || aprobadores.indexOf( usuario_temporal.id ) != -1 )
             {
                 aprobacionOpcion =  '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.token + '">' +
                                         '<span class="glyphicon glyphicon-edit"></span>' +
                                     '</a>';
                 modelRegister.opciones += aprobacionOpcion;
+                if( usuario.tipo == 'G' )
+                {
+                    modelRegister.aprobacion_masiva = aprobacionCheckBox;
+                }
             } 
         }
+
+        if( modelRegister.estado_id == APROBADO )
+        {
+            confirmacionOpcion =    '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.token + '">' +
+                                        '<span class="glyphicon glyphicon-edit"></span>' +
+                                    '</a>' +
+                                    '<button type="button" class="btn btn-default cancel-solicitud" data-idsolicitud=' + modelRegister.id + '>' +
+                                        '<span  class="glyphicon glyphicon-remove"></span>' +
+                                    '</button>';
+            modelRegister.opciones += confirmacionOpcion;
+            if( usuario.tipo == CONT )
+            {
+                modelRegister.aprobacion_masiva = aprobacionCheckBox;
+            }
+        }
+
+        if( modelRegister.estado_id == DESCARGO && usuario.id == modelRegister.responsable_id )
+        {
+            descargoOpcion = '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.token + '">' +
+                                '<span class="glyphicon glyphicon-edit"></span>' +
+                            '</a>';
+            modelRegister.opciones += descargoOpcion ;
+        }
+
+        modelRegister.opciones =    '<div class="btn-group btn-group-icon-md">' +
+                                        modelRegister.opciones +
+                                    '</div>'; 
 
         if( modelRegister.estado_id == PENDIENTE )
         {
@@ -2376,11 +2408,8 @@ function processData( data , usuario )
             modelRegister.revisor = '-';
         }
 
-        modelRegister.opciones =    '<div class="btn-group btn-group-icon-md">' +
-                                        modelRegister.opciones +
-                                    '</div>'; 
     }   
-    while( x-- );
+    //while( i-- );
 
     return data;    
 }

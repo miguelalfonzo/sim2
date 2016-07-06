@@ -334,7 +334,7 @@ class MoveController extends BaseController
             $columns =
                 [
                     [ 'title' => '#' , 'data' => 'id' , 'className' => 'text-center' ],
-                    [ 'title' => 'Solicitud' , 'data' => 'actividad_titulo' ],
+                    [ 'title' => 'Solicitud' , 'data' => 'actividad_titulo' , 'width' => '10%' ],
                     [ 'title' => 'Solicitador por' , 'data' => 'solicitador' , 'className' => 'text-center' ],
                     [ 'title' => 'Fecha de Solicitud' , 'data' => 'fecha_creacion' , 'className' => 'text-center' ],
                     [ 'title' => 'Aprobado por' , 'data' => 'revisor' , 'className' => 'text-center' ],
@@ -342,22 +342,27 @@ class MoveController extends BaseController
                     [ 'title' => 'Monto' , 'data' => 'monto' , 'className' => 'text-center' ],
                     [ 'title' => 'Estado' , 'data' => 'estado' , 'className' => 'text-center' ],
                     [ 'title' => 'Tipo' , 'data' => 'tipo_solicitud' , 'className' => 'text-center' ],
-                    [ 'title' => 'Edicion' , 'data' => 'opciones' , 'className' => 'text-center' , 'width' => '20%' ],
+                    [ 'title' => 'Edicion' , 'data' => 'opciones' , 'className' => 'text-center' , 'width' => '15%' ],
                     
                     //[ 'title' => 'Edicion' , 'defaultContent' => '<button class="btn btn-primary">Test</button>' ],
                     //[ 'title' => 'Test' , 'data' => 'id_inversion' ]
                 ];
             $user = Auth::user();
-            /*if( $user->type == GER_COM )
+            if( $user->type == GER_COM )
             {
-                $columns[] = [ 'title' => 'X' , 'data' => 'aprobacion_masiva' , 'className' => 'text-center' , 'defaultContent' => '<input name="mass-aprov" type="checkbox"/>' ];
-            }*/
+                $columns[] = [ 'title' => 'X' , 'data' => 'aprobacion_masiva' , 'className' => 'text-center' , 'defaultContent' => '' ];
+            }
+            elseif( $user->type == CONT )
+            {
+                $columns[ 3 ] = [ 'title' => 'Fecha de Deposito' , 'data' => 'fecha_creacion' , 'className' => 'text-center' ];
+                $columns[]    = [ 'title' => 'X' , 'data' => 'aprobacion_masiva' , 'className' => 'text-center' , 'defaultContent' => '' ];
+            }
             
             //$data = Solicitud::select( 'id , titulo, id_inversion' )->get();
 
             $rpta = $this->setRpta( $data );
-            $user = Auth::user();
             $rpta[ 'usuario' ] = [ 'id' => $user->id , 'tipo' => $user->type ];
+            $rpta[ 'usuario_temporal' ] = [ 'id' => $user->tempId() , 'tipo' => $user->tempType() ];
             $rpta[ 'columns' ] = $columns;
             return $rpta;
 
