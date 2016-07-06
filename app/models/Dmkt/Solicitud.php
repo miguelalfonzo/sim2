@@ -2,6 +2,7 @@
 
 namespace Dmkt;
 use \Eloquent;
+use \Auth;
 
 class Solicitud extends Eloquent
 {
@@ -226,7 +227,10 @@ class Solicitud extends Eloquent
 
     protected static function getUserSolicituds()
     {
-        return \DB::table( 'LISTADO_SOLICITUD' )->where( 'rownum' , '<=' , 10 )->get();
+        return \DB::table( 'LISTADO_SOLICITUD' )->where( 'rownum' , '<=' , 500 )
+            ->whereIn( 'estado_id' , [ 1 ] )
+            //->where( 'responsable_id' , Auth::user()->id )
+            ->get();
     }
 
 }

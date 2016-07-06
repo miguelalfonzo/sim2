@@ -335,18 +335,23 @@ class MoveController extends BaseController
                 [
                     [ 'title' => '#' , 'data' => 'id' , 'className' => 'text-center' ],
                     [ 'title' => 'Solicitud' , 'data' => 'actividad_titulo' ],
-                    [ 'title' => 'Solicitador por' , 'data' => 'responsable' , 'className' => 'text-center' ],
+                    [ 'title' => 'Solicitador por' , 'data' => 'solicitador' , 'className' => 'text-center' ],
                     [ 'title' => 'Fecha de Solicitud' , 'data' => 'fecha_creacion' , 'className' => 'text-center' ],
-                    [ 'title' => 'Aprobado por' , 'data' => 'aprobador' , 'className' => 'text-center' ],
-                    [ 'title' => 'Fecha de Aprobación' , 'data' => 'fecha_aprobacion' , 'className' => 'text-center' ],
+                    [ 'title' => 'Aprobado por' , 'data' => 'revisor' , 'className' => 'text-center' ],
+                    [ 'title' => 'Fecha de Aprobación' , 'data' => 'fecha_revision' , 'className' => 'text-center' ],
                     [ 'title' => 'Monto' , 'data' => 'monto' , 'className' => 'text-center' ],
                     [ 'title' => 'Estado' , 'data' => 'estado' , 'className' => 'text-center' ],
                     [ 'title' => 'Tipo' , 'data' => 'tipo_solicitud' , 'className' => 'text-center' ],
-                    [ 'title' => 'Edicion' , 'data' => 'opciones' , 'className' => 'text-center' ],
+                    [ 'title' => 'Edicion' , 'data' => 'opciones' , 'className' => 'text-center' , 'width' => '20%' ],
                     
                     //[ 'title' => 'Edicion' , 'defaultContent' => '<button class="btn btn-primary">Test</button>' ],
                     //[ 'title' => 'Test' , 'data' => 'id_inversion' ]
                 ];
+            $user = Auth::user();
+            /*if( $user->type == GER_COM )
+            {
+                $columns[] = [ 'title' => 'X' , 'data' => 'aprobacion_masiva' , 'className' => 'text-center' , 'defaultContent' => '<input name="mass-aprov" type="checkbox"/>' ];
+            }*/
             
             //$data = Solicitud::select( 'id , titulo, id_inversion' )->get();
 

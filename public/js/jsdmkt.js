@@ -28,7 +28,7 @@ var search_cliente    = $('.cliente-seeker');
 var idamount          = $('#amount');
 var doc_start         = $('.date_start').last();
 var doc_end           = $('.date_end').last();
-var cancel_solicitude = '.cancel-solicitude';
+var cancel_solicitud  = '.cancel-solicitud';
 var id_solicitud      = $( 'input[name=idsolicitud]' );
 var families          = $('#listfamily');
 var idState           = $("#idState");
@@ -565,14 +565,13 @@ if ( $('#deny_solicitude').length != 0 )
 }
 
 /* Cancel Solicitude */
-$(document).off( 'click' , cancel_solicitude );
-$(document).on( 'click' , cancel_solicitude, function () 
+$(document).off( 'click' , cancel_solicitud );
+$(document).on( 'click' , cancel_solicitud, function () 
 {
-    elem = $( this );
     var data = 
     {
-        idsolicitud: elem.attr('data-idsolicitude') ,
-        _token : elem.attr('data-token')
+        idsolicitud : this.dataset.idsolicitud ,
+        _token      : GBREPORTS.token
     };
     cancelDialog( data , '¿Esta seguro que desea cancelar esta solicitud?' );
 });
@@ -2222,7 +2221,7 @@ function listSolicituds()
     if( $.fn.dataTable.isDataTable( $( '#table_' + 'solicituds' ) ) )
     {
         $( '#table_' + 'solicituds' ).DataTable().clear();
-        $( '#table_' + 'solicituds' ).DataTable().destroy();
+        $( '#table_' + 'solicituds' ).DataTable().destroy( true );
     }
         
     customAjax( 'GET' , 'list-solicituds' , data ).done(function ( response ) 
@@ -2233,14 +2232,10 @@ function listSolicituds()
             var Data = processData( response.Data , response.usuario )
             var dataTable = $( '#table_' + 'solicituds' ).DataTable(
             {
-                bDestroy        : true ,
-                scrollX         : 99,
                 columns         : response.columns,
                 data            : Data ,
                 dom             : "<'row'<'col-xs-6'><'col-xs-6 pull-right'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
-                stateSave       : true,
-                bScrollCollapse : true,
-                iDisplayLength  : 10,
+                pageLength      : 10,
                 language        :
                 {
                     search       : 'Buscar',
@@ -2286,6 +2281,12 @@ function processData( data , usuario )
     var modelRegister;
     var htmlActvidad;
     var reporteOpcion;
+    var PENDIENTE = 1;
+    var ACEPTADO  = 2;
+    var DERIVADO  = 11;
+    var DESCARGO = 12;
+    var aprobadores;
+    var ESTADOS_APROBACION = [ PENDIENTE , DERIVADO , ACEPTADO ];
     do
     {
         modelRegister  = data[ x ];
@@ -2300,10 +2301,11 @@ function processData( data , usuario )
                             '</span>';        
         }
         modelRegister.actividad_titulo =    htmlActvidad +
-                                        '<label style="display:block">' +
-                                            modelRegister.titulo +
-                                        '</label>';
-        modelRegister.estado =  '<span class="label" style="background-color:' + modelRegister.color_estado + '">' + 
+                                        //'<label>' +
+                                            modelRegister.titulo 
+                                        //'</label>'
+                                        ;
+        modelRegister.estado =  '<span class="label" style="background-color:' + modelRegister.estado_color + '">' + 
                                 modelRegister.estado + 
                             '</span>';
 
@@ -2316,26 +2318,62 @@ function processData( data , usuario )
 
         if( modelRegister.monto_aprobado !== null )
         {
-            modelRegister.monto = modelRegister.moneda + ' ' + modelRegister.monto_aprobado;
+            modelRegister.monto = modelRegister.moneda + /*+ ' ' +*/ modelRegister.monto_aprobado;
         }
         else if( modelRegister.monto_aceptado !== null )
         {
-            modelRegister.monto = modelRegister.moneda + ' ' + modelRegister.monto_aceptado;
+            modelRegister.monto = modelRegister.moneda + /*+ ' ' +*/ modelRegister.monto_aceptado;
         }
         else
         {
-            modelRegister.monto = modelRegister.moneda + ' ' + modelRegister.monto_solicitado;
+            modelRegister.monto = modelRegister.moneda + /*+ ' ' +*/ modelRegister.monto_solicitado;
         }
 
         //console.log( 1 );
-        if( modelRegister.reporte && usuario.tipo == 'C' )
+        if( modelRegister.reporte && ( usuario.tipo == 'C' || usuario.id == modelRegister.responsable_id ) )
         {
             //console.log( 2 );
-            reporteOpcion = '<a class="btn btn-default" target="_blank">' +
+            reporteOpcion = '<a class="btn btn-default" target="_blank" href="a/' + modelRegister.token + '">' +
                                 '<span  class="glyphicon glyphicon-print"></span>' +
                             '</a>';
             modelRegister.opciones += reporteOpcion ;
             //console.log( modelRegister.ip)
+        }
+
+        if( modelRegister.estado_id == DESCARGO && usuario.id == modelRegister.responsable_id )
+        {
+            descargoOpcion = '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.token + '">' +
+                                '<span class="glyphicon glyphicon-edit"></span>' +
+                            '</a>';
+            modelRegister.opciones += descargoOpcion ;
+        }
+
+        if( modelRegister.estado_id == PENDIENTE && usuario.id == modelRegister.solicitador_id )
+        {
+            creationOptions =   '<a class="btn btn-default" href="editar-solicitud/' + modelRegister.token + '">' +
+                                    '<span  class="glyphicon glyphicon-pencil"></span>' +
+                                '</a>' +
+                                '<button type="button" class="btn btn-default cancel-solicitud" data-idsolicitud=' + modelRegister.id + '>' +
+                                    '<span  class="glyphicon glyphicon-remove"></span>' +
+                                '</button>';
+            modelRegister.opciones += creationOptions;
+        }
+        if( modelRegister.aprobadores != null && ESTADOS_APROBACION.indexOf( parseInt( modelRegister.estado_id ) ) != -1 )
+        {
+            aprobadores = modelRegister.aprobadores.split( '|' );
+            if( aprobadores.indexOf( usuario.id ) != -1 )
+            {
+                aprobacionOpcion =  '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.token + '">' +
+                                        '<span class="glyphicon glyphicon-edit"></span>' +
+                                    '</a>';
+                modelRegister.opciones += aprobacionOpcion;
+            } 
+        }
+
+        if( modelRegister.estado_id == PENDIENTE )
+        {
+            modelRegister.fecha_revision = '-';
+            modelRegister.revisor = '-';
         }
 
         modelRegister.opciones =    '<div class="btn-group btn-group-icon-md">' +

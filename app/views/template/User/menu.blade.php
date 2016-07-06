@@ -1,4 +1,4 @@
-<div class="row">   
+<div>   
     {{Form::token()}}
     <div class="form-group col-xs-8 col-sm-4 col-md-2 col-lg-2">
         <select id="idState" name="idstate" class="form-control selectestatesolicitude">
