@@ -334,7 +334,7 @@ class MoveController extends BaseController
             $columns =
                 [
                     [ 'title' => '#' , 'data' => 'id' , 'className' => 'text-center' ],
-                    [ 'title' => 'Solicitud' , 'data' => 'actividad_titulo' , 'width' => '10%' ],
+                    [ 'title' => 'Solicitud' , 'data' => 'actividad_titulo' , 'width' => '15%' ],
                     [ 'title' => 'Solicitador por' , 'data' => 'solicitador' , 'className' => 'text-center' ],
                     [ 'title' => 'Fecha de Solicitud' , 'data' => 'fecha_creacion' , 'className' => 'text-center' ],
                     [ 'title' => 'Aprobado por' , 'data' => 'revisor' , 'className' => 'text-center' ],
@@ -354,7 +354,7 @@ class MoveController extends BaseController
             }
             elseif( $user->type == CONT )
             {
-                $columns[ 3 ] = [ 'title' => 'Fecha de Deposito' , 'data' => 'fecha_creacion' , 'className' => 'text-center' ];
+                $columns[ 3 ] = [ 'title' => 'Fecha de Deposito' , 'data' => 'fecha_entrega' , 'className' => 'text-center' ];
                 $columns[]    = [ 'title' => 'X' , 'data' => 'aprobacion_masiva' , 'className' => 'text-center' , 'defaultContent' => '' ];
             }
             
@@ -363,6 +363,8 @@ class MoveController extends BaseController
             $rpta = $this->setRpta( $data );
             $rpta[ 'usuario' ] = [ 'id' => $user->id , 'tipo' => $user->type ];
             $rpta[ 'usuario_temporal' ] = [ 'id' => $user->tempId() , 'tipo' => $user->tempType() ];
+            $now = Carbon::now();
+            $rpta[ 'now' ] = [ 'year' => $now->year , 'month' => $now->month , 'day' => $now->day ];
             $rpta[ 'columns' ] = $columns;
             return $rpta;
 

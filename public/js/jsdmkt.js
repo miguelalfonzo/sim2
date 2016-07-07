@@ -2227,13 +2227,13 @@ function listSolicituds()
     {
         if ( response.Status === 'Ok' )
         {
-            //response.columns[ 0 ].createdCell = function(td, cellData, rowData, row, col ) { console.log( td , cellData , rowData , row , col ) };
-            var Data = processData( response.Data , response.usuario , response.usuario_temporal )
+            processData( response.Data , response.usuario , response.usuario_temporal );
+            processColumns( response.columns , response.usuario , response.now );
             var dataTable = $( '#table_' + 'solicituds' ).DataTable(
             {
                 autoWidth       : false,
                 columns         : response.columns,
-                data            : Data ,
+                data            : response.Data ,
                 dom             : "<'row'<'col-xs-6'><'col-xs-6 pull-right'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
                 destroy         : true,
                 pageLength      : 10,
@@ -2252,6 +2252,10 @@ function listSolicituds()
                         sPrevious : 'Anterior',
                         sNext     : 'Siguiente'
                     }
+                },
+                createdRow: function( row , data , dataIndex )
+                {
+                    $( row ).append( '<input type="hidden" class="solicitud-token" value="' + data.token + '">' );
                 }
             });
             var d = new Date();
@@ -2277,6 +2281,36 @@ function customAjax( type , url , data )
     });
 }
 
+function processColumns( columns , usuario , now )
+{
+    var now = new Date( now.year , now.month - 1 , now.day , 0 , 0 , 0 , 0 ); 
+    var dayms = 24 * 60 * 60 * 1000;
+    var exclamationSign = '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>';
+    var warningSign =  '<span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>';
+    var cellDataArray;
+    var cellDataDate; 
+    var diffms;
+    if( usuario.tipo == 'C' )
+    {
+        columns[ 3 ].createdCell = function( td , cellData , rowData , row , col ) 
+        { 
+            cellDataArray = cellData.split( '-' );
+            cellDataDate = new Date( cellDataArray[ 0 ] , cellDataArray[ 1 ] - 1  , cellDataArray[ 2 ] , 0 , 0 , 0 , 0 );  
+            diffms = cellDataDate - now;
+            if( diffms <= 0 )
+            {
+                td.classList.add( 'alert-danger' ); 
+                td.innerHTML = exclamationSign + ' ' + td.innerHTML;   
+            }
+            else if( diffms <= dayms )
+            {
+                td.classList.add( 'alert-warning' );
+                td.innerHTML = warningSign + '<strong> ' + td.innerHTML + '</strong>';          
+            }
+        };
+    }
+}
+
 function processData( data , usuario , usuario_temporal )
 {
     var i = data.length + 1;
@@ -2297,7 +2331,7 @@ function processData( data , usuario , usuario_temporal )
     //for( i = 0 ; i <= x ; i++ )
     while( --i )
     {
-        modelRegister  = data[ i ];
+        modelRegister  = data[ ( i - 1 ) ];
         if( modelRegister.actividad === null )
         {
             htmlActvidad = '';
@@ -2409,7 +2443,5 @@ function processData( data , usuario , usuario_temporal )
         }
 
     }   
-    //while( i-- );
-
-    return data;    
+    //while( i-- );    
 }
