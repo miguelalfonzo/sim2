@@ -357,6 +357,15 @@ class MoveController extends BaseController
                 $columns[ 3 ] = [ 'title' => 'Fecha de Deposito' , 'data' => 'fecha_entrega' , 'className' => 'text-center' ];
                 $columns[]    = [ 'title' => 'X' , 'data' => 'aprobacion_masiva' , 'className' => 'text-center' , 'defaultContent' => '' ];
             }
+            elseif( $user->type == TESORERIA )
+            {
+                $columns[ 2 ] = [ 'title' => 'Responsable' , 'data' => 'responsable' , 'className' => 'text-center' ];
+                $columns[ 3 ] = [ 'title' => 'Fecha de Deposito' , 'data' => 'fecha_entrega' , 'className' => 'text-center' ];
+                $columns[ 4 ] = [ 'title' => 'Deposito' , 'data' => 'monto' , 'className' => 'text-center' ];
+                unset( $columns[ 5 ] , $columns[ 6 ] );
+                $columns = array_values( $columns );
+                      
+            }
             
             //$data = Solicitud::select( 'id , titulo, id_inversion' )->get();
 
