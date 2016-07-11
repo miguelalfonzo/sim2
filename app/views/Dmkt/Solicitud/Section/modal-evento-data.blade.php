@@ -110,7 +110,6 @@
 		}); 
 		$('.btn_event_submit').click(function(){
 			var eventForm = $(this).parent().parent().parent();
-			console.log("click");
 			eventForm.ajaxForm({
 				success: function(result){
 					if(result.hasOwnProperty("status")){

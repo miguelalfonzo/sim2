@@ -102,7 +102,8 @@
         Route::post('get-document-detail' , 'Expense\ExpenseController@getDocument');
         Route::post('update-document' , 'Expense\ExpenseController@updateDocument');
 
-        Route::get( 'export/solicitudToDeposit' , 'Export\ExportController@exportSolicitudToDeposit' );
+        Route::get( 'export/solicitudToDeposit-pdf' , 'Export\ExportController@exportSolicitudToDepositPDF' );
+        Route::get( 'export/solicitudToDeposit-excel' , 'Export\ExportController@exportSolicitudToDepositExcel' );
         Route::post( 'end-expense-record' , 'Expense\ExpenseController@endExpenseRecord' );
 
         Route::post( 'modal-liquidation' , 'Deposit\DepositController@modalLiquidation' );
@@ -119,7 +120,9 @@
 
     Route::group( array( 'before' => 'tes' ), function()
     {
-        Route::post( 'deposit-solicitude', 'Deposit\DepositController@depositSolicitudeTes');
+        Route::post( 'solicitud-deposit' , 'Deposit\DepositController@solicitudDeposit' );
+        Route::post( 'massive-solicitud-deposit' , 'Deposit\DepositController@massiveSolicitudDeposit' );
+        Route::get( 'deposit-export' , 'Deposit\DepositController@depositExport' );
         Route::post( 'modal-extorno' , 'Deposit\DepositController@modalExtorno' );
         Route::post( 'confirm-extorno' , 'Deposit\DepositController@confirmExtorno' );
     });

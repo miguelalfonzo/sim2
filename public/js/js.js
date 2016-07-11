@@ -7,7 +7,7 @@ server =  pathnameArray.length >0 ? pathnameArray[0]+"/public/" : "";
 var datef = new Date();
 var dateactual = (datef.getMonth()+1)+'-'+datef.getFullYear();
 
-function loadingUI(message)
+function loadingUI( message )
 {
     $.blockUI(
     {
@@ -55,10 +55,15 @@ $(function()
 
     function ajaxError(statusCode,errorThrown)
     {
-        if (statusCode.status == 0) 
+        Ladda.stop();
+        if( statusCode.status === 0 ) 
+        {
             bootbox.alert('<h4 class="text-warning">Internet: Problemas de Conexion</h4>');    
+        }
         else
+        {
             bootbox.alert('<h4 class="text-danger">Error del Sistema</h4>');  
+        }
     }
 
     //Vars
@@ -1551,7 +1556,6 @@ $(function()
         $("#sol-titulo").val(sol_titulo);
         $("#id-solicitude").text(id_sol);
         $("input[name=token]").val(token);
-        $(".register-deposit").attr("data-deposit",tr.attr("sol-type"));
         $("#beneficiario").val(beneficiario);
         $("#total-deposit").val( tr.find('.deposit').text().trim() );
         $('#enable_deposit_Modal').modal();
