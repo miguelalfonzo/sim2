@@ -51,20 +51,7 @@ Route::filter( 'ager' , 'Filter\FilterController@asistenteGerencia');
 
 Route::filter( 'sys_user' , 'Filter\FilterController@system' ); 
 
-Route::filter( 'developer' , function()
-{
-    if( ! Auth::check() || is_null( Auth::user()->simApp ) )
-    {
-        return Redirect::to( 'login' );
-    }
-    else
-    {     
-        if( Auth::user()->type != 'A' )
-        {
-            return Redirect::to( 'show_user' ); 
-        }
-    }
-});
+Route::filter( 'developer' , 'Filter\FilterController@admin' ); 
 
 /*
 |--------------------------------------------------------------------------
