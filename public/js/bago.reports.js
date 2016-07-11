@@ -203,7 +203,6 @@
         },
         setMenuBarReports: function(reportsList) {
             this.reportsArray = reportsList;
-            console.log( this );
             if (this.reportsArray.length > 0) {
 				$("#menubar_reports").html('');
                 for (var z = 0; z < this.reportsArray.length; z++) {
@@ -403,7 +402,6 @@
 												
 												if(posTotalArray == -1)
 													posTotalArray = 0;
-												console.log("PostTotalArray "+posTotalArray);
 												totalArray[posTotalArray] = typeof(totalArray[posTotalArray]) == 'undefined' ? [] : totalArray[posTotalArray];
 												$(head).each(function(i,headColumn){
 													totalArray[posTotalArray][i] = typeof(totalArray[posTotalArray][i]) == 'undefined' ? 0 : totalArray[posTotalArray][i];
@@ -425,7 +423,7 @@
 																		totalArray[posTotalArray][i-1] = 'Total';
 																	}
 																}
-																totalArray[posTotalArray][i] = totalArray[posTotalArray][i] + number;
+																totalArray[posTotalArray][i] = Math.round( ( totalArray[posTotalArray][i] + number ) * 100 ) / 100;
 															}else{
 																totalArray[posTotalArray][i] = null;
 															}
@@ -464,8 +462,7 @@
 												}
 											});
 										}
-											var footerElement = $(".dataTables_scrollFoot table tfoot");
-											console.log("set footer");
+										var footerElement = $(".dataTables_scrollFoot table tfoot");
 										$(totalArray).each(function(i,row){
 
 											rowFaltantes = GBREPORTS.valores.length - footerElement.children().length;
@@ -497,14 +494,12 @@
 						}
 					}else
 					{
-						console.log("hola");
-							var msg = '';
-							if(typeof(data.message) != 'undefined')
-								msg = data.message;
-							else
-								msg = 'Hubo un problema con la formula al generar el reporte';
-							bootbox.alert(msg);
-						console.log("chau");
+						var msg = '';
+						if(typeof(data.message) != 'undefined')
+							msg = data.message;
+						else
+							msg = 'Hubo un problema con la formula al generar el reporte';
+						bootbox.alert(msg);
 						$("#dataTable").empty();
 						// bootbox.alert(data.Status + ': ' + data.message);
 						// gbReportsObject.changeDateRange(formula.frecuency);

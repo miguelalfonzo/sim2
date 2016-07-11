@@ -40,4 +40,9 @@ class Activity extends Eloquent
     {
         return $this->hasOne( 'Client\ClientType' , 'id' , 'tipo_cliente' );
     }
+
+    protected function getClientActivities( $clientType )
+    {
+        return Activity::distinct()->select( 'id' )->where( 'tipo_cliente' , $clientType )->get();
+    }
 }

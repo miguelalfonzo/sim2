@@ -852,32 +852,32 @@ function registerFondoInstitucional()
 
 $( '#search_responsable' ).on( 'click' , function(e)
 {
+    var spin      = Ladda.create( this );
+    spin.start();
     var div_monto = $( 'label[for=monto]' ).parent();
     if ( div_monto.hasClass( 'has-success' ) )
-        acceptedSolicitude();
+    {
+        acceptedSolicitude( spin );
+    }
     else
+    {
+        spin.stop();
         return false;
+    }
 });
+
 
 $( '#derivar_solicitud' ).on( 'click' , function()
 {
-    acceptedSolicitude( 'derivacion' );   
+    var spin = Ladda.create( this );
+    spin.start();
+    acceptedSolicitude( spin , 'derivacion' );   
 });
 
 
-function acceptedSolicitude( type )
+function acceptedSolicitude( spin , type )
 {
     var formData = new FormData( form_acepted_solicitude[ 0 ] );
-    
-    /*var d_clients = [];
-    var d_clients_type = [];
-
-    clients.children().each( function ()
-    {
-        elem = $(this);
-        d_clients.push( elem.attr("pk") );
-        d_clients_type.push( elem.attr("tipo_cliente") );
-    });*/
             
     if ( type !== undefined )
     {
@@ -900,17 +900,7 @@ function acceptedSolicitude( type )
     if ( $("#is-client-change").is(':checked'))
     {
         formData.append( 'modificacion_clientes' , 1 );        
-
-/*        d_clients.forEach( function( entry )
-        {
-            formData.append( "clientes[]", entry );
-        });   
-        d_clients_type.forEach( function( entry )
-        {
-            formData.append( "tipos_cliente[]" , entry );
-        });*/
     }
-
     else
     {
         formData.append( 'modificacion_clientes' , 0 );
@@ -926,9 +916,11 @@ function acceptedSolicitude( type )
         processData : false
     }).fail(function (statusCode,errorThrown) 
     {
+        spin.stop();
         ajaxError(statusCode,errorThrown);
     }).done(function (data)
     {
+        spin.stop();
         if (data.Status == 'Error' )
         {
             responseUI('Hubo un error al procesar la solicitud','red');
@@ -1514,7 +1506,7 @@ function seeker( element , name , url )
                 {
                     if ( data.Status != 'Ok')
                     {
-                        responseUI( 'Problema de Conexion' , 'red' );
+                        bootboxMessage( data );
                     }
                     else if ( data.Status == 'Ok' )
                     {
@@ -1649,6 +1641,7 @@ function ajaxError(statusCode,errorThrown)
     }
     else
     {
+        Ladda.stopAll();
         console.log( statusCode );
         console.log( errorThrown );
         bootbox.alert('<h4 class="red">Error del Sistema</h4>');  
@@ -2034,15 +2027,20 @@ $( document ).on( 'click' , '.open-details2' , function()
 // Add family-fondo
 $( '#btn-add-family-fondo' ).on( 'click' ,function () 
 {
+    var spin = Ladda.create( this );
+    spin.start();
     var family_id = $( '#selectfamilyadd' ).val();
     var family_exist = false;
-    $('.producto_value').each(function(i,v)
+    $( '.producto_value' ).each( function( i , v )
+    {
+        if( family_id == $( this ).val() )
         {
-            if(family_id == $(this).val() )
-                family_exist = true;
-        });
+            family_exist = true;
+        }
+    });
 
-    if(!family_exist)
+    if( !family_exist )
+    {
         $.ajax(
         {
             url: server + 'agregar-familia-fondo',
@@ -2058,20 +2056,23 @@ $( '#btn-add-family-fondo' ).on( 'click' ,function ()
             ajaxError( statusCode , errorThrown );
         }).done( function ( response )
         {
+            spin.stop();
             if ( response.Status === 'Ok' )
             {
-                 if(response.Data.Cond == true){
+                 if(response.Data.Cond == true)
+                 {
                     var options_val = '<option selected="" disabled="" value="0">Seleccione el Fondo</option>';
                     $.each( response.Data.Fondo_product, function( i, val ) 
                     {
                         options_val += '<option value="'+val.id+',' + val.tipo+'">'+ val.descripcion +' S/.'+ val.saldo_disponible +'</option>';
                     });
-                    $("#list-product2").append('<li class="list-group-item"><div class="input-group input-group-sm"><span class="input-group-addon" style="width:15%;">'+
-                    $("#selectfamilyadd option:selected").text() + '</span><select name="fondo_producto[]" class="selectpicker form-control">' +
+                    
+                    $( "#list-product2" ).append( '<li class="list-group-item"><div class="input-group input-group-sm"><span class="input-group-addon" style="width:15%;">'+
+                    $( "#selectfamilyadd option:selected" ).text() + '</span><select name="fondo_producto[]" class="selectpicker form-control">' +
                     options_val +'</select><span class="input-group-addon">' + $( '#type-money' ).html().trim() + '</span>'+
                     '<input name="monto_producto[]" type="text" class="form-control text-right amount_families2" value="0" style="padding:0px;text-align:center">'+
                     '<span class="input-group-btn"><button type="button" class="btn btn-default btn-remove-family"><span class="glyphicon glyphicon-remove"></span></button></span></div>'+
-                    '<input type="hidden" name="producto[]" class="producto_value" value="'+family_id+'"></li>');
+                    '<input type="hidden" name="producto[]" class="producto_value" value="'+family_id+'"></li>' );
 
 
                     $( ".btn-remove-family" ).bind( "click", function() {
@@ -2083,15 +2084,21 @@ $( '#btn-add-family-fondo' ).on( 'click' ,function ()
                     $('#approval-product-modal').modal('toggle');
                 }
                 else
+                {
                      bootbox.alert( '<h4 class="red">' + response.Data.Description + '</h4>');
+                }
             }
             else
             {
                 bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
             }
         });
+    }
     else
+    {
+         spin.stop();
          bootbox.alert( '<h4 class="red">El producto ya se encuentra en la lista</h4>');
+    }
 });
 
 

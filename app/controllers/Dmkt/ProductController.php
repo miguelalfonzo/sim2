@@ -33,6 +33,7 @@ class ProductController extends BaseController
 		$solProduct->id_solicitud = $inputs[ 'id_solicitud' ];
 		$solProduct->id_producto  = $inputs[ 'id_producto' ];
 		$solProduct->save();
+        return $solProduct->id;
     }
 
     public function unsetSolicitudProducts( $solicitudId , $productsId )
@@ -63,8 +64,7 @@ class ProductController extends BaseController
             $data = array(
                 'id_solicitud' => $solicitudId ,
                 'id_producto'  => $productId );
-            $this->newSolicitudProduct( $data );
-            $solicitudProductsId[] = SolicitudProduct::where( 'id_solicitud' , $solicitudId )->where( 'id_producto' , $productId )->first()->id;
+            $solicitudProductsId[] = $this->newSolicitudProduct( $data );
         }
         return $this->setRpta( $solicitudProductsId );
     } 

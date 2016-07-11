@@ -50,7 +50,7 @@ return array(
 
 		'oracle_dev' => array(
 			'driver' => 'oracle',
-			'host' => '192.168.1.4',
+			'host' => '10.51.1.4',
 			'port' => '1521',
 			'database' => 'BDBAGO',
 			'username' => 'simp',

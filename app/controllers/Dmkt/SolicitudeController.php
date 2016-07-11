@@ -823,15 +823,15 @@ class SolicitudeController extends BaseController
         $messages = array();
         if ( Auth::user()->type === SUP )
         {
-            $messages[ 'fondo_producto.required_if' ] = 'El campo :attribute es obligatorio. Si va a realizar una validacion seleccione el boton Derivar.' ;
+            $messages[ 'fondo_producto.required' ] = 'El campo :attribute es obligatorio. Si va a realizar una validacion seleccione el boton Derivar.' ;
         }
         else
         {
-            $messages[ 'fondo_producto.required_if' ] = 'El campo :attribute es obligatorio.' ;
+            $messages[ 'fondo_producto.required' ] = 'El campo :attribute es obligatorio.' ;
             
         }
 
-        if ( in_array( Auth::user()->type , array( GER_COM , GER_GER ) ) )
+        if ( in_array( Auth::user()->type , array( SUP , GER_PROD , GER_PROM , GER_COM , GER_GER ) ) )
         {
             $rules[ 'pago' ] = 'required|integer|min:1|exists:'.TB_TIPO_PAGO.',id';    
         }
@@ -873,9 +873,21 @@ class SolicitudeController extends BaseController
         });
      
         if ( $validator->fails() )
+        {
             return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
         else
+        {
+            if( $inputs[ 'derivacion' ] != 1 )
+            {
+                if( array_unique( $inputs[ 'producto' ] ) != $inputs[ 'producto' ] )
+                {
+                    return $this->warningException( 'Ha ingresado al menos una familia repetida' , __FUNCTION__ , __LINE__ , __FILE__ );
+                }
+            }
             return $this->setRpta();
+            
+        }    
     }
 
     private function acceptedSolicitudTransaction( $idSolicitud , $inputs )

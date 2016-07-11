@@ -41,4 +41,9 @@ class InvestmentActivity extends Eloquent
     {
     	return $this->hasOne( 'Dmkt\InvestmentType' , 'id' , 'id_inversion' );
     }
+
+    protected function getActivitiesInvestments( $activities )
+    {
+        return InvestmentActivity::distinct()->select( 'id_inversion' )->whereIn( 'id_actividad' , $activities )->get();
+    }
 }
