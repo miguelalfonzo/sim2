@@ -42,12 +42,18 @@ class LoginController extends BaseController{
             'password' 	=> Input::get('password'),
             'active'    => 1
         );
+
         if ( Auth::attempt( $userdata ) )
         {
-            if ( is_null( Auth::user()->simApp ) )
+            if( ! in_array( Auth::user()->type , [ REP_MED , SUP , GER_PROD , GER_PROM , GER_COM , GER_GER , CONT , TESORERIA , ASIS_GER , 'A' ] ) )
             {
                 Auth::logout();
-                return View::make( 'Dmkt.login' )->with( array( 'message' => 'Usuario no autorizado' ) );
+                return View::make( 'Dmkt.login' )->with( array( 'message' => 'Rol no autorizado' ) );
+            }
+            else if ( is_null( Auth::user()->simApp ) )
+            {
+                Auth::logout();
+                return View::make( 'Dmkt.login' )->with( array( 'message' => 'Usuario no autorizado para el SIM' ) );
             }
             else
             {
