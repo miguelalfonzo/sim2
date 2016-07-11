@@ -18,6 +18,9 @@ use \Fondo\FondoMkt;
 use \User;
 use \Devolution\DevolutionController;
 use \Carbon\Carbon;
+use \Excel;
+use \File;
+use \Response;
 
 class DepositController extends BaseController
 {
@@ -28,18 +31,6 @@ class DepositController extends BaseController
         foreach ( $object as $member => $data )
             $array[$member] = $data;
         return $array;
-    }
-
-    private function validateInpustDeposit( $inputs )
-    {
-        $rules = array( 'token'       => 'required|exists:solicitud,token,id_estado,' . DEPOSITO_HABILITADO ,
-                        'num_cuenta'  => 'required|numeric|exists:'.TB_PLAN_CUENTA.',ctactaextern',
-                        'op_number'   => 'required|string|min:1' );
-        $validator = Validator::make( $inputs , $rules );
-        if ( $validator->fails() ) 
-            return $this->warningException( substr( $this->msgValidator( $validator ), 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
-        else
-            return $this->setRpta();
     }
 
     private function verifyMoneyType( $solIdMoneda , $bankIdMoneda , $monto , $tc , $jDetalle )
@@ -66,69 +57,148 @@ class DepositController extends BaseController
         return $this->verifyMoneyType( $detalle->id_moneda , $bank->idtipomoneda , $jDetalle->monto_aprobado , $tc , $jDetalle );
     }
 
-    // IDKC: CHANGE STATUS => DEPOSITADO
-    public function depositSolicitudeTes()
+    private function validateInputsDeposit( $inputs )
+    {
+        $rules = array( 
+                'token'     => 'required|exists:solicitud,token,id_estado,' . DEPOSITO_HABILITADO ,
+                'cuenta'    => 'required|numeric|exists:'.TB_PLAN_CUENTA.',ctactaextern',
+                'operacion' => 'required|string|min:1' 
+            );
+        $messages = array(
+                'token.exists' => 'La solicitud no se encuentra en la etapa de deposito'
+            );
+        $validator = Validator::make( $inputs , $rules , $messages );
+        if ( $validator->fails() )
+        {
+            return $this->warningException( substr( $this->msgValidator( $validator ), 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
+        return $this->setRpta();
+    }
+
+    public function massiveSolicitudDeposit()
     {
         try
         {
-            DB::beginTransaction();
-            $inputs      = Input::all();
-            $middleRpta  = $this->validateInpustDeposit( $inputs );
-            if ( $middleRpta[status] == ok )
+            $inputs = Input::all();
+            $responses = [];
+            foreach( $inputs[ 'data' ] as $data )
             {
-                $solicitud   = Solicitud::where( 'token' , $inputs['token'] )->first();
-                
-                $oldIdestado  = $solicitud->id_estado;
-                $detalle      = $solicitud->detalle;
-                $tc           = ChangeRate::getTc();
-                
-                if ( ! is_null( $detalle->id_deposito )  )
-                    return $this->warningException( 'Cancelado - El deposito ya ha sido registrado' , __FUNCTION__ , __LINE__ , __FILE__ );
-            
-                $bagoAccount = PlanCta::find( $inputs['num_cuenta'] );
-                if ( $bagoAccount->account->idtipocuenta != BANCO )
-                    return $this->warningException( 'Cancelado - La cuenta N°: '.$inputs['num_cuenta'].' no ha sido registrada en el Sistema como Cuenta de Banco' , __FUNCTION__ , __LINE__ , __FILE__ );
-                        
-                $middleRpta = $this->getBankAmount( $detalle , $bagoAccount->account , $tc );
-                if ( $middleRpta[status] == ok )
-                {    
-                    $newDeposit                     = new Deposit;
-                    $newDeposit->id                 = $newDeposit->lastId() + 1;
-                    $newDeposit->num_transferencia  = $inputs['op_number'];
-                    $newDeposit->num_cuenta         = $inputs['num_cuenta'];
-                    $newDeposit->total              = $middleRpta[data]['monto'];
-                    $newDeposit->save();
-
-                    $detalle->id_deposito = $newDeposit->id;
-                    $detalle->detalle     = json_encode( $middleRpta[data]['jDetalle'] );
-                    $detalle->save();
-
-                    $solicitud->id_estado = DEPOSITADO;
-                    $solicitud->save();
-
-                    $middleRpta = $this->discountFondoBalance( $solicitud );
-                    
-                    if ( $middleRpta[ status ] == ok )
-                    {
-                        $middleRpta = $this->setStatus( $oldIdestado, DEPOSITADO , Auth::user()->id , USER_CONTABILIDAD , $solicitud->id );
-                        
-                        if ( $middleRpta[status] == ok )
-                        {
-                            Session::put( 'state' , R_REVISADO );
-                            DB::commit();
-                            return $middleRpta;
-                        }
-                    }
+                $inputs = 
+                    [
+                        'token'     => $data[ 'token' ],
+                        'cuenta'    => $inputs[ 'cuenta' ],
+                        'operacion' => $data[ 'operacion' ]
+                    ];
+                $middleRpta  = $this->validateInputsDeposit( $inputs );
+                if( $middleRpta[ status ] === ok )
+                {
+                    $middleRpta = $this->depositOperation( $data[ 'token' ] , $data[ 'operacion' ] , $inputs[ 'cuenta' ] );
                 }
+                $middleRpta[ description ]  = trim( $middleRpta[ description ] , '<br>' );
+                $middleRpta[ 'operacion' ]  = $data[ 'operacion' ];
+                $responses[ $data[ 'id' ] ] = $middleRpta;
             }
-            DB::rollback();
-            return $middleRpta;
+            Session::put( 'depositos' , $responses );
+            $status = array_unique( array_pluck( $responses , status ) );
+            if( count( $status ) === 1 && $status[ 0 ] === ok )
+            {
+                return $this->setRpta( $responses , 'Registro realizado correctamente' );
+            }
+            elseif( in_array( ok , $status , 1 ) )
+            {
+                return $this->setRpta( $responses , 'Registro realizado parcialmente' );
+            }
+            else
+            {
+                $rpta = $this->warningException( 'No se pudo realizar el registro. Existen las siguientes observaciones' , __FUNCTION__ , __LINE__ , __FILE__ );
+                $rpta[ data ] = $responses;
+                return $rpta;
+            }
         }
-        catch( Exception $e ) 
+        catch( Exception $e )
         {
-            DB::rollback();
             return $this->internalException( $e , __FUNCTION__ );
         }
+    }
+
+    public function solicitudDeposit()
+    {
+        try
+        {
+            $inputs      = Input::all();
+            $middleRpta  = $this->validateInputsDeposit( $inputs );
+            if( $middleRpta[ status ] === ok )
+            {
+                return $this->depositOperation( $inputs[ 'token' ] , $inputs[ 'operacion' ] , $inputs[ 'cuenta' ] );
+            }
+            return $middleRpta;
+        }
+        catch( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
+    }
+
+    public function depositOperation( $solicitudToken , $operationCode , $bankAccount )
+    {    
+        try
+        {
+            $modelAccount    = PlanCta::find( $bankAccount );
+            $modelSIMAccount = $modelAccount->account;
+            
+            if ( $modelSIMAccount->idtipocuenta != BANCO )
+            {
+                return $this->warningException( 'Cancelado - La cuenta N°: ' . $bankAccount . ' no ha sido registrada en el Sistema como Cuenta de Banco' , __FUNCTION__ , __LINE__ , __FILE__ );
+            }
+
+            return $this->depositTransaction( $solicitudToken , $modelSIMAccount , $operationCode );
+        }
+        catch( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
+    }
+
+    private function depositTransaction( $solicitudToken , $modelSIMAccount , $operationCode )
+    {
+        DB::beginTransaction();
+        $solicitud  = Solicitud::findByToken( $solicitudToken );
+        $detalle    = $solicitud->detalle;
+        $tc         = ChangeRate::getTc();
+        $middleRpta = $this->getBankAmount( $detalle , $modelSIMAccount , $tc );
+        if ( $middleRpta[ status ] === ok )
+        {    
+            $newDeposit                     = new Deposit;
+            $newDeposit->id                 = $newDeposit->lastId() + 1;
+            $newDeposit->num_transferencia  = $operationCode;
+            $newDeposit->num_cuenta         = $modelSIMAccount->num_cuenta;
+            $newDeposit->total              = $middleRpta[data]['monto'];
+            $newDeposit->save();
+
+            $detalle->id_deposito = $newDeposit->id;
+            $detalle->detalle     = json_encode( $middleRpta[ data ][ 'jDetalle' ] );
+            $detalle->save();
+
+            $oldIdestado          = $solicitud->id_estado;
+            $solicitud->id_estado = DEPOSITADO;
+            $solicitud->save();
+
+            $middleRpta = $this->discountFondoBalance( $solicitud );
+            
+            if ( $middleRpta[ status ] == ok )
+            {
+                $middleRpta = $this->setStatus( $oldIdestado, DEPOSITADO , Auth::user()->id , USER_CONTABILIDAD , $solicitud->id );
+                
+                if ( $middleRpta[status] == ok )
+                {
+                    Session::put( 'state' , R_REVISADO );
+                    DB::commit();
+                    return $middleRpta;
+                }
+            }
+        }
+        DB::rollback();
+        return $middleRpta;
     }
 
     private function discountFondoBalance( $solicitud )
@@ -184,7 +254,7 @@ class DepositController extends BaseController
 
             if ( $fondo->saldo < 0 )
                 return $this->warningException( 'El Fondo ' . $fondo->full_name . ' solo cuenta con S/.' . ( $fondo->saldo + $fondoMonto ) . 
-                                                $msg . $fondoMonto . ' en total' , __FUNCTION__ , __FILE__ , __LINE__ );
+                                                $msg . $fondoMonto . ' en total' , __FUNCTION__ , __LINE__ , __FILE__ );
             $data = array(
                 'idFondo'      => $fondo->id , 
                 'idFondoTipo'  => INVERSION_INSTITUCIONAL ,
@@ -206,7 +276,7 @@ class DepositController extends BaseController
         $inputs = Input::all();
         $solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
         if ( is_null ( $solicitud ) )
-            return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ , __FILE__ , __LINE__ );
+            return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
         else
             return $this->setRpta( array( 'View' => View::make( 'template.Modals.extorno' , array( 'solicitud' => $solicitud ) )->render() ) );
     }
@@ -223,9 +293,9 @@ class DepositController extends BaseController
         $solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
         
         if ( is_null( $solicitud ) )
-            return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ , __FILE__ , __LINE__ );
+            return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ ,  __LINE__ , __FILE__ );
         elseif( $solicitud->id_estado != DEPOSITADO )
-            return $this->warningException( 'La solicitud ya ha sido validada por contabilidad' , __FUNCTION__ , __FILE__ , __LINE__ );
+            return $this->warningException( 'La solicitud ya ha sido validada por contabilidad' , __FUNCTION__ , __LINE__ , __FILE__ );
         else
         {
             $deposito = $solicitud->detalle->deposit;
@@ -240,7 +310,7 @@ class DepositController extends BaseController
         $inputs = Input::all();
         $solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
         if ( is_null ( $solicitud ) )
-            return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ , __FILE__ , __LINE__ );
+            return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
         else
             return $this->setRpta( array( 'View' => View::make( 'template.Modals.liquidation' , array( 'solicitud' => $solicitud ) )->render() ) );
     }
@@ -255,11 +325,11 @@ class DepositController extends BaseController
 
             if ( is_null( $solicitud ) )
             {
-                return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ , __FILE__ , __LINE__ );
+                return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
             }
             elseif( ! in_array( $solicitud->id_estado, [DEPOSITADO, GASTO_HABILITADO] ) ) 
             {
-                return $this->warningException( 'No se puede Cancelar por Liquidacion' , __FUNCTION__ , __FILE__ , __LINE__ );
+                return $this->warningException( 'No se puede Cancelar por Liquidacion' , __FUNCTION__ , __LINE__ , __FILE__ );
             }
             else
             {
@@ -305,6 +375,58 @@ class DepositController extends BaseController
         {
             DB::rollback();
             return $this->internalException($e,__FUNCTION__);
+        }
+    }
+
+    public function depositExport()
+    {
+        try
+        {
+            $now  = Carbon::now();
+            $date = $now->toDateString();
+            $title = 'Detalle del Deposito-';
+            $directoryPath  = 'files/depositos';
+            $filePath = $directoryPath . '/' . $title . $date . '.xls';
+            
+            $data = [];
+            if( File::exists( public_path( $filePath ) ) )
+            {
+                $oldResponses = Excel::load( public_path( $filePath ) )->get();
+                $data[ 'oldResponses' ] = $oldResponses;
+            }
+
+            if( Session::has( 'depositos' ) )
+            {
+                $responses = Session::pull( 'depositos' );
+                $data[ 'responses' ] = $responses;
+            }
+
+            if( ! isset( $oldResponses ) && ! isset( $responses ) )
+            {
+                return $this->warningException( 'No se pudo exportar el excel con las observaciones del deposito' , __FUNCTION__ , __LINE__ , __FILE__ );
+            }
+            
+            Excel::create( $title . $date , function( $excel ) use( $data )
+            {
+                $excel->sheet( 'solicitudes' , function( $sheet ) use( $data )
+                {
+                    $sheet->freezeFirstRow();
+                    $sheet->setStyle( 
+                        array(
+                            'font' => 
+                                array(
+                                    'bold' => true
+                                )
+                            )
+                        );
+                    $sheet->loadView( 'Dmkt.Treasury.excelDepositDetail' , $data );
+                });
+            })->store( 'xls' , public_path( $directoryPath ) );
+            return Response::download( $filePath );
+        }
+        catch( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
         }
     }
 }

@@ -84,6 +84,14 @@
                                     </a>
                                 </li>
                                 <li role="separator" class="divider"></li>
+                            @elseif( Auth::user()->type === TESORERIA )
+                                <li>
+                                    <a data-toggle="modal" data-target="#massive-deposit-modal">
+                                        <span class="glyphicon glyphicon-usd" aria-hidden="true" ></span>
+                                        <span class="glyphicon-class">Deposito Masivo</span>
+                                    </a>
+                                </li>
+                                <li role="separator" class="divider"></li>
                             @endif
                             <li><a href="{{ URL::to('show_user') }}">Listado de Solicitudes</a></li>
                             @if ( Auth::user()->type == ASIS_GER )
@@ -126,7 +134,8 @@
                                 <li><a href="{{ URL::to('maintenance/view/Fondo_Gerente_Producto') }}">Mantenimiento de Fondos de G. Producto / G. Promocion</a></li>
                                 <li><a href="{{ URL::to('maintenance/view/Fondo_Institucion') }}">Mantenimiento de Fondos Institucionales</a></li>
                             @elseif ( in_array(Auth::user()->type, array(CONT)) )
-                                <li><a href="{{ URL::to('export/solicitudToDeposit') }}">Exportar Solicitudes a Depositar</a></li>
+                                <li><a href="{{ URL::to('export/solicitudToDeposit-pdf') }}">Exportar Solicitudes a Depositar - PDF</a></li>
+                                <li><a href="{{ URL::to('export/solicitudToDeposit-excel') }}">Exportar Solicitudes a Depositar - Excel</a></li>
                                 <li><a href="{{ URL::to('maintenance/finddocument') }}">Busqueda de Documentos Registrados</a></li>
                                 <li><a href="{{ URL::to('maintenance/documenttype') }}">Mantenimiento de Tipo de Documentos</a></li>
                                 <li><a href="{{ URL::to('maintenance/view/Fondo_Contable' ) }}">Mantenimiento de Fondo de Contabilidad</a></li>

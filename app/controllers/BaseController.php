@@ -136,7 +136,7 @@ class BaseController extends Controller
         {
             if( strpos( $exception->getMessage() , 'ORA-00001' ) )
             {
-                return array( status => error , description => $type . ':  No puede repetir la informacion de la tabla' );
+                return array( status => error , description => $type . ':  La informacion ingresada ya existe y no puede repetir la informacion de la tabla' );
             }
         }
         return array( status => error , description => $type . ': ' . $exception->getMessage() );

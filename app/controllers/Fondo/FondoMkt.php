@@ -125,7 +125,7 @@ class FondoMkt extends BaseController
                 if ( $fondo->{ 'saldo' . $tipo } < 0 )
                 {
                     return $this->warningException( 'El Fondo ' . $fondo->full_name . ' solo cuenta con S/.' . ( $fondo->{ 'saldo' . $tipo } + $fondoMonto ) . 
-                                                    $msg . $fondoMonto . ' en total' , __FUNCTION__ , __FILE__ , __LINE__ );
+                                                    $msg . $fondoMonto . ' en total' , __FUNCTION__ , __LINE__ , __FILE__ );
                 }
             }
         }
@@ -141,7 +141,7 @@ class FondoMkt extends BaseController
                     if( $fondoSup->{ 'saldo' . $tipo } < 0 )
                     {
                         return $this->warningException( 'El Fondo ' . $fondoSubCategory->descripcion . ' solo cuenta con S/.' . ( $fondoSup->{ 'saldo' . $tipo } + $amount ) . 
-                                                    $msg . $amount . ' en total' , __FUNCTION__ , __FILE__ , __LINE__ );
+                                                    $msg . $amount . ' en total' , __FUNCTION__ , __LINE__ , __FILE__ );
                     }
                 } 
             }
