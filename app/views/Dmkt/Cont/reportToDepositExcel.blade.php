@@ -50,7 +50,7 @@
                                 RUC: {{ $solicitud->detalle->num_ruc }}         
                             @endif
                         </td>
-                        <td>{{ $solicitud->detalle->typeMoney->simbolo . ' ' . $solicitud->detalle->monto_actual }}</td>
+                        <td>{{ $solicitud->detalle->currency_money }}</td>
                     </tr>    
                 @endforeach
             </tbody>
