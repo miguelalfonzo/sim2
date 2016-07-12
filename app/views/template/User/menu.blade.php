@@ -1,6 +1,6 @@
 <div class="row">   
     {{Form::token()}}
-    <div class="form-group col-xs-8 col-sm-4 col-md-2 col-lg-2">
+    <div class="form-group col-xs-12 col-sm-3 col-md-2 col-lg-2">
         <select id="idState" name="idstate" class="form-control selectestatesolicitude">
             @foreach( $states as $estado )
                 @if ( Auth::user()->type == TESORERIA )
@@ -29,17 +29,23 @@
             @endforeach
         </select>
     </div>
-    @if ( in_array( Auth::user()->type , array( GER_COM , CONT ) ) )
-        <div class="form-group col-sm-3 col-md-3" style="text-align:left">
+    @if ( in_array( Auth::user()->type , array( GER_COM , CONT , TESORERIA ) ) )
+        <div class="form-group col-xs-12 col-sm-3 col-md-2 col-lg-2" style="text-align:left">
             <div>
-                <a id="btn-mass-approve" class="btn btn-primary">
-                    Aprobación
-                </a>
+                @if( Auth::user()->type == TESORERIA )
+                    <a class="btn btn-primary" data-toggle="modal" data-target="#massive-deposit-modal">
+                        Deposito Masivo
+                    </a>
+                @else
+                    <a id="btn-mass-approve" class="btn btn-primary">
+                        Aprobación
+                    </a>
+                @endif
             </div>
         </div>
     @endif
     @if ( Auth::user()->type == TESORERIA )
-        <div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-6 pull-left">
+        <div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6 pull-left">
             <h4 style="margin:0px">
                 Tasa de Cambio
                 <span class="label label-info">

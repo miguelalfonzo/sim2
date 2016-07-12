@@ -84,14 +84,6 @@
                                     </a>
                                 </li>
                                 <li role="separator" class="divider"></li>
-                            @elseif( Auth::user()->type === TESORERIA )
-                                <li>
-                                    <a data-toggle="modal" data-target="#massive-deposit-modal">
-                                        <span class="glyphicon glyphicon-usd" aria-hidden="true" ></span>
-                                        <span class="glyphicon-class">Deposito Masivo</span>
-                                    </a>
-                                </li>
-                                <li role="separator" class="divider"></li>
                             @endif
                             <li><a href="{{ URL::to('show_user') }}">Listado de Solicitudes</a></li>
                             @if ( Auth::user()->type == ASIS_GER )
