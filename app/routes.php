@@ -85,6 +85,7 @@
     
     Route::group( array( 'before' => 'cont' ), function () 
     {
+        Route::get( 'solicitudsToDeposit' , 'Dmkt\SolicitudeController@solicitudsToDeposit' );
         Route::post('revisar-solicitud', 'Dmkt\SolicitudeController@checkSolicitud');
         Route::get('revisar-asiento-solicitud/{token}', 'Dmkt\SolicitudeController@viewSeatSolicitude');
         Route::get('generar-asiento-solicitud/{token}', 'Dmkt\SolicitudeController@viewGenerateSeatSolicitude');

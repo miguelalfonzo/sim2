@@ -106,6 +106,9 @@
                                         </a>
                                     </li>
                                 <li class="divider"></li>
+                                @if( Auth::user()->type == CONT )
+                                    <li><a href="{{ URL::to('solicitudsToDeposit') }}">Solicitudes a Depositar</a></li>
+                                @endif
                             </ul>
                         </li>
                     @endif
@@ -126,8 +129,6 @@
                                 <li><a href="{{ URL::to('maintenance/view/Fondo_Gerente_Producto') }}">Mantenimiento de Fondos de G. Producto / G. Promocion</a></li>
                                 <li><a href="{{ URL::to('maintenance/view/Fondo_Institucion') }}">Mantenimiento de Fondos Institucionales</a></li>
                             @elseif ( in_array(Auth::user()->type, array(CONT)) )
-                                <li><a href="{{ URL::to('export/solicitudToDeposit-pdf') }}">Exportar Solicitudes a Depositar - PDF</a></li>
-                                <li><a href="{{ URL::to('export/solicitudToDeposit-excel') }}">Exportar Solicitudes a Depositar - Excel</a></li>
                                 <li><a href="{{ URL::to('maintenance/finddocument') }}">Busqueda de Documentos Registrados</a></li>
                                 <li><a href="{{ URL::to('maintenance/documenttype') }}">Mantenimiento de Tipo de Documentos</a></li>
                                 <li><a href="{{ URL::to('maintenance/view/Fondo_Contable' ) }}">Mantenimiento de Fondo de Contabilidad</a></li>
