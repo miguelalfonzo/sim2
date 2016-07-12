@@ -2053,4 +2053,17 @@ class SolicitudeController extends BaseController
             return $this->internalException( $e , __FUNCTION__ );
         }
     }
+
+    public function solicitudsToDeposit()
+    {
+        try
+        {
+            $data = array( 'solicituds' => Solicitud::getDepositSolicituds() );
+            return View::make( 'Dmkt.Cont.SolicitudsToDeposit.show' , $data );
+        }
+        catch( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
+    }
 }

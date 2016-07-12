@@ -17,7 +17,7 @@ class ExportController extends BaseController
 		try
 		{
 			$data = array( 'solicituds' => Solicitud::getDepositSolicituds() );
-			$view = View::make( 'Dmkt.Cont.reportToDeposit' , $data )->render();
+			$view = View::make( 'Dmkt.Cont.SolicitudsToDeposit.pdf' , $data )->render();
 			return PDF::load( $view , 'A4' , 'landscape' )->show();
 		}
 		catch( Exception $e )
@@ -36,7 +36,7 @@ class ExportController extends BaseController
 			{
 				$excel->sheet( 'solicitudes' , function( $sheet ) use( $data )
 				{
-					$sheet->loadView( 'Dmkt.Cont.reportToDepositExcel' , $data );
+					$sheet->loadView( 'Dmkt.Cont.SolicitudsToDeposit.excel' , $data );
 				});
 			})->download( 'xls' );
 		}

@@ -30,22 +30,20 @@
         </select>
     </div>
     @if ( in_array( Auth::user()->type , array( GER_COM , CONT , TESORERIA ) ) )
-        <div class="form-group col-xs-12 col-sm-3 col-md-2 col-lg-2" style="text-align:left">
-            <div>
-                @if( Auth::user()->type == TESORERIA )
-                    <a class="btn btn-primary" data-toggle="modal" data-target="#massive-deposit-modal">
-                        Deposito Masivo
-                    </a>
-                @else
-                    <a id="btn-mass-approve" class="btn btn-primary">
-                        Aprobación
-                    </a>
-                @endif
-            </div>
+        <div class="form-group col-xs-12 col-sm-3 col-md-2 col-lg-2">
+            @if( Auth::user()->type == TESORERIA )
+                <a class="btn btn-primary" data-toggle="modal" data-target="#massive-deposit-modal">
+                    Deposito Masivo
+                </a>
+            @else
+                <a id="btn-mass-approve" class="btn btn-primary">
+                    Aprobación
+                </a>
+            @endif
         </div>
     @endif
-    @if ( Auth::user()->type == TESORERIA )
-        <div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6 pull-left">
+    @if( Auth::user()->type == TESORERIA )
+        <div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
             <h4 style="margin:0px">
                 Tasa de Cambio
                 <span class="label label-info">
