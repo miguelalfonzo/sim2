@@ -383,7 +383,7 @@ class ExpenseController extends BaseController
 			elseif ( $balanceSoles <= $payrollAmount && $balanceSoles >= 0  )
 				$toUser = USER_CONTABILIDAD;
 			else
-				return $this->warningException( 'No se puede registrar los gastos si exceden al monto depositado' , __FUNCTION__ , __FILE__ , __LINE__ );
+				return $this->warningException( 'No se puede registrar los gastos si exceden al monto depositado' , __FUNCTION__ , __LINE__ , __FILE__ );
 		}
 		elseif( $solicitud->idtiposolicitud == SOL_INST )
 		{
@@ -429,7 +429,7 @@ class ExpenseController extends BaseController
 			}			
 			else
 			{
-				return $this->warningException( 'No se puede registrar los gastos si exceden al monto depositado' , __FUNCTION__ , __FILE__ , __LINE__ );
+				return $this->warningException( 'No se puede registrar los gastos si exceden al monto depositado' , __FUNCTION__ , __LINE__ , __FILE__ );
 			}
 		}
 		elseif( $solicitud->idtiposolicitud == REEMBOLSO )

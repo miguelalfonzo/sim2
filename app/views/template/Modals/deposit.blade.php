@@ -44,7 +44,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <a id="" href="#" class="btn btn-success register-deposit" style="margin-right: 1em;">Confirmar Operación</a>
+                <button type="button" class="btn btn-success register-deposit" style="margin-right: 1em;">Confirmar Operación</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
             </div>
         </div>
