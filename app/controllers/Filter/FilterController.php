@@ -16,7 +16,8 @@ class FilterController
 	    {
 	        if ( Request::ajax() )
 	        { 
-	            return App::make('BaseController')->callAction( 'warningException' , array( 'Vuelva a acceder al sistema ( La sesion expiro )' , __FUNCTION__ , __LINE__ , __FILE__ ) );
+	            $warning = App::make('BaseController')->callAction( 'warningException' , array( 'Vuelva a acceder al sistema ( La sesion expiro )' , __FUNCTION__ , __LINE__ , __FILE__ ) );
+	        	$warning[ status ] = 'Logout';
 	        }
 	        else
 	        {

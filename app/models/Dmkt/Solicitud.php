@@ -232,9 +232,35 @@ class Solicitud extends Eloquent
             ->orderBy( 'id' , 'ASC' )->get();
     }
 
+    protected function getRevisionSolicituds()
+    {
+        return Solicitud::select( [ 'id' , 'token' ] )
+            ->where( 'id_estado' , APROBADO )
+            ->orderBy( 'id' , 'ASC' )->get();
+    }
+
+    protected function getDepositSeatSolicituds()
+    {
+        return Solicitud::select( [ 'id' , 'token' ] )
+            ->where( 'id_estado' , DEPOSITADO )
+            ->orderBy( 'id' , 'ASC' )->get();
+    }
+
+    protected function getRegularizationSeatSolicituds()
+    {
+        return Solicitud::select( [ 'id' , 'token' ] )
+            ->where( 'id_estado' , REGISTRADO )
+            ->orderBy( 'id' , 'ASC' )->get();
+    }
+
     protected static function findByToken( $token )
     {
         return Solicitud::where( 'token' , $token )->first();
+    }
+
+    protected static function findByTokens( $tokens )
+    {
+        return Solicitud::whereIn( 'token' , $tokens )->get();
     }
 
 }

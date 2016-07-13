@@ -54,7 +54,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-        	    <button type="button" id="register-deposit-massive" class="btn btn-success ladda-button" data-style="zoom-in">Confirmar</a>
+        	    <button type="button" id="register-deposit-massive" class="btn btn-success ladda-button" data-style="zoom-in">Confirmar</button>
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
@@ -201,7 +201,7 @@
         }
     });
 
-    $( document ).off( 'keypress' , '.deposit-solicitud-cell' );
+    /*$( document ).off( 'keypress' , '.deposit-solicitud-cell' );
     $( document ).on( 'keypress' , '.deposit-solicitud-cell' , function( event )
     {
         var cell = $( this );
@@ -215,17 +215,17 @@
            var input =  tableBody.find( 'tr' ).eq( rowIndex - 1 ).find( 'td' ).eq( columIndex ).find( 'input' );
            input.focus();
         }
-        /*else if( e.keyCode === 39 )
+        else if( e.keyCode === 39 )
         {
            var input =  tableBody.find( 'tr' ).eq( rowIndex ).find( 'td' ).eq( columIndex + 1 ).find( 'input' );
            input.focus();
-        }*/
+        }
         else if( e.keyCode === 40 )
         {
            var input =  tableBody.find( 'tr' ).eq( rowIndex + 1 ).find( 'td' ).eq( columIndex ).find( 'input' );
            input.focus();
         }
-        /*else if( e.keyCode === 13 )
+        else if( e.keyCode === 13 )
         {
             var newTr = '<tr>' +
                         '<td class="deposit-solicitud-cell" ><input type="text" class="form-control"></td>' +
@@ -233,8 +233,8 @@
                     '</tr>';
             var tableBodyTr =  tableBody.find( 'tr' ).eq( rowIndex );
             tableBodyTr.after( newTr );
-        }*/
-    });
+        }
+    });*/
     $( document ).off( 'keypress' , '.deposit-operacion-cell' );
     $( document ).on( 'keypress' , '.deposit-operacion-cell' , function( event )
     {

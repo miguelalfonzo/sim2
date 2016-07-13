@@ -111,6 +111,11 @@
         Route::post( 'confirm-liquidation' , 'Deposit\DepositController@confirmLiquidation' );
         Route::get('maintenance/finddocument', 'Dmkt\SolicitudeController@findDocument');
         Route::get('maintenance/documenttype', 'Dmkt\FondoController@listDocuments');
+
+        Route::post( 'massive-solicitud-revision' , 'Dmkt\SolicitudeController@massiveSolicitudsRevision' );
+        Route::get( 'revision-export' , 'Dmkt\SolicitudeController@revisionExport');
+        Route::get( 'seat-export' , 'Dmkt\SolicitudeController@seatExport');
+        
     });
 
     /*
