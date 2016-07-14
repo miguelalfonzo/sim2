@@ -1871,7 +1871,7 @@ class SolicitudeController extends BaseController
             $intersectArrays = array_intersect( $validStates , $states );
             if( count( $intersectArrays ) == 0 )
             {
-                return $this->warningException( 'Las solicitudes seleccionadas no estan en una etapa para realizar la aprobacion masiva' , __FUNCTION__ , __LINE__ , __FILE__ );
+                return $this->warningException( 'Al menos una solicitud seleccionada no esta en la etapa para realizar la aprobacion masiva' , __FUNCTION__ , __LINE__ , __FILE__ );
             }
             elseif( count( $intersectArrays ) > 1 )
             {
@@ -1879,7 +1879,7 @@ class SolicitudeController extends BaseController
             }
             elseif( count( $intersectArrays ) == 1 )
             {
-                $uniqueState = $intersectArrays[ 0 ];
+                $uniqueState = array_pop( $intersectArrays );
                 if( $uniqueState == APROBADO )
                 {
                     $middleRpta = $this->massiveSolicitudsCheck( $inputs[ 'data' ] );
@@ -1888,21 +1888,24 @@ class SolicitudeController extends BaseController
                 }
                 elseif( $uniqueState == DEPOSITADO )
                 {
-                    $middleRpta = $this->massiveSolicitudsDepositSeat( $inputs[ 'data' ] );
-                    Session::put( 'asientos' , $middleRpta );
+                    $middleRpta = $this->massiveSolicitudsAdvanceSeat( $inputs[ 'data' ] );
+                    Session::put( 'asientos_anticipo' , $middleRpta );
                     $location = 'seat-export';
                 }
                 elseif( $uniqueState == REGISTRADO )
                 {
-                    $middleRpta = $this->massiveSolicitudsDepositSeat( $inputs[ 'data' ] );
-                    Session::put( 'asientos' , $middleRpta );
+                    $middleRpta = $this->massiveSolicitudsRegularizationSeat( $inputs[ 'data' ] );
+                    Session::put( 'asientos_regularizacion' , $middleRpta );
                     $location = 'seat-export';
                 }
                 else
                 {
                     return $this->warningException( 'No se pudo procesar el estado actual de las solicitudes. #' . $uniqueState , __FUNCTION__ , __LINE__ , __FILE__ );
                 }
+
                 $status = array_unique( array_pluck( $middleRpta , status ) );
+            
+                
                 if( count( $status ) === 1 && $status[ 0 ] === ok )
                 {
                     $rpta = $this->setRpta( $middleRpta , 'Registro realizado correctamente' );
@@ -1942,6 +1945,17 @@ class SolicitudeController extends BaseController
         return $responses;
     }
 
+    private function massiveSolicitudsAdvanceSeat( $solicituds )
+    {
+        $responses = [];
+        foreach ( $solicituds as $solicitud ) 
+        {
+            $middleRpta = $this->advanceEntryOperation( $solicitud[ 'token' ] );
+            $responses[ $solicitud[ 'id' ] ] = $middleRpta;
+        }
+        return $responses;
+    }
+
     public function checkSolicitud()
     {
         try
@@ -1976,10 +1990,10 @@ class SolicitudeController extends BaseController
             }
 
             $solicitud = Solicitud::findByToken( $solicitudToken );
-            if ( is_null( $solicitud ) )
+            /*if ( is_null( $solicitud ) )
             {
                 return $this->warningException( 'Cancelado - No se encontro los datos de la solicitud' , __FUNCTION__, __LINE__, __FILE__ );
-            }
+            }*/
 
             if ( $solicitud->id_estado != APROBADO )
             {
@@ -2078,26 +2092,34 @@ class SolicitudeController extends BaseController
     {
         try
         {
+
             $now  = Carbon::now();
             $date = $now->toDateString();
             $title = 'Detalle del Procesamiento de Solicitudes-';
-            $directoryPath  = 'files/asientos';
+
+            $directoryPath  = 'files/asientos/anticipo';
+
             $filePath = $directoryPath . '/' . $title . $date . '.xls';
-            
+
             $data = [];
-            if( File::exists( public_path( $filePath ) ) )
-            {
-                $oldResponses = Excel::load( public_path( $filePath ) )->get();
-                $data[ 'oldResponses' ] = $oldResponses;
-            }
 
             if( Session::has( 'asientos' ) )
             {
-                $responses = Session::pull( 'revisiones' );
-                $data[ 'responses' ] = $responses;
+                $data[ 'responses' ] = Session::get( 'asientos_anticipo' );
+            \Log::info( $data[ 'responses' ] );
             }
 
-            if( ! isset( $oldResponses ) && ! isset( $responses ) )
+            if( File::exists( public_path( $filePath ) ) )
+            {
+                $rows = Excel::selectSheetsByIndex( 0 )->load( public_path( $filePath ) )->getTotalRowsOfFile();
+                if( $rows >= 0 )
+                {
+                    $data[ 'oldResponses' ] = Excel::selectSheetsByIndex( 0 )->load( public_path( $filePath ) )->get();
+                }
+            }
+
+
+            if( ! isset( $data[ 'responses' ] ) && ! isset( $data[ 'oldResponses' ] ) )
             {
                 return $this->warningException( 'No se pudo exportar el excel con las observaciones de las solicitudes procesadas' , __FUNCTION__ , __LINE__ , __FILE__ );
             }
@@ -2133,10 +2155,9 @@ class SolicitudeController extends BaseController
             $middleRpta = array();
             $inputs = Input::all();
             $middleRpta = $this->validateInputAdvanceEntry( $inputs );
-            if ( $middleRpta[status] == ok ) 
+            if( $middleRpta[ status ] == ok ) 
             {
-                $solicitud = Solicitud::find( $inputs[ 'idsolicitud' ] );
-                $middleRpta = $this->solicitudDepositSeatTransaction( $solicitud );    
+                $middleRpta = $this->advanceEntryOperation( $inputs[ 'solicitud_token' ] );    
             }
             return $middleRpta;
         }
@@ -2147,7 +2168,14 @@ class SolicitudeController extends BaseController
         }
     }
 
-    private function solicitudDepositSeatTransaction( $solicitud , $seatsData )
+    private function advanceEntryOperation( $solicitud_token )
+    {
+        $solicitud = Solicitud::findByToken( $solicitud_token );
+        $entries = $this->generateDepositEntryData( $solicitud );
+        return $this->advanceEntryTransaction( $solicitud , $entries ); 
+    }
+
+    private function advanceEntryTransaction( $solicitud , array $entries )
     {
         DB::beginTransaction();
 
@@ -2167,48 +2195,27 @@ class SolicitudeController extends BaseController
         }
         $solicitud->save();
 
-        $seats = array();
         $seats[ $solicitud->id ][ TIPO_ASIENTO_ANTICIPO ] = array();
 
-        for ( $i = 0 ; $i < count( $inputs[ 'number_account' ] ) ; $i++ ) 
+        foreach( $entries as $entry ) 
         {
-            $tbEntry               = new Entry;
-            $tbEntry->id           = $tbEntry->lastId() + 1;
-            $tbEntry->num_cuenta   = $inputs[ 'number_account' ][ $i ];
-            $tbEntry->fec_origen   = Carbon::createFromFormat( 'd/m/Y' , $solicitud->detalle->deposit->updated_at );
-            $tbEntry->d_c          = $inputs[ 'dc' ][ $i ];
-            $tbEntry->importe      = $inputs[ 'total' ][ $i ];
-            $tbEntry->leyenda      = trim( $inputs[ 'leyenda' ][ $i ] );
-            $tbEntry->id_solicitud = $inputs[ 'idsolicitud' ];
-            $tbEntry->tipo_asiento = TIPO_ASIENTO_ANTICIPO;
-            $tbEntry->save();
+            $tbEntry = new Entry;
+            $tbEntry->insertAdvanceEntry( $entry , $solicitud->id );
             $seats[ $solicitud->id ][ TIPO_ASIENTO_ANTICIPO ][] = $tbEntry;
         }
 
-        if( $solicitud->idtiposolicitud == REEMBOLSO )
-        {
-            $toUser = Auth::user()->id;    
-        }
-        elseif( in_array( $solicitud->idtiposolicitud , array( SOL_REP , SOL_INST ) ) )
-        {
-            $toUser = $solicitud->id_user_assign;
-        }
-
+        $toUser = $solicitud->id_user_assign;
+        
         $middleRpta = $this->setStatus( $oldIdEstado , $solicitud->id_estado , Auth::user()->id , $toUser , $solicitud->id );
-        if ( $middleRpta[ status ] === ok ) 
+        
+        if( $middleRpta[ status ] === ok ) 
         {
-            if( $solicitud->idtiposolicitud == REEMBOLSO )
-            {
-                Session::put( 'state' , R_FINALIZADO );
-            }
-            elseif( in_array( $solicitud->idtiposolicitud , array( SOL_REP , SOL_INST ) ) )
-            {
-                Session::put( 'state' , R_GASTO );
-            }
             $this->generateBagoSeat( $seats );
+            $middleRpta[ 'asiento' ] = substr( Entry::where( 'tipo_asiento' , TIPO_ASIENTO_ANTICIPO )->where( 'id_solicitud' , $solicitud->id )->first()->penclave , 0 , 5 );
+            Session::put( 'state' , R_REVISADO );
             DB::commit();
         }
-            return $middleRpta;
+        return $middleRpta;
         
         DB::rollback();
     }

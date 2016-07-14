@@ -114,7 +114,11 @@
                         ajaxError( statusCode , errorThrow );
                     }).done( function( response )
                     {
-                        if( response.Status == ok || response.Status == warning )
+                        if( response.Status != ok )
+                        {
+                            bootboxMessage( response );
+                        }
+                        if( typeof response[ data ] !== 'undefined' )
                         {
                             var rowStatus;
                             for( var i = 0 ; i < indexs.length ; i++ )
@@ -133,15 +137,10 @@
                                     revisionTableTr.removeClass( 'success' ).addClass( 'danger' ).attr( 'title' , rowStatus.Description );
                                 }
                             }
-                            spin.stop();
-                            //window.location.href = response.location;
+                            window.location.href = response.location;
                             getSolicitudList();
                         }
-                        else
-                        {
-                            spin.stop();
-                            bootboxMessage( response );
-                        }
+                        spin.stop();
                     });
                 }
             });

@@ -20,12 +20,12 @@ class Solicitud extends Eloquent
 
     protected function getDepositDebitCaptionAttribute()
     {
-        return substr( $this->id . ' ' . $this->assignedTo->personal->seat_name . ' ' . strtoupper( $this->investment->accountFund->nombre ) , 0 , 50 );    
+        return substr( ltrim( substr( $this->id , -6 ) , 0 ) . ' ' . $this->assignedTo->personal->seat_name . ' ' . strtoupper( $this->investment->accountFund->nombre ) , 0 , 50 );    
     }
 
     protected function getDepositCreditCaptionAttribute()
     {
-        return substr( $this->detalle->deposit->num_transferencia . '-' . $this->deposit_debit_caption , 0 , 50 );
+        return substr( $this->detalle->deposit->num_transferencia . ' ' . $this->assignedTo->personal->seat_name , 0 , 50 );
     }
 
     public function lastId()
