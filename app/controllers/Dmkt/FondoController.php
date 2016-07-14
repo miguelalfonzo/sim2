@@ -52,7 +52,7 @@ class FondoController extends BaseController
             $rules = array( 'idsolicitud' => 'required|integer|min:1|exists:solicitud,id' );
             $validator = Validator::make( $inputs , $rules );
             if ( $validator->fails() )
-                return $this->warningException( substr( $this->msgValidator($validator) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
+                return $this->warningException( $this->msgValidator , __FUNCTION__ , __LINE__ , __FILE__ );
             $solInst = Solicitud::find( $inputs['idsolicitud']);
             $detalle = $solInst->detalle;
             $jDetalle = json_decode($detalle->detalle);
@@ -466,7 +466,7 @@ class FondoController extends BaseController
                         'inversion'       => 'required|exists:tipo_inversion,id' );
         $validator = Validator::make($inputs, $rules);
         if ($validator->fails()) 
-            return $this->warningException( substr($this->msgValidator($validator), 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
+            return $this->warningException( $this->msgValidator , __FUNCTION__ , __LINE__ , __FILE__ );
 
         return $this->setRpta();
     }

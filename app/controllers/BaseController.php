@@ -88,16 +88,20 @@ class BaseController extends Controller
     protected function msgValidator( $validator )
     {
         $rpta = '';
-        foreach ($validator->messages()->all() as $msg)
+        foreach( $validator->messages()->all() as $msg )
+        {
             $rpta .= $msg.'<br> ';
-        return $rpta;
+        }
+        return substr( $rpta , 0 , -1 );
     }
 
     protected function msg2Validator( $validator )
     {
         $rpta = '';
-        foreach ( $validator->messages()->all() as $msg )
+        foreach( $validator->messages()->all() as $msg )
+        {
             $rpta .= $msg . ' - ' ;
+        }
         return substr( $rpta , 0 , -1 );
     }
 

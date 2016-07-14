@@ -161,7 +161,7 @@ class SolicitudeController extends BaseController
         $validator = Validator::make( $inputs , $rules );
         if ( $validator->fails() )
         {
-            return $this->warningException(substr($this->msgValidator($validator), 0, -1), __FUNCTION__, __LINE__, __FILE__);
+            return $this->warningException($this->msgValidator, __FUNCTION__, __LINE__, __FILE__);
         }
         else
         {
@@ -170,7 +170,7 @@ class SolicitudeController extends BaseController
             $validator = Validator::make( $inputs , $rules );
             if ( $validator->fails() )
             {
-                return $this->warningException( substr($this->msgValidator($validator), 0, -1), __FUNCTION__, __LINE__, __FILE__);
+                return $this->warningException( $this->msgValidator, __FUNCTION__, __LINE__, __FILE__);
             }
             return $this->setRpta();
         }
@@ -250,7 +250,7 @@ class SolicitudeController extends BaseController
                 $data['date'] = $this->getDay();
                 if ($solicitud->id_estado == DEPOSITADO )
                 {
-                    $data['lv'] = $this->textLv($solicitud);
+                    $data[ 'entries' ] = $this->generateDepositEntryData( $solicitud );
                 }
                 elseif ( ! is_null( $solicitud->toDeliveredHistory ) )
                 {
@@ -324,13 +324,13 @@ class SolicitudeController extends BaseController
 
         $validator = Validator::make($inputs, $rules);
         if ($validator->fails())
-            return $this->warningException(substr($this->msgValidator($validator), 0, -1), __FUNCTION__, __LINE__, __FILE__);
+            return $this->warningException($this->msgValidator, __FUNCTION__, __LINE__, __FILE__);
 
         $validator->sometimes('ruc', 'required|numeric|digits:11', function ($input) {
             return $input->pago == PAGO_CHEQUE;
         });
         if ($validator->fails())
-            return $this->warningException(substr($this->msgValidator($validator), 0, -1), __FUNCTION__, __LINE__, __FILE__);
+            return $this->warningException($this->msgValidator, __FUNCTION__, __LINE__, __FILE__);
         return $this->setRpta();
     }
 
@@ -543,10 +543,10 @@ class SolicitudeController extends BaseController
         $detalle->id_pago = $inputs['pago'];
     }
 
-    private function textLv($solicitud)
+    /*private function textLv($solicitud)
     {
         return substr( $solicitud->id . ' ' . $solicitud->assignedTo->personal->seat_name . ' ' . strtoupper( $solicitud->investment->accountFund->nombre ) , 0 , 50 );
-    }
+    }*/
 
     private function textAccepted($solicitud)
     {
@@ -576,7 +576,7 @@ class SolicitudeController extends BaseController
             
             $validator = Validator::make( $inputs, $rules);
             if ( $validator->fails() )
-                return $this->warningException(substr($this->msgValidator($validator), 0, -1), __FUNCTION__, __LINE__, __FILE__);
+                return $this->warningException($this->msgValidator, __FUNCTION__, __LINE__, __FILE__);
 
             $solicitud = Solicitud::find( $inputs[ 'idsolicitud' ] );
             if ( $solicitud->idtiposolicitud == SOL_INST )
@@ -815,7 +815,7 @@ class SolicitudeController extends BaseController
      
         if ( $validator->fails() )
         {
-            return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
+            return $this->warningException( $this->msgValidator , __FUNCTION__ , __LINE__ , __FILE__ );
         }
         else
         {
@@ -1408,19 +1408,20 @@ class SolicitudeController extends BaseController
 
     // IDKC: CHANGE STATUS => GASTO HABILITADO
 
-    private function validateInputAdvanceSeat($inputs)
+    private function validateInputAdvanceEntry($inputs)
     {
-            $rules = array(
-            'idsolicitud'    => 'required|integer|min:1|exists:solicitud,id',
-            'number_account' => 'required|array|size:2|each:numeric|each:digits,7|each:exists,cuenta,num_cuenta',
-            'dc'             => 'required|array|size:2|each:string|each:size,1|each:in,D,C',
-            'total'          => 'required|array|size:2|each:numeric|each:min,1',
-            'leyenda'        => 'required|array|size:2|each:required|each:string|each:min,1');
-        $validator = Validator::make( $inputs , $rules );
-        if ($validator->fails())
-            return $this->warningException(substr($this->msgValidator($validator), 0, -1), __FUNCTION__, __LINE__, __FILE__);
+        $rules = array( 'idsolicitud' => 'required|integer|min:1|exists:solicitud,id,id_estado,' . DEPOSITADO );
+        $messages = array( 'idsolicitud.exists' => 'La solicitud no se encuentra en la etapa de generacion del asiento de la transferencia' );
+        $validator = Validator::make( $inputs , $rules , $messages );
+        
+        if( $validator->fails() )
+        {
+            return $this->warningException( $this->msgValidator , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
         else
+        {
             return $this->setRpta();
+        }
     }
 
     private function generateBagoSeat( $seats )
@@ -1950,7 +1951,7 @@ class SolicitudeController extends BaseController
             $validator = Validator::make( $inputs , $rules );
             if ( $validator->fails() )
             {
-                return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
+                return $this->warningException( $this->msgValidator , __FUNCTION__ , __LINE__ , __FILE__ );
             }
 
             $solicitud = Solicitud::find( $inputs[ 'idsolicitud' ] );
@@ -1971,7 +1972,7 @@ class SolicitudeController extends BaseController
             $validator = Validator::make( $inputs , $rules );
             if ( $validator->fails() )
             {
-                return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
+                return $this->warningException( $this->msgValidator , __FUNCTION__ , __LINE__ , __FILE__ );
             }
 
             $solicitud = Solicitud::findByToken( $solicitudToken );
@@ -2125,20 +2126,16 @@ class SolicitudeController extends BaseController
         }
     }
 
-    public function solicitudDepositSeatOperation()
+    public function generateAdvanceEntry()
     {
         try 
         {
             $middleRpta = array();
             $inputs = Input::all();
-            $middleRpta = $this->validateInputAdvanceSeat( $inputs );
+            $middleRpta = $this->validateInputAdvanceEntry( $inputs );
             if ( $middleRpta[status] == ok ) 
             {
-                $solicitud = Solicitud::find( $inputs['idsolicitud'] );
-                if ( $solicitud->id_estado != DEPOSITADO )
-                {
-                    return $this->warningException( 'La solicitud no se encuentra en la etapa de generacion del asiento de la transferencia' , __FUNCTION__ , __LINE__ , __FILE__ );
-                }
+                $solicitud = Solicitud::find( $inputs[ 'idsolicitud' ] );
                 $middleRpta = $this->solicitudDepositSeatTransaction( $solicitud );    
             }
             return $middleRpta;
@@ -2286,16 +2283,44 @@ class SolicitudeController extends BaseController
         }
     }
 
-    private function generateDepositSeatData( $solicitud )
+    private function generateDepositEntryData( $solicitud )
     {
-        $seats = [];
-        $seats[] = $this->generateDepositSeatAssetData( $solicitud );
-        $seats[] = $this->generateDepositSeatDebitData( $solicitud );
-        return $seats;
+        $entries   = [];
+        $entries[] = $this->generateDepositEntryDebitData( $solicitud );
+        $entries[] = $this->generateDepositEntryCreditData( $solicitud );
+        return $entries;
     }
 
-    private function generateDepositSeatAssetData( $solicitud )
+    private function generateDepositEntryDebitData( $solicitud )
     {
+        $detail               = $solicitud->detalle;
+        $investment           = $solicitud->investment;
+        $account              = $investment->accountFund;
         
+        $entry                 = new stdClass;
+        $entry->account_name   = $account->nombre;
+        $entry->account_number = $account->num_cuenta;
+        $entry->origin         = $detail->deposit->updated_at;
+        $entry->d_c            = ASIENTO_GASTO_BASE;
+        $entry->import         = $detail->soles_import;
+        $entry->caption        = $solicitud->deposit_debit_caption;
+        return $entry;
+    }
+
+    private function generateDepositEntryCreditData( $solicitud )
+    {
+        $detail                = $solicitud->detalle;
+        $deposit               = $detail->deposit;
+        $investment            = $solicitud->investment;
+        $account               = $investment->accountFund;
+
+        $entry                 = new stdClass;
+        $entry->account_name   = $deposit->bagoAccount->ctanombrecta;
+        $entry->account_number = $deposit->num_cuenta;
+        $entry->origin         = $deposit->updated_at;
+        $entry->d_c            = ASIENTO_GASTO_DEPOSITO;
+        $entry->import         = $detail->soles_deposit_import;
+        $entry->caption        = $solicitud->deposit_credit_caption;
+        return $entry;
     }
 }

@@ -18,6 +18,16 @@ class Solicitud extends Eloquent
         return \Carbon\Carbon::parse( $attr )->format('Y-m-d H:i');
     }
 
+    protected function getDepositDebitCaptionAttribute()
+    {
+        return substr( $this->id . ' ' . $this->assignedTo->personal->seat_name . ' ' . strtoupper( $this->investment->accountFund->nombre ) , 0 , 50 );    
+    }
+
+    protected function getDepositCreditCaptionAttribute()
+    {
+        return substr( $this->detalle->deposit->num_transferencia . '-' . $this->deposit_debit_caption , 0 , 50 );
+    }
+
     public function lastId()
     {
         $lastId = Solicitud::orderBy('id', 'DESC')->first();

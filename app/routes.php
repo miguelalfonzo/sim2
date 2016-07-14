@@ -6,9 +6,9 @@
     |--------------------------------------------------------------------------
     */
 
-    Route::group( array( 'before' => 'developer' , 'namespace' => 'Seat' , 'prefix' => 'migrate' ) , function()
+    Route::group( array( 'before' => 'developer' , 'namespace' => 'Entry' , 'prefix' => 'migrate' ) , function()
     {
-        Route::get( 'seats2' , 'MigrateSeatController@migrateSeats');
+        Route::get( 'entries' , 'MigrateSeatController@migrateEntries');
     });
 
     Route::get( "logs", [ 
@@ -87,12 +87,12 @@
     {
         Route::get( 'solicitudsToDeposit' , 'Dmkt\SolicitudeController@solicitudsToDeposit' );
         Route::post('revisar-solicitud', 'Dmkt\SolicitudeController@checkSolicitud');
-        Route::get('revisar-asiento-solicitud/{token}', 'Dmkt\SolicitudeController@viewSeatSolicitude');
-        Route::get('generar-asiento-solicitud/{token}', 'Dmkt\SolicitudeController@viewGenerateSeatSolicitude');
-        Route::post('generate-seat-solicitude', 'Dmkt\SolicitudeController@generateSeatSolicitude');  
-        Route::get('revisar-asiento-gasto/{token}', 'Dmkt\SolicitudeController@viewSeatExpense');
-        Route::get('generar-asiento-gasto/{token}', 'Dmkt\SolicitudeController@viewGenerateSeatExpense');
-        Route::post('guardar-asiento-gasto', 'Dmkt\SolicitudeController@saveSeatExpense');
+        Route::get('revisar-asiento-solicitud/{token}', 'Dmkt\SolicitudeController@viewEntrySolicitude');
+        Route::get('generar-asiento-solicitud/{token}', 'Dmkt\SolicitudeController@viewGenerateEntrySolicitud');
+        Route::post( 'generar-asiento-anticipo' , 'Dmkt\SolicitudeController@generateAdvanceEntry' );  
+        Route::get('revisar-asiento-gasto/{token}', 'Dmkt\SolicitudeController@viewEntryExpense');
+        Route::get('generar-asiento-gasto/{token}', 'Dmkt\SolicitudeController@viewGenerateEntryExpense');
+        Route::post('guardar-asiento-gasto', 'Dmkt\SolicitudeController@saveEntryExpense');
         Route::post('get-account', 'Dmkt\SolicitudeController@getCuentaContHandler');
         Route::get('list-documents-type', 'Dmkt\FondoController@listDocuments');
         Route::post('list-documents', 'Movements\MoveController@searchDocs');

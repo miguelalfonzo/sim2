@@ -350,17 +350,21 @@ $(function()
     });
     
     //Generate Seat Solicitude
-    $("#seat-solicitude").on("click",function(e){
-        var $btn = $(this).button('loading');
-        e.preventDefault();
-        var data = {};
-        data._token = $("input[name=_token]").val();
-        var name_account = [];
-        var number_account = [];
-        var dc = [];
+    $( '#seat-solicitude' ).on( 'click' , function()
+    {
+        var $btn = $( this ).button( 'loading' );
+        //e.preventDefault();
+        var data = 
+        {
+            _token      : GBREPORTS.token,
+            idsolicitud : id_solicitud.val()
+        };
+        //var name_account = [];
+        /*var number_account = [];*/
+        /*var dc = [];
         var total = [];
-        var leyenda = [];
-        $("#table-seat-solicitude tbody .number_account").each(function(index){
+        var leyenda = [];*/
+        /*$("#table-seat-solicitude tbody .number_account").each(function(index){
             number_account[index] = $(this).text().trim();
         });
         $("#table-seat-solicitude tbody .dc").each(function(index){
@@ -375,36 +379,34 @@ $(function()
         data.number_account = number_account;
         data.dc = dc;
         data.total = total;
-        data.leyenda = leyenda;
-        var url = server+'generate-seat-solicitude';
-        if($(this).data('url'))
-        {
-            url = server + 'generate-seat-fondo';
-            data.idfondo = parseInt($("#idfondo").val(),10);
-        }
-        else
-            data.idsolicitud = $("input[name=idsolicitud]").val();
+        data.leyenda = leyenda;*/
+        var url = server + 'generar-asiento-anticipo';
+
         bootbox.confirm("¿Esta seguro que desea Generar el Asiento Contable?", function(result) 
         {
             $( '.bootbox button[ data-bb-handler=confirm ]' ).attr( 'disabled' , true );
-            if(result)
+            if( result )
             {
-                $.post(url, data)
-                .done( function (data)
+                $.post(url, data )
+                .done( function ( response )
                 {
-                    if(data.Status == 'Ok')
+                    $btn.button( 'reset' );    
+                    if( response.Status == ok )
                     {
                         bootbox.alert("<h4 class='green'>Se generó el asiento contable correctamente.</h4>", function()
                         {
-                            window.location.href = server+'show_user';
+                            window.location.href = server + 'show_user';
                         });
                     }
                     else
-                        bootbox.alert("<h4 class='red'>" + data.Status + ": " + data.Description + "</h4>");
+                    {
+                        bootboxMessage( response )
+                    }
                 });
             }
-            else{
-                $btn.button('reset')
+            else
+            {
+                $btn.button( 'reset' );
             }
         });
     });
@@ -419,7 +421,7 @@ $(function()
                 var data =
                 {
                     _token      : GBREPORTS.token ,
-                    idsolicitud : $("input[name=idsolicitud]").val()
+                    idsolicitud : id_solicitud.val()
                 }
                 $.post( server + 'revisar-solicitud' , data ).done( function ( data )
                 {
@@ -552,7 +554,7 @@ $(function()
         data : 
         {
             _token      : $('input[name=_token]').val() ,
-            idsolicitud : $('input[name=idsolicitud]').val()
+            idsolicitud : id_solicitud.val()
         }
         }).fail( function ( statusCode , errorThrown )
         {

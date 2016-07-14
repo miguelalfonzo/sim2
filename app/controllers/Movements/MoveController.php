@@ -89,7 +89,7 @@ class MoveController extends BaseController
             $rules = array( 'date_start' => 'required|date_format:"d/m/Y"' , 'date_end' => 'required|date_format:"d/m/Y"' );
             $validator = Validator::make( $inputs , $rules );
             if ( $validator->fails() ) 
-                return $this->warningException( substr($this->msgValidator($validator), 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
+                return $this->warningException( $this->msgValidator , __FUNCTION__ , __LINE__ , __FILE__ );
             
             $middleRpta = $this->getDocs( $inputs[ 'idProof' ] , $inputs[ 'date_start' ] , $inputs[ 'date_end' ] , $inputs[ 'val' ] );
         
