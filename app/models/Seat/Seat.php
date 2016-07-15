@@ -79,14 +79,14 @@ class Seat extends Eloquent
         $seat->pencondiva    = $systemSeat->tipo_responsable == 1 ? 'IN' : ( $seat->tipo_responsable == 2 ? 'NI' : ( $seat->tipo_responsable == 4 ? 'MO' : ' ' ) ); //Depende de la anterior columna para 1 => IN , 2 => NI y 4 => MO
         $seat->pengentarjeta = 'N' ; // Flag 'N' y 'S' . indica estado para el sistema de bago N => NO Y S => SI
         $seat->penusuario    = 'MQUIROZ' ;// USUARIO 
-    	$seat->pennrocompor  = ' '; //CORRELATIVO POR DOCUMENTO DE BAGO PARA CONTROL DOCUMENTARIO , SE INGRESARA EN EL SISTEMA DEV DE BAGO
+    	$seat->pennrocompor  = Self::blankspace( $systemSeat->nro_origen ); //CORRELATIVO POR DOCUMENTO DE BAGO PARA CONTROL DOCUMENTARIO , SE INGRESARA EN EL SISTEMA DEV DE BAGO
         $seat->pencodmoneda  = ' '; // CODIGO DE REGISTRO PARA LOS ASIENTOS EN DOLARES => 02 
     	$seat->pentipocambio = ' '; // TIPO DE CAMBIO PARA CUANDO EL ASIENTO ES EN DOLARES
     	$seat->penfchmod     = Carbon::now()->format( 'd/m/Y' );;
         //$seat->penimporte2 = ' '; // IMPORTE EN SOLES DEL ASIENTO CUANDO 
     	if ( $seat->save() )
         {
-            $updateSystemSeat = Entry::find( $systemSeat->id );
+            $updateSystemSeat           = Entry::find( $systemSeat->id );
             $updateSystemSeat->penclave = $seat->penclave;
             $updateSystemSeat->estado   = 1;
             if ( $updateSystemSeat->save() )

@@ -353,7 +353,6 @@ $(function()
     $( '#seat-solicitude' ).on( 'click' , function()
     {
         var $btn = $( this ).button( 'loading' );
-        //e.preventDefault();
         var data = 
         {
             _token          : GBREPORTS.token,
@@ -1289,12 +1288,12 @@ $(function()
     $( document ).off( 'click' , '#saveSeatExpense' );
     $( document ).on( 'click' , '#saveSeatExpense' , function()
     {
-        var $btn = $(this).button('loading');
-        var button = $(this);
-        var data = {};
-        data.seatList = GBDMKT.seatsList;
-        data._token   = $("input[name=_token]").val();
-        data.idsolicitud = $('#idsolicitud').attr("rel");
+        var $btn = $( this ).button( 'loading' );
+        var data = 
+        {
+            _token          : GBREPORTS.token,
+            solicitud_token : token
+        };
         bootbox.confirm("¿Esta seguro que desea Generar el Asiento de Gasto (Diario)?", function(result) 
         {
             $( '.bootbox button[ data-bb-handler=confirm ]' ).attr( 'disabled' , true );
@@ -1302,17 +1301,17 @@ $(function()
             {
                 $.ajax(
                 {
-                    type: 'post',
-                    url: server + 'guardar-asiento-gasto',
-                    data: data
+                    type : 'post',
+                    url  : server + 'guardar-asiento-gasto',
+                    data : data
                 }).fail( function( statusCode , errorThrown)
                 {
-                    bootbox.alert('<h4 class="red"> No se pudo acceder al servidor </h4>');
-                }).done( function ( result ) 
+                    $btn.button( 'reset' );
+                    ajaxError( statusCode , errorThrown );
+                }).done( function ( response ) 
                 {
-                    if( result.Status != 'Ok')
-                        bootbox.alert('<h4>' + result.Status + ': ' + result.Description + '</h4>');
-                    else if ( result.Status == 'Ok' )
+                    $btn.button( 'reset' );
+                    if( response.Status == ok )
                     {
                         responseUI( "Asiento Diario Registrado" , "green" );
                         setTimeout( function()
@@ -1320,9 +1319,14 @@ $(function()
                             window.location.href = server + 'show_user'; 
                         }, 2000);
                     }
+                    else
+                    {
+                        bootboxMessage( response );
+                    }
                 });
             }
-            else{
+            else
+            {
                 $btn.button('reset');
             }
         });

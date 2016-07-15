@@ -115,7 +115,6 @@ class MigrateSeatController extends BaseController
 				return;		
 			}
 		}
-		\Log::info( $seats );
 		foreach( $seats as $key => $seat )
 		{
 			$middleRpta = $this->registerSeatLines( $key , $seat , $penclave[ $idSolicitud ][ $seatType ] );

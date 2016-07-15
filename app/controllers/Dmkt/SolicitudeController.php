@@ -1399,4 +1399,16 @@ class SolicitudeController extends BaseController
         return $responses;
     }
 
+    private function massiveSolicitudsRegularizationSeat( $solicituds )
+    {
+        $responses = [];
+        foreach ( $solicituds as $solicitud ) 
+        {
+            $seatController = new Generate;
+            $middleRpta = $seatController->regularizationEntryOperation( $solicitud[ 'token' ] );
+            $responses[ $solicitud[ 'id' ] ] = $middleRpta;
+        }
+        return $responses;
+    }
+
 }

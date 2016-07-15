@@ -270,5 +270,23 @@ class BaseController extends Controller
         return View::make('template.leyenda', $data);
     }
 
-
+    protected function trim_text( $input, $length ) 
+    {
+        if( $length > 0 )
+        {
+            $inputLength = strlen( $input );
+            if( $inputLength > $length )
+            {
+                return substr( $input , $length * -1 );
+            }
+            else
+            {
+                return $input;
+            }
+        }
+        else
+        {
+            return '';
+        }
+    }
 }

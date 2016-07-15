@@ -8,6 +8,7 @@
 }
 </style>
 <div class="content">
+	<input type="hidden" name="token" value="{{ $solicitud->token }}">
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h3 class="panel-title"><strong>Generar Asiento Diario</strong></h3><strong class="user">Usuario : {{Auth::user()->username}}</strong>
@@ -18,7 +19,7 @@
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Solicitud</label>
-						<input id="idsolicitud" type="text" class="form-control" rel="{{$solicitud->id}}" value="{{$solicitud->id}} - {{mb_convert_case($solicitud->titulo,MB_CASE_TITLE,'UTF-8')}}" disabled>
+						<input type="text" class="form-control" value="{{ $solicitud->id . '-' . mb_convert_case( $solicitud->titulo , MB_CASE_TITLE , 'UTF-8' ) }}" disabled>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
@@ -103,7 +104,7 @@
 										<tr class="{{ $seatItem->type == 'IGV' ? 'info' : ($seatItem->type == 'SER' ? 'warning' : ($seatItem->type == 'REP' ? 'danger' : ($seatItem->type == 'CAN' ? 'success' : ''))) }}">
 											<td class="cuenta editable" data-cuenta_mkt="{{ $seatItem->cuentaMkt }}">{{ $seatItem->numero_cuenta }}</td>
 											<td class="codigo_sunat">{{ $seatItem->codigo_sunat }}</td>
-											<td class="numero_origen"></td>
+											<td class="numero_origen">{{ $seatItem->nro_origen }}</td>
 											<td class="fecha_origen">{{ $seatItem->fec_origen }}</td>
 											<td class="iva">{{ $seatItem->iva }}</td>
 											<td class="cod_prov">{{ $seatItem->cod_prov }}</td>

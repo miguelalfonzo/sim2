@@ -18,7 +18,7 @@ class Solicitud extends Eloquent
         return \Carbon\Carbon::parse( $attr )->format('Y-m-d H:i');
     }
 
-    protected function getDepositDebitCaptionAttribute()
+    protected function getSolicitudCaptionAttribute()
     {
         return substr( ltrim( substr( $this->id , -6 ) , 0 ) . ' ' . $this->assignedTo->personal->seat_name . ' ' . strtoupper( $this->investment->accountFund->nombre ) , 0 , 50 );    
     }
@@ -159,6 +159,16 @@ class Solicitud extends Eloquent
         return $this->hasMany( 'Dmkt\SolicitudClient' , 'id_solicitud' , 'id' )->orderBy( 'id' , 'ASC' );
     }
 
+    public function client()
+    {
+        return $this->hasOne( 'Dmkt\SolicitudClient' , 'id_solicitud' )->orderBy( 'id' , 'ASC' );
+    }
+
+    /*protected function clientEntry()
+    {
+        return $this->hasOne( 'Dmkt\SolicitudClient' , 'id_solicitud' )->orderByRaw( 'case when id_tipo_cliente when 3 then 0 else 1 end , id' )
+    }*/
+
     public function createdBy()
     {
         return $this->belongsTo( 'User' , 'created_by' );
@@ -206,17 +216,17 @@ class Solicitud extends Eloquent
 
     protected function advanceCreditEntry()
     {
-        return $this->hasOne( 'Expense\Entry' , 'id_solicitud' )->where( 'd_c' , ASIENTO_GASTO_BASE )->where( 'tipo_asiento' , 'A' );        
+        return $this->hasOne( 'Expense\Entry' , 'id_solicitud' )->where( 'd_c' , ASIENTO_GASTO_BASE )->where( 'tipo_asiento' , TIPO_ASIENTO_ANTICIPO );        
     }
 
     protected function advanceDepositEntry()
     {
-        return $this->hasOne( 'Expense\Entry' , 'id_solicitud' )->where( 'd_c' , ASIENTO_GASTO_DEPOSITO )->where( 'tipo_asiento' , 'A' );        
+        return $this->hasOne( 'Expense\Entry' , 'id_solicitud' )->where( 'd_c' , ASIENTO_GASTO_DEPOSITO )->where( 'tipo_asiento' , TIPO_ASIENTO_ANTICIPO );        
     }
 
     protected function dailyEntries()
     {
-        return $this->hasMany( 'Expense\Entry' , 'id_solicitud' )->where( 'tipo_asiento' , ASIENTO_GASTO_TIPO )->orderBy( 'id' , 'ASC' );
+        return $this->hasMany( 'Expense\Entry' , 'id_solicitud' )->where( 'tipo_asiento' , TIPO_ASIENTO_GASTO )->orderBy( 'id' , 'ASC' );
     }
     
     protected function investment()
