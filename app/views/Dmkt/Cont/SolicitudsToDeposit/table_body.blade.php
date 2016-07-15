@@ -14,7 +14,7 @@
                 {{ $solicitud->detalle->typePayment->nombre or 'TRANSFERENCIA' }}
             </td>
             <td>
-                {{ $solicitud->personalTo->full_name }}
+                {{-- $solicitud->personalTo->full_name --}}
             </td>
             <td>
                 @if( $solicitud->id_inversion == 36 )
@@ -23,12 +23,10 @@
                     @elseif( $solicitud->detalle->id_moneda == 2 )
                         194-1809102-167
                     @endif
-                @elseif( $solicitud->detalle->id_pago != PAGO_CHEQUE )
-                    @if( in_array( $solicitud->assignedTo->type , [ REP_MED , SUP ] , 1 ) )
-                        {{ $solicitud->personalTo->getAccount()  }}
-                    @endif
                 @else
-                    RUC: {{ $solicitud->detalle->num_ruc }}         
+                    {{-- @if( in_array( $solicitud->assignedTo->type , [ REP_MED , SUP ] ) )
+                        {{ $solicitud->personalTo->getAccount()  }}
+                    @endif --}}
                 @endif
             </td>
             <td>{{ $solicitud->detalle->currency_money }}</td>

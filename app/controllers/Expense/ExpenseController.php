@@ -52,7 +52,7 @@ class ExpenseController extends BaseController
     	$validator = Validator::make( $inputs , $rules , $messages );
         if ( $validator->fails() )
        	{ 
-            return $this->warningException( $this->msgValidator , __FUNCTION__ , __LINE__ , __FILE__ );
+            return $this->warningException( $this->msgValidator( $validator ) , __FUNCTION__ , __LINE__ , __FILE__ );
     	}
     	return $this->setRpta();
     }
@@ -72,7 +72,7 @@ class ExpenseController extends BaseController
 
         $validator = Validator::make( $inputs , $rules , $messages );
         if ( $validator->fails() ) 
-            return $this->warningException( $this->msgValidator , __FUNCTION__ , __LINE__ , __FILE__ );
+            return $this->warningException( $this->msgValidator( $validator ) , __FUNCTION__ , __LINE__ , __FILE__ );
         else
         {
         	$rules 		= array();
@@ -106,7 +106,7 @@ class ExpenseController extends BaseController
                 return $proofType->igv == 1 ;
             });
             if ( $validator->fails() ) 
-        	    return $this->warningException( $this->msgValidator , __FUNCTION__ , __LINE__ , __FILE__ );
+        	    return $this->warningException( $this->msgValidator( $validator ) , __FUNCTION__ , __LINE__ , __FILE__ );
         	else
 	    	    return $this->setRpta();
         } 

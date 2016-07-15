@@ -48,17 +48,29 @@ class MigrateSeatController extends BaseController
 
 	public function transactionGenerateSeat( $seats )
 	{
+		\Log::info( $seats );
 		$penclave = array();
 		$errors   = array();
-		foreach( $seats as $idSolicitud => $seatTypes )
+		foreach( $seats as $solicitud_id => $entryTypes )
 		{
-			foreach( $seatTypes as $seatType => $seats )
+			foreach( $entryTypes as $entryType => $entries )
 			{
-				$this->migrateSeat( $seatType , $seats , $idSolicitud , $penclave , $errors );
+				$this->migrateSeat( $entryType , $entries , $solicitud_id , $penclave , $errors );
 			}
 		}
 		return array( 'ok' => $penclave , 'error' => $errors );
 	}
+
+	/*public function transactionGenerateSeat2( $entries )
+	{
+		$penclave = array();
+		$errors   = array();
+		foreach( $entries as $entry )
+		{
+			$this->migrateSeat( $seatType , $seats , $entry->id_solicitud , $penclave , $errors );
+		}
+		return array( 'ok' => $penclave , 'error' => $errors );
+	}*/
 
 	public function migrateSeat( $seatType , $seats , $idSolicitud , &$penclave , &$errors )
 	{
@@ -71,6 +83,7 @@ class MigrateSeatController extends BaseController
 		{	
 			$origen = $seatType == 'A' ? 7 : ( $seatType == 'G' ? 1 : NULL );// ASIENTO DE DEPOSITO => 7 ( EXCEPCION CHEQUES ) | ASIENTO DE DOCUMENTO => 1 ( EXCEPCION PROVEEDORES ) 
 		}
+
 		$year   = Carbon::now()->year;
 		
 		if ( is_null( $origen ) )
@@ -102,7 +115,7 @@ class MigrateSeatController extends BaseController
 				return;		
 			}
 		}
-		
+		\Log::info( $seats );
 		foreach( $seats as $key => $seat )
 		{
 			$middleRpta = $this->registerSeatLines( $key , $seat , $penclave[ $idSolicitud ][ $seatType ] );
@@ -118,6 +131,7 @@ class MigrateSeatController extends BaseController
 
 	private function registerSeatLines( $key , $seat , $seatPrefix )
 	{
+		\Log::info( $seat );
 		if ( $key == 0 )
 		{
 			$state = 'C';

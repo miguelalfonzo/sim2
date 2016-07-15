@@ -43,7 +43,7 @@
                 @if ( in_array( $user->type , array( TESORERIA , GER_COM, CONT ) ) )
                     <input type="hidden" id="sol_token" class="i-tokens" value="{{$solicitud->token}}">
                     @if( ! is_null( $solicitud->id_user_assign ) )
-                        <input type="hidden" value="{{ $solicitud->personalTo->full_name }}" class="benef">
+                        <input type="hidden" value="{{-- $solicitud->personalTo->full_name --}}" class="benef">
                     @endif
                 @endif
                 <td class="text-center id_solicitud detail-control">{{$solicitud->id}}</td>
@@ -59,7 +59,7 @@
                     @if( $user->type == TESORERIA )
                         {{ $solicitud->personalTo->full_name }}    
                     @else
-                        {{ $solicitud->createdPersonal->full_name }}
+                        {{-- $solicitud->createdPersonal->full_name --}}
                     @endif
                 </td>
                 @if( in_array( $user->type , array( TESORERIA, CONT ) ))
@@ -93,7 +93,7 @@
                 @if( $user->type !== TESORERIA )
                     <td class="text-center">
                         @if ( $solicitud->id_estado != PENDIENTE )
-                            {{ $solicitud->lastHistory->createdPersonal->full_name }}
+                            {{-- $solicitud->lastHistory->createdPersonal->full_name --}}
                         @else
                             -
                         @endif

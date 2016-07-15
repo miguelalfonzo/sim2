@@ -356,30 +356,10 @@ $(function()
         //e.preventDefault();
         var data = 
         {
-            _token      : GBREPORTS.token,
-            idsolicitud : id_solicitud.val()
+            _token          : GBREPORTS.token,
+            solicitud_token : token
         };
-        //var name_account = [];
-        /*var number_account = [];*/
-        /*var dc = [];
-        var total = [];
-        var leyenda = [];*/
-        /*$("#table-seat-solicitude tbody .number_account").each(function(index){
-            number_account[index] = $(this).text().trim();
-        });
-        $("#table-seat-solicitude tbody .dc").each(function(index){
-            dc[index] = $(this).text().trim();
-        });
-        $("#table-seat-solicitude tbody .leyenda").each(function(index){
-            leyenda[index] = $(this).text().trim();
-        });
-        $("#table-seat-solicitude tbody .total").each(function(index){
-            total[index] = parseFloat($(this).text());
-        });
-        data.number_account = number_account;
-        data.dc = dc;
-        data.total = total;
-        data.leyenda = leyenda;*/
+        
         var url = server + 'generar-asiento-anticipo';
 
         bootbox.confirm("¿Esta seguro que desea Generar el Asiento Contable?", function(result) 
