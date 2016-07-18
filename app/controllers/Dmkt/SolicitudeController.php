@@ -1338,7 +1338,7 @@ class SolicitudeController extends BaseController
                 {
                     $middleRpta = $this->massiveSolicitudsRegularizationSeat( $inputs[ 'data' ] );
                     Session::put( 'asientos_regularizacion' , $middleRpta );
-                    $location = 'seat-export';
+                    $location = 'regularization-entry-export';
                 }
                 else
                 {

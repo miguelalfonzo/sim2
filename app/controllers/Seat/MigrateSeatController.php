@@ -48,7 +48,6 @@ class MigrateSeatController extends BaseController
 
 	public function transactionGenerateSeat( $seats )
 	{
-		\Log::info( $seats );
 		$penclave = array();
 		$errors   = array();
 		foreach( $seats as $solicitud_id => $entryTypes )
@@ -130,7 +129,6 @@ class MigrateSeatController extends BaseController
 
 	private function registerSeatLines( $key , $seat , $seatPrefix )
 	{
-		\Log::info( $seat );
 		if ( $key == 0 )
 		{
 			$state = 'C';

@@ -47,7 +47,7 @@
                                 <td style="background-color:#A9F5F2"></td>
                             @endif
                             <td>{{ $idSolicitud }}</td>
-                            <td>{{ $response[ 'asiento' ] }}</td>
+                            <td>{{{ $response[ 'asiento' ] or '' }}}</td>
                             <td>{{ $response[ status ] }}</td>
                             <td>{{{ $response[ description ] or '' }}}</td>
                         </tr>       

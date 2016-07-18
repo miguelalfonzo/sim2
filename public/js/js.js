@@ -611,13 +611,13 @@ $(function()
                         if ( data.expense.idtipotributo === null || data.expense.idtipotributo == 0 )
                         {
                             $("#regimen").val(0);
-                            $("#monto-regimen").val('').parent().parent().css("visibility" , "hidden" ); 
+                            $("#monto-regimen").val('').closest( '.form-group' ).hide();  
                         }
                         else
                         {
                             $("#regimen").val(data.expense.idtipotributo);
                             if ( data.expense.idtipotributo >= 1 )
-                                $("#monto-regimen").val(data.expense.monto_tributo).parent().parent().css("visibility" , "show" ); 
+                                $("#monto-regimen").val(data.expense.monto_tributo).closest( '.form-group' ).show(); 
                         }
                         $("#monto-regimen").numeric({negative:false});
                     }
@@ -1464,17 +1464,17 @@ $(function()
                 }
                 var modal = $('#documents_Modal');
                 if ( response.Data.sub_tot === null )
-                    modal.find('#subtotal').val('').parent().parent().hide();
+                    modal.find('#subtotal').val('').closest( '.form-group' ).hide();
                 else
-                    modal.find('#subtotal').val( response.Data.moneda + ' ' + response.Data.sub_tot ).parent().parent().show();
+                    modal.find('#subtotal').val( response.Data.moneda + ' ' + response.Data.sub_tot ).closest( '.form-group' ).show();
                 if ( response.Data.igv === null )
-                    modal.find('#igv').val('').parent().parent().hide();
+                    modal.find('#igv').val('').closest( '.form-group' ).hide();
                 else    
-                    modal.find('#igv').val( response.Data.moneda + ' ' + response.Data.igv ).parent().parent().show();
+                    modal.find('#igv').val( response.Data.moneda + ' ' + response.Data.igv ).closest( '.form-group' ).show();
                 if ( response.Data.imp_serv === null )
-                    modal.find('#imp-serv').val('').parent().parent().hide();
+                    modal.find('#imp-serv').val('').closest( '.form-group' ).hide();
                 else
-                    modal.find('#imp-serv').val( response.Data.moneda + ' ' + response.Data.imp_serv ).parent().parent().show();
+                    modal.find('#imp-serv').val( response.Data.moneda + ' ' + response.Data.imp_serv ).closest( '.form-group' ).show();
                 if ( response.Data.reparo == 0 )
                     modal.find('#reparo').val( 'No' );
                 else if ( response.Data.reparo == 1 )
@@ -1485,12 +1485,12 @@ $(function()
                 if ( response.Data.idtipotributo == null )
                 {
                     modal.find('#regimen').val( 0 );
-                    modal.find('#monto-regimen').val( response.Data.monto_tributo ).closest( '.form-group' ).css( 'visibility' , 'hidden' ); 
+                    modal.find('#monto-regimen').val( response.Data.monto_tributo ).closest( '.form-group' ).hide(); 
                 }
                 else
                 {
                     modal.find('#regimen').val( response.Data.idtipotributo );
-                    modal.find('#monto-regimen').val( response.Data.monto_tributo ).closest( '.form-group' ).css( 'visibility' , 'show' );
+                    modal.find('#monto-regimen').val( response.Data.monto_tributo ).closest( '.form-group' ).show();
                 }
                 modal.modal();
             }

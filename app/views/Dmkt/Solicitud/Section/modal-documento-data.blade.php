@@ -198,11 +198,9 @@
 				</div>
 
 				<!-- Monto de la Retencion -->
-				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" style="visibility:hidden">
-					<div class="form-expense">
-						<label>Monto de la Retención o Detracción</label>
-						<input id="monto-regimen" type="text" class="form-control">
-					</div>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4 form-group" style="display:none">
+					<label>Monto de la Retención o Detracción</label>
+					<input id="monto-regimen" type="text" class="form-control">
 				</div>
 
 				<!-- REPARO -->

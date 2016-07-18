@@ -84,12 +84,11 @@ class Seat extends Eloquent
     	$seat->pentipocambio = ' '; // TIPO DE CAMBIO PARA CUANDO EL ASIENTO ES EN DOLARES
     	$seat->penfchmod     = Carbon::now()->format( 'd/m/Y' );;
         //$seat->penimporte2 = ' '; // IMPORTE EN SOLES DEL ASIENTO CUANDO 
-    	if ( $seat->save() )
+    	if( $seat->save() )
         {
-            $updateSystemSeat           = Entry::find( $systemSeat->id );
-            $updateSystemSeat->penclave = $seat->penclave;
-            $updateSystemSeat->estado   = 1;
-            if ( $updateSystemSeat->save() )
+            $systemSeat->penclave = $seat->penclave;
+            $systemSeat->estado   = 1;
+            if( $systemSeat->save() )
             {
                 return array( status => ok );
             }

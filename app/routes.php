@@ -128,6 +128,8 @@
         {
             Route::get( 'revision-export' , 'ExportController@revisionExport');
             Route::get( 'advance-entry-export' , 'ExportController@advanceEntryExport' );
+            Route::get( 'regularization-entry-export' , 'ExportController@regularizationEntryExport' );
+            
             Route::get( 'export/solicitudToDeposit-pdf' , 'ExportController@exportSolicitudToDepositPDF' );
             Route::get( 'export/solicitudToDeposit-excel' , 'ExportController@exportSolicitudToDepositExcel' );
         });
