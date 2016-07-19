@@ -178,8 +178,44 @@
         }
     });
 
-    $( document ).off( 'keydown' , '.deposit-operacion-cell' );
-    $( document ).on( 'keydown' , '.deposit-operacion-cell' , function( event )
+    function inputUp( tableBody , rowIndex , columIndex , i )
+    {
+        ++i;
+        var input = tableBody.find( 'tr' ).eq( rowIndex - i ).find( 'td' ).eq( columIndex ).find( 'input' );
+        if( input.length == 0 )
+        {
+           inputUp( tableBody , rowIndex , columIndex , i );
+        }
+        else
+        {
+            input.focus();
+        }
+    }
+
+    function inputDown( tableBody , rowIndex , columIndex )
+    {
+        var trs = tableBody.children();
+        if( ( rowIndex + 1 ) == trs.length )
+        {
+            var newRowIndex = 0;
+        }
+        else
+        {
+            var newRowIndex = rowIndex + 1;
+        }
+        var input = tableBody.find( 'tr' ).eq( newRowIndex ).find( 'td' ).eq( columIndex ).find( 'input' );
+        if( input.length == 0 )
+        {
+           inputDown( tableBody , newRowIndex , columIndex );
+        }
+        else
+        {
+            input.focus();
+        }
+    }
+
+    //$( document ).off( 'keydown' , '.deposit-operacion-cell' );
+    $( '.deposit-operacion-cell' ).on( 'keydown' , function( event )
     {
         var cell = $( this );
         var e = event;
@@ -187,14 +223,22 @@
         var columIndex = cell.closest( 'td' ).index();
         var tableBody = $( '#massive-deposit-table tbody' );
 
+        var i = 0;
         if( e.keyCode === 38 )
         {
-            var input =  tableBody.find( 'tr' ).eq( rowIndex - 1 ).find( 'td' ).eq( columIndex ).find( 'input' );
-            input.focus();
+            inputUp( tableBody , rowIndex , columIndex , i );
+            /*var input =  tableBody.find( 'tr' ).eq( rowIndex - i ).find( 'td' ).eq( columIndex ).find( 'input' );
+            if( input.length == 0 )
+            {
+                i++;
+                var input =  tableBody.find( 'tr' ).eq( rowIndex - i ).find( 'td' ).eq( columIndex ).find( 'input' );
+            }
+            input.focus();*/
         }
         else if( e.keyCode === 40 )
         {
-            var trs = tableBody.children();
+            inputDown( tableBody , rowIndex , columIndex );
+            /*var trs = tableBody.children();
             if( ( rowIndex + 1 ) == trs.length )
             {
                 var newRowIndex = 0;
@@ -204,7 +248,7 @@
                 var newRowIndex = rowIndex + 1;
             }
             var input =  trs.eq( newRowIndex ).find( 'td' ).eq( columIndex ).find( 'input' );
-            input.focus();
+            input.focus();*/
         }
     });
 </script>
