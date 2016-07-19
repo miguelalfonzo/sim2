@@ -248,7 +248,7 @@ class Solicitud extends Eloquent
     {
         return Solicitud::select( [ 'id' , 'token' , 'id_detalle' , 'id_user_assign' , 'titulo' ] )
             ->where( 'id_estado' , DEPOSITO_HABILITADO )
-            ->with( [ 'detalle' , 'clients' ] )
+            ->with( [ 'detalle' , 'clients' , 'personalTo' ] )
             ->orderBy( 'id' , 'ASC' )->get();
     }
 

@@ -401,7 +401,7 @@ class Generate extends BaseController
     public function saveEntryExpense()
     {
         $inputs = Input::all();
-        return $this->saveEntryOperation( $inputs[ 'solicitud_token' ] );
+        return $this->regularizationEntryOperation( $inputs[ 'solicitud_token' ] );
     }
 
     public function regularizationEntryOperation( $token )
@@ -616,7 +616,7 @@ class Generate extends BaseController
         $entry->origin         = $detail->deposit->updated_at;
         $entry->d_c            = ASIENTO_GASTO_BASE;
         $entry->import         = $detail->soles_import;
-        $entry->caption        = $solicitud->deposit_debit_caption;
+        $entry->caption        = $solicitud->solicitud_caption;
         return $entry;
     }
 
