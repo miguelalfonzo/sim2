@@ -180,14 +180,23 @@
     function inputUp( tableBody , rowIndex , columIndex , i )
     {
         ++i;
-        var input = tableBody.find( 'tr' ).eq( rowIndex - i ).find( 'td' ).eq( columIndex ).find( 'input' );
-        if( input.length == 0 )
+        var tr = tableBody.find( 'tr' ).eq( rowIndex - i );
+        aaa = tr;
+        if( tr.css( 'display' ) == 'none' )
         {
-           inputUp( tableBody , rowIndex , columIndex , i );
+            inputUp( tableBody , rowIndex , columIndex , i );
         }
         else
         {
-            input.focus();
+            var input = tr.find( 'td' ).eq( columIndex ).find( 'input' );
+            if( input.length == 0 )
+            {
+               inputUp( tableBody , rowIndex , columIndex , i );
+            }
+            else
+            {
+                input.focus();
+            }
         }
     }
 
@@ -202,14 +211,24 @@
         {
             var newRowIndex = rowIndex + 1;
         }
-        var input = tableBody.find( 'tr' ).eq( newRowIndex ).find( 'td' ).eq( columIndex ).find( 'input' );
-        if( input.length == 0 )
+        var tr    = tableBody.find( 'tr' ).eq( newRowIndex );
+        aaa = tr;
+        
+        if( tr.css( 'display' ) == 'none' )
         {
            inputDown( tableBody , newRowIndex , columIndex );
         }
         else
         {
-            input.focus();
+            var input = tr.find( 'td' ).eq( columIndex ).find( 'input' );
+            if( input.length == 0 )
+            {
+               inputDown( tableBody , newRowIndex , columIndex );        
+            }
+            else
+            {
+                input.focus();
+            }
         }
     }
 
