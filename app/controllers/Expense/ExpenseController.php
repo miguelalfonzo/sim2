@@ -181,25 +181,29 @@ class ExpenseController extends BaseController
 			        $date 			  = $inputs['fecha_movimiento'];
 			        list($d, $m, $y)  = explode('/', $date);
 			        $d 				  = mktime(11, 14, 54, $m, $d, $y);
-					$inputs[ 'date' ] = date("Y/m/d", $d );
+					$inputs[ 'date' ] = date( "Y/m/d" , $d );
 					$inputs[ 'id_solicitud' ] = $solicitud->id;
 					$this->setExpense( $expense , $inputs );
 
 					//Detail Expense
 					ExpenseItem::where( 'id_gasto' , $expense->id )->delete();
-					if ( $proof->igv == 1 && array_sum( $inputs[ 'total_item' ] ) == ( $inputs[ 'total_expense' ] - $inputs[ 'imp_service' ] ) )
+					if( $proof->igv == 1 && $expense->igv != 0 && array_sum( $inputs[ 'total_item' ] ) == ( $inputs[ 'total_expense' ] - $inputs[ 'imp_service' ] ) )
+					{
 						$pIGV = 1 + ( Table::getIgv()->numero / 100 );
+					}
 					else
+					{
 						$pIGV = 1;
+					}
 					for( $i = 0 ; $i < count( $inputs[ 'quantity' ] ) ; $i++ )
 					{
-						$expense_detail = new ExpenseItem;
-						$expense_detail->id = $expense_detail->lastId() + 1 ;
-						$expense_detail->id_gasto = $expense->id;
-						$expense_detail->cantidad = $inputs['quantity'][$i];
+						$expense_detail              = new ExpenseItem;
+						$expense_detail->id          = $expense_detail->lastId() + 1 ;
+						$expense_detail->id_gasto    = $expense->id;
+						$expense_detail->cantidad    = $inputs['quantity'][$i];
 						$expense_detail->descripcion = $inputs['description'][$i];
-						$expense_detail->tipo_gasto = $inputs['tipo_gasto'][$i];
-						$expense_detail->importe = $inputs['total_item'][$i] / $pIGV ;
+						$expense_detail->tipo_gasto  = $inputs['tipo_gasto'][$i];
+						$expense_detail->importe     = $inputs['total_item'][$i] / $pIGV ;
 						$expense_detail->save();				
 					}
 					if ( Auth::user()->type === CONT )
