@@ -29,7 +29,7 @@
                 </div>
                 <div class="form-group">
                     <label>Busqueda ( Presionar Enter )</label>
-                    <input type="text" id="filter-solicitud-id" class="form-control" style="font-weight:bold">
+                    <input type="text" id="filter-solicitud-id" class="form-control" style="font-weight:bold;text-transform:uppercase">
                 </div>
                 <div style="max-height:300px;overflow-y:scroll">
                 	<table id="massive-deposit-table" class="table table-striped table-hover table-bordered table-condensed" cellspacing="0" width="100%">
@@ -101,7 +101,6 @@
         }
         if( solicituds.length == 0 )
         {
-            //spin.stop();
             bootbox.alert( '<h4 class="text-warning"><b>No ingreso al menos un numero de operacion</b></h4>' );
         }
         else
@@ -174,7 +173,7 @@
         if( event.keyCode === 13 )
         {
             $( '#massive-deposit-table tbody tr' ).hide();
-            $( '#massive-deposit-table tbody tr:contains(' + this.value + ')' ).show();
+            $( '#massive-deposit-table tbody tr:contains(' + this.value.toUpperCase() + ')' ).show();
         }
     });
 
@@ -214,7 +213,6 @@
         }
     }
 
-    //$( document ).off( 'keydown' , '.deposit-operacion-cell' );
     $( '.deposit-operacion-cell' ).on( 'keydown' , function( event )
     {
         var cell = $( this );
@@ -227,28 +225,10 @@
         if( e.keyCode === 38 )
         {
             inputUp( tableBody , rowIndex , columIndex , i );
-            /*var input =  tableBody.find( 'tr' ).eq( rowIndex - i ).find( 'td' ).eq( columIndex ).find( 'input' );
-            if( input.length == 0 )
-            {
-                i++;
-                var input =  tableBody.find( 'tr' ).eq( rowIndex - i ).find( 'td' ).eq( columIndex ).find( 'input' );
-            }
-            input.focus();*/
         }
         else if( e.keyCode === 40 )
         {
             inputDown( tableBody , rowIndex , columIndex );
-            /*var trs = tableBody.children();
-            if( ( rowIndex + 1 ) == trs.length )
-            {
-                var newRowIndex = 0;
-            }
-            else
-            {
-                var newRowIndex = rowIndex + 1;
-            }
-            var input =  trs.eq( newRowIndex ).find( 'td' ).eq( columIndex ).find( 'input' );
-            input.focus();*/
         }
     });
 </script>
