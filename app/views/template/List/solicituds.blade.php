@@ -31,7 +31,7 @@
             <th>Estado</th>
             <th>Tipo</th>
             <th class="col-xs-2 col-sm-2">Edicion</th>
-            @if ( in_array( $user->type , array( GER_COM , CONT ) ) )
+            @if( $user->type == GER_COM )
                 <th data-checkbox="true">Marcar</th>
             @endif
         </tr>
@@ -117,22 +117,14 @@
                 @include('template.List.states')
                 <td class="text-center">{{ $solicitud->typeSolicitude->nombre }}</td>
                 @include('template.List.icons')
-                @if ( in_array( $user->type , array( GER_COM , CONT ) ) )
+                @if( $user->type == GER_COM )
                     <td class="text-center">
-                        @if( $user->type === GER_COM )
-                            @if ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) ) && 
-                                $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario === $user->type && 
-                                in_array( $user->id , $solicitud->managerEdit( $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario )->lists( 'id_gerprod' ) ) )
-                                <input type="checkbox" name="mass-aprov">
-                            @else
-                                <input type="checkbox" name="mass-aprov" disabled>
-                            @endif
-                        @elseif( $user->type == CONT )
-                            @if( $solicitud->id_estado == APROBADO )
-                                <input type="checkbox" name="mass-aprov">
-                            @else
-                                <input type="checkbox" name="mass-aprov" disabled>    
-                            @endif
+                        @if ( in_array( $solicitud->id_estado , array( PENDIENTE , DERIVADO , ACEPTADO ) ) && 
+                            $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario === $user->type && 
+                            in_array( $user->id , $solicitud->managerEdit( $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario )->lists( 'id_gerprod' ) ) )
+                            <input type="checkbox" name="mass-aprov">
+                        @else
+                            <input type="checkbox" name="mass-aprov" disabled>
                         @endif
                     </td>
                 @endif

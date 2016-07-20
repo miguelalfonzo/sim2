@@ -40,7 +40,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 form-group" style="visibility:hidden">
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 form-group" style="display:none">
                         <label>Monto de la Retención o Detracción</label>
                         <input id="monto-regimen" type="text" class="form-control">
                     </div>

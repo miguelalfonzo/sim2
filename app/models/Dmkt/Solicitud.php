@@ -18,6 +18,16 @@ class Solicitud extends Eloquent
         return \Carbon\Carbon::parse( $attr )->format('Y-m-d H:i');
     }
 
+    protected function getSolicitudCaptionAttribute()
+    {
+        return substr( ltrim( substr( $this->id , -6 ) , 0 ) . ' ' . $this->assignedTo->personal->seat_name . ' ' . strtoupper( $this->investment->accountFund->nombre ) , 0 , 50 );    
+    }
+
+    protected function getDepositCreditCaptionAttribute()
+    {
+        return substr( $this->detalle->deposit->num_transferencia . ' ' . $this->assignedTo->personal->seat_name , 0 , 50 );
+    }
+
     public function lastId()
     {
         $lastId = Solicitud::orderBy('id', 'DESC')->first();
@@ -149,6 +159,16 @@ class Solicitud extends Eloquent
         return $this->hasMany( 'Dmkt\SolicitudClient' , 'id_solicitud' , 'id' )->orderBy( 'id' , 'ASC' );
     }
 
+    public function client()
+    {
+        return $this->hasOne( 'Dmkt\SolicitudClient' , 'id_solicitud' )->orderBy( 'id' , 'ASC' );
+    }
+
+    /*protected function clientEntry()
+    {
+        return $this->hasOne( 'Dmkt\SolicitudClient' , 'id_solicitud' )->orderByRaw( 'case when id_tipo_cliente when 3 then 0 else 1 end , id' )
+    }*/
+
     public function createdBy()
     {
         return $this->belongsTo( 'User' , 'created_by' );
@@ -196,17 +216,17 @@ class Solicitud extends Eloquent
 
     protected function advanceCreditEntry()
     {
-        return $this->hasOne( 'Expense\Entry' , 'id_solicitud' )->where( 'd_c' , ASIENTO_GASTO_BASE )->where( 'tipo_asiento' , 'A' );        
+        return $this->hasOne( 'Expense\Entry' , 'id_solicitud' )->where( 'd_c' , ASIENTO_GASTO_BASE )->where( 'tipo_asiento' , TIPO_ASIENTO_ANTICIPO );        
     }
 
     protected function advanceDepositEntry()
     {
-        return $this->hasOne( 'Expense\Entry' , 'id_solicitud' )->where( 'd_c' , ASIENTO_GASTO_DEPOSITO )->where( 'tipo_asiento' , 'A' );        
+        return $this->hasOne( 'Expense\Entry' , 'id_solicitud' )->where( 'd_c' , ASIENTO_GASTO_DEPOSITO )->where( 'tipo_asiento' , TIPO_ASIENTO_ANTICIPO );        
     }
 
     protected function dailyEntries()
     {
-        return $this->hasMany( 'Expense\Entry' , 'id_solicitud' )->where( 'tipo_asiento' , ASIENTO_GASTO_TIPO )->orderBy( 'id' , 'ASC' );
+        return $this->hasMany( 'Expense\Entry' , 'id_solicitud' )->where( 'tipo_asiento' , TIPO_ASIENTO_GASTO )->orderBy( 'id' , 'ASC' );
     }
     
     protected function investment()
@@ -228,13 +248,39 @@ class Solicitud extends Eloquent
     {
         return Solicitud::select( [ 'id' , 'token' , 'id_detalle' , 'id_user_assign' , 'titulo' ] )
             ->where( 'id_estado' , DEPOSITO_HABILITADO )
-            ->with( [ 'detalle' , 'clients' ] )
+            ->with( [ 'detalle' , 'clients' , 'personalTo' ] )
+            ->orderBy( 'id' , 'ASC' )->get();
+    }
+
+    protected function getRevisionSolicituds()
+    {
+        return Solicitud::select( [ 'id' , 'token' ] )
+            ->where( 'id_estado' , APROBADO )
+            ->orderBy( 'id' , 'ASC' )->get();
+    }
+
+    protected function getDepositSeatSolicituds()
+    {
+        return Solicitud::select( [ 'id' , 'token' ] )
+            ->where( 'id_estado' , DEPOSITADO )
+            ->orderBy( 'id' , 'ASC' )->get();
+    }
+
+    protected function getRegularizationSeatSolicituds()
+    {
+        return Solicitud::select( [ 'id' , 'token' ] )
+            ->where( 'id_estado' , REGISTRADO )
             ->orderBy( 'id' , 'ASC' )->get();
     }
 
     protected static function findByToken( $token )
     {
         return Solicitud::where( 'token' , $token )->first();
+    }
+
+    protected static function findByTokens( $tokens )
+    {
+        return Solicitud::whereIn( 'token' , $tokens )->get();
     }
 
 }

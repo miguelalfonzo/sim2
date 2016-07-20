@@ -27,8 +27,8 @@
 					<td>{{{ $dailyEntry->penclave or '' }}}</td>
 					<td>{{ $dailyEntry->num_cuenta }}</td>
 					<td>{{ $dailyEntry->cc }}</td>
-					<td></td>
-					<td>{{ Carbon\Carbon::createFromFormat( 'Y-m-d h:i:s' , $dailyEntry->fec_origen )->format( 'd/m/Y' ) }}</td>
+					<td>{{ $dailyEntry->nro_origen }}</td>
+					<td>{{ Carbon\Carbon::createFromFormat( 'Y-m-d H:i:s' , $dailyEntry->fec_origen )->format( 'd/m/Y' ) }}</td>
 					<td>{{ $dailyEntry->iva }}</td>
 					<td>{{ $dailyEntry->cod_pro }}</td>
 					<td>{{ $dailyEntry->nom_prov }}</td>

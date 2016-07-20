@@ -65,8 +65,10 @@ Route::filter( 'developer' , 'Filter\FilterController@admin' );
 */
 Route::filter( 'csrf' , function () 
 {
-    if( Session::token() !== Input::get('_token') )
+	if( Session::token() !== Input::get('_token') )
     { 
-        return App::make('BaseController')->callAction( 'warningException' , array( 'Es necesario que vuelva a cargar la pagina debido a sesion inactiva o acceso desde otro dispositivo' , __FUNCTION__ , __LINE__ , __FILE__ ) );
+        $rpta = App::make('BaseController')->callAction( 'warningException' , array( 'Es necesario que vuelva a cargar la pagina debido a sesion inactiva o acceso desde otro dispositivo' , __FUNCTION__ , __LINE__ , __FILE__ ) );
+    	$rpta[ status ] = 'Csrf';
+    	return $rpta;
     }
 });

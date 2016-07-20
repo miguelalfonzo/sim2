@@ -1,5 +1,5 @@
 <div class="modal fade" id="massive-deposit-modal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">
@@ -29,7 +29,7 @@
                 </div>
                 <div class="form-group">
                     <label>Busqueda ( Presionar Enter )</label>
-                    <input type="text" id="filter-solicitud-id" class="form-control" style="font-weight:bold">
+                    <input type="text" id="filter-solicitud-id" class="form-control" style="font-weight:bold;text-transform:uppercase">
                 </div>
                 <div style="max-height:300px;overflow-y:scroll">
                 	<table id="massive-deposit-table" class="table table-striped table-hover table-bordered table-condensed" cellspacing="0" width="100%">
@@ -37,6 +37,9 @@
                 			<tr>
                                 <th>N°</th>
     		            		<th># Solicitud</th>
+                                <th>Colaborador</th>
+                                <th>Cuenta</th>
+                                <th>Monto</th>
     		            		<th>N° Operacion</th>
                 			</tr>
                 		</thead>
@@ -45,7 +48,10 @@
                     			<tr>
                                     <td><b>{{ $key + 1 }}</b></td>
                     				<td class="deposit-solicitud-cell"><b>{{ $depositId->id }}</b></td>
-                    				<td class="deposit-operacion-cell"><b><input type="text" class="form-control" autocomplete="off"></b></td>
+                    				<td><b>{{ mb_strtoupper( $depositId->personalTo->full_name ) }}</b></td>
+                                    <td><b>{{ $depositId->personalTo->getAccount() }}</b></td>
+                                    <td><b>{{ $depositId->detalle->currency_money }}</b></td>
+                                    <td class="deposit-operacion-cell"><b><input type="text" class="form-control" autocomplete="off"></b></td>
                                     <input type="hidden" class="deposit-solicitud-token" value="{{ $depositId->token }}"> 
                     			</tr>
                             @endforeach
@@ -54,22 +60,13 @@
                 </div>
             </div>
             <div class="modal-footer">
-        	    <button type="button" id="register-deposit-massive" class="btn btn-success ladda-button" data-style="zoom-in">Confirmar</a>
+        	    <button type="button" id="register-deposit-massive" class="btn btn-success ladda-button" data-style="zoom-in">Confirmar</button>
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
 </div>
 <script>
-    /*$( '#deposit-add' ).click( function()
-    {
-        var newTr = '<tr>' +
-                        '<td class="deposit-solicitud-cell"><input type="text" class="form-control"></td>' +
-                        '<td class="deposit-operacion-cell"><input type="text" class="form-control"></td>' +
-                    '</tr>';
-        $( '#massive-deposit-table' ).append( newTr );
-    });*/
-
     $( '#register-deposit-massive' ).click( function()
     {
         var spin = Ladda.create( this );
@@ -85,15 +82,15 @@
         {
             depositTableTr    = depositTableTrs.eq( i );
             depositTableTds   = depositTableTr.find( 'td' );
-            depositNumberCell = depositTableTds.eq( 2 ).find( 'input' );
-            if( depositNumberCell.length !== 0 )
+            depositNumberCell = depositTableTr.find( '.deposit-operacion-cell input' );
+            if( depositNumberCell.length != 0 )
             {
                 depositNumber = depositNumberCell.val().trim();
                 if( depositNumber != '' )
                 {
                     solicitud = 
                     { 
-                        id        : depositTableTds.eq( 1 ).text(),
+                        id        : depositTableTr.find( '.deposit-solicitud-cell' ).text(),
                         token     : depositTableTr.find( '.deposit-solicitud-token' ).val(),
                         operacion : depositNumber
                     };
@@ -104,7 +101,6 @@
         }
         if( solicituds.length == 0 )
         {
-            //spin.stop();
             bootbox.alert( '<h4 class="text-warning"><b>No ingreso al menos un numero de operacion</b></h4>' );
         }
         else
@@ -133,44 +129,24 @@
                         ajaxError( statusCode , errorThrow );
                     }).done( function( response )
                     {
-                        if( response.Status === ok )
+                        if( response.Status != ok )
                         {
-                            //bootboxMessage( response );
-                            var rowStatus;
-                            for( var i = 0 ; i < indexs.length ; i++ )
-                            {
-                                depositTableTr = depositTableTrs.eq( indexs[ i ] );
-                                depositTableTds = depositTableTr.find( 'td' );
-                                id = depositTableTds.eq( 1 ).text();
-                                rowStatus = response[ data ][ id ];
-                                if( rowStatus.Status === ok )
-                                {
-                                    depositTableTr.addClass( 'success' ).attr( 'title' , 'Ok' );
-                                    depositTableTds.eq( 2 ).find( 'b' ).text( rowStatus.operacion );
-                                }
-                                else
-                                {
-                                    depositTableTr.addClass( 'danger' ).attr( 'title' , rowStatus.Description );
-                                }
-                            }
-                            spin.stop();
-                            window.location.href = 'deposit-export';
-                            getSolicitudList();
+                            bootboxMessage( response );
                         }
-                        else if( response.Status === warning )
+                        
+                        if( typeof response[ data ] !== 'undefined' )
                         {
-                            //bootboxMessage( response );
                             var rowStatus;
                             for( var i = 0 ; i < indexs.length ; i++ )
                             {
                                 depositTableTr = depositTableTrs.eq( indexs[ i ] );
                                 depositTableTds = depositTableTr.find( 'td' );
-                                id = depositTableTds.eq( 1 ).text();
+                                id = depositTableTr.find( '.deposit-solicitud-cell' ).text();
                                 rowStatus = response[ data ][ id ];
                                 if( rowStatus.Status === ok )
                                 {
                                     depositTableTr.addClass( 'success' ).attr( 'title' , 'Ok' );
-                                    depositTableTds.eq( 2 ).find( 'b' ).text( rowStatus.operacion );
+                                    depositTableTr.find( '.deposit-operacion-cell b' ).text( rowStatus.operacion );
                                 }
                                 else
                                 {
@@ -197,46 +173,66 @@
         if( event.keyCode === 13 )
         {
             $( '#massive-deposit-table tbody tr' ).hide();
-            $( '#massive-deposit-table tbody tr:contains(' + this.value + ')' ).show();
+            $( '#massive-deposit-table tbody tr:contains(' + this.value.toUpperCase() + ')' ).show();
         }
     });
 
-    $( document ).off( 'keypress' , '.deposit-solicitud-cell' );
-    $( document ).on( 'keypress' , '.deposit-solicitud-cell' , function( event )
+    function inputUp( tableBody , rowIndex , columIndex , i )
     {
-        var cell = $( this );
-        var e = event;
-        var rowIndex = cell.closest( 'tr' ).index();
-        var columIndex = cell.closest( 'td' ).index();
-        var tableBody = $( '#massive-deposit-table tbody' );
+        ++i;
+        var tr = tableBody.find( 'tr' ).eq( rowIndex - i );
+        aaa = tr;
+        if( tr.css( 'display' ) == 'none' )
+        {
+            inputUp( tableBody , rowIndex , columIndex , i );
+        }
+        else
+        {
+            var input = tr.find( 'td' ).eq( columIndex ).find( 'input' );
+            if( input.length == 0 )
+            {
+               inputUp( tableBody , rowIndex , columIndex , i );
+            }
+            else
+            {
+                input.focus();
+            }
+        }
+    }
+
+    function inputDown( tableBody , rowIndex , columIndex )
+    {
+        var trs = tableBody.children();
+        if( ( rowIndex + 1 ) == trs.length )
+        {
+            var newRowIndex = 0;
+        }
+        else
+        {
+            var newRowIndex = rowIndex + 1;
+        }
+        var tr    = tableBody.find( 'tr' ).eq( newRowIndex );
+        aaa = tr;
         
-        if( e.keyCode === 38 )
+        if( tr.css( 'display' ) == 'none' )
         {
-           var input =  tableBody.find( 'tr' ).eq( rowIndex - 1 ).find( 'td' ).eq( columIndex ).find( 'input' );
-           input.focus();
+           inputDown( tableBody , newRowIndex , columIndex );
         }
-        /*else if( e.keyCode === 39 )
+        else
         {
-           var input =  tableBody.find( 'tr' ).eq( rowIndex ).find( 'td' ).eq( columIndex + 1 ).find( 'input' );
-           input.focus();
-        }*/
-        else if( e.keyCode === 40 )
-        {
-           var input =  tableBody.find( 'tr' ).eq( rowIndex + 1 ).find( 'td' ).eq( columIndex ).find( 'input' );
-           input.focus();
+            var input = tr.find( 'td' ).eq( columIndex ).find( 'input' );
+            if( input.length == 0 )
+            {
+               inputDown( tableBody , newRowIndex , columIndex );        
+            }
+            else
+            {
+                input.focus();
+            }
         }
-        /*else if( e.keyCode === 13 )
-        {
-            var newTr = '<tr>' +
-                        '<td class="deposit-solicitud-cell" ><input type="text" class="form-control"></td>' +
-                        '<td class="deposit-operacion-cell"><input type="text" class="form-control"></td>' +
-                    '</tr>';
-            var tableBodyTr =  tableBody.find( 'tr' ).eq( rowIndex );
-            tableBodyTr.after( newTr );
-        }*/
-    });
-    $( document ).off( 'keypress' , '.deposit-operacion-cell' );
-    $( document ).on( 'keypress' , '.deposit-operacion-cell' , function( event )
+    }
+
+    $( '.deposit-operacion-cell' ).on( 'keydown' , function( event )
     {
         var cell = $( this );
         var e = event;
@@ -244,29 +240,14 @@
         var columIndex = cell.closest( 'td' ).index();
         var tableBody = $( '#massive-deposit-table tbody' );
 
+        var i = 0;
         if( e.keyCode === 38 )
         {
-           var input =  tableBody.find( 'tr' ).eq( rowIndex - 1 ).find( 'td' ).eq( columIndex ).find( 'input' );
-           input.focus();
+            inputUp( tableBody , rowIndex , columIndex , i );
         }
-        /*else if( e.keyCode === 37 )
-        {
-           var input =  tableBody.find( 'tr' ).eq( rowIndex ).find( 'td' ).eq( columIndex - 1 ).find( 'input' );
-           input.focus();
-        }*/
         else if( e.keyCode === 40 )
         {
-           var input =  tableBody.find( 'tr' ).eq( rowIndex + 1 ).find( 'td' ).eq( columIndex ).find( 'input' );
-           input.focus();
+            inputDown( tableBody , rowIndex , columIndex );
         }
-       /* else if( e.keyCode === 13 )
-        {
-           var newTr = '<tr>' +
-                        '<td class="deposit-solicitud-cell"><input type="text" class="form-control"></td>' +
-                        '<td class="deposit-operacion-cell"><input type="text" class="form-control"></td>' +
-                    '</tr>';
-            var tableBodyTr =  tableBody.find( 'tr' ).eq( rowIndex );
-            tableBodyTr.after( newTr );
-        }*/
     });
 </script>

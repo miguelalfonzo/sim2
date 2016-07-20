@@ -350,61 +350,42 @@ $(function()
     });
     
     //Generate Seat Solicitude
-    $("#seat-solicitude").on("click",function(e){
-        var $btn = $(this).button('loading');
-        e.preventDefault();
-        var data = {};
-        data._token = $("input[name=_token]").val();
-        var name_account = [];
-        var number_account = [];
-        var dc = [];
-        var total = [];
-        var leyenda = [];
-        $("#table-seat-solicitude tbody .number_account").each(function(index){
-            number_account[index] = $(this).text().trim();
-        });
-        $("#table-seat-solicitude tbody .dc").each(function(index){
-            dc[index] = $(this).text().trim();
-        });
-        $("#table-seat-solicitude tbody .leyenda").each(function(index){
-            leyenda[index] = $(this).text().trim();
-        });
-        $("#table-seat-solicitude tbody .total").each(function(index){
-            total[index] = parseFloat($(this).text());
-        });
-        data.number_account = number_account;
-        data.dc = dc;
-        data.total = total;
-        data.leyenda = leyenda;
-        var url = server+'generate-seat-solicitude';
-        if($(this).data('url'))
+    $( '#seat-solicitude' ).on( 'click' , function()
+    {
+        var $btn = $( this ).button( 'loading' );
+        var data = 
         {
-            url = server + 'generate-seat-fondo';
-            data.idfondo = parseInt($("#idfondo").val(),10);
-        }
-        else
-            data.idsolicitud = $("input[name=idsolicitud]").val();
+            _token          : GBREPORTS.token,
+            solicitud_token : token
+        };
+        
+        var url = server + 'generar-asiento-anticipo';
+
         bootbox.confirm("¿Esta seguro que desea Generar el Asiento Contable?", function(result) 
         {
             $( '.bootbox button[ data-bb-handler=confirm ]' ).attr( 'disabled' , true );
-            if(result)
+            if( result )
             {
-                $.post(url, data)
-                .done( function (data)
+                $.post(url, data )
+                .done( function ( response )
                 {
-                    if(data.Status == 'Ok')
+                    $btn.button( 'reset' );    
+                    if( response.Status == ok )
                     {
                         bootbox.alert("<h4 class='green'>Se generó el asiento contable correctamente.</h4>", function()
                         {
-                            window.location.href = server+'show_user';
+                            window.location.href = server + 'show_user';
                         });
                     }
                     else
-                        bootbox.alert("<h4 class='red'>" + data.Status + ": " + data.Description + "</h4>");
+                    {
+                        bootboxMessage( response )
+                    }
                 });
             }
-            else{
-                $btn.button('reset')
+            else
+            {
+                $btn.button( 'reset' );
             }
         });
     });
@@ -419,7 +400,7 @@ $(function()
                 var data =
                 {
                     _token      : GBREPORTS.token ,
-                    idsolicitud : $("input[name=idsolicitud]").val()
+                    idsolicitud : id_solicitud.val()
                 }
                 $.post( server + 'revisar-solicitud' , data ).done( function ( data )
                 {
@@ -552,7 +533,7 @@ $(function()
         data : 
         {
             _token      : $('input[name=_token]').val() ,
-            idsolicitud : $('input[name=idsolicitud]').val()
+            idsolicitud : id_solicitud.val()
         }
         }).fail( function ( statusCode , errorThrown )
         {
@@ -630,13 +611,13 @@ $(function()
                         if ( data.expense.idtipotributo === null || data.expense.idtipotributo == 0 )
                         {
                             $("#regimen").val(0);
-                            $("#monto-regimen").val('').parent().parent().css("visibility" , "hidden" ); 
+                            $("#monto-regimen").val('').closest( '.form-group' ).hide();  
                         }
                         else
                         {
                             $("#regimen").val(data.expense.idtipotributo);
                             if ( data.expense.idtipotributo >= 1 )
-                                $("#monto-regimen").val(data.expense.monto_tributo).parent().parent().css("visibility" , "show" ); 
+                                $("#monto-regimen").val(data.expense.monto_tributo).closest( '.form-group' ).show(); 
                         }
                         $("#monto-regimen").numeric({negative:false});
                     }
@@ -1307,12 +1288,12 @@ $(function()
     $( document ).off( 'click' , '#saveSeatExpense' );
     $( document ).on( 'click' , '#saveSeatExpense' , function()
     {
-        var $btn = $(this).button('loading');
-        var button = $(this);
-        var data = {};
-        data.seatList = GBDMKT.seatsList;
-        data._token   = $("input[name=_token]").val();
-        data.idsolicitud = $('#idsolicitud').attr("rel");
+        var $btn = $( this ).button( 'loading' );
+        var data = 
+        {
+            _token          : GBREPORTS.token,
+            solicitud_token : token
+        };
         bootbox.confirm("¿Esta seguro que desea Generar el Asiento de Gasto (Diario)?", function(result) 
         {
             $( '.bootbox button[ data-bb-handler=confirm ]' ).attr( 'disabled' , true );
@@ -1320,17 +1301,17 @@ $(function()
             {
                 $.ajax(
                 {
-                    type: 'post',
-                    url: server + 'guardar-asiento-gasto',
-                    data: data
+                    type : 'post',
+                    url  : server + 'guardar-asiento-gasto',
+                    data : data
                 }).fail( function( statusCode , errorThrown)
                 {
-                    bootbox.alert('<h4 class="red"> No se pudo acceder al servidor </h4>');
-                }).done( function ( result ) 
+                    $btn.button( 'reset' );
+                    ajaxError( statusCode , errorThrown );
+                }).done( function ( response ) 
                 {
-                    if( result.Status != 'Ok')
-                        bootbox.alert('<h4>' + result.Status + ': ' + result.Description + '</h4>');
-                    else if ( result.Status == 'Ok' )
+                    $btn.button( 'reset' );
+                    if( response.Status == ok )
                     {
                         responseUI( "Asiento Diario Registrado" , "green" );
                         setTimeout( function()
@@ -1338,9 +1319,14 @@ $(function()
                             window.location.href = server + 'show_user'; 
                         }, 2000);
                     }
+                    else
+                    {
+                        bootboxMessage( response );
+                    }
                 });
             }
-            else{
+            else
+            {
                 $btn.button('reset');
             }
         });
@@ -1478,17 +1464,17 @@ $(function()
                 }
                 var modal = $('#documents_Modal');
                 if ( response.Data.sub_tot === null )
-                    modal.find('#subtotal').val('').parent().parent().hide();
+                    modal.find('#subtotal').val('').closest( '.form-group' ).hide();
                 else
-                    modal.find('#subtotal').val( response.Data.moneda + ' ' + response.Data.sub_tot ).parent().parent().show();
+                    modal.find('#subtotal').val( response.Data.moneda + ' ' + response.Data.sub_tot ).closest( '.form-group' ).show();
                 if ( response.Data.igv === null )
-                    modal.find('#igv').val('').parent().parent().hide();
+                    modal.find('#igv').val('').closest( '.form-group' ).hide();
                 else    
-                    modal.find('#igv').val( response.Data.moneda + ' ' + response.Data.igv ).parent().parent().show();
+                    modal.find('#igv').val( response.Data.moneda + ' ' + response.Data.igv ).closest( '.form-group' ).show();
                 if ( response.Data.imp_serv === null )
-                    modal.find('#imp-serv').val('').parent().parent().hide();
+                    modal.find('#imp-serv').val('').closest( '.form-group' ).hide();
                 else
-                    modal.find('#imp-serv').val( response.Data.moneda + ' ' + response.Data.imp_serv ).parent().parent().show();
+                    modal.find('#imp-serv').val( response.Data.moneda + ' ' + response.Data.imp_serv ).closest( '.form-group' ).show();
                 if ( response.Data.reparo == 0 )
                     modal.find('#reparo').val( 'No' );
                 else if ( response.Data.reparo == 1 )
@@ -1499,12 +1485,12 @@ $(function()
                 if ( response.Data.idtipotributo == null )
                 {
                     modal.find('#regimen').val( 0 );
-                    modal.find('#monto-regimen').val( response.Data.monto_tributo ).closest( '.form-group' ).css( 'visibility' , 'hidden' ); 
+                    modal.find('#monto-regimen').val( response.Data.monto_tributo ).closest( '.form-group' ).hide(); 
                 }
                 else
                 {
                     modal.find('#regimen').val( response.Data.idtipotributo );
-                    modal.find('#monto-regimen').val( response.Data.monto_tributo ).closest( '.form-group' ).css( 'visibility' , 'show' );
+                    modal.find('#monto-regimen').val( response.Data.monto_tributo ).closest( '.form-group' ).show();
                 }
                 modal.modal();
             }

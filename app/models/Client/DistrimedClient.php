@@ -18,4 +18,9 @@ class DistrimedClient extends Eloquent
     	else
     		return $this->clrut . '-' . $this->clnombre;	
     }
+
+    protected function getEntryNameAttribute()
+    {
+        return $this->clnombre;
+    }
 }

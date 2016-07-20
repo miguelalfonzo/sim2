@@ -88,16 +88,20 @@ class BaseController extends Controller
     protected function msgValidator( $validator )
     {
         $rpta = '';
-        foreach ($validator->messages()->all() as $msg)
+        foreach( $validator->messages()->all() as $msg )
+        {
             $rpta .= $msg.'<br> ';
-        return $rpta;
+        }
+        return substr( $rpta , 0 , -1 );
     }
 
     protected function msg2Validator( $validator )
     {
         $rpta = '';
-        foreach ( $validator->messages()->all() as $msg )
+        foreach( $validator->messages()->all() as $msg )
+        {
             $rpta .= $msg . ' - ' ;
+        }
         return substr( $rpta , 0 , -1 );
     }
 
@@ -266,5 +270,23 @@ class BaseController extends Controller
         return View::make('template.leyenda', $data);
     }
 
-
+    protected function trim_text( $input, $length ) 
+    {
+        if( $length > 0 )
+        {
+            $inputLength = strlen( $input );
+            if( $inputLength > $length )
+            {
+                return substr( $input , $length * -1 );
+            }
+            else
+            {
+                return $input;
+            }
+        }
+        else
+        {
+            return '';
+        }
+    }
 }

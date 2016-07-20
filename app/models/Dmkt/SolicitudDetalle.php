@@ -106,6 +106,38 @@ class SolicitudDetalle extends Eloquent
         }
     }
 
+    protected function getSolesImportAttribute()
+    {
+        if( $this->id_moneda == DOLARES )
+        {
+            return round( $this->monto_actual * $this->tcv , 2 , PHP_ROUND_HALF_DOWN );
+        }
+        elseif( $this->id_moneda == SOLES )
+        {
+            return $this->monto_actual;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    protected function getSolesDepositImportAttribute()
+    {
+        if( $this->id_moneda == DOLARES )
+        {
+            return round( $this->deposit->total * $this->tcv , 2 , PHP_ROUND_HALF_DOWN );
+        }
+        elseif( $this->id_moneda == SOLES )
+        {
+            return $this->deposit->total;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     public function lastId()
     {
         $lastId = SolicitudDetalle::orderBy('id', 'DESC')->first();
