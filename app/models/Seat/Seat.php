@@ -29,7 +29,7 @@ class Seat extends Eloquent
         return $seat;
     }
 
-    protected static function registerSeat( $systemSeat , $seatPrefix , $key , $date , $state )
+    protected static function registerSeat( $systemSeat , $seatPrefix , $key , $state )
     {
         $seat                = new Seat;
         $seat->penclave      = $seatPrefix . str_pad( ( $key + 1 ) , 4 , 0 , STR_PAD_LEFT ); //CLAVE DE BAGO DEL ASIENTO
@@ -37,14 +37,12 @@ class Seat extends Eloquent
         $seat->pentipomovim  = 'VS';
 
         //EL CAMPO PENAAMOVIM ES EL MISMO DIA DE LA TRANSFERENCIA O ES EL ULTIMO DIA DEL MES PARA LOS ASIENTOS CON PREFIJO 0 (MANUALES)
-        if( substr( $seatPrefix , 0 , 1 ) == 0 )
-        {
-            $date->lastOfMonth();
-        }
+        $now = Carbon::now();
 
-        $seat->penddmovim    = str_pad( $date->day , 2 , 0 , STR_PAD_LEFT );// DIA ( TEXTO DOS DIGITOS )DEL REGISTRO DEL ASIENTO , CIERRE CONTABLE GENERALMENTE 31 o 30 o 29 o 28
-        $seat->penmmmovim    = str_pad( $date->month , 2 , 0 , STR_PAD_LEFT );// MES ( TEXTO DOS DIGITOS )DEL REGISTRO DEL ASIENTO , MES DEL REGISTRO DEL ASIENTO
-        $seat->penaamovim    = $date->year; //AÑO DE REGISTRO DEL ASIENTO
+        $seat->penddmovim    = $now->format( 'd' );// DIA ( TEXTO DOS DIGITOS )DEL REGISTRO DEL ASIENTO , CIERRE CONTABLE GENERALMENTE 31 o 30 o 29 o 28
+        $seat->penmmmovim    = $now->format( 'm' );// MES ( TEXTO DOS DIGITOS )DEL REGISTRO DEL ASIENTO , MES DEL REGISTRO DEL ASIENTO
+        $seat->penaamovim    = $now->format( 'Y' );
+
         $seat->penctaextern  = $systemSeat->num_cuenta; //CUENTA CONTABLE 7 DIGITOS
         $seat->pencodcompor  = Self::blankspace( $systemSeat->cc ); // CODIGO DEL TIPO DE DOCUMENTO ESTABLECIDO POR SUNAT| '00' => NO SUSTENTABLE | CODIGOS DIFERENTES PARA FACTURAS , BOLETAS , TICKET , RECIBO POR HONORARIOS 
         $seat->penddcomporg  = str_pad( $systemSeat->fec_origen->day , 2 , 0 , STR_PAD_LEFT ); // DIA DEL DOCUMENTO | texto 2 digitos

@@ -137,8 +137,7 @@ class MigrateSeatController extends BaseController
 		{
 			$state = ' ';
 		}
-		$seatDate = Carbon::createFromFormat( 'Y-m-d H:i:s' , $seat->fec_origen );
-		return Seat::registerSeat( $seat , $seatPrefix , $key , $seatDate , $state );
+		return Seat::registerSeat( $seat , $seatPrefix , $key , $state );
 	}
 
 	private function generateSeatExcel( $data )
