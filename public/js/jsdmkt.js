@@ -1743,7 +1743,11 @@ function bootboxMessage( response )
     {
         colorClass = 'text-danger';
     }
-    bootbox.alert( '<h4 class="' + colorClass + '">' + response.Status + ': ' + response.Description + '</h4>' );
+    else
+    {
+        colorClass = 'text-info';
+    }
+    bootbox.alert( '<h4 class="' + colorClass + '">' + response.Description + '</h4>' );
 
 }
 

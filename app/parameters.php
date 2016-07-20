@@ -1,6 +1,5 @@
 <?php
 
-const TIPO_ASIENTO_ANTICIPO = 'A';
 const IMAGE_PATH            = 'img/reembolso/';
 const WIDTH                 = 800;
 const HEIGHT                = 600;
@@ -18,17 +17,18 @@ const CUENTA_BAGO           = 'B';
 const SOLES   = 1;
 const DOLARES = 2;
 
-// ASIENTOS DE GASTOS
+// ASIENTOS
+const ASIENTO_GASTO_BASE                      = 'D';
+const ASIENTO_GASTO_DEPOSITO                  = 'C';
+const TIPO_ASIENTO_ANTICIPO                   = 'A';
+const TIPO_ASIENTO_GASTO                      = 'G';
+const ERROR_NOT_FOUND_MATCH_ACCOUNT_MKT_CNT   = 'No se encontro cuenta relacionada';
 const ASIENTO_GASTO_IVA_BASE                  = 'N6';
 const ASIENTO_GASTO_IVA_IGV                   = 'I6';
 const ASIENTO_GASTO_COD_PROV_IGV              = '90000';
 const ASIENTO_GASTO_COD_PROV                  = '';
 const ASIENTO_GASTO_COD_IGV                   = '80';
 const ASIENTO_GASTO_COD                       = '';
-const ASIENTO_GASTO_BASE                      = 'D';
-const ASIENTO_GASTO_DEPOSITO                  = 'C';
-const ASIENTO_GASTO_TIPO                      = 'G';
-const ERROR_NOT_FOUND_MATCH_ACCOUNT_MKT_CNT   = 'No se encontro cuenta relacionada';
 const MESSAGE_NOT_FOUND_MATCH_ACCOUNT_MKT_CNT = 'Verificar relación entre las cuentas de Marketing y Contabilidad';
 const ERROR_NOT_FOUND_MARCA                   = 'No se encontro Marca';
 const MESSAGE_NOT_FOUND_MARCA                 = 'Verificar relación entre las Cuentas de Contabilidad y las Marcas';
@@ -39,6 +39,7 @@ const CUENTA_RETENCION_HABER                  = 4011400;
 const CUENTA_DETRACCION_HABER                 = 4212300;
 const CUENTA_RENTA_4TA_HABER                  = 4017200;
 const CUENTA_HABER_REEMBOLSO                  = 4699700;
+const CUENTA_RECIBO_HONORARIO                 = 4241000;
 const ERROR_INVALID_ACCOUNT_MKT               = 'Error de Cuenta';
 const MSG_INVALID_ACCOUNT_MKT                 = 'Verificar campo de cuenta';
 

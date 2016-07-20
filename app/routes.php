@@ -8,7 +8,7 @@
 
     Route::group( array( 'before' => 'developer' , 'namespace' => 'Seat' , 'prefix' => 'migrate' ) , function()
     {
-        Route::get( 'seats2' , 'MigrateSeatController@migrateSeats');
+        Route::get( 'entries' , 'MigrateSeatController@migrateEntries');
     });
 
     Route::get( "logs", [ 
@@ -84,33 +84,56 @@
     */
     
     Route::group( array( 'before' => 'cont' ), function () 
-    {
-        Route::get( 'solicitudsToDeposit' , 'Dmkt\SolicitudeController@solicitudsToDeposit' );
-        Route::post('revisar-solicitud', 'Dmkt\SolicitudeController@checkSolicitud');
-        Route::get('revisar-asiento-solicitud/{token}', 'Dmkt\SolicitudeController@viewSeatSolicitude');
-        Route::get('generar-asiento-solicitud/{token}', 'Dmkt\SolicitudeController@viewGenerateSeatSolicitude');
-        Route::post('generate-seat-solicitude', 'Dmkt\SolicitudeController@generateSeatSolicitude');  
-        Route::get('revisar-asiento-gasto/{token}', 'Dmkt\SolicitudeController@viewSeatExpense');
-        Route::get('generar-asiento-gasto/{token}', 'Dmkt\SolicitudeController@viewGenerateSeatExpense');
-        Route::post('guardar-asiento-gasto', 'Dmkt\SolicitudeController@saveSeatExpense');
-        Route::post('get-account', 'Dmkt\SolicitudeController@getCuentaContHandler');
-        Route::get('list-documents-type', 'Dmkt\FondoController@listDocuments');
+    { 
+  
         Route::post('list-documents', 'Movements\MoveController@searchDocs');
         
-        Route::post('maintenance/cont-document-manage' , 'Expense\ExpenseController@manageDocument');
-        Route::post('consultarRucCont', 'Expense\RucController@show');
-        Route::get('edit-expense-cont', 'Expense\ExpenseController@editExpense');
-        Route::post('get-document-detail' , 'Expense\ExpenseController@getDocument');
-        Route::post('update-document' , 'Expense\ExpenseController@updateDocument');
+        Route::group( [ 'namespace' => 'Expense' ] , function()
+        {
+            Route::get( 'edit-expense-cont', 'ExpenseController@editExpense');
+            Route::post( 'maintenance/cont-document-manage' , 'ExpenseController@manageDocument');
+            Route::post( 'get-document-detail' , 'ExpenseController@getDocument');
+            Route::post( 'update-document' , 'ExpenseController@updateDocument');
+            Route::post( 'end-expense-record' , 'ExpenseController@endExpenseRecord' );
+            Route::post( 'consultarRucCont', 'RucController@show');
+        });
+      
+        Route::group( [ 'namespace' => 'Deposit' ] , function()
+        {
+            Route::post( 'modal-liquidation' , 'DepositController@modalLiquidation' );
+            Route::post( 'confirm-liquidation' , 'DepositController@confirmLiquidation' );
+        });
 
-        Route::get( 'export/solicitudToDeposit-pdf' , 'Export\ExportController@exportSolicitudToDepositPDF' );
-        Route::get( 'export/solicitudToDeposit-excel' , 'Export\ExportController@exportSolicitudToDepositExcel' );
-        Route::post( 'end-expense-record' , 'Expense\ExpenseController@endExpenseRecord' );
+        Route::group( [ 'namespace' => 'Dmkt' ] , function()
+        {
+            Route::get( 'solicitudsToDeposit' , 'SolicitudeController@solicitudsToDeposit' );
+            Route::get( 'maintenance/finddocument', 'SolicitudeController@findDocument' );
+            Route::post( 'get-account', 'SolicitudeController@getCuentaContHandler' );
+            Route::post( 'revisar-solicitud', 'SolicitudeController@checkSolicitud' );
+            Route::post( 'massive-solicitud-revision' , 'SolicitudeController@massiveSolicitudsRevision' );
 
-        Route::post( 'modal-liquidation' , 'Deposit\DepositController@modalLiquidation' );
-        Route::post( 'confirm-liquidation' , 'Deposit\DepositController@confirmLiquidation' );
-        Route::get('maintenance/finddocument', 'Dmkt\SolicitudeController@findDocument');
-        Route::get('maintenance/documenttype', 'Dmkt\FondoController@listDocuments');
+            Route::get( 'list-documents-type', 'FondoController@listDocuments' );
+            Route::get( 'maintenance/documenttype', 'FondoController@listDocuments' );
+        });
+
+        Route::group( [ 'namespace' => 'Seat' ] , function()
+        {
+            Route::get( 'generar-asiento-gasto/{token}' , 'Generate@viewGenerateEntryExpense' );        
+    
+            Route::post( 'generar-asiento-anticipo' , 'Generate@generateAdvanceEntry' );  
+            Route::post( 'guardar-asiento-gasto', 'Generate@saveEntryExpense');
+        });
+
+        Route::group( [ 'namespace' => 'Export' ] , function()
+        {
+            Route::get( 'revision-export' , 'ExportController@revisionExport');
+            Route::get( 'advance-entry-export' , 'ExportController@advanceEntryExport' );
+            Route::get( 'regularization-entry-export' , 'ExportController@regularizationEntryExport' );
+            
+            Route::get( 'export/solicitudToDeposit-pdf' , 'ExportController@exportSolicitudToDepositPDF' );
+            Route::get( 'export/solicitudToDeposit-excel' , 'ExportController@exportSolicitudToDepositExcel' );
+        });
+
     });
 
     /*
@@ -251,7 +274,7 @@
         |--------------------------------------------------------------------------
         */
         
-        Route::get( 'timeline-modal/{id}' , 'Dmkt\SolicitudeController@getTimeLine');
+        Route::get( 'timeline-modal/{id}' , 'TimeLine\Controller@getTimeLine');
         
         /*
         |--------------------------------------------------------------------------

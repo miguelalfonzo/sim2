@@ -70,7 +70,7 @@ class DepositController extends BaseController
         $validator = Validator::make( $inputs , $rules , $messages );
         if ( $validator->fails() )
         {
-            return $this->warningException( substr( $this->msgValidator( $validator ), 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
+            return $this->warningException( $this->msgValidator( $validator ) , __FUNCTION__ , __LINE__ , __FILE__ );
         }
         return $this->setRpta();
     }
@@ -288,7 +288,7 @@ class DepositController extends BaseController
         $validator = Validator::make( $inputs , $rules );
         
         if ( $validator->fails() )
-            return $this->warningException( substr( $this->msgValidator( $validator ), 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
+            return $this->warningException( $this->msgValidator( $validator ) , __FUNCTION__ , __LINE__ , __FILE__ );
         
         $solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
         

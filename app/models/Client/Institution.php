@@ -13,4 +13,9 @@ class Institution extends Eloquent
     {
         return $this->pejrazon;
     }
+
+    protected function getEntryNameAttribute()
+    {
+    	return $this->pejrazon;
+    }
 }

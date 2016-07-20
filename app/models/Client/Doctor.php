@@ -12,4 +12,9 @@ class Doctor extends Eloquent
     {
         return $this->attributes[ 'pefnrodoc1' ].'-'.$this->attributes[ 'pefnombres' ].' '.$this->attributes[ 'pefpaterno'].' '.$this->attributes[ 'pefmaterno' ];
     }
+
+    protected function getEntryNameAttribute()
+    {
+    	return $this->pefnombres . ' ' . $this->pefpaterno . ' ' . $this->pefmaterno;
+    }
 } 

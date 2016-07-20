@@ -8,6 +8,7 @@
 }
 </style>
 <div class="content">
+	<input type="hidden" name="token" value="{{ $solicitud->token }}">
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h3 class="panel-title"><strong>Generar Asiento Diario</strong></h3><strong class="user">Usuario : {{Auth::user()->username}}</strong>
@@ -18,7 +19,7 @@
 				<div class="col-xs-12 col-sm-6 col-md-4">
 					<div class="form-expense">
 						<label>Solicitud</label>
-						<input id="idsolicitud" type="text" class="form-control" rel="{{$solicitud->id}}" value="{{$solicitud->id}} - {{mb_convert_case($solicitud->titulo,MB_CASE_TITLE,'UTF-8')}}" disabled>
+						<input type="text" class="form-control" value="{{ $solicitud->id . '-' . mb_convert_case( $solicitud->titulo , MB_CASE_TITLE , 'UTF-8' ) }}" disabled>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6 col-md-4">
@@ -99,33 +100,31 @@
 											</tr>
 										</thead>
 										<tbody>
-										@if ( isset( $seats ) )
-											@foreach($seats as $seatItem)
-											<tr class="{{ $seatItem->type == 'IGV' ? 'info' : ($seatItem->type == 'SER' ? 'warning' : ($seatItem->type == 'REP' ? 'danger' : ($seatItem->type == 'CAN' ? 'success' : ''))) }}">
-												<td class="cuenta editable" data-cuenta_mkt="{{ $seatItem->cuentaMkt }}">{{ $seatItem->numero_cuenta }}</td>
-												<td class="codigo_sunat">{{ $seatItem->codigo_sunat }}</td>
-												<td class="numero_origen"></td>
-												<td class="fecha_origen">{{ $seatItem->fec_origen }}</td>
-												<td class="iva">{{ $seatItem->iva }}</td>
-												<td class="cod_prov">{{ $seatItem->cod_prov }}</td>
-												<td class="nombre_proveedor">{{ $seatItem->nombre_proveedor }}</td>
-												<td class="cod">{{ $seatItem->cod }}</td>
-												<td class="ruc">{{ $seatItem->ruc }}</td>
-												<td class="prefijo">{{ $seatItem->prefijo }}</td>
-												<td class="cbte_proveedor">{{ $seatItem->cbte_proveedor }}</td>
-												<td class="dc">{{ $seatItem->dc }}</td>
-												<td class="importe">{{ $seatItem->importe }}</td>
-												<td class="leyenda">{{ $seatItem->leyenda }}</td>
-												<td class="leyenda_variable">{{ $seatItem->leyenda_variable }}</td>
-												<td class="tipo_responsable">{{ $seatItem->tipo_responsable }}</td>
-												<td>
-													<a class="edit-seat" href="#" {{ $seatItem->type != '' ? 'style="display:none;"' : ''  }}>
-														<span class="glyphicon glyphicon-pencil"></span>
-													</a>
-												</td>
-											</tr>
-											@endforeach
-										@endif
+										@foreach($seats as $seatItem)
+										<tr class="{{ $seatItem->type == 'IGV' ? 'info' : ($seatItem->type == 'SER' ? 'warning' : ($seatItem->type == 'REP' ? 'danger' : ($seatItem->type == 'CAN' ? 'success' : ''))) }}">
+											<td class="cuenta editable" data-cuenta_mkt="{{ $seatItem->cuentaMkt }}">{{ $seatItem->numero_cuenta }}</td>
+											<td class="codigo_sunat">{{ $seatItem->codigo_sunat }}</td>
+											<td class="numero_origen">{{ $seatItem->nro_origen }}</td>
+											<td class="fecha_origen">{{ $seatItem->fec_origen }}</td>
+											<td class="iva">{{ $seatItem->iva }}</td>
+											<td class="cod_prov">{{ $seatItem->cod_prov }}</td>
+											<td class="nombre_proveedor">{{ $seatItem->nombre_proveedor }}</td>
+											<td class="cod">{{ $seatItem->cod }}</td>
+											<td class="ruc">{{ $seatItem->ruc }}</td>
+											<td class="prefijo">{{ $seatItem->prefijo }}</td>
+											<td class="cbte_proveedor">{{ $seatItem->cbte_proveedor }}</td>
+											<td class="dc">{{ $seatItem->dc }}</td>
+											<td class="importe">{{ $seatItem->importe }}</td>
+											<td class="leyenda">{{ $seatItem->leyenda }}</td>
+											<td class="leyenda_variable">{{ $seatItem->leyenda_variable }}</td>
+											<td class="tipo_responsable">{{ $seatItem->tipo_responsable }}</td>
+											<td>
+												<a class="edit-seat" href="#" {{ $seatItem->type != '' ? 'style="display:none;"' : ''  }}>
+													<span class="glyphicon glyphicon-pencil"></span>
+												</a>
+											</td>
+										</tr>
+										@endforeach
 										</tbody>
 									</table>
 								</div>
@@ -157,32 +156,30 @@
 											</tr>
 										</thead>
 										<tbody>
-										@if ( isset($expenseItem) )
-										@foreach($expenseItem as $expenseValue)
-											<tr data-id="{{ $expenseValue->id }}">
-											    @foreach($typeProof as $val)
-											    	 @if($expenseValue->idcomprobante == $val->id)
-											    		<td rowspan="{{ $expenseValue->count }}" data-id="{{ $val->idcomprobante }}">{{ $val->descripcion }}</td>
-											    	@endif
-												@endforeach
-											    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->num_prefijo }}-{{ $expenseValue->num_serie }}</td>
-											    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->ruc }}</td>
-											    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->razon }}</td>
-											    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->descripcion }}</td>
-											    <td rowspan="{{ $expenseValue->count }}">{{ date("Y/m/d",strtotime($expenseValue->fecha_movimiento)) }}</td>
-											    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->sub_tot }}</td>
-											    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->igv }}</td>
-											    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->imp_serv }}</td>
-											    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->monto }}</td>
-											    @foreach($expenseValue->itemList as $expenseItem)
-											    	<td>{{ $expenseItem->cantidad }}</td>
-											    	<td>{{ $expenseItem->descripcion }}</td>
-											    	<td>{{ $expenseItem->importe }}</td>
-											    	</tr><tr>
-											    @endforeach
-											</tr>
-										@endforeach
-										@endif
+											@foreach($expenseItem as $expenseValue)
+												<tr data-id="{{ $expenseValue->id }}">
+												    @foreach($typeProof as $val)
+												    	 @if($expenseValue->idcomprobante == $val->id)
+												    		<td rowspan="{{ $expenseValue->count }}" data-id="{{ $val->idcomprobante }}">{{ $val->descripcion }}</td>
+												    	@endif
+													@endforeach
+												    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->num_prefijo }}-{{ $expenseValue->num_serie }}</td>
+												    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->ruc }}</td>
+												    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->razon }}</td>
+												    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->descripcion }}</td>
+												    <td rowspan="{{ $expenseValue->count }}">{{ date("Y/m/d",strtotime($expenseValue->fecha_movimiento)) }}</td>
+												    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->sub_tot }}</td>
+												    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->igv }}</td>
+												    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->imp_serv }}</td>
+												    <td rowspan="{{ $expenseValue->count }}">{{ $expenseValue->monto }}</td>
+												    @foreach($expenseValue->itemList as $expenseItem)
+												    	<td>{{ $expenseItem->cantidad }}</td>
+												    	<td>{{ $expenseItem->descripcion }}</td>
+												    	<td>{{ $expenseItem->importe }}</td>
+												    	</tr><tr>
+												    @endforeach
+												</tr>
+											@endforeach
 										</tbody>
 									</table>
 								</div>

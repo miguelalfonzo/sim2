@@ -35,9 +35,13 @@
                 <a class="btn btn-primary" data-toggle="modal" data-target="#massive-deposit-modal">
                     Deposito Masivo
                 </a>
-            @else
+            @elseif( Auth::user()->type == GER_COM )
                 <a id="btn-mass-approve" class="btn btn-primary">
                     Aprobación
+                </a>
+            @else
+                <a class="btn btn-primary" data-toggle="modal" data-target="#massive-revision-modal">
+                    Revision Masiva
                 </a>
             @endif
         </div>

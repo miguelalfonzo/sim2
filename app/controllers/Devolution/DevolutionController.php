@@ -122,7 +122,7 @@ class DevolutionController extends BaseController
 			'monto_descuento_planilla' => 'required|numeric|min:1' );  
         $validator = Validator::make( $inputs, $rules );
         if ( $validator->fails() ) 
-            return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
+            return $this->warningException( $this->msgValidator( $validator ) , __FUNCTION__ , __LINE__ , __FILE__ );
 	    return $this->setRpta(); 
     }
 
