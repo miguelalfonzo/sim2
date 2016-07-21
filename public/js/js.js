@@ -478,7 +478,7 @@ $(function()
             $("#number-serie").val("");
             $("#razon").text("");
             $( '#regimen' ).parent().parent().hide();
-            $( '#monto-regimen' ).parent().parent().hide();
+            $( '#monto-regimen' ).closest( '.form-group' ).hide();
         }
     }
 
