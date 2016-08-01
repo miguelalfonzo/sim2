@@ -29,10 +29,35 @@ var search_cliente    = $('.cliente-seeker');
 var idamount          = $('#amount');
 var doc_start         = $('.date_start').last();
 var doc_end           = $('.date_end').last();
-var cancel_solicitude = '.cancel-solicitude';
+var cancel_solicitud  = '.cancel-solicitud';
 var id_solicitud      = $( 'input[name=idsolicitud]' );
 var families          = $('#listfamily');
 var idState           = $("#idState");
+
+//LISTA SOLICITUD
+var PENDIENTE = 1;
+var DERIVADO  = 11;
+var ACEPTADO  = 2;
+var APROBADO  = 3;
+
+var CONFIRMADO = 13;
+var DEPOSITADO = 4;
+
+var DESCARGO = 12;
+var ENTREGADO = 6;
+var REGISTRADO = 5;
+
+var GER_COM = 'G';
+var CONT    = 'C';
+var TESORERIA = 'T';
+
+var DEVOLUCION_POR_VALIDAR = 2;
+var DEVOLUCION_POR_REALIZAR = 1;
+
+var aprobacionCheckBox = '<input name="mass-aprov" type="checkbox"/>';
+
+//var aprobadores;
+//var ESTADOS_APROBACION = [ PENDIENTE , DERIVADO , ACEPTADO ];
 
 //VALIDACION DE MONTOS DE FAMILIAS
 var amount_error_families = $('#amount_error_families');
@@ -580,14 +605,13 @@ if ( $('#deny_solicitude').length != 0 )
 }
 
 /* Cancel Solicitude */
-$(document).off( 'click' , cancel_solicitude );
-$(document).on( 'click' , cancel_solicitude, function () 
+$(document).off( 'click' , cancel_solicitud );
+$(document).on( 'click' , cancel_solicitud, function () 
 {
-    elem = $( this );
     var data = 
     {
-        idsolicitud: elem.attr('data-idsolicitude') ,
-        _token : elem.attr('data-token')
+        idsolicitud : this.dataset.idsolicitud ,
+        _token      : GBREPORTS.token
     };
     cancelDialog( data , '¿Esta seguro que desea cancelar esta solicitud?' );
 });
@@ -1661,6 +1685,7 @@ function ajaxError(statusCode,errorThrown)
         console.log( errorThrown );
         bootbox.alert('<h4 class="red">Error del Sistema</h4>');  
     }
+    Ladda.stopAll();
 }
 
 $(".date_month").datepicker(date_options2).on('changeDate', function (e) {
@@ -2241,3 +2266,306 @@ $( document ).ready(function()
     $( "#fecha-value" ).attr('disabled', true);
 });
 
+function listSolicituds()
+{
+    var d = new Date();
+    console.log( d.getTime() );
+    var data =
+    {
+        //_token     : GBREPORTS.token,
+        fecha_inicio : $('#drp_menubar').data('daterangepicker').startDate.format("L"),
+        fecha_final  : $('#drp_menubar').data('daterangepicker').endDate.format("L") ,
+        estado       : $('#idState').val()
+    };
+    /*if( $.fn.dataTable.isDataTable( $( '#table_' + 'solicituds' ) ) )
+    {
+        $( '#table_' + 'solicituds' ).DataTable().clear().destroy();
+    }*/
+        
+    customAjax( 'GET' , 'list-solicituds' , data ).done(function ( response ) 
+    {
+        if ( response.Status === 'Ok' )
+        {
+            processData( response.Data , response.usuario , response.usuario_temporal );
+            processColumns( response.columns , response.usuario , response.now );
+            var dataTable = $( '#table_' + 'solicituds' ).DataTable(
+            {
+                autoWidth       : false,
+                columns         : response.columns,
+                data            : response.Data ,
+                dom             : "<'row'<'col-xs-6'><'col-xs-6 pull-right'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
+                destroy         : true,
+                pageLength      : 10,
+                stateSave       : true,
+                language        :
+                {
+                    search       : 'Buscar',
+                    zeroRecords  : 'No hay ' + 'solicitudes' ,
+                    infoEmpty    : 'No ha encontrado ' + 'solicitudes' +' disponibles',
+                    info         : 'Mostrando _END_ de _TOTAL_ ' + 'solicitudes' ,
+                    lengthMenu   : "Mostrando _MENU_ registros por página",
+                    infoEmpty    : "No ha encontrado información disponible",
+                    infoFiltered : "(filtrado de _MAX_ regitros en total)",
+                    paginate     : 
+                    {
+                        sPrevious : 'Anterior',
+                        sNext     : 'Siguiente'
+                    }
+                },
+                createdRow: function( row , data , dataIndex )
+                {
+                    $( row ).append( '<input type="hidden" class="solicitud-token" value="' + data.token + '">' );
+                }
+            });
+            var d = new Date();
+            console.log( d.getTime() );
+        }
+        else
+        {
+            bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+        }
+    });   
+}
+
+function customAjax( type , url , data )
+{
+    return $.ajax(
+    {
+        type : type ,
+        url  : url ,
+        data : data 
+    }).fail( function( statusCode , errorThrow )
+    {
+        ajaxError( statusCode , errorThrow )
+    });
+}
+
+function processColumns( columns , usuario , now )
+{
+    var now = new Date( now.year , now.month - 1 , now.day , 0 , 0 , 0 , 0 ); 
+    var dayms = 24 * 60 * 60 * 1000;
+    var exclamationSign = '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>';
+    var warningSign =  '<span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>';
+    var cellDataArray;
+    var cellDataDate; 
+    var diffms;
+    if( usuario.tipo == 'C' )
+    {
+        columns[ 3 ].createdCell = function( td , cellData , rowData , row , col ) 
+        { 
+            cellDataArray = cellData.split( '-' );
+            cellDataDate = new Date( cellDataArray[ 0 ] , cellDataArray[ 1 ] - 1  , cellDataArray[ 2 ] , 0 , 0 , 0 , 0 );  
+            diffms = cellDataDate - now;
+            if( diffms <= 0 )
+            {
+                td.classList.add( 'alert-danger' ); 
+                td.innerHTML = exclamationSign + ' ' + td.innerHTML;   
+            }
+            else if( diffms <= dayms )
+            {
+                td.classList.add( 'alert-warning' );
+                td.innerHTML = warningSign + '<strong> ' + td.innerHTML + '</strong>';          
+            }
+        };
+    }
+}
+
+function processData( data , usuario , usuario_temporal )
+{
+    var i = data.length + 1;
+    //var modelRegister;
+    //var htmlActvidad;
+    //var reporteOpcion;
+    
+    while( --i )
+    {
+        var modelRegister  = data[ ( i - 1 ) ];
+        if( modelRegister.actividad === null )
+        {
+            var htmlActvidad = '';
+        }
+        else
+        {
+            var htmlActvidad = '<span class="label" style="margin-right:1em;background-color:' + modelRegister.color_actividad + '">' + 
+                                modelRegister.actividad +
+                            '</span>';        
+        }
+        modelRegister.actividad_titulo =    htmlActvidad +
+                                            modelRegister.titulo;
+
+        modelRegister.estado =  '<span class="label" style="background-color:' + modelRegister.estado_color + '">' + 
+                                modelRegister.estado + 
+                            '</span>';
+
+        if( modelRegister.monto_aprobado !== null )
+        {
+            modelRegister.monto = modelRegister.moneda + /*+ ' ' +*/ modelRegister.monto_aprobado;
+        }
+        else if( modelRegister.monto_aceptado !== null )
+        {
+            modelRegister.monto = modelRegister.moneda + /*+ ' ' +*/ modelRegister.monto_aceptado;
+        }
+        else
+        {
+            modelRegister.monto = modelRegister.moneda + /*+ ' ' +*/ modelRegister.monto_solicitado;
+        }
+
+        processDataStates( modelRegister , usuario , usuario_temporal );
+    }   
+
+    function processDataStates( modelRegister , usuario , usuario_temporal )
+    {
+        var options =   '<a class="btn btn-default open-details" data-id="' + modelRegister.id + '">' +
+                            '<span class="glyphicon glyphicon-eye-open"></span>' +
+                        '</a>' +
+                        '<a class="btn btn-default timeLine" data-id="' + modelRegister.id + '">' +
+                            '<span class="glyphicon glyphicon-time"></span>' +
+                        '</a>';
+        if( modelRegister.reporte && ( usuario.tipo == CONT || usuario.id == modelRegister.responsable_id ) )
+        {
+            options =   '<a class="btn btn-default" target="_blank" href="a/' + modelRegister.token + '">' +
+                            '<span  class="glyphicon glyphicon-print"></span>' +
+                        '</a>';
+        }
+
+        if( modelRegister.estado_id == PENDIENTE )
+        {
+            modelRegister.fecha_revision = '-';
+            modelRegister.revisor = '-';
+        
+            if( usuario.id == modelRegister.solicitador_id )
+            {
+                options +=  '<a class="btn btn-default" href="editar-solicitud/' + modelRegister.token + '">' +
+                                '<span  class="glyphicon glyphicon-pencil"></span>' +
+                            '</a>' +
+                            '<button type="button" class="btn btn-default cancel-solicitud" data-idsolicitud=' + modelRegister.id + '>' +
+                                '<span  class="glyphicon glyphicon-remove"></span>' +
+                            '</button>';
+            }
+            if ( modelRegister.aprobadores != null )
+            {
+                options += processDataApprovalPolicy( modelRegister , usuario , usuario_temporal );
+            }
+        }
+        else if( modelRegister.estado_id == DERIVADO )
+        {
+            if ( modelRegister.aprobadores != null )
+            {
+                options += processDataApprovalPolicy( modelRegister , usuario , usuario_temporal );
+            }
+        }
+        else if( modelRegister.estado_id == ACEPTADO )
+        {
+            if ( modelRegister.aprobadores != null )
+            {
+                options += processDataApprovalPolicy( modelRegister , usuario , usuario_temporal );
+            }
+        }
+        else if( modelRegister.estado_id == APROBADO )
+        {
+            if( usuario.tipo == CONT )
+            {
+                options +=  '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.token + '">' +
+                                '<span class="glyphicon glyphicon-edit"></span>' +
+                            '</a>' +
+                            '<button type="button" class="btn btn-default cancel-solicitud" data-idsolicitud=' + modelRegister.id + '>' +
+                                '<span  class="glyphicon glyphicon-remove"></span>' +
+                            '</button>';
+                modelRegister.aprobacion_masiva = aprobacionCheckBox;
+            }
+        }
+        else if( modelRegister.estado_id == CONFIRMADO )
+        {
+            if( usuario.tipo == TESORERIA )
+            {
+                options +=  '<a class="btn btn-default modal_deposit">' +
+                                '<span class="glyphicon glyphicon-usd"></span>' +
+                            '</a>';
+            }
+        }       
+        else if( modelRegister.estado_id == DEPOSITADO )
+        {
+            if( usuario.tipo == CONT )
+            {
+                options +=  '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.token + '">' +
+                                '<span class="glyphicon glyphicon-book"></span>' +
+                            '</a>';
+            }
+            else if( usuario.tipo == TESORERIA )
+            {
+                options +=  '<a class="btn btn-default modal_extorno">' + 
+                                '<span class="glyphicon glyphicon-pencil"></span>' +
+                            '</a>';
+            }
+        }
+        else if( modelRegister.estado_id == DESCARGO )
+        {
+            if( usuario.id == modelRegister.responsable_id )
+            {
+                options +=  '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.token + '">' +
+                                '<span class="glyphicon glyphicon-edit"></span>' +
+                            '</a>';
+            }
+        }
+        else if( modelRegister.estado_id == ENTREGADO )
+        {
+            if( modelRegister.dev_est_id == DEVOLUCION_POR_REALIZAR )
+            {
+                if( usuario.id == modelRegister.responsable_id )
+                {
+                    options +=  '<button type="button" class="btn btn-default">' +
+                                    '<span class="glyphicon glyphicon-edit"></span>' +
+                                '</button>';
+                }
+            }
+            else if( modelRegister.dev_est_id == DEVOLUCION_POR_VALIDAR )
+            {
+                if( usuario.tipo == TESORERIA )
+                {
+                    options +=  '<a class="btn btn-default get-devolution-info" data-type="confirm-inmediate-devolution">' +
+                                    '<span  class="glyphicon glyphicon-transfer"></span>' +
+                                '</a>';
+                }
+            }
+            else if( modelRegister.dev_est_id == null )
+            {
+                if( usuario.tipo == CONT )
+                {
+                    options +=  '<button type="button" class="btn btn-default">' +
+                                    '<span class="glyphicon glyphicon-edit"></span>' +
+                                '</button>';
+                }
+            }    
+        }
+        else if( modelRegister.estado_id == REGISTRADO )
+        {
+            if( usuario.tipo == CONT )
+            {
+                options +=   '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.token + '">' +
+                                '<span class="glyphicon glyphicon-book"></span>' +
+                            '</a>';
+            }
+        }
+
+        modelRegister.opciones  =   '<div class="btn-group btn-group-icon-md">' +
+                                        options +
+                                    '</div>';
+    }
+
+    function processDataApprovalPolicy( modelRegister , usuario , usuario_temporal )
+    {
+        var options = '';
+        var aprobadores = modelRegister.aprobadores.split( '|' );
+        if( aprobadores.indexOf( usuario.id ) != -1 || aprobadores.indexOf( usuario_temporal.id ) != -1 )
+        {
+            options +=  '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.token + '">' +
+                            '<span class="glyphicon glyphicon-edit"></span>' +
+                        '</a>';
+            if( usuario.tipo == GER_COM )
+            {
+                modelRegister.aprobacion_masiva = aprobacionCheckBox;
+            }
+        } 
+        return options;
+    }
+}

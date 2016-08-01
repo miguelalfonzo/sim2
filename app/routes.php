@@ -267,6 +267,7 @@
         Route::post( 'list-table' , 'Movements\MoveController@getTable');
         Route::post( 'detail-solicitud' , 'Movements\MoveController@getSolicitudDetail');
         Route::get('getleyenda', 'BaseController@getLeyenda');
+        Route::get( 'list-solicituds' , 'Movements\MoveController@getSolicituds' );
 
         /*
         |--------------------------------------------------------------------------
