@@ -125,7 +125,7 @@ class Generate extends BaseController
                 }
                 else
                 {
-                    $nro_origen_pre = '70' . $nro_origen_model_entries->correl;
+                    $nro_origen_pre = '70' . str_pad( $nro_origen_model_entries->correl + 1 , 4 , 0 , STR_PAD_LEFT );
                 }
 
                 $i = 1;
