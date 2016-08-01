@@ -110,9 +110,10 @@ class Generate extends BaseController
                 $firstSolicitudClient = $solicitud->client;
                 $clientName           = $firstSolicitudClient->{ $firstSolicitudClient->clientType->relacion }->entry_name;                          
 
-                $nro_origen_sufix = 'S';
+               /* $nro_origen_sufix = 'S';
                 $nro_origen_middle = str_pad( substr( $solicitud->id , -5 ) , 5 , 0 , STR_PAD_LEFT );
-                $nro_origen_pre = $nro_origen_sufix . $nro_origen_middle;
+                $nro_origen_pre = $nro_origen_sufix . $nro_origen_middle;*/
+                $nro_origen_pre = '700000';
                 $i = 1;
 
                 foreach( $solicitud->documentList as $expense ) 
