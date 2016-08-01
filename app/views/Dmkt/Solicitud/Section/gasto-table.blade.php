@@ -7,7 +7,7 @@
 			<th>Nro. Comprobante</th>
 			<th>Fecha</th>
 			<th>Monto Total</th>
-			@if ( ! isset( $view ) && ( $solicitud->id_estado == GASTO_HABILITADO || Auth::user()->type == CONT ) )
+			@if ( ! isset( $view ) && ( in_array( $solicitud->id_estado , [ GASTO_HABILITADO , ENTREGADO ] ) || Auth::user()->type == CONT ) )
 				<th>Editar</th>
 				<th>Eliminar</th>
 			@endif
@@ -16,7 +16,7 @@
 	<tbody>
 		@if ( $solicitud->expenses->count() == 0 )
 			<tr>
-				@if ( ! isset( $view ) && ( $solicitud->id_estado == GASTO_HABILITADO || Auth::user()->type == CONT ) )
+				@if ( ! isset( $view ) && ( in_array( $solicitud->id_estado , [ GASTO_HABILITADO , ENTREGADO ] ) || Auth::user()->type == CONT ) )
 					<td colspan="8">No se registro documentos</td>
 				@else
 					<td colspan="6">No se registro documentos</td>
@@ -34,7 +34,7 @@
 						<span class="type_money">{{$solicitud->detalle->typemoney->simbolo}}</span>
 						<span class="total_expense">{{(real)$expense->monto}}</span>
 					</td>
-					@if ( ! isset( $view ) && ( $solicitud->id_estado == GASTO_HABILITADO || Auth::user()->type == CONT ) )
+					@if ( ! isset( $view ) && ( in_array( $solicitud->id_estado , [ GASTO_HABILITADO , ENTREGADO ] ) || Auth::user()->type == CONT ) )
 						<td class="text-center">
 							<a href="#" class="edit-expense">
 								<span class="glyphicon glyphicon-pencil "></span>

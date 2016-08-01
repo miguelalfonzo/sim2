@@ -66,7 +66,7 @@
                 <a class="btn btn-default get-devolution-info" data-type="confirm-inmediate-devolution">
                     <span  class="glyphicon glyphicon-transfer"></span>
                 </a>
-            @elseif( $user->type == CONT && $solicitud->devolutions()->whereIn( 'id_estado_devolucion' , array( DEVOLUCION_POR_REALIZAR , DEVOLUCION_POR_VALIDAR ) )->get()->count() == 0 )
+            @elseif( ( $user->type == CONT || $user->id == $solicitud->id_user_assign ) && $solicitud->devolutions()->whereIn( 'id_estado_devolucion' , array( DEVOLUCION_POR_REALIZAR , DEVOLUCION_POR_VALIDAR ) )->get()->count() == 0 )
                 <a class="btn btn-default" href="{{URL::to('ver-solicitud/'.$solicitud->token)}}">
                     <span  class="glyphicon glyphicon-edit"></span>
                 </a>
