@@ -110,9 +110,24 @@ class Generate extends BaseController
                 $firstSolicitudClient = $solicitud->client;
                 $clientName           = $firstSolicitudClient->{ $firstSolicitudClient->clientType->relacion }->entry_name;                          
 
-                $nro_origen_sufix = 'S';
+               /* $nro_origen_sufix = 'S';
                 $nro_origen_middle = str_pad( substr( $solicitud->id , -5 ) , 5 , 0 , STR_PAD_LEFT );
-                $nro_origen_pre = $nro_origen_sufix . $nro_origen_middle;
+                $nro_origen_pre = $nro_origen_sufix . $nro_origen_middle;*/
+                $nro_origen_model_entries = Entry::select( 'substr( nro_origen , 3 , 4 ) correl' )
+                                            ->where( 'extract( year from created_at )' , $now->year )
+                                            ->where( 'nro_origen' , 'like' , '70%' )
+                                            ->where( 'length( nro_origen )' , 8 )
+                                            ->orderBy( 'nro_origen' , 'DESC' )
+                                            ->first();
+                if( is_null( $nro_origen_model_entries ) )
+                {
+                    $nro_origen_pre = '700001';
+                }
+                else
+                {
+                    $nro_origen_pre = '70' . str_pad( $nro_origen_model_entries->correl + 1 , 4 , 0 , STR_PAD_LEFT );
+                }
+
                 $i = 1;
 
                 foreach( $solicitud->documentList as $expense ) 
