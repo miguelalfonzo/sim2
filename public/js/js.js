@@ -4,9 +4,6 @@ var pathnameArray= pathname.split("/public/");
 
 server =  pathnameArray.length >0 ? pathnameArray[0]+"/public/" : "";
 
-var datef = new Date();
-var dateactual = (datef.getMonth()+1)+'-'+datef.getFullYear();
-
 function loadingUI( message )
 {
     $.blockUI(
@@ -481,7 +478,7 @@ $(function()
             $("#number-serie").val("");
             $("#razon").text("");
             $( '#regimen' ).parent().parent().hide();
-            $( '#monto-regimen' ).parent().parent().hide();
+            $( '#monto-regimen' ).closest( '.form-group' ).hide();
         }
     }
 
@@ -554,9 +551,8 @@ $(function()
     });
     //Edit a document already registered
 
-    $(document).on("click"," #table-expense .edit-expense", function( e )
+    $( document ).on( 'click' , '#table-expense .edit-expense' , function()
     {
-        e.preventDefault();
         $("#ruc-hide").siblings().parent().removeClass('input-group');
         $(".search-ruc").hide();
         $(".message-expense").text('').hide();
@@ -577,7 +573,7 @@ $(function()
             url  : server + 'edit-expense' ,
             data : 
             {
-                _token  : $('input[name=_token]').val(),
+                _token  : GBREPORTS.token,
                 idgasto : row_expense.attr('data-id')
             },
             beforeSend:function()
@@ -672,12 +668,7 @@ $(function()
                         $("#igv").val(0);
                         $('#dreparo').hide();
                     }
-                    var row_expenses = $(".total").parent();
-                    tot_expenses = calculateTot( row_expenses , '.total_expense' );
-                    var balance = deposit - tot_expenses;
-                    $("#balance").val(balance.toFixed(2));
-                    $(".detail-expense").show();
-                    //$('#cancel-expense').show();
+                    $( ".detail-expense" ).show();
                     $('#expense-register').modal('show');
                 }, 500 );         
             }
@@ -691,9 +682,6 @@ $(function()
 
     });
 
-    $( "#open-expense-register" ).click( function(){
-        rechargeViewExpense();
-    });
     //Validation spending record button
     $( "#save-expense" ).click( function( e )
     {
@@ -988,7 +976,7 @@ $(function()
         $("#save-expense").html("Registrar");
         var tot_expenses = calculateTot($(".total").parent() , '.total_expense' ).toFixed( 2 );
         var balance = deposit - tot_expenses;
-        $("#balance").val(balance);
+        $( "#balance" ).val( balance.toFixed( 2 ) );
         cleanExpenseView();
         if( balance === 0 )
         {
@@ -1179,10 +1167,11 @@ $(function()
             balance = deposit - tot_expenses - tot_item_expense + parseFloat($("#tot-edit-hidden").val());
             $("#balance").val( balance.toFixed( 2 ) );
         }
+
         if( balance < 0 )
         {
-            $(".message-expense").html('El monto ingresado supera el saldo.').css("color","red").show();
-            $("#balance").css("color","red");
+            $( ".message-expense" ).html( 'El monto ingresado supera el saldo.' ).css( "color" , "red" ).show();
+            $( "#balance" ).css( "color" , "red" );
         }
         else
         {
@@ -1195,39 +1184,44 @@ $(function()
     function calcularIGV()
     {
         //Total variables Proof
-        var total_item = $(".total-item input");
-        var proof_type_sel = $("#proof-type :selected");
+        var total_item        = $( ".total-item input" );
+        var proof_type_sel    = $( "#proof-type :selected" );
         var sub_total_expense = 0;
-        var imp_service = parseFloat($("#imp-ser").val());
-        var igv_percent = $('#igv').attr('igv') / 100;
+        var imp_service       = parseFloat( $( "#imp-ser" ).val());
+        var igv_percent       = $( '#igv' ).attr( 'igv' ) / 100;
+        
         var total_expense = 0;
-        $.each(total_item,function(){
-            if(!$.isNumeric($(this).val()))
-                total_expense += 0;
-            else
-                total_expense += parseFloat($(this).val());
+        $.each( total_item , function()
+        {
+            if( $.isNumeric( this.value ) )
+            {
+                total_expense += parseFloat( this.value );
+            }
         });
         if ( total_expense > 0 )
         {
-            if( proof_type_sel.attr("igv") == 1 )
+            if( proof_type_sel.attr( "igv" ) == 1 )
             {
-                if(!imp_service) imp_service = 0;
+                if( ! imp_service ) 
+                {
+                    imp_service = 0;
+                }
                 var igv = total_expense * igv_percent / ( 1 + igv_percent );
                 sub_total_expense = total_expense / ( 1 + igv_percent );
-                $("#sub-tot").val( sub_total_expense.toFixed(2) );
+                $( "#sub-tot" ).val( sub_total_expense.toFixed( 2 ) );
                 total_expense = sub_total_expense + igv + imp_service;
                 
-                $("#igv").val( igv.toFixed(2) );
-                $("#total-expense").val( total_expense.toFixed(2) );
+                $( "#igv" ).val( igv.toFixed( 2 ) );
+                $( "#total-expense" ).val( total_expense.toFixed( 2 ) );
             }
             else
                 $("#total-expense").val( total_expense.toFixed(2) );
         }
         else
         {
-            $("#total-expense").val('');
-            $("#sub-tot").val(0);
-            $("#igv").val(0);
+            $( "#total-expense" ).val( '' );
+            $( "#sub-tot" ).val( 0 );
+            $( "#igv" ).val( 0 );
         }
         calcularBalance();
     }
@@ -1336,8 +1330,8 @@ $(function()
     });
 
     // EDIT SEAT CONT
-    $(document).off("click", ".edit-seat-save");
-    $(document).on("click", ".edit-seat-save", function(e)
+    $( document ).off( "click" , ".edit-seat-save" );
+    $( document ).on( "click" , ".edit-seat-save" , function(e)
     {
         e.preventDefault(this);
         trElement = $(this).parent().parent();

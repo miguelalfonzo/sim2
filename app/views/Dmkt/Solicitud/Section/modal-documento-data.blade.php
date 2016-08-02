@@ -80,9 +80,9 @@
 					<div class="input-group">
 				    	<div class="input-group-addon">{{$solicitud->detalle->typemoney->simbolo}}</div>
 				    	@if ( isset( $balance) )
-				    		<input id="balance" class="form-control" type="text" value="{{$balance}}" disabled>
+				    		<input id="balance" class="form-control" type="text" value="{{ $balance }}" disabled>
 				    	@else
-				      		<input id="balance" class="form-control" type="text" value="{{json_decode($detalle->detalle)->monto_aprobado}}" disabled>
+				      		<input id="balance" class="form-control" type="text" value="{{ $detalle->monto_aprobado}}" disabled>
 				    	@endif
 				    </div>
 				</div>
