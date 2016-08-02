@@ -67,32 +67,6 @@ $(function()
     var token          = $('input[name=token]').val();
     var row_item_first = $("#table-items tbody tr:eq(0)").clone();
     var deposit        = parseFloat($('#amount').val());
-    /*var proof_type;
-    var proof_type_sel;
-    var ruc;
-    var ruc_hide;
-    var razon;
-    var razon_hide;
-    var razon_edit;
-    var number_prefix;
-    var number_serie;
-    var voucher_number;
-    var date;
-    var desc_expense;
-    var row_item;
-    var tot_item = 0;
-    var row_items;
-    var tot_items = 0;
-    var row_expense;
-    var tot_expense = 0;
-    var row_expenses;
-    var tot_expenses = 0;
-    var quantity;
-    var description;
-    var total_item;
-    var row_expense_first;
-    var data          = {};
-    var data_response = {};*/
     
     //Calculate the IGV loading
     if( parseFloat( $( ".total-item" ).val() ) ) 

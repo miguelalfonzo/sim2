@@ -2373,9 +2373,6 @@ function processColumns( columns , usuario , now )
 function processData( data , usuario , usuario_temporal )
 {
     var i = data.length + 1;
-    //var modelRegister;
-    //var htmlActvidad;
-    //var reporteOpcion;
     
     while( --i )
     {
@@ -2423,7 +2420,7 @@ function processData( data , usuario , usuario_temporal )
                         '</a>';
         if( modelRegister.reporte && ( usuario.tipo == CONT || usuario.id == modelRegister.responsable_id ) )
         {
-            options =   '<a class="btn btn-default" target="_blank" href="a/' + modelRegister.token + '">' +
+            options +=   '<a class="btn btn-default" target="_blank" href="a/' + modelRegister.token + '">' +
                             '<span  class="glyphicon glyphicon-print"></span>' +
                         '</a>';
         }

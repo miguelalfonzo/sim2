@@ -11,6 +11,7 @@ use \View;
 use \Expense\ChangeRate;
 use \Expense\ProofType;
 use \Expense\Expense;
+use \Custom\DataList;
 use \Validator;
 use \Exception;
 use \System\FondoHistory;
@@ -177,9 +178,12 @@ class MoveController extends BaseController
 
         $data = $this->searchSolicituds( $estado , $dates , null );
         
-        $data = array( 'solicituds' => $data );
-        if ( Auth::user()->type == TESORERIA )
-            $data['tc'] = ChangeRate::getTc();
+        $user = Auth::user();
+        $data = array( 'solicituds' => $data , 'user' => $user );
+        if ( $user->type == TESORERIA )
+        {
+            $data[ 'tc' ] = ChangeRate::getTc();
+        }
         Session::put( 'state' , $estado );
         $view = array( 'View' => View::make('template.List.solicituds')->with( $data )->render() );
         return $this->setRpta( $view  );
@@ -355,7 +359,6 @@ class MoveController extends BaseController
             elseif( $user->type == CONT )
             {
                 $columns[ 3 ] = [ 'title' => 'Fecha de Deposito' , 'data' => 'fecha_entrega' , 'className' => 'text-center' ];
-                $columns[]    = [ 'title' => 'X' , 'data' => 'aprobacion_masiva' , 'className' => 'text-center' , 'defaultContent' => '' ];
             }
             elseif( $user->type == TESORERIA )
             {
@@ -388,8 +391,10 @@ class MoveController extends BaseController
 
     protected function searchUserSolicituds2( $estado , array $dates , $filter , $type = 'FLUJO' )
     {
-        return Solicitud::getUserSolicituds();
-      
+        //return Solicitud::getUserSolicituds();
+        \Log::info( $dates );
+
+        return DataList::getSolicituds( $dates , $estado );
     }
 
     protected function searchUserSolicituds( $estado , array $dates , $filter , $type = 'FLUJO' )
