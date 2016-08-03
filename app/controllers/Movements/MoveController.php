@@ -338,7 +338,7 @@ class MoveController extends BaseController
             $columns =
                 [
                     [ 'title' => '#' , 'data' => 'id' , 'className' => 'text-center' ],
-                    [ 'title' => 'Solicitud' , 'data' => 'actividad_titulo' , 'width' => '15%' ],
+                    [ 'title' => 'Solicitud' , 'data' => 'actividad_titulo' ],
                     [ 'title' => 'Solicitador por' , 'data' => 'solicitador' , 'className' => 'text-center' ],
                     [ 'title' => 'Fecha de Solicitud' , 'data' => 'fecha_creacion' , 'className' => 'text-center' ],
                     [ 'title' => 'Aprobado por' , 'data' => 'revisor' , 'className' => 'text-center' ],
@@ -346,7 +346,7 @@ class MoveController extends BaseController
                     [ 'title' => 'Monto' , 'data' => 'monto' , 'className' => 'text-center' ],
                     [ 'title' => 'Estado' , 'data' => 'estado' , 'className' => 'text-center' ],
                     [ 'title' => 'Tipo' , 'data' => 'tipo_solicitud' , 'className' => 'text-center' ],
-                    [ 'title' => 'Edicion' , 'data' => 'opciones' , 'className' => 'text-center' , 'width' => '15%' ],
+                    [ 'title' => 'Edicion' , 'data' => 'opciones' , 'className' => 'text-center' , 'width' => '25%' ],
                     
                     //[ 'title' => 'Edicion' , 'defaultContent' => '<button class="btn btn-primary">Test</button>' ],
                     //[ 'title' => 'Test' , 'data' => 'id_inversion' ]

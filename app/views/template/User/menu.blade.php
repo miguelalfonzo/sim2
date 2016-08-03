@@ -65,6 +65,6 @@
         </div>
     @endif
     <div class="container-fluid">
-        <table id="table_solicituds" class="table table-striped table-hover table-bordered" cellspacing="0" width="100%"></table>
+        <table id="table_solicituds" class="table table-striped table-hover table-bordered" cellspacing="0" cellpading="0" border="0" style="width:100%"></table>
     </div>
 </div>

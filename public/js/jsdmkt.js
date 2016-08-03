@@ -2295,13 +2295,13 @@ function listSolicituds()
             processColumns( response.columns , response.usuario , response.now );
             var dataTable = $( '#table_' + 'solicituds' ).DataTable(
             {
-                autoWidth       : false,
                 columns         : response.columns,
                 data            : response.Data ,
                 dom             : "<'row'<'col-xs-6'><'col-xs-6 pull-right'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
                 destroy         : true,
                 pageLength      : 10,
                 stateSave       : true,
+                scrollX         : true,
                 language        :
                 {
                     search       : 'Buscar',
@@ -2364,12 +2364,12 @@ function processColumns( columns , usuario , now )
             if( diffms <= 0 )
             {
                 td.classList.add( 'alert-danger' ); 
-                td.innerHTML = exclamationSign + ' ' + td.innerHTML;   
+                td.innerHTML = exclamationSign + '</br> ' + td.innerHTML;   
             }
             else if( diffms <= dayms )
             {
                 td.classList.add( 'alert-warning' );
-                td.innerHTML = warningSign + '<strong> ' + td.innerHTML + '</strong>';          
+                td.innerHTML = warningSign + '</br><strong> ' + td.innerHTML + '</strong>';          
             }
         };
     }
@@ -2390,7 +2390,7 @@ function processData( data , usuario , usuario_temporal )
         {
             var htmlActvidad = '<span class="label" style="margin-right:1em;background-color:' + modelRegister.color_actividad + '">' + 
                                 modelRegister.actividad +
-                            '</span>';        
+                            '</span></br>';        
         }
         modelRegister.actividad_titulo =    htmlActvidad +
                                             modelRegister.titulo;
