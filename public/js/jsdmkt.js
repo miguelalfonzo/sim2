@@ -361,7 +361,7 @@ var calcDataTableHeight = function()
 function listTable( type , date )
 {
     date = typeof date !== 'undefined' ? date : null;
-    var l = Ladda.create($("#search-solicitude")[0]);
+    //var l = Ladda.create($("#search-solicitude")[0]);
     $.ajax({
         url: server + 'list-table',
         type: 'POST',
@@ -479,7 +479,8 @@ function getSolicitudList()
     }
     else
     {
-        listTable( 'solicitudes' );
+        //listTable( 'solicitudes' );
+        listSolicituds();
     }
 }
 
@@ -677,7 +678,8 @@ function cancelDialog  ( data , message )
                                         if ( data.Type == 1 )
                                         {
                                             idState.val(6);
-                                            listTable( 'solicitudes' );
+                                            //listTable( 'solicitudes' );
+                                            listSolicituds();
                                         }
                                         else if ( data.Type == 2 )
                                             searchFondos( $('.date_month').first().val() );
@@ -1701,10 +1703,10 @@ $(".date_month").datepicker(date_options2).on('changeDate', function (e) {
 });
 
 /* Filter all solicitude by date */
-$('#search-solicitude').on('click', function()
+/*$('#search-solicitude').on('click', function()
 { 
     listTable( 'solicitudes' );
-});
+});*/
 
 $('#search-documents').on('click', function()
 { 
@@ -1917,7 +1919,8 @@ $("#btn-mass-approve").click( function()
                         var color = 'red';
                     else
                         var color = '';
-                    listTable( 'solicitudes' );
+                    //listTable( 'solicitudes' );
+                    listSolicituds();
                     bootbox.alert("<h4 style='color:" + color + "'>" + data.Description + "</h4>", function()
                     {
                         colorTr(data.token);
@@ -2246,17 +2249,19 @@ $( document ).ready(function()
 
     if ( $("#idState").length === 1 )
     {
-        listTable( 'solicitudes' );
+        //listTable( 'solicitudes' );
+        listSolicituds();
     }
 
-    _token       =  GBREPORTS.token;
+    //_token       =  GBREPORTS.token;
 
     /** --------------------------------------------- CONTABILIDAD ------------------------------------------------- **/
 
     $(document).off('change','#idState')
     $(document).on('change','#idState',function()
     {
-        listTable( 'solicitudes' );
+        //listTable( 'solicitudes' );
+        listSolicituds();
     });
 
 
@@ -2418,19 +2423,26 @@ function processData( data , usuario , usuario_temporal )
                         '<a class="btn btn-default timeLine" data-id="' + modelRegister.id + '">' +
                             '<span class="glyphicon glyphicon-time"></span>' +
                         '</a>';
-        if( modelRegister.reporte && ( usuario.tipo == CONT || usuario.id == modelRegister.responsable_id ) )
+        if( modelRegister.reporte /* && ( usuario.tipo == CONT || usuario.id == modelRegister.responsable_id )*/ )
         {
             options +=   '<a class="btn btn-default" target="_blank" href="a/' + modelRegister.token + '">' +
                             '<span  class="glyphicon glyphicon-print"></span>' +
                         '</a>';
         }
 
+        /*if( modelRegister.aprobadores )
+        {
+            options +=  '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.token + '">' +
+                            '<span class="glyphicon glyphicon-edit"></span>' +
+                        '</a>';
+        }*/
+
         if( modelRegister.estado_id == PENDIENTE )
         {
             modelRegister.fecha_revision = '-';
             modelRegister.revisor = '-';
         
-            if( usuario.id == modelRegister.solicitador_id )
+            if( modelRegister.sol_usr )
             {
                 options +=  '<a class="btn btn-default" href="editar-solicitud/' + modelRegister.token + '">' +
                                 '<span  class="glyphicon glyphicon-pencil"></span>' +
@@ -2439,23 +2451,23 @@ function processData( data , usuario , usuario_temporal )
                                 '<span  class="glyphicon glyphicon-remove"></span>' +
                             '</button>';
             }
-            if ( modelRegister.aprobadores != null )
+            if( modelRegister.aprobadores )
             {
-                options += processDataApprovalPolicy( modelRegister , usuario , usuario_temporal );
+                options += processDataApprovalPolicy( modelRegister , usuario );
             }
         }
         else if( modelRegister.estado_id == DERIVADO )
         {
-            if ( modelRegister.aprobadores != null )
+            if( modelRegister.aprobadores )
             {
-                options += processDataApprovalPolicy( modelRegister , usuario , usuario_temporal );
+                options += processDataApprovalPolicy( modelRegister , usuario );
             }
         }
         else if( modelRegister.estado_id == ACEPTADO )
         {
-            if ( modelRegister.aprobadores != null )
+            if( modelRegister.aprobadores )
             {
-                options += processDataApprovalPolicy( modelRegister , usuario , usuario_temporal );
+                options += processDataApprovalPolicy( modelRegister , usuario );
             }
         }
         else if( modelRegister.estado_id == APROBADO )
@@ -2468,10 +2480,9 @@ function processData( data , usuario , usuario_temporal )
                             '<button type="button" class="btn btn-default cancel-solicitud" data-idsolicitud=' + modelRegister.id + '>' +
                                 '<span  class="glyphicon glyphicon-remove"></span>' +
                             '</button>';
-                modelRegister.aprobacion_masiva = aprobacionCheckBox;
             }
         }
-        else if( modelRegister.estado_id == CONFIRMADO )
+        /*else if( modelRegister.estado_id == CONFIRMADO )
         {
             if( usuario.tipo == TESORERIA )
             {
@@ -2479,7 +2490,7 @@ function processData( data , usuario , usuario_temporal )
                                 '<span class="glyphicon glyphicon-usd"></span>' +
                             '</a>';
             }
-        }       
+        }   */    
         else if( modelRegister.estado_id == DEPOSITADO )
         {
             if( usuario.tipo == CONT )
@@ -2497,7 +2508,7 @@ function processData( data , usuario , usuario_temporal )
         }
         else if( modelRegister.estado_id == DESCARGO )
         {
-            if( usuario.id == modelRegister.responsable_id )
+            if( modelRegister.responsable_id )
             {
                 options +=  '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.token + '">' +
                                 '<span class="glyphicon glyphicon-edit"></span>' +
@@ -2508,30 +2519,30 @@ function processData( data , usuario , usuario_temporal )
         {
             if( modelRegister.dev_est_id == DEVOLUCION_POR_REALIZAR )
             {
-                if( usuario.id == modelRegister.responsable_id )
-                {
+                /*if( usuario.id == modelRegister.responsable_id )
+                {*/
                     options +=  '<button type="button" class="btn btn-default">' +
                                     '<span class="glyphicon glyphicon-edit"></span>' +
                                 '</button>';
-                }
+                //}
             }
             else if( modelRegister.dev_est_id == DEVOLUCION_POR_VALIDAR )
             {
-                if( usuario.tipo == TESORERIA )
-                {
+                /*if( usuario.tipo == TESORERIA )
+                {*/
                     options +=  '<a class="btn btn-default get-devolution-info" data-type="confirm-inmediate-devolution">' +
                                     '<span  class="glyphicon glyphicon-transfer"></span>' +
                                 '</a>';
-                }
+                //}
             }
-            else if( modelRegister.dev_est_id == null )
+            else if( modelRegister.dev_est_id == 3 )
             {
-                if( usuario.tipo == CONT )
-                {
+                /*if( usuario.tipo == CONT )
+                {*/
                     options +=  '<button type="button" class="btn btn-default">' +
                                     '<span class="glyphicon glyphicon-edit"></span>' +
                                 '</button>';
-                }
+                //}
             }    
         }
         else if( modelRegister.estado_id == REGISTRADO )
@@ -2549,20 +2560,15 @@ function processData( data , usuario , usuario_temporal )
                                     '</div>';
     }
 
-    function processDataApprovalPolicy( modelRegister , usuario , usuario_temporal )
+    function processDataApprovalPolicy( modelRegister , usuario )
     {
-        var options = '';
-        var aprobadores = modelRegister.aprobadores.split( '|' );
-        if( aprobadores.indexOf( usuario.id ) != -1 || aprobadores.indexOf( usuario_temporal.id ) != -1 )
-        {
-            options +=  '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.token + '">' +
+        var options =   '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.token + '">' +
                             '<span class="glyphicon glyphicon-edit"></span>' +
                         '</a>';
-            if( usuario.tipo == GER_COM )
-            {
-                modelRegister.aprobacion_masiva = aprobacionCheckBox;
-            }
-        } 
+        if( usuario.tipo == GER_COM )
+        {
+            modelRegister.aprobacion_masiva = aprobacionCheckBox;
+        }
         return options;
     }
 }

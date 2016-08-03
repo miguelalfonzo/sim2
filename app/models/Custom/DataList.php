@@ -26,7 +26,7 @@ class DataList
     	$end   = $dates[ 'end' ];
     	\Log::info( $user_id );
     	$data = DB::table( "TABLE( LISTADO_SOLICITUD_FN( $user_id , '$start' , '$end' , $state ) )" )->get();
-        \Log::info( $data );
+        //\Log::info( $data );
         return $data;
         return DB::table( 'SOLICITUD a' )
         	->join( 'solicitud_detalle b')
