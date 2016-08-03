@@ -128,8 +128,6 @@ class MoveController extends BaseController
             $inputs = Input::all();
             switch( $inputs['type'] )
             {
-                case 'solicitudes':
-                    return $this->searchSim( $inputs );
                 case 'movimientos':
                     return $this->searchMove( $inputs['date_start' ] , $inputs[ 'date_end' ] , $inputs[ 'filter' ] );
             }
@@ -138,57 +136,6 @@ class MoveController extends BaseController
         {
             return $this->internalException( $e , __FUNCTION__ );
         }
-    }
-
-    private function searchSim( $inputs )
-    {
-        $today = getdate();
-        $m = $today['mday'] . '-' . $today['mon'] . '-' . $today['year'];      
-        
-        if ( Input::has( 'idstate' ) )
-        {
-            $estado = $inputs['idstate'];
-        }
-        else
-        {
-            $estado = R_TODOS;
-        }
-
-        if ( Input::has('date_start'))
-        {
-            $start = $inputs['date_start'];
-        }
-        else
-        {
-            $start = Carbon::now()->format( '01-m-Y' );
-            //$start = date('01-m-Y', strtotime($m));
-        }
-
-        if (Input::has('date_end'))
-        {
-            $end = $inputs['date_end'];
-        }
-        else
-        {
-            $end = Carbon::now()->format( 'd-m-Y' );
-            //$end = date('t-m-Y', strtotime($m));
-        }
-
-        $dates = array( 'start' => $start , 'end' => $end );    
-
-        $data = $this->searchSolicituds( $estado , $dates , null );
-        
-        $user = Auth::user();
-        $data = array( 'solicituds' => $data , 'user' => $user );
-        if ( $user->type == TESORERIA )
-        {
-            $data[ 'tc' ] = ChangeRate::getTc();
-        }
-        Session::put( 'state' , $estado );
-        $view = array( 'View' => View::make('template.List.solicituds')->with( $data )->render() );
-        return $this->setRpta( $view  );
-        
-        return $middleRpta;
     }
 
     private function formatAnioMes( $date )
@@ -284,7 +231,8 @@ class MoveController extends BaseController
             }
         }
 
-        if ( $estado != R_TODOS )
+        if( $estado != R_TODOS )
+        {
             $solicituds->whereHas( 'state' , function ( $q ) use( $estado )
             {
                 $q->whereHas( 'rangeState' , function ( $t ) use( $estado )
@@ -292,6 +240,7 @@ class MoveController extends BaseController
                     $t->where( 'id' , $estado );
                 });
             });
+        }
         $solicituds->with( 'activity' );
         return $solicituds->orderBy('id', 'ASC')->get();
     }
@@ -333,7 +282,7 @@ class MoveController extends BaseController
         {
             $inputs = Input::all();
             $dates  = [ 'start' => $inputs[ 'fecha_inicio' ] , 'end' => $inputs[ 'fecha_final' ] ];
-            $data   = $this->searchUserSolicituds2( $inputs[ 'estado' ] , $dates , null );
+            $data   = $this->searchUserSolicituds( $inputs[ 'estado' ] , $dates , null );
 
             $columns =
                 [
@@ -346,10 +295,7 @@ class MoveController extends BaseController
                     [ 'title' => 'Monto' , 'data' => 'monto' , 'className' => 'text-center' ],
                     [ 'title' => 'Estado' , 'data' => 'estado' , 'className' => 'text-center' ],
                     [ 'title' => 'Tipo' , 'data' => 'tipo_solicitud' , 'className' => 'text-center' ],
-                    [ 'title' => 'Edicion' , 'data' => 'opciones' , 'className' => 'text-center' , 'width' => '25%' ],
-                    
-                    //[ 'title' => 'Edicion' , 'defaultContent' => '<button class="btn btn-primary">Test</button>' ],
-                    //[ 'title' => 'Test' , 'data' => 'id_inversion' ]
+                    [ 'title' => 'Edicion' , 'data' => 'opciones' , 'className' => 'text-center' , 'width' => '35%' ],
                 ];
             $user = Auth::user();
             if( $user->type == GER_COM )
@@ -370,11 +316,8 @@ class MoveController extends BaseController
                       
             }
             
-            //$data = Solicitud::select( 'id , titulo, id_inversion' )->get();
-
             $rpta = $this->setRpta( $data );
-            $rpta[ 'usuario' ] = [ 'id' => $user->id , 'tipo' => $user->type ];
-            $rpta[ 'usuario_temporal' ] = [ 'id' => $user->tempId() , 'tipo' => $user->tempType() ];
+            $rpta[ 'usuario' ] = [ 'tipo' => $user->type ];
             $now = Carbon::now();
             $rpta[ 'now' ] = [ 'year' => $now->year , 'month' => $now->month , 'day' => $now->day ];
             $rpta[ 'columns' ] = $columns;
@@ -389,101 +332,9 @@ class MoveController extends BaseController
         }
     }
 
-    protected function searchUserSolicituds2( $estado , array $dates , $filter , $type = 'FLUJO' )
-    {
-        //return Solicitud::getUserSolicituds();
-        \Log::info( $dates );
-
-        return DataList::getSolicituds( $dates , $estado );
-    }
-
     protected function searchUserSolicituds( $estado , array $dates , $filter , $type = 'FLUJO' )
     {
-        \Log::info( microtime() );
-        
-        $str = 'ltrim( regexp_substr( detalle , \'"monto_aprobado":([[:digit:]]*)\' ) , \'"monto_aprobado":\' ) valor_aprobado';
-        \Log::info( $str );
-
-        $solicituds = Solicitud::where( function( $query ) use( $dates )
-        {
-            $query->where( function( $query ) use( $dates )
-            {
-                $query->where( 'idtiposolicitud' , '<>' , SOL_INST )->whereRaw( "created_at between to_date( '" . $dates[ 'start' ] . "','DD-MM-YY') and to_date( '" . $dates[ 'end' ] . "' ,'DD-MM-YY')+1" );
-            })->orWhere( function( $query ) use( $dates )
-            {
-                $query->where( 'idtiposolicitud' , SOL_INST )->wherehas( 'detalle' , function ( $query ) use( $dates )
-                {
-                    $query->whereHas( TB_PERIODO , function( $query ) use( $dates )
-                    {
-                        $query->where( 'aniomes' , '>=' , $this->formatAnioMes( $dates[ 'start' ] ) )->where( 'aniomes' , '<=' , $this->formatAnioMes( $dates[ 'end' ] ) );
-                    });
-                });  
-            });
-        });
-   
-
-   /*     if ( $estado != R_TODOS )
-        {
-            $solicituds->whereHas( 'state' , function ( $q ) use( $estado )
-            {
-                $q->whereHas( 'rangeState' , function ( $t ) use( $estado )
-                {
-                    $t->where( 'id' , $estado );
-                });
-            });
-        }*/
-/*
-        if ( in_array( Auth::user()->type , array ( REP_MED , SUP , GER_PROD , GER_PROM , ASIS_GER ) ) )
-                $solicituds->where( function ( $query )
-                {
-                    $query->whereHas( 'gerente' , function( $query )
-                    {
-                        $query->whereIn( 'id_gerprod' , array( Auth::user()->id , Auth::user()->tempId() ) );
-                    })->orWhereIn( 'created_by' , array( Auth::user()->id , Auth::user()->tempId() ) )
-                    ->orWhereIn( 'id_user_assign' , array( Auth::user()->id , Auth::user()->tempId() ) );
-                });
-            elseif ( Auth::user()->type == TESORERIA ) 
-                if ( $estado == R_REVISADO )
-                    $solicituds->whereIn( 'id_estado' , array( DEPOSITO_HABILITADO , DEPOSITADO ) );
-                else if( $estado == R_GASTO )
-                    $solicituds->where( 'id_estado' , ENTREGADO );
-                */
-        $solicituds->select( [ 'id' , 'titulo' , 'id_actividad' , 'id_user_assign' , 'created_at' , 'id_detalle' , 'id_estado' ] );
-        $solicituds->with( [ 'activity' => function( $query )
-        {
-            $query->select( [ 'id' , 'nombre' , 'color' ] );
-        } , 'personalTo' => function( $query )
-        {
-            $query->select( [ 'user_id' , 'nombres' , 'apellidos' , 'initcap( nombres || \' \' || apellidos ) full_name' ] );
-        } , 'lastHistory' => function( $query )
-        {
-            $query->select( [ 'id_solicitud' , 'updated_by' , 'updated_at' ] )
-                ->with( [ 'updatedPersonal' => function( $query )
-                {
-                    $query->select( [ 'user_id' , 'nombres' , 'apellidos' , 'initcap( nombres || \' \' || apellidos ) full_name' ] );
-                }]);
-        } , 'detalle' => function( $query )
-        {
-            $query->select( [ 'id' , 'detalle' , 'id_moneda' , 
-                'ltrim( regexp_substr( detalle , \'"monto_aprobado":"{0,1}[[:digit:]]+(\.[[:digit:]]+){0,1}\' ) , \'"monto_aprobado":\' ) valor_aprobado',
-                'ltrim( regexp_substr( detalle , \'"monto_aceptado":"{0,1}[[:digit:]]+(\.[[:digit:]]+){0,1}\' ) , \'"monto_aceptado":\' ) valor_aceptado',
-                'ltrim( regexp_substr( detalle , \'"monto_solicitado":"{0,1}[[:digit:]]+(\.[[:digit:]]+){0,1}\' ) , \'"monto_solicitado":\' ) valor_solicitado' ] )
-                ->with( [ 'typeMoney' => function( $query )
-                {
-                    $query->select( [ 'id' , 'simbolo' ] );
-                }]);;
-        } , 'state' => function( $query )
-        {
-            $query->select( [ 'id' , 'nombre' , 'id_estado' ] )
-                ->with( [ 'rangeState' => function( $query )
-                {
-                    $query->select( [ 'id' , 'color' ] );
-                }]);;
-        }]);
-        \Log::info( microtime() );
-        $data = $solicituds->orderBy('id', 'ASC')->get();
-        \Log::info( microtime() );
-        return $data;   
+        return DataList::getSolicituds( $dates , $estado );
     }
 
 }

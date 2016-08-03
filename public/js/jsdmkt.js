@@ -2273,25 +2273,18 @@ $( document ).ready(function()
 
 function listSolicituds()
 {
-    var d = new Date();
-    console.log( d.getTime() );
     var data =
     {
-        //_token     : GBREPORTS.token,
         fecha_inicio : $('#drp_menubar').data('daterangepicker').startDate.format("L"),
         fecha_final  : $('#drp_menubar').data('daterangepicker').endDate.format("L") ,
         estado       : $('#idState').val()
     };
-    /*if( $.fn.dataTable.isDataTable( $( '#table_' + 'solicituds' ) ) )
-    {
-        $( '#table_' + 'solicituds' ).DataTable().clear().destroy();
-    }*/
         
     customAjax( 'GET' , 'list-solicituds' , data ).done(function ( response ) 
     {
         if ( response.Status === 'Ok' )
         {
-            processData( response.Data , response.usuario , response.usuario_temporal );
+            processData( response.Data , response.usuario );
             processColumns( response.columns , response.usuario , response.now );
             var dataTable = $( '#table_' + 'solicituds' ).DataTable(
             {
@@ -2322,8 +2315,6 @@ function listSolicituds()
                     $( row ).append( '<input type="hidden" class="solicitud-token" value="' + data.token + '">' );
                 }
             });
-            var d = new Date();
-            console.log( d.getTime() );
         }
         else
         {
@@ -2354,7 +2345,7 @@ function processColumns( columns , usuario , now )
     var cellDataArray;
     var cellDataDate; 
     var diffms;
-    if( usuario.tipo == 'C' )
+    if( usuario.tipo == 'C' || usuario.tipo == 'T' )
     {
         columns[ 3 ].createdCell = function( td , cellData , rowData , row , col ) 
         { 
@@ -2364,18 +2355,18 @@ function processColumns( columns , usuario , now )
             if( diffms <= 0 )
             {
                 td.classList.add( 'alert-danger' ); 
-                td.innerHTML = exclamationSign + '</br> ' + td.innerHTML;   
+                td.innerHTML = exclamationSign + '<strong> ' + td.innerHTML + '</strong>';   
             }
             else if( diffms <= dayms )
             {
                 td.classList.add( 'alert-warning' );
-                td.innerHTML = warningSign + '</br><strong> ' + td.innerHTML + '</strong>';          
+                td.innerHTML = warningSign + '<strong> ' + td.innerHTML + '</strong>';          
             }
         };
     }
 }
 
-function processData( data , usuario , usuario_temporal )
+function processData( data , usuario )
 {
     var i = data.length + 1;
     
@@ -2390,7 +2381,7 @@ function processData( data , usuario , usuario_temporal )
         {
             var htmlActvidad = '<span class="label" style="margin-right:1em;background-color:' + modelRegister.color_actividad + '">' + 
                                 modelRegister.actividad +
-                            '</span></br>';        
+                            '</span>';        
         }
         modelRegister.actividad_titulo =    htmlActvidad +
                                             modelRegister.titulo;
@@ -2401,21 +2392,21 @@ function processData( data , usuario , usuario_temporal )
 
         if( modelRegister.monto_aprobado !== null )
         {
-            modelRegister.monto = modelRegister.moneda + /*+ ' ' +*/ modelRegister.monto_aprobado;
+            modelRegister.monto = modelRegister.moneda + modelRegister.monto_aprobado;
         }
         else if( modelRegister.monto_aceptado !== null )
         {
-            modelRegister.monto = modelRegister.moneda + /*+ ' ' +*/ modelRegister.monto_aceptado;
+            modelRegister.monto = modelRegister.moneda + modelRegister.monto_aceptado;
         }
         else
         {
-            modelRegister.monto = modelRegister.moneda + /*+ ' ' +*/ modelRegister.monto_solicitado;
+            modelRegister.monto = modelRegister.moneda + modelRegister.monto_solicitado;
         }
 
-        processDataStates( modelRegister , usuario , usuario_temporal );
+        processDataStates( modelRegister , usuario );
     }   
 
-    function processDataStates( modelRegister , usuario , usuario_temporal )
+    function processDataStates( modelRegister , usuario )
     {
         var options =   '<a class="btn btn-default open-details" data-id="' + modelRegister.id + '">' +
                             '<span class="glyphicon glyphicon-eye-open"></span>' +
@@ -2423,19 +2414,12 @@ function processData( data , usuario , usuario_temporal )
                         '<a class="btn btn-default timeLine" data-id="' + modelRegister.id + '">' +
                             '<span class="glyphicon glyphicon-time"></span>' +
                         '</a>';
-        if( modelRegister.reporte /* && ( usuario.tipo == CONT || usuario.id == modelRegister.responsable_id )*/ )
+        if( modelRegister.reporte )
         {
             options +=   '<a class="btn btn-default" target="_blank" href="a/' + modelRegister.token + '">' +
                             '<span  class="glyphicon glyphicon-print"></span>' +
                         '</a>';
         }
-
-        /*if( modelRegister.aprobadores )
-        {
-            options +=  '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.token + '">' +
-                            '<span class="glyphicon glyphicon-edit"></span>' +
-                        '</a>';
-        }*/
 
         if( modelRegister.estado_id == PENDIENTE )
         {
@@ -2451,24 +2435,6 @@ function processData( data , usuario , usuario_temporal )
                                 '<span  class="glyphicon glyphicon-remove"></span>' +
                             '</button>';
             }
-            if( modelRegister.aprobadores )
-            {
-                options += processDataApprovalPolicy( modelRegister , usuario );
-            }
-        }
-        else if( modelRegister.estado_id == DERIVADO )
-        {
-            if( modelRegister.aprobadores )
-            {
-                options += processDataApprovalPolicy( modelRegister , usuario );
-            }
-        }
-        else if( modelRegister.estado_id == ACEPTADO )
-        {
-            if( modelRegister.aprobadores )
-            {
-                options += processDataApprovalPolicy( modelRegister , usuario );
-            }
         }
         else if( modelRegister.estado_id == APROBADO )
         {
@@ -2481,16 +2447,7 @@ function processData( data , usuario , usuario_temporal )
                                 '<span  class="glyphicon glyphicon-remove"></span>' +
                             '</button>';
             }
-        }
-        /*else if( modelRegister.estado_id == CONFIRMADO )
-        {
-            if( usuario.tipo == TESORERIA )
-            {
-                options +=  '<a class="btn btn-default modal_deposit">' +
-                                '<span class="glyphicon glyphicon-usd"></span>' +
-                            '</a>';
-            }
-        }   */    
+        }    
         else if( modelRegister.estado_id == DEPOSITADO )
         {
             if( usuario.tipo == CONT )
@@ -2519,30 +2476,21 @@ function processData( data , usuario , usuario_temporal )
         {
             if( modelRegister.dev_est_id == DEVOLUCION_POR_REALIZAR )
             {
-                /*if( usuario.id == modelRegister.responsable_id )
-                {*/
-                    options +=  '<button type="button" class="btn btn-default">' +
-                                    '<span class="glyphicon glyphicon-edit"></span>' +
-                                '</button>';
-                //}
+                options +=  '<button type="button" class="btn btn-default">' +
+                                '<span class="glyphicon glyphicon-edit"></span>' +
+                            '</button>';
             }
             else if( modelRegister.dev_est_id == DEVOLUCION_POR_VALIDAR )
             {
-                /*if( usuario.tipo == TESORERIA )
-                {*/
-                    options +=  '<a class="btn btn-default get-devolution-info" data-type="confirm-inmediate-devolution">' +
-                                    '<span  class="glyphicon glyphicon-transfer"></span>' +
-                                '</a>';
-                //}
+                options +=  '<a class="btn btn-default get-devolution-info" data-type="confirm-inmediate-devolution">' +
+                                '<span  class="glyphicon glyphicon-transfer"></span>' +
+                            '</a>';
             }
             else if( modelRegister.dev_est_id == 3 )
             {
-                /*if( usuario.tipo == CONT )
-                {*/
-                    options +=  '<button type="button" class="btn btn-default">' +
-                                    '<span class="glyphicon glyphicon-edit"></span>' +
-                                '</button>';
-                //}
+                options +=  '<button type="button" class="btn btn-default">' +
+                                '<span class="glyphicon glyphicon-edit"></span>' +
+                            '</button>';
             }    
         }
         else if( modelRegister.estado_id == REGISTRADO )
@@ -2553,6 +2501,11 @@ function processData( data , usuario , usuario_temporal )
                                 '<span class="glyphicon glyphicon-book"></span>' +
                             '</a>';
             }
+        }
+
+        if( modelRegister.aprobadores )
+        {
+            options += processDataApprovalPolicy( modelRegister , usuario );
         }
 
         modelRegister.opciones  =   '<div class="btn-group btn-group-icon-md">' +
