@@ -120,7 +120,8 @@ class Generate extends BaseController
                                             ->orderBy( 'nro_origen' , 'DESC' );
                 if( $year == 2016 )
                 {
-                    $nro_origen_model_entries->where( 'id' , '>' , 33334 );
+                    $change_date = Carbon::createFromFormat( 'Y-m-d H' , '2016-08-04 14' );
+                    $nro_origen_model_entries->where( 'created_at', '>', $change_date );
                 }
 
                 $nro_origen_model_entries = $nro_origen_model_entries->first();
