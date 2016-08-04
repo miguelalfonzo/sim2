@@ -2271,6 +2271,19 @@ $( document ).ready(function()
     $( "#fecha-value" ).attr('disabled', true);
 });
 
+function customAjax( type , url , data )
+{
+    return $.ajax(
+    {
+        type : type ,
+        url  : url ,
+        data : data 
+    }).fail( function( statusCode , errorThrow )
+    {
+        ajaxError( statusCode , errorThrow )
+    });
+}
+
 function listSolicituds()
 {
     var data =
@@ -2323,19 +2336,6 @@ function listSolicituds()
     });   
 }
 
-function customAjax( type , url , data )
-{
-    return $.ajax(
-    {
-        type : type ,
-        url  : url ,
-        data : data 
-    }).fail( function( statusCode , errorThrow )
-    {
-        ajaxError( statusCode , errorThrow )
-    });
-}
-
 function processColumns( columns , usuario , now )
 {
     var now = new Date( now.year , now.month - 1 , now.day , 0 , 0 , 0 , 0 ); 
@@ -2372,35 +2372,35 @@ function processData( data , usuario )
     
     while( --i )
     {
-        var modelRegister  = data[ ( i - 1 ) ];
-        if( modelRegister.actividad === null )
+        var modelRegister = data[ ( i - 1 ) ];
+        if( modelRegister.act_nom )
+        {
+            var htmlActvidad = '<span class="label" style="margin-right:1em;background-color:' + modelRegister.act_col + '">' + 
+                                modelRegister.act_nom +
+                            '</span>';        
+        }
+        else
         {
             var htmlActvidad = '';
         }
-        else
-        {
-            var htmlActvidad = '<span class="label" style="margin-right:1em;background-color:' + modelRegister.color_actividad + '">' + 
-                                modelRegister.actividad +
-                            '</span>';        
-        }
         modelRegister.actividad_titulo =    htmlActvidad +
-                                            modelRegister.titulo;
+                                            modelRegister.tit;
 
-        modelRegister.estado =  '<span class="label" style="background-color:' + modelRegister.estado_color + '">' + 
-                                modelRegister.estado + 
+        modelRegister.estado =  '<span class="label" style="background-color:' + modelRegister.est_col + '">' + 
+                                modelRegister.est_nom + 
                             '</span>';
 
-        if( modelRegister.monto_aprobado !== null )
+        if( modelRegister.mont_aprob )
         {
-            modelRegister.monto = modelRegister.moneda + modelRegister.monto_aprobado;
+            modelRegister.monto = modelRegister.mon_sim + modelRegister.monto_aprob;
         }
         else if( modelRegister.monto_aceptado !== null )
         {
-            modelRegister.monto = modelRegister.moneda + modelRegister.monto_aceptado;
+            modelRegister.monto = modelRegister.mon_sim + modelRegister.monto_acept;
         }
         else
         {
-            modelRegister.monto = modelRegister.moneda + modelRegister.monto_solicitado;
+            modelRegister.monto = modelRegister.mon_sim + modelRegister.monto_sol;
         }
 
         processDataStates( modelRegister , usuario );
@@ -2414,93 +2414,88 @@ function processData( data , usuario )
                         '<a class="btn btn-default timeLine" data-id="' + modelRegister.id + '">' +
                             '<span class="glyphicon glyphicon-time"></span>' +
                         '</a>';
-        if( modelRegister.reporte )
+        if( modelRegister.repor_usr )
         {
-            options +=   '<a class="btn btn-default" target="_blank" href="a/' + modelRegister.token + '">' +
+            options +=   '<a class="btn btn-default" target="_blank" href="a/' + modelRegister.tok + '">' +
                             '<span  class="glyphicon glyphicon-print"></span>' +
                         '</a>';
         }
 
-        if( modelRegister.estado_id == PENDIENTE )
+        switch( modelRegister.est_id )
         {
-            modelRegister.fecha_revision = '-';
-            modelRegister.revisor = '-';
-        
-            if( modelRegister.sol_usr )
-            {
-                options +=  '<a class="btn btn-default" href="editar-solicitud/' + modelRegister.token + '">' +
-                                '<span  class="glyphicon glyphicon-pencil"></span>' +
-                            '</a>' +
-                            '<button type="button" class="btn btn-default cancel-solicitud" data-idsolicitud=' + modelRegister.id + '>' +
-                                '<span  class="glyphicon glyphicon-remove"></span>' +
-                            '</button>';
-            }
-        }
-        else if( modelRegister.estado_id == APROBADO )
-        {
-            if( usuario.tipo == CONT )
-            {
-                options +=  '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.token + '">' +
-                                '<span class="glyphicon glyphicon-edit"></span>' +
-                            '</a>' +
-                            '<button type="button" class="btn btn-default cancel-solicitud" data-idsolicitud=' + modelRegister.id + '>' +
-                                '<span  class="glyphicon glyphicon-remove"></span>' +
-                            '</button>';
-            }
-        }    
-        else if( modelRegister.estado_id == DEPOSITADO )
-        {
-            if( usuario.tipo == CONT )
-            {
-                options +=  '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.token + '">' +
-                                '<span class="glyphicon glyphicon-book"></span>' +
-                            '</a>';
-            }
-            else if( usuario.tipo == TESORERIA )
-            {
-                options +=  '<a class="btn btn-default modal_extorno">' + 
-                                '<span class="glyphicon glyphicon-pencil"></span>' +
-                            '</a>';
-            }
-        }
-        else if( modelRegister.estado_id == DESCARGO )
-        {
-            if( modelRegister.responsable_id )
-            {
-                options +=  '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.token + '">' +
-                                '<span class="glyphicon glyphicon-edit"></span>' +
-                            '</a>';
-            }
-        }
-        else if( modelRegister.estado_id == ENTREGADO )
-        {
-            if( modelRegister.dev_est_id == DEVOLUCION_POR_REALIZAR )
-            {
-                options +=  '<button type="button" class="btn btn-default">' +
-                                '<span class="glyphicon glyphicon-edit"></span>' +
-                            '</button>';
-            }
-            else if( modelRegister.dev_est_id == DEVOLUCION_POR_VALIDAR )
-            {
-                options +=  '<a class="btn btn-default get-devolution-info" data-type="confirm-inmediate-devolution">' +
-                                '<span  class="glyphicon glyphicon-transfer"></span>' +
-                            '</a>';
-            }
-            else if( modelRegister.dev_est_id == 3 )
-            {
-                options +=  '<button type="button" class="btn btn-default">' +
-                                '<span class="glyphicon glyphicon-edit"></span>' +
-                            '</button>';
-            }    
-        }
-        else if( modelRegister.estado_id == REGISTRADO )
-        {
-            if( usuario.tipo == CONT )
-            {
-                options +=   '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.token + '">' +
-                                '<span class="glyphicon glyphicon-book"></span>' +
-                            '</a>';
-            }
+            case PENDIENTE:
+                modelRegister.fecha_revision = '-';
+                modelRegister.revisor = '-';
+                if( modelRegister.sol_usr )
+                {
+                    options +=  '<a class="btn btn-default" href="editar-solicitud/' + modelRegister.tok + '">' +
+                                    '<span  class="glyphicon glyphicon-pencil"></span>' +
+                                '</a>' +
+                                '<button type="button" class="btn btn-default cancel-solicitud" data-idsolicitud=' + modelRegister.id + '>' +
+                                    '<span  class="glyphicon glyphicon-remove"></span>' +
+                                '</button>';
+                }
+                break;
+            case APROBADO:
+                if( usuario.tipo == CONT )
+                {
+                    options +=  '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.tok + '">' +
+                                    '<span class="glyphicon glyphicon-edit"></span>' +
+                                '</a>' +
+                                '<button type="button" class="btn btn-default cancel-solicitud" data-idsolicitud=' + modelRegister.id + '>' +
+                                    '<span  class="glyphicon glyphicon-remove"></span>' +
+                                '</button>';
+                }
+                break;
+            case DEPOSITADO:
+                if( usuario.tipo == CONT )
+                {
+                    options +=  '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.tok + '">' +
+                                    '<span class="glyphicon glyphicon-book"></span>' +
+                                '</a>';
+                }
+                else if( usuario.tipo == TESORERIA )
+                {
+                    options +=  '<a class="btn btn-default modal_extorno">' + 
+                                    '<span class="glyphicon glyphicon-pencil"></span>' +
+                                '</a>';
+                }
+                break;
+            case DESCARGO:
+                if( modelRegister.resp_usr )
+                {
+                    options +=  '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.tok + '">' +
+                                    '<span class="glyphicon glyphicon-edit"></span>' +
+                                '</a>';
+                }
+                break;
+            case ENTREGADO:
+                if( modelRegister.dev_est_id == DEVOLUCION_POR_REALIZAR )
+                {
+                    options +=  '<button type="button" class="btn btn-default">' +
+                                    '<span class="glyphicon glyphicon-edit"></span>' +
+                                '</button>';
+                }
+                else if( modelRegister.dev_est_id == DEVOLUCION_POR_VALIDAR )
+                {
+                    options +=  '<a class="btn btn-default get-devolution-info" data-type="confirm-inmediate-devolution">' +
+                                    '<span  class="glyphicon glyphicon-transfer"></span>' +
+                                '</a>';
+                }
+                else if( modelRegister.dev_est_id == 3 )
+                {
+                    options +=  '<button type="button" class="btn btn-default">' +
+                                    '<span class="glyphicon glyphicon-edit"></span>' +
+                                '</button>';
+                }    
+                break;
+            case REGISTRADO:
+                if( usuario.tipo == CONT )
+                {
+                    options +=   '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.tok + '">' +
+                                    '<span class="glyphicon glyphicon-book"></span>' +
+                                '</a>';
+                }
         }
 
         if( modelRegister.aprobadores )
