@@ -109,23 +109,29 @@ class Generate extends BaseController
 
                 $firstSolicitudClient = $solicitud->client;
                 $clientName           = $firstSolicitudClient->{ $firstSolicitudClient->clientType->relacion }->entry_name;                          
+              
+                $year = $now->year;
 
-               /* $nro_origen_sufix = 'S';
-                $nro_origen_middle = str_pad( substr( $solicitud->id , -5 ) , 5 , 0 , STR_PAD_LEFT );
-                $nro_origen_pre = $nro_origen_sufix . $nro_origen_middle;*/
-                $nro_origen_model_entries = Entry::select( 'substr( nro_origen , 3 , 4 ) correl' )
-                                            ->where( 'extract( year from created_at )' , $now->year )
+                $nro_origen_model_entries = Entry::select( 'substr( nro_origen , 3 , 6 ) correl' )
+                                            ->whereNotNull( 'nro_origen' )
+                                            ->where( 'extract( year from created_at )' , $year )
                                             ->where( 'nro_origen' , 'like' , '70%' )
                                             ->where( 'length( nro_origen )' , 8 )
-                                            ->orderBy( 'nro_origen' , 'DESC' )
-                                            ->first();
+                                            ->orderBy( 'nro_origen' , 'DESC' );
+                if( $year == 2016 )
+                {
+                    $nro_origen_model_entries->where( 'id' , '>' , 33334 );
+                }
+
+                $nro_origen_model_entries = $nro_origen_model_entries->first();
+
                 if( is_null( $nro_origen_model_entries ) )
                 {
-                    $nro_origen_pre = '700001';
+                    $nro_origen_pre = '70000000';
                 }
                 else
                 {
-                    $nro_origen_pre = '70' . str_pad( $nro_origen_model_entries->correl + 1 , 4 , 0 , STR_PAD_LEFT );
+                    $nro_origen_pre = '70' . str_pad( $nro_origen_model_entries->correl , 6 , 0 , STR_PAD_LEFT );
                 }
 
                 $i = 1;
@@ -148,7 +154,8 @@ class Generate extends BaseController
                     if( $comprobante->igv == 1 && $expense->igv > 0 )
                     {
                         $cc         = $comprobante->cta_sunat;
-                        $nro_origen = $nro_origen_pre . str_pad( substr( $i , -2 ) , 2 , 0 , STR_PAD_LEFT );
+                        //$nro_origen = $nro_origen_pre . str_pad( substr( $i , -2 ) , 2 , 0 , STR_PAD_LEFT );
+                        $nro_origen = $nro_origen_pre + $i;
                         ++$i;
                         $ruc        = $expense->ruc;
                         $razon      = $expense->razon;
