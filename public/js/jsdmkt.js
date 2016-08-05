@@ -2404,10 +2404,9 @@ function processData( data , usuario )
         switch( modelRegister.est_id )
         {
             case PENDIENTE:
-                console.log( 'hola ');
                 modelRegister.fecha_revision = '-';
                 modelRegister.revisor = '-';
-                if( modelRegister.crea_usr || modelRegister.stat == 1 )
+                if( modelRegister.crea_usr && modelRegister.sol_tip_id != 2 && modelRegister.stat == 1 )
                 {
                     options +=  '<a class="btn btn-default" href="editar-solicitud/' + modelRegister.tok + '">' +
                                     '<span  class="glyphicon glyphicon-pencil"></span>' +
@@ -2429,7 +2428,7 @@ function processData( data , usuario )
                 }
                 break;
             case DEPOSITO_HABILITADO:
-                if( usuario.tipo == CONT && modelRegister.sol_tip_id != 3 )
+                if( usuario.tipo == CONT && modelRegister.sol_tip_id == 1 )
                 {
                     options +=  '<button type="button" class="btn btn-default cancel-solicitud" data-idsolicitud=' + modelRegister.id + '>' +
                                     '<span  class="glyphicon glyphicon-remove"></span>' +

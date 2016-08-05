@@ -48,27 +48,28 @@ class MoveController extends BaseController
                 else
                     $solicitud->saldo = 'El Tipo de Moneda es: '.$detalle->id_moneda ;
         }
-        $view = View::make('Tables.movimientos')->with( array( 'solicituds' => $middleRpta[data] , 'subCategoriaId' =>$subCategoriaId ) )->render();
+        $view = View::make('Tables.movimientos')->with( array( 'solicituds' => $data , 'subCategoriaId' =>$subCategoriaId ) )->render();
+        $rpta = $this->setRpta( [ 'View' => $view ] );
+        
         if ( Auth::user()->type == TESORERIA )
         {
-            $soles = $middleRpta[data]->sum( function( $solicitud )
+            $soles = $data->sum( function( $solicitud )
             {
                 $deposito = $solicitud->detalle->deposit;
                 $moneda = $deposito->account->typeMoney;
                 if ( $moneda->id == SOLES )
                     return $solicitud->detalle->deposit->total;
             });
-            $dolares = $middleRpta[data]->sum( function( $solicitud )
+            $dolares = $data->sum( function( $solicitud )
             {
                 $deposito = $solicitud->detalle->deposit;
                 $moneda = $deposito->account->typeMoney;
                 if ( $moneda->id == DOLARES )
                     return $solicitud->detalle->deposit->total;
             });
-            $middleRpta[data]['Total'] = array( 'Soles' => $soles , 'Dolares' => $dolares );
+            $rpta[ data ][ 'Total' ] = array( 'Soles' => $soles , 'Dolares' => $dolares );
         }
-        $middleRpta[data]['View'] = $view;
-        return $middleRpta;
+        return $rpta;
     }
 
     private function setDates( $start , $end )
@@ -143,7 +144,7 @@ class MoveController extends BaseController
         return Carbon::createFromFormat( 'd/m/Y' , $date )->format( 'Ym' );
     }
 
-    protected function searchSolicituds( $estado , array $dates , $filter , $type = 'FLUJO' )
+    protected function searchSolicituds( $estado , array $dates , $filter )
     {
         $solicituds = Solicitud::where( function( $query ) use( $dates )
         {
@@ -161,25 +162,7 @@ class MoveController extends BaseController
                 });  
             });
         });
-        if ( $type == 'FLUJO' )
-        {
-            if ( in_array( Auth::user()->type , array ( REP_MED , SUP , GER_PROD , GER_PROM , ASIS_GER ) ) )
-                $solicituds->where( function ( $query )
-                {
-                    $query->whereHas( 'gerente' , function( $query )
-                    {
-                        $query->whereIn( 'id_gerprod' , array( Auth::user()->id , Auth::user()->tempId() ) );
-                    })->orWhereIn( 'created_by' , array( Auth::user()->id , Auth::user()->tempId() ) )
-                    ->orWhereIn( 'id_user_assign' , array( Auth::user()->id , Auth::user()->tempId() ) );
-                });
-            elseif ( Auth::user()->type == TESORERIA ) 
-                if ( $estado == R_REVISADO )
-                    $solicituds->whereIn( 'id_estado' , array( DEPOSITADO ) );
-                else if( $estado == R_GASTO )
-                    $solicituds->where( 'id_estado' , ENTREGADO );
-        }
-        elseif( $type == 'MOVIMIENTOS' )
-        {
+        
             if ( in_array( Auth::user()->type , array ( SUP ) ) )
             {
                 $solicituds->where( function ( $query )
@@ -229,8 +212,7 @@ class MoveController extends BaseController
                     });
                 });
             }
-        }
-
+        
         if( $estado != R_TODOS )
         {
             $solicituds->whereHas( 'state' , function ( $q ) use( $estado )
@@ -284,6 +266,11 @@ class MoveController extends BaseController
             $dates  = [ 'start' => $inputs[ 'fecha_inicio' ] , 'end' => $inputs[ 'fecha_final' ] ];
             $data   = $this->searchUserSolicituds( $inputs[ 'estado' ] , $dates , null );
 
+            if( isset( $data[ status ] ) && $data[ status ] == error )
+            {
+                return $data;
+            }
+
             $columns =
                 [
                     [ 'title' => '#' , 'data' => 'id' , 'className' => 'text-center' , 'width' => '5%'],
@@ -309,8 +296,8 @@ class MoveController extends BaseController
             elseif( $user->type == TESORERIA )
             {
                 $columns[ 2 ] = [ 'title' => 'Responsable' , 'data' => 'resp_nom' , 'className' => 'text-center' ];
-                $columns[ 3 ] = [ 'title' => 'Fecha de Deposito' , 'data' => 'entr_fec' , 'className' => 'text-center' ];
-                $columns[ 4 ] = [ 'title' => 'Deposito' , 'data' => 'monto' , 'className' => 'text-center' ];
+                $columns[ 3 ] = [ 'title' => 'Fecha de Deposito' , 'data' => 'entr_fec' , 'className' => 'text-center' , 'width' => '10%' ];
+                $columns[ 4 ] = [ 'title' => 'Deposito' , 'data' => 'monto' , 'className' => 'text-center' , 'width' => '5%' ];
                 unset( $columns[ 5 ] , $columns[ 6 ] );
                 $columns = array_values( $columns );
                       
