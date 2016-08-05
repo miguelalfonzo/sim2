@@ -4,6 +4,7 @@ namespace Dmkt;
 
 use \Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletingTrait;
+use \Auth;
 
 class InvestmentType extends Eloquent
 {
@@ -39,7 +40,16 @@ class InvestmentType extends Eloquent
 
     protected static function orderMkt()
     {
-        return InvestmentType::orderBy('nombre','asc')->where( 'codigo_actividad' , INVERSION_MKT )->get();
+        $investments = InvestmentType::orderBy('nombre','asc');
+        if( Auth::user()->username == 'holistic' )
+        {
+            $investments->whereIn( 'codigo_actividad' , [ INVERSION_MKT , INVERSION_PROV ] ); 
+        }
+        else
+        {
+            $investments->where( 'codigo_actividad' , INVERSION_MKT );
+        }
+        return $investments->get();
     }
 
     protected static function orderInst()

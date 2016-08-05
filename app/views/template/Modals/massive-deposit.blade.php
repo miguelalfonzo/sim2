@@ -9,21 +9,13 @@
                 <h4 class="modal-title" id="myModalLabel">Registro del Depósito - Masivo</h4>
             </div>
             <div class="modal-body">
-                <div class="form-group" style="display:none">
+                <div class="form-group">
                     <label>Bancos</label>
                     <select id="massive-bank-account" class="form-control">
                         @foreach ( $banks as $bank )
-                            @if( $bank->typeMoney->simbolo == 'S/.' )
-                                <option value="{{ $bank->num_cuenta }}" selected>
-                                    {{ $bank->typeMoney->simbolo . '-' . $bank->bagoAccount->ctanombrecta }}
-                                </option>
-                            {{-- 
-                            @else
-                                <option value="{{ $bank->num_cuenta }}">
-                                    {{ $bank->typeMoney->simbolo . '-' . $bank->bagoAccount->ctanombrecta }}
-                                </option>
-                            --}}
-                            @endif
+                            <option value="{{ $bank->num_cuenta }}">
+                                {{ $bank->typeMoney->simbolo . '-' . $bank->bagoAccount->ctanombrecta }}
+                            </option>    
                         @endforeach
                     </select>
                 </div>
@@ -49,7 +41,27 @@
                                     <td><b>{{ $key + 1 }}</b></td>
                     				<td class="deposit-solicitud-cell"><b>{{ $depositId->id }}</b></td>
                     				<td><b>{{ mb_strtoupper( $depositId->personalTo->full_name ) }}</b></td>
-                                    <td><b>{{ $depositId->personalTo->getAccount() }}</b></td>
+                                    <td>
+                                        <b>
+                                            @if( $depositId->id_inversion == 36 )
+                                                @if( $depositId->detalle->id_moneda == 1 )
+                                                    194-1732292-098
+                                                @elseif( $depositId->detalle->id_moneda == 2 )
+                                                    194-1809102-167
+                                                @endif
+                                            @elseif( $depositId->id_inversion == 38 )
+                                                @if( $depositId->detalle->id_moneda == 1 )
+                                                    194-233-9351007
+                                                @elseif( $depositId->detalle->id_moneda == 2 )
+                                                    194-229-5288135
+                                                @endif
+                                            @else
+                                                @if( in_array( $depositId->assignedTo->type , [ REP_MED , SUP ] ) )
+                                                    {{ $depositId->personalTo->getAccount() }}
+                                                @endif
+                                            @endif
+                                        </b>
+                                    </td>
                                     <td><b>{{ $depositId->detalle->currency_money }}</b></td>
                                     <td class="deposit-operacion-cell"><b><input type="text" class="form-control" autocomplete="off"></b></td>
                                     <input type="hidden" class="deposit-solicitud-token" value="{{ $depositId->token }}"> 

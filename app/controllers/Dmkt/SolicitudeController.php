@@ -114,7 +114,7 @@ class SolicitudeController extends BaseController
     {
         include(app_path() . '/models/Query/QueryProducts.php');
         $data = array(
-            'reasons'     => SolicitudType::where( 'code' , '<>' , 'F' )->orderBy( 'id' )->get(),
+            'reasons'     => SolicitudType::getNormalTypes(),
             'activities'  => Activity::order(),
             'payments'    => TypePayment::all(),
             'currencies'  => TypeMoney::all(),
@@ -132,7 +132,7 @@ class SolicitudeController extends BaseController
         include(app_path() . '/models/Query/QueryProducts.php');
         $data = array( 
            'solicitud'   => Solicitud::where('token', $token)->firstOrFail(),
-           'reasons'     => SolicitudType::where( 'code' , '<>' , 'F' )->orderBy( 'id' )->get(),
+           'reasons'     => SolicitudType::getNormalTypes(),
            'activities'  => Activity::order(),
            'payments'    => TypePayment::all(),
            'currencies'  => TypeMoney::all(),
