@@ -41,7 +41,7 @@ class InvestmentType extends Eloquent
     protected static function orderMkt()
     {
         $investments = InvestmentType::orderBy('nombre','asc');
-        if( Auth::user()->username == 'holistic' )
+        if( Auth::user()->username == 'HOLISTIC' )
         {
             $investments->whereIn( 'codigo_actividad' , [ INVERSION_MKT , INVERSION_PROV ] ); 
         }
