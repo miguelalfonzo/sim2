@@ -408,20 +408,6 @@ class TestController extends BaseController
         return View::make('template.User.show',$data);   
     }
 
-    public function passNewSolicitud()
-    {
-        //$alert = new AlertController;
-        $data = array( 'reasons'     => Reason::all() ,
-                       'activities'  => Activity::order(),
-                       'payments'    => TypePayment::all(),
-                       'currencies'  => TypeMoney::all(),
-                       'families'    => Marca::orderBy('descripcion', 'ASC')->get(),
-                       'investments' => InvestmentType::order() 
-                       //'alert'       => $alert->expenseAlert() 
-                       ); 
-        return View::make( 'Dmkt.Register.solicitud' , $data );
-    }  
-
     public function getUserSubFondos()
     {
     	$id = 35;

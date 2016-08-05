@@ -172,6 +172,7 @@ const TIPO_GERPROD              = 128;
 
 const INVERSION_MKT             = 'M';
 const INVERSION_INSTITUCIONAL   = 'I';
+const INVERSION_PROV            = 'P';
 
 const FONDO_CUENTA              = 'PRUEBA FONDO CUENTA';
 

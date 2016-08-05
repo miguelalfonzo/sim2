@@ -20,8 +20,14 @@
                 @if( $solicitud->id_inversion == 36 )
                     @if( $solicitud->detalle->id_moneda == 1 )
                         194-1732292-098
-                    @else
+                    @elseif( $solicitud->detalle->id_moneda == 2 )
                         194-1809102-167
+                    @endif
+                @elseif( $solicitud->id_inversion == 38 )
+                    @if( $solicitud->detalle->id_moneda == 1 )
+                        194-233-9351007
+                    @elseif( $solicitud->detalle->id_moneda == 2 )
+                        194-229-5288135
                     @endif
                 @else
                     @if( in_array( $solicitud->assignedTo->type , [ REP_MED , SUP ] ) )

@@ -16,7 +16,8 @@ use \Validator;
 use \DB;
 use \Auth;
 use \stdClass;
-use \Exoense\ChangeRate;
+use \Expense\ChangeRate;
+use \Expense\PlanCta;
 
 class Generate extends BaseController
 {
@@ -364,14 +365,18 @@ class Generate extends BaseController
                 }
                 else
                 {
-                    if ( $solicitud->id_inversion == 36 && $detalle->id_moneda == SOLES )
+                    if( in_array( $solicitud->id_inversion , [ 36 , 38 ] ) )
                     {
-                        $cuentaMkt = 1893000;
+                        if( $solicitud->detalle->deposit->account->idtipomoneda == SOLES )
+                        {
+                            $cuentaMkt = 1893000;
+                        }
+                        elseif( $solicitud->detalle->deposit->account->idtipomoneda == DOLARES )
+                        {
+                            $cuentaMkt = 1894000;
+                        }
                     }
-                    elseif( $solicitud->id_inversion == 36 && $detalle->id_moneda == DOLARES )
-                    {
-                        $cuentaMkt = 1894000;
-                    }
+                
                     $seatList[] = $this->createSeatElement( $cuentaMkt , $cuentaMkt, '', $oldExpense->updated_at->format( 'd/m/Y' ) , '', '', '', '', '', '', '', 
                         ASIENTO_GASTO_DEPOSITO , $import_transf , '' , $solicitud->solicitud_caption , '' , '' , 'CAN' );
                 }
@@ -634,12 +639,30 @@ class Generate extends BaseController
         $account              = $investment->accountFund;
         
         $entry                 = new stdClass;
-        $entry->account_name   = $account->nombre;
-        $entry->account_number = $account->num_cuenta;
         $entry->origin         = $detail->deposit->updated_at;
         $entry->d_c            = ASIENTO_GASTO_BASE;
         $entry->import         = $detail->soles_import;
         $entry->caption        = $solicitud->solicitud_caption;
+
+        if( in_array( $solicitud->id_inversion , [ 36 , 38 ] ) )
+        {
+            if( $solicitud->detalle->deposit->account->idtipomoneda == SOLES )
+            {
+                $num_cuenta = 1893000;
+            }
+            elseif( $solicitud->detalle->deposit->account->idtipomoneda == DOLARES )
+            {
+                $num_cuenta = 1894000;
+            }
+            $entry->account_name   = PlanCta::find( $num_cuenta )->ctanombrecta;
+            $entry->account_number = $num_cuenta;   
+        }
+        else
+        {
+            $entry->account_name   = $account->nombre;
+            $entry->account_number = $account->num_cuenta;
+        }
+
         return $entry;
     }
 
