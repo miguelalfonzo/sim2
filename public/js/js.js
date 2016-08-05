@@ -1497,7 +1497,7 @@ $(function()
         });
     });
 
-    $(document).off("click", ".modal_deposit");
+    /*$(document).off("click", ".modal_deposit");
     $(document).on("click", ".modal_deposit", function(e)
     {
         var tr            = $( this ).parent().parent().parent();
@@ -1513,7 +1513,7 @@ $(function()
         $("#beneficiario").val(beneficiario);
         $("#total-deposit").val( tr.find('.deposit').text().trim() );
         $('#enable_deposit_Modal').modal();
-    });
+    });*/
 
     $('#ruc').click( function()
     {
@@ -1767,10 +1767,8 @@ $(function()
         var data =
         {
             _token : GBREPORTS.token ,
-            tipo   : $( this ).attr( 'data-type' ) ,
-            token  : $( 'input[ name=token ]' ).length === 1 && $( 'input[ name=token ]' ).val().trim() !== '' ? 
-                     $( 'input[ name=token ]' ).val() : 
-                     $( this ).parent().parent().parent().find( '#sol_token' ).val()
+            tipo   : this.dataset.type ,
+            token  : $( this ).closest( 'tr' ).find( '.solicitud-token' ).val()
         };
         $.post( server + 'get-devolution-info' , data )
         .done( function ( response ) 
@@ -1896,7 +1894,7 @@ $(function()
                         {
                             if ( data.tipo == 'confirm-inmediate-devolution')
                             {    
-                                listTable( 'solicitudes' );
+                                getSolicitudList();
                             }
                             else if( data.tipo == 'do-inmediate-devolution' || data.tipo == 'register-inmediate-devolution' )
                             {
@@ -1924,6 +1922,7 @@ $(function()
     $( document ).on( 'click' , '.modal_extorno' , function()
     {
         var element = $( this );
+        var solicitud_token = element.closest( 'tr' ).find( '.solicitud-token' ).val();
         $.ajax(
         {
             type : 'post',
@@ -1931,7 +1930,7 @@ $(function()
             data : 
             {
                 _token : GBREPORTS.token ,
-                token  : element.parent().parent().parent().find('#sol_token').val()
+                token  : solicitud_token
             }
         }).fail( function( statusCode , errorThrow )
         {
@@ -1968,7 +1967,7 @@ $(function()
                                     data : 
                                     {
                                         _token           : GBREPORTS.token ,
-                                        token            : element.parent().parent().parent().find('#sol_token').val(),
+                                        token            : solicitud_token,
                                         numero_operacion : $( '#nuevo_num_ope' ).val()
                                     }
                                 }).fail( function( statusCode , errorThrow )
@@ -1979,7 +1978,7 @@ $(function()
                                     if ( response.Status == 'Ok' )
                                     {
                                         bootbox.alert( '<h4 class="green">Cambio de N° de Operacion Confirmado</h4>');
-                                        listTable( 'solicitudes' );
+                                        getSolicitudList();
                                     }
                                     else
                                         bootbox.alert( '<h4 class="red">' + response.Status + ' : ' + response.Description + '</h4>' );
@@ -2004,7 +2003,7 @@ $(function()
             data : 
             {
                 _token : GBREPORTS.token ,
-                token  : element.parent().parent().parent().find('#sol_token').val()
+                token  : element.closest( 'tr' ).find( '.solicitud-token' ).val()
             }
         }).fail( function( statusCode , errorThrow )
         {
@@ -2042,7 +2041,7 @@ $(function()
                                     data : 
                                     {
                                         _token  : GBREPORTS.token ,
-                                        token   : element.parent().parent().parent().find('#sol_token').val() ,
+                                        token   : element.closest( 'tr' ).find( '.solicitud-token' ).val() ,
                                         periodo : $( '#periodo' ).val()
                                     }
                                 }).fail( function( statusCode , errorThrow )
@@ -2053,7 +2052,7 @@ $(function()
                                     if ( response.Status == 'Ok' )
                                     {
                                         bootbox.alert( '<h4 class="green">Cancelacion de la Solicitud por Cese Confirmado</h4>');
-                                        listTable( 'solicitudes' );
+                                        getSolicitudList();
                                     }
                                     else
                                         bootbox.alert( '<h4 class="red">' + response.Status + ' : ' + response.Description + '</h4>' );

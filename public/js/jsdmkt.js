@@ -35,29 +35,22 @@ var families          = $('#listfamily');
 var idState           = $("#idState");
 
 //LISTA SOLICITUD
-var PENDIENTE = 1;
-var DERIVADO  = 11;
-var ACEPTADO  = 2;
-var APROBADO  = 3;
-
-var CONFIRMADO = 13;
-var DEPOSITADO = 4;
-
-var DESCARGO = 12;
-var ENTREGADO = 6;
-var REGISTRADO = 5;
+var PENDIENTE = '1';
+var APROBADO  = '3';
+var DEPOSITO_HABILITADO = '13';
+var DEPOSITADO = '4';
+var DESCARGO = '12';
+var ENTREGADO = '6';
+var REGISTRADO = '5';
 
 var GER_COM = 'G';
 var CONT    = 'C';
 var TESORERIA = 'T';
 
-var DEVOLUCION_POR_VALIDAR = 2;
 var DEVOLUCION_POR_REALIZAR = 1;
+var DEVOLUCION_POR_VALIDAR = 2;
 
 var aprobacionCheckBox = '<input name="mass-aprov" type="checkbox"/>';
-
-//var aprobadores;
-//var ESTADOS_APROBACION = [ PENDIENTE , DERIVADO , ACEPTADO ];
 
 //VALIDACION DE MONTOS DE FAMILIAS
 var amount_error_families = $('#amount_error_families');
@@ -361,8 +354,8 @@ var calcDataTableHeight = function()
 function listTable( type , date )
 {
     date = typeof date !== 'undefined' ? date : null;
-    //var l = Ladda.create($("#search-solicitude")[0]);
-    $.ajax({
+    $.ajax(
+    {
         url: server + 'list-table',
         type: 'POST',
         data:
@@ -473,13 +466,12 @@ $(document).on( "click" , ".register-deposit" , function( e )
 
 function getSolicitudList()
 {
-    if ( $('.table_solicitudes').length === 0 )
+    if( $( '#table_solicituds' ).length == 0 )
     {
         window.location.href = server +"show_user";
     }
     else
     {
-        //listTable( 'solicitudes' );
         listSolicituds();
     }
 }
@@ -678,8 +670,7 @@ function cancelDialog  ( data , message )
                                         if ( data.Type == 1 )
                                         {
                                             idState.val(6);
-                                            //listTable( 'solicitudes' );
-                                            listSolicituds();
+                                            getSolicitudList();
                                         }
                                         else if ( data.Type == 2 )
                                             searchFondos( $('.date_month').first().val() );
@@ -1702,18 +1693,10 @@ $(".date_month").datepicker(date_options2).on('changeDate', function (e) {
     }
 });
 
-/* Filter all solicitude by date */
-/*$('#search-solicitude').on('click', function()
-{ 
-    listTable( 'solicitudes' );
-});*/
-
 $('#search-documents').on('click', function()
 { 
     listDocuments();
 });
-
-
 
 function validateNewSol()
 {
@@ -1880,15 +1863,16 @@ $("#btn-mass-approve").click( function()
             if (result)
             {
                 var data = {};
-                var trs = $('#table_solicitudes tbody tr');
-                data._token = _token;
+                var trs = $('#table_solicituds tbody tr');
+                data._token = GBREPORTS.token;
                 data.solicitudes = [];
-                trs.each(function( index)
+                trs.each( function( index , value )
                 {
                     var sol = {};
-                    if ( $(this).find('input[name=mass-aprov]:checked').length != 0 )
+                    var elem = $( value );
+                    if ( elem.find( 'input[ name=mass-aprov ]:checked' ).length != 0 )
                     {
-                        sol.token = $(this).find("#sol_token").val();
+                        sol.token = elem.find( '.solicitud-token' ).val();
                         data.solicitudes.push(sol);
                     }
                 });
@@ -1919,8 +1903,9 @@ $("#btn-mass-approve").click( function()
                         var color = 'red';
                     else
                         var color = '';
-                    //listTable( 'solicitudes' );
+                    
                     listSolicituds();
+
                     bootbox.alert("<h4 style='color:" + color + "'>" + data.Description + "</h4>", function()
                     {
                         colorTr(data.token);
@@ -2249,18 +2234,14 @@ $( document ).ready(function()
 
     if ( $("#idState").length === 1 )
     {
-        //listTable( 'solicitudes' );
         listSolicituds();
     }
-
-    //_token       =  GBREPORTS.token;
 
     /** --------------------------------------------- CONTABILIDAD ------------------------------------------------- **/
 
     $(document).off('change','#idState')
     $(document).on('change','#idState',function()
     {
-        //listTable( 'solicitudes' );
         listSolicituds();
     });
 
@@ -2325,7 +2306,7 @@ function listSolicituds()
                 },
                 createdRow: function( row , data , dataIndex )
                 {
-                    $( row ).append( '<input type="hidden" class="solicitud-token" value="' + data.token + '">' );
+                    $( row ).append( '<input type="hidden" class="solicitud-token" value="' + data.tok + '">' );
                 }
             });
         }
@@ -2392,15 +2373,15 @@ function processData( data , usuario )
 
         if( modelRegister.mont_aprob )
         {
-            modelRegister.monto = modelRegister.mon_sim + modelRegister.monto_aprob;
+            modelRegister.monto = modelRegister.mon_sim + modelRegister.mont_aprob;
         }
-        else if( modelRegister.monto_aceptado !== null )
+        else if( modelRegister.mont_acept )
         {
-            modelRegister.monto = modelRegister.mon_sim + modelRegister.monto_acept;
+            modelRegister.monto = modelRegister.mon_sim + modelRegister.mont_acept;
         }
         else
         {
-            modelRegister.monto = modelRegister.mon_sim + modelRegister.monto_sol;
+            modelRegister.monto = modelRegister.mon_sim + modelRegister.mont_sol;
         }
 
         processDataStates( modelRegister , usuario );
@@ -2420,13 +2401,13 @@ function processData( data , usuario )
                             '<span  class="glyphicon glyphicon-print"></span>' +
                         '</a>';
         }
-
         switch( modelRegister.est_id )
         {
             case PENDIENTE:
+                console.log( 'hola ');
                 modelRegister.fecha_revision = '-';
                 modelRegister.revisor = '-';
-                if( modelRegister.sol_usr )
+                if( modelRegister.crea_usr || modelRegister.stat == 1 )
                 {
                     options +=  '<a class="btn btn-default" href="editar-solicitud/' + modelRegister.tok + '">' +
                                     '<span  class="glyphicon glyphicon-pencil"></span>' +
@@ -2447,12 +2428,26 @@ function processData( data , usuario )
                                 '</button>';
                 }
                 break;
+            case DEPOSITO_HABILITADO:
+                if( usuario.tipo == CONT && modelRegister.sol_tip_id != 3 )
+                {
+                    options +=  '<button type="button" class="btn btn-default cancel-solicitud" data-idsolicitud=' + modelRegister.id + '>' +
+                                    '<span  class="glyphicon glyphicon-remove"></span>' +
+                                '</button>';
+                }
+                break;
             case DEPOSITADO:
                 if( usuario.tipo == CONT )
                 {
-                    options +=  '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.tok + '">' +
+                    options +=  '<a class="btn btn-default" target="_blank" href="ver-solicitud/' + modelRegister.tok + '">' +
                                     '<span class="glyphicon glyphicon-book"></span>' +
                                 '</a>';
+                    if( modelRegister.sol_tip_id != 3 )
+                    {
+                        options  +=     '<a class="btn btn-default modal_liquidacion">' +
+                                            '<span class="glyphicon glyphicon-inbox"></span>' +
+                                        '</a>';
+                    }
                 }
                 else if( usuario.tipo == TESORERIA )
                 {
@@ -2467,6 +2462,18 @@ function processData( data , usuario )
                     options +=  '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.tok + '">' +
                                     '<span class="glyphicon glyphicon-edit"></span>' +
                                 '</a>';
+                    if( modelRegister.sol_tip_id != 3 )
+                    {
+                        options  +=     '<a class="btn btn-default modal_liquidacion">' +
+                                            '<span class="glyphicon glyphicon-inbox"></span>' +
+                                        '</a>';
+                    }
+                }
+                if( usuario.tipo == CONT && modelRegister.sol_tip_id == 3 )
+                {
+                    options +=  '<button type="button" class="btn btn-default cancel-solicitud" data-idsolicitud=' + modelRegister.id + '>' +
+                                    '<span  class="glyphicon glyphicon-remove"></span>' +
+                                '</button>';
                 }
                 break;
             case ENTREGADO:
@@ -2492,13 +2499,14 @@ function processData( data , usuario )
             case REGISTRADO:
                 if( usuario.tipo == CONT )
                 {
-                    options +=   '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.tok + '">' +
+                    options +=   '<a class="btn btn-default" target="_blank" href="ver-solicitud/' + modelRegister.tok + '">' +
                                     '<span class="glyphicon glyphicon-book"></span>' +
                                 '</a>';
                 }
+                break;
         }
 
-        if( modelRegister.aprobadores )
+        if( modelRegister.aprob_usr )
         {
             options += processDataApprovalPolicy( modelRegister , usuario );
         }
@@ -2510,7 +2518,7 @@ function processData( data , usuario )
 
     function processDataApprovalPolicy( modelRegister , usuario )
     {
-        var options =   '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.token + '">' +
+        var options =   '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.tok + '">' +
                             '<span class="glyphicon glyphicon-edit"></span>' +
                         '</a>';
         if( usuario.tipo == GER_COM )

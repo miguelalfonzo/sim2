@@ -286,30 +286,30 @@ class MoveController extends BaseController
 
             $columns =
                 [
-                    [ 'title' => '#' , 'data' => 'id' , 'className' => 'text-center' ],
+                    [ 'title' => '#' , 'data' => 'id' , 'className' => 'text-center' , 'width' => '5%'],
                     [ 'title' => 'Solicitud' , 'data' => 'actividad_titulo' ],
-                    [ 'title' => 'Solicitador por' , 'data' => 'solicitador' , 'className' => 'text-center' ],
-                    [ 'title' => 'Fecha de Solicitud' , 'data' => 'fecha_creacion' , 'className' => 'text-center' ],
-                    [ 'title' => 'Aprobado por' , 'data' => 'revisor' , 'className' => 'text-center' ],
-                    [ 'title' => 'Fecha de Aprobación' , 'data' => 'fecha_revision' , 'className' => 'text-center' ],
-                    [ 'title' => 'Monto' , 'data' => 'monto' , 'className' => 'text-center' ],
-                    [ 'title' => 'Estado' , 'data' => 'estado' , 'className' => 'text-center' ],
-                    [ 'title' => 'Tipo' , 'data' => 'tipo_solicitud' , 'className' => 'text-center' ],
-                    [ 'title' => 'Edicion' , 'data' => 'opciones' , 'className' => 'text-center' , 'width' => '35%' ],
+                    [ 'title' => 'Solicitador por' , 'data' => 'crea_nom' , 'width' => '5%' , 'className' => 'text-center' ],
+                    [ 'title' => 'Fecha de Solicitud' , 'data' => 'crea_fec' , 'width' => '5%' ,  'className' => 'text-center' ],
+                    [ 'title' => 'Aprobado por' , 'data' => 'rev_nom' , 'width' => '5%' , 'className' => 'text-center' ],
+                    [ 'title' => 'Fecha de Aprobación' , 'data' => 'rev_fec' , 'width' => '5%' , 'className' => 'text-center' ],
+                    [ 'title' => 'Monto' , 'data' => 'monto' , 'className' => 'text-center' , 'width' => '5%' ],
+                    [ 'title' => 'Estado' , 'data' => 'estado' , 'className' => 'text-center' , 'width' => '5%'],
+                    [ 'title' => 'Tipo' , 'data' => 'sol_tip_nom' , 'className' => 'text-center' , 'width' => '5%'],
+                    [ 'title' => 'Edicion' , 'data' => 'opciones' , 'width' => '15%' , 'className' => 'text-center'  ],
                 ];
             $user = Auth::user();
             if( $user->type == GER_COM )
             {
-                $columns[] = [ 'title' => 'X' , 'data' => 'aprobacion_masiva' , 'className' => 'text-center' , 'defaultContent' => '' ];
+                $columns[] = [ 'title' => 'X' , 'data' => 'aprobacion_masiva' , 'className' => 'text-center' , 'defaultContent' => ''  ];
             }
             elseif( $user->type == CONT )
             {
-                $columns[ 3 ] = [ 'title' => 'Fecha de Deposito' , 'data' => 'fecha_entrega' , 'className' => 'text-center' ];
+                $columns[ 3 ] = [ 'title' => 'Fecha de Deposito' , 'data' => 'entr_fec' , 'className' => 'text-center' , 'width' => '5%'];
             }
             elseif( $user->type == TESORERIA )
             {
-                $columns[ 2 ] = [ 'title' => 'Responsable' , 'data' => 'responsable' , 'className' => 'text-center' ];
-                $columns[ 3 ] = [ 'title' => 'Fecha de Deposito' , 'data' => 'fecha_entrega' , 'className' => 'text-center' ];
+                $columns[ 2 ] = [ 'title' => 'Responsable' , 'data' => 'resp_nom' , 'className' => 'text-center' ];
+                $columns[ 3 ] = [ 'title' => 'Fecha de Deposito' , 'data' => 'entr_fec' , 'className' => 'text-center' ];
                 $columns[ 4 ] = [ 'title' => 'Deposito' , 'data' => 'monto' , 'className' => 'text-center' ];
                 unset( $columns[ 5 ] , $columns[ 6 ] );
                 $columns = array_values( $columns );
