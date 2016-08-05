@@ -60,23 +60,12 @@ class MigrateSeatController extends BaseController
 		return array( 'ok' => $penclave , 'error' => $errors );
 	}
 
-	/*public function transactionGenerateSeat2( $entries )
-	{
-		$penclave = array();
-		$errors   = array();
-		foreach( $entries as $entry )
-		{
-			$this->migrateSeat( $seatType , $seats , $entry->id_solicitud , $penclave , $errors );
-		}
-		return array( 'ok' => $penclave , 'error' => $errors );
-	}*/
-
 	public function migrateSeat( $seatType , $seats , $idSolicitud , &$penclave , &$errors )
 	{
 		$solicitud = Solicitud::find( $idSolicitud );
-		if ( $solicitud->id_inversion == 36 && $seatType == 'G' )
+		if( in_array( $solicitud->id_inversion , [ 36 , 38 ] ) && $seatType == 'G' )
 		{
-			$origen = 4; // CODIGO PARA EL ASIENTO DE DOCUMENTOS SOLO PARA LA INVERSION VMJ
+			$origen = 4; // CODIGO PARA EL ASIENTO DE DOCUMENTOS SOLO PARA LA INVERSION VMJ y HOLISTIC SOLUTIONS
 		}
 		else
 		{	
