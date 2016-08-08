@@ -4,19 +4,13 @@ namespace Report;
 
 use \BaseController;
 use \View;
-use \Input;
-use \Excel;
-use \Fondo\FondoSupervisor;
-use \Fondo\FondoSubCategoria;
 
-class Funds extends BaseController
+class Accounting extends BaseController
 {
 
 	public function show( $type )
 	{
-		$typeCode 	   = $this->getTypeCode( $type );
-		$fondoCategory = FondoSubCategoria::getRolFunds( $typeCode );
-		return View::make( 'Report.fund.view' , [ 'type' => $type , 'funds' => $fondoCategory ] ); 
+		return View::make( 'Report.account.view'  , [ 'type' => $type ] ); 
 	}
 
 	public function source()
@@ -32,7 +26,7 @@ class Funds extends BaseController
         {  
             $excel->sheet( 'Data' , function( $sheet ) use ( $data )
             {
-                $sheet->loadView( 'Report.fund.table' , $data );
+                $sheet->loadView( 'Report.table' , $data );
             });  
         })->export( 'xls' ); 
 	}
@@ -43,7 +37,6 @@ class Funds extends BaseController
 		{
 			return SUP;
 		}
-
 	}
 
 	private function getData( $type , $category )

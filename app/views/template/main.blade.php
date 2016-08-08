@@ -108,6 +108,7 @@
                                 <li class="divider"></li>
                                 @if( Auth::user()->type == CONT )
                                     <li><a href="{{ URL::to('solicitudsToDeposit') }}">Solicitudes a Depositar</a></li>
+                                    <li><a href="{{ URL::to( 'report/cont/view/contabilidad' ) }}">Reporte de Contabilidad</a></li>
                                 @endif
                             </ul>
                         </li>
@@ -134,7 +135,7 @@
                                 <li><a href="{{ URL::to('maintenance/view/Fondo_Contable' ) }}">Mantenimiento de Fondo de Contabilidad</a></li>
                                 <li><a href="{{ URL::to('maintenance/view/Cuenta_Gasto_Marca') }}">Mantenimiento de Cuentas - Marcas</a></li>
                             @elseif( Auth::user()->type === SUP )
-                                <li><a href="{{ URL::to( 'report/view/Fondo_Supervisor' ) }}">Reporte de Fondos de Supervisor</a></li>
+                                <li><a href="{{ URL::to( 'report/sup/view/Fondo_Supervisor' ) }}">Reporte de Fondos de Supervisor</a></li>
                             @endif
                         </ul>
                     </li>
