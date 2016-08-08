@@ -4,19 +4,62 @@ namespace Report;
 
 use \BaseController;
 use \View;
+use \Custom\DataList;
 
 class Accounting extends BaseController
 {
 
 	public function show( $type )
 	{
-		return View::make( 'Report.account.view'  , [ 'type' => $type ] ); 
+		$data = $this->getReportType( $type );
+		return View::make( $data[ 'View' ] , $data ); 
+	}
+
+	private function getReportType( $type )
+	{
+		if( $type == 'monto' )
+		{
+			$data =
+			[
+				'View' => 'Report.account.view',
+				'type' => $type
+			];
+		}
+		return $data;
 	}
 
 	public function source()
 	{
-		$inputs = Input::all();
-		return $this->getData( $inputs[ 'type' ] , $inputs[ 'category' ] );
+		try
+        {
+            $inputs = Input::all();
+            $dates  = [ 'start' => '01/01/2016' , 'end' => '01/08/2016' ];
+            //$data   = $this->searchUserSolicituds( $inputs[ 'estado' ] , $dates , null );
+            $data = DataList::getAmountReport( 0 , $dates , 0 , 0 );
+            if( isset( $data[ status ] ) && $data[ status ] == error )
+            {
+                return $data;
+            }
+
+            $columns =
+                [
+                    [ 'title' => '#' , 'data' => 'id' , 'className' => 'text-center' ],
+                    [ 'title' => 'Colaborador' , 'data' => 'empl_nom' , 'className' => 'text-center' ],
+                    [ 'title' => 'Cuenta' , 'data' => 'cuenta_num' , 'className' => 'text-center' ],
+                    [ 'title' => 'Fecha' , 'data' => 'dep_fec' , 'className' => 'text-center' ],
+                    [ 'title' => 'Monto Depositado' , 'data' => 'dep_mon' , 'className' => 'text-center' ],
+                    [ 'title' => 'Monto Regularizado' , 'data' => 'reg_mon' , 'className' => 'text-center' ],
+                    [ 'title' => 'Monto Devuelto' , 'data' => 'dev_mon' , 'className' => 'text-center' ],
+                    [ 'title' => 'Estado de Cuenta' , 'data' => 'debe' , 'className' => 'text-center' ]
+                ];
+            $rpta = $this->setRpta( $data );
+            $rpta[ 'columns' ] = $columns;
+            return $rpta;
+        }
+        catch( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
 	}
 
 	public function export( $type , $category )
@@ -29,34 +72,5 @@ class Accounting extends BaseController
                 $sheet->loadView( 'Report.table' , $data );
             });  
         })->export( 'xls' ); 
-	}
-
-	private function getTypeCode( $type )
-	{
-		if( $type === 'Fondo_Supervisor' )
-		{
-			return SUP;
-		}
-	}
-
-	private function getData( $type , $category )
-	{
-		if( $type === 'Fondo_Supervisor' )
-		{
-			$data = FondoSupervisor::getSupFund( $category );
-			$columns =
-                [ 
-                        [ 'data' => 'subcategoria.descripcion' , 'name' => 'Nombre' , 'relations' => [ 'subcategoria' , 'descripcion' ] ],
-                        [ 'data' => 'marca.descripcion' , 'name' => 'Familia' , 'relations' => [ 'marca' , 'descripcion' ] ], 
-                        [ 'data' => 'saldo' , 'className' => 'sum-saldo' , 'name' => 'Saldo S/.' ],
-                        [ 'data' => 'retencion' , 'className' => 'sum-retencion' , 'name' => 'Retencion S/.' ],
-                        [ 'data' => 'saldo_disponible' , 'className' => 'sum-saldo-disponible' , 'name' => 'Saldo Disponible S/.' ]
-                        
-                ];
-			$rpta = $this->setRpta( $data );
-			$rpta[ 'columns' ] = $columns;
-			$rpta[ 'message' ] = 'registros';
-			return $rpta;
-		}
 	}
 }

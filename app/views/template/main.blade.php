@@ -108,7 +108,7 @@
                                 <li class="divider"></li>
                                 @if( Auth::user()->type == CONT )
                                     <li><a href="{{ URL::to('solicitudsToDeposit') }}">Solicitudes a Depositar</a></li>
-                                    <li><a href="{{ URL::to( 'report/cont/view/contabilidad' ) }}">Reporte de Contabilidad</a></li>
+                                    <li><a href="{{ URL::to( 'report/cont/view/monto' ) }}">Reporte de Montos</a></li>
                                 @endif
                             </ul>
                         </li>

@@ -1,7 +1,8 @@
 @extends('template.main')
 @section('solicitude')
     <div class="page-header">
-        <h3>Reporte {{ str_replace( '_' , ' ' , $type ) }}</h3>
+        <input type="hidden" id="report-type" value="{{ $type }}">
+        <h3>Reporte de Montos</h3>
         <div class="col-xs-6 col-md-6 col-sm-4 col-lg-4 form-group">
         
         </div>
@@ -20,11 +21,12 @@
         $( document ).ready( function()
         {   
             GBREPORTS.changeDateRange( 'M' );
+            getReportData();
         });
         
         function columnDataTable( response )
         {
-            var dataTable = $( '#table_contabilidad' ).DataTable(
+            var dataTable = $( '#table_reporte_' +  {{ $type }} ).DataTable(
             {
                 columns         : response.columns,
                 data            : response.Data ,
@@ -90,15 +92,10 @@
 
         $( '#report-export' ).on( 'click' , function()
         {
-            var url = 'report/export-';
+            var url = 'report/cont/export-';
             url += $( '#report-type' ).val() + '-';
             url += $( '#fund-category' ).val();
             window.location.href = server + url;
         });
-
-        $(document).on( 'ready' , function()
-        {
-            getReportData();
-        })
     </script>
 @stop
