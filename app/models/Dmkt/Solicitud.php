@@ -2,6 +2,7 @@
 
 namespace Dmkt;
 use \Eloquent;
+use \Auth;
 
 class Solicitud extends Eloquent
 {
