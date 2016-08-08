@@ -2419,7 +2419,7 @@ function processData( data , usuario )
             case APROBADO:
                 if( usuario.tipo == CONT )
                 {
-                    options +=  '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.tok + '">' +
+                    options +=  '<a class="btn btn-default"  target="_blank" href="ver-solicitud/' + modelRegister.tok + '">' +
                                     '<span class="glyphicon glyphicon-edit"></span>' +
                                 '</a>' +
                                 '<button type="button" class="btn btn-default cancel-solicitud" data-idsolicitud=' + modelRegister.id + '>' +
@@ -2492,17 +2492,17 @@ function processData( data , usuario )
                                     '<span  class="glyphicon glyphicon-transfer"></span>' +
                                 '</a>';
                 }
-                else if( modelRegister.dev_est_id == 3 )
+                else if( modelRegister.dev_est_id == 3 || modelRegister.resp_usr )
                 {
-                    options +=  '<button type="button" class="btn btn-default">' +
+                    options +=  '<a class="btn btn-default" target="_blank" href="ver-solicitud/' + modelRegister.tok + '">' +
                                     '<span class="glyphicon glyphicon-edit"></span>' +
-                                '</button>';
+                                '</a>';
                 }    
                 break;
             case REGISTRADO:
                 if( usuario.tipo == CONT )
                 {
-                    options +=   '<a class="btn btn-default" target="_blank" href="ver-solicitud/' + modelRegister.tok + '">' +
+                    options +=   '<a class="btn btn-default" target="_blank" href="generar-asiento-gasto/' + modelRegister.tok + '">' +
                                     '<span class="glyphicon glyphicon-book"></span>' +
                                 '</a>';
                 }
