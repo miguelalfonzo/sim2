@@ -2461,18 +2461,22 @@ function processData( data , usuario )
                     options +=  '<a class="btn btn-default" href="ver-solicitud/' + modelRegister.tok + '">' +
                                     '<span class="glyphicon glyphicon-edit"></span>' +
                                 '</a>';
-                    if( modelRegister.sol_tip_id != 3 )
-                    {
-                        options  +=     '<a class="btn btn-default modal_liquidacion">' +
-                                            '<span class="glyphicon glyphicon-inbox"></span>' +
-                                        '</a>';
-                    }
+                    
                 }
-                if( usuario.tipo == CONT && modelRegister.sol_tip_id == 3 )
+                if( usuario.tipo == CONT )
                 {
-                    options +=  '<button type="button" class="btn btn-default cancel-solicitud" data-idsolicitud=' + modelRegister.id + '>' +
-                                    '<span  class="glyphicon glyphicon-remove"></span>' +
-                                '</button>';
+                    if( modelRegister.sol_tip_id == 3 )
+                    {
+                        options +=  '<button type="button" class="btn btn-default cancel-solicitud" data-idsolicitud=' + modelRegister.id + '>' +
+                                        '<span  class="glyphicon glyphicon-remove"></span>' +
+                                    '</button>';
+                    }
+                    else
+                    {
+                        options +=  '<a class="btn btn-default modal_liquidacion">' +
+                                        '<span class="glyphicon glyphicon-inbox"></span>' +
+                                    '</a>';
+                    }
                 }
                 break;
             case ENTREGADO:
