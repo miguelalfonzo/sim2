@@ -2509,7 +2509,7 @@ function processData( data , usuario )
                 break;
         }
 
-        if( modelRegister.aprob_usr )
+        if( modelRegister.aprob_usr && modelRegister.est_id != 30 )
         {
             options += processDataApprovalPolicy( modelRegister , usuario );
         }
