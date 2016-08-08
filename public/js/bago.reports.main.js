@@ -3,7 +3,7 @@ $(document).ready(function()
 	$('#drp_menubar').on('apply.daterangepicker', function(ev, picker) {
 		$('#btn_extra').hide();
 		if( $( '#idState' ).length === 1 )
-			listTable( 'solicitudes' );
+			listSolicituds();
 		else if( $( '#container-event' ).length === 1 )
 			getEvents();
 		else if( $( '#fondo_mkt_history' ).length === 1 )

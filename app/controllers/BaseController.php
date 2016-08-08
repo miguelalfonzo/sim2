@@ -125,7 +125,7 @@ class BaseController extends Controller
         return array( status => warning , description => $description );
     }
 
-    protected function internalException( $exception , $function , $type = 'System' )
+    public function internalException( $exception , $function , $type = 'System' )
     {
         Log::error( $exception );
         if ( $exception->getCode() != 1 )
