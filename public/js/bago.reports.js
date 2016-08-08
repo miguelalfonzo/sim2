@@ -10,9 +10,6 @@
 		this.drpSpan         = $('#drp_menubar span');
 		var gbReportsObject  = this;
 		this.dateRangePickerCallback = function(start, end, label) {
-			// console.log("label: "+label);
-			// console.log(start.toISOString(), end.toISOString(), label);
-			// console.log(start.format('LL') + ' ' + end.format('LL'));
 			gbReportsObject.reportDate = start.format("YYYY/MM/DD") + " - " + end.format("YYYY/MM/DD");
 			gbReportsObject.drpSpan.html(start.format('LL') + ' - ' + end.format('LL'));
 

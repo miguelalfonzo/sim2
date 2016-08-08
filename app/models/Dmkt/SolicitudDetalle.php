@@ -152,7 +152,7 @@ class SolicitudDetalle extends Eloquent
         return $this->hasOne( 'Dmkt\Periodo' , 'id' , 'id_periodo' );
     }
 
-    protected function typeMoney()
+    public function typeMoney()
     {
     	return $this->hasOne('Common\TypeMoney','id', 'id_moneda' );
     }

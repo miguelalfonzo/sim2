@@ -1,4 +1,4 @@
-<div class="row">   
+<div>   
     {{Form::token()}}
     <div class="form-group col-xs-12 col-sm-3 col-md-2 col-lg-2">
         <select id="idState" name="idstate" class="form-control selectestatesolicitude">
@@ -64,5 +64,7 @@
             </h4>
         </div>
     @endif
-    <div class="container-fluid table_solicitudes" id="solicitudes"></div>
+    <div class="container-fluid">
+        <table id="table_solicituds" class="table table-striped table-hover table-bordered" cellspacing="0" cellpading="0" border="0" style="width:100%"></table>
+    </div>
 </div>

@@ -5484,9 +5484,9 @@ button.close {
     -webkit-appearance: none
 }
 
-.modal-open {
+/*.modal-open {
     overflow: hidden
-}
+}*/
 
 .modal {
     display: none;
