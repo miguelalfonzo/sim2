@@ -5,6 +5,7 @@ namespace Report;
 use \BaseController;
 use \View;
 use \Custom\DataList;
+use \Input;
 
 class Accounting extends BaseController
 {

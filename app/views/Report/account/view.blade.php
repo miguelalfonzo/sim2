@@ -3,15 +3,26 @@
     <div class="page-header">
         <input type="hidden" id="report-type" value="{{ $type }}">
         <h3>Reporte de Montos</h3>
-        <div class="col-xs-6 col-md-6 col-sm-4 col-lg-4 form-group">
-        
+        <div class="row">
+        <div class="col-xs-12 col-md-12 col-sm-3 col-lg-3 form-group">
+            <label>Colaborador</label>
+            <input type="text" class="form-control">
         </div>
-        <div class="form-group">
+        <div class="col-xs-12 col-md-12 col-sm-3 col-lg-3 form-group">
+            <label>Cuenta</label>
+            <input type="text" class="form-control">
+        </div>
+        <div class="col-xs-12 col-md-12 col-sm-3 col-lg-3 form-group">
+            <label># Solicitud</label>
+            <input type="text" class="form-control">
+        </div>
+        <div class="col-xs-12 col-md-12 col-sm-3 col-lg-3 form-group">
             <button type="button" id="report-export" class="btn btn-primary btn-md ladda-button" data-style="zoom-in">Exportar</button>
             <button type="button" id="search-report" class="btn btn-primary btn-md ladda-button" data-style="zoom-in">
                 <span class="glyphicon glyphicon-search"></span>
             </button>
         </div>
+    </div>
     </div>
     <div class="container-fluid">
         <table id="table_reporte_{{ $type }}" class="table table-striped table-hover table-bordered text-center" cellspacing="0" width="100%">
@@ -26,7 +37,7 @@
         
         function columnDataTable( response )
         {
-            var dataTable = $( '#table_reporte_' +  {{ $type }} ).DataTable(
+            var dataTable = $( '#table_reporte_' +  '{{ $type }}' ).DataTable(
             {
                 columns         : response.columns,
                 data            : response.Data ,
@@ -73,13 +84,20 @@
                     }
                 }).done( function( response )
                 {
-                    spin.stop();
-                    name = '#table_reporte_' + eType;
-                    var element = $( name );
-                    columnDataTable( response );
+                    if( response.Status == ok )
+                    {
+                        spin.stop();
+                        name = '#table_reporte_' + eType;
+                        var element = $( name );
+                        columnDataTable( response );
+                    }
+                    else
+                    {
+                        spin.stop();
+                        bootboxMessage( response );
+                    }
                 }).fail( function( statusCode , errorThrow )
                 {
-                    spin.stop();
                     ajaxError( statusCode , errorThrow );
                 });
             }

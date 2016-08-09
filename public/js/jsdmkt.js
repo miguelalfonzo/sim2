@@ -614,7 +614,7 @@ $('#deny_solicitude').on('click', function (e)
     var data =
     {
         idsolicitud : id_solicitud.val() ,
-        _token      : _token   
+        _token      : GBREPORTS.token   
     }
     cancelDialog( data , '¿Esta seguro que desea rechazar esta solicitud?' );
 });
@@ -1489,9 +1489,9 @@ function seeker( element , name , url )
             {
                 $.ajax(
                 {
-                    type: 'post',
-                    url: server + url ,
-                    data:
+                    type : 'post',
+                    url  : server + url ,
+                    data :
                     {
                         _token : GBREPORTS.token,
                         sVal   : request

@@ -173,4 +173,15 @@ class Personal extends Eloquent
     {
         return $this->belongsTo( 'User' , 'user_id' );
     }
+
+    public function getResponsibleUsers( $name )
+    {
+        return Personal::select( [ 'UPPER( NOMBRES || \' \' || APELLIDOS ) label' , 'USER_ID value' ] )
+               ->where( 'UPPER( NOMBRES || \' \' || APELLIDOS )' , 'like' , "q['%$name%']" )
+               ->whereHas( 'user' , function( $q )
+               {
+                   $q->whereIn( 'type' , [ REP_MED , SUP ] );
+               })
+               ->get();
+    }
 }

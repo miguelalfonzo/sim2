@@ -102,6 +102,20 @@ class Seeker extends BaseController
         }
     }
 
+    public function responsibleSource()
+    {
+        try 
+        {
+            $inputs = Input::all();
+            $data = Personal::getResponsibleUsers( $inputs[ 'sVal' ] );
+            return $this->setRpta();
+        }
+        catch( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
+    }
+
     private function getHierarchyType()
     {
         if ( Auth::user()->type == SUP )
