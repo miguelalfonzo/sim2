@@ -482,7 +482,7 @@ $(document).on('click' , '.delete-fondo' , function (e)
     var data = 
     {
         idsolicitud : $( this ).parent().parent().parent().children().first().text().trim() ,
-        _token      : _token
+        _token      : GBREPORTS.token
     };
     cancelDialog( data , '¿Esta seguro de anular el registro del fondo?' );
 });
@@ -614,7 +614,7 @@ $('#deny_solicitude').on('click', function (e)
     var data =
     {
         idsolicitud : id_solicitud.val() ,
-        _token      : _token   
+        _token      : GBREPORTS.token   
     }
     cancelDialog( data , '¿Esta seguro que desea rechazar esta solicitud?' );
 });
@@ -819,7 +819,7 @@ $(document).on('click','.edit-fondo' , function(e)
     data = 
     {
         'idsolicitud' : idsolicitud,
-        '_token'      : _token
+        '_token'      : GBREPORTS.token
     };
     $.post( server + 'get-sol-inst' , data )
     .fail( function ( statusCode , errorThrown ) 
@@ -1196,7 +1196,7 @@ $(document).on( 'click' , '.maintenance-save' , function()
 {
     var trElement = $(this).parent().parent();
     var aData = {};
-    aData._token = _token;
+    aData._token = GBREPORTS.token;
     aData.type   = trElement.attr('type');
     aData.Data   = {};
     trElement.children().each( function( i , data )
@@ -1233,7 +1233,7 @@ $(document).on('click' , '.maintenance-update' , function()
 {
     var trElement = $(this).parent().parent();
     var aData = {};
-    aData._token = _token;
+    aData._token = GBREPORTS.token;
     aData.id     = trElement.attr('row-id');
     aData.type   = trElement.attr('type');
     aData.Data   = {};
@@ -1269,7 +1269,7 @@ $(document).on( 'click' , '.maintenance-disable' , function()
 {
     var trElement = $(this).parent().parent();
     var aData = {};
-    aData._token = _token;
+    aData._token = GBREPORTS.token;
     aData.id     = trElement.attr('row-id');
     aData.type   = trElement.attr('type');
     $.ajax(
@@ -1298,7 +1298,7 @@ $(document).on('click' , '.maintenance-enable' , function()
 {
     var trElement = $(this).parent().parent();
     var aData = {};
-    aData._token = _token;
+    aData._token = GBREPORTS.token;
     aData.id     = trElement.attr('row-id');
     aData.type   = trElement.attr('type');
     $.ajax(
@@ -1333,7 +1333,7 @@ function enableTd( data )
         {
             type   : td[ 0 ].classList[ 0 ] ,
             val    : td.html().trim(),
-            _token : _token
+            _token : GBREPORTS.token
         }
     }).fail( function( statusCode , errorThrown )
     {
@@ -1369,7 +1369,7 @@ $(document).on("click", ".elementSave", function()
 {
     var data_json = {} ;
     data_json.type = 'Update';
-    data_json._token = _token;
+    data_json._token = GBREPORTS.token;
     var aux = false;
     trElement     = $(this).parent().parent();
     var z=trElement.children().first();
