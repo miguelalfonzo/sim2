@@ -108,7 +108,7 @@ class Seeker extends BaseController
         {
             $inputs = Input::all();
             $data = Personal::getResponsibleUsers( $inputs[ 'sVal' ] );
-            return $this->setRpta();
+            return $this->setRpta( $data );
         }
         catch( Exception $e )
         {

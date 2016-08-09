@@ -1031,9 +1031,14 @@ function removeinput(data)
 {
     var rep = data.parent().find('input:text');
     rep.typeahead( 'val' , '' );
-    rep.attr('disabled', false).attr('data-select',"false").attr('data-cod','').attr('data-cod-sup' ,'' ).attr('data-cuenta','').focus().parent().parent().parent().removeClass('has-success');
+    rep.attr('disabled', false).attr( 'readonly' , false ).attr('data-select',"false").attr('data-cod','').attr('data-cod-sup' ,'' ).attr('data-cuenta','').focus().parent().parent().parent().removeClass('has-success');
     data.fadeOut();
 }
+
+$( '#edit-responsible' ).click( function()
+{
+    removeinput( $( this ) );
+});
 
 $( document ).off( 'click' , '#edit-rep' );
 $(document).on("click","#edit-rep", function(e)
@@ -1510,15 +1515,19 @@ function seeker( element , name , url )
             }
         }).on('typeahead:selected', function ( evento, suggestion , dataset )
         {
-            var input = $(this);
-            if ( dataset === 'users' )
+            var input = $( this );
+            if ( dataset == 'users' )
             {
                 $( this ).attr( 'readonly' , '' ).attr( 'data-cod' , suggestion.value ).parent().parent().addClass( 'has-success' );
+            }
+            else if( dataset == 'responsibles' )
+            {
+                input.attr( 'readonly' , '' ).attr( 'data-cod' , suggestion.value ).closest( '.form-group' ).addClass( 'has-success' );    
+                input.closest( 'div' ).find( '#edit-responsible' ).fadeIn();
             }
             else if ( dataset == 'institutions')
             {
                 $( this ).attr( 'disabled' , true ).attr( 'data-cod' , suggestion.value ).parent().parent().parent().addClass( 'has-success' );
-                $( this ).parent().parent().find('.edit-repr').fadeIn();
             }
             else if ( dataset == 'clients' )
             {
@@ -2231,6 +2240,7 @@ $( document ).ready(function()
     seeker( $( '.institucion-seeker' ) , 'institutions' , 'search-institution' );
     seeker( $( '.rep-seeker' ) , 'reps' , 'search-rep' );
     seeker( $( '#user-seeker' ) , 'users' , 'search-users' );
+    seeker( $( '#responsible-seeker' ) , 'responsibles' , 'search-responsibles' );
 
     if ( $("#idState").length === 1 )
     {

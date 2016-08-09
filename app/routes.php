@@ -89,7 +89,8 @@
     Route::group( array( 'before' => 'cont' ), function () 
     { 
   
-        Route::post( 'list-documents', 'Movements\MoveController@searchDocs');
+        Route::post( 'list-documents', 'Movements\MoveController@searchDocs' );
+        Route::post( 'search-responsibles' , 'Source\Seeker@responsibleSource' );
         Route::group( [ 'namespace' => 'Expense' ] , function()
         {
             Route::get( 'edit-expense-cont', 'ExpenseController@editExpense');

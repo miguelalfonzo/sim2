@@ -152,6 +152,16 @@ selectproduct{
     right: 1.75em;
     top: 2.25em;
 }
+
+.pencil-seeker {
+    color: green;
+    position: absolute;
+    right: 1.75em;
+    top: 2.25em;
+    padding-top:1%;
+    display: none;
+}
+
 #table_solicitude_fondos_wrapper{
     margin-top: 50px;
 }

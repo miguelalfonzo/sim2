@@ -4,17 +4,20 @@
         <input type="hidden" id="report-type" value="{{ $type }}">
         <h3>Reporte de Montos</h3>
         <div class="row">
-        <div class="col-xs-12 col-md-12 col-sm-3 col-lg-3 form-group">
+        <div class="col-xs-12 col-md-12 col-sm-4 col-lg-4 form-group">
             <label>Colaborador</label>
-            <input type="text" class="form-control">
+            <div class="scrollable-dropdown-menu">
+                <input type="text" id="responsible-seeker" class="form-control" style="display:inline">    
+                <a id="edit-responsible" class="glyphicon glyphicon-pencil pencil-seeker" href="#"></a>
+            </div>
         </div>
-        <div class="col-xs-12 col-md-12 col-sm-3 col-lg-3 form-group">
+        <div class="col-xs-12 col-md-12 col-sm-4 col-lg-4 form-group">
             <label>Cuenta</label>
-            <input type="text" class="form-control">
+            <input type="text" id="num-cuenta" class="form-control">
         </div>
-        <div class="col-xs-12 col-md-12 col-sm-3 col-lg-3 form-group">
+        <div class="col-xs-12 col-md-12 col-sm-4 col-lg-4 form-group">
             <label># Solicitud</label>
-            <input type="text" class="form-control">
+            <input type="text" id="solicitud-id" class="form-control">
         </div>
         <div class="col-xs-12 col-md-12 col-sm-3 col-lg-3 form-group">
             <button type="button" id="report-export" class="btn btn-primary btn-md ladda-button" data-style="zoom-in">Exportar</button>
@@ -69,6 +72,24 @@
             var eType = $( '#report-type' );
             if( eType.length !== 0 )
             {
+                var colaborador = $( '#responsible-seeker' ).attr( 'data-cod' );
+                if( typeof colaborador == 'undefined' || colaborador.trim() == '' )
+                {
+                    colaborador = 0;
+                }
+                
+                var num_cuenta = $( '#num-cuenta' ).val().trim();
+                if( num_cuenta == '' )
+                {
+                    num_cuenta = 0;
+                }
+
+                var solicitud_id = $( '#solicitud-id' ).val().trim();
+                if( solicitud_id == '' )
+                {
+                    solicitud_id = 0;
+                }
+                
                 var spin = Ladda.create( $( '#search-report' )[ 0 ] );
                 eType    = eType.val();
                 spin.start();
@@ -78,9 +99,13 @@
                     url  : server + 'report/cont/data' ,
                     data : 
                     {
-                        _token   : GBREPORTS.token,
-                        type     : eType,
-                        category : $( '#fund-category' ).val()
+                        _token       : GBREPORTS.token,
+                        type         : eType,
+                        fecha_inicio : $( '#drp_menubar' ).data( 'daterangepicker' ).startDate.format( "L" ),
+                        fecha_final  : $( '#drp_menubar' ).data( 'daterangepicker' ).endDate.format( "L" ),
+                        colaborador  : colaborador,
+                        num_cuenta   : num_cuenta,
+                        solicitud_id : solicitud_id
                     }
                 }).done( function( response )
                 {

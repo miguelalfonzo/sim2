@@ -34,9 +34,8 @@ class Accounting extends BaseController
 		try
         {
             $inputs = Input::all();
-            $dates  = [ 'start' => '01/01/2016' , 'end' => '01/08/2016' ];
-            //$data   = $this->searchUserSolicituds( $inputs[ 'estado' ] , $dates , null );
-            $data = DataList::getAmountReport( 0 , $dates , 0 , 0 );
+            $dates  = [ 'start' => $inputs[ 'fecha_inicio' ] , 'end' => $inputs[ 'fecha_final' ] ];
+            $data = DataList::getAmountReport( $inputs[ 'colaborador' ] , $dates , $inputs[ 'num_cuenta' ] , $inputs[ 'solicitud_id' ] );
             if( isset( $data[ status ] ) && $data[ status ] == error )
             {
                 return $data;
