@@ -29,6 +29,14 @@ class Accounting extends BaseController
 				'type' => $type
 			];
 		}
+        elseif( $type == 'completo' )
+        {
+            $data =
+            [
+                'View' => 'Report.account.view',
+                'type' => $type
+            ];
+        }
 		return $data;
 	}
 
@@ -37,13 +45,47 @@ class Accounting extends BaseController
 		try
         {
             $inputs = Input::all();
-            $dates  = [ 'start' => $inputs[ 'fecha_inicio' ] , 'end' => $inputs[ 'fecha_final' ] ];
-            $data = DataList::getAmountReport( $inputs[ 'colaborador' ] , $dates , $inputs[ 'num_cuenta' ] , $inputs[ 'solicitud_id' ] );
+    
+            $data = $this->getData( $inputs );
+
             if( isset( $data[ status ] ) && $data[ status ] == error )
             {
                 return $data;
             }
 
+            $format = $this->getFormat( $inputs[ 'type' ] );
+            
+            $rpta = $this->setRpta( $data );
+            
+            $rpta = array_merge( $rpta , $format );
+
+            return $rpta;
+        }
+        catch( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
+	}
+
+    private function getData( $inputs )
+    {
+        $dates  = [ 'start' => $inputs[ 'fecha_inicio' ] , 'end' => $inputs[ 'fecha_final' ] ];
+
+        if( $inputs[ 'type' ] == 'monto' )
+        {
+            $data = DataList::getAmountReport( $inputs[ 'colaborador' ] , $dates , $inputs[ 'num_cuenta' ] , $inputs[ 'solicitud_id' ] );
+        }
+        else
+        {
+            $data = \DB::table( 'REP_COMP' )->get();
+        }
+        return $data;
+    }
+
+    private function getFormat( $type )
+    {
+        if( $type == 'monto' )
+        {
             $columns =
                 [
                     [ 'title' => '#' , 'data' => 'id' , 'className' => 'text-center' ],
@@ -55,15 +97,37 @@ class Accounting extends BaseController
                     [ 'title' => 'Monto Devuelto' , 'data' => 'dev_mon' , 'className' => 'text-center' ],
                     [ 'title' => 'Estado de Cuenta' , 'data' => 'debe' , 'className' => 'text-center' ]
                 ];
-            $rpta = $this->setRpta( $data );
-            $rpta[ 'columns' ] = $columns;
-            return $rpta;
+            $rowsGroup = [];
         }
-        catch( Exception $e )
+        else
         {
-            return $this->internalException( $e , __FUNCTION__ );
+            $columns =
+                [
+                    [ 'title' => '#' , 'data' => 'id' , 'className' => 'text-center' ],
+                    [ 'title' => 'Mon Dep.' , 'data' => 'total' , 'className' => 'text-center' ],
+                    [ 'title' => 'Operacion' , 'data' => 'num_transferencia' , 'className' => 'text-center' ],
+                    [ 'title' => 'Anticip' , 'data' => 'num_asie_ant' , 'className' => 'text-center' ],
+                    [ 'title' => 'Regular' , 'data' => 'num_asie_reg' , 'className' => 'text-center' ],
+                    [ 'title' => 'Comprob' , 'data' => 'comp' , 'className' => 'text-center' ],
+                    [ 'title' => 'RUC' , 'data' => 'ruc' , 'className' => 'text-center' ],
+                    [ 'title' => 'Razon' , 'data' => 'razon' , 'className' => 'text-center' ],
+                    [ 'title' => 'N°' , 'data' => 'num' , 'className' => 'text-center' ],
+                    [ 'title' => 'Fec' , 'data' => 'fecha_movimiento' , 'className' => 'text-center' ],
+                    [ 'title' => 'Desc' , 'data' => 'doc_desc' , 'className' => 'text-center' ],
+                    [ 'title' => 'Sub Tot' , 'data' => 'sub_tot' , 'className' => 'text-center' ],
+                    [ 'title' => 'Impuesto Servicio' , 'data' => 'imp_serv' , 'className' => 'text-center' ],
+                    [ 'title' => 'IGV' , 'data' => 'igv' , 'className' => 'text-center' ],
+                    [ 'title' => 'Reparo' , 'data' => 'reparo' , 'className' => 'text-center' ],
+                    [ 'title' => 'Retencion' , 'data' => 'retencion' , 'className' => 'text-center' ],
+                    [ 'title' => 'Detraccion' , 'data' => 'detraccion' , 'className' => 'text-center' ],
+                    [ 'title' => 'Total' , 'data' => 'monto' , 'className' => 'text-center' ],
+                    
+                    [ 'title' => 'D. Monto' , 'data' => 'importe' , 'className' => 'text-center' ]
+                ];
+            $rowsGroup = [ 0 , 1 , 2 , 3 , 4 , 5 , 6 , 7, 8 , 9 , 10 , 11 , 12 ,13 , 14 , 15 , 16 , 17 , 18 ];
         }
-	}
+        return [ 'columns' => $columns , 'rowsGroup' => $rowsGroup ];
+    }
 
 	public function export()
 	{

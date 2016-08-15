@@ -108,7 +108,8 @@
                                 <li class="divider"></li>
                                 @if( Auth::user()->type == CONT )
                                     <li><a href="{{ URL::to('solicitudsToDeposit') }}">Solicitudes a Depositar</a></li>
-                                    <li><a href="{{ URL::to( 'report/cont/view/monto' ) }}">Reporte de Montos</a></li>
+                                    <li><a href="{{ URL::to( 'report/cont/view/monto' ) }}">Detalle de Montos</a></li>
+                                    <li><a href="{{ URL::to( 'report/cont/view/completo' ) }}">Completo</a></li>
                                 @endif
                             </ul>
                         </li>
@@ -203,6 +204,7 @@
 {{ HTML::script('js/bootstrap-datepicker.es.js') }}
 {{ HTML::script('js/bootbox.min.js') }}
 {{ HTML::script('js/jquery.dataTables.min.js') }}
+{{ HTML::script('js/dataTables.rowsGroup.js') }}
 {{ HTML::script('js/dataTables.bootstrap.js') }}
 {{ HTML::script('js/spin.min.js') }}
 {{ HTML::script('js/ladda.min.js') }}
