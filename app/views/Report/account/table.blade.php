@@ -8,19 +8,15 @@
 			<thead>
 				<tr>
 					@foreach( $columns as $column )
-						<th>{{ $column[ 'name' ] }}</th>
+						<th>{{ $column[ 'title' ] }}</th>
 					@endforeach  
 				</tr>
 			</thead>
 			<tbody>
-				@foreach( $Data as $row )
+				@foreach( $data as $row )
 					<tr>
 						@foreach( $columns as $column )
-							@if( isset( $column[ 'relations' ] ) )
-								<td>{{ $row->{ $column[ 'relations' ][ 0 ] }->{ $column[ 'relations' ][ 1 ] } }}</td>
-							@else
-								<td>{{ $row->{ $column[ 'data' ] } }}</td>
-							@endif
+							<td>{{ $row->{ $column[ 'data' ] } }}</td>
 						@endforeach  
 					</tr>
 				@endforeach  

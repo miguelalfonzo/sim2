@@ -69,8 +69,8 @@
     
         function getReportData()
         {
-            var eType = $( '#report-type' );
-            if( eType.length !== 0 )
+            var rType = $( '#report-type' );
+            if( rType.length !== 0 )
             {
                 var colaborador = $( '#responsible-seeker' ).attr( 'data-cod' );
                 if( typeof colaborador == 'undefined' || colaborador.trim() == '' )
@@ -91,7 +91,7 @@
                 }
                 
                 var spin = Ladda.create( $( '#search-report' )[ 0 ] );
-                eType    = eType.val();
+                rType    = rType.val();
                 spin.start();
                 $.ajax(
                 {
@@ -100,7 +100,7 @@
                     data : 
                     {
                         _token       : GBREPORTS.token,
-                        type         : eType,
+                        type         : rType,
                         fecha_inicio : $( '#drp_menubar' ).data( 'daterangepicker' ).startDate.format( "L" ),
                         fecha_final  : $( '#drp_menubar' ).data( 'daterangepicker' ).endDate.format( "L" ),
                         colaborador  : colaborador,
@@ -112,7 +112,7 @@
                     if( response.Status == ok )
                     {
                         spin.stop();
-                        name = '#table_reporte_' + eType;
+                        name = '#table_reporte_' + rType;
                         var element = $( name );
                         columnDataTable( response );
                     }
@@ -135,10 +135,52 @@
 
         $( '#report-export' ).on( 'click' , function()
         {
-            var url = 'report/cont/export-';
-            url += $( '#report-type' ).val() + '-';
-            url += $( '#fund-category' ).val();
-            window.location.href = server + url;
+            var spin = Ladda.create( this );
+            spin.start();
+            var url = 'report/cont/export';
+            var rType = $( '#report-type' ).val();
+            var colaborador = $( '#responsible-seeker' ).attr( 'data-cod' );
+            if( typeof colaborador == 'undefined' || colaborador.trim() == '' )
+            {
+                colaborador = 0;
+            }
+            
+            var num_cuenta = $( '#num-cuenta' ).val().trim();
+            if( num_cuenta == '' )
+            {
+                num_cuenta = 0;
+            }
+
+            var solicitud_id = $( '#solicitud-id' ).val().trim();
+            if( solicitud_id == '' )
+            {
+                solicitud_id = 0;
+            }
+
+            var data = 
+            {
+                _token       : GBREPORTS.token,
+                type         : rType,
+                fecha_inicio : $( '#drp_menubar' ).data( 'daterangepicker' ).startDate.format( "L" ),
+                fecha_final  : $( '#drp_menubar' ).data( 'daterangepicker' ).endDate.format( "L" ),
+                colaborador  : colaborador,
+                num_cuenta   : num_cuenta,
+                solicitud_id : solicitud_id
+            };
+
+            customAjax( 'POST' , server + url , data ).done( function( response )
+            {
+                if( response.Status == ok )
+                {
+                    spin.stop();
+                    window.location.href = server + url + '/' + response.title;
+                }
+                else
+                {
+                    spin.stop();
+                    bootboxMessage( response );
+                }
+            });
         });
     </script>
 @stop

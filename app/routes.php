@@ -138,7 +138,8 @@
         {
             Route::get( 'view/{type}' , 'Accounting@show' );
             Route::post( 'data' , 'Accounting@source' );
-            Route::get( 'export-{type}-{user_id}-{start_date}-{end_date}-{num_cuenta}-{solicitud_id}' , 'Accounting@export' );
+            Route::post( 'export' , 'Accounting@export' );
+            Route::get( 'export/{title}' , 'Accounting@download' );
         });
 
     });
