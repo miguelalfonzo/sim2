@@ -309,9 +309,6 @@ class MoveController extends BaseController
             $rpta[ 'now' ] = [ 'year' => $now->year , 'month' => $now->month , 'day' => $now->day ];
             $rpta[ 'columns' ] = $columns;
             return $rpta;
-
-
-
         }
         catch( Exception $e )
         {
