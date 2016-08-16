@@ -1768,7 +1768,7 @@ $(function()
         {
             _token : GBREPORTS.token ,
             tipo   : this.dataset.type ,
-            token  : $( this ).closest( 'tr' ).find( '.solicitud-token' ).val()
+            token  : token
         };
         $.post( server + 'get-devolution-info' , data )
         .done( function ( response ) 
