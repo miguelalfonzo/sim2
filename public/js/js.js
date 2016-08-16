@@ -1764,11 +1764,20 @@ $(function()
     $( document ).off( 'click' , '.get-devolution-info' );
     $( document ).on( 'click' , '.get-devolution-info' , function()
     {
+        if( $( '#table_solicituds' ).length == 0 )
+        {
+            var tok = token;
+        }
+        else
+        {
+            var tok = $( this ).closest( 'tr' ).find( '.solicitud-token' ).val();
+        }
+
         var data =
         {
             _token : GBREPORTS.token ,
             tipo   : this.dataset.type ,
-            token  : token
+            token  : tok
         };
         $.post( server + 'get-devolution-info' , data )
         .done( function ( response ) 
