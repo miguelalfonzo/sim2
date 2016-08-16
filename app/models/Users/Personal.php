@@ -183,8 +183,6 @@ class Personal extends Eloquent
                    $q->whereIn( 'type' , [ REP_MED , SUP ] );
                })
                ->get();
-        $d = \DB::getQueryLog();
-        \Log::info( $d );
         return $data;
     }
 }
