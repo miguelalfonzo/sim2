@@ -139,7 +139,7 @@
             Route::get( 'view/{type}' , 'Accounting@show' );
             Route::post( 'data' , 'Accounting@source' );
             Route::post( 'export' , 'Accounting@export' );
-            Route::get( 'export/{title}' , 'Accounting@download' );
+            Route::get( 'export/{type}-{title}' , 'Accounting@download' );
         });
 
     });

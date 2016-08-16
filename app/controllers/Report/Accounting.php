@@ -21,20 +21,22 @@ class Accounting extends BaseController
 
 	private function getReportType( $type )
 	{
-		if( $type == 'monto' )
+		if( $type == 'cuenta' )
 		{
 			$data =
 			[
 				'View' => 'Report.account.view',
-				'type' => $type
+				'type' => $type,
+                'title' => 'Reporte de Estado de Cuenta'
 			];
 		}
         elseif( $type == 'completo' )
         {
             $data =
             [
-                'View' => 'Report.account.view',
-                'type' => $type
+                'View'  => 'Report.account.view',
+                'type'  => $type,
+                'title' => 'Reporte Completo'
             ];
         }
 		return $data;
@@ -71,62 +73,67 @@ class Accounting extends BaseController
     {
         $dates  = [ 'start' => $inputs[ 'fecha_inicio' ] , 'end' => $inputs[ 'fecha_final' ] ];
 
-        if( $inputs[ 'type' ] == 'monto' )
+        switch( $inputs[ 'type' ] )
         {
-            $data = DataList::getAmountReport( $inputs[ 'colaborador' ] , $dates , $inputs[ 'num_cuenta' ] , $inputs[ 'solicitud_id' ] );
-        }
-        else
-        {
-            $data = \DB::table( 'REP_COMP' )->get();
+            case 'cuenta':
+                $data = DataList::getAmountReport( $inputs[ 'colaborador' ] , $dates , $inputs[ 'num_cuenta' ] , $inputs[ 'solicitud_id' ] , $inputs[ 'depurado' ] );
+                break;
+            case 'completo':
+                $data = DataList::getCompleteAccountReport( $inputs[ 'colaborador' ] , $dates , $inputs[ 'num_cuenta' ] , $inputs[ 'solicitud_id' ] , $inputs[ 'depurado' ] );
+                break;
         }
         return $data;
     }
 
     private function getFormat( $type )
     {
-        if( $type == 'monto' )
+        if( $type == 'cuenta' )
         {
             $columns =
                 [
                     [ 'title' => '#' , 'data' => 'id' , 'className' => 'text-center' ],
                     [ 'title' => 'Colaborador' , 'data' => 'empl_nom' , 'className' => 'text-center' ],
                     [ 'title' => 'Cuenta' , 'data' => 'cuenta_num' , 'className' => 'text-center' ],
-                    [ 'title' => 'Fecha' , 'data' => 'dep_fec' , 'className' => 'text-center' ],
+                    [ 'title' => 'Fecha Deposito' , 'data' => 'dep_fec' , 'className' => 'text-center' ],
                     [ 'title' => 'Monto Depositado' , 'data' => 'dep_mon' , 'className' => 'text-center' ],
                     [ 'title' => 'Monto Regularizado' , 'data' => 'reg_mon' , 'className' => 'text-center' ],
                     [ 'title' => 'Monto Devuelto' , 'data' => 'dev_mon' , 'className' => 'text-center' ],
                     [ 'title' => 'Estado de Cuenta' , 'data' => 'debe' , 'className' => 'text-center' ]
                 ];
-            $rowsGroup = [];
         }
         else
         {
             $columns =
                 [
                     [ 'title' => '#' , 'data' => 'id' , 'className' => 'text-center' ],
-                    [ 'title' => 'Mon Dep.' , 'data' => 'total' , 'className' => 'text-center' ],
-                    [ 'title' => 'Operacion' , 'data' => 'num_transferencia' , 'className' => 'text-center' ],
-                    [ 'title' => 'Anticip' , 'data' => 'num_asie_ant' , 'className' => 'text-center' ],
-                    [ 'title' => 'Regular' , 'data' => 'num_asie_reg' , 'className' => 'text-center' ],
-                    [ 'title' => 'Comprob' , 'data' => 'comp' , 'className' => 'text-center' ],
-                    [ 'title' => 'RUC' , 'data' => 'ruc' , 'className' => 'text-center' ],
-                    [ 'title' => 'Razon' , 'data' => 'razon' , 'className' => 'text-center' ],
-                    [ 'title' => 'N°' , 'data' => 'num' , 'className' => 'text-center' ],
-                    [ 'title' => 'Fec' , 'data' => 'fecha_movimiento' , 'className' => 'text-center' ],
-                    [ 'title' => 'Desc' , 'data' => 'doc_desc' , 'className' => 'text-center' ],
-                    [ 'title' => 'Sub Tot' , 'data' => 'sub_tot' , 'className' => 'text-center' ],
-                    [ 'title' => 'Impuesto Servicio' , 'data' => 'imp_serv' , 'className' => 'text-center' ],
-                    [ 'title' => 'IGV' , 'data' => 'igv' , 'className' => 'text-center' ],
-                    [ 'title' => 'Reparo' , 'data' => 'reparo' , 'className' => 'text-center' ],
-                    [ 'title' => 'Retencion' , 'data' => 'retencion' , 'className' => 'text-center' ],
-                    [ 'title' => 'Detraccion' , 'data' => 'detraccion' , 'className' => 'text-center' ],
-                    [ 'title' => 'Total' , 'data' => 'monto' , 'className' => 'text-center' ],
-                    
-                    [ 'title' => 'D. Monto' , 'data' => 'importe' , 'className' => 'text-center' ]
+                    [ 'title' => 'Colaborador' , 'data' => 'resp_nom' , 'className' => 'text-center' ],
+                    [ 'title' => 'Cuenta' , 'data' => 'cta' , 'className' => 'text-center' ],
+                    [ 'title' => 'Fecha Deposito' , 'data' => 'dep_fec' , 'className' => 'text-center' ],
+                    [ 'title' => 'Depositado' , 'data' => 'dep_mon' , 'className' => 'text-center' ],
+                    [ 'title' => 'N° Operacion' , 'data' => 'dep_num' , 'className' => 'text-center' ],
+                    [ 'title' => 'N° A. Anticipo' , 'data' => 'asi_ant_num' , 'className' => 'text-center' ],
+                    [ 'title' => 'N° A. Regularizacion' , 'data' => 'asi_reg_num' , 'className' => 'text-center' ],
+                    [ 'title' => 'Comprobante' , 'data' => 'comp_nom' , 'className' => 'text-center' ],
+                    [ 'title' => 'RUC' , 'data' => 'comp_ruc' , 'className' => 'text-center' ],
+                    [ 'title' => 'Razon' , 'data' => 'comp_raz' , 'className' => 'text-center' ],
+                    [ 'title' => 'N°' , 'data' => 'comp_num' , 'className' => 'text-center' ],
+                    [ 'title' => 'Fecha Doc.' , 'data' => 'comp_fec' , 'className' => 'text-center' ],
+                    [ 'title' => 'Descripcion' , 'data' => 'comp_des' , 'className' => 'text-center' ],
+                    [ 'title' => 'Sub Total' , 'data' => 'comp_subt' , 'className' => 'text-center' ],
+                    [ 'title' => 'Impuesto Servicio' , 'data' => 'comp_iser' , 'className' => 'text-center' ],
+                    [ 'title' => 'IGV' , 'data' => 'comp_igv' , 'className' => 'text-center' ],
+                    [ 'title' => 'Reparo' , 'data' => 'comp_rep' , 'className' => 'text-center' ],
+                    [ 'title' => 'Retencion' , 'data' => 'comp_ret' , 'className' => 'text-center' ],
+                    [ 'title' => 'Detraccion' , 'data' => 'comp_det' , 'className' => 'text-center' ],
+                    [ 'title' => 'Total' , 'data' => 'comp_tot' , 'className' => 'text-center' ],
+                    [ 'title' => 'Detalle Cantidad' , 'data' => 'comp_d_cant' , 'className' => 'text-center' ],
+                    [ 'title' => 'Detalle Descripcion' , 'data' => 'comp_d_des' , 'className' => 'text-center' ],
+                    [ 'title' => 'Detalle Tipo' , 'data' => 'comp_d_tip' , 'className' => 'text-center' ],
+                    [ 'title' => 'Detalle Monto' , 'data' => 'comp_d_tot' , 'className' => 'text-center' ],
+                    [ 'title' => 'Devolucion' , 'data' => 'dev_mon' , 'className' => 'text-center' ]
                 ];
-            $rowsGroup = [ 0 , 1 , 2 , 3 , 4 , 5 , 6 , 7, 8 , 9 , 10 , 11 , 12 ,13 , 14 , 15 , 16 , 17 , 18 ];
         }
-        return [ 'columns' => $columns , 'rowsGroup' => $rowsGroup ];
+        return [ 'columns' => $columns ];
     }
 
 	public function export()
@@ -135,23 +142,15 @@ class Accounting extends BaseController
         {
     		$inputs = Input::all();
             $dates  = [ 'start' => $inputs[ 'fecha_inicio' ] , 'end' => $inputs[ 'fecha_final' ] ];
-            $data = DataList::getAmountReport( $inputs[ 'colaborador' ] , $dates , $inputs[ 'num_cuenta' ] , $inputs[ 'solicitud_id' ] );
+            $data   = $this->getData( $inputs );
+            
             if( isset( $data[ status ] ) && $data[ status ] == error )
             {
                 return $data;
             }
 
-            $columns =
-                [
-                    [ 'title' => '#' , 'data' => 'id' , 'className' => 'text-center' ],
-                    [ 'title' => 'Colaborador' , 'data' => 'empl_nom' , 'className' => 'text-center' ],
-                    [ 'title' => 'Cuenta' , 'data' => 'cuenta_num' , 'className' => 'text-center' ],
-                    [ 'title' => 'Fecha' , 'data' => 'dep_fec' , 'className' => 'text-center' ],
-                    [ 'title' => 'Monto Depositado' , 'data' => 'dep_mon' , 'className' => 'text-center' ],
-                    [ 'title' => 'Monto Regularizado' , 'data' => 'reg_mon' , 'className' => 'text-center' ],
-                    [ 'title' => 'Monto Devuelto' , 'data' => 'dev_mon' , 'className' => 'text-center' ],
-                    [ 'title' => 'Estado de Cuenta' , 'data' => 'debe' , 'className' => 'text-center' ]
-                ];
+            $format = $this->getFormat( $inputs[ 'type' ] );
+            $columns = $format[ 'columns' ];
 
             $now = Carbon::now();
             $title = 'Rep-' . $now->format( 'YmdHi' );
@@ -176,11 +175,11 @@ class Accounting extends BaseController
         }
     }
 
-    public function download( $title )
+    public function download( $type , $title )
     {
         try
         {
-            $directoryPath = 'files/reporte/contabilidad/monto';
+            $directoryPath = 'files/reporte/contabilidad/' . $type ;
             $filePath = $directoryPath . '/' . $title . '.xls';
             return Response::download( $filePath );
         }

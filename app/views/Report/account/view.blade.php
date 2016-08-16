@@ -2,8 +2,12 @@
 @section('solicitude')
     <div class="page-header">
         <input type="hidden" id="report-type" value="{{ $type }}">
-        <h3>Reporte de Montos</h3>
+        <h3>{{ $title }}</h3>
         <div class="row">
+        <div class="col-xs-12 col-md-12 col-sm-1 col-lg-1 form-group">
+            <label>Depurado</label>
+            <input type="checkbox" id="report-depurado" class="form-control" style="cursor:pointer;margin:0" checked>
+        </div>
         <div class="col-xs-12 col-md-12 col-sm-4 col-lg-4 form-group">
             <label>Colaborador</label>
             <div class="scrollable-dropdown-menu">
@@ -11,7 +15,7 @@
                 <a id="edit-responsible" class="glyphicon glyphicon-pencil pencil-seeker" href="#"></a>
             </div>
         </div>
-        <div class="col-xs-12 col-md-12 col-sm-4 col-lg-4 form-group">
+        <div class="col-xs-12 col-md-12 col-sm-3 col-lg-3 form-group">
             <label>Cuenta</label>
             <input type="text" id="num-cuenta" class="form-control">
         </div>
@@ -63,8 +67,7 @@
                         sPrevious : 'Anterior',
                         sNext     : 'Siguiente'
                     }
-                },
-                rowsGroup: response.rowsGroup
+                }
             });
         }
     
@@ -103,7 +106,8 @@
                     fecha_final  : $( '#drp_menubar' ).data( 'daterangepicker' ).endDate.format( "L" ),
                     colaborador  : colaborador,
                     num_cuenta   : num_cuenta,
-                    solicitud_id : solicitud_id
+                    solicitud_id : solicitud_id,
+                    depurado     : $( '#report-depurado' ).prop( 'checked' ) ? 1 : 0
                 }
             }).done( function( response )
             {
@@ -162,7 +166,8 @@
                 fecha_final  : $( '#drp_menubar' ).data( 'daterangepicker' ).endDate.format( "L" ),
                 colaborador  : colaborador,
                 num_cuenta   : num_cuenta,
-                solicitud_id : solicitud_id
+                solicitud_id : solicitud_id,
+                depurado     : $( '#report-depurado' ).prop( 'checked' ) ? 1 : 0
             };
 
             customAjax( 'POST' , server + url , data ).done( function( response )
@@ -170,7 +175,7 @@
                 if( response.Status == ok )
                 {
                     spin.stop();
-                    window.location.href = server + url + '/' + response.title;
+                    window.location.href = server + url + '/' + rType + '-' + response.title;
                 }
                 else
                 {
