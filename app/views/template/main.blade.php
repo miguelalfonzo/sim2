@@ -219,8 +219,6 @@
                     START_DATE = moment( "{{ $date[ "startDate" ] }}" , "DD/MM/YYYY" );
                     END_DATE   = moment( "{{ $date[ "endDate" ] }}" , "DD/MM/YYYY" );
                 @endif
-                console.log( START_DATE );
-                console.log( END_DATE );
             @endif
         </script>
 

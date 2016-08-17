@@ -120,8 +120,8 @@ $(function()
         {
             orientation : "top",
             language    : 'es',
-            startDate   : typeof START_DATE === 'undefined' ? '{{}}' : START_DATE ,
-            endDate     : typeof END_DATE === 'undefined' ? '' : END_DATE ,
+            startDate   : typeof START_DATE == 'undefined' || typeof START_DATE == 'object' ? '+0' : START_DATE ,
+            endDate     : typeof END_DATE == 'undefined' || typeof END_DATE == 'object' ? null : END_DATE ,
             format      : 'dd/mm/yyyy'
         });
         //selected a date hide the datepicker

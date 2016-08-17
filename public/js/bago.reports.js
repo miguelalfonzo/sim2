@@ -31,8 +31,8 @@
 			'Mes Actual'    : [moment().startOf('month'), moment().endOf('month')],
 			'Mes Pasado'    : [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
 		};
-		this.dateRangePickerStartDate   = START_DATE;
-		this.dateRangePickerEndDate     = END_DATE;
+		this.dateRangePickerStartDate   = typeof START_DATE == 'object' ? START_DATE : moment().startOf( 'month' );
+		this.dateRangePickerEndDate     = typeof END_DATE == 'object' ? END_DATE : moment(); 
 		this.dateRangePickerFormat      = 'YYYY/MM/DD';
 		this.dateRangePickerApplyClass  = 'btn-fill btn-success btn-sm';
 		this.dateRangePickerCancelClass = 'btn-fill btn-default btn-sm';
