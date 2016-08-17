@@ -117,7 +117,7 @@
                 $.ajax(
                 {
                     type : 'post' ,
-                    url  : server + 'report/data' ,
+                    url  : server + 'report/sup/data' ,
                     data : 
                     {
                         _token   : GBREPORTS.token,
@@ -145,7 +145,7 @@
 
         $( '#report-export' ).on( 'click' , function()
         {
-            var url = 'report/export-';
+            var url = 'report/sup/export-';
             url += $( '#report-type' ).val() + '-';
             url += $( '#fund-category' ).val();
             window.location.href = server + url;

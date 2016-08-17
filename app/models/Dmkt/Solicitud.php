@@ -245,6 +245,18 @@ class Solicitud extends Eloquent
         return $this->hasMany( 'Devolution\Devolution' , 'id_solicitud' );
     }
 
+    public function pendingRefund()
+    {
+        return $this->hasMany( 'Devolution\Devolution' , 'id_solicitud' )
+            ->whereIn( 'id_estado_devolucion' , [ DEVOLUCION_POR_REALIZAR , DEVOLUCION_POR_VALIDAR ] );
+    }
+
+    public function pendingPayrollRefund()
+    {
+        return $this->hasMany( 'Devolution\Devolution' , 'id_solicitud' )
+            ->where( 'id_tipo_devolucion' , DEVOLUCION_PLANILLA );
+    }
+
     protected function getDepositSolicituds()
     {
         return Solicitud::select( [ 'id' , 'token' , 'id_detalle' , 'id_user_assign' , 'titulo' , 'id_inversion' ] )

@@ -13,6 +13,8 @@ $(document).ready(function()
 		}
 		else if( $( '#movimientos' ).length === 1 )
 			listTable( 'movimientos' , null );
+		else if( $( '#report-type' ).length == 1 )
+			getReportData();
 		else
 		{
 			$(".btn_extra").hide("slow");

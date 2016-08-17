@@ -31,8 +31,8 @@
 			'Mes Actual'    : [moment().startOf('month'), moment().endOf('month')],
 			'Mes Pasado'    : [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
 		};
-		this.dateRangePickerStartDate   = moment().startOf('month');
-		this.dateRangePickerEndDate     = moment();
+		this.dateRangePickerStartDate   = typeof START_DATE == 'object' ? START_DATE : moment().startOf( 'month' );
+		this.dateRangePickerEndDate     = typeof END_DATE == 'object' ? END_DATE : moment(); 
 		this.dateRangePickerFormat      = 'YYYY/MM/DD';
 		this.dateRangePickerApplyClass  = 'btn-fill btn-success btn-sm';
 		this.dateRangePickerCancelClass = 'btn-fill btn-default btn-sm';
@@ -192,8 +192,8 @@
         constructor: gbReports,
         initGBReports: function(){
 			$('body').append(this.templateNewReport);
-			this.reportDate = moment().startOf('month').format("YYYY/MM/DD") + " - " + moment().format("YYYY/MM/DD");
-			this.drpSpan.html(moment().startOf('month').format('LL') + ' - ' + moment().format('LL'));
+			this.reportDate = this.dateRangePickerStartDate.format("YYYY/MM/DD") + " - " + this.dateRangePickerEndDate.format("YYYY/MM/DD");
+			this.drpSpan.html(this.dateRangePickerStartDate.format('LL') + ' - ' + this.dateRangePickerEndDate.format('LL'));
 			this.drp.daterangepicker(this.dateRangePickerOption, this.dateRangePickerCallback);
 			// GBREPORTS.setAutoResize();
 			this.getReports();

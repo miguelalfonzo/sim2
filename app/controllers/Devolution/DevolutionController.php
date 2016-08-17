@@ -192,21 +192,16 @@ class DevolutionController extends BaseController
 
     public function registerInmediateDevolution( $inputs )
     {
-        DB::beginTransaction();
         $solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
         
         $middleRpta = $this->validateDevolution( $solicitud );
         if ( $middleRpta[ status ] != ok )
         {
-            DB::rollback();
             return $middleRpta;
         }
 
-        if( $solicitud->idtiposolicitud == REEMBOLSO )
-        {
-            return $this->warningException( 'Cancelado - Los Reembolos no estan habilitados para realizar registro de devolucion' , __FUNCTION__ , __LINE__ , __FILE__ );
-        }
-
+        DB::beginTransaction();
+        
 		//REGISTRO DE LA DEVOLUCION
 		$this->setDevolucion( $solicitud->id , null , $inputs[ 'monto_devolucion' ] , DEVOLUCION_POR_REALIZAR , DEVOLUCION_INMEDIATA );
 
