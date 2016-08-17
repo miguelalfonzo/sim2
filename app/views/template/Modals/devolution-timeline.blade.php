@@ -2,20 +2,6 @@
 	<div class="container-fluid hide">
 		<h6 class="text-center">DEVOLUCION</h6>
 		<div class="stage-container">
-			<div class="stage col-md-3 col-sm-3 success">
-				<div class="stage-header stage-success"></div>
-				<div class="stage-content">
-					<h3 class="stage-title">
-						@if( $devolutions[ 0 ]->histories[ 0 ]->status_to == 2 )
-							Inicio por Saldo Pendiente
-						@else
-							Inicio por Revision de Documentos
-						@endif
-					</h3>
-					<span class="label label-info">{{ strtoupper( $devolutions[ 0 ]->createdBy->personal->full_name ) }}</span>
-					<span class="label label-info">{{ $devolutions[ 0 ]->created_at }}</span>
-				</div>
-			</div>
 			@foreach( $devolutions as $devolution )
 				@foreach( $devolution->histories as $devolutionHistory )
 					<div class="stage col-md-3 col-sm-3 success">
@@ -47,18 +33,10 @@
 							</span>
 						</div>
 					</div>
+				@endif
+				@if( in_array( $devolution->id_estado_devolucion , [ 1 , 2 ] ) )
 					<div class="stage col-md-3 col-sm-3">
 						<div class="stage-header"></div>
-						<div class="stage-content">
-							<h3 class="stage-title">Confirmacion</h3>
-							<span class="label label-info">
-								TESORERIA
-							</span>
-						</div>
-					</div>
-				@elseif( $devolution->id_estado_devolucion == 2 )
-					<div class="stage col-md-3 col-sm-3 pending">
-						<div class="stage-header stage-pending"></div>
 						<div class="stage-content">
 							<h3 class="stage-title">Confirmacion</h3>
 							<span class="label label-info">

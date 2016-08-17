@@ -53,8 +53,10 @@ class SolicitudeController extends BaseController
 
     public function showUser()
     {
-        if ( Session::has( 'state' ) )
+        if( Session::has( 'state' ) )
+        {
             $state = Session::get( 'state' );
+        }
         else 
         {
             if ( Auth::user()->type == CONT )
@@ -64,6 +66,7 @@ class SolicitudeController extends BaseController
             else if ( ! is_null( Auth::user()->simApp ) )
                 $state = R_PENDIENTE;
         }
+
         $mWarning = array();
         if ( Session::has( 'warnings' ) )
         {
@@ -107,6 +110,15 @@ class SolicitudeController extends BaseController
             
             $solicitud->save();
         }
+
+        if( Session::has( 'start_date' ) && Session::has( 'end_date' ) )
+        {
+            $date = [];
+            $date[ 'startDate' ] = Session::get( 'start_date' );
+            $date[ 'endDate' ] = Session::get( 'end_date' );
+            $data[ 'date' ] = $date;
+        }
+
         return View::make('template.User.show', $data);
     }
 

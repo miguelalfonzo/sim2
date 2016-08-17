@@ -35,9 +35,12 @@
 
     Route::group( array( 'before' => 'sup' ) , function() 
     {
-        Route::get( 'report/view/{type}' , 'Report\Funds@show' );
-        Route::post( 'report/data' , 'Report\Funds@source' );
-        Route::get( 'report/export-{type}-{category}' , 'Report\Funds@export' );
+        Route::group( [ 'prefix' => 'report/sup' , 'namespace' => 'Report' ] , function()
+        {
+            Route::get( 'view/{type}' , 'Funds@show' );
+            Route::post( 'data' , 'Funds@source' );
+            Route::get( 'export-{type}-{category}' , 'Funds@export' );
+        });
     });
 
     /*
@@ -86,8 +89,8 @@
     Route::group( array( 'before' => 'cont' ), function () 
     { 
   
-        Route::post('list-documents', 'Movements\MoveController@searchDocs');
-        
+        Route::post( 'list-documents', 'Movements\MoveController@searchDocs' );
+        Route::post( 'search-responsibles' , 'Source\Seeker@responsibleSource' );
         Route::group( [ 'namespace' => 'Expense' ] , function()
         {
             Route::get( 'edit-expense-cont', 'ExpenseController@editExpense');
@@ -111,15 +114,13 @@
             Route::post( 'get-account', 'SolicitudeController@getCuentaContHandler' );
             Route::post( 'revisar-solicitud', 'SolicitudeController@checkSolicitud' );
             Route::post( 'massive-solicitud-revision' , 'SolicitudeController@massiveSolicitudsRevision' );
-
             Route::get( 'list-documents-type', 'FondoController@listDocuments' );
             Route::get( 'maintenance/documenttype', 'FondoController@listDocuments' );
         });
 
         Route::group( [ 'namespace' => 'Seat' ] , function()
         {
-            Route::get( 'generar-asiento-gasto/{token}' , 'Generate@viewGenerateEntryExpense' );        
-    
+            Route::get( 'generar-asiento-gasto/{token}' , 'Generate@viewGenerateEntryExpense' ); 
             Route::post( 'generar-asiento-anticipo' , 'Generate@generateAdvanceEntry' );  
             Route::post( 'guardar-asiento-gasto', 'Generate@saveEntryExpense');
         });
@@ -128,10 +129,17 @@
         {
             Route::get( 'revision-export' , 'ExportController@revisionExport');
             Route::get( 'advance-entry-export' , 'ExportController@advanceEntryExport' );
-            Route::get( 'regularization-entry-export' , 'ExportController@regularizationEntryExport' );
-            
+            Route::get( 'regularization-entry-export' , 'ExportController@regularizationEntryExport' );         
             Route::get( 'export/solicitudToDeposit-pdf' , 'ExportController@exportSolicitudToDepositPDF' );
             Route::get( 'export/solicitudToDeposit-excel' , 'ExportController@exportSolicitudToDepositExcel' );
+        });
+
+        Route::group( [ 'prefix' => 'report/cont' , 'namespace' => 'Report' ] , function()
+        {
+            Route::get( 'view/{type}' , 'Accounting@show' );
+            Route::post( 'data' , 'Accounting@source' );
+            Route::post( 'export' , 'Accounting@export' );
+            Route::get( 'export/{type}-{title}' , 'Accounting@download' );
         });
 
     });

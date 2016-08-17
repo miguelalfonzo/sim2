@@ -16,7 +16,7 @@ class Funds extends BaseController
 	{
 		$typeCode 	   = $this->getTypeCode( $type );
 		$fondoCategory = FondoSubCategoria::getRolFunds( $typeCode );
-		return View::make( 'Report.view' , [ 'type' => $type , 'funds' => $fondoCategory ] ); 
+		return View::make( 'Report.fund.view' , [ 'type' => $type , 'funds' => $fondoCategory ] ); 
 	}
 
 	public function source()
@@ -32,7 +32,7 @@ class Funds extends BaseController
         {  
             $excel->sheet( 'Data' , function( $sheet ) use ( $data )
             {
-                $sheet->loadView( 'Report.table' , $data );
+                $sheet->loadView( 'Report.fund.table' , $data );
             });  
         })->export( 'xls' ); 
 	}

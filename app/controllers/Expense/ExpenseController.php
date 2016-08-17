@@ -118,6 +118,14 @@ class ExpenseController extends BaseController
 		{
 			DB::beginTransaction();
 			$inputs = Input::all();
+
+			$solicitud = Solicitud::findByToken( $inputs[ 'token' ] );
+
+			if( $solicitud->pendingRefund->count() != 0 )
+			{
+				return $this->warningException( 'No puede modificar documentos debido a que hay una devolucion pendiente' , __FUNCTION__ , __LINE__ , __FILE__ );
+			}
+
 			$middleRpta = $this->validateInputExpense( $inputs );
 			if ( $middleRpta[ status ] === ok )
 			{
@@ -150,7 +158,7 @@ class ExpenseController extends BaseController
 						$expense->id = $expense->lastId() + 1;
 			        }
 			        
-			        $solicitud 		  = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
+			        
 					$proof = ProofType::find( $inputs[ 'proof_type' ] );
 		    		
 				    if( $proof->code != 'N' && ! isset( $inputs[ 'idgasto' ] ) && ! is_null( $inputs[ 'ruc' ] ) && ! is_null( $inputs[ 'number_prefix' ] ) && ! is_null( $inputs[ 'number_serie' ] ) )
@@ -292,7 +300,10 @@ class ExpenseController extends BaseController
 			$inputs 	  = Input::all();
 			$expense      = Expense::find( $inputs[ 'idgasto' ] );
 			if ( is_null( $expense ) )
+			{
 				return $this->warningException( 'No existe registro del gasto con Id: ' . $inputs[ 'idgasto' ] , __FUNCTION__ , __LINE__ , __FILE__ );
+			}
+
 			return $this->setRpta( array( 'expenseItems' => $expense->items , 'expense' => $expense ) );
 		}
 		catch ( Exception $e )

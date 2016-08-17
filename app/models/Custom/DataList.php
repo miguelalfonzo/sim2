@@ -29,4 +29,40 @@ class DataList
             return [ status => error , description => 'No se pudo cargar el listado de solicitudes' ];
         }
     }
+
+    public static function getAmountReport( $user_id , array $dates , $num_account , $solicitud_id , $depurado )
+    {
+        try
+        {
+            DB::setDateFormat('DD/MM/YYYY');
+            $start = $dates[ 'start' ];
+            $end   = $dates[ 'end' ];
+            $data = DB::table( "TABLE( REP_CONT_CUENTA_FN( $user_id , '$start' , '$end' , $num_account , $solicitud_id , $depurado ) )" )->get();
+            return $data;
+        }
+        catch( Exception $e )
+        {
+            Log::error( __FUNCTION__ );
+            Log::error( $e );
+            return [ status => error , description => 'No se pudo cargar el reporte' ];
+        }
+    }
+
+    public static function getCompleteAccountReport( $user_id , array $dates , $num_account , $solicitud_id , $depurado )
+    {
+        try
+        {
+            DB::setDateFormat('DD/MM/YYYY');
+            $start = $dates[ 'start' ];
+            $end   = $dates[ 'end' ];
+            $data = DB::table( "TABLE( REP_CONT_COMP_FN( $user_id , '$start' , '$end' , $num_account , $solicitud_id , $depurado ) )" )->get();
+            return $data;
+        }
+        catch( Exception $e )
+        {
+            Log::error( __FUNCTION__ );
+            Log::error( $e );
+            return [ status => error , description => 'No se pudo cargar el reporte' ];
+        }
+    }
 }
