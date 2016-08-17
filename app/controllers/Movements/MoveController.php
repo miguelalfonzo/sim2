@@ -41,12 +41,12 @@ class MoveController extends BaseController
             $jDetalle = json_decode($detalle->detalle);
             $deposito = $detalle->deposit;
             
-                if ( $detalle->id_moneda == DOLARES )
-                    $solicitud->saldo = $detalle->typeMoney->simbolo . ' ' . ( $detalle->monto_actual - $solicitud->expenses->sum('monto') );
-                elseif ( $detalle->id_moneda == SOLES )
-                    $solicitud->saldo = $detalle->typeMoney->simbolo . ' ' . ( $detalle->monto_actual - $solicitud->expenses->sum('monto') );
-                else
-                    $solicitud->saldo = 'El Tipo de Moneda es: '.$detalle->id_moneda ;
+            if ( $detalle->id_moneda == DOLARES )
+                $solicitud->saldo = $detalle->typeMoney->simbolo . ' ' . ( $detalle->monto_actual - $solicitud->expenses->sum('monto') );
+            elseif ( $detalle->id_moneda == SOLES )
+                $solicitud->saldo = $detalle->typeMoney->simbolo . ' ' . ( $detalle->monto_actual - $solicitud->expenses->sum('monto') );
+            else
+                $solicitud->saldo = 'El Tipo de Moneda es: '.$detalle->id_moneda ;
         }
         $view = View::make('Tables.movimientos')->with( array( 'solicituds' => $data , 'subCategoriaId' =>$subCategoriaId ) )->render();
         $rpta = $this->setRpta( [ 'View' => $view ] );
@@ -308,6 +308,11 @@ class MoveController extends BaseController
             $now = Carbon::now();
             $rpta[ 'now' ] = [ 'year' => $now->year , 'month' => $now->month , 'day' => $now->day ];
             $rpta[ 'columns' ] = $columns;
+            
+            Session::put( 'state' , $inputs[ 'estado' ] );
+            Session::put( 'start_date' ,  $inputs[ 'fecha_inicio' ] );
+            Session::put( 'end_date' ,  $inputs[ 'fecha_final' ] );
+            
             return $rpta;
         }
         catch( Exception $e )

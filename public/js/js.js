@@ -161,7 +161,7 @@ $(function()
 
         bootbox.confirm( '<h3 class="red"><strong>¿Esta seguro que desea Terminar la Fase del Registro de Gasto?</strong><h3>' , function(result) 
         {
-            if(result)
+            if( result )
             {
                 endExpenseAjax( data ).done( function ( response ) 
                 {
@@ -178,8 +178,7 @@ $(function()
                     }
                     else
                     {
-                        //return false;
-                        bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+                        bootboxMessage( response );
                     }
                 });
             }
@@ -838,9 +837,6 @@ $(function()
                     ajaxExpense( data ).done( function( response )
                     {
                         ajaxExpenseDone( response , 'Gasto Registrado' );
-                    }).fail(function( statusCode , errorThrown )
-                    {
-                        ajaxError( statusCode , errorThrown );
                     });
                 }
                 else
@@ -850,9 +846,6 @@ $(function()
                         ajaxExpense(data).done(function( response )
                         {
                             ajaxExpenseDone( response , 'Gasto Registrado' );
-                        }).fail(function( statusCode , errorThrown )
-                        {
-                            ajaxError( statusCode , errorThrown );
                         });
                     }
                     else
@@ -925,7 +918,10 @@ $(function()
     {
         $( '#expense-register' ).modal( 'hide' );
         if( response.Status !== 'Ok' )
+        {
+            $.unblockUI();
             bootbox.alert( '<h4 class="red">' + response.Status + ' : ' + response.Description + '</h4>' );
+        }
         else
         {
             responseUI( msg , 'green' );
@@ -1075,6 +1071,9 @@ $(function()
             {
                 loadingUI('Registrando');
             }
+        }).fail(function( statusCode , errorThrown )
+        {
+            ajaxError( statusCode , errorThrown );
         });
     }
     

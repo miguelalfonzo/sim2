@@ -1749,6 +1749,8 @@ function validateNewSol()
 
 function bootboxMessage( response )
 {
+    $.unblockUI();
+    Ladda.stopAll();
     var colorClass = '';
     if( response.Status === ok )
     {
@@ -2492,9 +2494,9 @@ function processData( data , usuario )
             case ENTREGADO:
                 if( modelRegister.dev_est_id == DEVOLUCION_POR_REALIZAR )
                 {
-                    options +=  '<button type="button" class="btn btn-default">' +
-                                    '<span class="glyphicon glyphicon-edit"></span>' +
-                                '</button>';
+                    options +=  '<a class="btn btn-default get-devolution-info" data-type="do-inmediate-devolution">' +
+                                    '<span  class="glyphicon glyphicon-transfer"></span>' +
+                                '</a>';
                 }
                 else if( modelRegister.dev_est_id == DEVOLUCION_POR_VALIDAR )
                 {

@@ -185,14 +185,6 @@
         </div>
         @include('template.Modals.temporal_user')
 
-        <script type="text/javascript">
-            URL_BASE = '{{ asset('/') }}';
-            @if( isset( $solicitud ) && in_array( $solicitud->id_estado , array ( GASTO_HABILITADO , ENTREGADO ) ) && isset( $date ) )
-                START_DATE = '{{ $date[ "startDate" ] }}';
-                END_DATE   = '{{ $date[ "endDate" ] }}';
-            @endif
-        </script>
-
         {{ HTML::script('js/jquery.blockUI.js') }}
         {{ HTML::script('js/jquery.numeric.js') }}
         {{ HTML::script('js/jquery-ui.min.js') }}
@@ -212,6 +204,27 @@
         {{ HTML::script('js/locales/bootstrap-tagsinput.min.js') }}
         {{ HTML::script('js/moment.js') }}
         {{ HTML::script('js/moment.locale.es.js') }}
+
+        <script type="text/javascript">
+            URL_BASE = '{{ asset( '/' ) }}';
+            @if( isset( $solicitud ) )  
+                @if( in_array( $solicitud->id_estado , array ( GASTO_HABILITADO , ENTREGADO ) ) && isset( $date ) )
+                    START_DATE = '{{ $date[ "startDate" ] }}';
+                    END_DATE   = '{{ $date[ "endDate" ] }}';
+                @endif
+            @else
+                START_DATE = moment().startOf('month');
+                END_DATE   = moment();
+                @if( isset( $date ) )
+                    START_DATE = moment( "{{ $date[ "startDate" ] }}" , "DD/MM/YYYY" );
+                    END_DATE   = moment( "{{ $date[ "endDate" ] }}" , "DD/MM/YYYY" );
+                @endif
+                console.log( START_DATE );
+                console.log( END_DATE );
+            @endif
+        </script>
+
+
         {{ HTML::script('js/daterangepicker.js') }}
         {{ HTML::script('js/jquery.bootstrap.wizard.js') }}
         {{ HTML::script('js/bago.reports.js') }}

@@ -31,8 +31,8 @@
                 <a id="seat-solicitude" data-loading-text="Generando..." class="btn btn-success">Generar Asiento</a>
             @elseif( $solicitud->id_estado == ENTREGADO )
                 @if( $solicitud->idtiposolicitud != REEMBOLSO )
-                    @if ( $solicitud->devolutions()->whereIn( 'id_estado_devolucion' , array( DEVOLUCION_POR_REALIZAR , DEVOLUCION_POR_VALIDAR ) )->get()->count() === 0 )
-                        @if( $solicitud->devolutions()->where( 'id_tipo_devolucion' , DEVOLUCION_PLANILLA )->get()->count() === 0 )
+                    @if( $solicitud->pendingRefund->count() == 0 )
+                        @if( $solicitud->pendingPayrollRefund->count() == 0 )
                             <a id="confirm-payroll-discount" class="btn btn-info">Registro de Descuento por Planilla</a>
                         @endif
                         <a class="btn btn-info get-devolution-info" data-type="register-inmediate-devolution">Solicitud de Descuento Inmediato</a>
