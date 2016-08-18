@@ -4,32 +4,32 @@
         <input type="hidden" id="report-type" value="{{ $type }}">
         <h3>{{ $title }}</h3>
         <div class="row">
-        <div class="col-xs-12 col-md-12 col-sm-1 col-lg-1 form-group">
-            <label>Depurado</label>
-            <input type="checkbox" id="report-depurado" class="form-control" style="cursor:pointer;margin:0" checked>
-        </div>
-        <div class="col-xs-12 col-md-12 col-sm-4 col-lg-4 form-group">
-            <label>Colaborador</label>
-            <div class="scrollable-dropdown-menu">
-                <input type="text" id="responsible-seeker" class="form-control" style="display:inline">    
-                <a id="edit-responsible" class="glyphicon glyphicon-pencil pencil-seeker" href="#"></a>
+            <div class="col-md-1 form-group">
+                <label>Depurado</label>
+                <input type="checkbox" id="report-depurado" class="form-control" style="cursor:pointer;margin:0" checked>
+            </div>
+            <div class="col-md-3 form-group">
+                <label>Colaborador</label>
+                <div class="scrollable-dropdown-menu">
+                    <input type="text" id="responsible-seeker" class="form-control" style="display:inline">    
+                    <a id="edit-responsible" class="glyphicon glyphicon-pencil pencil-seeker" href="#"></a>
+                </div>
+            </div>
+            <div class="col-md-1 form-group">
+                <label>Cuenta</label>
+                <input type="text" id="num-cuenta" class="form-control">
+            </div>
+            <div class="col-md-2 form-group">
+                <label># Solicitud</label>
+                <input type="text" id="solicitud-id" class="form-control">
+            </div>
+            <div class="col-md-3 form-group" style="margin-top:24px">
+                <button type="button" id="report-export" class="btn btn-primary btn-md ladda-button" data-style="zoom-in">Exportar</button>
+                <button type="button" id="search-report" class="btn btn-primary btn-md ladda-button" data-style="zoom-in">
+                    <span class="glyphicon glyphicon-search"></span>
+                </button>
             </div>
         </div>
-        <div class="col-xs-12 col-md-12 col-sm-3 col-lg-3 form-group">
-            <label>Cuenta</label>
-            <input type="text" id="num-cuenta" class="form-control">
-        </div>
-        <div class="col-xs-12 col-md-12 col-sm-4 col-lg-4 form-group">
-            <label># Solicitud</label>
-            <input type="text" id="solicitud-id" class="form-control">
-        </div>
-        <div class="col-xs-12 col-md-12 col-sm-3 col-lg-3 form-group">
-            <button type="button" id="report-export" class="btn btn-primary btn-md ladda-button" data-style="zoom-in">Exportar</button>
-            <button type="button" id="search-report" class="btn btn-primary btn-md ladda-button" data-style="zoom-in">
-                <span class="glyphicon glyphicon-search"></span>
-            </button>
-        </div>
-    </div>
     </div>
     <div class="container-fluid">
         <table id="table_reporte_{{ $type }}" class="table table-striped table-hover table-bordered text-center" cellspacing="0" width="100%">
