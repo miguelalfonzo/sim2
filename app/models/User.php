@@ -21,7 +21,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	 *
 	 * @var array
 	 */
-	protected $hidden = array('password', 'remember_token');
+	protected $hidden = array( 'password', 'remember_token' , 'passbago' );
 
     function lastId()
     {
@@ -82,8 +82,14 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
         return $this->hasMany('Common\UserApp' ,'iduser','id');
     }
 
-    public function simApp(){
+    public function simApp()
+    {
         return $this->hasOne('Common\UserApp' , 'iduser' , 'id' )->where( 'idapp' , SISTEMA_SIM );
+    }
+
+    protected function bagoSimApp()
+    {
+        return $this->hasOne( 'Users\BagoUserSystem' , 'usicodusu' , 'username' )->where( 'usicodsis' , '@SIM' );
     }
 
     public function getName()
@@ -103,7 +109,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
     protected function assignedTempUser()
     {
         return $this->hasOne( 'Users\TemporalUser' , 'id_user' );
-    } 
+    }
 
     public function tempId()
     {
@@ -137,6 +143,19 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
         $userIds[] = $this->id;
 
         return $userIds;
+    }
+
+    public static function validateUserName( $userName )
+    {
+        return User::where( 'username' , $userName )->first(); 
+    }
+
+    public static function loginBagoUser( $userName , $password )
+    {
+        return User::where( 'username' , $userName )
+            ->whereRaw( "passbago = UTL_RAW.CAST_TO_VARCHAR2( PK_ENCRIPTACION.FN_ENCRIPTAR( UPPER( '$password' )))" )
+            ->where( 'active' , 1 )
+            ->first();
     }
     
 }
