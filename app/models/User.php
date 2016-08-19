@@ -89,7 +89,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 
     protected function bagoSimApp()
     {
-        return $this->hasOne( 'Users\BagoUserSystem' , 'usicodusu' , 'username' )->where( 'usicodsis' , '@SIM' );
+        return $this->hasOne( 'Users\BagoUserSystem' , 'usicodusu' , 'UPPER( username )' )->where( 'usicodsis' , '@SIM' );
     }
 
     public function getName()

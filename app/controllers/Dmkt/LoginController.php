@@ -43,7 +43,7 @@ class LoginController extends BaseController{
 
         if( is_null( $user ) )
         {
-            return Redirect::to( 'login' )->with( 'error_login' , true );       
+            return View::make( 'Dmkt.login' )->with( array( 'message' => 'Usuario no registrado en el esquema USR: USERS' ) );    
         }
         else
         {
