@@ -63,7 +63,7 @@ class SolicitudeController extends BaseController
                 $state = R_APROBADO;
             elseif ( Auth::user()->type == TESORERIA )
                 $state = R_REVISADO;
-            else if ( ! is_null( Auth::user()->simApp ) )
+            else
                 $state = R_PENDIENTE;
         }
 

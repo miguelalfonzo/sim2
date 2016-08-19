@@ -14,7 +14,7 @@ class FilterController
 	{
 	    if( ! Auth::check() )
 	    {
-	        if ( Request::ajax() )
+	    	if ( Request::ajax() )
 	        { 
 	            $warning = App::make('BaseController')->callAction( 'warningException' , array( 'Vuelva a acceder al sistema ( La sesion expiro )' , __FUNCTION__ , __LINE__ , __FILE__ ) );
 	        	$warning[ status ] = 'Logout';
@@ -24,7 +24,7 @@ class FilterController
 	            return Redirect::to( 'login' );        
 	        }
 	    }
-	    elseif( is_null( Auth::user()->simApp ) )
+	    elseif( is_null( Auth::user()->simApp ) && is_null( Auth::user()->bagoSimApp ) )
 	    { 
 	        if ( Request::ajax() )
 	        { 
