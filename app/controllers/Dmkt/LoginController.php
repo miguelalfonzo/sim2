@@ -35,35 +35,78 @@ class LoginController extends BaseController{
                 ->withErrors( $validator ) // send back all errors to the login form
                 ->withInput( Input::except('password') ); // send back the input (not the password) so that we can repopulate the form
         } 
-        
-        // create our user data for the authentication
-        $userdata = array(
-            'username' 	=> Input::get('username'),
-            'password' 	=> Input::get('password'),
-            'active'    => 1
-        );
 
-        if ( Auth::attempt( $userdata ) )
+        $userName = Input::get( 'username' );
+        $password = Input::get( 'password' );
+
+        $user = User::validateUsername( $userName );
+
+        if( is_null( $user ) )
         {
-            if( ! in_array( Auth::user()->type , [ REP_MED , SUP , GER_PROD , GER_PROM , GER_COM , GER_GER , CONT , TESORERIA , ASIS_GER , 'A' ] ) )
-            {
-                Auth::logout();
-                return View::make( 'Dmkt.login' )->with( array( 'message' => 'Rol no autorizado' ) );
-            }
-            else if ( is_null( Auth::user()->simApp ) )
-            {
-                Auth::logout();
-                return View::make( 'Dmkt.login' )->with( array( 'message' => 'Usuario no autorizado para el SIM' ) );
-            }
-            else
-            {
-                Auth::user()->touch();
-                return Redirect::to( 'show_user' );
-            }
+            return Redirect::to( 'login' )->with( 'error_login' , true );       
         }
         else
         {
-            return Redirect::to( 'login' )->with( 'error_login' , true );
+            if( is_null( $user->passbago ) )
+            {
+                // create our user data for the authentication
+                $userdata = array(
+                    'username'  => $userName,
+                    'password'  => $password,
+                    'active'    => 1
+                );
+
+                if ( Auth::attempt( $userdata ) )
+                {
+                    if( ! in_array( Auth::user()->type , [ REP_MED , SUP , GER_PROD , GER_PROM , GER_COM , GER_GER , CONT , TESORERIA , ASIS_GER , 'A' ] ) )
+                    {
+                        Auth::logout();
+                        return View::make( 'Dmkt.login' )->with( array( 'message' => 'Rol no autorizado' ) );
+                    }
+                    else if( is_null( Auth::user()->simApp ) )
+                    {
+                        Auth::logout();
+                        return View::make( 'Dmkt.login' )->with( array( 'message' => 'Usuario no autorizado para el SIM' ) );
+                    }
+                    else
+                    {
+                        Auth::user()->touch();
+                        return Redirect::to( 'show_user' );
+                    }
+                }
+                else
+                {
+                    return Redirect::to( 'login' )->with( 'error_login' , true );
+                }
+            }
+            else
+            {
+                Auth::login( $user );
+                if( is_null( Auth::user()->bagoSimApp ) )
+                {
+                    Auth::logout();
+                    return View::make( 'Dmkt.login' )->with( array( 'message' => 'Usuario no autorizado para el SIM' ) );
+                }
+                else if( ! in_array( Auth::user()->type , [ REP_MED , SUP , GER_PROD , GER_PROM , GER_COM , GER_GER , CONT , TESORERIA , ASIS_GER , 'A' ] ) )
+                {
+                    Auth::logout();
+                    return View::make( 'Dmkt.login' )->with( array( 'message' => 'Rol no autorizado' ) );
+                }
+                else
+                {
+                    $user = User::loginBagoUser( $userName , $password );
+                    if( is_null( $user ) )
+                    {
+                        Auth::logout();
+                        return Redirect::to( 'login' )->with( 'error_login' , true );
+                    }
+                    else
+                    {
+                        Auth::user()->touch();
+                        return Redirect::to( 'show_user' );   
+                    }
+                }    
+            }
         }  
     }
 

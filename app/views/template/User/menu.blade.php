@@ -19,7 +19,7 @@
                             <option value="{{$estado->id}}">{{$estado->nombre}}</option>
                         @endif
                     @endif
-                @elseif ( ! is_null( Auth::user()->simApp ) && ! Auth::user()->simApp->count() !== 0 )
+                @else
                     @if( isset( $state ) && $state == $estado->id )
                         <option value="{{$estado->id}}" selected>{{$estado->nombre}}</option>
                     @else

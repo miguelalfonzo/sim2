@@ -1,6 +1,6 @@
 @extends('template.main')
 @section('solicitude')
-    <div class="page-header">
+    <div>
         <input type="hidden" id="report-type" value="{{ $type }}">
         <h3>{{ $title }}</h3>
         <div class="row">
@@ -15,7 +15,7 @@
                     <a id="edit-responsible" class="glyphicon glyphicon-pencil pencil-seeker" href="#"></a>
                 </div>
             </div>
-            <div class="col-md-1 form-group">
+            <div class="col-md-2 form-group">
                 <label>Cuenta</label>
                 <input type="text" id="num-cuenta" class="form-control">
             </div>
@@ -30,11 +30,16 @@
                 </button>
             </div>
         </div>
+        <div>
+        <b>Nota</b>
+        <label>Depurado: Filtra las solicitudes para mostrar las que tienen un saldo pendiente a favor o en contra</label>
+        </div>
     </div>
     <div class="container-fluid">
         <table id="table_reporte_{{ $type }}" class="table table-striped table-hover table-bordered text-center" cellspacing="0" width="100%">
         </table>
     </div>
+
     <script>
         $( document ).ready( function()
         {   
