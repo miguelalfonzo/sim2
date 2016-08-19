@@ -1084,7 +1084,7 @@ $(function()
         {
             sum += parseFloat($(this).find(clas).html());
         });
-        return sum;
+        return sum.toFixed( 2 );
     }
 
     $( '#cancel-expense' ).on( 'click' , function() 
@@ -1130,17 +1130,22 @@ $(function()
         if( ! $.isNumeric( imp_serv ) ) imp_serv = 0 ;
         if( ! $.isNumeric( tot_item_expense ) ) tot_item_expense = 0 ;
         
+        console.log( deposit );
+        console.log( tot_expenses );
+        console.log( tot_item_expense );
+
         if(btn_save === "Registrar")
         {
             balance = deposit - tot_expenses - tot_item_expense;
-            $("#balance").val( balance.toFixed( 2 ) );
         }
         else
         {
             balance = deposit - tot_expenses - tot_item_expense + parseFloat($("#tot-edit-hidden").val());
-            $("#balance").val( balance.toFixed( 2 ) );
         }
 
+        balance = parseFloat( balance.toFixed( 2 ) );
+        $( "#balance" ).val( balance );
+        
         if( balance < 0 )
         {
             $( ".message-expense" ).html( 'El monto ingresado supera el saldo.' ).css( "color" , "red" ).show();
