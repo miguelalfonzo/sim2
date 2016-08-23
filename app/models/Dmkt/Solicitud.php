@@ -3,6 +3,7 @@
 namespace Dmkt;
 use \Eloquent;
 use \Auth;
+use \Carbon\Carbon;
 
 class Solicitud extends Eloquent
 {
@@ -31,11 +32,23 @@ class Solicitud extends Eloquent
 
     public function lastId()
     {
+        $now = Carbon::now();
         $lastId = Solicitud::orderBy('id', 'DESC')->first();
         if( is_null( $lastId ) )
-            return 0;
+        {
+            return $now->format( 'Y' ) . '000001';
+        }
         else
-            return $lastId->id;
+        {
+            if( $now->format( 'Y' ) == substr( $lastId->id , 0 , 4 ) )
+            {
+                return $lastId->id + 1;
+            }
+            else
+            {
+                return $now->format( 'Y' ) . '000001';        
+            }
+        }
     }
 
     protected static function solInst( $periodo )

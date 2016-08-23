@@ -263,19 +263,26 @@
         Route::post( 'get-client-view' , 'Source\Seeker@getClientView');
     });
 
-    Route::group(array('before' => 'sys_user'), function ()
+
+    Route::group( array( 'before' => 'sys_user' ) , function()
     {
-        Route::post('buscar-solicitudes', 'Dmkt\SolicitudeController@searchDmkt');
-        Route::get('listar-solicitudes/{estado}', 'Dmkt\SolicitudeController@listSolicitude');
-        Route::get('getclients', 'Dmkt\SolicitudeController@getClients');
-        Route::post('list-account-state', 'Movements\MoveController@searchMove');
-        Route::get('show_user', 'Dmkt\SolicitudeController@showUser');
-        Route::get('ver-solicitud/{token}', 'Dmkt\SolicitudeController@viewSolicitude');
-        Route::get('show-fondo/{token}','Expense\ExpenseController@showFondo');
-        Route::post( 'list-table' , 'Movements\MoveController@getTable');
-        Route::post( 'detail-solicitud' , 'Movements\MoveController@getSolicitudDetail');
-        Route::get('getleyenda', 'BaseController@getLeyenda');
-        Route::get( 'list-solicituds' , 'Movements\MoveController@getSolicituds' );
+        Route::get( 'show_user' , 'Dmkt\SolicitudeController@showUser' );
+        Route::get( 'view-sup-rep' , 'Synchro\SynchroController@viewSupRep' );
+        Route::post( 'update-sup-rep' , 'Synchro\SynchroController@updateSupRep' );
+    });
+
+    Route::group( array('before' => 'process_user' ) , function ()
+    {
+        Route::post( 'buscar-solicitudes'          , 'Dmkt\SolicitudeController@searchDmkt' );
+        Route::get(  'listar-solicitudes/{estado}' , 'Dmkt\SolicitudeController@listSolicitude' );
+        Route::get(  'getclients'                  , 'Dmkt\SolicitudeController@getClients' );
+        Route::post( 'list-account-state'          , 'Movements\MoveController@searchMove' );
+        Route::get(  'ver-solicitud/{token}'       , 'Dmkt\SolicitudeController@viewSolicitude' );
+        Route::get(  'show-fondo/{token}'          , 'Expense\ExpenseController@showFondo' );
+        Route::post( 'list-table'                  , 'Movements\MoveController@getTable' );
+        Route::post( 'detail-solicitud'            , 'Movements\MoveController@getSolicitudDetail' );
+        Route::get(  'getleyenda'                  , 'BaseController@getLeyenda' );
+        Route::get(  'list-solicituds'             , 'Movements\MoveController@getSolicituds' );
 
         /*
         |--------------------------------------------------------------------------

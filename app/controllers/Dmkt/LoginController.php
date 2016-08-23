@@ -58,7 +58,7 @@ class LoginController extends BaseController{
 
                 if ( Auth::attempt( $userdata ) )
                 {
-                    if( ! in_array( Auth::user()->type , [ REP_MED , SUP , GER_PROD , GER_PROM , GER_COM , GER_GER , CONT , TESORERIA , ASIS_GER , 'A' ] ) )
+                    if( ! in_array( Auth::user()->type , [ REP_MED , SUP , GER_PROD , GER_PROM , GER_COM , GER_GER , CONT , TESORERIA , ASIS_GER , 'A' , ESTUD ] ) )
                     {
                         Auth::logout();
                         return View::make( 'Dmkt.login' )->with( array( 'message' => 'Rol no autorizado' ) );
@@ -87,7 +87,7 @@ class LoginController extends BaseController{
                     Auth::logout();
                     return View::make( 'Dmkt.login' )->with( array( 'message' => 'Usuario no autorizado para el SIM' ) );
                 }
-                else if( ! in_array( Auth::user()->type , [ REP_MED , SUP , GER_PROD , GER_PROM , GER_COM , GER_GER , CONT , TESORERIA , ASIS_GER , 'A' ] ) )
+                else if( ! in_array( Auth::user()->type , [ REP_MED , SUP , GER_PROD , GER_PROM , GER_COM , GER_GER , CONT , TESORERIA , ASIS_GER , 'A' , ESTUD ] ) )
                 {
                     Auth::logout();
                     return View::make( 'Dmkt.login' )->with( array( 'message' => 'Rol no autorizado' ) );

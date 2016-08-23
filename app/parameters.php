@@ -81,6 +81,7 @@ const GER_GER                                 = 'GG';
 const CONT                                    = 'C';
 const TESORERIA                               = 'T';
 const ASIS_GER                                = 'AG';
+const ESTUD                                   = 'E';
 
 //ID DE TIPO DE SOLICITUDES
 const SOL_REP                                 = 1;

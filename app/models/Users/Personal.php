@@ -4,6 +4,9 @@ namespace Users;
 
 use \Eloquent;
 use \Auth;
+use \Exception;
+use \Log;
+use \DB;
 
 class Personal extends Eloquent
 {
@@ -184,5 +187,95 @@ class Personal extends Eloquent
                })
                ->get();
         return $data;
+    }
+
+    public static function viewSupRep()
+    {
+        try
+        {
+            $supRepData = [];
+            $supRepData =   
+                Personal::select( [ 'UPPER( ' . TB_PERSONAL . '.APELLIDOS || \' \' || ' . TB_PERSONAL . '.NOMBRES ) VISITADOR' , 'UPPER( B.APELLIDOS || \' \' || B.NOMBRES ) SUPERVISOR' ] )
+                    ->join( TB_PERSONAL . ' B' , 'B.BAGO_ID' , '=' , TB_PERSONAL . '.REFERENCIA_ID' )
+                    ->whereIn( TB_PERSONAL . '.tipo' , [ 'RM' , 'RI' , 'RF' ] )
+                    ->where( 'b.tipo' , 'S' )
+                    ->orderBy( 'b.apellidos' , 'ASC' )
+                    ->orderBy( TB_PERSONAL . '.apellidos' , 'ASC' )
+                    ->get();
+            $rpta = [ 'Status' => 'Ok' ];
+        }
+        catch( Exception $e )
+        {
+            Log::error( $e );
+            $rpta = [ 'Status' => 'Error' , 'Description' => $e->getMessage() ];
+        }
+        finally
+        {
+            $rpta[ 'Data' ] = $supRepData;
+            return $rpta; 
+        }
+    }
+
+    public static function updateSupRep()
+    {
+        try
+        {
+            $supRepTable = [];
+            $supIds = Personal::select( 'bago_id' )
+                        ->where( 'tipo' , 'S' )
+                        ->lists( 'bago_id' );
+            $repIds = Personal::select( 'bago_id' )
+                        ->whereIn( 'tipo' , [ 'RM' , 'RI' , 'RF' ] )
+                        ->lists( 'bago_id' );
+
+            $supRepTable    =    
+                DB::table( 'FICPE.VISITADOR A' )
+                    ->select( [ 'a.visvisitador' , 'c.supsupervisor' , 'a.vispaterno || \' \' || a.vismaterno || \' \' || a.visnombre visitador' , 'c.suppaterno || \' \' || c.supmaterno || \' \' || c.supnombre supervisor' ] )
+                    ->join( 'FICPE.LINSUPVIS B' , 'B.LSVVISITADOR' , '=' , 'A.VISVISITADOR' )
+                    ->join( 'FICPE.SUPERVISOR C' , 'C.SUPSUPERVISOR' , '=' , 'B.LSVSUPERVISOR' )
+                    ->where( 'a.visactivo' , 'S' )
+                    ->where( 'c.supactivo' , 'S' )
+                    ->whereIn( 'a.visvisitador' , $repIds )
+                    ->whereIn( 'c.supsupervisor' , $supIds )
+                    ->orderBy( 'c.supsupervisor' , 'DESC' )
+                    ->get();
+
+            foreach( $supRepTable as $supRepRow )
+            {
+                $personalRow = Personal::where( 'bago_id' , $supRepRow->visvisitador )->whereIn( 'tipo' , [ 'RM' , 'RI' , 'RF' ] )->get();
+                
+                if( $personalRow->count() == 1 )
+                {
+                    if( $personalRow[ 0 ]->referencia_id == $supRepRow->supsupervisor )
+                    {
+                        $supRepRow->status = -1;
+                    }
+                    else
+                    {
+                        $personalRow = $personalRow[ 0 ];
+                        $personalRow->referencia_id = $supRepRow->supsupervisor;
+                        $personalRow->referencia_tipo = 'S';
+                        $personalRow->save();   
+                        $supRepRow->status = 1;
+                    }
+                }
+                else
+                {
+                    $supRepRow->status = $personalRow->count();
+                }     
+            }
+            
+            $rpta = [ 'Status' => 'Ok' , 'Description' => 'Actualizado correctamente' ];
+        }
+        catch( Exception $e )
+        {
+            Log::error( $e );
+            $rpta = [ 'Status' => 'Error' , 'Description' => $e->getMessage() ];
+        }
+        finally
+        {
+            $rpta[ 'Data' ] = $supRepTable;
+            return $rpta;
+        }
     }
 }

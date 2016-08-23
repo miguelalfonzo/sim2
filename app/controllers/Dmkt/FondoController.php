@@ -271,7 +271,7 @@ class FondoController extends BaseController
                 else
                 {
                     $solicitud               = new Solicitud;
-                    $solicitud->id           = $solicitud->lastId() + 1;
+                    $solicitud->id           = $solicitud->lastId();
                     $solicitud->token        = sha1( md5( uniqid( $solicitud->id , true ) ) );
                     $solicitud->id_inversion = $inputs[ 'inversion' ];
                     $detalle                 = new SolicitudDetalle;
