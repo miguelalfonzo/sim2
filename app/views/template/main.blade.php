@@ -61,6 +61,8 @@
             </a>
         </header>
         <div class="container-fluid" style="max-height: 100vh; padding-left: 0; padding-right: 0;">
+            @if( Auth::user()->type != ESTUD )
+        
             <nav class="navbar navbar-bago navbar-static-top" role="navigation" style="/*margin-bottom: 0*/; z-index: 10;">
                 <div class="container-fluid">
                     <div class="navbar-header relative">
@@ -73,32 +75,36 @@
                     </div>
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                         <ul class="nav navbar-nav">
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                    Solicitud  
-                                    <span class="caret"></span>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    @if ( in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD , ASIS_GER ) ) )
-                                        <li>
-                                            <a href="{{URL::to('nueva-solicitud')}}">
-                                                <span class="glyphicon glyphicon-plus" aria-hidden="true" ></span>
-                                                <span class="glyphicon-class"> Nuevo</span>
-                                            </a>
-                                        </li>
-                                        <li role="separator" class="divider"></li>
-                                    @endif
-                                    <li><a href="{{ URL::to('show_user') }}">Listado de Solicitudes</a></li>
-                                    @if ( Auth::user()->type == ASIS_GER )
-                                        <li><a href="{{ URL::to('solicitude/institution') }}">Solicitudes Institucionales</a></li>
-                                    @endif
-                                </ul>
-                            </li>
+                            @if( Auth::user()->type != ESTUD )
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                        Solicitud  
+                                        <span class="caret"></span>
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        @if ( in_array( Auth::user()->type , array( REP_MED , SUP , GER_PROD , ASIS_GER ) ) )
+                                            <li>
+                                                <a href="{{URL::to('nueva-solicitud')}}">
+                                                    <span class="glyphicon glyphicon-plus" aria-hidden="true" ></span>
+                                                    <span class="glyphicon-class"> Nuevo</span>
+                                                </a>
+                                            </li>
+                                            <li role="separator" class="divider"></li>
+                                        @endif
+                                        <li><a href="{{ URL::to('show_user') }}">Listado de Solicitudes</a></li>
+                                        @if ( Auth::user()->type == ASIS_GER )
+                                            <li><a href="{{ URL::to('solicitude/institution') }}">Solicitudes Institucionales</a></li>
+                                        @endif
+                                    </ul>
+                                </li>
+                            @endif
                             @if ( in_array( Auth::user()->type, array( REP_MED , SUP, GER_PROD, GER_PROM, GER_COM , GER_GER , CONT ) ) )
                                 <li><a href="{{ URL::to('solicitude/statement')}}">Movimientos</a></li>
                             @endif
-                            <li><a href="{{ URL::to('eventos')}}">Eventos</a></li>
-                            @if( Auth::user()->type != REP_MED ) 
+                            @if( Auth::user()->type != ESTUD )
+                                <li><a href="{{ URL::to('eventos')}}">Eventos</a></li>
+                            @endif
+                            @if( ! in_array( Auth::user()->type , [ REP_MED , ESTUD ] ) ) 
                                 <li class="dropdown">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
                                         Reportes 
@@ -120,7 +126,7 @@
                                     </ul>
                                 </li>
                             @endif
-                            @if ( in_array(Auth::user()->type, array(SUP, GER_PROD, GER_PROM, GER_COM, CONT)) )
+                            @if ( in_array(Auth::user()->type, array(SUP, GER_PROD, GER_PROM, GER_COM, CONT , ESTUD )) )
                                 <li class="dropdown">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
                                         Configuración 
@@ -144,8 +150,10 @@
                                             <li><a href="{{ URL::to('maintenance/documenttype') }}">Mantenimiento de Tipo de Documentos</a></li>
                                             <li><a href="{{ URL::to('maintenance/view/Fondo_Contable' ) }}">Mantenimiento de Fondo de Contabilidad</a></li>
                                             <li><a href="{{ URL::to('maintenance/view/Cuenta_Gasto_Marca') }}">Mantenimiento de Cuentas - Marcas</a></li>
-                                        @elseif( Auth::user()->type === SUP )
+                                        @elseif( Auth::user()->type == SUP )
                                             <li><a href="{{ URL::to( 'report/sup/view/Fondo_Supervisor' ) }}">Reporte de Fondos de Supervisor</a></li>
+                                        @elseif( Auth::user()->type == ESTUD )
+                                            <li><a href="{{ URL::to( 'view-sup-rep' ) }}">Syncronizacion</a></li>
                                         @endif
                                     </ul>
                                 </li>
@@ -167,19 +175,24 @@
                             Alertas 
                             <span class="badge badge-success"></span>
                         </a>
-                        <div id="drp_menubar" class="navbar-form navbar-right btn-default navbar-btn" style="cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; margin-right: -8px;">
-                            <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
-                            <span></span> 
-                            <b class="caret"></b>
-                        </div>
+                        @if( Auth::user()->type != ESTUD )
+                            <div id="drp_menubar" class="navbar-form navbar-right btn-default navbar-btn" style="cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; margin-right: -8px;">
+                                <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+                                <span></span> 
+                                <b class="caret"></b>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </nav>
+            @endif
+        
             <div id="dataTable" class="container-fluid" style="font-size:10pt">
                 @yield('solicitude')
                 <br>
             </div>
         </div>
+
         <div id="loading" style="display: none">
             {{ HTML::image('img/spiffygif.gif') }}
         </div>
