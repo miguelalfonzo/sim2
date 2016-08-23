@@ -40,6 +40,7 @@ use \Fondo\FondoMkt;
 use \Fondo\FondoInstitucional;
 use \VisitZone\Zone;
 use \Seat\Generate;
+use \Redirect;
 
 class SolicitudeController extends BaseController
 {
@@ -84,17 +85,18 @@ class SolicitudeController extends BaseController
         
         $data = array( 'state' => $state, 'states' => StateRange::order(), 'warnings' => $mWarning );
         
-        if( Auth::user()->type == TESORERIA)
+        $user = Auth::user();
+        if( $user->type == TESORERIA)
         {
             $data[ 'tc']          = ChangeRate::getTc();
             $data[ 'banks']       = Account::banks();
             $data[ 'depositIds' ] = Solicitud::getDepositSolicituds();
         }
-        elseif (Auth::user()->type == ASIS_GER)
+        elseif ( $user->type == ASIS_GER)
         {
             $data[ 'activities'] = Activity::order();
         }
-        elseif (Auth::user()->type == CONT)
+        elseif ( $user->type == CONT)
         {
             $data[ 'proofTypes']      = ProofType::order();
             $data[ 'regimenes']       = Regimen::all();
@@ -119,7 +121,14 @@ class SolicitudeController extends BaseController
             $data[ 'date' ] = $date;
         }
 
-        return View::make('template.User.show', $data);
+        if( $user->type == 'E' )
+        {
+            return Redirect::to( 'view-sup-rep' );
+        }
+        else
+        {
+            return View::make('template.User.show', $data);
+        }
     }
 
     public function newSolicitude()
@@ -468,7 +477,7 @@ class SolicitudeController extends BaseController
                 else 
                 {
                     $solicitud     = new Solicitud;
-                    $solicitud->id = $solicitud->lastId() + 1;
+                    $solicitud->id = $solicitud->lastId();
                 }
 
                 $detalle               = new SolicitudDetalle;
