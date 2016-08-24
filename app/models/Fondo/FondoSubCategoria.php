@@ -15,6 +15,11 @@ class FondoSubCategoria extends Eloquent
 		return FondoSubCategoria::orderBy( 'descripcion' , 'ASC' )->get();
 	}
 
+	public function categoria()
+	{
+		return $this->belongsTo( 'Fondo\FondoCategoria' , 'id_fondo_categoria' );
+	}
+
 	protected function fondoMktType()
 	{
 		return $this->hasOne( 'Fondo\FondoMktType' , 'codigo' , 'tipo' );

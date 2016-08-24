@@ -15,9 +15,14 @@ class Solicitud extends Eloquent
         return $this->attributes['created_at'];
     }
 
+    protected function getCreatedAtYearAttribute()
+    {
+        return $this->created_at->format( 'Y' );
+    }
+
     protected function getCreatedAtAttribute( $attr )
     {
-        return \Carbon\Carbon::parse( $attr )->format('Y-m-d H:i');
+        return Carbon::parse( $attr )->format('Y-m-d H:i');
     }
 
     protected function getSolicitudCaptionAttribute()

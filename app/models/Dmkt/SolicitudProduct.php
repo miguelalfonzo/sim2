@@ -6,6 +6,7 @@ use \DB;
 use \Fondo\FondoGerProd;
 use \Fondo\FondoSupervisor;
 use \Expense\ChangeRate;
+use \Carbon\Carbon;
 
 class SolicitudProduct extends Eloquent
 {
@@ -23,10 +24,24 @@ class SolicitudProduct extends Eloquent
 
     public function getSubFondo( $userType , $solicitud , $productoId = null )
     {
-        $id_producto =  isset($productoId) ? $productoId : $this->id_producto;
+        $id_producto = isset( $productoId ) ? $productoId : $this->id_producto;
+        $year        = $solicitud->created_at_year; 
         if ( $userType == SUP )
         {
-            $userid = $solicitud->personalTo->userSup();
+            $userId = $solicitud->personalTo->userSup();
+
+            $data = FondoSupervisor::select( [ 'id' , 'subcategoria_id' , 'saldo' , 'retencion' , 'marca_id' , '\'S\' tipo' ] )
+                    ->with( 'subCategoria.categoria' , 'marca' )
+                    ->where( 'supervisor_id' , $userId )
+                    ->where( 'marca_id' , $id_producto )
+                    ->where( 'anio' , $year )
+                    ->get();
+            \Log::info( $data );
+            \Log::info( $data[ 0 ]->saldo_disponible );
+            \Log::info( $data[ 0 ]->detail_name );
+            return $data;
+/*
+
             return DB::table(TB_FONDO_SUPERVISOR.' fs')
                         ->select("m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'fs.saldo - fs.retencion saldo_disponible' , 'fs.id' , 'fs.marca_id' , '\'S\' tipo' )
                         ->leftJoin(TB_FONDO_CATEGORIA_SUB.' fsc' , 'fsc.id' , '=' , 'fs.subcategoria_id' )
@@ -36,7 +51,7 @@ class SolicitudProduct extends Eloquent
                         ->where('trim( fsc.tipo )' , FONDO_SUBCATEGORIA_SUPERVISOR )
                         ->where('fs.supervisor_id' , $userid )->orderBy( 'm.descripcion' , 'asc' )
                         ->where( 'fs.marca_id' , $id_producto )
-                        ->get();
+                        ->get();*/
         }
         else if ( in_array( $userType , array( GER_PROD , GER_PROM ) ) )
         {
@@ -143,4 +158,5 @@ class SolicitudProduct extends Eloquent
     {
         $this->attributes[ 'monto_asignado' ] = round( $value , 2 , PHP_ROUND_HALF_DOWN );
     }
+
 }
