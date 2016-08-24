@@ -611,7 +611,7 @@ class ExpenseController extends BaseController
 				'clientes'     => $clientes,
 				'cmps'         => $cmps,
 				'getSpecialty' => $getSpecialty,
-				'date'         => array( 'toDay' => $solicitud->created_at , 'lastDay' => $jDetalle->fecha_entrega ),
+				'date'         => array( 'toDay' => $solicitud->created_at_parse , 'lastDay' => $jDetalle->fecha_entrega ),
 				'name'         => $name_aproved,
 				'dni'          => $dni,
 				'charge'       => $charge,

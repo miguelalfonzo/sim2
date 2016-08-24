@@ -1752,15 +1752,15 @@ function bootboxMessage( response )
     $.unblockUI();
     Ladda.stopAll();
     var colorClass = '';
-    if( response.Status === ok )
+    if( response.Status == ok )
     {
         colorClass = 'text-success';
     }
-    else if( response.Status === warning )
+    else if( response.Status == warning )
     {
         colorClass = 'text-warning';
     }
-    else if( response.Status === error )
+    else if( response.Status == error )
     {
         colorClass = 'text-danger';
     }
@@ -2082,7 +2082,7 @@ $( '#btn-add-family-fondo' ).on( 'click' ,function ()
         }
     });
 
-    if( !family_exist )
+    if( ! family_exist )
     {
         $.ajax(
         {
@@ -2092,48 +2092,41 @@ $( '#btn-add-family-fondo' ).on( 'click' ,function ()
             {
                 _token       : GBREPORTS.token,
                 solicitud_id : id_solicitud.val() ,
-                producto : family_id
+                producto     : family_id
             }
-        }).fail( function ( statusCode , errorThrown )
+        }).fail( function( statusCode , errorThrown )
         {
             ajaxError( statusCode , errorThrown );
-        }).done( function ( response )
+        }).done( function( response )
         {
             spin.stop();
-            if ( response.Status === 'Ok' )
+            if( response.Status == 'Ok' )
             {
-                 if(response.Data.Cond == true)
-                 {
-                    var options_val = '<option selected="" disabled="" value="0">Seleccione el Fondo</option>';
-                    $.each( response.Data.Fondo_product, function( i, val ) 
-                    {
-                        options_val += '<option value="'+val.id+',' + val.tipo+'">'+ val.descripcion +' S/.'+ val.saldo_disponible +'</option>';
-                    });
-                    
-                    $( "#list-product2" ).append( '<li class="list-group-item"><div class="input-group input-group-sm"><span class="input-group-addon" style="width:15%;">'+
-                    $( "#selectfamilyadd option:selected" ).text() + '</span><select name="fondo_producto[]" class="selectpicker form-control">' +
-                    options_val +'</select><span class="input-group-addon">' + $( '#type-money' ).html().trim() + '</span>'+
-                    '<input name="monto_producto[]" type="text" class="form-control text-right amount_families2" value="0" style="padding:0px;text-align:center">'+
-                    '<span class="input-group-btn"><button type="button" class="btn btn-default btn-remove-family"><span class="glyphicon glyphicon-remove"></span></button></span></div>'+
-                    '<input type="hidden" name="producto[]" class="producto_value" value="'+family_id+'"></li>' );
-
-
-                    $( ".btn-remove-family" ).bind( "click", function() {
-                        $(this).parent().prev('input').val(0);
-                        verifySum( $(this).parent().prev('input') , 1 )
-                        $(this).closest('li').remove();
-                        
-                    });
-                    $('#approval-product-modal').modal('toggle');
-                }
-                else
+                var options_val = '<option selected="" disabled="" value="0">Seleccione el Fondo</option>';
+                $.each( response.Data , function( i, val ) 
                 {
-                     bootbox.alert( '<h4 class="red">' + response.Data.Description + '</h4>');
-                }
+                    options_val += '<option value=" ' + val.id + ',' + val.tipo + '">'+ val.marca.descripcion + ' | ' + val.sub_categoria.categoria.descripcion + ' | ' + val.sub_categoria.descripcion + ' S/.' + ( val.saldo - val.retencion ) + '</option>';
+                });
+                
+                $( "#list-product2" ).append( '<li class="list-group-item"><div class="input-group input-group-sm"><span class="input-group-addon" style="width:15%;">'+
+                $( "#selectfamilyadd option:selected" ).text() + '</span><select name="fondo_producto[]" class="selectpicker form-control">' +
+                options_val +'</select><span class="input-group-addon">' + $( '#type-money' ).html().trim() + '</span>'+
+                '<input name="monto_producto[]" type="text" class="form-control text-right amount_families2" value="0" style="padding:0px;text-align:center">'+
+                '<span class="input-group-btn"><button type="button" class="btn btn-default btn-remove-family"><span class="glyphicon glyphicon-remove"></span></button></span></div>'+
+                '<input type="hidden" name="producto[]" class="producto_value" value="'+family_id+'"></li>' );
+
+
+                $( ".btn-remove-family" ).bind( "click", function() {
+                    $(this).parent().prev('input').val(0);
+                    verifySum( $(this).parent().prev('input') , 1 )
+                    $(this).closest('li').remove();
+                    
+                });
+                $('#approval-product-modal').modal('toggle');
             }
             else
             {
-                bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+                bootboxMessage( response );
             }
         });
     }

@@ -27,11 +27,10 @@ class FondoInstitucional extends Eloquent
 
 	public static function getSubFondo()
 	{
-		return DB::table( TB_FONDO_INSTITUCION.' f' )
-            ->select( "fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo - f.retencion saldo_disponible' , 'f.id' , '\'AG\' tipo' )
-            ->leftJoin( TB_FONDO_CATEGORIA_SUB.' fsc' , 'f.subcategoria_id' , '=' , 'fsc.id' )
-            ->leftJoin( TB_FONDO_CATEGORIA.' fc' , 'fsc.id_fondo_categoria' , '=' , 'fc.id' )
-            ->where( 'trim( fsc.tipo )' , FONDO_SUBCATEGORIA_INSTITUCION )->get();
+		return  FondoInstitucional::whereHas( 'subcategoria' , function( $query )
+	            {
+	            	$query->where( 'trim( tipo )' , 'I' );
+	            })->get();
     }
 
     protected static function order()
@@ -63,5 +62,11 @@ class FondoInstitucional extends Eloquent
 	{
 		return $this->SubCategoria->descripcion;
 	}
+
+	public function getDetailNameAttribute()
+    {
+    	$subCategory = $this->subCategoria;
+        return $subCategory->categoria->descripcion . ' | ' . $subCategory->descripcion;
+    }
 
 }

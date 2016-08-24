@@ -69,4 +69,10 @@ class FondoGerProd extends Eloquent
 		return $this->subCategoria->descripcion . ' | ' . $this->marca->descripcion . ' S/.' . $this->saldo_disponible ;
 	}
 
+	public function getDetailNameAttribute()
+    {
+    	$subCategory = $this->subCategoria;
+        return $this->marca->descripcion . ' | ' . $subCategory->categoria->descripcion . ' | ' . $subCategory->descripcion;
+    }
+
 }
