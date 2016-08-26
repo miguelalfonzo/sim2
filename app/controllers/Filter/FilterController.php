@@ -118,6 +118,11 @@ class FilterController
 		return $this->rolFilter( [ ASIS_GER ] );
 	}
 
+	public function estudio()
+	{
+		return $this->rolFilter( [ ESTUD ] );
+	}
+
 	public function process()
 	{
 		return $this->rolFilter( [ REP_MED , SUP , GER_PROD , GER_PROM , GER_COM , GER_GER , CONT , TESORERIA , ASIS_GER , 'A' ] );

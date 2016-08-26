@@ -196,7 +196,10 @@
 			this.drpSpan.html(this.dateRangePickerStartDate.format('LL') + ' - ' + this.dateRangePickerEndDate.format('LL'));
 			this.drp.daterangepicker(this.dateRangePickerOption, this.dateRangePickerCallback);
 			// GBREPORTS.setAutoResize();
-			this.getReports();
+			if( $( ".report_menubar_option" ).length != 0 )
+			{
+				this.getReports();
+        	}
         },
         setMenuBarReports: function(reportsList) {
             this.reportsArray = reportsList;
@@ -216,19 +219,24 @@
         getReports: function(callbacks) {
 			var url = URL_BASE + "reports/getUserReports";
             var gbReportsObject = this;
-            $.ajax({
-				url        : url,
-				ContentType: gbReportsObject.contentTypeAjax,
-				cache      : false
-            }).done(function(dataResult) {
-				if(dataResult.status == 'OK'){
-					if(typeof(dataResult.data) != 'undefined'){
-						$(".report_menubar_option").not(".new").remove();
-						gbReportsObject.setMenuBarReports(dataResult.data);
+            $.ajax(
+            {
+				url         : url,
+				ContentType : gbReportsObject.contentTypeAjax,
+				cache       : false
+            }).done( function( response )
+            {
+				if( response.status == 'OK' )
+				{
+					if( typeof( response.data ) != 'undefined' )
+					{
+						$( ".report_menubar_option" ).not(".new").remove();
+						gbReportsObject.setMenuBarReports( response.data);
 					}
 				}
-				else{
-					bootbox.alert(dataResult.message);
+				else
+				{
+					bootboxMessage( response );
 				}
             });
         },

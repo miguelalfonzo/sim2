@@ -919,7 +919,7 @@ class SolicitudeController extends BaseController
                     $solDetalle->save();
                 }
 
-                if ( $solicitud->id_estado != APROBADO ) 
+                if( $solicitud->id_estado != APROBADO ) 
                 {
                     $familiesId = $solicitud->products->lists( 'id_producto' );
                     

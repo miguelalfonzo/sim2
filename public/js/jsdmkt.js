@@ -1528,6 +1528,7 @@ function seeker( element , name , url )
             else if ( dataset == 'institutions')
             {
                 $( this ).attr( 'disabled' , true ).attr( 'data-cod' , suggestion.value ).parent().parent().parent().addClass( 'has-success' );
+                $( this ).parent().parent().find('.edit-repr').fadeIn();
             }
             else if ( dataset == 'clients' )
             {

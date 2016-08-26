@@ -263,12 +263,22 @@
         Route::post( 'get-client-view' , 'Source\Seeker@getClientView');
     });
 
+    Route::group( array( 'before' => 'estudio' ) , function()
+    {
+        Route::get( 'view-sup-rep' , 'Synchro\SynchroController@viewSupRep' );
+        Route::post( 'update-sup-rep' , 'Synchro\SynchroController@updateSupRep' );
+
+        Route::group( [ 'namespace' => 'PPTO' ] , function()
+        {
+            Route::get( 'view-ppto'    , 'PPTOController@view' );
+            Route::post( 'upload-ppto' , 'PPTOController@upload' );
+            Route::post( 'upload-ppto-sup' , 'PPTOController@uploadCategoryFamilyUser' );
+        });
+    });
 
     Route::group( array( 'before' => 'sys_user' ) , function()
     {
         Route::get( 'show_user' , 'Dmkt\SolicitudeController@showUser' );
-        Route::get( 'view-sup-rep' , 'Synchro\SynchroController@viewSupRep' );
-        Route::post( 'update-sup-rep' , 'Synchro\SynchroController@updateSupRep' );
     });
 
     Route::group( array('before' => 'process_user' ) , function ()

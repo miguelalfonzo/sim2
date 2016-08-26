@@ -32,6 +32,8 @@ use \System\FondoMktHistory;
 use \Devolution\Devolution;
 use \Devolution\DevolutionHistory;
 use \Event\Event;
+
+use \PPTO\PPTOSupervisor;
 	
 	//SAVE USER_ID FOR CREATED_BY & UPDATED_BY
 	Solicitud::observe(				new Transaction());
@@ -60,8 +62,11 @@ use \Event\Event;
 	Devolution::observe( 			new Transaction());
 	DevolutionHistory::observe(     new Transaction());
 	Event::observe( 				new Transaction());
-	//FileStorage::observe(			new Transaction());
+	//FileStorage::observe(			new Transaction())
+
+	PPTOSupervisor::observe(        new Transaction());;
 	
 	//SOFT DELETE
 	Activity::observe(          	new SoftDelete());
 	TemporalUser::observe(      	new SoftDelete());
+	PPTOSupervisor::observe(        new Transaction());

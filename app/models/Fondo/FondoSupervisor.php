@@ -109,4 +109,13 @@ class FondoSupervisor extends Eloquent
 		return $supFunds->get();
 	}
 
+	protected function getUnique( $year , $category , $userId , $familyId )
+	{
+		return FondoSupervisor::where( 'anio' , $year )
+			->where( 'subcategoria_id' , $category )
+			->where( 'supervisor_id' , $userId )
+			->where( 'marca_id' , $familyId )
+			->first();
+	}
+
 }
