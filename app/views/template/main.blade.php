@@ -152,7 +152,7 @@
                                             <li><a href="{{ URL::to( 'report/sup/view/Fondo_Supervisor' ) }}">Reporte de Fondos de Supervisor</a></li>
                                         @elseif( Auth::user()->type == ESTUD )
                                             <li><a href="{{ URL::to( 'view-sup-rep' ) }}">Syncronizacion</a></li>
-                                            <li><a href="">Presupuesto</a></li>
+                                            <li><a href="{{ URL::to( 'view-ppto' ) }}">Presupuesto</a></li>
                                         @endif
                                     </ul>
                                 </li>

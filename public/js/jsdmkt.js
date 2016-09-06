@@ -1769,8 +1769,19 @@ function bootboxMessage( response )
     {
         colorClass = 'text-info';
     }
-    bootbox.alert( '<h4 class="' + colorClass + '">' + response.Description + '</h4>' );
 
+    var listgroup = '';
+    var list = response.List;
+    if( typeof list != 'undefined' )
+    {
+        listgroup = '<ul class="list-group">';
+        list.Detail.forEach( function( value )
+        {
+            listgroup += '<li class="list-group-item ' + list.Class + '">' + value + '</li>'; 
+        });
+        listgroup += '</ul>';
+    }
+    bootbox.alert( '<h4 class="' + colorClass + '">' + response.Description + '</h4>' + listgroup );
 }
 
 //Validate send register solicitude

@@ -265,14 +265,17 @@
 
     Route::group( array( 'before' => 'estudio' ) , function()
     {
-        Route::get( 'view-sup-rep' , 'Synchro\SynchroController@viewSupRep' );
-        Route::post( 'update-sup-rep' , 'Synchro\SynchroController@updateSupRep' );
-
+        Route::group( [ 'namespace' => 'Synchro' ] , function()
+        {
+            Route::get( 'view-sup-rep' , 'SynchroController@viewSupRep' );
+            Route::post( 'update-sup-rep' , 'SynchroController@updateSupRep' );
+        });
         Route::group( [ 'namespace' => 'PPTO' ] , function()
         {
             Route::get( 'view-ppto'    , 'PPTOController@view' );
             Route::post( 'upload-ppto' , 'PPTOController@upload' );
             Route::post( 'upload-ppto-sup' , 'PPTOController@uploadCategoryFamilyUser' );
+            Route::post( 'load-ppto' , 'PPTOController@loadPPTO' );
         });
     });
 

@@ -10,7 +10,7 @@ class PPTOSupervisor extends Eloquent
 	protected $table      = 'PPTO_SUPERVISOR';
 	protected $primaryKey = 'id';
 
-	protected function nextId()
+	public function nextId()
 	{
 		$register = PPTOSupervisor::orderBy( 'id' , 'DESC' )->first();
 		if( is_null( $register ) )
@@ -67,6 +67,38 @@ class PPTOSupervisor extends Eloquent
 		$this->marca_id        = $data->family_id;
 		$this->monto           = $data->amount;
 		$this->save();
+	}
+
+	public function getCurrentPPTO( $year )
+	{
+		$version = $this->nextVersion( $year );
+		return PPTOSupervisor::where( 'anio' , $year )->where( 'version' , $version - 1 )->get();
+	}
+
+	public function getPPTO( $year )
+	{
+		$version = $this->nextVersion( $year );
+		return PPTOSupervisor::select( [ 'id' , 'subcategoria_id' , 'supervisor_id' , 'marca_id' , 'monto' ] )
+			->where( 'version' , $version - 1 )
+			->with( [ 'subCategory' , 'family' , 'personal'] )
+			->orderBy( 'subcategoria_id' , 'ASC' )
+			->orderBy( 'supervisor_id' , 'ASC' )
+			->orderBy( 'marca_id' , 'ASC' )->get();
+	}
+
+	public function subCategory()
+	{
+		return $this->belongsTo( 'Fondo\FondoSubCategoria' , 'subcategoria_id' );
+	}
+
+	public function family()
+	{
+		return $this->belongsTo( 'Dmkt\Marca' , 'marca_id' );
+	}
+
+	public function personal()
+	{
+		return $this->hasOne( 'Users\Personal' ,  'user_id' , 'supervisor_id' );
 	}
 
 }

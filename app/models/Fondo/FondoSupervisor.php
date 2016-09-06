@@ -2,9 +2,10 @@
 
 namespace Fondo;
 
-use \Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletingTrait;
+use \Eloquent;
 use \Auth;
+use \DB;
 
 class FondoSupervisor extends Eloquent
 {
@@ -13,6 +14,19 @@ class FondoSupervisor extends Eloquent
 
 	protected $table      = TB_FONDO_SUPERVISOR;
 	protected $primaryKey = 'id';
+
+	public function nextId()
+	{
+		$register = FondoSupervisor::orderBy( 'id' , 'DESC' )->first();
+		if( is_null( $register ) )
+		{
+			return 1;
+		}
+		else
+		{
+			return $register->id + 1;
+		}
+	}
 
 	protected function getSaldoDisponibleAttribute()
 	{
@@ -117,5 +131,15 @@ class FondoSupervisor extends Eloquent
 			->where( 'marca_id' , $familyId )
 			->first();
 	}
+
+	protected function updateFundAmount( $fundId , $diffAmount )
+    {
+        if( ! is_numeric( $diffAmount ) )
+        {
+            return -1;
+        }
+        return FondoSupervisor::where( 'id' , $fundId )
+            ->update( [ 'saldo' => DB::raw( 'saldo + ' . $diffAmount ) ] ); 
+    }
 
 }

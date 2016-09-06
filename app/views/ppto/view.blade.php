@@ -37,7 +37,7 @@
 			</div>
 
 			<div class="form-group col-lg-2">
-				<label>Categoía</label>
+				<label>Categoría</label>
 				<select class="form-control ppto-category">   
 					@foreach( $categories as $category )
 						@if( $category->tipo == SUP )
@@ -56,29 +56,18 @@
 				<input type="file" class="file" accept=" application/vnd.ms-excel , application/vnd.openxmlformats-officedocument.spreadsheetml.sheet , application/vnd.ms-excel.sheet.macroEnabled.12 " style="display:none">	
 			</div>
 
-			<div class="form-group col-lg-2">
+			<div class="form-group col-lg-1">
 				<button type="button" class="btn btn-primary load-ppto" style="margin-top:24px" >Cargar</button>
 			</div>
 
+			<div class="form-group col-lg-1">
+				<button type="button" class="btn btn-primary search-ppto" style="margin-top:24px" >
+					<span class="glyphicon glyphicon-search"></span>
+				</button>
+			</div>
+
 			<div class="container-fluid">
-				<table class="table table-striped table-hover table-bordered">
-					<thead>
-						<tr>
-							<th>Categoría</th>
-							<th>Supervisor</th>
-							<th>Familia</th>
-							<th>Monto</th>
-							<th></th>
-						</tr>
-					</thead>
-					<tbody>
-						{{-- @foreach( $rpta[ 'Data' ] as $row )
-							<tr>
-								<td>{{ $row->supervisor }}</td>
-								<td>{{ $row->visitador }} </td>
-							</tr>
-						@endforeach --}}
-					</tbody>
+				<table id="table-ppto-1" class="table table-striped table-hover table-bordered" cellspacing="0" width="100%">
 				</table>
 			</div>
 		</div>
@@ -99,7 +88,7 @@
 			</div>
 
 			<div class="form-group col-lg-2">
-				<label>Categoía</label>
+				<label>Categoría</label>
 				<select class="form-control ppto-category"> 
 					@foreach( $categories as $category )
 						@if( in_array( $category->tipo , [ GER_PROD , GER_PROM ] ) ) 
@@ -118,8 +107,14 @@
 				<input type="file" class="file" accept=" application/vnd.ms-excel , application/vnd.openxmlformats-officedocument.spreadsheetml.sheet , application/vnd.ms-excel.sheet.macroEnabled.12 " style="display:none">	
 			</div>
 
-			<div class="form-group col-lg-2">
+			<div class="form-group col-lg-1">
 				<button type="button" class="btn btn-primary load-ppto" style="margin-top:24px" >Cargar</button>
+			</div>
+
+			<div class="form-group col-lg-1">
+				<button type="button" class="btn btn-primary search-ppto" style="margin-top:24px" >
+					<span class="glyphicon glyphicon-search"></span>
+				</button>
 			</div>
 
 			<div class="container-fluid">
@@ -163,21 +158,77 @@
 				<input id="ppto-amount" class="form-control">
 			</div>
 
-			<div class="form-group col-lg-2">
+			<div class="form-group col-lg-1">
 				<button type="button" class="btn btn-primary load-ppto" style="margin-top:24px" >Cargar</button>
+			</div>
+
+			<div class="form-group col-lg-1">
+				<button type="button" class="btn btn-primary search-ppto" style="margin-top:24px" >
+					<span class="glyphicon glyphicon-search"></span>
+				</button>
 			</div>
 
 		</div>
 	</div>
 
 	<script>
-		zzz = 11;
-		var file = $( '.file' );
+		
+		var file     = $( '.file' );
 		var filename = $( '.filename' );
+
+		function loadPPTO( type , year )
+		{
+			$.ajax(
+			{
+				type : 'POST',
+				url  : 'load-ppto',
+				data : 
+				{
+					_token : GBREPORTS.token,
+					type   : type,
+					year   : year
+				}
+			}).fail( function( statusCode , errorThrown )
+			{
+				ajaxError( statusCode , errorThrown );
+			}).done( function( response )
+			{
+				var dataTable = $( '#table-ppto-' + type ).DataTable(
+	            {
+	                columns         : response.columns,
+	                data            : response.Data ,
+	                dom             : "<'row'<'col-xs-6'><'col-xs-6 pull-right'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
+	                destroy         : true,
+	                pageLength      : 10,
+	                stateSave       : true,
+	                scrollX         : true,
+	                language        :
+	                {
+	                    search       : 'Buscar',
+	                    zeroRecords  : 'No hay ' + 'solicitudes' ,
+	                    infoEmpty    : 'No ha encontrado ' + 'solicitudes' +' disponibles',
+	                    info         : 'Mostrando _END_ de _TOTAL_ ' + 'solicitudes' ,
+	                    lengthMenu   : "Mostrando _MENU_ registros por página",
+	                    infoEmpty    : "No ha encontrado información disponible",
+	                    infoFiltered : "(filtrado de _MAX_ regitros en total)",
+	                    paginate     : 
+	                    {
+	                        sPrevious : 'Anterior',
+	                        sNext     : 'Siguiente'
+	                    }
+	                },
+	                createdRow: function( row , data , dataIndex )
+	                {
+	                    $( row ).append( '<input type="hidden" class="ppto-id" value="' + data.id + '">' );
+	                }
+	            });
+			});
+		}
 
 		$( document ).ready( function()
 		{
 			$( '#ppto-amount' ).numeric( { negative : false } );
+			loadPPTO( 1 , $( '#tab-ppto-sup .ppto-year' ).val() );
     	});
 
 		$( '.open-file' ).click( function()
@@ -221,18 +272,13 @@
 				dataType: 'json',
 			}).fail( function( statusCode , errorThrown )
 			{
-				console.log( statusCode );
-				console.log( errorThrown );
+				ajaxError( statusCode , errorThrown );
 			}).done( function( response )
 			{
 				if( response.Status == ok )
 				{
 					response.Description = 'Se cargo el ppto correctamente';
 				}
-				/*else
-				{	
-					bootbox.alert( 'error' );
-				}*/
 				bootboxMessage( response );
 			});
 		});
