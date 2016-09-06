@@ -7,21 +7,26 @@ use Illuminate\Auth\Reminders\RemindableInterface;
 
 class User extends Eloquent implements UserInterface, RemindableInterface {
 
-	use UserTrait, RemindableTrait;
+    use UserTrait, RemindableTrait;
 
-	/**
-	 * The database table used by the model.
-	 *
-	 * @var string
-	 */    
+    /**
+     * The database table used by the model.
+     *
+     * @var string
+     */    
     protected $table = TB_USUARIOS;
 
-	/**
-	 * The attributes excluded from the model's JSON form.
-	 *
-	 * @var array
-	 */
-	protected $hidden = array( 'password', 'remember_token' , 'passbago' );
+    /**
+     * The attributes excluded from the model's JSON form.
+     *
+     * @var array
+     */
+    protected $hidden = array( 'password', 'remember_token' );
+
+    function getUpperUsernameAttribute()
+    {
+        return mb_strtoupper( $this->username );
+    } 
 
     function lastId()
     {
@@ -89,7 +94,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 
     protected function bagoSimApp()
     {
-        return $this->hasOne( 'Users\BagoUserSystem' , 'usicodusu' , 'UPPER( username )' )->where( 'usicodsis' , '@SIM' );
+        return $this->hasOne( 'Users\BagoUserSystem' , 'usicodusu' , 'upper_username' )->where( 'usicodsis' , '@SIM' );
     }
 
     public function getName()
