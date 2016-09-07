@@ -47,13 +47,22 @@ class PPTOController extends BaseController
         {
             $PPTOSupModel = new PPTOSupervisor;
             $data = $PPTOSupModel->getPPTO( $inputs[ 'year' ] );
+
+            $options = 
+                '<button type="button" class="btn btn-success btn-xs edit-ppto-row" style="outline:none">' +
+                    '<span class="glyphicon glyphicon-pencil"></span>' +
+                '</button>' +
+                '<button type="button" class="btn btn-success btn-xs save-ppto-row" style="outline:none;display:none">' +
+                    '<span class="glyphicon glyphicon-disk"></span>' +
+                '</button>';
+
             $columns =
             [
                 [ 'title' => 'Categoría' , 'data' => 'sub_category.descripcion' , 'className' => 'text-center' ],
                 [ 'title' => 'Supervisor' , 'data' => 'personal.nombres' , 'className' => 'text-center' ],
                 [ 'title' => 'Familia' , 'data' => 'family.descripcion' , 'className' => 'text-center' ],
-                [ 'title' => 'Monto' , 'data' => 'monto' ,  'className' => 'text-center' ],
-                [ 'title' => '' , 'defaultContent' => '<button type="button" class="btn btn-success btn-xs" style="outline:none"><span class="glyphicon glyphicon-pencil"></span></button>' , 'className' => 'text-center' ],
+                [ 'title' => 'Monto' , 'data' => 'monto' ,  'className' => 'text-center monto-cell' ],
+                [ 'title' => '' , 'defaultContent' => '<button type="button" class="btn btn-success btn-xs edit-ppto-row" style="outline:none"><span class="glyphicon glyphicon-pencil"></span></button>' , 'className' => 'text-center option-cell' ],
             ];
             $rpta = $this->setRpta( $data );
             $rpta[ 'columns' ] = $columns;

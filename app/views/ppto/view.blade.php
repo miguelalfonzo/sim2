@@ -231,6 +231,15 @@
 			loadPPTO( 1 , $( '#tab-ppto-sup .ppto-year' ).val() );
     	});
 
+    	$( document ).off( 'click' , '.edit-ppto-row' );
+    	$( document ).on( 'click' , '.edit-ppto-row' , function()
+    	{
+    		var tr = $( this ).closest( 'tr' );
+    		var montoCell = tr.find( '.monto-cell' );
+    		montoCell.html( '<input type="text" value="' + montoCell.text().trim() + '" class="form-control"/>' );
+    		var optionCell = tr.find( '.option-cell' ); 
+    	}
+
 		$( '.open-file' ).click( function()
 		{
 			$( this ).closest( '.form-group' ).find( 'input[ type=file ]' ).click();
