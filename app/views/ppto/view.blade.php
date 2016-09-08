@@ -61,15 +61,13 @@
 			</div>
 
 			<div class="form-group col-lg-1">
-				<button type="button" class="btn btn-primary search-ppto" style="margin-top:24px" >
+				<button type="button" class="btn btn-primary search-ppto ladda-button" data-style="zoom-in" style="margin-top:24px" >
 					<span class="glyphicon glyphicon-search"></span>
 				</button>
 			</div>
 
-			<div class="container-fluid">
 				<table id="table-ppto-1" class="table table-striped table-hover table-bordered" cellspacing="0" width="100%">
 				</table>
-			</div>
 		</div>
 
 		<div class="tab-pane fade" id="tab-ppto-ger" data-type="2">
@@ -112,7 +110,7 @@
 			</div>
 
 			<div class="form-group col-lg-1">
-				<button type="button" class="btn btn-primary search-ppto" style="margin-top:24px" >
+				<button type="button" class="btn btn-primary search-ppto ladda-button" data-style="zoom-in" style="margin-top:24px" >
 					<span class="glyphicon glyphicon-search"></span>
 				</button>
 			</div>
@@ -163,10 +161,13 @@
 			</div>
 
 			<div class="form-group col-lg-1">
-				<button type="button" class="btn btn-primary search-ppto" style="margin-top:24px" >
+				<button type="button" class="btn btn-primary search-ppto ladda-button" data-style="zoom-in" style="margin-top:24px" >
 					<span class="glyphicon glyphicon-search"></span>
 				</button>
 			</div>
+
+			<table id="table-ppto-3" class="table table-striped table-hover table-bordered" cellspacing="0" width="100%" style="width:100%">
+			</table>
 
 		</div>
 	</div>
@@ -178,6 +179,20 @@
 
 		function loadPPTO( type , year )
 		{
+			if( type == 1 )
+			{
+				var spin = Ladda.create( $( '#tab-ppto-sup' ).find( '.search-ppto' )[ 0 ] );
+			}
+			else if( type == 2 )
+			{
+				var spin = Ladda.create( $( '#tab-ppto-ger' ).find( '.search-ppto' )[ 0 ] );
+			}
+			else if( type == 3 )
+			{
+				var spin = Ladda.create( $( '#tab-ppto-ins' ).find( '.search-ppto' )[ 0 ] );
+			}
+			spin.start();
+
 			$.ajax(
 			{
 				type : 'POST',
@@ -193,6 +208,7 @@
 				ajaxError( statusCode , errorThrown );
 			}).done( function( response )
 			{
+				spin.stop();
 				var dataTable = $( '#table-ppto-' + type ).DataTable(
 	            {
 	                columns         : response.columns,
@@ -229,7 +245,22 @@
 		{
 			$( '#ppto-amount' ).numeric( { negative : false } );
 			loadPPTO( 1 , $( '#tab-ppto-sup .ppto-year' ).val() );
+			loadPPTO( 3 , $( '#tab-ppto-ins .ppto-year' ).val() );
     	});
+
+    	$( 'a[data-toggle="tab"]').on( 'shown.bs.tab', function()
+    	{
+    		$.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
+    	});
+
+    	$( '.search-ppto' ).click( function()
+    	{
+    		var panel = $( this ).closest( '.tab-pane' );
+    		var type = panel.attr( 'data-type' );
+    		var year = panel.find( '.ppto-year' ).val();
+    		loadPPTO( type , year );
+    	});
+
 
     	$( document ).off( 'click' , '.edit-ppto-row' );
     	$( document ).on( 'click' , '.edit-ppto-row' , function()
@@ -238,7 +269,7 @@
     		var montoCell = tr.find( '.monto-cell' );
     		montoCell.html( '<input type="text" value="' + montoCell.text().trim() + '" class="form-control"/>' );
     		var optionCell = tr.find( '.option-cell' ); 
-    	}
+    	});
 
 		$( '.open-file' ).click( function()
 		{
@@ -255,15 +286,17 @@
 			var panel = $( this ).closest( '.tab-pane' );
 			var data = new FormData();
 			var type = panel[ 0 ].dataset.type;
+			var year = panel.find( '.ppto-year' ).val();
+			
 			if( type == 3 )
 			{
-				data.append( 'year'  , panel.find( '.ppto-year' ).val() );
+				data.append( 'year'  , year );
 				data.append( 'amount' , panel.find( '#ppto-amount' ).val() );
 			}
 			else
 			{
 				data.append( 'file' , panel.find( '.file' )[ 0 ].files[ 0 ] );
-				data.append( 'year'  , panel.find( '.ppto-year' ).val() );
+				data.append( 'year'  , year );
 				data.append( 'category'  , panel.find( '.ppto-category' ).val() );	
 			}
 			data.append( 'type' , type );
@@ -287,6 +320,7 @@
 				if( response.Status == ok )
 				{
 					response.Description = 'Se cargo el ppto correctamente';
+					loadPPTO( type , year )
 				}
 				bootboxMessage( response );
 			});
