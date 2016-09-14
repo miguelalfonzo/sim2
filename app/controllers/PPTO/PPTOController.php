@@ -5,7 +5,7 @@ namespace PPTO;
 use \BaseController;
 
 use \Users\Personal;
-use \PPTO\PPTOInstitucional;
+use \PPTO\PPTOInstitucion;
 use \PPTO\PPTOSupervisor;
 use \PPTO\PPTOGerente;
 use \Fondo\FondoMktPeriodHistory;
@@ -29,7 +29,7 @@ use \Exception;
 class PPTOController extends BaseController
 {    
     const SupPPTOType  = 1;
-    const GenPPTOType  = 2;
+    const GerPPTOType  = 2;
     const InsPPTOType  = 3;
 	
     public function view()
@@ -48,17 +48,20 @@ class PPTOController extends BaseController
         $inputs = Input::all();
         
         $options = 
-            '<button type="button" class="btn btn-success btn-xs edit-ppto-row" style="outline:none">' .
+            '<button type="button" class="btn btn-info btn-xs edit-ppto-row">' .
                 '<span class="glyphicon glyphicon-pencil"></span>' .
             '</button>' .
-            '<button type="button" class="btn btn-success btn-xs save-ppto-row" style="outline:none;display:none">' .
-                '<span class="glyphicon glyphicon-disk"></span>' .
+            '<button type="button" class="btn btn-success btn-xs save-ppto-row" style="display:none">' .
+                '<span class="glyphicon glyphicon-ok"></span>' .
+            '</button>' .
+            '<button type="button" class="btn btn-info btn-xs cancel-ppto-row" style="display:none">' .
+                '<span class="glyphicon glyphicon-share"></span>' .
             '</button>';
     
         if( $inputs[ 'type' ] == Self::SupPPTOType )
         {
             $PPTOSupModel = new PPTOSupervisor;
-            $data = $PPTOSupModel->getPPTO( $inputs[ 'year' ] );
+            $data = $PPTOSupModel->getPPTO( $inputs[ 'year' ] , $inputs[ 'category' ] );
             $columns =
             [
                 [ 'title' => 'Categoría' , 'data' => 'sub_category.descripcion' , 'className' => 'text-center' ],
@@ -68,23 +71,21 @@ class PPTOController extends BaseController
                 [ 'title' => '' , 'defaultContent' => $options , 'className' => 'text-center option-cell' ],
             ];
         }
-        elseif( $inputs[ 'type' ] == Self::GenPPTOType )
+        elseif( $inputs[ 'type' ] == Self::GerPPTOType )
         {
             $PPTOGenModel = new PPTOGerente;
-            $data = $PPTOGenModel->getPPTO( $inputs[ 'year' ] );
+            $data = $PPTOGenModel->getPPTO( $inputs[ 'year' ] , $inputs[ 'category' ] );
             $columns =
             [
                 [ 'title' => 'Categoría' , 'data' => 'sub_category.descripcion' , 'className' => 'text-center' ],
-                [ 'title' => 'Supervisor' , 'data' => 'personal.nombres' , 'className' => 'text-center' ],
                 [ 'title' => 'Familia' , 'data' => 'family.descripcion' , 'className' => 'text-center' ],
                 [ 'title' => 'Monto' , 'data' => 'monto' ,  'className' => 'text-center monto-cell' ],
                 [ 'title' => '' , 'defaultContent' => $options , 'className' => 'text-center option-cell' ],
             ];
-
         }
         elseif( $inputs[ 'type' ] == Self::InsPPTOType )
         {
-            $PPTOInsModel = new PPTOInstitucional;
+            $PPTOInsModel = new PPTOInstitucion;
             $data = $PPTOInsModel->getPPTO( $inputs[ 'year' ] );
             $columns =
             [
@@ -101,6 +102,34 @@ class PPTOController extends BaseController
         return $rpta;
     }
 
+    public function update()
+    {
+        try
+        {
+            $inputs = Input::all();
+            $middleRpta = $this->validateUpdate( $inputs );
+            if( $middleRpta[ status ] == ok )
+            {
+                $pptoProcedureModel = new PPTOProcedure;
+                switch( $inputs[ 'type' ] )
+                {
+                    case Self::GerPPTOType:
+                        return $pptoProcedureModel->gerUpdateProcedure( $inputs[ 'ppto_id' ] , $inputs[ 'monto' ] );
+                    default:
+                        return $this->warningException( 'Sin implementar' , __FUNCTION__ , __LINE__ , __FILE__ );
+                }
+            }
+            else
+            {
+                return $middleRpta;
+            }   
+        }
+        catch( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
+    }
+
     public function upload()
     {
         try 
@@ -108,7 +137,7 @@ class PPTOController extends BaseController
             $inputs = Input::all();
             $year   = $inputs[ 'year' ];
             
-            if( ! isset( $inputs[ 'type' ] ) || ! in_array( $inputs[ 'type' ] , [ Self::SupPPTOType , Self::GenPPTOType , Self::InsPPTOType ] ) )
+            if( ! isset( $inputs[ 'type' ] ) || ! in_array( $inputs[ 'type' ] , [ Self::SupPPTOType , Self::GerPPTOType , Self::InsPPTOType ] ) )
             {
                 return $this->warningException( 'Carga no identificada' , __FUNCTION__ , __LINE__ , __FILE__ );
             }
@@ -120,12 +149,12 @@ class PPTOController extends BaseController
                 switch( $inputs[ 'type' ] )
                 {
                     case Self::SupPPTOType:
-                        $fileRows = Excel::selectSheetsByIndex( 0 )->load( $inputs[ 'file' ] )->get();      
-                        return $this->categoryFamilyUserUploadProcess( $fileRows );
-                    case Self::GenPPTOType:
-                        return $this->categoryFamilyUploadProcess( $inputs[ 'file' ] , $year );  
+                        return $this->categoryFamilyUserUploadProcess( $inputs[ 'file' ] , $year , $inputs[ 'category' ] );
+                    case Self::GerPPTOType:
+                        return $this->categoryFamilyUploadProcess( $inputs[ 'file' ] , $year , $inputs[ 'category' ] );  
                     case Self::InsPPTOType:
-                        return $this->categoryUploadProcess( $inputs[ 'amount' ] , $year , 31 );
+                        $pptoProcedureModel = new PPTOProcedure;
+                        return $pptoProcedureModel->insPPTOTransaction( $inputs[ 'amount' ] , $year );
                     default:
                         return $this->warningException( 'Sin implementar' , __FUNCTION__ , __LINE__ , __FILE__ );
                 }
@@ -141,6 +170,7 @@ class PPTOController extends BaseController
 
     public function uploadValidate( $inputs )
     {
+
         $rules =
         [
             'year' => 'required|numeric|min:' . $this->getStartYear(),
@@ -148,21 +178,16 @@ class PPTOController extends BaseController
 
         $messages =
         [
-            'year.min' => 'El año ' . $inputs[ 'year' ] . ' es menor que el actual'
+            'year.min' => 'El año ' . $inputs[ 'year' ] . ' es menor que el actual',
         ];
 
         $validator = Validator::make( $inputs , $rules , $messages );
 
         $type = $inputs[ 'type' ];
-        
-        $validator->sometimes( [ 'category' ] , 'required|numeric|in:' . $this->typeCategories( $inputs[ 'type' ] ) , function() use( $type )
-        {
-            return in_array( $type , [ Self::SupPPTOType , Self::GenPPTOType ] );
-        });
 
         $validator->sometimes( [ 'file' ] , 'required|mimes:xls,xlsx' , function() use( $type )
         {
-            return in_array( $type , [ Self::SupPPTOType , Self::GenPPTOType ] );
+            return in_array( $type , [ Self::SupPPTOType , Self::GerPPTOType ] );
         });
 
         $validator->sometimes( [ 'amount' ] , 'required|numeric' , function() use( $type )
@@ -174,7 +199,9 @@ class PPTOController extends BaseController
         {
             return $this->warningException( $this->msgValidator( $validator ) , __FUNCTION__ , __FILE__ , __LINE__ );
         }
+        
         return $this->setRpta();
+
     }
 
     private function processUploadCategoryFamilyUser( $fileRows )
@@ -227,42 +254,59 @@ class PPTOController extends BaseController
         return $this->setRpta();
     }
 
-    private function categoryUploadProcess( $amount , $year , $category )
+    private function validateRowGer( $inputs , $familiesId )
     {
-        return PPTOProcedure::insProcedure( $amount , $year );
-        
-        $version  = PPTOInstitucional::nextVersion( $year );
-        $pptoLastInsRegister = PPTOInstitucional::getSameLast( $year , $category , $version -1 , $amount );
-        if( is_null( $pptoLastInsRegister ) )
+        $rules =
+        [
+            'monto'   => 'required|numeric|min:0',
+            'cod129'  => 'required|numeric|in:' . $familiesId ,
+        ];
+
+        $messages =
+        [
+            'cod129.in'  => 'La familia (codigo:' . $inputs[ 'cod129' ] . ') no figura en el PPTO de Ventas.'
+        ];
+
+        $validator = Validator::make( $inputs , $rules , $messages );
+        if( $validator->fails() )
         {
-            return PPTOProcedure::insProcedure( $amount , $year );
-        }
-        else
-        {
-            return $this->warningException( 'No se encontro diferencia en el monto cargado anteriormente' , __FUNCTION__ , __LINE__ , __FILE__ );
-        }
+            return $this->warningException( $this->msgValidator( $validator ) , __FUNCTION__ , __LINE__ , __FILE__ );
+        };
+        return $this->setRpta();
     }
 
-    private function categoryFamilyUploadProcess( $file , $year )
+    /*private function categoryUploadProcess( $amount , $year , $category )
     {
-        
+        return PPTOProcedure::insProcedure( $amount , $year );
+    }*/
+
+    private function categoryFamilyUploadProcess( $file , $year , $category )
+    {
         $fileData = Excel::selectSheetsByIndex( 0 )->load( $file )->get();
+
+        include( app_path() . '/models/Query/QueryProducts.php' );            
+        $familiesId = implode( $qryProducts->lists( 'id' ) , ',' );
 
         $uniqueArray = [];
         $warnings = [];
         foreach( $fileData as $key => $row )
         {
-            $compare = $row->categoria . '|' . $row->cod129; 
+            $middleRpta = $this->validateRowGer( $row->toArray() , $familiesId );
+            if( $middleRpta[ status ] != ok )
+            {
+                $warnings[] = 'Fila N° ' . ( $key + 2 ) . '. ' . $middleRpta[ description ];
+            }
+
             if( $key != 0 )
             {
-                $sameKey = array_search( $compare , $uniqueArray );
+                $sameKey = array_search( $row->cod129 , $uniqueArray );
                 if( $sameKey !== FALSE )
                 {
-                    $warnings[] = 'Los campos de CATEGORIA y COD129 son iguales en las filas N° ' . ( $sameKey + 2 ) . ' y ' . ( $key + 2 );
+                    $warnings[] = 'El campo COD129 es igual en las filas N° ' . ( $sameKey + 2 ) . ' y ' . ( $key + 2 );
                     unset( $uniqueArray[ $sameKey ] );
                 }
             }
-            $uniqueArray[] = $compare;
+            $uniqueArray[] = $row->cod129;
         }
 
         if( ! empty( $warnings ) )
@@ -272,25 +316,9 @@ class PPTOController extends BaseController
             return $rpta;
         }
 
-        \Log::info( $uniqueArray );
+        $pptoProcedure = new PPTOProcedure;
+        return $pptoProcedure->gerPPTOTransaction( $fileData , $year , $category );
 
-        \Log::info( $warnings );
-
-        return $this->setRpta();
-
-        $same = true;
-        foreach( $fileRows as $row )
-        {   
-            
-            $pptoLastGenRegister = PPTOGerente::getSameLast( $year , $category , $row->cod129 , $row->monto );
-        
-            if( is_null( $pptoLastGenRegister ) )
-            {
-                $same = false;
-            }
-        
-            $row->user_id   = $personRegister->user_id;
-        } 
     }
 
     public function categoryFamilyUserUploadProcess( $fileData , $year , $category )
@@ -473,7 +501,7 @@ class PPTOController extends BaseController
                     ->lists( 'id' );
             return implode( $fundCategoryIds , ',' );
         }
-        elseif( $type = Self::GenPPTOType )
+        elseif( $type = Self::GerPPTOType )
         {
             $fundCategoryIds = FondoSubCategoria::select( 'id' )
                     ->whereIn( 'trim( tipo )' , [ GER_PROD , GER_PROM ] )
@@ -481,6 +509,27 @@ class PPTOController extends BaseController
             return implode( $fundCategoryIds , ',' );  
         }
         return 0;
+    }
+
+    private function validateUpdate( $inputs )
+    {
+        $rules =
+        [
+            'monto'   => 'required|numeric|min:0'
+        ];
+
+        $messages =
+        [
+            'monto.numeric'  => 'El monto ingresado no es un valor numerico',
+            'monto.min'      => 'El monto debe ser mayor o igual a 0'
+        ];
+
+        $validator = Validator::make( $inputs , $rules , $messages );
+        if( $validator->fails() )
+        {
+            return $this->warningException( $this->msgValidator( $validator ) , __FUNCTION__ , __LINE__ , __FILE__ );
+        };
+        return $this->setRpta();
     }
 
 }

@@ -4,19 +4,18 @@ namespace PPTO;
 
 use \Eloquent;
 
-class PPTOSupervisor extends Eloquent
+class PPTOGerente extends Eloquent
 {
 
-	protected $table      = 'PPTO_SUPERVISOR';
+	protected $table      = 'PPTO_GERENTE';
 	protected $primaryKey = 'id';
 
-	public static function nextVersion( $year , $subCategory )
+	private function nextVersion( $year , $subCategory )
 	{
-		$register = PPTOSupervisor::select( 'max( version ) max_version' )
+		$register = PPTOGerente::select( 'max( version ) max_version' )
 			->where( 'anio' , $year )
 			->where( 'subcategoria_id' , $subCategory )
 			->first();
-			
 		if( is_null( $register ) )
 		{
 			return 1;
@@ -30,12 +29,11 @@ class PPTOSupervisor extends Eloquent
 	public function getPPTO( $year , $subCategory )
 	{
 		$version = $this->nextVersion( $year , $subCategory );
-		return PPTOSupervisor::select( [ 'id' , 'subcategoria_id' , 'marca_id' , 'supervisor_id' , 'monto' ] )
+		return PPTOGerente::select( [ 'id' , 'subcategoria_id' , 'marca_id' , 'monto' ] )
+			->with( [ 'subCategory' , 'family' ] )
+			->where( 'anio' , $year )
 			->where( 'version' , $version - 1 )
-			->with( [ 'subCategory' , 'family' , 'personal'] )
-			->orderBy( 'subcategoria_id' , 'ASC' )
-			->orderBy( 'supervisor_id' , 'ASC' )
-			->orderBy( 'marca_id' , 'ASC' )->get();
+			->get();
 	}
 
 	public function subCategory()
@@ -48,9 +46,5 @@ class PPTOSupervisor extends Eloquent
 		return $this->belongsTo( 'Dmkt\Marca' , 'marca_id' );
 	}
 
-	public function personal()
-	{
-		return $this->hasOne( 'Users\Personal' ,  'user_id' , 'supervisor_id' );
-	}
 
 }

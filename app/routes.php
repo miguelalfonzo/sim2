@@ -276,6 +276,7 @@
             Route::post( 'upload-ppto' , 'PPTOController@upload' );
             Route::post( 'upload-ppto-sup' , 'PPTOController@uploadCategoryFamilyUser' );
             Route::post( 'load-ppto' , 'PPTOController@loadPPTO' );
+            Route::post( 'update-ppto-row' , 'PPTOController@update' );
         });
     });
 

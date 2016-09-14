@@ -115,26 +115,9 @@
 				</button>
 			</div>
 
-			<div class="container-fluid">
-				<table class="table table-striped table-hover table-bordered">
-					<thead>
-						<tr>
-							<th>Categoría</th>
-							<th>Familia</th>
-							<th>Monto</th>
-							<th></th>
-						</tr>
-					</thead>
-					<tbody>
-						{{-- @foreach( $rpta[ 'Data' ] as $row )
-							<tr>
-								<td>{{ $row->supervisor }}</td>
-								<td>{{ $row->visitador }} </td>
-							</tr>
-						@endforeach --}}
-					</tbody>
-				</table>
-			</div>
+			<table id="table-ppto-2" class="table table-striped table-hover table-bordered" cellspacing="0" width="100%" style="width:100%">
+			</table>
+
 		</div>
 		<div class="tab-pane fade" id="tab-ppto-ins" data-type="3">
 			<div class="row">
@@ -177,32 +160,31 @@
 		var file     = $( '.file' );
 		var filename = $( '.filename' );
 
-		function loadPPTO( type , year )
+		function loadPPTO( tab )
 		{
-			if( type == 1 )
+			var type = tab.attr( 'data-type' );
+			var year = tab.find( '.ppto-year' ).val();
+			
+			var data =
 			{
-				var spin = Ladda.create( $( '#tab-ppto-sup' ).find( '.search-ppto' )[ 0 ] );
-			}
-			else if( type == 2 )
+				_token : GBREPORTS.token,
+				type   : type,
+				year   : year	
+			};
+
+			if( type != 3 )
 			{
-				var spin = Ladda.create( $( '#tab-ppto-ger' ).find( '.search-ppto' )[ 0 ] );
+				data.category = tab.find( '.ppto-category' ).val();
 			}
-			else if( type == 3 )
-			{
-				var spin = Ladda.create( $( '#tab-ppto-ins' ).find( '.search-ppto' )[ 0 ] );
-			}
+
+			var spin = Ladda.create( tab.find( '.search-ppto' )[ 0 ] );
 			spin.start();
 
 			$.ajax(
 			{
 				type : 'POST',
 				url  : 'load-ppto',
-				data : 
-				{
-					_token : GBREPORTS.token,
-					type   : type,
-					year   : year
-				}
+				data : data
 			}).fail( function( statusCode , errorThrown )
 			{
 				ajaxError( statusCode , errorThrown );
@@ -244,8 +226,9 @@
 		$( document ).ready( function()
 		{
 			$( '#ppto-amount' ).numeric( { negative : false } );
-			loadPPTO( 1 , $( '#tab-ppto-sup .ppto-year' ).val() );
-			loadPPTO( 3 , $( '#tab-ppto-ins .ppto-year' ).val() );
+			loadPPTO( $( '#tab-ppto-sup' ) );
+			loadPPTO( $( '#tab-ppto-ger' ) );
+			loadPPTO( $( '#tab-ppto-ins' ) );
     	});
 
     	$( 'a[data-toggle="tab"]').on( 'shown.bs.tab', function()
@@ -256,19 +239,73 @@
     	$( '.search-ppto' ).click( function()
     	{
     		var panel = $( this ).closest( '.tab-pane' );
-    		var type = panel.attr( 'data-type' );
-    		var year = panel.find( '.ppto-year' ).val();
-    		loadPPTO( type , year );
+    		loadPPTO( panel );
     	});
-
 
     	$( document ).off( 'click' , '.edit-ppto-row' );
     	$( document ).on( 'click' , '.edit-ppto-row' , function()
     	{
-    		var tr = $( this ).closest( 'tr' );
+    		var elem = $( this );
+    		elem.fadeOut();
+    		var tr = elem.closest( 'tr' );
     		var montoCell = tr.find( '.monto-cell' );
-    		montoCell.html( '<input type="text" value="' + montoCell.text().trim() + '" class="form-control"/>' );
-    		var optionCell = tr.find( '.option-cell' ); 
+    		var inputs = 
+    			'<input type="text" value="' + montoCell.text().trim() + '" class="form-control"/>' +
+    			'<input type="hidden" value="' + montoCell.text().trim() + '" class="form-control monto-ppto-row"/>'
+    		
+    		montoCell.html( inputs );
+    		tr.find( '.save-ppto-row' ).fadeIn(); 
+    		tr.find( '.cancel-ppto-row' ).fadeIn(); 
+    	});
+
+    	$( document ).off( 'click' , '.save-ppto-row' );
+    	$( document ).on( 'click' , '.save-ppto-row' , function()
+    	{
+    		var elem = $( this );
+    		var tr = elem.closest( 'tr' );
+    		
+    		var type = elem.closest( '.tab-pane' ).attr( 'data-type' );
+    		var ppto_id = tr.find( '.ppto-id' ).val();
+    		var monto = tr.find( '.monto-cell input[ type=text ]' ).val();
+    		
+    		$.ajax(
+			{
+				type : 'POST',
+				url  : 'update-ppto-row',
+				data : 
+				{
+					_token    : GBREPORTS.token,
+					type      : type,
+					ppto_id   : ppto_id,
+					monto     : monto
+				}
+			}).fail( function( statusCode , errorThrown )
+			{
+				ajaxError( statusCode , errorThrown );
+			}).done( function( response )
+			{
+				if( response.Status == ok )
+				{
+					tr.find( '.monto-cell' ).html( response.Data );
+					elem.fadeOut();
+					tr.find( '.cancel-ppto-row' ).fadeOut();
+					tr.find( '.edit-ppto-row' ).fadeIn();
+				}
+				bootboxMessage( response );
+			
+			});
+    	});
+
+    	$( document ).off( 'click' , '.cancel-ppto-row' );
+    	$( document ).on( 'click' , '.cancel-ppto-row' , function()
+    	{
+    		var elem = $( this );
+    		elem.fadeOut();
+    		var tr = elem.closest( 'tr' );
+    		var monto = tr.find( '.monto-ppto-row' ).val();
+    		tr.find( '.monto-cell' ).html( monto );
+    		tr.find( '.edit-ppto-row' ).fadeIn();
+    		tr.find( '.save-ppto-row' ).fadeOut();
     	});
 
 		$( '.open-file' ).click( function()
@@ -301,7 +338,6 @@
 			}
 			data.append( 'type' , type );
 			data.append( '_token' , GBREPORTS.token );
-			console.log( data );
 			
 			$.ajax(
 			{
@@ -319,8 +355,7 @@
 			{
 				if( response.Status == ok )
 				{
-					response.Description = 'Se cargo el ppto correctamente';
-					loadPPTO( type , year )
+					loadPPTO( panel )
 				}
 				bootboxMessage( response );
 			});
