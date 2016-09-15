@@ -204,33 +204,6 @@ class PPTOController extends BaseController
 
     }
 
-    private function processUploadCategoryFamilyUser( $fileRows )
-    {
-        include( app_path() . '/models/Query/QueryProducts.php' );
-                    
-        $supsId     = $this->getSupIds();
-        $familiesId = implode( $qryProducts->lists( 'id' ) , ',' );
-
-        $warnings = [];
-        foreach( $fileRows as $row )
-        {
-            $middleRpta = $this->validateRowSup( $row->toArray() , $familiesId , $supsId );
-            if( $middleRpta[ status ] != ok )
-            {
-                $warnings[] = $middleRpta[ description ];
-            }
-        }
-
-        if( ! empty( $warnings ) )
-        {
-            $rpta = $this->warningException( 'Se encontraron las siguientes observaciones en la carga del PPTO:' , __FUNCTION__ , __LINE__ , __FILE__ );
-            $rpta[ 'List' ] = [ 'Class' => 'list-group-item-warning' , 'Detail' => $warnings ];
-            return $rpta;
-        }
-        return $this->uploadCategoryFamilyUser();           
-    }
-
-
     private function validateRowSup( $inputs , $familiesId , $supsId )
     {
         $rules =
@@ -321,162 +294,52 @@ class PPTOController extends BaseController
 
     }
 
-    public function categoryFamilyUserUploadProcess( $fileData , $year , $category )
+    public function categoryFamilyUserUploadProcess( $file , $year , $category )
     {
-    	$version  = PPTOSupervisor::nextVersion( $year );
-    		
-		$same = true;
-		foreach( $fileRows as $row )
-		{	
-			$personRegister = Personal::getBagoSup( $row->codfico );
-		
-			if( is_null( $personRegister ) )
-			{
-				return $this->warningException( 'El supervisor no esta registrado en el SIM' , __FUNCTION__ , __LINE__ , __FILE__ );
-			}
-			
-			$pptoLastSupRegister = PPTOSupervisor::getSameLast( $year , $category , $personRegister->user_id , $row->cod129 , $version - 1 , $row->monto );
-		
-			if( is_null( $pptoLastSupRegister ) )
-			{
-                $same = false;
-            }
-        
-            $row->user_id   = $personRegister->user_id;
-        }
+    	$fileData = Excel::selectSheetsByIndex( 0 )->load( $file )->get();
 
-        if( $same )
+        include( app_path() . '/models/Query/QueryProducts.php' );            
+        $familiesId = implode( $qryProducts->lists( 'id' ) , ',' );
+        $supIds = $this->getSupIds();
+        $uniqueArray = [];
+        $warnings = [];
+        foreach( $fileData as $key => $row )
         {
-            return $this->warningException( 'No se ha encontrado diferencias en los archivos' , __FUNCTION__ , __LINE__ , __FILE__ );
-        }
-            
-        $registersPPTO = [];
-        $user = Auth::user();
-
-        $PPTOSupModel = new PPTOSupervisor;
-        $PPTOId = $PPTOSupModel->nextId();
-        
-        foreach( $fileRows as $row )
-        {
-            $row->monto = round( $row->monto , 2 , PHP_ROUND_HALF_UP );
-            $data = 
-            [
-                'id'              => $PPTOId++,
-                'version'         => $version,
-                'anio'            => $year,
-                'supervisor_id'   => $row->user_id,
-                'subcategoria_id' => $inputs[ 'category' ],
-                'marca_id'        => $row->cod129,
-                'monto'           => $row->monto,
-                'created_by'      => $user->id,
-                'updated_by'      => $user->id
-            ];
-
-            $registersPPTO[] = $data;
-
-        }
-
-            DB::beginTransaction();
-
-            $statusPPTO = PPTOSupervisor::insert( $registersPPTO );
-            
-            if( $statusPPTO == 1 )
+            $middleRpta = $this->validateRowSup( $row->toArray() , $familiesId , $supIds );
+            if( $middleRpta[ status ] != ok )
             {
-            
-                $registersFund   = [];
-
-                $fundSupModel = new FondoSupervisor;
-                $fundId       = $fundSupModel->nextId();
-
-                $modelPPTO = $PPTOSupModel->getCurrentPPTO( $year );
-
-                foreach( $modelPPTO as $row )
-                {
-                    $fundSupRegister = FondoSupervisor::getUnique( $year , $category , $row->supervisor_id , $row->marca_id );
-                    if( is_null( $fundSupRegister ) )
-                    {
-                        $data =
-                        [
-                            'id'              => $fundId++,
-                            'anio'            => $year,
-                            'supervisor_id'   => $row->supervisor_id,
-                            'subcategoria_id' => $inputs[ 'category' ],
-                            'marca_id'        => $row->marca_id,
-                            'saldo'           => $row->monto,
-                            'retencion'       => 0,
-                            'created_by'      => $user->id,
-                            'updated_by'      => $user->id
-                        ];
-
-                        $registersFund[] = $data;
-                    }
-                    else
-                    {
-                        $firstMoveRegister = FondoMktHistory::getFundFirstRegister( $fundSupRegister->id , SUP );
-                        if( is_null( $firstMoveRegister ) )
-                        {
-                            $initialAmount = $fundSupRegister->saldo;
-                        }
-                        else
-                        {
-                            $initialAmount = $firstMoveRegister->old_saldo;
-                        }
-
-                        if( $row->monto != $initialAmount )
-                        {
-
-                            $diffAmount = $row->monto - $initialAmount;
-
-                            $fundUpdate = FondoSupervisor::updateFundAmount( $fundSupRegister->id , $diffAmount );
-                            if( $fundUpdate == -1 )
-                            {
-                                DB::rollback();
-                                return $this->warningException( 'No se pudo realizar la carga del PPTO' , __FUNCTION__ , __LINE__ , __FILE__ );
-                            }
-
-                            $historyUpdates = FondoMktHistory::updateFundAmount( $fundSupRegister->id , SUP , $diffAmount );
-                            if( $historyUpdates == -1 )
-                            {
-                                DB::rollback();
-                                return $this->warningException( 'No se pudo realizar la carga del PPTO' , __FUNCTION__ , __LINE__ , __FILE__ );
-                            }
-                            $periodHistoryUpdates = FondoMktPeriodHistory::updateFundAmount( $category , $year , $diffAmount );
-                            if( $periodHistoryUpdates == -1 )
-                            {
-                                DB::rollback();
-                                return $this->warningException( 'No se pudo realizar la carga del PPTO' , __FUNCTION__ , __LINE__ , __FILE__ );
-                            }   
-                        }
-                    }
-                }
-                
-                if( empty( $registersFund ) )
-                {
-                    DB::commit();
-                    return $this->setRpta();
-                }
-                else
-                {
-                    $statusFund = FondoSupervisor::insert( $registersFund );
-                
-                    if( $statusFund == 1 )
-                    {
-                        DB::commit();
-                        return $this->setRpta();
-                    }
-                    else
-                    {
-                        DB::rollback();
-                        return $this->warningException( 'No se pudo realizar la carga del PPTO' , __FUNCTION__ , __LINE__ , __FILE__ );            
-                    }
-                }
+                $warnings[] = 'Fila N° ' . ( $key + 2 ) . '. ' . $middleRpta[ description ];
             }
             else
             {
-                DB::rollback();
-                return $this->warningException( 'No se pudo realizar la carga del PPTO' , __FUNCTION__ , __LINE__ , __FILE__ );            
+                $personRegister = Personal::getBagoSup( $row->codfico );
+                $row->user_id   = $personRegister->user_id;
             }
-    	
+
+            $compare = $row->cod129 . '|' . $row->supervisor_id;
+
+            if( $key != 0 )
+            {
+                $sameKey = array_search( $compare , $uniqueArray );
+                if( $sameKey !== FALSE )
+                {
+                    $warnings[] = 'El campo COD129 y CODFICO no es igual en las filas N° ' . ( $sameKey + 2 ) . ' y ' . ( $key + 2 );
+                    unset( $uniqueArray[ $sameKey ] );
+                }
+            }
+
+            $uniqueArray[] = $row->cod129 . '|' . $row->supervisor_id;
+        }
+
+        if( ! empty( $warnings ) )
+        {
+            $rpta = $this->warningException( 'Se encontraron las siguientes observaciones en la carga del PPTO:' , __FUNCTION__ , __LINE__ , __FILE__ );
+            $rpta[ 'List' ] = [ 'Class' => 'list-group-item-warning' , 'Detail' => $warnings ];
+            return $rpta;
+        }
+
+        $pptoProcedure = new PPTOProcedure;
+        return $pptoProcedure->supPPTOTransaction( $fileData , $year , $category );
     }
 
     private function getStartYear()
