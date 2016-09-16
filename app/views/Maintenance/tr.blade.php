@@ -4,16 +4,16 @@
             <td class="{{{ $record->class or $record->key }}}" style="text-align:center" disabled></td>
         @else
             <td class="{{{ $record->class or $record->key }}}" save=1 style="text-align:center">
-                <input type="text" style="width:100%">
+                <input type="text" class="form-control" style="width:100%">
             </td>
         @endif 
     @endforeach
     <td style="text-align:center">
-        <a class="maintenance-save" href="#">
+        <button type="button" class="btn btn-success btn-xs maintenance-save">
             <span class="glyphicon glyphicon-floppy-disk"></span>
-        </a>
-        <a class="maintenance-cancel" href="#">
+        </button>
+        <button type="button" class="btn btn-danger btn-xs maintenance-remove">
             <span class="glyphicon glyphicon-remove"></span>
-        </a>
+        </button>
     </td>
 </tr>

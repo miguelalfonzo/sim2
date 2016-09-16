@@ -24,6 +24,9 @@ use \Parameter\Parameter;
 use \Fondo\FondoSupervisor;
 use \Fondo\FondoGerProd;
 use \Fondo\FondoInstitucional;
+use \Fondo\FondoSubCategoria;
+use \Fondo\FondoCategoria;
+use \Fondo\FondoMktType;
 use \System\FondoMktHistory;
 use \Policy\ApprovalInstanceType;
 use \Excel;
@@ -39,29 +42,35 @@ class TableController extends BaseController
 	{
 		switch( $type ):
 			case 'Fondo_Contable':
-				return array( 'model' => new Fondo , 'id' => MANTENIMIENTO_FONDO , 'key' => 'nombre' , 'add' => true );
+				return array( 'model' => new Fondo , 'id' => MANTENIMIENTO_FONDO , 'key' => 'nombre' );
 			case 'Cuenta_Gasto_Marca':
-				return array( 'model' => new MarkProofAccounts , 'id' => 1 , 'add' => true );
+				return array( 'model' => new MarkProofAccounts , 'id' => 1 );
 			case 'Parametro':
-				return array( 'model' => new Parameter , 'id' => 2 , 'add' => false );
+				return array( 'model' => new Parameter , 'id' => 2 );
 			case 'Fondo_Supervisor':
-				return array( 'model' => new FondoSupervisor , 'id' => 3 , 'add' => false );
+				return array( 'model' => new FondoSupervisor , 'id' => 3 );
 			case 'Fondo_Gerente_Producto':
-				return array( 'model' => new FondoGerProd , 'id' => 4 , 'add' => false );
+				return array( 'model' => new FondoGerProd , 'id' => 4 );
 			case 'Fondo_Institucion':
-				return array( 'model' => new FondoInstitucional , 'id' => 5 , 'add' => false );
+				return array( 'model' => new FondoInstitucional , 'id' => 5 );
 			case 'Tipo_Inversion':
-				return array( 'model' => new InvestmentType , 'id' => 7 , 'key' => 'nombre' , 'add' => true );
+				return array( 'model' => new InvestmentType , 'id' => 7 , 'key' => 'nombre' );
 			case 'Tipo_Actividad':
-				return array( 'model' => new Activity , 'id' => 8 , 'key' => 'nombre' , 'add' => true );
+				return array( 'model' => new Activity , 'id' => 8 , 'key' => 'nombre' );
 			case 'Inversion_Actividad':
-				return array( 'model' => new InvestmentActivity , 'id' => 9 , 'add' => true );
+				return array( 'model' => new InvestmentActivity , 'id' => 9 );
+			case 'Fondo_Subcategoria':
+				return array( 'model' => new FondoSubCategoria , 'id' => 10 );
 			case 'Tipo_Cliente':
-				return array( 'model' => new ClientType , 'key' => 'descripcion' , 'add' => true );
+				return array( 'model' => new ClientType , 'key' => 'descripcion' );
 			case 'Tipo_Instancia_Aprobacion':
-				return array( 'model' => new ApprovalInstanceType , 'key' => 'descripcion' , 'add' => true );
+				return array( 'model' => new ApprovalInstanceType , 'key' => 'descripcion' );
 			case 'Documento':
-				return array( 'model' => new Proof , 'key' => 'codigo' , 'add' => false );
+				return array( 'model' => new Proof , 'key' => 'codigo' );
+			case 'Fondo_Categoria':
+				return array( 'model' => new FondoCategoria , 'key' => 'descripcion' );
+			case 'Fondo_Subcategoria_Tipo':
+				return array( 'model' => new FondoMktType , 'key' => 'descripcion' );
 		endswitch;
 	}
 
@@ -80,8 +89,8 @@ class TableController extends BaseController
 			'columns' => $columns , 
 			'titulo'  => 'Mantenimiento de ' . $maintenance->descripcion , 
 			'type'    => $type , 
-			'add'	  => $vData[ 'add' ] ,
-			'export'  => true
+			'add'	  => $maintenance->agregar ,
+			'options' => false
 		);
 		$now = Carbon::now();
 		Excel::create( $maintenance->descripcion . ' ' . $now->format( 'YmdHi' ) , function( $excel ) use( $data )
@@ -136,11 +145,14 @@ class TableController extends BaseController
 		$columns     = json_decode( $maintenance->formula );
 		return View::make( 'Maintenance.view' , 
 			array( 
-				'records' => $records , 
-				'columns' => $columns , 
-				'titulo'  => 'Mantenimiento de ' . $maintenance->descripcion , 
-				'type'    => $type , 
-				'add'	  => $vData[ 'add' ]
+				'records'  => $records , 
+				'columns'  => $columns , 
+				'titulo'   => 'Mantenimiento de ' . $maintenance->descripcion , 
+				'type'     => $type , 
+				'add'	   => $maintenance->agregar ,
+				'disabled' => $maintenance->deshabilitar ,
+				'export'   => $maintenance->exportar ,
+				'options'  => $maintenance->opciones 
 			) 
 		);		
 	}

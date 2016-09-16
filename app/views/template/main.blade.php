@@ -153,7 +153,7 @@
                                         @elseif( Auth::user()->type == ESTUD )
                                             <li><a href="{{ URL::to( 'view-sup-rep' ) }}">Syncronizacion</a></li>
                                             <li><a href="{{ URL::to( 'view-ppto' ) }}">Presupuesto</a></li>
-                                            <li><a href="{{ URL::to( 'view-fondo-category-maintenance' ) }}">Categorías</a></li>
+                                            <li><a href="{{ URL::to('maintenance/view/Fondo_Subcategoria') }}">Mantenimiento de Categorías de Fondo</a></li> 
                                         @endif
                                     </ul>
                                 </li>

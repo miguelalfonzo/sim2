@@ -3,9 +3,13 @@
 namespace Fondo;
 
 use \Eloquent;
+use Illuminate\Database\Eloquent\SoftDeletingTrait;
 
 class FondoSubCategoria extends Eloquent
 {
+
+	use SoftDeletingTrait;
+
 	protected $table      = TB_FONDO_CATEGORIA_SUB;
 	protected $primaryKey = 'id';
 	protected $fillable   = array('id','descripcion', 'fondos_categorias_id');
@@ -60,5 +64,15 @@ class FondoSubCategoria extends Eloquent
 	{
 		return FondoSubCategoria::where( 'trim( tipo )' , $typeCode )->get();
 	}
+
+	protected static function orderWithTrashed()
+	{
+		return FondoSubCategoria::withTrashed()
+			->where( 'trim( tipo )' , '<>' , 'O' )
+			->orderBy( 'id_fondo_categoria' , 'ASC' )
+			->orderBy( 'position' , 'ASC' )
+			->get();
+	}
+
 
 }

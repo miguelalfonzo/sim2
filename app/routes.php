@@ -62,13 +62,17 @@
     Route::group( array( 'before' => 'gercom_cont' ) , function()
     {
         Route::post( 'gercom-mass-approv' ,'Dmkt\SolicitudeController@massApprovedSolicitudes');
+    });
 
-        /*
-        |--------------------------------------------------------------------------
-        | MANTENIMIENTO
-        |--------------------------------------------------------------------------
-        */
 
+    /*
+    |--------------------------------------------------------------------------
+    | MANTENIMIENTO
+    |--------------------------------------------------------------------------
+    */
+
+    Route::group( [ 'before' => 'gercom_cont_estudio' ] , function()
+    {
         Route::get( 'maintenance/view/{type}' , 'Maintenance\TableController@getView' );
         Route::post( 'get-cell-maintenance-info' , 'Maintenance\TableController@getMaintenanceCellData' );
         Route::post( 'update-maintenance-info' , 'Maintenance\TableController@updateMaintenanceData' );
@@ -77,7 +81,6 @@
         Route::post( 'get-table-maintenance-info' , 'Maintenance\TableController@getMaintenanceTableData');
         Route::post( 'maintenance-enable' , 'Maintenance\TableController@enableRecord');
         Route::post( 'maintenance-disable' , 'Maintenance\TableController@disableRecord');
-
     });
 
     /*

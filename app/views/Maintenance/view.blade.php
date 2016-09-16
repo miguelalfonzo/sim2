@@ -2,7 +2,7 @@
 @section('solicitude')
     <div class="page-header">
         <h3>{{ $titulo }}</h3>
-        @if( in_array( $type , array( 'Fondo_Supervisor' , 'Fondo_Gerente_Producto' , 'Fondo_Institucion' ) ) )
+        @if( $export )
             <button type="button" id="maintenance-export" class="btn btn-primary" data-type="{{ $type }}">Exportar</button>
         @endif
     </div>

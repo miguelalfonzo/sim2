@@ -1104,6 +1104,15 @@ $(document).on("click", ".elementEdit", function()
     });
 });
 
+$(document).off( 'click' , '.maintenance-remove' );
+$(document).on( 'click' , '.maintenance-remove' , function()
+{
+    var tr = $( this ).closest( 'tr' )
+    tr.remove();
+    $( 'input[case=' + tr.attr( 'type' ) + ']' ).show();
+    
+});
+
 $(document).off( 'click' , '.maintenance-add' );
 $(document).on( 'click' , '.maintenance-add' , function()
 {
@@ -1157,9 +1166,27 @@ $(document).on("click", "#add-doc", function()
 $(document).off( 'click' , '.maintenance-cancel');
 $(document).on( 'click' , '.maintenance-cancel' , function()
 {
-    var tr = $(this).parent().parent();
-    $( 'input[case=' + tr.attr( 'type' ) + ']' ).show();
-    listMaintenanceTable( tr.attr('type')  );
+    var tr = $(this).closest( 'tr' );
+    var type = tr.attr( 'type' );
+
+    
+    tr.children().each( function()
+    {
+        var td = $( this );
+        if( this.getAttribute( 'editable' ) == 2 )
+        {
+            td.html( 
+                '<button type="button" class="btn btn-info btn-xs maintenance-edit">' +
+                    '<span class="glyphicon glyphicon-pencil"></span>' +
+                '</button>'
+            );
+        }
+        else if( this.getAttribute( 'editable' ) != null )
+        {
+            td.html( td.find( 'input[ type=hidden ]' ).val() );
+        }
+    });
+    $( '#table_' + type ).DataTable().columns.adjust();
 });
 
 $( '#maintenance-export' ).on( 'click' , function()
@@ -1170,30 +1197,44 @@ $( '#maintenance-export' ).on( 'click' , function()
 $(document).off( 'click' , '.maintenance-edit' );
 $(document).on( 'click' , '.maintenance-edit' , function()
 {
-    var trElement = $(this).parent().parent();
-    trElement.children().each(function(i,data)
+    var trElement = $(this).closest( 'tr' );
+    var type = trElement.attr( 'type' );
+    trElement.children().each( function( i , data )
     {
-        var td = $(data);
+        var td = $( data );
         if ( td.attr('editable') == 1 )
             enableTd( data );
         else if ( td.attr('editable') == 2 )
         {
-            $(data).html('<a class="maintenance-update" href="#">'
-            + '<span class="glyphicon glyphicon-floppy-disk"></span></a>'
-            + '<a class="maintenance-cancel" href="#"><span class="glyphicon glyphicon-remove"></span></a>');        
+            $(data).html(
+                '<button type="button" class="btn btn-success btn-xs maintenance-update">' +
+                    '<span class="glyphicon glyphicon-floppy-disk"></span>' +
+                '</button>' +
+                '<button type="button" class="btn btn-danger btn-xs maintenance-cancel">' +
+                    '<span class="glyphicon glyphicon-remove"></span>' +
+                '</button>'
+            );        
         }
         else if ( td.attr('editable') == 3 )
         {
-            var val = td.html();
-            td.html('<input type="text" style="width:100%" value="' + val.trim() + '">');
-            td.children().numeric();
+            var val = td.text();
+            td.html(
+                '<input type="text" class="form-control" style="width:100%" value="' + val.trim() + '">' +
+                '<input type="hidden" value="' + val.trim() + '">' 
+            );
+            td.find( 'input[ type=text ]' ).numeric();
         }
         else if ( td.attr('editable') == 4 )
         {
-            var val = td.html();
-            td.html('<input type="text" style="width:100%" value="' + val.trim() + '">');
+            var val = td.text();
+            td.html( 
+                '<input type="text" class="form-control" style="width:100%" value="' + val.trim() + '">' +
+                '<input type="hidden" value="' + val.trim() + '">'
+            );
         }
     });
+
+    $( '#table_' + type ).DataTable().columns.adjust();
 });
 
 $(document).off( 'click' , '.maintenance-save');
@@ -1330,6 +1371,7 @@ $(document).on('click' , '.maintenance-enable' , function()
 function enableTd( data )
 {
     var td = $(data);
+    var value = td.text().trim();
     $.ajax(
     {
         type: 'post' ,
@@ -1337,7 +1379,7 @@ function enableTd( data )
         data: 
         {
             type   : td[ 0 ].classList[ 0 ] ,
-            val    : td.html().trim(),
+            val    : value,
             _token : GBREPORTS.token
         }
     }).fail( function( statusCode , errorThrown )
@@ -1346,7 +1388,7 @@ function enableTd( data )
     }).done( function( response )
     {
         if ( response.Status == 'Ok')
-            td.html( response.Data );
+            td.html( response.Data + '<input type="hidden" value="' + value + '">' );
         else
             bootbox.alert('<h4 class="red">' + Data.Status + ': ' + Data.Description + '</h4>');            
     });
