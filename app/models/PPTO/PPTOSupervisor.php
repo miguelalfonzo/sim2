@@ -31,8 +31,9 @@ class PPTOSupervisor extends Eloquent
 	{
 		$version = $this->nextVersion( $year , $subCategory );
 		return PPTOSupervisor::select( [ 'id' , 'subcategoria_id' , 'marca_id' , 'supervisor_id' , 'monto' ] )
-			->where( 'version' , $version - 1 )
 			->with( [ 'subCategory' , 'family' , 'personal'] )
+			->where( 'anio' , $year )
+			->where( 'version' , $version - 1 )
 			->orderBy( 'subcategoria_id' , 'ASC' )
 			->orderBy( 'supervisor_id' , 'ASC' )
 			->orderBy( 'marca_id' , 'ASC' )->get();

@@ -12,7 +12,9 @@ use \Fondo\FondoMktPeriodHistory;
 use \Fondo\FondoSubCategoria;
 use \System\FondoMktHistory;
 use \Fondo\FondoSupervisor;
-use \PPTO\PPTOProcedure;
+use \PPTO\InsPPTOProcedure;
+use \PPTO\GerPPTOProcedure;
+use \PPTO\SupPPTOPRocedure;
 
 use \Carbon\Carbon;
 use \Validator;
@@ -110,11 +112,16 @@ class PPTOController extends BaseController
             $middleRpta = $this->validateUpdate( $inputs );
             if( $middleRpta[ status ] == ok )
             {
-                $pptoProcedureModel = new PPTOProcedure;
                 switch( $inputs[ 'type' ] )
                 {
                     case Self::GerPPTOType:
-                        return $pptoProcedureModel->gerUpdateProcedure( $inputs[ 'ppto_id' ] , $inputs[ 'monto' ] );
+                        $gerPPTOProcedureModel = new GerPPTOProcedure;
+                        $roundAmount = round( $inputs[ 'monto' ] , 2 , PHP_ROUND_HALF_UP );
+                        return $this->validateResponse( $gerPPTOProcedureModel->update( $inputs[ 'ppto_id' ] , $roundAmount , Auth::user()->id ) );
+                    case Self::SupPPTOType:
+                        $supPPTOProcedureModel = new SupPPTOProcedure;
+                        $roundAmount = round( $inputs[ 'monto' ] , 2 , PHP_ROUND_HALF_UP );
+                        return $this->validateResponse( $supPPTOProcedureModel->update( $inputs[ 'ppto_id' ] , $roundAmount , Auth::user()->id ) );
                     default:
                         return $this->warningException( 'Sin implementar' , __FUNCTION__ , __LINE__ , __FILE__ );
                 }
@@ -153,13 +160,11 @@ class PPTOController extends BaseController
                     case Self::GerPPTOType:
                         return $this->categoryFamilyUploadProcess( $inputs[ 'file' ] , $year , $inputs[ 'category' ] );  
                     case Self::InsPPTOType:
-                        $pptoProcedureModel = new PPTOProcedure;
-                        return $pptoProcedureModel->insPPTOTransaction( $inputs[ 'amount' ] , $year );
+                        return $this->categoryUploadProcess( $inputs[ 'amount' ] , $year );
                     default:
                         return $this->warningException( 'Sin implementar' , __FUNCTION__ , __LINE__ , __FILE__ );
                 }
-            }
-            
+            } 
             return $middleRpta;
         }
         catch( Exception $e )
@@ -190,7 +195,7 @@ class PPTOController extends BaseController
             return in_array( $type , [ Self::SupPPTOType , Self::GerPPTOType ] );
         });
 
-        $validator->sometimes( [ 'amount' ] , 'required|numeric' , function() use( $type )
+        $validator->sometimes( [ 'amount' ] , 'required|numeric|min:0' , function() use( $type )
         {
             return in_array( $type , [ Self::InsPPTOType ] );
         });
@@ -248,10 +253,18 @@ class PPTOController extends BaseController
         return $this->setRpta();
     }
 
-    /*private function categoryUploadProcess( $amount , $year , $category )
+    private function categoryUploadProcess( $amount , $year )
     {
-        return PPTOProcedure::insProcedure( $amount , $year );
-    }*/
+        $roundAmount = round( $amount , 2 , PHP_ROUND_HALF_UP );
+        $insPPTOProcedureModel = new InsPPTOProcedure;
+        $middleRpta = $this->validateResponse( $insPPTOProcedureModel->uploadValidate( $roundAmount , $year ) );
+        if( $middleRpta[ status ] == ok )
+        {
+            $user_id = Auth::user()->id;
+            return $this->validateResponse( $insPPTOProcedureModel->upload( $roundAmount , $year , $user_id ) );
+        }
+        return $middleRpta;
+    }
 
     private function categoryFamilyUploadProcess( $file , $year , $category )
     {
@@ -289,9 +302,23 @@ class PPTOController extends BaseController
             return $rpta;
         }
 
-        $pptoProcedure = new PPTOProcedure;
-        return $pptoProcedure->gerPPTOTransaction( $fileData , $year , $category );
-
+        $rowInputs = '';
+        foreach( $fileData as $key => $row )
+        {
+            $rowInputs .= 'FILE_GERENTE_ROW( ' . $row->cod129 . ' , ' . round( $row->monto , 2 , PHP_ROUND_HALF_UP ) . ' ),';
+        }
+        $rowInputs = substr( $rowInputs , 0 , -1 );
+        $dataInput = 'FILE_GERENTE_TAB( ' . $rowInputs . ' )';
+        
+        $gerPPTOProcedureModel = new GerPPTOProcedure;
+        $middleRpta = $this->validateResponse( $gerPPTOProcedureModel->uploadValidate( $dataInput , $year , $category ) );
+        if( $middleRpta[ status ] == ok )
+        {
+            $user_id = Auth::user()->id;
+            return $this->validateResponse( $gerPPTOProcedureModel->upload( $dataInput , $year , $category , $user_id ) );
+        }
+        return $middleRpta;
+    
     }
 
     public function categoryFamilyUserUploadProcess( $file , $year , $category )
@@ -338,8 +365,22 @@ class PPTOController extends BaseController
             return $rpta;
         }
 
-        $pptoProcedure = new PPTOProcedure;
-        return $pptoProcedure->supPPTOTransaction( $fileData , $year , $category );
+        $rowInputs = '';
+        foreach( $fileData as $key => $row )
+        {
+            $rowInputs .= 'FILE_SUPERVISOR_ROW( ' . $row->user_id . ' , ' . $row->cod129 . ' , ' . round( $row->monto , 2 , PHP_ROUND_HALF_UP ) . ' ),';
+        }
+        $rowInputs = substr( $rowInputs , 0 , -1 );
+        $dataInput = 'FILE_SUPERVISOR_TAB( ' . $rowInputs . ' )';
+        
+        $supPPTOProcedure = new SupPPTOProcedure;
+        $middleRpta = $this->validateResponse( $supPPTOProcedure->uploadValidate( $dataInput , $year , $category ) );
+        if( $middleRpta[ status ] == ok )
+        {
+            \Log::info( 'inicio' );
+            return $this->validateResponse( $supPPTOProcedure->upload( $dataInput , $year , $category , Auth::user()->id ) );
+        }
+        return $middleRpta;
     }
 
     private function getStartYear()
@@ -393,6 +434,38 @@ class PPTOController extends BaseController
             return $this->warningException( $this->msgValidator( $validator ) , __FUNCTION__ , __LINE__ , __FILE__ );
         };
         return $this->setRpta();
+    }
+
+    private function validateResponse( $response )
+    {
+        \Log::info( $response );
+        $response = json_decode( $response );
+        if( $response->{ status } == ok )
+        {
+            $rpta = [ status => ok ];
+        }
+        else
+        {
+            $rpta = [ status => warning ];
+        }
+
+        if( isset( $response->{ description } ) )
+        {
+            $rpta[ description ] = $response->{ description };
+        }
+
+        if( isset( $response->{ data } ) )
+        {
+            $rpta[ data ] = $response->{ data };
+        }  
+
+        if( isset( $response->List ) )
+        {
+            $rpta[ 'List' ] = [ 'Class' => $response->List->Class , 'Detail' => explode( '|' , substr( $response->List->Message , 0 , - 1 ) )  ];     
+        } 
+
+        return $rpta;
+
     }
 
 }
