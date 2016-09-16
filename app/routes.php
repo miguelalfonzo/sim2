@@ -278,6 +278,11 @@
             Route::post( 'load-ppto' , 'PPTOController@loadPPTO' );
             Route::post( 'update-ppto-row' , 'PPTOController@update' );
         });
+
+        Route::group( [ 'namespace' => 'Fondo' ] , function()
+        {
+            Route::get( 'view-fondo-category-maintenance' , 'Maintenance@subCategoryView' );
+        });
     });
 
     Route::group( array( 'before' => 'sys_user' ) , function()
