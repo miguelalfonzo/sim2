@@ -393,7 +393,7 @@ class TableController extends BaseController
 	public function addMaintenanceData()
 	{
 		$inputs = Input::all();
-		return $this->addRowVersion2( $inputs );
+		return $this->addRow( $inputs );
 	}
 
 	private function addRow( $inputs )

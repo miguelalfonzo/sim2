@@ -29,11 +29,11 @@
                         @if( $disabled )
                             @if ( is_null( $record->deleted_at ) )
                                 <button type="button" class="btn btn-danger btn-xs maintenance-disable">
-                                    <span class="glyphicon glyphicon-remove"></span>
+                                    <span class="glyphicon glyphicon-ban-circle"></span>
                                 </button>
                             @else
                                 <button type="button" class="btn btn-success btn-xs maintenance-enable">
-                                    <span class="glyphicon glyphicon-ok"></span>
+                                    <span class="glyphicon glyphicon-ok-sign"></span>
                                 </button>
                             @endif
                         @endif

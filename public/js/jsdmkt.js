@@ -1173,16 +1173,19 @@ $(document).on("click", "#add-doc", function()
 $(document).off( 'click' , '.maintenance-cancel');
 $(document).on( 'click' , '.maintenance-cancel' , function()
 {
-    var tr = $(this).closest( 'tr' );
+    var elem = $( this );
+    var td  = elem.closest( 'tr' );
+    var tr = td.closest( 'tr' );
     var type = tr.attr( 'type' );
-
+    td.find( '.maintenance-update' ).remove();
+    elem.remove();
     
     tr.children().each( function()
     {
         var td = $( this );
         if( this.getAttribute( 'editable' ) == 2 )
         {
-            td.html( 
+            td.prepend( 
                 '<button type="button" class="btn btn-info btn-xs maintenance-edit">' +
                     '<span class="glyphicon glyphicon-pencil"></span>' +
                 '</button>'
@@ -1204,21 +1207,23 @@ $( '#maintenance-export' ).on( 'click' , function()
 $(document).off( 'click' , '.maintenance-edit' );
 $(document).on( 'click' , '.maintenance-edit' , function()
 {
-    var trElement = $(this).closest( 'tr' );
-    var type = trElement.attr( 'type' );
-    trElement.children().each( function( i , data )
+    var elem = $( this );
+    var tr = elem.closest( 'tr' );
+    var type = tr.attr( 'type' );
+    elem.remove();
+    tr.children().each( function( i , data )
     {
         var td = $( data );
         if ( td.attr('editable') == 1 )
             enableTd( data );
         else if ( td.attr('editable') == 2 )
         {
-            $(data).html(
+            $( data ).prepend(
                 '<button type="button" class="btn btn-success btn-xs maintenance-update">' +
-                    '<span class="glyphicon glyphicon-floppy-disk"></span>' +
+                    '<span class="glyphicon glyphicon-ok"></span>' +
                 '</button>' +
-                '<button type="button" class="btn btn-danger btn-xs maintenance-cancel">' +
-                    '<span class="glyphicon glyphicon-remove"></span>' +
+                '<button type="button" class="btn btn-info btn-xs maintenance-cancel">' +
+                    '<span class="glyphicon glyphicon-chevron-left"></span>' +
                 '</button>'
             );        
         }

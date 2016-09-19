@@ -20,7 +20,7 @@
         <button type="button" class="btn btn-success btn-xs maintenance-save">
             <span class="glyphicon glyphicon-floppy-disk"></span>
         </button>
-        <button type="button" class="btn btn-danger btn-xs maintenance-remove">
+        <button type="button" class="btn btn-warning btn-xs maintenance-remove">
             <span class="glyphicon glyphicon-remove"></span>
         </button>
     </td>
