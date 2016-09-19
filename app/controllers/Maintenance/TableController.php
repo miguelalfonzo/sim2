@@ -400,16 +400,6 @@ class TableController extends BaseController
 	private function addRow( $inputs )
 	{
 		$id = $this->getModel( $inputs[ 'type' ] )[ 'id' ];
-		$data = array(
-			'records' => json_decode( Maintenance::find( $id )->formula ),
-			'type'	  => $inputs[ 'type' ]
-		);
-		return $this->setRpta( View::make( 'Maintenance.tr' , $data )->render() );
-	}
-
-	private function addRowVersion2( $inputs )
-	{
-		$id = $this->getModel( $inputs[ 'type' ] )[ 'id' ];
 		$addFormulaJson = Maintenance::find( $id )->agregar_formula;
 		$addFormula = json_decode( $addFormulaJson );
 		foreach( $addFormula as $row )
@@ -418,7 +408,6 @@ class TableController extends BaseController
 			if( isset( $row->model ) )
 			{
 				$vData = $this->getModel( $row->model );
-				\Log::info( $vData );
 				$data = $vData[ 'model' ]->getAddData();
 				$row->data = $data;
 			}
@@ -428,7 +417,7 @@ class TableController extends BaseController
 			'records' => $addFormula,
 			'type'    => $inputs[ 'type' ]
 		];
-		return $this->setRpta( View::make( 'Maintenance.trVersion2' , $data )->render() );
+		return $this->setRpta( View::make( 'Maintenance.tr' , $data )->render() );
 	}
 
 	private function addActividad()
