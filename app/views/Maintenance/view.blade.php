@@ -10,10 +10,10 @@
         @include( 'Maintenance.table')
     </div>
     <div>
-        @if ( $add )
-            <input class="btn btn-primary maintenance-add" type="button" case="{{ $type }}" value="Agregar">
-        @else
+        @if( is_null( $add ) )
             <input class="btn btn-primary maintenance-add" type="button" case="{{ $type }}" value="Agregar" style="display:none">
+        @else
+            <input class="btn btn-primary maintenance-add" type="button" case="{{ $type }}" value="Agregar">
         @endif
     </div>
     <script>

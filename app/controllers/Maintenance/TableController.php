@@ -89,7 +89,6 @@ class TableController extends BaseController
 			'columns' => $columns , 
 			'titulo'  => 'Mantenimiento de ' . $maintenance->descripcion , 
 			'type'    => $type , 
-			'add'	  => $maintenance->agregar ,
 			'options' => false
 		);
 		$now = Carbon::now();
@@ -149,7 +148,7 @@ class TableController extends BaseController
 				'columns'  => $columns , 
 				'titulo'   => 'Mantenimiento de ' . $maintenance->descripcion , 
 				'type'     => $type , 
-				'add'	   => $maintenance->agregar ,
+				'add'	   => $maintenance->agregar_formula ,
 				'disabled' => $maintenance->deshabilitar ,
 				'export'   => $maintenance->exportar ,
 				'options'  => $maintenance->opciones 
