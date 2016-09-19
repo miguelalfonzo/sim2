@@ -116,22 +116,6 @@ class TableController extends BaseController
 		}
 	}
 
-	public function getTableParameter()
-	{
-		$records = Parameter::all();
-		$columns = Maintenance::find(2);
-		$columns = json_decode( $columns->formula );
-		return View::make( 'Maintenance.table' )->with( array( 'records' => $records , 'columns' => $columns , 'type' => 'parametro' , 'titulo' => 'Mantenimiento de Parametros' ) );
-	}
-
-	public function getTableDailySeatRelation()
-	{
-		$records = MarkProofAccounts::all();
-		$columns = Maintenance::find(1);
-		$columns = json_decode( $columns->formula );
-		return View::make( 'Maintenance.table' )->with( array( 'records' => $records , 'columns' => $columns , 'type' => 'cuentasMarca' , 'titulo' => 'Mantenimiento de Cuentas - Marca' ) );
-	}
-
 	public function getView( $type )
 	{
 		$vData       = $this->getModel( $type );
@@ -360,7 +344,6 @@ class TableController extends BaseController
 
 	private function saveMaintenance( $inputs )
 	{
-		\Log::info( $inputs );
 		$vData = $this->getModel( $inputs[ 'type' ] );
 		$record = $vData[ 'model' ];
 		$record->id = $record->nextId();
@@ -403,7 +386,6 @@ class TableController extends BaseController
 		$addFormula = json_decode( $addFormulaJson );
 		foreach( $addFormula as $row )
 		{
-
 			if( isset( $row->model ) )
 			{
 				$vData = $this->getModel( $row->model );
