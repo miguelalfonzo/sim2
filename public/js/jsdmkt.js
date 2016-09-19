@@ -1110,12 +1110,14 @@ $(document).on( 'click' , '.maintenance-remove' , function()
     var tr = $( this ).closest( 'tr' )
     tr.remove();
     $( 'input[case=' + tr.attr( 'type' ) + ']' ).show();
+    $( '#table_' + tr.attr( 'type' ) ).DataTable().columns.adjust();
     
 });
 
 $(document).off( 'click' , '.maintenance-add' );
 $(document).on( 'click' , '.maintenance-add' , function()
 {
+    var type = this.getAttribute( 'case' );
     var button = $(this);
     $.ajax(
     {
@@ -1133,11 +1135,16 @@ $(document).on( 'click' , '.maintenance-add' , function()
     {
         if ( response.Status == 'Ok')
         {
-            button.parent().parent().find('tbody').append( response.Data );
-            var table = '#table_' + button.attr( 'case' );
+            var tbody = button.parent().parent().find( 'tbody' );
+            tbody.append( response.Data );
+            var table = $( '#table_' + type );
             var scroll = $( table ).parent();
             scroll.scrollTop( scroll[0].scrollHeight );
             button.hide();
+            var tr = tbody.children().last();
+            tr.find( '.input-numeric' ).numeric();
+            tr.find( '.input-integer' ).numeric( { negative : false , decimal : false } );
+            $( table ).DataTable().columns.adjust();
         }
         else
             bootbox.alert('<h4 class="red">' + Data.Status + ': ' + Data.Description + '</h4>');            
@@ -1215,11 +1222,11 @@ $(document).on( 'click' , '.maintenance-edit' , function()
                 '</button>'
             );        
         }
-        else if ( td.attr('editable') == 3 )
+        else if( td.attr('editable') == 3 )
         {
             var val = td.text();
             td.html(
-                '<input type="text" class="form-control" style="width:100%" value="' + val.trim() + '">' +
+                '<input type="text" class="form-control input-sm" style="width:100%" value="' + val.trim() + '">' +
                 '<input type="hidden" value="' + val.trim() + '">' 
             );
             td.find( 'input[ type=text ]' ).numeric();
@@ -1228,7 +1235,7 @@ $(document).on( 'click' , '.maintenance-edit' , function()
         {
             var val = td.text();
             td.html( 
-                '<input type="text" class="form-control" style="width:100%" value="' + val.trim() + '">' +
+                '<input type="text" class="form-control input-sm" style="width:100%" value="' + val.trim() + '">' +
                 '<input type="hidden" value="' + val.trim() + '">'
             );
         }
@@ -1240,18 +1247,19 @@ $(document).on( 'click' , '.maintenance-edit' , function()
 $(document).off( 'click' , '.maintenance-save');
 $(document).on( 'click' , '.maintenance-save' , function()
 {
-    var trElement = $(this).parent().parent();
+    var trElement = $(this).closest( 'tr' );
+    var type = trElement.attr( 'type' );
     var aData = {};
     aData._token = GBREPORTS.token;
-    aData.type   = trElement.attr('type');
+    aData.type   = type;
     aData.Data   = {};
     trElement.children().each( function( i , data )
     {
         var td = $(data);
-        if ( td.attr('save') == 1 )
-            aData.Data[td[0].classList[0]] = td.children().val() ;
-        else if ( td.attr('save') == 2 )
-            aData[td[0].classList[0]] = td.children().val() ;
+        if ( typeof td.attr( 'column' ) != 'undefined' )
+        {
+            aData.Data[ td.attr( 'column' ) ] = td.children().val() ;
+        }
     });
     $.ajax(
     {

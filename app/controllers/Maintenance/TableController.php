@@ -361,10 +361,11 @@ class TableController extends BaseController
 
 	private function saveMaintenance( $inputs )
 	{
+		\Log::info( $inputs );
 		$vData = $this->getModel( $inputs[ 'type' ] );
 		$record = $vData[ 'model' ];
 		$record->id = $record->nextId();
-		foreach ( $inputs[ data ] as $column => $data )
+		foreach( $inputs[ data ] as $column => $data )
 			$record->$column = $data;
 		$record->save();
 		return $this->setRpta( $record );
@@ -393,17 +394,7 @@ class TableController extends BaseController
 	public function addMaintenanceData()
 	{
 		$inputs = Input::all();
-		switch( $inputs[ 'type' ] ):
-			case 'Tipo_Actividad':
-				return $this->addActividad();
-			case 'Tipo_Inversion':
-				return $this->addInversion();
-			case 'Inversion_Actividad':
-				return $this->addInversionActividad();
-			case 'Cuenta_Gasto_Marca':
-				return $this->addcuentasMarca();
-		endswitch;
-		return $this->addRow( $inputs );
+		return $this->addRowVersion2( $inputs );
 	}
 
 	private function addRow( $inputs )
@@ -414,6 +405,30 @@ class TableController extends BaseController
 			'type'	  => $inputs[ 'type' ]
 		);
 		return $this->setRpta( View::make( 'Maintenance.tr' , $data )->render() );
+	}
+
+	private function addRowVersion2( $inputs )
+	{
+		$id = $this->getModel( $inputs[ 'type' ] )[ 'id' ];
+		$addFormulaJson = Maintenance::find( $id )->agregar_formula;
+		$addFormula = json_decode( $addFormulaJson );
+		foreach( $addFormula as $row )
+		{
+
+			if( isset( $row->model ) )
+			{
+				$vData = $this->getModel( $row->model );
+				\Log::info( $vData );
+				$data = $vData[ 'model' ]->getAddData();
+				$row->data = $data;
+			}
+		}
+		$data = 
+		[
+			'records' => $addFormula,
+			'type'    => $inputs[ 'type' ]
+		];
+		return $this->setRpta( View::make( 'Maintenance.trVersion2' , $data )->render() );
 	}
 
 	private function addActividad()

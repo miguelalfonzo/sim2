@@ -1,6 +1,6 @@
 <tr type="{{ $type }}">
     @foreach( $records as $record )
-        @if ( $record->editable == 0 )
+        @if( $record->editable == 0 )
             <td class="{{{ $record->class or $record->key }}}" style="text-align:center" disabled></td>
         @else
             <td class="{{{ $record->class or $record->key }}}" save=1 style="text-align:center">

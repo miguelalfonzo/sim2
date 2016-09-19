@@ -14,6 +14,18 @@ class FondoSubCategoria extends Eloquent
 	protected $primaryKey = 'id';
 	protected $fillable   = array('id','descripcion', 'fondos_categorias_id');
 
+	public function nextId()
+	{
+	    $nextId = $this->withTrashed()
+	    	->select( 'id' )
+	    	->orderBy( 'id' , 'desc' )
+	    	->first();
+        if ( is_null( $nextId ) )
+            return 1;
+        else
+            return $nextId->id + 1;
+    }
+
 	protected static function order()
 	{
 		return FondoSubCategoria::orderBy( 'descripcion' , 'ASC' )->get();
@@ -73,6 +85,5 @@ class FondoSubCategoria extends Eloquent
 			->orderBy( 'position' , 'ASC' )
 			->get();
 	}
-
 
 }
