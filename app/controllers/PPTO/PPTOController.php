@@ -257,11 +257,11 @@ class PPTOController extends BaseController
     {
         $roundAmount = round( $amount , 2 , PHP_ROUND_HALF_UP );
         $insPPTOProcedureModel = new InsPPTOProcedure;
-        $middleRpta = $this->validateResponse( $insPPTOProcedureModel->uploadValidate( $roundAmount , $year ) );
+        $middleRpta = $insPPTOProcedureModel->uploadValidate( $roundAmount , $year );
         if( $middleRpta[ status ] == ok )
         {
             $user_id = Auth::user()->id;
-            return $this->validateResponse( $insPPTOProcedureModel->upload( $roundAmount , $year , $user_id ) );
+            return $insPPTOProcedureModel->upload( $roundAmount , $year , $user_id );
         }
         return $middleRpta;
     }

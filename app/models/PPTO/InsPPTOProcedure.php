@@ -15,12 +15,13 @@ class InsPPTOProcedure
         try
         {
             $pdo = DB::getPdo();
-            $stmt = $pdo->prepare( 'BEGIN PK_PPTO_INSTITUCION.SP_VALIDAR_PPTO_INSTITUCION( :monto , :año , :rpta ); end;' );
+            $stmt = $pdo->prepare( 'BEGIN PK_PPTO_INSTITUCION.SP_VALIDAR_PPTO_INSTITUCION( :monto , :año , :rpta , :desc ); end;' );
             $stmt->bindParam( ':monto' , $roundAmount );
             $stmt->bindParam( ':año' , $year , PDO::PARAM_INT );
-            $stmt->bindParam( ':rpta' , $rpta , PDO::PARAM_STR , 200 );
+            $stmt->bindParam( ':rpta' , $rpta , PDO::PARAM_STR , 10 );
+            $stmt->bindParam( ':desc' , $desc , PDO::PARAM_STR , 200 );
             $stmt->execute();
-            return $rpta;
+            return [ status => $rpta , description => $desc ];
         }
         catch( Exception $e )
         {
@@ -34,13 +35,14 @@ class InsPPTOProcedure
         try
         {
             $pdo = DB::getPdo();
-            $stmt = $pdo->prepare( 'BEGIN PK_PPTO_INSTITUCION.SP_CARGA_PPTO_INSTITUCION( :monto , :año , :user_id , :rpta ); end;' );
+            $stmt = $pdo->prepare( 'BEGIN PK_PPTO_INSTITUCION.SP_CARGA_PPTO_INSTITUCION( :monto , :año , :user_id , :rpta , :desc ); end;' );
             $stmt->bindParam( ':monto' , $roundAmount );
             $stmt->bindParam( ':año' , $year , PDO::PARAM_INT );
             $stmt->bindParam( ':user_id' , $user_id , PDO::PARAM_INT );
-            $stmt->bindParam( ':rpta' , $rpta , PDO::PARAM_STR , 200 );
+            $stmt->bindParam( ':rpta' , $rpta , PDO::PARAM_STR , 10 );
+            $stmt->bindParam( ':desc' , $desc , PDO::PARAM_STR , 200 );
             $stmt->execute();
-            return $rpta;
+            return [ status => $rpta , description => $desc ];
         }
         catch( Exception $e )
         {
