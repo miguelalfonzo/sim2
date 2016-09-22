@@ -23,7 +23,7 @@ class GerPPTOProcedure
             $response = [ status => $rpta , description => $desc ];
             if( ! is_null( $list ) )
             {
-                $response[ 'List' ] = $list;
+                $response[ 'List' ] = [ 'Detail' => explode( '|' , substr( $list , 0 , -1 ) ) , 'Class' => 'list-warning' ];
             }
             return $response;
         }

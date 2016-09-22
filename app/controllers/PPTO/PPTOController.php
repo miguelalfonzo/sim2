@@ -305,10 +305,10 @@ class PPTOController extends BaseController
         $rowInputs = '';
         foreach( $fileData as $key => $row )
         {
-            $rowInputs .= 'FILE_GERENTE_ROW( ' . $row->cod129 . ' , ' . round( $row->monto , 2 , PHP_ROUND_HALF_UP ) . ' ),';
+            $rowInputs .= 'TP_FILE_GERENTE_ROW( ' . $row->cod129 . ' , ' . round( $row->monto , 2 , PHP_ROUND_HALF_UP ) . ' ),';
         }
         $rowInputs = substr( $rowInputs , 0 , -1 );
-        $dataInput = 'FILE_GERENTE_TAB( ' . $rowInputs . ' )';
+        $dataInput = 'TP_FILE_GERENTE_TAB( ' . $rowInputs . ' )';
         
         $gerPPTOProcedureModel = new GerPPTOProcedure;
         $middleRpta = $gerPPTOProcedureModel->uploadValidate( $dataInput , $year , $category );
