@@ -26,7 +26,7 @@ class InsPPTOProcedure
         catch( Exception $e )
         {
             Log::error( $e );
-            return json_encode( [ status => error , description => $e->getMessage() ] );
+            return [ status => error , description => $e->getMessage() ];
         }    
     }
 
@@ -47,7 +47,7 @@ class InsPPTOProcedure
         catch( Exception $e )
         {
             Log::error( $e );
-            return json_encode( [ status => error , description => $e->getMessage() ] );
+            return [ status => error , description => $e->getMessage() ];
         }
     }
 }

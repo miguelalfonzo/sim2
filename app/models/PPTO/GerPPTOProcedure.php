@@ -13,17 +13,24 @@ class GerPPTOProcedure
         try
         {
             $pdo = DB::getPdo();
-            $stmt = $pdo->prepare( 'BEGIN PK_PPTO_GERENTE.SP_VALIDAR_PPTO_GERENTE( ' . $input . ' , :año , :categoria , :rpta ); end;' );
+            $stmt = $pdo->prepare( 'BEGIN PK_PPTO_GERENTE.SP_VALIDAR_PPTO_GERENTE( ' . $input . ' , :año , :categoria , :rpta , :desc , :list ); end;' );
             $stmt->bindParam( ':año' , $year , PDO::PARAM_INT );
             $stmt->bindParam( ':categoria' , $category , PDO::PARAM_INT );
-            $stmt->bindParam( ':rpta' , $rpta , PDO::PARAM_STR , 4000 );
+            $stmt->bindParam( ':rpta' , $rpta , PDO::PARAM_STR , 10 );
+            $stmt->bindParam( ':desc' , $desc , PDO::PARAM_STR , 200 );
+            $stmt->bindParam( ':list' , $list , PDO::PARAM_STR , 500 );
             $stmt->execute();
-            return $rpta;
+            $response = [ status => $rpta , description => $desc ];
+            if( ! is_null( $list ) )
+            {
+                $response[ 'List' ] = $list;
+            }
+            return $response;
         }
         catch( Exception $e )
         {
             Log::error( $e );
-            return json_encode( [ status => error , description => $e->getMessage() ] );
+            return [ status => error , description => $e->getMessage() ];
         }
     }
 

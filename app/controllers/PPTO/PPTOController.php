@@ -117,7 +117,7 @@ class PPTOController extends BaseController
                     case Self::GerPPTOType:
                         $gerPPTOProcedureModel = new GerPPTOProcedure;
                         $roundAmount = round( $inputs[ 'monto' ] , 2 , PHP_ROUND_HALF_UP );
-                        return $this->validateResponse( $gerPPTOProcedureModel->update( $inputs[ 'ppto_id' ] , $roundAmount , Auth::user()->id ) );
+                        return $gerPPTOProcedureModel->update( $inputs[ 'ppto_id' ] , $roundAmount , Auth::user()->id );
                     case Self::SupPPTOType:
                         $supPPTOProcedureModel = new SupPPTOProcedure;
                         $roundAmount = round( $inputs[ 'monto' ] , 2 , PHP_ROUND_HALF_UP );
@@ -311,11 +311,11 @@ class PPTOController extends BaseController
         $dataInput = 'FILE_GERENTE_TAB( ' . $rowInputs . ' )';
         
         $gerPPTOProcedureModel = new GerPPTOProcedure;
-        $middleRpta = $this->validateResponse( $gerPPTOProcedureModel->uploadValidate( $dataInput , $year , $category ) );
+        $middleRpta = $gerPPTOProcedureModel->uploadValidate( $dataInput , $year , $category );
         if( $middleRpta[ status ] == ok )
         {
             $user_id = Auth::user()->id;
-            return $this->validateResponse( $gerPPTOProcedureModel->upload( $dataInput , $year , $category , $user_id ) );
+            return $gerPPTOProcedureModel->upload( $dataInput , $year , $category , $user_id );
         }
         return $middleRpta;
     
