@@ -63,7 +63,12 @@ class FondoMktHistory extends Eloquent
     public function fromInstitutionFund()
     {
         return $this->belongsTo( '\Fondo\FondoInstitucional' , 'id_to_fondo' );    
-    }    
+    }
+
+    protected function createdByPersonal()
+    {
+        return $this->hasOne( '\Users\Personal' , 'user_id' , 'created_by' );
+    }  
 
     protected function updatedBy()
     {

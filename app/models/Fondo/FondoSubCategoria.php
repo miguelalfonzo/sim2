@@ -5,6 +5,10 @@ namespace Fondo;
 use \Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletingTrait;
 
+use \Fondo\FondoSupervisor;
+use \Fondo\FondoGerProd;
+use \Fondo\FondoInstitucional;
+
 class FondoSubCategoria extends Eloquent
 {
 
@@ -86,4 +90,28 @@ class FondoSubCategoria extends Eloquent
 			->get();
 	}
 
+	public function getFondos( $year )
+	{
+		\Log::info( $this );
+		\Log::info( $year );
+		if( $this->tipo == 'S ' )
+		{
+
+		} 
+		elseif( $this->tipo == 'P ' || $this->tipo == 'GP' )
+		{
+			$data = FondoGerProd::where( 'anio' , $year )->where( 'subcategoria_id' , $this->id )->get();
+			\Log::info( 'f' );
+			return $data;
+		}
+		elseif( $this->tipo == 'I ' )
+		{
+
+		}
+		else
+		{
+			return null;
+		}
+		//return $this->{ $this->relacion }->where( 'anio' , $year );
+	}
 }

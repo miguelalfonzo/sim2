@@ -259,6 +259,7 @@ class FondoMkt extends BaseController
                                 ->whereHas( $subCategoryType->relacion , function( $query ) use ( $subCategory )
                                 {
                                     $query->where( 'subcategoria_id' , $subCategory->id );
+                                        
                                 })->get();
 
         
@@ -269,8 +270,10 @@ class FondoMkt extends BaseController
                                     $query->where( 'subcategoria_id' , $subCategory->id );
                                 })->get();
 
-
-        $Fondos         = $subCategory->{ $subCategoryType->relacion };
+        //$subCategoryModel = new FondoSubCategoria;
+        //$Fondos = $subCategoryModel->getFondos( $subCategoryType->relacion , $start , $end );
+        $Fondos         = $subCategory->getFondos( substr( $end , 0 , 4 ) );
+        \Log::info( $Fondos );
         $FondosTotal    = $Fondos->sum( 'saldo' );
         $RetencionTotal = $Fondos->sum( 'retencion' );
         
