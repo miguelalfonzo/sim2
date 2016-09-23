@@ -377,7 +377,6 @@ class PPTOController extends BaseController
         $middleRpta = $this->validateResponse( $supPPTOProcedure->uploadValidate( $dataInput , $year , $category ) );
         if( $middleRpta[ status ] == ok )
         {
-            \Log::info( 'inicio' );
             return $this->validateResponse( $supPPTOProcedure->upload( $dataInput , $year , $category , Auth::user()->id ) );
         }
         return $middleRpta;
@@ -432,40 +431,8 @@ class PPTOController extends BaseController
         if( $validator->fails() )
         {
             return $this->warningException( $this->msgValidator( $validator ) , __FUNCTION__ , __LINE__ , __FILE__ );
-        };
+        }
         return $this->setRpta();
-    }
-
-    private function validateResponse( $response )
-    {
-        \Log::info( $response );
-        $response = json_decode( $response );
-        if( $response->{ status } == ok )
-        {
-            $rpta = [ status => ok ];
-        }
-        else
-        {
-            $rpta = [ status => warning ];
-        }
-
-        if( isset( $response->{ description } ) )
-        {
-            $rpta[ description ] = $response->{ description };
-        }
-
-        if( isset( $response->{ data } ) )
-        {
-            $rpta[ data ] = $response->{ data };
-        }  
-
-        if( isset( $response->List ) )
-        {
-            $rpta[ 'List' ] = [ 'Class' => $response->List->Class , 'Detail' => explode( '|' , substr( $response->List->Message , 0 , - 1 ) )  ];     
-        } 
-
-        return $rpta;
-
     }
 
 }

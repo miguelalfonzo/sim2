@@ -32,6 +32,7 @@ class PPTOGerente extends Eloquent
 		return PPTOGerente::select( [ 'id' , 'subcategoria_id' , 'marca_id' , 'monto' ] )
 			->with( [ 'subCategory' , 'family' ] )
 			->where( 'anio' , $year )
+			->where( 'subcategoria_id' , $subCategory )
 			->where( 'version' , $version - 1 )
 			->get();
 	}
