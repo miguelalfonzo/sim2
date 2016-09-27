@@ -2,6 +2,7 @@
 
 namespace Fondo;
 
+use \Carbon\Carbon;
 use \Eloquent;
 use \DB;
 use Illuminate\Database\Eloquent\SoftDeletingTrait;
@@ -40,7 +41,11 @@ class FondoInstitucional extends Eloquent
 
 	protected static function orderWithTrashed()
 	{
-		return FondoInstitucional::orderBy( 'updated_at' , 'DESC' )->withTrashed()->get();
+		$now = Carbon::now();
+		return FondoInstitucional::select( [ 'id' , 'subcategoria_id' , 'saldo' , 'retencion' ] )
+			->where( 'anio' , '=' , $now->format( 'Y' ) )
+			->orderBy( 'updated_at' , 'DESC' )->withTrashed()
+			->get();
 	}
 
 	protected function setSaldoAttribute( $value )

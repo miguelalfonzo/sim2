@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\SoftDeletingTrait;
 use \Eloquent;
 use \Auth;
 use \DB;
+use \Carbon\Carbon;
 
 class FondoSupervisor extends Eloquent
 {
@@ -50,12 +51,17 @@ class FondoSupervisor extends Eloquent
 
 	protected static function order()
 	{
-		return FondoSupervisor::orderBy( 'updated_at' , 'desc' )->get();
+		return 
+			FondoSupervisor::select( [ 'id' , 'subcategoria_id' , 'marca_id' , 'supervisor_id' , 'saldo' , 'retencion' ] )
+				->orderBy( 'updated_at' , 'desc' )->get();
 	}
 
 	protected static function orderWithTrashed()
 	{
-		return FondoSupervisor::orderBy( 'updated_at' , 'desc' )->withTrashed()->get();
+		$now = Carbon::now();
+		return FondoSupervisor::select( [ 'id' , 'subcategoria_id' , 'marca_id' , 'supervisor_id' , 'saldo' , 'retencion' ] )
+			->where( 'anio' , '=' , $now->format( 'Y' ) )
+			->orderBy( 'updated_at' , 'desc' )->withTrashed()->get();
 	}	
 
 	protected function setSaldoAttribute( $value )
@@ -100,21 +106,13 @@ class FondoSupervisor extends Eloquent
 
 	protected static function getSupFund( $category )
 	{
+		$now = Carbon::now();
 		$supFunds = FondoSupervisor::select( 'subcategoria_id , marca_id , round( saldo , 2 ) saldo , retencion , ( saldo - retencion ) saldo_disponible' )
-				   ->where( 'supervisor_id' , Auth::user()->id )->orderBy( 'subcategoria_id' )->with( 'subcategoria' , 'marca' );
+				   ->where( 'supervisor_id' , Auth::user()->id )
+				   ->where( 'anio' , '=' , $now->format( 'Y' ) )
+				   ->orderBy( 'subcategoria_id' )
+				   ->with( 'subcategoria' , 'marca' );
 
-		if( $category != 0 )
-		{
-			$supFunds = $supFunds->where( 'subcategoria_id' , $category );
-		}
-		
-		return $supFunds->get();
-	}
-
-	protected static function getReportSupFund( $category )
-	{
-		$supFunds = FondoSupervisor::where( 'supervisor_id' , Auth::user()->id )->orderBy( 'subcategoria_id' );
-		
 		if( $category != 0 )
 		{
 			$supFunds = $supFunds->where( 'subcategoria_id' , $category );
