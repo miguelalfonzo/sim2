@@ -322,7 +322,6 @@ class ExpenseController extends BaseController
 	{
 		try
 		{
-			DB::beginTransaction();
 			$inputs 	= Input::all();
 			$solicitud  = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
 			
@@ -335,7 +334,17 @@ class ExpenseController extends BaseController
 			{
 				return $this->warningException( 'Ya finalizo el registro de documentos para esta solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
 			}
+			
+			if( $solicitud->idtiposolicitud == REEMBOLSO )
+			{
+				$gastos = $solicitud->expenses->sum( 'monto' );
+				if( $gastos <= 0 )
+				{
+					return $this->warningException( 'No puedo terminar un reembolso sin registrar al menos un documento' , __FUNCTION__ , __LINE__ , __FILE__ );
+				}
+			}
 
+			DB::beginTransaction();
 			$oldIdEstado = $solicitud->id_estado;
 		
 			$middleRpta = $this->validateExpense( $solicitud , $inputs );
@@ -350,7 +359,7 @@ class ExpenseController extends BaseController
 			if ( $middleRpta[status] == ok )
 			{
 				Session::put( 'state' , R_GASTO );
-				DB::commit();
+				//DB::commit();
 			}
 			else
 				DB::rollback();
