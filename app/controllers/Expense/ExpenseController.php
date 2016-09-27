@@ -359,7 +359,7 @@ class ExpenseController extends BaseController
 			if ( $middleRpta[status] == ok )
 			{
 				Session::put( 'state' , R_GASTO );
-				//DB::commit();
+				DB::commit();
 			}
 			else
 				DB::rollback();

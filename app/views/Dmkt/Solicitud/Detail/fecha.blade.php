@@ -15,12 +15,12 @@
     			</span>
             </div>
     		<span  class="input-group-btn solicitud-date">
-    			<button class="btn btn-default" type="button" id="edit-date-activate" style="height: 38px;">
+    			<button class="btn btn-default" type="button" id="edit-date-activate">
     				<i class="glyphicon glyphicon-edit"></i>
     			</button>						
     		</span>
     		<span  class="input-group-btn  edit-date" style="display:none">
-                <button class="btn btn-default" type="button" id="edit-date-deactivate" style="height: 38px;">
+                <button class="btn btn-default" type="button" id="edit-date-deactivate">
     				<i class="glyphicon glyphicon-ban-circle"></i>
     			</button>
     		</span>
