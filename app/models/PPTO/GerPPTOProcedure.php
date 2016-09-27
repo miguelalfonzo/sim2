@@ -12,15 +12,13 @@ class GerPPTOProcedure
     {
         try
         {
-
-            Log::info( 'hola1');
             $pdo = DB::getPdo();
             $stmt = $pdo->prepare( 'BEGIN PK_PPTO_GERENTE.SP_VALIDAR_PPTO_GERENTE( ' . $input . ' , :año , :categoria , :rpta , :desc , :list ); end;' );
             $stmt->bindParam( ':año' , $year , PDO::PARAM_INT );
             $stmt->bindParam( ':categoria' , $category , PDO::PARAM_INT );
             $stmt->bindParam( ':rpta' , $rpta , PDO::PARAM_STR , 10 );
-            $stmt->bindParam( ':desc' , $desc , PDO::PARAM_STR , 200 );
-            $stmt->bindParam( ':list' , $list , PDO::PARAM_STR , 500 );
+            $stmt->bindParam( ':desc' , $desc , PDO::PARAM_STR , 300 );
+            $stmt->bindParam( ':list' , $list , PDO::PARAM_STR , 10000 );
             $stmt->execute();
             $response = [ status => $rpta , description => $desc ];
             if( ! is_null( $list ) )

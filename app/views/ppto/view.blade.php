@@ -57,7 +57,7 @@
 			</div>
 
 			<div class="form-group col-lg-1">
-				<button type="button" class="btn btn-primary load-ppto" style="margin-top:24px" >Cargar</button>
+				<button type="button" class="btn btn-primary load-ppto ladda-button" data-style="zoom-in" style="margin-top:24px" >Cargar</button>
 			</div>
 
 			<div class="form-group col-lg-1">
@@ -106,7 +106,7 @@
 			</div>
 
 			<div class="form-group col-lg-1">
-				<button type="button" class="btn btn-primary load-ppto" style="margin-top:24px" >Cargar</button>
+				<button type="button" class="btn btn-primary load-ppto ladda-button" data-style="zoom-in" style="margin-top:24px" >Cargar</button>
 			</div>
 
 			<div class="form-group col-lg-1">
@@ -140,7 +140,7 @@
 			</div>
 
 			<div class="form-group col-lg-1">
-				<button type="button" class="btn btn-primary load-ppto" style="margin-top:24px" >Cargar</button>
+				<button type="button" class="btn btn-primary load-ppto ladda-button" data-style="zoom-in" style="margin-top:24px" >Cargar</button>
 			</div>
 
 			<div class="form-group col-lg-1">
@@ -338,7 +338,9 @@
 			}
 			data.append( 'type' , type );
 			data.append( '_token' , GBREPORTS.token );
-			
+		
+			var spin = Ladda.create( this );
+			spin.start();	
 			$.ajax(
 			{
 				type : 'POST',
@@ -353,6 +355,7 @@
 				ajaxError( statusCode , errorThrown );
 			}).done( function( response )
 			{
+				spin.stop();
 				if( response.Status == ok )
 				{
 					loadPPTO( panel )

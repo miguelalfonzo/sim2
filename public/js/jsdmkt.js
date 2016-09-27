@@ -1829,7 +1829,7 @@ function bootboxMessage( response )
     var list = response.List;
     if( typeof list != 'undefined' )
     {
-        listgroup = '<ul class="list-group">';
+        listgroup = '<ul class="list-group" style="max-height:300px;overflow-y:scroll">';
         list.Detail.forEach( function( value )
         {
             listgroup += '<li class="list-group-item ' + list.Class + '">' + value + '</li>'; 

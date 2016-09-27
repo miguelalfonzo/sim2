@@ -121,7 +121,7 @@ class PPTOController extends BaseController
                     case Self::SupPPTOType:
                         $supPPTOProcedureModel = new SupPPTOProcedure;
                         $roundAmount = round( $inputs[ 'monto' ] , 2 , PHP_ROUND_HALF_UP );
-                        return $this->validateResponse( $supPPTOProcedureModel->update( $inputs[ 'ppto_id' ] , $roundAmount , Auth::user()->id ) );
+                        return $supPPTOProcedureModel->update( $inputs[ 'ppto_id' ] , $roundAmount , Auth::user()->id );
                     default:
                         return $this->warningException( 'Sin implementar' , __FUNCTION__ , __LINE__ , __FILE__ );
                 }
@@ -323,6 +323,7 @@ class PPTOController extends BaseController
 
     public function categoryFamilyUserUploadProcess( $file , $year , $category )
     {
+        \Log::info( microtime() );
     	$fileData = Excel::selectSheetsByIndex( 0 )->load( $file )->get();
 
         include( app_path() . '/models/Query/QueryProducts.php' );            
@@ -343,19 +344,19 @@ class PPTOController extends BaseController
                 $row->user_id   = $personRegister->user_id;
             }
 
-            $compare = $row->cod129 . '|' . $row->supervisor_id;
+            $compare = $row->cod129 . '|' . $row->codfico;
 
             if( $key != 0 )
             {
                 $sameKey = array_search( $compare , $uniqueArray );
                 if( $sameKey !== FALSE )
                 {
-                    $warnings[] = 'El campo COD129 y CODFICO no es igual en las filas N° ' . ( $sameKey + 2 ) . ' y ' . ( $key + 2 );
+                    $warnings[] = 'El campo COD129 y CODFICO es igual en las filas N° ' . ( $sameKey + 2 ) . ' y ' . ( $key + 2 );
                     unset( $uniqueArray[ $sameKey ] );
                 }
             }
 
-            $uniqueArray[] = $row->cod129 . '|' . $row->supervisor_id;
+            $uniqueArray[] = $row->cod129 . '|' . $row->codfico;
         }
 
         if( ! empty( $warnings ) )
@@ -368,16 +369,20 @@ class PPTOController extends BaseController
         $rowInputs = '';
         foreach( $fileData as $key => $row )
         {
-            $rowInputs .= 'FILE_SUPERVISOR_ROW( ' . $row->user_id . ' , ' . $row->cod129 . ' , ' . round( $row->monto , 2 , PHP_ROUND_HALF_UP ) . ' ),';
+            $rowInputs .= 'TP_FILE_SUPERVISOR_ROW( ' . $row->user_id . ' , ' . $row->cod129 . ' , ' . round( $row->monto , 2 , PHP_ROUND_HALF_UP ) . ' ),';
         }
         $rowInputs = substr( $rowInputs , 0 , -1 );
-        $dataInput = 'FILE_SUPERVISOR_TAB( ' . $rowInputs . ' )';
+        $dataInput = 'TP_FILE_SUPERVISOR_TAB( ' . $rowInputs . ' )';
         
+        \Log::info( microtime() );
+
         $supPPTOProcedure = new SupPPTOProcedure;
-        $middleRpta = $this->validateResponse( $supPPTOProcedure->uploadValidate( $dataInput , $year , $category ) );
+        $middleRpta = $supPPTOProcedure->uploadValidate( $dataInput , $year , $category );
+        \Log::info( microtime() );
+        
         if( $middleRpta[ status ] == ok )
         {
-            return $this->validateResponse( $supPPTOProcedure->upload( $dataInput , $year , $category , Auth::user()->id ) );
+            return $supPPTOProcedure->upload( $dataInput , $year , $category , Auth::user()->id );
         }
         return $middleRpta;
     }

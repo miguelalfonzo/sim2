@@ -33,8 +33,8 @@ class PPTOSupervisor extends Eloquent
 		return PPTOSupervisor::select( [ 'id' , 'subcategoria_id' , 'marca_id' , 'supervisor_id' , 'monto' ] )
 			->with( [ 'subCategory' , 'family' , 'personal'] )
 			->where( 'anio' , $year )
+			->where( 'subcategoria_id' , $subCategory )
 			->where( 'version' , $version - 1 )
-			->orderBy( 'subcategoria_id' , 'ASC' )
 			->orderBy( 'supervisor_id' , 'ASC' )
 			->orderBy( 'marca_id' , 'ASC' )->get();
 	}
