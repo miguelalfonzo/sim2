@@ -21,12 +21,15 @@
 
 	<div class="tab-content">
 		<div class="tab-pane fade active in" id="tab-ppto-sup" data-type="1">
-
 			<div class="row">
-				<div class="form-group col-md-12">
-					<h4><b>Carga de Presupuesto Supervisor</b></h4>
-				</div>
+				<h4><b>Carga de Presupuesto Supervisor</b>&nbsp;</h4>
 			</div>
+			<div class="row">
+				<ul class="list-group ppto-alert">
+					<!-- <li class="list-group-item list-group-item-danger"><b>No se puede cargar el presupuesto</b></li> -->
+				</ul>
+			</div>
+			
 			<div class="form-group col-lg-2">
 				<label>Año</label>
 				<select class="form-control ppto-year">
@@ -76,6 +79,12 @@
 					<h4><b>Carga de Presupuesto Gerentes</b></h4>
 				</div>
 			</div>
+			<div class="row">
+				<ul class="list-group ppto-alert">
+					<!-- <li class="list-group-item list-group-item-danger"><b>No se puede cargar el presupuesto</b></li> -->
+				</ul>
+			</div>
+			
 			<div class="form-group col-lg-2">
 				<label>Año</label>
 				<select class="form-control ppto-year">
@@ -125,6 +134,12 @@
 					<h4><b>Carga de Presupuesto Institucional</b></h4>
 				</div>
 			</div>
+			<div class="row">
+				<ul class="list-group ppto-alert">
+					<!-- <li class="list-group-item list-group-item-danger"><b>No se puede cargar el presupuesto</b></li> -->
+				</ul>
+			</div>
+			
 			<div class="form-group col-lg-2">
 				<label>Año</label>
 				<select class="form-control ppto-year">
@@ -223,12 +238,46 @@
 			});
 		}
 
+		function getPPTOStatus( tab )
+		{
+			var type = tab.attr( 'data-type' );
+			$.ajax(
+			{
+				type : 'POST',
+				url  : 'ppto-status',
+				data : { _token : GBREPORTS.token , type : type }
+			}).fail( function( statusCode , errorThrown )
+			{
+				ajaxError( statusCode , errorThrown );
+			}).done( function( response )
+			{
+				if( response.Status == ok )
+				{
+					tab.find( '.ppto-alert' ).html( '<li class="list-group-item list-group-item-success"><b>Habilitado</b></li>' );
+				}
+				else
+				{
+					tab.find( '.ppto-alert' ).html( '<li class="list-group-item list-group-item-danger"><b>Deshabilitado</b></li>' );
+				}
+
+			});
+				
+		} 
+
 		$( document ).ready( function()
 		{
 			$( '#ppto-amount' ).numeric( { negative : false } );
 			loadPPTO( $( '#tab-ppto-sup' ) );
 			loadPPTO( $( '#tab-ppto-ger' ) );
 			loadPPTO( $( '#tab-ppto-ins' ) );
+
+			getPPTOStatus( $( '#tab-ppto-sup' ) );
+			getPPTOStatus( $( '#tab-ppto-ger' ) );
+			getPPTOStatus( $( '#tab-ppto-ins' ) );
+			
+			setInterval( getPPTOStatus , 10000 , $( '#tab-ppto-sup' ) );
+			setInterval( getPPTOStatus , 10000 , $( '#tab-ppto-ger' ) );
+			setInterval( getPPTOStatus , 10000 , $( '#tab-ppto-ins' ) );
     	});
 
     	$( 'a[data-toggle="tab"]').on( 'shown.bs.tab', function()

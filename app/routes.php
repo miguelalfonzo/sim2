@@ -280,6 +280,7 @@
             Route::post( 'upload-ppto-sup' , 'PPTOController@uploadCategoryFamilyUser' );
             Route::post( 'load-ppto' , 'PPTOController@loadPPTO' );
             Route::post( 'update-ppto-row' , 'PPTOController@update' );
+            Route::post( 'ppto-status' , 'PPTOController@status' );
         });
 
         Route::group( [ 'namespace' => 'Fondo' ] , function()

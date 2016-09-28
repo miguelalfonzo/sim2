@@ -440,4 +440,30 @@ class PPTOController extends BaseController
         return $this->setRpta();
     }
 
+    public function status()
+    {
+        $inputs = Input::all();
+        if( in_array( $inputs[ 'type' ] , [ Self::SupPPTOType , Self::GerPPTOType , Self::InsPPTOType ] ) )
+        {
+            return $this->getProcessStatus( $inputs[ 'type' ] );
+        }
+        else
+        {
+            return $this->warningException( 'No se pudo determinar el estado del presupuesto' , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
+    }
+
+    private function getProcessStatus( $type )
+    {
+        $data = DB::table( 'ESTADO_PROCESO' )->where( 'id' , $type )->first();
+        if( $data->status == 1 )
+        {
+            return $this->setRpta();
+        }
+        else
+        {
+            return $this->warningException( 'No habilitado' , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
+    }
+
 }
