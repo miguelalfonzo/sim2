@@ -28,7 +28,9 @@ class FondoInstitucional extends Eloquent
 
 	public static function getSubFondo()
 	{
-		return  FondoInstitucional::whereHas( 'subcategoria' , function( $query )
+		$now = Carbon::now();
+		return  FondoInstitucional::where( 'anio' , $now->format( 'Y' ) )
+				->whereHas( 'subcategoria' , function( $query )
 	            {
 	            	$query->where( 'trim( tipo )' , 'I' );
 	            })->get();
