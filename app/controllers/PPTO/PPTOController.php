@@ -15,6 +15,7 @@ use \Fondo\FondoSupervisor;
 use \PPTO\InsPPTOProcedure;
 use \PPTO\GerPPTOProcedure;
 use \PPTO\SupPPTOPRocedure;
+use \Process\ProcessState;
 
 use \Carbon\Carbon;
 use \Validator;
@@ -36,13 +37,21 @@ class PPTOController extends BaseController
 	
     public function view()
     {
-        $startYear  = $this->getStartYear();
-        $years      = range( $startYear , $startYear + 50 , 1 );
-        $categories = 
-            FondoSubCategoria::select( [ 'id' , 'descripcion' , 'trim( tipo ) tipo' ] )
-                ->whereIn( 'trim( tipo )' , [ SUP , GER_PROD , GER_PROM ] )
-                ->orderBy( 'descripcion' , 'ASC' )->get();
-    	return View::make( 'ppto.view' , [ 'years' => $years , 'categories' => $categories ] );    
+        $pptoProcess = ProcessState::getPPTOStatusProcess();
+        if( $pptoProcess->status == 0 )
+        {
+            return View::make( 'ppto.disable-view' );  
+        }
+        else
+        {
+            $startYear  = $this->getStartYear();
+            $years      = range( $startYear , $startYear + 1 , 1 );
+            $categories = 
+                FondoSubCategoria::select( [ 'id' , 'descripcion' , 'trim( tipo ) tipo' ] )
+                    ->whereIn( 'trim( tipo )' , [ SUP , GER_PROD , GER_PROM ] )
+                    ->orderBy( 'descripcion' , 'ASC' )->get();
+        	return View::make( 'ppto.enable-view' , [ 'years' => $years , 'categories' => $categories ] );    
+        }
     }
 
     public function loadPPTO()
@@ -463,6 +472,36 @@ class PPTOController extends BaseController
         else
         {
             return $this->warningException( 'No habilitado' , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
+    }
+
+    public function enable()
+    {
+        $pptoProcess = ProcessState::getPPTOStatusProcess();
+        if( $pptoProcess->status == 0 )
+        {
+            $pptoProcess->status = 1;
+            $pptoProcess->save();
+            return $this->setRpta( null , 'Se habilito el proceso de carga del presupuesto' ); 
+        }
+        else
+        {
+            return $this->warningException( 'El proceso de carga del presupuesto ya se encuentra habilitado' , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
+    }
+
+    public function disable()
+    {
+        $pptoProcess = ProcessState::getPPTOStatusProcess();
+        if( $pptoProcess->status == 1 )
+        {
+            $pptoProcess->status = 0;
+            $pptoProcess->save();
+            return $this->setRpta( null , 'Se deshabilito el proceso de carga del presupuesto' );
+        }
+        else
+        {
+            return $this->warningException( 'El proceso de carga del presupuesto ya se encuentra inhabilitado' , __FUNCTION__ , __LINE__ , __FILE__ );
         }
     }
 

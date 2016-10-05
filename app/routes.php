@@ -22,10 +22,10 @@
     |--------------------------------------------------------------------------
     */
 
-    Route::get( '/', array( 'uses' => 'Dmkt\LoginController@showLogin'));
-    Route::get( 'login', array('uses' => 'Dmkt\LoginController@showLogin'));
-    Route::post( 'login', array('uses' => 'Dmkt\LoginController@doLogin'));
-    Route::get( 'logout', array('uses' => 'Dmkt\LoginController@doLogout'));
+    Route::get(  '/'      , array( 'uses' => 'Dmkt\LoginController@showLogin' ) );
+    Route::get(  'login'  , array( 'uses' => 'Dmkt\LoginController@showLogin' ) );
+    Route::post( 'login'  , array( 'uses' => 'Dmkt\LoginController@doLogin' ) );
+    Route::get(  'logout' , array( 'uses' => 'Dmkt\LoginController@doLogout' ) );
 
     /*
     |--------------------------------------------------------------------------
@@ -101,7 +101,7 @@
             Route::post( 'get-document-detail' , 'ExpenseController@getDocument');
             Route::post( 'update-document' , 'ExpenseController@updateDocument');
             Route::post( 'end-expense-record' , 'ExpenseController@endExpenseRecord' );
-            Route::post( 'consultarRucCont', 'RucController@show');
+            //Route::post( 'consultarRucCont', 'RucController@show');
         });
       
         Route::group( [ 'namespace' => 'Deposit' ] , function()
@@ -281,6 +281,8 @@
             Route::post( 'load-ppto' , 'PPTOController@loadPPTO' );
             Route::post( 'update-ppto-row' , 'PPTOController@update' );
             Route::post( 'ppto-status' , 'PPTOController@status' );
+            Route::post( 'ppto-enable' , 'PPTOController@enable' );
+            Route::post( 'ppto-disable' , 'PPTOController@disable' );
         });
 
         Route::group( [ 'namespace' => 'Fondo' ] , function()

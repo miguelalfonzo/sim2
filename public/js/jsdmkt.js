@@ -1555,17 +1555,18 @@ function seeker( element , name , url )
                     {
                         _token : GBREPORTS.token,
                         sVal   : request
-                    },
-                    error: function()
-                    {
-                        var resp = '{"value:0","label":"Error de Conexion"}';
-                        response(resp);
-                    },
-                }).done( function (data)
+                    }
+                }).fail( function( statusCode , errorThrown )
                 {
-                    if ( data.Status != 'Ok')
-                        data.Data = '{"value":"0","label":"Error en la busqueda"}';   
-                    return response( data.Data );
+                    var rpta = [ { type : 'Fallo' , value: 0 , label : 'Revise su conexion a internet' } ];
+                    response( response );    
+                }).done( function( response )
+                {
+                    if ( response.Status != 'Ok' )
+                    {
+                        response.Data = [ { type : response.Status , value: 0 , label: response.Description } ];   
+                    }
+                    return response( response.Data );
                 });              
             }
         }).on('typeahead:selected', function ( evento, suggestion , dataset )
@@ -1820,6 +1821,10 @@ function bootboxMessage( response )
     {
         colorClass = 'text-danger';
     }
+    else if( response.Status == 'Logout' )
+    {
+        window.location.href = 'login';
+    }
     else
     {
         colorClass = 'text-info';
@@ -1836,7 +1841,13 @@ function bootboxMessage( response )
         });
         listgroup += '</ul>';
     }
-    bootbox.alert( '<h4 class="' + colorClass + '">' + response.Description + '</h4>' + listgroup );
+    bootbox.alert( '<h4 class="' + colorClass + '">' + response.Description + '</h4>' + listgroup , function()
+    {
+        if( response.Status == 'Logout' )
+        {
+            window.location.href = 'login';
+        }
+    });
 }
 
 //Validate send register solicitude
@@ -2294,7 +2305,7 @@ $( document ).ready(function()
             }         
         });
     }
-    if( window.location.href.match( 'public/show_user' ) !== null )
+    if( window.location.href.match( 'public/show_user' ) != null )
     {
         getAlerts();
     }
@@ -2348,7 +2359,7 @@ function listSolicituds()
         
     customAjax( 'GET' , 'list-solicituds' , data ).done(function ( response ) 
     {
-        if ( response.Status === 'Ok' )
+        if ( response.Status == 'Ok' )
         {
             processData( response.Data , response.usuario );
             processColumns( response.columns , response.usuario , response.now );
@@ -2384,7 +2395,7 @@ function listSolicituds()
         }
         else
         {
-            bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+            bootboxMessage( response );
         }
     });   
 }

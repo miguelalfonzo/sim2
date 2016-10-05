@@ -44,6 +44,7 @@ class FondoGerProd extends Eloquent
 	{
 		$now = Carbon::now();
 		return FondoGerProd::select( [ 'id' , 'subcategoria_id' , 'marca_id' , 'saldo' , 'retencion' ] )
+			->where( 'subcategoria_id' , '<>' , 31 )
 			->where( 'anio' , '=' , $now->format( 'Y' ) )
 			->orderBy( 'updated_at' , 'DESC' )->withTrashed()->get();
 	}

@@ -1,6 +1,10 @@
 @extends( 'template.main' )
 @section( 'solicitude' )
-	
+	<div class="container-fluid jumbotron">
+		<h3 style="margin-top:0px">Inhabilitacion del Proceso de Carga de Presupuesto</h3>
+		<button id="ppto-disable" type="button" class="btn btn-success">Confirmar</button>
+	</div>
+
 	<ul class="nav nav-tabs" role="tablist">
 		<li class="active">
 			<a href="#tab-ppto-sup" role="tab" data-toggle="tab">
@@ -363,6 +367,26 @@
 				bootboxMessage( response );
 			});
 		});
+
+		var disableButton = document.getElementById( 'ppto-disable' );
+		disableButton.onclick = function()
+		{
+			var data = { _token : GBREPORTS.token };
+			$.post( 'ppto-disable' , data ).fail( function( statusCode , errorThrown )
+			{
+				ajaxError( statusCode , errorThrown );
+			}).done( function( response )
+			{
+				if( response.Status == ok )
+				{
+					window.location.reload();
+				}
+				else
+				{
+					bootboxMessage( response );
+				}
+			});
+		};
 
 	</script>
 @stop
