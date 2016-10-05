@@ -226,7 +226,7 @@
 				cache       : false
             }).done( function( response )
             {
-				if( response.status == 'OK' )
+				if( validateResponse( response ) )
 				{
 					if( typeof( response.data ) != 'undefined' )
 					{
@@ -355,9 +355,10 @@
                 cache: false,
             }).done(function(data) {
 				formula = JSON.parse(GBREPORTS.lastReport.formula);
-				if (data.status == 'OK' && typeof(data.tfootList) != 'undefined' && typeof(data.tbodyList) != 'undefined')
+				if( data.Status == ok && typeof(data.tfootList) != 'undefined' && typeof(data.tbodyList) != 'undefined')
 				{
-					if(typeof(data.message) == 'undefined'){
+					if( typeof data.message == 'undefined' )
+					{
 							GBREPORTS.valores = data.valores;
 							$("#dataTable").html('<table cellpadding="0" cellspacing="0" border="0" style="width:100%" id="dt_report" class="table table-striped table-hover table-bordered"></table>');
 
@@ -497,14 +498,16 @@
 							// $("#dt_report").css('margin-left', '19px');
 							gbReportsObject.changeDateRange(formula.frecuency);
 						}
-					}else
+					}
+					else
 					{
-						var msg = '';
+						/*var msg = '';
 						if(typeof(data.message) != 'undefined')
 							msg = data.message;
 						else
 							msg = 'Hubo un problema con la formula al generar el reporte';
-						bootbox.alert(msg);
+						bootbox.alert(msg);*/
+						bootboxMessage( data );
 						$("#dataTable").empty();
 						// bootbox.alert(data.Status + ': ' + data.message);
 						// gbReportsObject.changeDateRange(formula.frecuency);

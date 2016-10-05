@@ -153,6 +153,12 @@ class PPTOController extends BaseController
             $inputs = Input::all();
             $year   = $inputs[ 'year' ];
             
+            $pptoProcess = ProcessState::getPPTOStatusProcess();
+            if( $pptoProcess->status != 1 )
+            {
+                return $this->warningException( 'El proceso de carga de presupuesto no esta habilitado' , __FUNCTION__ , __LINE__ , __FILE__ );  
+            }
+
             if( ! isset( $inputs[ 'type' ] ) || ! in_array( $inputs[ 'type' ] , [ Self::SupPPTOType , Self::GerPPTOType , Self::InsPPTOType ] ) )
             {
                 return $this->warningException( 'Carga no identificada' , __FUNCTION__ , __LINE__ , __FILE__ );

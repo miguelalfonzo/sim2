@@ -251,7 +251,13 @@ class FondoMkt extends BaseController
     {
         $inputs = Input::all();
         $start = $inputs[ 'start' ];
-        $end   = $inputs[ 'end' ];  
+        $end   = $inputs[ 'end' ]; 
+
+        if( substr( $start , 0 , 4) != substr( $end , 0 , 4 ) )
+        {
+            return $this->warningException( 'No se puede generar el reporte para años diferentes.' , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
+
         $subCategory           = FondoSubCategoria::find( $inputs[ 'id_subcategoria' ] );
         $subCategoryType       = $subCategory->fondoMktType;
         $fondoMktHistoriesData = FondoMktHistory::whereRaw( "created_at between to_date( '$start' , 'YYYY/MM/DD' ) and to_date( '$end' , 'YYYY/MM/DD' ) + 1" )

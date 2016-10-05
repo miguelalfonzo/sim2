@@ -87,7 +87,7 @@
     $( document ).ready( function()
     {
         @if( Session::has( 'message' ) )
-            bootbox.alert( '<h4 class="text-danger">{{ Session::get( 'message' ) }}</h4>' );
+            bootbox.alert( '<h4 class="text-warning">{{ Session::get( 'message' ) }}</h4>' );
         @endif
     });
 </script>

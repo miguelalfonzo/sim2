@@ -64,6 +64,18 @@ var date_options2 =
     autoclose   : true
 };
 
+function validateResponse( response )
+{
+    if( response.Status == ok )
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 $(document).off( 'click' , '.timeLine' );
 $(document).on( 'click' , '.timeLine' , function(e)
 {
@@ -1823,7 +1835,7 @@ function bootboxMessage( response )
     }
     else if( response.Status == 'Logout' )
     {
-        window.location.href = 'login';
+        colorClass = 'text-warning';
     }
     else
     {
@@ -2286,23 +2298,27 @@ $( document ).ready(function()
             {
                 _token     : GBREPORTS.token
             }
-        }).done( function( dataResult ) 
+        }).done( function( response ) 
         {
-            if( dataResult.status == 'OK' )
+            if( validateResponse( response ) )
             {
-                if( typeof( dataResult.alerts ) != 'undefined' )
+                if( typeof( response.alerts ) != 'undefined' )
                 {
-                    if( dataResult.alerts.length > 0 )
+                    if( response.alerts.length > 0 )
                     {
                         $( '.sim_alerta' ).show( 'slow' );
-                        var alerts = dataResult.alerts;
+                        var alerts = response.alerts;
                         $( '.sim_alerta' ).find( 'span' ).html( 
                             ( typeof alerts[0] === 'undefined' ? 0 : alerts[0].data.length ) + 
                             ( typeof alerts[1] === 'undefined' ? 0 : alerts[1].data.length ) + 
                             ( typeof alerts[2] === 'undefined' ? 0 : alerts[2].data.length ) );
                     }
                 }
-            }         
+            }
+            else
+            {
+                bootboxMessage( response );
+            }
         });
     }
     if( window.location.href.match( 'public/show_user' ) != null )
