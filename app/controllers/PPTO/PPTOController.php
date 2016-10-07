@@ -117,6 +117,12 @@ class PPTOController extends BaseController
     {
         try
         {
+            $pptoProcess = ProcessState::getPPTOStatusProcess();
+            if( $pptoProcess->status != 1 )
+            {
+                return $this->warningException( 'El proceso de carga de presupuesto no esta habilitado' , __FUNCTION__ , __LINE__ , __FILE__ );  
+            }
+
             $inputs = Input::all();
             $middleRpta = $this->validateUpdate( $inputs );
             if( $middleRpta[ status ] == ok )
@@ -150,14 +156,14 @@ class PPTOController extends BaseController
     {
         try 
         {
-            $inputs = Input::all();
-            $year   = $inputs[ 'year' ];
-            
             $pptoProcess = ProcessState::getPPTOStatusProcess();
             if( $pptoProcess->status != 1 )
             {
                 return $this->warningException( 'El proceso de carga de presupuesto no esta habilitado' , __FUNCTION__ , __LINE__ , __FILE__ );  
             }
+
+            $inputs = Input::all();
+            $year   = $inputs[ 'year' ];
 
             if( ! isset( $inputs[ 'type' ] ) || ! in_array( $inputs[ 'type' ] , [ Self::SupPPTOType , Self::GerPPTOType , Self::InsPPTOType ] ) )
             {
