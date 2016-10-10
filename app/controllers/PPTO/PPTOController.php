@@ -16,6 +16,7 @@ use \PPTO\InsPPTOProcedure;
 use \PPTO\GerPPTOProcedure;
 use \PPTO\SupPPTOPRocedure;
 use \Process\ProcessState;
+use \Expense\Table;
 
 use \Carbon\Carbon;
 use \Validator;
@@ -289,10 +290,33 @@ class PPTOController extends BaseController
 
     private function categoryFamilyUploadProcess( $file , $year , $category )
     {
+        $rows = Excel::selectSheetsByIndex( 0 )->load( $file )->getTotalRowsOfFile();
+        if( $rows == 0 )
+        {
+            return $this->warningException( 'El archivo esta vacío' , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
+        if( $rows == 1 )
+        {
+            return $this->warningException( 'El archivo solo contiene una fila' , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
+
         $fileData = Excel::selectSheetsByIndex( 0 )->load( $file )->get();
 
-        include( app_path() . '/models/Query/QueryProducts.php' );            
-        $familiesId = implode( $qryProducts->lists( 'id' ) , ',' );
+        if( ! isset( $fileData[ 0 ]->cod129 ) || ! isset( $fileData[ 0 ]->monto ) )
+        {
+            return $this->warningException( 'El archivo debe tener las siguientes cabeceras en la primera fila: COD129 y MONTO' , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
+
+        if( $fileData->count() == 0 )
+        {
+            return $this->warningException( 'Las filas del archivo no tienen informacion de las familias y sus montos' , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
+
+        //Listado de los codigos de las familias del maestro de bago
+        $parametersModel = new Table;
+        $familiesId = implode( $parametersModel->getFamilies() , ',' ); 
+        /*include( app_path() . '/models/Query/QueryProducts.php' );            
+        $familiesId = implode( $qryProducts->lists( 'id' ) , ',' );*/
 
         $uniqueArray = [];
         $warnings = [];
@@ -344,11 +368,34 @@ class PPTOController extends BaseController
 
     public function categoryFamilyUserUploadProcess( $file , $year , $category )
     {
-        \Log::info( microtime() );
-    	$fileData = Excel::selectSheetsByIndex( 0 )->load( $file )->get();
+        $rows = Excel::selectSheetsByIndex( 0 )->load( $file )->getTotalRowsOfFile();
+        if( $rows == 0 )
+        {
+            return $this->warningException( 'El archivo esta vacío' , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
+        if( $rows == 1 )
+        {
+            return $this->warningException( 'El archivo solo contiene una fila' , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
 
-        include( app_path() . '/models/Query/QueryProducts.php' );            
-        $familiesId = implode( $qryProducts->lists( 'id' ) , ',' );
+        $fileData = Excel::selectSheetsByIndex( 0 )->load( $file )->get();
+
+        if( ! isset( $fileData[ 0 ]->cod129 ) || ! isset( $fileData[ 0 ]->codfico ) || ! isset( $fileData[ 0 ]->monto ) )
+        {
+            return $this->warningException( 'El archivo debe tener las siguientes cabeceras en la primera fila: CODFICO , COD129 y MONTO' , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
+
+        if( $fileData->count() == 0 )
+        {
+            return $this->warningException( 'Las filas del archivo no tienen informacion de los supervisores , sus familias y sus montos' , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
+
+        //Listado de los codigos de las familias del maestro de bago
+        $parametersModel = new Table;
+        $familiesId = implode( $parametersModel->getFamilies() , ',' ); 
+        /*include( app_path() . '/models/Query/QueryProducts.php' );            
+        $familiesId = implode( $qryProducts->lists( 'id' ) , ',' );*/
+        
         $supIds = $this->getSupIds();
         $uniqueArray = [];
         $warnings = [];
@@ -395,11 +442,8 @@ class PPTOController extends BaseController
         $rowInputs = substr( $rowInputs , 0 , -1 );
         $dataInput = 'TP_FILE_SUPERVISOR_TAB( ' . $rowInputs . ' )';
         
-        \Log::info( microtime() );
-
         $supPPTOProcedure = new SupPPTOProcedure;
         $middleRpta = $supPPTOProcedure->uploadValidate( $dataInput , $year , $category );
-        \Log::info( microtime() );
         
         if( $middleRpta[ status ] == ok )
         {

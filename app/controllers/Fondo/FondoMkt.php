@@ -260,7 +260,7 @@ class FondoMkt extends BaseController
 
         $subCategory           = FondoSubCategoria::find( $inputs[ 'id_subcategoria' ] );
         $subCategoryType       = $subCategory->fondoMktType;
-        $fondoMktHistoriesData = FondoMktHistory::whereRaw( "created_at between to_date( '$start' , 'YYYY/MM/DD' ) and to_date( '$end' , 'YYYY/MM/DD' ) + 1" )
+        $fondoMktHistoriesData = FondoMktHistory::whereRaw( "created_at between to_date( '$start' , 'YYYY/MM/DD' ) and to_date( '$end 235959' , 'YYYY/MM/DD HH24MISS' )" )
                                 ->where( 'id_tipo_to_fondo' , trim( $subCategory->tipo ) )
                                 ->whereHas( $subCategoryType->relacion , function( $query ) use ( $subCategory )
                                 {
@@ -279,7 +279,6 @@ class FondoMkt extends BaseController
         //$subCategoryModel = new FondoSubCategoria;
         //$Fondos = $subCategoryModel->getFondos( $subCategoryType->relacion , $start , $end );
         $Fondos         = $subCategory->getFondos( substr( $end , 0 , 4 ) );
-        \Log::info( $Fondos );
         $FondosTotal    = $Fondos->sum( 'saldo' );
         $RetencionTotal = $Fondos->sum( 'retencion' );
         

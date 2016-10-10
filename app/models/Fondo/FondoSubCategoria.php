@@ -92,21 +92,20 @@ class FondoSubCategoria extends Eloquent
 
 	public function getFondos( $year )
 	{
-		\Log::info( $this );
-		\Log::info( $year );
 		if( $this->tipo == 'S ' )
 		{
-
+			$data = FondoSupervisor::where( 'anio' , $year )->where( 'subcategoria_id' , $this->id )->get();
+			return $data;
 		} 
 		elseif( $this->tipo == 'P ' || $this->tipo == 'GP' )
 		{
 			$data = FondoGerProd::where( 'anio' , $year )->where( 'subcategoria_id' , $this->id )->get();
-			\Log::info( 'f' );
 			return $data;
 		}
 		elseif( $this->tipo == 'I ' )
 		{
-
+			$data = FondoInstitucional::where( 'anio' , $year )->where( 'subcategoria_id' , $this->id )->get();
+			return $data;
 		}
 		else
 		{

@@ -294,6 +294,7 @@
 					elem.fadeOut();
 					tr.find( '.cancel-ppto-row' ).fadeOut();
 					tr.find( '.edit-ppto-row' ).fadeIn();
+					loadPPTO( elem.closest( '.tab-pane' ) );
 				}
 				bootboxMessage( response );
 			

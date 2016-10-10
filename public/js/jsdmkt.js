@@ -1557,7 +1557,7 @@ function seeker( element , name , url )
                     return '<p><strong>' + data.type + ': ' + data.label + '</strong></p>';
                 }
             },
-            source: function (request , response)
+            source: function( request , dataset )
             {
                 $.ajax(
                 {
@@ -1570,15 +1570,17 @@ function seeker( element , name , url )
                     }
                 }).fail( function( statusCode , errorThrown )
                 {
-                    var rpta = [ { type : 'Fallo' , value: 0 , label : 'Revise su conexion a internet' } ];
-                    response( response );    
+                    ajaxError( statusCode , errorThrown );    
                 }).done( function( response )
                 {
-                    if ( response.Status != 'Ok' )
+                    if ( validateResponse( response ) )
                     {
-                        response.Data = [ { type : response.Status , value: 0 , label: response.Description } ];   
+                        return dataset( response.Data );
                     }
-                    return response( response.Data );
+                    else
+                    {
+                        bootboxMessage( response );
+                    }
                 });              
             }
         }).on('typeahead:selected', function ( evento, suggestion , dataset )
@@ -1857,7 +1859,7 @@ function bootboxMessage( response )
     {
         if( response.Status == 'Logout' )
         {
-            window.location.href = 'login';
+            window.location.href = server + 'login';
         }
     });
 }

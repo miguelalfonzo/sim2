@@ -11,7 +11,12 @@ class Table extends Eloquent
 	
 	protected static function getIGV()
 	{
-		return Table::where('tipo','143')->where('codigo' , '1' )->first();	
+		return Table::where( 'tipo' , 143 )->where( 'codigo' , 1 )->first();	
+	}
+
+	public function getFamilies()
+	{
+		return $this->select( 'codigo' )->where( 'tipo' , 129 )->lists( 'codigo' );
 	}
 
 }
