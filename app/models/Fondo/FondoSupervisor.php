@@ -2,9 +2,11 @@
 
 namespace Fondo;
 
-use \Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletingTrait;
+use \Eloquent;
 use \Auth;
+use \DB;
+use \Carbon\Carbon;
 
 class FondoSupervisor extends Eloquent
 {
@@ -13,6 +15,19 @@ class FondoSupervisor extends Eloquent
 
 	protected $table      = TB_FONDO_SUPERVISOR;
 	protected $primaryKey = 'id';
+
+	public function nextId()
+	{
+		$register = FondoSupervisor::orderBy( 'id' , 'DESC' )->first();
+		if( is_null( $register ) )
+		{
+			return 1;
+		}
+		else
+		{
+			return $register->id + 1;
+		}
+	}
 
 	protected function getSaldoDisponibleAttribute()
 	{
@@ -36,12 +51,17 @@ class FondoSupervisor extends Eloquent
 
 	protected static function order()
 	{
-		return FondoSupervisor::orderBy( 'updated_at' , 'desc' )->get();
+		return 
+			FondoSupervisor::select( [ 'id' , 'subcategoria_id' , 'marca_id' , 'supervisor_id' , 'saldo' , 'retencion' ] )
+				->orderBy( 'updated_at' , 'desc' )->get();
 	}
 
 	protected static function orderWithTrashed()
 	{
-		return FondoSupervisor::orderBy( 'updated_at' , 'desc' )->withTrashed()->get();
+		$now = Carbon::now();
+		return FondoSupervisor::select( [ 'id' , 'subcategoria_id' , 'marca_id' , 'supervisor_id' , 'saldo' , 'retencion' ] )
+			->where( 'anio' , '=' , $now->format( 'Y' ) )
+			->orderBy( 'updated_at' , 'desc' )->withTrashed()->get();
 	}	
 
 	protected function setSaldoAttribute( $value )
@@ -69,6 +89,12 @@ class FondoSupervisor extends Eloquent
 		return $this->subCategoria->descripcion . ' | ' . $this->marca->descripcion . ' S/.' . $this->saldo_disponible ;
 	}
 
+	public function getDetailNameAttribute()
+    {
+    	$subCategory = $this->subCategoria;
+        return $this->marca->descripcion . ' | ' . $subCategory->categoria->descripcion . ' | ' . $subCategory->descripcion;
+    }
+
 	protected static function totalAmount( $subcategory , $supervisorId )
 	{
 		$model  =	FondoSupervisor::select( 'sum( saldo ) saldo , sum( retencion ) retencion , sum( saldo - retencion ) saldo_disponible , subcategoria_id' )
@@ -80,8 +106,12 @@ class FondoSupervisor extends Eloquent
 
 	protected static function getSupFund( $category )
 	{
+		$now = Carbon::now();
 		$supFunds = FondoSupervisor::select( 'subcategoria_id , marca_id , round( saldo , 2 ) saldo , retencion , ( saldo - retencion ) saldo_disponible' )
-				   ->where( 'supervisor_id' , Auth::user()->id )->orderBy( 'subcategoria_id' )->with( 'subcategoria' , 'marca' );
+				   ->where( 'supervisor_id' , Auth::user()->id )
+				   ->where( 'anio' , '=' , $now->format( 'Y' ) )
+				   ->orderBy( 'subcategoria_id' )
+				   ->with( 'subcategoria' , 'marca' );
 
 		if( $category != 0 )
 		{
@@ -91,15 +121,23 @@ class FondoSupervisor extends Eloquent
 		return $supFunds->get();
 	}
 
-	protected static function getReportSupFund( $category )
+	protected function getUnique( $year , $category , $userId , $familyId )
 	{
-		$supFunds = FondoSupervisor::where( 'supervisor_id' , Auth::user()->id )->orderBy( 'subcategoria_id' );
-		if( $category != 0 )
-		{
-			$supFunds = $supFunds->where( 'subcategoria_id' , $category );
-		}
-		
-		return $supFunds->get();
+		return FondoSupervisor::where( 'anio' , $year )
+			->where( 'subcategoria_id' , $category )
+			->where( 'supervisor_id' , $userId )
+			->where( 'marca_id' , $familyId )
+			->first();
 	}
+
+	protected function updateFundAmount( $fundId , $diffAmount )
+    {
+        if( ! is_numeric( $diffAmount ) )
+        {
+            return -1;
+        }
+        return FondoSupervisor::where( 'id' , $fundId )
+            ->update( [ 'saldo' => DB::raw( 'saldo + ' . $diffAmount ) ] ); 
+    }
 
 }

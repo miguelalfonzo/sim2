@@ -3,6 +3,7 @@
 namespace System;
 
 use \Eloquent;
+use \DB;
 
 class FondoMktHistory extends Eloquent
 {
@@ -62,7 +63,12 @@ class FondoMktHistory extends Eloquent
     public function fromInstitutionFund()
     {
         return $this->belongsTo( '\Fondo\FondoInstitucional' , 'id_to_fondo' );    
-    }    
+    }
+
+    protected function createdByPersonal()
+    {
+        return $this->hasOne( '\Users\Personal' , 'user_id' , 'created_by' );
+    }  
 
     protected function updatedBy()
     {
@@ -73,4 +79,25 @@ class FondoMktHistory extends Eloquent
     {
         return $this->belongsTo( '\Fondo\FondoMktHistoryReason' , 'id_fondo_history_reason' );
     }
+
+    protected function getFundFirstRegister( $fundId , $type )
+    {
+        return FondoMktHistory::where( 'id_to_fondo' , $fundId )
+            ->where( 'id_tipo_to_fondo' , $type )
+            ->orderBy( 'created_at' , 'ASC' )
+            ->orderBy( 'id' , 'ASC' )
+            ->first();    
+    }
+
+    protected function updateFundAmount( $fundId , $type , $diffAmount )
+    {
+        if( ! is_numeric( $diffAmount ) )
+        {
+            return -1;
+        }
+        return FondoMktHistory::where( 'id_to_fondo' , $fundId )
+            ->where( 'id_tipo_to_fondo' , $type )
+            ->update( [ 'to_old_saldo' => DB::raw( 'to_old_saldo + ' . $diffAmount ) , 'to_new_saldo' => DB::raw( 'to_new_saldo + ' . $diffAmount ) ] ); 
+    }
+
 }

@@ -3,6 +3,7 @@
 namespace Fondo;
 
 use \Eloquent;
+use \Carbon\Carbon;
 use Illuminate\Database\Eloquent\SoftDeletingTrait;
 
 class FondoGerProd extends Eloquent
@@ -41,7 +42,11 @@ class FondoGerProd extends Eloquent
 
 	protected static function orderWithTrashed()
 	{
-		return FondoGerProd::orderBy( 'updated_at' , 'DESC' )->withTrashed()->get();
+		$now = Carbon::now();
+		return FondoGerProd::select( [ 'id' , 'subcategoria_id' , 'marca_id' , 'saldo' , 'retencion' ] )
+			->where( 'subcategoria_id' , '<>' , 31 )
+			->where( 'anio' , '=' , $now->format( 'Y' ) )
+			->orderBy( 'updated_at' , 'DESC' )->withTrashed()->get();
 	}
 
 	protected function setSaldoAttribute( $value )
@@ -68,5 +73,11 @@ class FondoGerProd extends Eloquent
 	{
 		return $this->subCategoria->descripcion . ' | ' . $this->marca->descripcion . ' S/.' . $this->saldo_disponible ;
 	}
+
+	public function getDetailNameAttribute()
+    {
+    	$subCategory = $this->subCategoria;
+        return $this->marca->descripcion . ' | ' . $subCategory->categoria->descripcion . ' | ' . $subCategory->descripcion;
+    }
 
 }

@@ -5,7 +5,9 @@ use \Eloquent;
 use \DB;
 use \Fondo\FondoGerProd;
 use \Fondo\FondoSupervisor;
+use \Fondo\FondoInstitucional;
 use \Expense\ChangeRate;
+use \Carbon\Carbon;
 
 class SolicitudProduct extends Eloquent
 {
@@ -23,70 +25,64 @@ class SolicitudProduct extends Eloquent
 
     public function getSubFondo( $userType , $solicitud , $productoId = null )
     {
-        $id_producto =  isset($productoId) ? $productoId : $this->id_producto;
+        $id_producto = isset( $productoId ) ? $productoId : $this->id_producto;
+        $year        = $solicitud->created_at_year; 
         if ( $userType == SUP )
         {
-            $userid = $solicitud->personalTo->userSup();
-            return DB::table(TB_FONDO_SUPERVISOR.' fs')
-                        ->select("m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'fs.saldo - fs.retencion saldo_disponible' , 'fs.id' , 'fs.marca_id' , '\'S\' tipo' )
-                        ->leftJoin(TB_FONDO_CATEGORIA_SUB.' fsc' , 'fsc.id' , '=' , 'fs.subcategoria_id' )
-                        ->leftJoin(TB_FONDO_CATEGORIA.' fc' , 'fc.id' , '=' , 'fsc.id_fondo_categoria' )
-                        ->leftJoin(TB_MARCAS_BAGO.' m' , 'fs.marca_id' , '=' , 'm.id' )
-                        //->where('fs.saldo' , '>' , 0 )
-                        ->where('trim( fsc.tipo )' , FONDO_SUBCATEGORIA_SUPERVISOR )
-                        ->where('fs.supervisor_id' , $userid )->orderBy( 'm.descripcion' , 'asc' )
-                        ->where( 'fs.marca_id' , $id_producto )
-                        ->get();
-        }
-        else if ( in_array( $userType , array( GER_PROD , GER_PROM ) ) )
-        {
-            return DB::table( TB_FONDO_GERENTE_PRODUCTO.' f' )
-            ->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo - f.retencion saldo_disponible', 'f.id' , 'f.marca_id' , '\'P\' tipo' )
-            ->leftJoin( TB_FONDO_CATEGORIA_SUB.' fsc' , 'f.subcategoria_id' , '=' , 'fsc.id' )
-            ->leftJoin( TB_FONDO_CATEGORIA.' fc' , 'fsc.id_fondo_categoria' , '=' , 'fc.id' )
-            ->leftJoin( TB_MARCAS_BAGO.' m' , 'f.marca_id' , '=' , 'm.id' )
-            ->where( function( $query ) use( $userType )
-            {
-                $query->where( 'trim( fsc.tipo )' , $userType );
-            })
-            ->where( 'f.saldo' , '>' , 0 )->orderBy( 'm.descripcion' , 'asc' )
-            ->where( 'f.marca_id' , $id_producto )
-            ->get();
-        }
-        else if ( $userType == ASIS_GER )
-        {
-            return DB::table( TB_FONDO_INSTITUCION.' f' )
-            ->select( "fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo - f.retencion saldo_disponible' , 'f.id' , '\'AG\' tipo' )
-            ->leftJoin( TB_FONDO_CATEGORIA_SUB.' fsc' , 'f.subcategoria_id' , '=' , 'fsc.id' )
-            ->leftJoin( TB_FONDO_CATEGORIA.' fc' , 'fsc.id_fondo_categoria' , '=' , 'fc.id' )
-            ->where( 'fsc.tipo' , FONDO_SUBCATEGORIA_INSTITUCION )->get();
-        }
-        else if ( in_array( $userType , array( GER_COM , GER_GER ) ) )
-        {
-            $supFunds = DB::table(TB_FONDO_SUPERVISOR.' fs')
-                        ->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion || ' | ' || p.nombres || ' ' || p.apellidos descripcion" , 'fs.saldo - fs.retencion saldo_disponible' , 'fs.id' , 'fs.marca_id' , '\'S\' tipo' )
-                        ->leftJoin(TB_FONDO_CATEGORIA_SUB.' fsc' , 'fsc.id' , '=' , 'fs.subcategoria_id' )
-                        ->leftJoin(TB_FONDO_CATEGORIA.' fc' , 'fc.id' , '=' , 'fsc.id_fondo_categoria' )
-                        ->leftJoin(TB_MARCAS_BAGO.' m' , 'fs.marca_id' , '=' , 'm.id' )
-                        ->leftJoin(TB_PERSONAL.' p' , 'fs.supervisor_id' , '=' , 'p.user_id' )
-                        ->where('fs.saldo' , '>' , 0 )
-                        ->where('trim( fsc.tipo )' , FONDO_SUBCATEGORIA_SUPERVISOR )
-                        ->where( 'fs.marca_id' , $id_producto );
-            $gerFunds = DB::table( TB_FONDO_GERENTE_PRODUCTO.' f' )
-                        ->select( "m.descripcion || ' | ' || fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo - f.retencion saldo_disponible', 'f.id' , 'f.marca_id' , '\'P\' tipo' )
-                        ->leftJoin( TB_FONDO_CATEGORIA_SUB.' fsc' , 'f.subcategoria_id' , '=' , 'fsc.id' )
-                        ->leftJoin( TB_FONDO_CATEGORIA.' fc' , 'fsc.id_fondo_categoria' , '=' , 'fc.id' )
-                        ->leftJoin( TB_MARCAS_BAGO.' m' , 'f.marca_id' , '=' , 'm.id' )
-                        ->whereIn( 'trim( fsc.tipo )' , array( GER_PROD , GER_PROM ) )
-                        ->where( 'f.saldo' , '>' , 0 )
-                        ->where( 'f.marca_id' , $id_producto );
-            return  $supFunds
-                    ->unionAll( $gerFunds )
-                    ->orderBy( 'descripcion' , 'asc' )
+            $userId = $solicitud->personalTo->userSup();
+
+            return FondoSupervisor::select( [ 'id' , 'subcategoria_id' , 'saldo' , 'retencion' , 'marca_id' , '\'S\' tipo' ] )
+                    ->whereHas( 'subcategoria' , function( $query ) use ( $userType )
+                    {
+                        $query->where( 'trim( tipo )' , $userType );
+                    })
+                    ->with( 'subCategoria.categoria' , 'marca' )
+                    ->where( 'supervisor_id' , $userId )
+                    ->where( 'marca_id' , $id_producto )
+                    ->where( 'anio' , $year )
                     ->get();
         }
+        else if( in_array( $userType , [ GER_PROD , GER_PROM ] ) )
+        {
+            return FondoGerProd::select( [ 'id' , 'subcategoria_id' , 'saldo' , 'retencion' , 'marca_id' , '\'P\' tipo' ] )
+                    ->whereHas( 'subcategoria' , function( $query ) use ( $userType )
+                    {
+                        $query->where( 'trim( tipo )' , $userType );
+                    })
+                    ->with( 'subCategoria.categoria' , 'marca' )
+                    ->where( 'marca_id' , $id_producto )
+                    ->where( 'anio' , $year )
+                    ->where( 'saldo' , '>' , 0 )
+                    ->get();
+        }
+        else if( in_array( $userType , [ GER_COM , GER_GER ] ) )
+        {
+            $supFunds = FondoSupervisor::select( [ 'id' , 'subcategoria_id' , 'saldo' , 'retencion' , 'marca_id' , '\'S\' tipo' ] )
+                        ->whereHas( 'subcategoria' , function( $query ) use ( $userType )
+                        {
+                            $query->where( 'trim( tipo )' , SUP );
+                        })
+                        ->with( 'subCategoria.categoria' , 'marca' )
+                        ->where( 'marca_id' , $id_producto )
+                        ->where( 'anio' , $year )
+                        ->where( 'saldo' , '>' , 0 )
+                        ->get();
+            $gerFunds = FondoGerProd::select( [ 'id' , 'subcategoria_id' , 'saldo' , 'retencion' , 'marca_id' , '\'P\' tipo' ] )
+                        ->whereHas( 'subcategoria' , function( $query ) use ( $userType )
+                        {
+                            $query->whereIn( 'trim( tipo )' , [ GER_PROD , GER_PROM ] );
+                        })
+                        ->with( 'subCategoria.categoria' , 'marca' )
+                        ->where( 'marca_id' , $id_producto )
+                        ->where( 'anio' , $year )
+                        ->where( 'saldo' , '>' , 0 )
+                        ->get();
+            return $supFunds->merge( $gerFunds );
+        }
         else
-            return array();
+        {
+            return [];
+        }
     }
 
     /*protected function getSolProducts( $idSolProduct )
@@ -143,4 +139,5 @@ class SolicitudProduct extends Eloquent
     {
         $this->attributes[ 'monto_asignado' ] = round( $value , 2 , PHP_ROUND_HALF_DOWN );
     }
+
 }

@@ -28,11 +28,11 @@
                             <span class="input-group-addon" style="width:15%;">{{{ is_null( $product->marca ) ? '' : $product->marca->descripcion}}}</span>
                             @if ( in_array( $tipo_usuario , array( SUP , GER_PROD , GER_PROM , GER_COM , GER_GER ) ) )
                                 <select name="fondo_producto[]" class="selectpicker form-control">
-                                    @if ( is_null( $product->id_fondo_marketing ) )
+                                    @if( is_null( $product->id_fondo_marketing ) )
                                         <option selected disabled value="0">Seleccione el Fondo</option>
                                         @foreach( $product->getSubFondo( $tipo_usuario , $solicitud ) as $fondoMkt )
                                             <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}">
-                                                {{ $fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_disponible }}
+                                                {{ $fondoMkt->detail_name . ' S/.' . $fondoMkt->saldo_disponible }}
                                             </option>
                                         @endforeach
                                     @else
@@ -40,10 +40,10 @@
                                             {{ $product->thisSubFondo->approval_product_name . ' ( Reservado S/. ' . $product->monto_asignado_soles . ' ) ' }}
                                         </option>    
                                         @foreach( $product->getSubFondo( $tipo_usuario , $solicitud ) as $fondoMkt )
-                                            @if ( $fondoMkt->id == $product->id_fondo_marketing )
-                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}" style="background-color:#00FFFF">{{$fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_disponible }}</option>
+                                            @if( $fondoMkt->id == $product->id_fondo_marketing )
+                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}" style="background-color:#00FFFF">{{ $fondoMkt->detail_name . ' S/.' . $fondoMkt->saldo_disponible }}</option>
                                             @else   
-                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}">{{$fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_disponible }}</option>
+                                                <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}">{{ $fondoMkt->detail_name . ' S/.' . $fondoMkt->saldo_disponible }}</option>
                                             @endif
                                         @endforeach
                                     @endif
@@ -84,7 +84,7 @@
                                             <option selected disabled value="0">Seleccione el Fondo</option>
                                             @foreach( $product->getSubFondo( $tipo_usuario , $solicitud ) as $fondoMkt )
                                                 <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}">
-                                                    {{ $fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_disponible }}
+                                                    {{ $fondoMkt->detail_name . ' S/.' . $fondoMkt->saldo_disponible }}
                                                 </option>
                                             @endforeach
                                         @else
@@ -93,9 +93,9 @@
                                             </option>    
                                             @foreach( $product->getSubFondo( $tipo_usuario , $solicitud ) as $fondoMkt )
                                                 @if ( $fondoMkt->id == $product->id_fondo_marketing )
-                                                    <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}" style="background-color:#00FFFF">{{$fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_disponible }}</option>
+                                                    <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}" style="background-color:#00FFFF">{{$fondoMkt->detail_name . ' S/.' . $fondoMkt->saldo_disponible }}</option>
                                                 @else   
-                                                    <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}">{{$fondoMkt->descripcion . ' S/.' . $fondoMkt->saldo_disponible }}</option>
+                                                    <option value="{{ $fondoMkt->id . ',' . $fondoMkt->tipo }}">{{$fondoMkt->detail_name . ' S/.' . $fondoMkt->saldo_disponible }}</option>
                                                 @endif
                                             @endforeach
                                         @endif

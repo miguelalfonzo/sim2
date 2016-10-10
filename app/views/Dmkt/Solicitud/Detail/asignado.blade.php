@@ -12,12 +12,12 @@
 						@endforeach
 				</select>
 				<span  class="input-group-btn solicitud-resp">
-					<button class="btn btn-default" type="button" id="edit-resp-activate" style="height: 38px;">
+					<button class="btn btn-default" type="button" id="edit-resp-activate">
 						<i class="glyphicon glyphicon-edit"></i>
 					</button>						
 				</span>
 				<span class="input-group-btn edit-resp" style="display: none">
-	                <button class="btn btn-default" type="button" id="edit-resp-deactivate" style="height: 38px;">
+	                <button class="btn btn-default" type="button" id="edit-resp-deactivate">
 						<i class="glyphicon glyphicon-ban-circle"></i>
 					</button>
 				</span>

@@ -60,13 +60,15 @@ class BaseController extends Controller
 
     protected function getExpenseDate( $solicitud , $range = 0 )
     {
-        $now = Carbon::now();
-        $created = new Carbon( $solicitud->created_at );
-        if ( $solicitud->idtiposolicitud == 3)
-            $expenseDate = (new Carbon('first day of August 2015'));
+        if( $solicitud->idtiposolicitud == 3 )
+        {
+            $expenseDate = new Carbon( 'first day of August 2015' );
+        }
         else
-            $expenseDate = $now->subDays( 30 )->max( $created );
-        return array( 'startDate' => $expenseDate->subDays( $range )->format('d/m/Y') , 'endDate' => Carbon::now()->addDays( $range )->format('d/m/Y') );
+        {
+            $expenseDate = Carbon::now()->subDays( 30 )->max( $solicitud->created_at );
+        }
+        return [ 'startDate' => $expenseDate->format( 'd/m/Y' ) , 'endDate' => Carbon::now()->format( 'd/m/Y' ) ];
     }
 
     protected function getDay( $type=1 )
@@ -132,7 +134,7 @@ class BaseController extends Controller
         {
             Mail::send('soporte', array( 'exception' => $exception ), function( $message ) use( $function )
             {
-                $message->to( array( SOPORTE_EMAIL_1 => POSTMAN_USER_NAME_1 , SOPORTE_EMAIL_2 => POSTMAN_USER_NAME_2 , SOPORTE_EMAIL_3 => POSTMAN_USER_NAME_3 ) )
+                $message->to( array( SOPORTE_EMAIL_1 => POSTMAN_USER_NAME_1 , SOPORTE_EMAIL_2 => POSTMAN_USER_NAME_2 ) )
                 ->subject( error.' - Function: '.$function );
             });
         }
