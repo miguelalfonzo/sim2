@@ -6,18 +6,20 @@ use \Auth;
 use \Request;
 use \App;
 use \Redirect;
+use \Process\ProcessState;
 
 class FilterController
 {
 
 	private function rolFilter( $rols )
 	{
-	    if( ! Auth::check() )
+		if( ! Auth::check() )
 	    {
-	    	if ( Request::ajax() )
+	    	if( Request::ajax() )
 	        { 
 	            $warning = App::make('BaseController')->callAction( 'warningException' , array( 'Vuelva a acceder al sistema ( La sesion expiro )' , __FUNCTION__ , __LINE__ , __FILE__ ) );
 	        	$warning[ status ] = 'Logout';
+	        	return $warning;
 	        }
 	        else
 	        {
@@ -45,6 +47,24 @@ class FilterController
 	        {
 	            return Redirect::to( 'show_user' );        
 	        }
+	    }
+	    elseif( Auth::user()->type != ESTUD )
+	    {
+	    	$pptoProcess = ProcessState::getPPTOStatusProcess();
+			if( $pptoProcess->status == 1 )
+			{
+				if ( Request::ajax() )
+		        { 
+		            $warning = App::make('BaseController')->callAction( 'warningException' , array( 'El sistema esta deshabilitado por el proceso de carga del presupuesto. Por favor esperar unos minutos' , __FUNCTION__ , __LINE__ , __FILE__ ) );
+		        	$warning[ status ] = 'Logout';
+		        	return $warning;
+		        }
+		        else
+		        {
+		            return Redirect::to( 'login' )
+		            	->with( [ 'message' => 'El sistema esta deshabilitado por el proceso de carga del presupuesto. Por favor esperar unos minutos' ] );        
+		        }
+			}
 	    }
 	}
 
@@ -113,9 +133,19 @@ class FilterController
 		return $this->rolFilter( [ GER_COM , CONT ] );
 	}
 
+	public function gerCom_cont_estudio()
+	{
+		return $this->rolFilter( [ GER_COM , CONT , ESTUD ] );
+	}
+
 	public function asistenteGerencia()
 	{
 		return $this->rolFilter( [ ASIS_GER ] );
+	}
+
+	public function estudio()
+	{
+		return $this->rolFilter( [ ESTUD ] );
 	}
 
 	public function process()

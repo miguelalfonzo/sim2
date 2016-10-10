@@ -34,7 +34,7 @@
                         @endif
                     </td>
                     <td>{{ $FondoMktHistory->toFund->middle_name }}</td>
-                    <td class="text-center">{{ $FondoMktHistory->updatedBy->personal->full_name }}</td>
+                    <td class="text-center">{{ $FondoMktHistory->createdByPersonal->full_name }}</td>
                     <td class="text-center">
                         @if ( $FondoMktHistory->to_old_saldo > $FondoMktHistory->to_new_saldo )
                             {{ $FondoMktHistory->to_old_saldo - $FondoMktHistory->to_new_saldo }}

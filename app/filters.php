@@ -46,10 +46,14 @@ Route::filter( 'gerprod_gerprom_gercom_gerger' , 'Filter\FilterController@gerent
 
 Route::filter( 'gercom' , 'Filter\FilterController@gerenteComercial' );
 Route::filter( 'gercom_cont' , 'Filter\FilterController@gerCom_cont' );
+Route::filter( 'gercom_cont_estudio' , 'Filter\FilterController@gerCom_cont_estudio' );
 
 Route::filter( 'ager' , 'Filter\FilterController@asistenteGerencia');
 
+Route::filter( 'estudio' , 'Filter\FilterController@estudio' );
+
 Route::filter( 'process_user' , 'Filter\FilterController@process' );
+
 
 Route::filter( 'sys_user' , 'Filter\FilterController@system' ); 
 
@@ -67,6 +71,7 @@ Route::filter( 'developer' , 'Filter\FilterController@admin' );
 */
 Route::filter( 'csrf' , function () 
 {
+	$inputs = Input::all();
 	if( Session::token() !== Input::get('_token') )
     { 
         $rpta = App::make('BaseController')->callAction( 'warningException' , array( 'Es necesario que vuelva a cargar la pagina debido a sesion inactiva o acceso desde otro dispositivo' , __FUNCTION__ , __LINE__ , __FILE__ ) );

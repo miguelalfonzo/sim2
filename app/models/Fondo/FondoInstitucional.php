@@ -2,6 +2,7 @@
 
 namespace Fondo;
 
+use \Carbon\Carbon;
 use \Eloquent;
 use \DB;
 use Illuminate\Database\Eloquent\SoftDeletingTrait;
@@ -27,11 +28,12 @@ class FondoInstitucional extends Eloquent
 
 	public static function getSubFondo()
 	{
-		return DB::table( TB_FONDO_INSTITUCION.' f' )
-            ->select( "fc.descripcion || ' | ' || fsc.descripcion descripcion" , 'f.saldo - f.retencion saldo_disponible' , 'f.id' , '\'AG\' tipo' )
-            ->leftJoin( TB_FONDO_CATEGORIA_SUB.' fsc' , 'f.subcategoria_id' , '=' , 'fsc.id' )
-            ->leftJoin( TB_FONDO_CATEGORIA.' fc' , 'fsc.id_fondo_categoria' , '=' , 'fc.id' )
-            ->where( 'trim( fsc.tipo )' , FONDO_SUBCATEGORIA_INSTITUCION )->get();
+		$now = Carbon::now();
+		return  FondoInstitucional::where( 'anio' , $now->format( 'Y' ) )
+				->whereHas( 'subcategoria' , function( $query )
+	            {
+	            	$query->where( 'trim( tipo )' , 'I' );
+	            })->get();
     }
 
     protected static function order()
@@ -41,7 +43,11 @@ class FondoInstitucional extends Eloquent
 
 	protected static function orderWithTrashed()
 	{
-		return FondoInstitucional::orderBy( 'updated_at' , 'DESC' )->withTrashed()->get();
+		$now = Carbon::now();
+		return FondoInstitucional::select( [ 'id' , 'subcategoria_id' , 'saldo' , 'retencion' ] )
+			->where( 'anio' , '=' , $now->format( 'Y' ) )
+			->orderBy( 'updated_at' , 'DESC' )->withTrashed()
+			->get();
 	}
 
 	protected function setSaldoAttribute( $value )
@@ -63,5 +69,11 @@ class FondoInstitucional extends Eloquent
 	{
 		return $this->SubCategoria->descripcion;
 	}
+
+	public function getDetailNameAttribute()
+    {
+    	$subCategory = $this->subCategoria;
+        return $subCategory->categoria->descripcion . ' | ' . $subCategory->descripcion;
+    }
 
 }

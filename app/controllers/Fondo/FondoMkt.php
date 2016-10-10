@@ -251,14 +251,21 @@ class FondoMkt extends BaseController
     {
         $inputs = Input::all();
         $start = $inputs[ 'start' ];
-        $end   = $inputs[ 'end' ];  
+        $end   = $inputs[ 'end' ]; 
+
+        if( substr( $start , 0 , 4) != substr( $end , 0 , 4 ) )
+        {
+            return $this->warningException( 'No se puede generar el reporte para años diferentes.' , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
+
         $subCategory           = FondoSubCategoria::find( $inputs[ 'id_subcategoria' ] );
         $subCategoryType       = $subCategory->fondoMktType;
-        $fondoMktHistoriesData = FondoMktHistory::whereRaw( "created_at between to_date( '$start' , 'YYYY/MM/DD' ) and to_date( '$end' , 'YYYY/MM/DD' ) + 1" )
+        $fondoMktHistoriesData = FondoMktHistory::whereRaw( "created_at between to_date( '$start' , 'YYYY/MM/DD' ) and to_date( '$end 235959' , 'YYYY/MM/DD HH24MISS' )" )
                                 ->where( 'id_tipo_to_fondo' , trim( $subCategory->tipo ) )
                                 ->whereHas( $subCategoryType->relacion , function( $query ) use ( $subCategory )
                                 {
                                     $query->where( 'subcategoria_id' , $subCategory->id );
+                                        
                                 })->get();
 
         
@@ -269,8 +276,9 @@ class FondoMkt extends BaseController
                                     $query->where( 'subcategoria_id' , $subCategory->id );
                                 })->get();
 
-
-        $Fondos         = $subCategory->{ $subCategoryType->relacion };
+        //$subCategoryModel = new FondoSubCategoria;
+        //$Fondos = $subCategoryModel->getFondos( $subCategoryType->relacion , $start , $end );
+        $Fondos         = $subCategory->getFondos( substr( $end , 0 , 4 ) );
         $FondosTotal    = $Fondos->sum( 'saldo' );
         $RetencionTotal = $Fondos->sum( 'retencion' );
         

@@ -37,7 +37,7 @@
                             {{{ $solicitud->approvedHistory->user->personal->full_name or '' }}}
                         @endif
                     </td>
-                    <td class="text-center">{{$solicitud->created_at}}</td>
+                    <td class="text-center">{{$solicitud->created_at_parse }}</td>
                     <td class="text-center">{{$solicitud->updated_at}}</td>
                     <td class="text-center">
                         @if ( $solicitud->products->count() !== 0 )

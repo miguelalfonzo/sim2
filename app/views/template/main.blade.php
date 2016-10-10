@@ -61,8 +61,6 @@
             </a>
         </header>
         <div class="container-fluid" style="max-height: 100vh; padding-left: 0; padding-right: 0;">
-            @if( Auth::user()->type != ESTUD )
-        
             <nav class="navbar navbar-bago navbar-static-top" role="navigation" style="/*margin-bottom: 0*/; z-index: 10;">
                 <div class="container-fluid">
                     <div class="navbar-header relative">
@@ -154,22 +152,26 @@
                                             <li><a href="{{ URL::to( 'report/sup/view/Fondo_Supervisor' ) }}">Reporte de Fondos de Supervisor</a></li>
                                         @elseif( Auth::user()->type == ESTUD )
                                             <li><a href="{{ URL::to( 'view-sup-rep' ) }}">Syncronizacion</a></li>
+                                            <li><a href="{{ URL::to( 'view-ppto' ) }}">Presupuesto</a></li>
+                                            <li><a href="{{ URL::to('maintenance/view/Fondo_Subcategoria') }}">Mantenimiento de Categorías de Fondo</a></li> 
                                         @endif
                                     </ul>
                                 </li>
-                            @endif                    
-                            <li class="report_menubar_option btn_extra" style="display:none;">
-                                <a href="#" rel="export">
-                                    <span class="glyphicon glyphicon-save" aria-hidden="true"></span>
-                                    <span class="glyphicon-class">  Exportar</span>
-                                </a>
-                            </li>
-                            <li class="report_menubar_option btn_extra2" style="display:none;">
-                                <a href="#" rel="email">
-                                    <span class="glyphicon glyphicon-envelope" ></span>
-                                    <span class="glyphicon-class">  Enviar Correo</span>
-                                </a>
-                            </li>
+                            @endif      
+                            @if( ! in_array( Auth::user()->type , [ REP_MED , ESTUD ] ) )
+                                <li class="report_menubar_option btn_extra" style="display:none;">
+                                    <a href="#" rel="export">
+                                        <span class="glyphicon glyphicon-save" aria-hidden="true"></span>
+                                        <span class="glyphicon-class">  Exportar</span>
+                                    </a>
+                                </li>
+                                <li class="report_menubar_option btn_extra2" style="display:none;">
+                                    <a href="#" rel="email">
+                                        <span class="glyphicon glyphicon-envelope" ></span>
+                                        <span class="glyphicon-class">  Enviar Correo</span>
+                                    </a>
+                                </li>
+                             @endif
                         </ul>
                         <a class="btn btn-primary navbar-btn sim_alerta" href="{{ URL::to('alerts') }}" role="button">
                             Alertas 
@@ -185,8 +187,7 @@
                     </div>
                 </div>
             </nav>
-            @endif
-        
+            
             <div id="dataTable" class="container-fluid" style="font-size:10pt">
                 @yield('solicitude')
                 <br>

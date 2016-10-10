@@ -4,7 +4,7 @@
             @foreach( $columns as $column )
                 <th>{{$column->name}}</th>
             @endforeach
-            @if( ! isset( $export ) )
+            @if( $options )
                 <th>Edición</th>
             @endif
         </tr>
@@ -21,20 +21,20 @@
                         @endif
                     </td>
                 @endforeach
-                @if( ! isset( $export ) )
+                @if( $options )
                     <td editable=2 style="text-align:center">
-                        <a class="maintenance-edit" href="#">
+                        <button type="button" class="btn btn-info btn-xs maintenance-edit">
                             <span class="glyphicon glyphicon-pencil"></span>
-                        </a>
-                        @if( ! in_array( $type , array( 'Parametro' , 'Fondo_Supervisor' , 'Fondo_Gerente_Producto' , 'Fondo_Institucion' , 'Fondo_Contable' , 'Cuenta_Gasto_Marca' ) ) )
+                        </button>
+                        @if( $disabled )
                             @if ( is_null( $record->deleted_at ) )
-                                <a class="maintenance-disable" href="#">
-                                    <span class="glyphicon glyphicon-remove red"></span>
-                                </a>
+                                <button type="button" class="btn btn-danger btn-xs maintenance-disable">
+                                    <span class="glyphicon glyphicon-ban-circle"></span>
+                                </button>
                             @else
-                                <a class="maintenance-enable" href="#">
-                                    <span class="glyphicon glyphicon-ok green"></span>
-                                </a>
+                                <button type="button" class="btn btn-success btn-xs maintenance-enable">
+                                    <span class="glyphicon glyphicon-ok-sign"></span>
+                                </button>
                             @endif
                         @endif
                     </td>
