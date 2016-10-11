@@ -10,26 +10,23 @@ class PPTOInstitucion extends Eloquent
 	protected $table      = 'PPTO_INSTITUCION';
 	protected $primaryKey = 'id';
 
-	private function nextVersion( $year )
+	public function getPPTO( $year , $subCategory , $version )
 	{
-		$register = PPTOInstitucion::select( 'max( version ) max_version' )->where( 'anio' , $year )->first();
-		if( is_null( $register ) )
-		{
-			return 1;
-		}
-		else
-		{
-			return $register->max_version + 1;
-		}
-	}
-
-	public function getPPTO( $year )
-	{
-		$version = $this->nextVersion( $year );
-		return PPTOInstitucion::select( [ 'id' , 'monto' , 'subcategoria_id' ] )
+		return $this->select( [ 'id' , 'monto' , 'subcategoria_id' , 'anio' , 'version' ] )
 			->with( [ 'subCategory' ] )
 			->where( 'anio' , $year )
-			->where( 'version' , $version - 1 )
+			->where( 'subcategoria_id' , $subCategory )
+			->where( 'version' , $version )
+			->get();
+	}
+
+	public function getVersions( $year , $subCategory )
+	{
+		return $this->distinct()
+			->select( 'version' )
+			->where( 'anio' , $year )
+			->where( 'subcategoria_id' , $subCategory )
+			->orderBy( 'version' , 'ASC' )
 			->get();
 	}
 

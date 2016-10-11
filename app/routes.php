@@ -283,6 +283,8 @@
             Route::post( 'ppto-status' , 'PPTOController@status' );
             Route::post( 'ppto-enable' , 'PPTOController@enable' );
             Route::post( 'ppto-disable' , 'PPTOController@disable' );
+            Route::post( 'ppto-versions' , 'PPTOController@getVersions' );
+            Route::get( 'ppto-export-{type}-{year}-{category}-{version}' , 'PPTOController@export' );
         });
 
         Route::group( [ 'namespace' => 'Fondo' ] , function()

@@ -51,7 +51,12 @@
 				</select>
 			</div>
 
-			<div class="form-group col-lg-4">
+			<div class="form-group col-lg-2">
+				<label>Version</label>
+				<select class="form-control ppto-version"></select>
+			</div>
+
+			<div class="form-group col-lg-3">
 				<label>Excel</label>
 				<div class="input-group">
 					<span  class="input-group-addon btn glyphicon glyphicon-folder-open open-file" style="top:0"></span>
@@ -62,6 +67,12 @@
 
 			<div class="form-group col-lg-1">
 				<button type="button" class="btn btn-primary load-ppto ladda-button" data-style="zoom-in" style="margin-top:24px" >Cargar</button>
+			</div>
+
+			<div class="form-group col-lg-1 pull-right">
+				<button type="button" class="btn btn-primary export-ppto" style="margin-top:24px" >Exportar
+					<span class="glyphicon glyphicon glyphicon-export"></span>
+				</button>
 			</div>
 
 			<div class="form-group col-lg-1">
@@ -100,7 +111,12 @@
 				</select>
 			</div>
 
-			<div class="form-group col-lg-4">
+			<div class="form-group col-lg-2">
+				<label>Version</label>
+				<select class="form-control ppto-version"></select>
+			</div>
+
+			<div class="form-group col-lg-3">
 				<label>Excel</label>
 				<div class="input-group">
 					<span  class="input-group-addon btn glyphicon glyphicon-folder-open open-file" style="top:0"></span>
@@ -116,6 +132,12 @@
 			<div class="form-group col-lg-1">
 				<button type="button" class="btn btn-primary search-ppto ladda-button" data-style="zoom-in" style="margin-top:24px" >
 					<span class="glyphicon glyphicon-search"></span>
+				</button>
+			</div>
+
+			<div class="form-group col-lg-1 pull-right">
+				<button type="button" class="btn btn-primary export-ppto" style="margin-top:24px" >Exportar
+					<span class="glyphicon glyphicon glyphicon-export"></span>
 				</button>
 			</div>
 
@@ -139,6 +161,11 @@
 			</div>
 
 			<div class="form-group col-lg-2">
+				<label>Version</label>
+				<select class="form-control ppto-version"></select>
+			</div>
+
+			<div class="form-group col-lg-2">
 				<label>Monto</label>
 				<input id="ppto-amount" class="form-control">
 			</div>
@@ -150,6 +177,12 @@
 			<div class="form-group col-lg-1">
 				<button type="button" class="btn btn-primary search-ppto ladda-button" data-style="zoom-in" style="margin-top:24px" >
 					<span class="glyphicon glyphicon-search"></span>
+				</button>
+			</div>
+
+			<div class="form-group col-lg-1 pull-right">
+				<button type="button" class="btn btn-primary export-ppto" style="margin-top:24px" >Exportar
+					<span class="glyphicon glyphicon glyphicon-export"></span>
 				</button>
 			</div>
 
@@ -166,14 +199,16 @@
 
 		function loadPPTO( tab )
 		{
-			var type = tab.attr( 'data-type' );
-			var year = tab.find( '.ppto-year' ).val();
+			var type    = tab.attr( 'data-type' );
+			var year    = tab.find( '.ppto-year' ).val();
+			var version = tab.find( '.ppto-version' ).val();
 			
 			var data =
 			{
-				_token : GBREPORTS.token,
-				type   : type,
-				year   : year	
+				_token  : GBREPORTS.token,
+				type    : type,
+				year    : year,
+				version : version	
 			};
 
 			if( type != 3 )
@@ -226,14 +261,6 @@
 	            });
 			});
 		}
-
-		$( document ).ready( function()
-		{
-			$( '#ppto-amount' ).numeric( { negative : false } );
-			loadPPTO( $( '#tab-ppto-sup' ) );
-			loadPPTO( $( '#tab-ppto-ger' ) );
-			loadPPTO( $( '#tab-ppto-ins' ) );
-    	});
 
     	$( 'a[data-toggle="tab"]').on( 'shown.bs.tab', function()
     	{
@@ -385,9 +412,94 @@
 				else
 				{
 					bootboxMessage( response );
-				}
+				}	
 			});
 		};
+
+		function getVersions( tab )
+		{
+			var type 	 = tab.attr( 'data-type' );
+			var year 	 = tab.find( '.ppto-year' ).val();
+			
+			var data =
+			{
+				_token   : GBREPORTS.token,
+				type     : type,
+				year     : year
+			};
+
+			if( type != 3 )
+			{
+				data.category = tab.find( '.ppto-category' ).val();
+			}
+
+			$.ajax(
+			{
+				type : 'POST',
+				url  : 'ppto-versions',
+				data : data
+			}).fail( function( statusCode , errorThrown )
+			{
+				ajaxError( statusCode , errorThrown );
+			}).done( function( response )
+			{
+				if( validateResponse( response ) )
+				{
+					var html = '';
+					response.Data.forEach( function( value )
+					{
+						html += '<option value="' + value.version + '">' + value.version + '</option>';
+					});
+					tab.find( '.ppto-version' ).html( html );
+				}
+				else
+				{
+					bootboxMessage( response );
+				}
+			});
+		}
+
+		var selectsYear = $( '.ppto-year' );
+		selectsYear.change( function()
+		{
+			var tab = $( this ).closest( '.tab-pane' );
+			getVersions( tab );
+		});
+
+		var selectsCategory = $( '.ppto-category' );
+		selectsCategory.change( function()
+		{
+			var tab = $( this ).closest( '.tab-pane' );
+			getVersions( tab );
+		});
+
+		$( '.export-ppto' ).click( function()
+		{
+			var tab = $( this ).closest( '.tab-pane' );
+			var type = tab.attr( 'data-type' );
+			var year = tab.find( '.ppto-year' ).val();
+			var category = tab.find( '.ppto-category' ).val();
+			var version = tab.find( '.ppto-version' ).val();
+			var url = server + 'ppto-export' + '-' + type + '-' + year + '-' + category + '-' + version;
+			window.location.href = url;
+		});
+
+		$( document ).ready( function()
+		{
+			$( '#ppto-amount' ).numeric( { negative : false } );
+			var tabPPTOSup = $( '#tab-ppto-sup' );
+			var tabPPTOGer = $( '#tab-ppto-ger' );
+			var tabPPTOIns = $( '#tab-ppto-ins' );
+			loadPPTO( tabPPTOSup );
+			getVersions( tabPPTOSup );
+			
+			loadPPTO( tabPPTOGer );
+			getVersions( tabPPTOGer );
+			
+			loadPPTO( tabPPTOIns );
+    		getVersions( tabPPTOIns );
+			
+    	});
 
 	</script>
 @stop
