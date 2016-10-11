@@ -1759,6 +1759,7 @@ function ajaxError(statusCode,errorThrown)
         bootbox.alert('<h4 class="red">Error del Sistema</h4>');  
     }
     Ladda.stopAll();
+    $( '#loading' ).hide( 'slow' );
 }
 
 $(".date_month").datepicker(date_options2).on('changeDate', function (e) {
@@ -2374,9 +2375,11 @@ function listSolicituds()
         fecha_final  : $('#drp_menubar').data('daterangepicker').endDate.format("L") ,
         estado       : $('#idState').val()
     };
-        
+
+    $( '#loading' ).show( 'slow' );
     customAjax( 'GET' , 'list-solicituds' , data ).done(function ( response ) 
     {
+        $( '#loading' ).hide( 'slow' );
         if ( response.Status == 'Ok' )
         {
             processData( response.Data , response.usuario );
