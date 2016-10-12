@@ -46,5 +46,22 @@ class FondoMktPeriodHistory extends Eloquent
 			->where( 'substr( periodo , 0 , 4 )' , $year )
             ->update( [ 'saldo_inicial' => DB::raw( 'saldo_inicial + ' . $diffAmount ) , 'saldo_final' => DB::raw( 'saldo_final + ' . $diffAmount ) ] ); 
 	}
+
+	public function maxFundPeriod( $subCategoryId , $endPeriod )
+	{
+		$startPeriod = substr( $endPeriod , 0 , 4 ) . '00';
+		return $this->select( 'periodo' )
+			->where( 'subcategoria_id' , $subCategoryId )
+			->where( 'periodo' , '<' , $endPeriod )
+			->where( 'periodo' , '>' , $startPeriod )
+			->max( 'periodo' );
+	}
 	
+	public function getPeriodData( $subCategoryId , $period )
+	{
+		return $this->select( [ 'saldo_final' , 'retencion_final' ] )
+            ->where( 'periodo' , $period )
+            ->where( 'subcategoria_id' , $subCategoryId )
+            ->first();
+	}
 }

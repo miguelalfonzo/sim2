@@ -47,4 +47,38 @@ class PPTOSupervisor extends Eloquent
 		return $this->hasOne( 'Users\Personal' ,  'user_id' , 'supervisor_id' );
 	}
 
+	private function maxVersion( $subCategory , $year )
+	{
+        $register = $this->select( 'max( version ) max_version' )
+    		->where( 'anio' , $year )
+            ->where( 'subcategoria_id' , $subCategory )
+            ->first();
+        
+        if( is_null( $register ) )
+        {
+            return 0;
+        }
+        else
+        {
+            return $register->max_version;
+        }
+    }
+
+	public function sumCategoryAmount( $subCategory , $year )
+	{
+		$maxVersion = $this->maxVersion( $subCategory , $year );
+		if( $maxVersion == 0 )
+		{
+			return 0;
+		}
+		else
+		{
+			return $this->select( 'monto' )
+				->where( 'subcategoria_id' , $subCategory )
+				->where( 'anio' , $year )
+				->where( 'version' , $maxVersion )
+				->sum( 'monto' );
+		}
+	}
+
 }

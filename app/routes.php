@@ -57,6 +57,7 @@
         Route::get( 'fondoHistorial' , 'Fondo\FondoMkt@getFondoHistorial' );
         Route::post( 'fondo-subcategoria-history' , 'Fondo\FondoMkt@getFondoSubCategoryHistory' );
         Route::get( 'maintenance-export/{type}' , 'Maintenance\TableController@export' );
+        Route::get( 'export-fondoHistorial-{start}-{end}-{subCategory}' , 'Fondo\FondoMkt@exportFondoHistorial' );
     });
 
     Route::group( array( 'before' => 'gercom_cont' ) , function()

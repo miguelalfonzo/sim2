@@ -100,4 +100,39 @@ class FondoMktHistory extends Eloquent
             ->update( [ 'to_old_saldo' => DB::raw( 'to_old_saldo + ' . $diffAmount ) , 'to_new_saldo' => DB::raw( 'to_new_saldo + ' . $diffAmount ) ] ); 
     }
 
+    public function getSubCategoryData( $subCategoryId , $subCategoryType , $toFund , $start , $end )
+    {
+        return $this->select( [ 'sum( to_old_saldo - to_new_saldo ) diff_saldo' , 'sum( old_retencion - new_retencion ) diff_retencion' ] )
+            ->where( 'id_tipo_to_fondo' , trim( $subCategoryType ) )
+            ->whereRaw( "created_at between to_date( '$start' , 'YYYYMMDD' ) and to_date( '$end 235959' , 'YYYYMMDD HH24MISS' )" )
+            ->whereHas( $toFund , function( $query ) use ( $subCategoryId )
+            {
+                $query->where( 'subcategoria_id' , $subCategoryId );
+            })->first();
+    }
+
+    public function getSubCategoryBalanceData( $subCategoryId , $subCategoryType , $toFund , $start , $end )
+    {
+        return $this->select( 
+                [ 
+                    'id' ,
+                    'id_fondo_history_reason' ,
+                    'id_solicitud' ,
+                    'id_tipo_to_fondo' ,
+                    'id_to_fondo' ,
+                    'to_old_saldo' ,
+                    'to_new_saldo' ,
+                    'created_at' ,
+                    'created_by' ,
+                    "to_char( created_at , 'YYYYMM' ) periodo"
+                ] 
+            )->where( 'id_tipo_to_fondo' , trim( $subCategoryType ) )
+            ->whereIn( 'id_fondo_history_reason' , [ FONDO_AJUSTE , FONDO_DEPOSITO , FONDO_DEVOLUCION_PLANILLA , FONDO_DEVOLUCION_TESORERIA , 8 ] )
+            ->whereRaw( "created_at between to_date( '$start' , 'YYYYMMDD' ) and to_date( '$end 235959' , 'YYYYMMDD HH24MISS' )" )
+            ->whereHas( $toFund , function( $query ) use ( $subCategoryId )
+            {
+                $query->where( 'subcategoria_id' , $subCategoryId );
+                    
+            })->get();
+    }
 }

@@ -2,6 +2,7 @@
 @section( 'solicitude' )
 	<div class="container-fluid jumbotron">
 		<h3 style="margin-top:0px">Inhabilitacion del Proceso de Carga de Presupuesto</h3>
+		<h5><b>Nota: Si no se inhabilita el proceso los usuarios no podran ingresar al sistema</b></h5>
 		<button id="ppto-disable" type="button" class="btn btn-success">Confirmar</button>
 	</div>
 
@@ -26,63 +27,67 @@
 	<div class="tab-content">
 		<div class="tab-pane fade active in" id="tab-ppto-sup" data-type="1">
 
-			<div class="row">
+			
 				<div class="form-group col-md-12">
 					<h4><b>Carga de Presupuesto Supervisor</b></h4>
 				</div>
-			</div>
-			<div class="form-group col-lg-2">
-				<label>Año</label>
-				<select class="form-control ppto-year">
-					@foreach( $years as $year )
-						<option value="{{ $year }}">{{ $year }}</option>
-					@endforeach
-				</select>
-			</div>
-
-			<div class="form-group col-lg-2">
-				<label>Categoría</label>
-				<select class="form-control ppto-category">   
-					@foreach( $categories as $category )
-						@if( $category->tipo == SUP )
-							<option value="{{ $category->id }}">{{ $category->descripcion }}</option>
-						@endif
-					@endforeach
-				</select>
-			</div>
-
-			<div class="form-group col-lg-2">
-				<label>Version</label>
-				<select class="form-control ppto-version"></select>
-			</div>
-
-			<div class="form-group col-lg-3">
-				<label>Excel</label>
-				<div class="input-group">
-					<span  class="input-group-addon btn glyphicon glyphicon-folder-open open-file" style="top:0"></span>
-					<input type="text" class="form-control filename" readonly="true">
+				
+				<div class="form-group col-lg-2">
+					<label>Año</label>
+					<select class="form-control ppto-year">
+						@foreach( $years as $year )
+							<option value="{{ $year }}">{{ $year }}</option>
+						@endforeach
+					</select>
 				</div>
-				<input type="file" class="file" accept=" application/vnd.ms-excel , application/vnd.openxmlformats-officedocument.spreadsheetml.sheet , application/vnd.ms-excel.sheet.macroEnabled.12 " style="display:none">	
-			</div>
 
-			<div class="form-group col-lg-1">
-				<button type="button" class="btn btn-primary load-ppto ladda-button" data-style="zoom-in" style="margin-top:24px" >Cargar</button>
-			</div>
+				<div class="form-group col-lg-2">
+					<label>Categoría</label>
+					<select class="form-control ppto-category">   
+						@foreach( $categories as $category )
+							@if( $category->tipo == SUP )
+								<option value="{{ $category->id }}">{{ $category->descripcion }}</option>
+							@endif
+						@endforeach
+					</select>
+				</div>
 
-			<div class="form-group col-lg-1 pull-right">
-				<button type="button" class="btn btn-primary export-ppto" style="margin-top:24px" >Exportar
-					<span class="glyphicon glyphicon glyphicon-export"></span>
-				</button>
-			</div>
+				<div class="form-group col-lg-2">
+					<label>Version</label>
+					<select class="form-control ppto-version"></select>
+				</div>
 
-			<div class="form-group col-lg-1">
-				<button type="button" class="btn btn-primary search-ppto ladda-button" data-style="zoom-in" style="margin-top:24px" >
-					<span class="glyphicon glyphicon-search"></span>
-				</button>
-			</div>
+				<div class="form-group col-lg-3">
+					<label>Excel</label>
+					<div class="input-group">
+						<span  class="input-group-addon btn glyphicon glyphicon-folder-open open-file" style="top:0"></span>
+						<input type="text" class="form-control filename" readonly="true">
+					</div>
+					<input type="file" class="file" accept=" application/vnd.ms-excel , application/vnd.openxmlformats-officedocument.spreadsheetml.sheet , application/vnd.ms-excel.sheet.macroEnabled.12 " style="display:none">	
+				</div>
 
-				<table id="table-ppto-1" class="table table-striped table-hover table-bordered" cellspacing="0" width="100%">
-				</table>
+				<div class="form-group col-xs-4 col-lg-1">
+					<button type="button" class="btn btn-primary load-ppto ladda-button" data-style="zoom-in" style="margin-top:24px" >Cargar</button>
+				</div>
+
+				<div class="form-group col-xs-2 col-lg-1">
+					<button type="button" class="btn btn-primary search-ppto ladda-button" data-style="zoom-in" style="margin-top:24px" >
+						<span class="glyphicon glyphicon-search"></span>
+					</button>
+				</div>
+
+				<div class="form-group col-xs-6 col-lg-1 pull-right">
+					<button type="button" class="btn btn-primary export-ppto" style="margin-top:24px" >Exportar
+						<span class="glyphicon glyphicon glyphicon-export"></span>
+					</button>
+				</div>
+
+				<label>Nota: El campo de version no afecta la carga del presupuesto solo afecta a la busqueda del presupuesto</label>
+
+	
+
+			<table id="table-ppto-1" class="table table-striped table-hover table-bordered" cellspacing="0" width="100%">
+			</table>
 		</div>
 
 		<div class="tab-pane fade" id="tab-ppto-ger" data-type="2">
@@ -140,6 +145,9 @@
 					<span class="glyphicon glyphicon glyphicon-export"></span>
 				</button>
 			</div>
+
+			<label>Nota: El campo de version no afecta la carga del presupuesto solo afecta a la busqueda del presupuesto</label>
+
 
 			<table id="table-ppto-2" class="table table-striped table-hover table-bordered" cellspacing="0" width="100%" style="width:100%">
 			</table>
