@@ -5,16 +5,18 @@ namespace Maintenance;
 use \BaseController;
 use \Input;
 use \View;
-use \Common\TypeUser;
+use \Excel;
+use \DB;
+use \Auth;
+use \Carbon\Carbon;
+
+//MODELOS
 use \Fondo\Fondo;
 use \Expense\Proof;
 use \Expense\MarkProofAccounts;
 use \Expense\Mark;
 use \Dmkt\Account;
 use \Expense\PlanCta;
-use \Common\TypeMoney;
-use \DB;
-use \Log;
 use \Exception;
 use \Dmkt\InvestmentType;
 use \Dmkt\InvestmentActivity;
@@ -29,8 +31,6 @@ use \Fondo\FondoCategoria;
 use \Fondo\FondoMktType;
 use \System\FondoMktHistory;
 use \Policy\ApprovalInstanceType;
-use \Excel;
-use \Carbon\Carbon;
 use \Fondo\FondoMkt;
 use \Expense\BagoMarcaGasto;
 
@@ -126,11 +126,19 @@ class TableController extends BaseController
 		
 		$maintenance = Maintenance::find( $id );
 		$columns     = json_decode( $maintenance->formula );
+		
+		$title = 'Mantenimiento de ' . $maintenance->descripcion;
+		if( ! in_array( Auth::user()->type , [ GER_COM , CONT , ESTUD ] ) )
+		{
+			$maintenance->opciones = false;
+			$title = $maintenance->descripcion;
+		}
+
 		return View::make( 'Maintenance.view' , 
 			array( 
 				'records'  => $records , 
 				'columns'  => $columns , 
-				'titulo'   => 'Mantenimiento de ' . $maintenance->descripcion , 
+				'titulo'   => $title , 
 				'type'     => $type , 
 				'add'	   => $maintenance->agregar_formula ,
 				'disabled' => $maintenance->deshabilitar ,
@@ -138,38 +146,6 @@ class TableController extends BaseController
 				'options'  => $maintenance->opciones 
 			) 
 		);		
-	}
-
-	public function getMaintenanceTableData()
-	{
-		try
-		{
-			$inputs = Input::all();
-			return $this->getTable( $inputs );
-		}
-		catch( Exception $e )
-		{
-			return $this->internalException( $e , __FUNCTION__ );
-		}
-	}
-
-	private function getTable( $inputs )
-	{
-		$vData       = $this->getModel( $inputs[ 'type' ] );
-		$model  	 = $vData[ 'model' ];
-		$id          = $vData[ 'id' ];
-		$records     = $model::order();
-		$maintenance = Maintenance::find( $id );
-		$columns = json_decode( $maintenance->formula );
-		return $this->setRpta( 
-			View::make( 'Maintenance.table' , 
-				array( 
-					'records' => $records , 
-					'columns' => $columns , 
-					'type'    => $inputs[ 'type' ]
-				) 
-			)->render()
-		);
 	}
 
 	private function updateFondoMkt( $inputs )
@@ -265,6 +241,11 @@ class TableController extends BaseController
 		try
 		{
 			$inputs = Input::all();
+			if( ! in_array( Auth::user()->type , [ GER_COM , CONT , ESTUD ] ) )
+			{
+				return $this->warningException( 'No esta autorizado para modificar la informacion' , __FUNCTION__ , __LINE__ , __FILE__ );
+			}
+
 			switch( $inputs[ 'type' ] ):
 				case 'Fondo_Gerente_Producto':
 					return $this->updateFondoMkt( $inputs );
@@ -410,7 +391,7 @@ class TableController extends BaseController
 	private function getDailySeatRelation()
 	{
 		$records = MarkProofAccounts::all();
-		$columns = Maintenance::find(1);
+		$columns = Maintenance::find( 1 );
 		$columns = json_decode( $columns->formula );
 		return $this->setRpta( View::make( 'Maintenance.table' )->with( array( 'records' => $records , 'columns' => $columns , 'type' => 'cuentasMarca' ) )->render() );
 	}

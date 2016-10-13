@@ -4,6 +4,7 @@ namespace Fondo;
 
 use \Eloquent;
 use \Carbon\Carbon;
+use \Auth;
 use Illuminate\Database\Eloquent\SoftDeletingTrait;
 
 class FondoGerProd extends Eloquent
@@ -43,10 +44,31 @@ class FondoGerProd extends Eloquent
 	protected static function orderWithTrashed()
 	{
 		$now = Carbon::now();
-		return FondoGerProd::select( [ 'id' , 'subcategoria_id' , 'marca_id' , 'saldo' , 'retencion' ] )
+		$fundDataSql = FondoGerProd::select( [ 'id' , 'subcategoria_id' , 'marca_id' , 'saldo' , 'retencion' ] )
 			->where( 'subcategoria_id' , '<>' , 31 )
 			->where( 'anio' , '=' , $now->format( 'Y' ) )
-			->orderBy( 'updated_at' , 'DESC' )->withTrashed()->get();
+			->orderBy( 'updated_at' , 'DESC' )->withTrashed();
+		if( Auth::user()->type != GER_COM )
+		{
+			if( Auth::user()->type == GER_PROD )
+			{
+				//CATEGORIAS ASIGNADAS AL GERENTE DE PRODUCTO
+				$gerProdSubCategoryIds = [ 1 , 2 , 3 , 4 , 6 , 7 , 8 , 9 , 13 , 14 , 15 , 16 , 17 , 18 , 19 , 20 , 21 , 22 , 23 , 24 , 25 , 26 , 27 , 28 , 29 , 30 ];
+				$fundDataSql->whereIn( 'subcategoria_id' , $gerProdSubCategoryIds );
+			}
+			elseif( Auth::user()->type == GER_PROM )
+			{
+				//CATEGORIAS ASIGNADAS AL GERENTE DE PROMOCION QUE NO PERTENCE A LA TABLA DE SUPERVISOR O INSTITUCIONAL
+				$gerPromSubCategoryIds = [ 5 , 10 , 12 , 32 ];
+				$fundDataSql->whereIn( 'subcategoria_id' , $gerPromSubCategoryIds );	
+			}
+			else
+			{
+				//OTROS USUARIOS ASIGNA UNA CATEGORIA INEXISTENTE
+				$fundDataSql->where( 'subcategoria_id' , 0 );
+			}
+		}
+		return $fundDataSql->get();
 	}
 
 	protected function setSaldoAttribute( $value )

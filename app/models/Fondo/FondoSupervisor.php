@@ -59,9 +59,17 @@ class FondoSupervisor extends Eloquent
 	protected static function orderWithTrashed()
 	{
 		$now = Carbon::now();
-		return FondoSupervisor::select( [ 'id' , 'subcategoria_id' , 'marca_id' , 'supervisor_id' , 'saldo' , 'retencion' ] )
+		$fundDataSql = FondoSupervisor::select( [ 'id' , 'subcategoria_id' , 'marca_id' , 'supervisor_id' , 'saldo' , 'retencion' ] )
 			->where( 'anio' , '=' , $now->format( 'Y' ) )
-			->orderBy( 'updated_at' , 'desc' )->withTrashed()->get();
+			->orderBy( 'updated_at' , 'desc' )->withTrashed();
+
+		if( ! in_array( Auth::user()->type , [ GER_PROM , GER_COM ] ) )
+		{
+			//OTROS USUARIOS ASIGNA UNA CATEGORIA INEXISTENTE
+			$fundDataSql->where( 'subcategoria_id' , 0 );
+		}
+
+		return $fundDataSql->get();
 	}	
 
 	protected function setSaldoAttribute( $value )

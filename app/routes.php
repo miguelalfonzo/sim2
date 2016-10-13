@@ -51,12 +51,8 @@
 
     Route::group( array( 'before' => 'gercom' ) , function() 
     {
-        Route::get('maintenance/FondosSupervisor', 'Maintenance\TableController@getSupFunds');
-        Route::get('maintenance/FondosGerProd', 'Maintenance\TableController@getGerProdFunds');
-        Route::get('maintenance/FondosInstitution', 'Maintenance\TableController@getInstitutionFunds');
         Route::get( 'fondoHistorial' , 'Fondo\FondoMkt@getFondoHistorial' );
         Route::post( 'fondo-subcategoria-history' , 'Fondo\FondoMkt@getFondoSubCategoryHistory' );
-        Route::get( 'maintenance-export/{type}' , 'Maintenance\TableController@export' );
         Route::get( 'export-fondoHistorial-{start}-{end}-{subCategory}' , 'Fondo\FondoMkt@exportFondoHistorial' );
     });
 
@@ -72,16 +68,21 @@
     |--------------------------------------------------------------------------
     */
 
-    Route::group( [ 'before' => 'gercom_cont_estudio' ] , function()
+    Route::group( [ 'before' => 'maintenance_roles' ] , function()
     {
-        Route::get( 'maintenance/view/{type}' , 'Maintenance\TableController@getView' );
-        Route::post( 'get-cell-maintenance-info' , 'Maintenance\TableController@getMaintenanceCellData' );
-        Route::post( 'update-maintenance-info' , 'Maintenance\TableController@updateMaintenanceData' );
-        Route::post( 'save-maintenance-info' , 'Maintenance\TableController@saveMaintenanceData' );
-        Route::post( 'add-maintenance-info' , 'Maintenance\TableController@addMaintenanceData' );
-        Route::post( 'get-table-maintenance-info' , 'Maintenance\TableController@getMaintenanceTableData');
-        Route::post( 'maintenance-enable' , 'Maintenance\TableController@enableRecord');
-        Route::post( 'maintenance-disable' , 'Maintenance\TableController@disableRecord');
+        Route::group( [ 'namespace' => 'Maintenance' ] , function()
+        {
+            Route::get(  'maintenance/view/{type}'    , 'TableController@getView' );
+            Route::get( 'maintenance-export/{type}'   , 'TableController@export' );
+            
+            Route::post( 'get-cell-maintenance-info'  , 'TableController@getMaintenanceCellData' );
+            Route::post( 'update-maintenance-info'    , 'TableController@updateMaintenanceData' );
+            Route::post( 'save-maintenance-info'      , 'TableController@saveMaintenanceData' );
+            Route::post( 'add-maintenance-info'       , 'TableController@addMaintenanceData' );
+            Route::post( 'maintenance-enable'         , 'TableController@enableRecord');
+            Route::post( 'maintenance-disable'        , 'TableController@disableRecord');
+        
+        });
     });
 
     /*

@@ -133,9 +133,9 @@ class FilterController
 		return $this->rolFilter( [ GER_COM , CONT ] );
 	}
 
-	public function gerCom_cont_estudio()
+	public function maintenanceRoles()
 	{
-		return $this->rolFilter( [ GER_COM , CONT , ESTUD ] );
+		return $this->rolFilter( [ GER_PROD , GER_PROM , GER_COM , CONT , ESTUD ] );
 	}
 
 	public function asistenteGerencia()

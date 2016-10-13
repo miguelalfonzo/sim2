@@ -246,29 +246,6 @@ $( document ).on( 'focus' , 'select[name=actividad]' , function()
     $(this).parent().parent().removeClass( 'has-error');
 });
 
-function listMaintenanceTable( type )
-{
-    $.ajax(
-    {
-        url  : server + 'get-table-maintenance-info',
-        type : 'POST' ,
-        data :
-        {
-            _token : GBREPORTS.token,
-            type   : type
-        }
-    }).fail( function ( statusCode , errorThrown )
-    {
-        ajaxError( statusCode , errorThrown );
-    }).done(function ( response ) 
-    {
-        if ( response.Status == 'Ok' )
-            dataTable( type , response.Data , 'registros' );
-        else
-            bootbox.alert('<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
-    });
-}
-
 function listDocuments()
 {
     var l = Ladda.create( $( "#search-documents" )[ 0 ] );
@@ -1291,7 +1268,6 @@ $(document).on( 'click' , '.maintenance-save' , function()
         if ( response.Status == 'Ok')
         {
             bootbox.alert('<h4 class="text-success">Tabla Actualizada</h4>');
-            // listMaintenanceTable( aData.type );
             window.location.reload(true);
         }
         else
@@ -1327,7 +1303,6 @@ $(document).on('click' , '.maintenance-update' , function()
         if ( response.Status == 'Ok')
         {
             bootbox.alert('<h4 class="text-success">Relaciones Actualizadas</h4>');
-            // listMaintenanceTable( aData.type );
             window.location.reload(true);
         }
         else
@@ -1356,7 +1331,6 @@ $(document).on( 'click' , '.maintenance-disable' , function()
         if ( response.Status == 'Ok' )
         {
             bootbox.alert('<h4 class="green">Registro deshabilitado</h4>');
-            //listMaintenanceTable( aData.type );
             window.location.reload(true); 
         }
         else
@@ -1385,7 +1359,6 @@ $(document).on('click' , '.maintenance-enable' , function()
         if ( response.Status == 'Ok' )
         {
             bootbox.alert('<h4 class="green">Registro habilitado</h4>');
-            //listMaintenanceTable( aData.type );
             window.location.reload(true);
         }
         else

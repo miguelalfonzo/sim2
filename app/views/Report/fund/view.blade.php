@@ -92,7 +92,7 @@
 
                     this.api().column( '.sum-retencion' , { search: 'applied' } ).every( function () 
                     {
-                        if( this.data.length != 0 )
+                        if( this.data().length != 0 )
                         {
                             var sum  =  this.data().reduce( function ( a , b ) 
                                         {
@@ -104,7 +104,7 @@
 
                     this.api().column( '.sum-saldo-disponible' , { search: 'applied' } ).every( function () 
                     {
-                        if( this.data.length != 0 )
+                        if( this.data().length != 0 )
                         {
                             var sum  =  this.data().reduce( function ( a , b ) 
                                         {
