@@ -97,41 +97,6 @@ class FondoController extends BaseController
         return substr( $rpta , 0 , -2 );
     }
 
-    public function endFondos( $start )
-    {
-        try
-        {
-            $periodo = $this->period( $start );
-            $periodos = Periodo::where( 'aniomes' , $periodo )->first();
-            if ( is_null( $periodos ) )
-                return $this->warningException( 'El periodo seleccionado no ha sido activado: '.$periodo , __FUNCTION__ , __LINE__ , __FILE__ );
-            elseif ( $periodos->status == BLOCKED )
-                return $this->warningException( 'El periodo ya se encuentra Terminado' , __FUNCTION__ , __LINE__ , __FILE__ );
-            
-            $solicituds = Solicitud::solInst( $periodo );
-            if ( $solicituds->count() === 0 )
-                return $this->warningException( 'No se encontro solicitudes para el periodo especificado: ' . $periodo , __FUNCTION__ , __LINE__ , __FILE__);
-        
-            DB::beginTransaction();
-            $middleRpta = $this->endSolicituds( $solicituds );
-            if ( $middleRpta[status] == ok )
-            {
-                $periodos->status = BLOCKED ;
-                $periodos->save();
-                DB::commit();
-            }
-            else
-            {
-                DB::rollback();
-            }
-            return $middleRpta;
-        }
-        catch (Exception $e)
-        {
-            return $this->internalException( $e , __FUNCTION__ );
-        }
-    }
-
     private function endSolicituds( $solicituds )
     {
         $fondoMktController = new FondoMkt;
@@ -139,8 +104,8 @@ class FondoController extends BaseController
         $historiesFondoMkt = array();
         foreach( $solicituds as $solicitud )
         {
-            $detalle = $solicitud->detalle;
-            $fondo = $detalle->thisSubFondo;
+            $detalle           = $solicitud->detalle;
+            $fondo             = $detalle->thisSubFondo;
             if ( $fondo->saldo_disponible < $detalle->monto_solicitado )
                 return $this->warningException( 'No se cuenta con saldo en el fondo ' . $fondo->subCategoria->descripcion . ' para terminar los Fondos Institucionales.'  , __FUNCTION__ , __LINE__ , __FILE__ );
             else
@@ -176,6 +141,40 @@ class FondoController extends BaseController
             return $this->setRpta();
         else
             return array( status => warning , description => $msgWarning );
+    }
+
+    public function endFondos( $start )
+    {
+        try
+        {
+            DB::beginTransaction();
+            $periodo = $this->period( $start );
+            $periodos = Periodo::where( 'aniomes' , $periodo )->first();
+            if ( is_null( $periodos ) )
+                return $this->warningException( 'El periodo seleccionado no ha sido activado: '.$periodo , __FUNCTION__ , __LINE__ , __FILE__ );
+            elseif ( $periodos->status == BLOCKED )
+                return $this->warningException( 'El periodo ya se encuentra Terminado' , __FUNCTION__ , __LINE__ , __FILE__ );
+            
+            $solicituds = Solicitud::solInst( $periodo );
+            if ( $solicituds->count() === 0 )
+                return $this->warningException( 'No se encontro solicitudes para el periodo especificado: ' . $periodo , __FUNCTION__ , __LINE__ , __FILE__);
+        
+            $middleRpta = $this->endSolicituds( $solicituds );
+            if ( $middleRpta[status] == ok )
+            {
+                $periodos->status = BLOCKED ;
+                $periodos->save();
+                DB::commit();
+            }
+            else
+                DB::rollback();
+            return $middleRpta;
+        }
+        catch (Exception $e)
+        {
+            DB::rollback();
+            return $this->internalException( $e , __FUNCTION__ );
+        }
     }
     
     private function validateOneInstitution( $idPeriodo , $cod )

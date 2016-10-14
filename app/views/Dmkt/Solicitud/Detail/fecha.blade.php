@@ -1,7 +1,7 @@
 <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
     <label class="control-label col-xs-12 col-sm-12 col-md-12 col-lg-12">Fecha de Creacion / Deposito</label>
     <div class="input-group col-xs-12 col-sm-5 col-md-5 col-lg-5 pull-left">
-        <input type="text" class="form-control" maxlength="10" disabled value="{{ $solicitud->created_at_date }}">
+        <input type="text" class="form-control" maxlength="10" disabled value="{{ date_format( date_create( $solicitud->created_at ) , 'd/m/Y' ) }}">
     </div>
     <div class="input-group col-xs-12 col-sm-7 col-md-7 col-lg-7 pull-left">
     	<div class="input-group solicitud-date" style="width:100%">
@@ -15,12 +15,12 @@
     			</span>
             </div>
     		<span  class="input-group-btn solicitud-date">
-    			<button class="btn btn-default" type="button" id="edit-date-activate">
+    			<button class="btn btn-default" type="button" id="edit-date-activate" style="height: 38px;">
     				<i class="glyphicon glyphicon-edit"></i>
     			</button>						
     		</span>
     		<span  class="input-group-btn  edit-date" style="display:none">
-                <button class="btn btn-default" type="button" id="edit-date-deactivate">
+                <button class="btn btn-default" type="button" id="edit-date-deactivate" style="height: 38px;">
     				<i class="glyphicon glyphicon-ban-circle"></i>
     			</button>
     		</span>

@@ -64,18 +64,6 @@ var date_options2 =
     autoclose   : true
 };
 
-function validateResponse( response )
-{
-    if( response.Status == ok )
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
 $(document).off( 'click' , '.timeLine' );
 $(document).on( 'click' , '.timeLine' , function(e)
 {
@@ -245,6 +233,29 @@ $( document ).on( 'focus' , 'select[name=actividad]' , function()
 {
     $(this).parent().parent().removeClass( 'has-error');
 });
+
+function listMaintenanceTable( type )
+{
+    $.ajax(
+    {
+        url  : server + 'get-table-maintenance-info',
+        type : 'POST' ,
+        data :
+        {
+            _token : GBREPORTS.token,
+            type   : type
+        }
+    }).fail( function ( statusCode , errorThrown )
+    {
+        ajaxError( statusCode , errorThrown );
+    }).done(function ( response ) 
+    {
+        if ( response.Status == 'Ok' )
+            dataTable( type , response.Data , 'registros' );
+        else
+            bootbox.alert('<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+    });
+}
 
 function listDocuments()
 {
@@ -1093,20 +1104,9 @@ $(document).on("click", ".elementEdit", function()
     });
 });
 
-$(document).off( 'click' , '.maintenance-remove' );
-$(document).on( 'click' , '.maintenance-remove' , function()
-{
-    var tr = $( this ).closest( 'tr' )
-    tr.remove();
-    $( 'input[case=' + tr.attr( 'type' ) + ']' ).show();
-    $( '#table_' + tr.attr( 'type' ) ).DataTable().columns.adjust();
-    
-});
-
 $(document).off( 'click' , '.maintenance-add' );
 $(document).on( 'click' , '.maintenance-add' , function()
 {
-    var type = this.getAttribute( 'case' );
     var button = $(this);
     $.ajax(
     {
@@ -1124,16 +1124,11 @@ $(document).on( 'click' , '.maintenance-add' , function()
     {
         if ( response.Status == 'Ok')
         {
-            var tbody = button.parent().parent().find( 'tbody' );
-            tbody.append( response.Data );
-            var table = $( '#table_' + type );
+            button.parent().parent().find('tbody').append( response.Data );
+            var table = '#table_' + button.attr( 'case' );
             var scroll = $( table ).parent();
             scroll.scrollTop( scroll[0].scrollHeight );
             button.hide();
-            var tr = tbody.children().last();
-            tr.find( '.input-numeric' ).numeric();
-            tr.find( '.input-integer' ).numeric( { negative : false , decimal : false } );
-            $( table ).DataTable().columns.adjust();
         }
         else
             bootbox.alert('<h4 class="red">' + Data.Status + ': ' + Data.Description + '</h4>');            
@@ -1162,30 +1157,9 @@ $(document).on("click", "#add-doc", function()
 $(document).off( 'click' , '.maintenance-cancel');
 $(document).on( 'click' , '.maintenance-cancel' , function()
 {
-    var elem = $( this );
-    var td  = elem.closest( 'tr' );
-    var tr = td.closest( 'tr' );
-    var type = tr.attr( 'type' );
-    td.find( '.maintenance-update' ).remove();
-    elem.remove();
-    
-    tr.children().each( function()
-    {
-        var td = $( this );
-        if( this.getAttribute( 'editable' ) == 2 )
-        {
-            td.prepend( 
-                '<button type="button" class="btn btn-info btn-xs maintenance-edit">' +
-                    '<span class="glyphicon glyphicon-pencil"></span>' +
-                '</button>'
-            );
-        }
-        else if( this.getAttribute( 'editable' ) != null )
-        {
-            td.html( td.find( 'input[ type=hidden ]' ).val() );
-        }
-    });
-    $( '#table_' + type ).DataTable().columns.adjust();
+    var tr = $(this).parent().parent();
+    $( 'input[case=' + tr.attr( 'type' ) + ']' ).show();
+    listMaintenanceTable( tr.attr('type')  );
 });
 
 $( '#maintenance-export' ).on( 'click' , function()
@@ -1196,64 +1170,47 @@ $( '#maintenance-export' ).on( 'click' , function()
 $(document).off( 'click' , '.maintenance-edit' );
 $(document).on( 'click' , '.maintenance-edit' , function()
 {
-    var elem = $( this );
-    var tr = elem.closest( 'tr' );
-    var type = tr.attr( 'type' );
-    elem.remove();
-    tr.children().each( function( i , data )
+    var trElement = $(this).parent().parent();
+    trElement.children().each(function(i,data)
     {
-        var td = $( data );
+        var td = $(data);
         if ( td.attr('editable') == 1 )
             enableTd( data );
         else if ( td.attr('editable') == 2 )
         {
-            $( data ).prepend(
-                '<button type="button" class="btn btn-success btn-xs maintenance-update">' +
-                    '<span class="glyphicon glyphicon-ok"></span>' +
-                '</button>' +
-                '<button type="button" class="btn btn-info btn-xs maintenance-cancel">' +
-                    '<span class="glyphicon glyphicon-chevron-left"></span>' +
-                '</button>'
-            );        
+            $(data).html('<a class="maintenance-update" href="#">'
+            + '<span class="glyphicon glyphicon-floppy-disk"></span></a>'
+            + '<a class="maintenance-cancel" href="#"><span class="glyphicon glyphicon-remove"></span></a>');        
         }
-        else if( td.attr('editable') == 3 )
+        else if ( td.attr('editable') == 3 )
         {
-            var val = td.text();
-            td.html(
-                '<input type="text" class="form-control input-sm" style="width:100%" value="' + val.trim() + '">' +
-                '<input type="hidden" value="' + val.trim() + '">' 
-            );
-            td.find( 'input[ type=text ]' ).numeric();
+            var val = td.html();
+            td.html('<input type="text" style="width:100%" value="' + val.trim() + '">');
+            td.children().numeric();
         }
         else if ( td.attr('editable') == 4 )
         {
-            var val = td.text();
-            td.html( 
-                '<input type="text" class="form-control input-sm" style="width:100%" value="' + val.trim() + '">' +
-                '<input type="hidden" value="' + val.trim() + '">'
-            );
+            var val = td.html();
+            td.html('<input type="text" style="width:100%" value="' + val.trim() + '">');
         }
     });
-
-    $( '#table_' + type ).DataTable().columns.adjust();
 });
 
 $(document).off( 'click' , '.maintenance-save');
 $(document).on( 'click' , '.maintenance-save' , function()
 {
-    var trElement = $(this).closest( 'tr' );
-    var type = trElement.attr( 'type' );
+    var trElement = $(this).parent().parent();
     var aData = {};
     aData._token = GBREPORTS.token;
-    aData.type   = type;
+    aData.type   = trElement.attr('type');
     aData.Data   = {};
     trElement.children().each( function( i , data )
     {
         var td = $(data);
-        if ( typeof td.attr( 'column' ) != 'undefined' )
-        {
-            aData.Data[ td.attr( 'column' ) ] = td.children().val() ;
-        }
+        if ( td.attr('save') == 1 )
+            aData.Data[td[0].classList[0]] = td.children().val() ;
+        else if ( td.attr('save') == 2 )
+            aData[td[0].classList[0]] = td.children().val() ;
     });
     $.ajax(
     {
@@ -1268,6 +1225,7 @@ $(document).on( 'click' , '.maintenance-save' , function()
         if ( response.Status == 'Ok')
         {
             bootbox.alert('<h4 class="text-success">Tabla Actualizada</h4>');
+            // listMaintenanceTable( aData.type );
             window.location.reload(true);
         }
         else
@@ -1303,6 +1261,7 @@ $(document).on('click' , '.maintenance-update' , function()
         if ( response.Status == 'Ok')
         {
             bootbox.alert('<h4 class="text-success">Relaciones Actualizadas</h4>');
+            // listMaintenanceTable( aData.type );
             window.location.reload(true);
         }
         else
@@ -1331,6 +1290,7 @@ $(document).on( 'click' , '.maintenance-disable' , function()
         if ( response.Status == 'Ok' )
         {
             bootbox.alert('<h4 class="green">Registro deshabilitado</h4>');
+            //listMaintenanceTable( aData.type );
             window.location.reload(true); 
         }
         else
@@ -1359,6 +1319,7 @@ $(document).on('click' , '.maintenance-enable' , function()
         if ( response.Status == 'Ok' )
         {
             bootbox.alert('<h4 class="green">Registro habilitado</h4>');
+            //listMaintenanceTable( aData.type );
             window.location.reload(true);
         }
         else
@@ -1369,7 +1330,6 @@ $(document).on('click' , '.maintenance-enable' , function()
 function enableTd( data )
 {
     var td = $(data);
-    var value = td.text().trim();
     $.ajax(
     {
         type: 'post' ,
@@ -1377,7 +1337,7 @@ function enableTd( data )
         data: 
         {
             type   : td[ 0 ].classList[ 0 ] ,
-            val    : value,
+            val    : td.html().trim(),
             _token : GBREPORTS.token
         }
     }).fail( function( statusCode , errorThrown )
@@ -1386,7 +1346,7 @@ function enableTd( data )
     }).done( function( response )
     {
         if ( response.Status == 'Ok')
-            td.html( response.Data + '<input type="hidden" value="' + value + '">' );
+            td.html( response.Data );
         else
             bootbox.alert('<h4 class="red">' + Data.Status + ': ' + Data.Description + '</h4>');            
     });
@@ -1530,7 +1490,7 @@ function seeker( element , name , url )
                     return '<p><strong>' + data.type + ': ' + data.label + '</strong></p>';
                 }
             },
-            source: function( request , dataset )
+            source: function (request , response)
             {
                 $.ajax(
                 {
@@ -1540,20 +1500,17 @@ function seeker( element , name , url )
                     {
                         _token : GBREPORTS.token,
                         sVal   : request
-                    }
-                }).fail( function( statusCode , errorThrown )
-                {
-                    ajaxError( statusCode , errorThrown );    
-                }).done( function( response )
-                {
-                    if ( validateResponse( response ) )
+                    },
+                    error: function()
                     {
-                        return dataset( response.Data );
-                    }
-                    else
-                    {
-                        bootboxMessage( response );
-                    }
+                        var resp = '{"value:0","label":"Error de Conexion"}';
+                        response(resp);
+                    },
+                }).done( function (data)
+                {
+                    if ( data.Status != 'Ok')
+                        data.Data = '{"value":"0","label":"Error en la busqueda"}';   
+                    return response( data.Data );
                 });              
             }
         }).on('typeahead:selected', function ( evento, suggestion , dataset )
@@ -1732,7 +1689,6 @@ function ajaxError(statusCode,errorThrown)
         bootbox.alert('<h4 class="red">Error del Sistema</h4>');  
     }
     Ladda.stopAll();
-    $( '#loading' ).hide( 'slow' );
 }
 
 $(".date_month").datepicker(date_options2).on('changeDate', function (e) {
@@ -1797,45 +1753,24 @@ function bootboxMessage( response )
     $.unblockUI();
     Ladda.stopAll();
     var colorClass = '';
-    if( response.Status == ok )
+    if( response.Status === ok )
     {
         colorClass = 'text-success';
     }
-    else if( response.Status == warning )
+    else if( response.Status === warning )
     {
         colorClass = 'text-warning';
     }
-    else if( response.Status == error )
+    else if( response.Status === error )
     {
         colorClass = 'text-danger';
-    }
-    else if( response.Status == 'Logout' )
-    {
-        colorClass = 'text-warning';
     }
     else
     {
         colorClass = 'text-info';
     }
+    bootbox.alert( '<h4 class="' + colorClass + '">' + response.Description + '</h4>' );
 
-    var listgroup = '';
-    var list = response.List;
-    if( typeof list != 'undefined' )
-    {
-        listgroup = '<ul class="list-group" style="max-height:300px;overflow-y:auto">';
-        list.Detail.forEach( function( value )
-        {
-            listgroup += '<li class="list-group-item ' + list.Class + '">' + value + '</li>'; 
-        });
-        listgroup += '</ul>';
-    }
-    bootbox.alert( '<h4 class="' + colorClass + '">' + response.Description + '</h4>' + listgroup , function()
-    {
-        if( response.Status == 'Logout' )
-        {
-            window.location.href = server + 'login';
-        }
-    });
 }
 
 //Validate send register solicitude
@@ -2148,7 +2083,7 @@ $( '#btn-add-family-fondo' ).on( 'click' ,function ()
         }
     });
 
-    if( ! family_exist )
+    if( !family_exist )
     {
         $.ajax(
         {
@@ -2158,41 +2093,48 @@ $( '#btn-add-family-fondo' ).on( 'click' ,function ()
             {
                 _token       : GBREPORTS.token,
                 solicitud_id : id_solicitud.val() ,
-                producto     : family_id
+                producto : family_id
             }
-        }).fail( function( statusCode , errorThrown )
+        }).fail( function ( statusCode , errorThrown )
         {
             ajaxError( statusCode , errorThrown );
-        }).done( function( response )
+        }).done( function ( response )
         {
             spin.stop();
-            if( response.Status == 'Ok' )
+            if ( response.Status === 'Ok' )
             {
-                var options_val = '<option selected="" disabled="" value="0">Seleccione el Fondo</option>';
-                $.each( response.Data , function( i, val ) 
-                {
-                    options_val += '<option value=" ' + val.id + ',' + val.tipo + '">'+ val.marca.descripcion + ' | ' + val.sub_categoria.categoria.descripcion + ' | ' + val.sub_categoria.descripcion + ' S/.' + ( val.saldo - val.retencion ) + '</option>';
-                });
-                
-                $( "#list-product2" ).append( '<li class="list-group-item"><div class="input-group input-group-sm"><span class="input-group-addon" style="width:15%;">'+
-                $( "#selectfamilyadd option:selected" ).text() + '</span><select name="fondo_producto[]" class="selectpicker form-control">' +
-                options_val +'</select><span class="input-group-addon">' + $( '#type-money' ).html().trim() + '</span>'+
-                '<input name="monto_producto[]" type="text" class="form-control text-right amount_families2" value="0" style="padding:0px;text-align:center">'+
-                '<span class="input-group-btn"><button type="button" class="btn btn-default btn-remove-family"><span class="glyphicon glyphicon-remove"></span></button></span></div>'+
-                '<input type="hidden" name="producto[]" class="producto_value" value="'+family_id+'"></li>' );
-
-
-                $( ".btn-remove-family" ).bind( "click", function() {
-                    $(this).parent().prev('input').val(0);
-                    verifySum( $(this).parent().prev('input') , 1 )
-                    $(this).closest('li').remove();
+                 if(response.Data.Cond == true)
+                 {
+                    var options_val = '<option selected="" disabled="" value="0">Seleccione el Fondo</option>';
+                    $.each( response.Data.Fondo_product, function( i, val ) 
+                    {
+                        options_val += '<option value="'+val.id+',' + val.tipo+'">'+ val.descripcion +' S/.'+ val.saldo_disponible +'</option>';
+                    });
                     
-                });
-                $('#approval-product-modal').modal('toggle');
+                    $( "#list-product2" ).append( '<li class="list-group-item"><div class="input-group input-group-sm"><span class="input-group-addon" style="width:15%;">'+
+                    $( "#selectfamilyadd option:selected" ).text() + '</span><select name="fondo_producto[]" class="selectpicker form-control">' +
+                    options_val +'</select><span class="input-group-addon">' + $( '#type-money' ).html().trim() + '</span>'+
+                    '<input name="monto_producto[]" type="text" class="form-control text-right amount_families2" value="0" style="padding:0px;text-align:center">'+
+                    '<span class="input-group-btn"><button type="button" class="btn btn-default btn-remove-family"><span class="glyphicon glyphicon-remove"></span></button></span></div>'+
+                    '<input type="hidden" name="producto[]" class="producto_value" value="'+family_id+'"></li>' );
+
+
+                    $( ".btn-remove-family" ).bind( "click", function() {
+                        $(this).parent().prev('input').val(0);
+                        verifySum( $(this).parent().prev('input') , 1 )
+                        $(this).closest('li').remove();
+                        
+                    });
+                    $('#approval-product-modal').modal('toggle');
+                }
+                else
+                {
+                     bootbox.alert( '<h4 class="red">' + response.Data.Description + '</h4>');
+                }
             }
             else
             {
-                bootboxMessage( response );
+                bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
             }
         });
     }
@@ -2274,30 +2216,26 @@ $( document ).ready(function()
             {
                 _token     : GBREPORTS.token
             }
-        }).done( function( response ) 
+        }).done( function( dataResult ) 
         {
-            if( validateResponse( response ) )
+            if( dataResult.status == 'OK' )
             {
-                if( typeof( response.alerts ) != 'undefined' )
+                if( typeof( dataResult.alerts ) != 'undefined' )
                 {
-                    if( response.alerts.length > 0 )
+                    if( dataResult.alerts.length > 0 )
                     {
                         $( '.sim_alerta' ).show( 'slow' );
-                        var alerts = response.alerts;
+                        var alerts = dataResult.alerts;
                         $( '.sim_alerta' ).find( 'span' ).html( 
                             ( typeof alerts[0] === 'undefined' ? 0 : alerts[0].data.length ) + 
                             ( typeof alerts[1] === 'undefined' ? 0 : alerts[1].data.length ) + 
                             ( typeof alerts[2] === 'undefined' ? 0 : alerts[2].data.length ) );
                     }
                 }
-            }
-            else
-            {
-                bootboxMessage( response );
-            }
+            }         
         });
     }
-    if( window.location.href.match( 'public/show_user' ) != null )
+    if( window.location.href.match( 'public/show_user' ) !== null )
     {
         getAlerts();
     }
@@ -2348,12 +2286,10 @@ function listSolicituds()
         fecha_final  : $('#drp_menubar').data('daterangepicker').endDate.format("L") ,
         estado       : $('#idState').val()
     };
-
-    $( '#loading' ).show( 'slow' );
+        
     customAjax( 'GET' , 'list-solicituds' , data ).done(function ( response ) 
     {
-        $( '#loading' ).hide( 'slow' );
-        if ( response.Status == 'Ok' )
+        if ( response.Status === 'Ok' )
         {
             processData( response.Data , response.usuario );
             processColumns( response.columns , response.usuario , response.now );
@@ -2389,7 +2325,7 @@ function listSolicituds()
         }
         else
         {
-            bootboxMessage( response );
+            bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
         }
     });   
 }

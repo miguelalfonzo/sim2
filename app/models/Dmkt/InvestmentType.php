@@ -66,9 +66,4 @@ class InvestmentType extends Eloquent
     {
         return $this->belongsTo( '\Policy\ApprovalInstanceType' , 'id_tipo_instancia_aprobacion' );
     }
-
-    public function getAddData()
-    {
-        return $this->select( [ 'id' , 'nombre descripcion' ] )->get();
-    }
 }

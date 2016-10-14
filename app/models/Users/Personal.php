@@ -278,9 +278,4 @@ class Personal extends Eloquent
             return $rpta;
         }
     }
-
-    public static function getBagoSup( $code )
-    {
-        return Personal::where( 'tipo' , SUP )->where( 'bago_id' , $code )->first(); 
-    }
 }

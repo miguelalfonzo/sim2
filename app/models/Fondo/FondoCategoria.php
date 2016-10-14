@@ -14,11 +14,4 @@ class FondoCategoria extends Eloquent
 	{
 		return $this->hasMany('Maintenance\fondosSubCategorias');
 	}
-
-	public function getAddData()
-	{
-		return $this->select( [ 'id' , 'descripcion' ] )
-			->orderBy( 'descripcion' , 'ASC' )
-			->get();
-	}
 }

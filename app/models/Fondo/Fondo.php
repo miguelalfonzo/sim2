@@ -62,12 +62,4 @@ class Fondo extends Eloquent
         return Fondo::where( 'num_cuenta' , $accountNumber )->first();
     }
 
-    public function getAddData()
-    {
-        return $this->select( [ 'id' , 'nombre descripcion' ] )
-            ->orderBy( 'nombre' , 'ASC' )
-            ->get();
-    }
-
-
 }

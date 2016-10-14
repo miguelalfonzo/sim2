@@ -32,9 +32,6 @@ use \System\FondoMktHistory;
 use \Devolution\Devolution;
 use \Devolution\DevolutionHistory;
 use \Event\Event;
-use \Fondo\FondoSubCategoria;
-
-use \PPTO\PPTOSupervisor;
 	
 	//SAVE USER_ID FOR CREATED_BY & UPDATED_BY
 	Solicitud::observe(				new Transaction());
@@ -53,19 +50,18 @@ use \PPTO\PPTOSupervisor;
 	Account::observe( 				new Transaction());
 	Mark::observe( 					new Transaction());
 	MarkProofAccounts::observe( 	new Transaction());
+	InvestmentType::observe(    	new Transaction());
+	InvestmentActivity::observe(	new Transaction());
 	FondoSupervisor::observe(   	new Transaction());
 	FondoGerProd::observe( 			new Transaction());
 	FondoInstitucional::observe(	new Transaction());
-	FondoSubCategoria::observe( 	new Transaction());
 	FondoMktHistory::observe( 		new Transaction());
 	FondoMktPeriodHistory::observe( new Transaction());
 	Devolution::observe( 			new Transaction());
 	DevolutionHistory::observe(     new Transaction());
 	Event::observe( 				new Transaction());
+	//FileStorage::observe(			new Transaction());
 	
 	//SOFT DELETE
 	Activity::observe(          	new SoftDelete());
 	TemporalUser::observe(      	new SoftDelete());
-	InvestmentType::observe(    	new SoftDelete());
-	InvestmentActivity::observe(	new SoftDelete());
-	

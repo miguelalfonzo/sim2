@@ -14,6 +14,7 @@ use \Expense\Expense;
 use \Custom\DataList;
 use \Validator;
 use \Exception;
+use \System\FondoHistory;
 use \Dmkt\Solicitud;
 use \Carbon\Carbon;
 use \Fondo\FondoSubCategoria;

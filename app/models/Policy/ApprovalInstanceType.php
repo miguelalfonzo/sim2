@@ -30,11 +30,4 @@ class ApprovalInstanceType extends Eloquent
 
     }
 
-    public function getAddData()
-    {
-        return $this->select( [ 'id' , 'descripcion' ] )
-            ->orderBy( 'descripcion' , 'ASC' )
-            ->get();
-    }
-
 }

@@ -17,27 +17,19 @@ class LoginController extends BaseController{
 
     public function showLogin()
     {
-        return View::make( 'Dmkt.login' );
+        return View::make('Dmkt.login');
     }
 
     public function doLogin()
     {
         // validate the info, create rules for the inputs
-        $rules = 
-        [
+        $rules = array(
             'username' => 'required', // make sure the email is an actual email
             'password' => 'required|min:3' // password can only be alphanumeric and has to be greater than 3 characters
-        ];
+        );
 
-        $messages =
-        [
-            'username.required' => 'El campo Usuario es obligatorio',
-            'password.required' => 'El campo Clave es obligatorio',
-            'password.min'      => 'El campo Clave debe tener al menos 3 caracteres'
-        ];
-
-        $validator = Validator::make( Input::all(), $rules , $messages );
-        if( $validator->fails() ) 
+        $validator = Validator::make( Input::all(), $rules);
+        if ($validator->fails()) 
         {
             return Redirect::to( 'login' )
                 ->withErrors( $validator ) // send back all errors to the login form
@@ -51,7 +43,7 @@ class LoginController extends BaseController{
 
         if( is_null( $user ) )
         {
-            return Redirect::to( 'login' )->with( [ 'message' => 'Usuario no registrado en el esquema USR: USERS' ] );    
+            return View::make( 'Dmkt.login' )->with( array( 'message' => 'Usuario no registrado en el esquema USR: USERS' ) );    
         }
         else
         {
@@ -69,12 +61,12 @@ class LoginController extends BaseController{
                     if( ! in_array( Auth::user()->type , [ REP_MED , SUP , GER_PROD , GER_PROM , GER_COM , GER_GER , CONT , TESORERIA , ASIS_GER , 'A' , ESTUD ] ) )
                     {
                         Auth::logout();
-                        return Redirect::to( 'login' )->with( [ 'message' => 'Rol no autorizado' ] );
+                        return View::make( 'Dmkt.login' )->with( array( 'message' => 'Rol no autorizado' ) );
                     }
                     else if( is_null( Auth::user()->simApp ) )
                     {
                         Auth::logout();
-                        return Redirect::to( 'login' )->with( [ 'message' => 'Usuario no autorizado para el SIM' ] );
+                        return View::make( 'Dmkt.login' )->with( array( 'message' => 'Usuario no autorizado para el SIM' ) );
                     }
                     else
                     {
@@ -84,7 +76,7 @@ class LoginController extends BaseController{
                 }
                 else
                 {
-                    return Redirect::to( 'login' )->with( [ 'message' , 'Usuario y/o contraseña incorrecto.' ] );
+                    return Redirect::to( 'login' )->with( 'error_login' , true );
                 }
             }
             else
@@ -93,12 +85,12 @@ class LoginController extends BaseController{
                 if( is_null( Auth::user()->bagoSimApp ) )
                 {
                     Auth::logout();
-                    return Redirect::to( 'login' )->with( [ 'message' => 'Usuario no autorizado para el SIM' ] );
+                    return View::make( 'Dmkt.login' )->with( array( 'message' => 'Usuario no autorizado para el SIM' ) );
                 }
                 else if( ! in_array( Auth::user()->type , [ REP_MED , SUP , GER_PROD , GER_PROM , GER_COM , GER_GER , CONT , TESORERIA , ASIS_GER , 'A' , ESTUD ] ) )
                 {
                     Auth::logout();
-                    return Redirect::to( 'login' )->with( [ 'message' => 'Rol no autorizado' ] );
+                    return View::make( 'Dmkt.login' )->with( array( 'message' => 'Rol no autorizado' ) );
                 }
                 else
                 {
@@ -106,7 +98,7 @@ class LoginController extends BaseController{
                     if( is_null( $user ) )
                     {
                         Auth::logout();
-                        return Redirect::to( 'login' )->with( [ 'message' => 'Usuario y/o contraseña incorrecto.' ] );
+                        return Redirect::to( 'login' )->with( 'error_login' , true );
                     }
                     else
                     {

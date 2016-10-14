@@ -196,10 +196,7 @@
 			this.drpSpan.html(this.dateRangePickerStartDate.format('LL') + ' - ' + this.dateRangePickerEndDate.format('LL'));
 			this.drp.daterangepicker(this.dateRangePickerOption, this.dateRangePickerCallback);
 			// GBREPORTS.setAutoResize();
-			if( $( ".report_menubar_option" ).length != 0 )
-			{
-				this.getReports();
-        	}
+			this.getReports();
         },
         setMenuBarReports: function(reportsList) {
             this.reportsArray = reportsList;
@@ -219,24 +216,19 @@
         getReports: function(callbacks) {
 			var url = URL_BASE + "reports/getUserReports";
             var gbReportsObject = this;
-            $.ajax(
-            {
-				url         : url,
-				ContentType : gbReportsObject.contentTypeAjax,
-				cache       : false
-            }).done( function( response )
-            {
-				if( validateResponse( response ) )
-				{
-					if( typeof( response.data ) != 'undefined' )
-					{
-						$( ".report_menubar_option" ).not(".new").remove();
-						gbReportsObject.setMenuBarReports( response.data);
+            $.ajax({
+				url        : url,
+				ContentType: gbReportsObject.contentTypeAjax,
+				cache      : false
+            }).done(function(dataResult) {
+				if(dataResult.status == 'OK'){
+					if(typeof(dataResult.data) != 'undefined'){
+						$(".report_menubar_option").not(".new").remove();
+						gbReportsObject.setMenuBarReports(dataResult.data);
 					}
 				}
-				else
-				{
-					bootboxMessage( response );
+				else{
+					bootbox.alert(dataResult.message);
 				}
             });
         },
@@ -355,10 +347,9 @@
                 cache: false,
             }).done(function(data) {
 				formula = JSON.parse(GBREPORTS.lastReport.formula);
-				if( data.Status == ok && typeof(data.tfootList) != 'undefined' && typeof(data.tbodyList) != 'undefined')
+				if (data.status == 'OK' && typeof(data.tfootList) != 'undefined' && typeof(data.tbodyList) != 'undefined')
 				{
-					if( typeof data.message == 'undefined' )
-					{
+					if(typeof(data.message) == 'undefined'){
 							GBREPORTS.valores = data.valores;
 							$("#dataTable").html('<table cellpadding="0" cellspacing="0" border="0" style="width:100%" id="dt_report" class="table table-striped table-hover table-bordered"></table>');
 
@@ -498,16 +489,14 @@
 							// $("#dt_report").css('margin-left', '19px');
 							gbReportsObject.changeDateRange(formula.frecuency);
 						}
-					}
-					else
+					}else
 					{
-						/*var msg = '';
+						var msg = '';
 						if(typeof(data.message) != 'undefined')
 							msg = data.message;
 						else
 							msg = 'Hubo un problema con la formula al generar el reporte';
-						bootbox.alert(msg);*/
-						bootboxMessage( data );
+						bootbox.alert(msg);
 						$("#dataTable").empty();
 						// bootbox.alert(data.Status + ': ' + data.message);
 						// gbReportsObject.changeDateRange(formula.frecuency);

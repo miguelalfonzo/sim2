@@ -22,10 +22,10 @@
     |--------------------------------------------------------------------------
     */
 
-    Route::get(  '/'      , array( 'uses' => 'Dmkt\LoginController@showLogin' ) );
-    Route::get(  'login'  , array( 'uses' => 'Dmkt\LoginController@showLogin' ) );
-    Route::post( 'login'  , array( 'uses' => 'Dmkt\LoginController@doLogin' ) );
-    Route::get(  'logout' , array( 'uses' => 'Dmkt\LoginController@doLogout' ) );
+    Route::get( '/', array( 'uses' => 'Dmkt\LoginController@showLogin'));
+    Route::get( 'login', array('uses' => 'Dmkt\LoginController@showLogin'));
+    Route::post( 'login', array('uses' => 'Dmkt\LoginController@doLogin'));
+    Route::get( 'logout', array('uses' => 'Dmkt\LoginController@doLogout'));
 
     /*
     |--------------------------------------------------------------------------
@@ -51,38 +51,33 @@
 
     Route::group( array( 'before' => 'gercom' ) , function() 
     {
+        Route::get('maintenance/FondosSupervisor', 'Maintenance\TableController@getSupFunds');
+        Route::get('maintenance/FondosGerProd', 'Maintenance\TableController@getGerProdFunds');
+        Route::get('maintenance/FondosInstitution', 'Maintenance\TableController@getInstitutionFunds');
         Route::get( 'fondoHistorial' , 'Fondo\FondoMkt@getFondoHistorial' );
         Route::post( 'fondo-subcategoria-history' , 'Fondo\FondoMkt@getFondoSubCategoryHistory' );
-        Route::get( 'export-fondoHistorial-{start}-{end}-{subCategory}' , 'Fondo\FondoMkt@exportFondoHistorial' );
+        Route::get( 'maintenance-export/{type}' , 'Maintenance\TableController@export' );
     });
 
     Route::group( array( 'before' => 'gercom_cont' ) , function()
     {
         Route::post( 'gercom-mass-approv' ,'Dmkt\SolicitudeController@massApprovedSolicitudes');
-    });
 
+        /*
+        |--------------------------------------------------------------------------
+        | MANTENIMIENTO
+        |--------------------------------------------------------------------------
+        */
 
-    /*
-    |--------------------------------------------------------------------------
-    | MANTENIMIENTO
-    |--------------------------------------------------------------------------
-    */
+        Route::get( 'maintenance/view/{type}' , 'Maintenance\TableController@getView' );
+        Route::post( 'get-cell-maintenance-info' , 'Maintenance\TableController@getMaintenanceCellData' );
+        Route::post( 'update-maintenance-info' , 'Maintenance\TableController@updateMaintenanceData' );
+        Route::post( 'save-maintenance-info' , 'Maintenance\TableController@saveMaintenanceData' );
+        Route::post( 'add-maintenance-info' , 'Maintenance\TableController@addMaintenanceData' );
+        Route::post( 'get-table-maintenance-info' , 'Maintenance\TableController@getMaintenanceTableData');
+        Route::post( 'maintenance-enable' , 'Maintenance\TableController@enableRecord');
+        Route::post( 'maintenance-disable' , 'Maintenance\TableController@disableRecord');
 
-    Route::group( [ 'before' => 'maintenance_roles' ] , function()
-    {
-        Route::group( [ 'namespace' => 'Maintenance' ] , function()
-        {
-            Route::get(  'maintenance/view/{type}'    , 'TableController@getView' );
-            Route::get( 'maintenance-export/{type}'   , 'TableController@export' );
-            
-            Route::post( 'get-cell-maintenance-info'  , 'TableController@getMaintenanceCellData' );
-            Route::post( 'update-maintenance-info'    , 'TableController@updateMaintenanceData' );
-            Route::post( 'save-maintenance-info'      , 'TableController@saveMaintenanceData' );
-            Route::post( 'add-maintenance-info'       , 'TableController@addMaintenanceData' );
-            Route::post( 'maintenance-enable'         , 'TableController@enableRecord');
-            Route::post( 'maintenance-disable'        , 'TableController@disableRecord');
-        
-        });
     });
 
     /*
@@ -103,7 +98,7 @@
             Route::post( 'get-document-detail' , 'ExpenseController@getDocument');
             Route::post( 'update-document' , 'ExpenseController@updateDocument');
             Route::post( 'end-expense-record' , 'ExpenseController@endExpenseRecord' );
-            //Route::post( 'consultarRucCont', 'RucController@show');
+            Route::post( 'consultarRucCont', 'RucController@show');
         });
       
         Route::group( [ 'namespace' => 'Deposit' ] , function()
@@ -268,36 +263,12 @@
         Route::post( 'get-client-view' , 'Source\Seeker@getClientView');
     });
 
-    Route::group( array( 'before' => 'estudio' ) , function()
-    {
-        Route::group( [ 'namespace' => 'Synchro' ] , function()
-        {
-            Route::get( 'view-sup-rep' , 'SynchroController@viewSupRep' );
-            Route::post( 'update-sup-rep' , 'SynchroController@updateSupRep' );
-        });
-        Route::group( [ 'namespace' => 'PPTO' ] , function()
-        {
-            Route::get( 'view-ppto'    , 'PPTOController@view' );
-            Route::post( 'upload-ppto' , 'PPTOController@upload' );
-            Route::post( 'upload-ppto-sup' , 'PPTOController@uploadCategoryFamilyUser' );
-            Route::post( 'load-ppto' , 'PPTOController@loadPPTO' );
-            Route::post( 'update-ppto-row' , 'PPTOController@update' );
-            Route::post( 'ppto-status' , 'PPTOController@status' );
-            Route::post( 'ppto-enable' , 'PPTOController@enable' );
-            Route::post( 'ppto-disable' , 'PPTOController@disable' );
-            Route::post( 'ppto-versions' , 'PPTOController@getVersions' );
-            Route::get( 'ppto-export-{type}-{year}-{category}-{version}' , 'PPTOController@export' );
-        });
-
-        Route::group( [ 'namespace' => 'Fondo' ] , function()
-        {
-            Route::get( 'view-fondo-category-maintenance' , 'Maintenance@subCategoryView' );
-        });
-    });
 
     Route::group( array( 'before' => 'sys_user' ) , function()
     {
         Route::get( 'show_user' , 'Dmkt\SolicitudeController@showUser' );
+        Route::get( 'view-sup-rep' , 'Synchro\SynchroController@viewSupRep' );
+        Route::post( 'update-sup-rep' , 'Synchro\SynchroController@updateSupRep' );
     });
 
     Route::group( array('before' => 'process_user' ) , function ()

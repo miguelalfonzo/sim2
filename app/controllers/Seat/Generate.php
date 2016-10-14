@@ -98,7 +98,7 @@ class Generate extends BaseController
 
             if( $solicitud->documentList->count() == 0 ) 
             {
-                return $seatList;
+                return $seatList();
             }
             else 
             {

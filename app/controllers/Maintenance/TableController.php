@@ -5,18 +5,16 @@ namespace Maintenance;
 use \BaseController;
 use \Input;
 use \View;
-use \Excel;
-use \DB;
-use \Auth;
-use \Carbon\Carbon;
-
-//MODELOS
+use \Common\TypeUser;
 use \Fondo\Fondo;
 use \Expense\Proof;
 use \Expense\MarkProofAccounts;
 use \Expense\Mark;
 use \Dmkt\Account;
 use \Expense\PlanCta;
+use \Common\TypeMoney;
+use \DB;
+use \Log;
 use \Exception;
 use \Dmkt\InvestmentType;
 use \Dmkt\InvestmentActivity;
@@ -26,11 +24,10 @@ use \Parameter\Parameter;
 use \Fondo\FondoSupervisor;
 use \Fondo\FondoGerProd;
 use \Fondo\FondoInstitucional;
-use \Fondo\FondoSubCategoria;
-use \Fondo\FondoCategoria;
-use \Fondo\FondoMktType;
 use \System\FondoMktHistory;
 use \Policy\ApprovalInstanceType;
+use \Excel;
+use \Carbon\Carbon;
 use \Fondo\FondoMkt;
 use \Expense\BagoMarcaGasto;
 
@@ -42,35 +39,29 @@ class TableController extends BaseController
 	{
 		switch( $type ):
 			case 'Fondo_Contable':
-				return array( 'model' => new Fondo , 'id' => MANTENIMIENTO_FONDO , 'key' => 'nombre' );
+				return array( 'model' => new Fondo , 'id' => MANTENIMIENTO_FONDO , 'key' => 'nombre' , 'add' => true );
 			case 'Cuenta_Gasto_Marca':
-				return array( 'model' => new MarkProofAccounts , 'id' => 1 );
+				return array( 'model' => new MarkProofAccounts , 'id' => 1 , 'add' => true );
 			case 'Parametro':
-				return array( 'model' => new Parameter , 'id' => 2 );
+				return array( 'model' => new Parameter , 'id' => 2 , 'add' => false );
 			case 'Fondo_Supervisor':
-				return array( 'model' => new FondoSupervisor , 'id' => 3 );
+				return array( 'model' => new FondoSupervisor , 'id' => 3 , 'add' => false );
 			case 'Fondo_Gerente_Producto':
-				return array( 'model' => new FondoGerProd , 'id' => 4 );
+				return array( 'model' => new FondoGerProd , 'id' => 4 , 'add' => false );
 			case 'Fondo_Institucion':
-				return array( 'model' => new FondoInstitucional , 'id' => 5 );
+				return array( 'model' => new FondoInstitucional , 'id' => 5 , 'add' => false );
 			case 'Tipo_Inversion':
-				return array( 'model' => new InvestmentType , 'id' => 7 , 'key' => 'nombre' );
+				return array( 'model' => new InvestmentType , 'id' => 7 , 'key' => 'nombre' , 'add' => true );
 			case 'Tipo_Actividad':
-				return array( 'model' => new Activity , 'id' => 8 , 'key' => 'nombre' );
+				return array( 'model' => new Activity , 'id' => 8 , 'key' => 'nombre' , 'add' => true );
 			case 'Inversion_Actividad':
-				return array( 'model' => new InvestmentActivity , 'id' => 9 );
-			case 'Fondo_Subcategoria':
-				return array( 'model' => new FondoSubCategoria , 'id' => 10 );
+				return array( 'model' => new InvestmentActivity , 'id' => 9 , 'add' => true );
 			case 'Tipo_Cliente':
-				return array( 'model' => new ClientType , 'key' => 'descripcion' );
+				return array( 'model' => new ClientType , 'key' => 'descripcion' , 'add' => true );
 			case 'Tipo_Instancia_Aprobacion':
-				return array( 'model' => new ApprovalInstanceType , 'key' => 'descripcion' );
+				return array( 'model' => new ApprovalInstanceType , 'key' => 'descripcion' , 'add' => true );
 			case 'Documento':
-				return array( 'model' => new Proof , 'key' => 'codigo' );
-			case 'Fondo_Categoria':
-				return array( 'model' => new FondoCategoria , 'key' => 'descripcion' );
-			case 'Fondo_Subcategoria_Tipo':
-				return array( 'model' => new FondoMktType , 'key' => 'descripcion' );
+				return array( 'model' => new Proof , 'key' => 'codigo' , 'add' => false );
 		endswitch;
 	}
 
@@ -89,7 +80,8 @@ class TableController extends BaseController
 			'columns' => $columns , 
 			'titulo'  => 'Mantenimiento de ' . $maintenance->descripcion , 
 			'type'    => $type , 
-			'options' => false
+			'add'	  => $vData[ 'add' ] ,
+			'export'  => true
 		);
 		$now = Carbon::now();
 		Excel::create( $maintenance->descripcion . ' ' . $now->format( 'YmdHi' ) , function( $excel ) use( $data )
@@ -116,6 +108,22 @@ class TableController extends BaseController
 		}
 	}
 
+	public function getTableParameter()
+	{
+		$records = Parameter::all();
+		$columns = Maintenance::find(2);
+		$columns = json_decode( $columns->formula );
+		return View::make( 'Maintenance.table' )->with( array( 'records' => $records , 'columns' => $columns , 'type' => 'parametro' , 'titulo' => 'Mantenimiento de Parametros' ) );
+	}
+
+	public function getTableDailySeatRelation()
+	{
+		$records = MarkProofAccounts::all();
+		$columns = Maintenance::find(1);
+		$columns = json_decode( $columns->formula );
+		return View::make( 'Maintenance.table' )->with( array( 'records' => $records , 'columns' => $columns , 'type' => 'cuentasMarca' , 'titulo' => 'Mantenimiento de Cuentas - Marca' ) );
+	}
+
 	public function getView( $type )
 	{
 		$vData       = $this->getModel( $type );
@@ -126,26 +134,47 @@ class TableController extends BaseController
 		
 		$maintenance = Maintenance::find( $id );
 		$columns     = json_decode( $maintenance->formula );
-		
-		$title = 'Mantenimiento de ' . $maintenance->descripcion;
-		if( ! in_array( Auth::user()->type , [ GER_COM , CONT , ESTUD ] ) )
-		{
-			$maintenance->opciones = false;
-			$title = $maintenance->descripcion;
-		}
-
 		return View::make( 'Maintenance.view' , 
 			array( 
-				'records'  => $records , 
-				'columns'  => $columns , 
-				'titulo'   => $title , 
-				'type'     => $type , 
-				'add'	   => $maintenance->agregar_formula ,
-				'disabled' => $maintenance->deshabilitar ,
-				'export'   => $maintenance->exportar ,
-				'options'  => $maintenance->opciones 
+				'records' => $records , 
+				'columns' => $columns , 
+				'titulo'  => 'Mantenimiento de ' . $maintenance->descripcion , 
+				'type'    => $type , 
+				'add'	  => $vData[ 'add' ]
 			) 
 		);		
+	}
+
+	public function getMaintenanceTableData()
+	{
+		try
+		{
+			$inputs = Input::all();
+			return $this->getTable( $inputs );
+		}
+		catch( Exception $e )
+		{
+			return $this->internalException( $e , __FUNCTION__ );
+		}
+	}
+
+	private function getTable( $inputs )
+	{
+		$vData       = $this->getModel( $inputs[ 'type' ] );
+		$model  	 = $vData[ 'model' ];
+		$id          = $vData[ 'id' ];
+		$records     = $model::order();
+		$maintenance = Maintenance::find( $id );
+		$columns = json_decode( $maintenance->formula );
+		return $this->setRpta( 
+			View::make( 'Maintenance.table' , 
+				array( 
+					'records' => $records , 
+					'columns' => $columns , 
+					'type'    => $inputs[ 'type' ]
+				) 
+			)->render()
+		);
 	}
 
 	private function updateFondoMkt( $inputs )
@@ -241,11 +270,6 @@ class TableController extends BaseController
 		try
 		{
 			$inputs = Input::all();
-			if( ! in_array( Auth::user()->type , [ GER_COM , CONT , ESTUD ] ) )
-			{
-				return $this->warningException( 'No esta autorizado para modificar la informacion' , __FUNCTION__ , __LINE__ , __FILE__ );
-			}
-
 			switch( $inputs[ 'type' ] ):
 				case 'Fondo_Gerente_Producto':
 					return $this->updateFondoMkt( $inputs );
@@ -328,7 +352,7 @@ class TableController extends BaseController
 		$vData = $this->getModel( $inputs[ 'type' ] );
 		$record = $vData[ 'model' ];
 		$record->id = $record->nextId();
-		foreach( $inputs[ data ] as $column => $data )
+		foreach ( $inputs[ data ] as $column => $data )
 			$record->$column = $data;
 		$record->save();
 		return $this->setRpta( $record );
@@ -357,28 +381,26 @@ class TableController extends BaseController
 	public function addMaintenanceData()
 	{
 		$inputs = Input::all();
+		switch( $inputs[ 'type' ] ):
+			case 'Tipo_Actividad':
+				return $this->addActividad();
+			case 'Tipo_Inversion':
+				return $this->addInversion();
+			case 'Inversion_Actividad':
+				return $this->addInversionActividad();
+			case 'Cuenta_Gasto_Marca':
+				return $this->addcuentasMarca();
+		endswitch;
 		return $this->addRow( $inputs );
 	}
 
 	private function addRow( $inputs )
 	{
 		$id = $this->getModel( $inputs[ 'type' ] )[ 'id' ];
-		$addFormulaJson = Maintenance::find( $id )->agregar_formula;
-		$addFormula = json_decode( $addFormulaJson );
-		foreach( $addFormula as $row )
-		{
-			if( isset( $row->model ) )
-			{
-				$vData = $this->getModel( $row->model );
-				$data = $vData[ 'model' ]->getAddData();
-				$row->data = $data;
-			}
-		}
-		$data = 
-		[
-			'records' => $addFormula,
-			'type'    => $inputs[ 'type' ]
-		];
+		$data = array(
+			'records' => json_decode( Maintenance::find( $id )->formula ),
+			'type'	  => $inputs[ 'type' ]
+		);
 		return $this->setRpta( View::make( 'Maintenance.tr' , $data )->render() );
 	}
 
@@ -391,7 +413,7 @@ class TableController extends BaseController
 	private function getDailySeatRelation()
 	{
 		$records = MarkProofAccounts::all();
-		$columns = Maintenance::find( 1 );
+		$columns = Maintenance::find(1);
 		$columns = json_decode( $columns->formula );
 		return $this->setRpta( View::make( 'Maintenance.table' )->with( array( 'records' => $records , 'columns' => $columns , 'type' => 'cuentasMarca' ) )->render() );
 	}

@@ -4,7 +4,6 @@ namespace Fondo;
 
 use \Eloquent;
 use \Carbon\Carbon;
-use \DB;
 
 class FondoMktPeriodHistory extends Eloquent
 {
@@ -35,33 +34,5 @@ class FondoMktPeriodHistory extends Eloquent
 		else
 			return $lastId->id + 1;
 	}
-
-	protected function updateFundAmount( $categoryId , $year , $diffAmount )
-	{
-		if( ! is_numeric( $diffAmount ) )
-		{
-			return -1;
-		}
-		return FondoMktPeriodHistory::where( 'subcategoria_id' , $categoryId )
-			->where( 'substr( periodo , 0 , 4 )' , $year )
-            ->update( [ 'saldo_inicial' => DB::raw( 'saldo_inicial + ' . $diffAmount ) , 'saldo_final' => DB::raw( 'saldo_final + ' . $diffAmount ) ] ); 
-	}
-
-	public function maxFundPeriod( $subCategoryId , $endPeriod )
-	{
-		$startPeriod = substr( $endPeriod , 0 , 4 ) . '00';
-		return $this->select( 'periodo' )
-			->where( 'subcategoria_id' , $subCategoryId )
-			->where( 'periodo' , '<' , $endPeriod )
-			->where( 'periodo' , '>' , $startPeriod )
-			->max( 'periodo' );
-	}
 	
-	public function getPeriodData( $subCategoryId , $period )
-	{
-		return $this->select( [ 'saldo_final' , 'retencion_final' ] )
-            ->where( 'periodo' , $period )
-            ->where( 'subcategoria_id' , $subCategoryId )
-            ->first();
-	}
 }

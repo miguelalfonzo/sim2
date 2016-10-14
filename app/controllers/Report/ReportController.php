@@ -30,7 +30,7 @@ class ReportController extends BaseController
     // LIST REPORT USER HANDLER
     public function listReportsUserHandler()
     {
-        $result = [ status => ok ]; 
+        $result = array("status" => 'OK'); 
         try 
         {
             $userId       = Auth::user()->id;
@@ -39,10 +39,9 @@ class ReportController extends BaseController
             if(!$reportList->isEmpty()){
                 $result["data"]   = $reportList;
             }
-        }
-        catch (Exception $e)
-        {
-            $result = $this->internalException( $e , __FUNCTION__ );
+        }catch (Exception $e) {
+            $result["status"]  = 'ERROR';
+            $result["message"] = REPORT_MESSAGE_EXCEPTION;
         }
         finally
         {
@@ -87,14 +86,16 @@ class ReportController extends BaseController
             $validator = Validator::make($configReport, $rules, $messages);
             if( $validator->fails() )
             {
-                return $this->warningException( $this->msgValidator( $validator ) , __FUNCTION__ , __LINE__ , __FILE__ );
+                $error            = $validator->messages();
+                $result['status'] = 'ERROR';
+                $result['data']   = $error;
             }
             else
             {
                 $data = $this->reportViewProcess($configReport);
-                if( $data[ status ] == ok )
+                if($data['status']=='OK')
                 {
-                    if( ! isset( $data[ description ] ) )
+                    if( ! isset( $data[ 'message' ] ) )
                     {
                         $data['reportId'] = $id_reporte;
                         $data['fromDate'] = $fromDate;
@@ -115,13 +116,17 @@ class ReportController extends BaseController
                 }
                 else
                 {
-                   $result = $this->warningException( REPORT_MESSAGE_EXCEPTION , __FUNCTION__ , __LINE__ , __FILE__ );
+                    $result["status"]  = 'ERROR';
+                    $result["message"] = REPORT_MESSAGE_EXCEPTION;
                 }
             }
         }
         catch( Exception $e )
         {
-            $result = $this->internalException( $e , __FUNCTION__ );
+            \Log::error( $e );
+            
+            $result["status"]  = 'ERROR';
+            $result["message"] = REPORT_MESSAGE_EXCEPTION;
         }
         finally
         {
@@ -132,7 +137,7 @@ class ReportController extends BaseController
     public function reportExcelHandler()
     {
         set_time_limit(REPORT_TIME_LIMIT);
-        $result = [ status => ok ];
+        $result = array('status' => 'OK');
         try
         {
             $reportFileName = Session::get('reportFileName');
@@ -141,33 +146,28 @@ class ReportController extends BaseController
             // $inputs         = (array) json_decode($inputs);
             $inputs         = Input::all();
             
-            if( $inputs['id'] = $reportData['reportId'] && $inputs['fromDate'][0].$inputs['fromDate'][1].$inputs['fromDate'][2] == $reportData['fromDate'] && $inputs['toDate'][0].$inputs['toDate'][1].$inputs['toDate'][2] == $reportData['toDate'] )
-            {
+            if($inputs['id'] = $reportData['reportId'] && $inputs['fromDate'][0].$inputs['fromDate'][1].$inputs['fromDate'][2] == $reportData['fromDate'] && $inputs['toDate'][0].$inputs['toDate'][1].$inputs['toDate'][2] == $reportData['toDate']){
                 $reportData['filter'] = $inputs['filter'];
                 $report               = $this->createReportExcel($reportData, $reportFileName);
                 
-                if($report[ status ] == ok )
-                {
+                if($report['status'] == 'OK'){
                     list($userId, $reportId, $fromDate, $toDate) = explode("-", $reportFileName);
                     $result['url'] = asset('/reports/export/download/'. $userId .'/'. $reportId .'/'. $fromDate .'/'. $toDate .'/');
                     $result['ext'] = $report['report']['ext'];
+                }else{
+                    $result['status'] = 'ERROR';
+                    $result['message'] = REPORT_MESSAGE_EXPORT_GENERATE;
                 }
-                else
-                {
-                    $result = $this->warningException( REPORT_MESSAGE_EXPORT_GENERATE , __FUNCTION__ , __LINE__ , __FILE__ );
-                }
-            }
-            else
-            {
-                $result = $this->warningException( REPORT_MESSAGE_EXPORT_GENERATE , __FUNCTION__ , __LINE__ , __FILE__ );
+            }else{
+                $result['status']  = 'ERROR';
+                $result['message'] = REPORT_MESSAGE_EXPORT_GENERATE;
             }
         }
         catch (Exception $e)
         {
-            $result = $this->internalException( $e , __FUNCTION__ );
-        }
-        finally
-        {
+            $result['status'] = 'ERROR';
+            $result['message'] = $e;
+        }finally{
             return $result;
         }
     }
@@ -200,11 +200,11 @@ class ReportController extends BaseController
     // PROCESS REPORT VIEW
     public function reportViewProcess($configReport)
     {   
-        $result = [ status => ok ];
+        $result = array( status => ok );
         
         $dataReport = $this->getDataReport($configReport);
 
-        if( ! isset( $dataReport[ description ] ) )
+        if( ! isset( $dataReport[ 'message' ] ) )
         {
             $dataReport  = DataGroup::arrayCastRecursive((array) $dataReport);
             // // idkc : Validacion de inputs
@@ -218,7 +218,10 @@ class ReportController extends BaseController
 
             if( $validator->fails() )
             {
-                return $this->warningException( $this->msgValidator( $validator ) , __FUNCTION__ , __LINE__ , __FILE__ );
+                $error            = $validator->messages();
+                $result['status'] = 'ERROR';
+                $result['data']   = $error;
+                
             }
             else if( isset( $dataReport[ 'dataset' ] ) )
             {
@@ -230,12 +233,12 @@ class ReportController extends BaseController
                     'values' => 'required|array'
                 );
                 $validator = Validator::make($dataReport['formula'], $rules);
-                if ($validator->fails())
-                {
-                    $result = $this->warningException( $this->msgValidator( $validator ) , __FUNCTION__ , __LINE__ , __FILE__ );
-                }
-                else
-                {
+                if ($validator->fails()){
+                    $error            = $validator->messages();
+                    $result['status'] = 'ERROR';
+                    $result['data']   = $error;
+
+                }else{
                     $newData = array(
                         'head' => array()
                     );
@@ -263,7 +266,7 @@ class ReportController extends BaseController
                         'data'    => $dataReport['dataset']['body'],
                         'columns' => $columns
                     ));
-                    $dataReport['dataset']['body'] = $resultAddcolumns[ status ] == ok ? $resultAddcolumns['data'] : null;
+                    $dataReport['dataset']['body'] = $resultAddcolumns['status'] == 'OK' ? $resultAddcolumns['data'] : null;
                 }
                 $resultProcess = DataGroup::process(array(
                     'body'       => $dataReport['dataset']['body'], 
@@ -308,7 +311,7 @@ class ReportController extends BaseController
                     'analytics' => $dataReport['analytics'],
                     'valores'   => $values_list,
                     'rows'      => $dataReport['formula']['rows'],
-                    status      => ok
+                    'status'    => 'OK'
                 );
             }
         }
@@ -367,19 +370,21 @@ class ReportController extends BaseController
     }
 
     public function addColumns($parameters){
-        $result = [ status => ok ];
-        
+        $result = array(
+            'status' => 'OK'
+        );
         $rules  = array(
             'data'    => 'required|array',
             'columns' => 'array'
         );
+
         $validator = Validator::make($parameters, $rules);
-        if( $validator->fails() )
-        {
-            $result = $this->warningException( $this->msgValidator( $validator ) , __FUNCTION__ , __LINE__ , __FILE__ );
-        }
-        else
-        {
+        if ($validator->fails()){
+            $error            = $validator->messages();
+            $result['status'] = 'ERROR';
+            $result['data']   = $error;
+            
+        }else{
             foreach ($parameters['data'] as $key => $data_temp) 
             {
                 for ($k = 0; $k < count($parameters['columns']) ; $k++) 
@@ -396,7 +401,7 @@ class ReportController extends BaseController
     public function createReportExcel($data, $file)
     {
         set_time_limit(REPORT_TIME_LIMIT);
-        $result = [ status => ok ];
+        $result = array('status' => 'OK');
         try 
         {
             $view     = View::make('Report.previewExport', $data)->render();
@@ -416,36 +421,25 @@ class ReportController extends BaseController
             })->store('xls', public_path() . REPORT_EXPORT_DIRECTORY, true);
             $result['report'] = $report;
         }
-        catch( Exception $e ) 
+        catch (Exception $e) 
         {
-            $result = $this->internalException( $e , __FUNCTION__ );
-        }
-        finally
-        {
+            $result['status'] = 'ERROR';
+            $result['message'] = $e;
+        }finally{
             return $result;
         }
     }
 
     private function processQuery( $dataArray )
     {
-        $result         = [ status => ok ];
+        $result         = array("status" => 'OK');
         // idkc         : PARAMETER FOR SQL QUERY
         $fromDate       = $dataArray['fromDate'];
         $toDate         = $dataArray['toDate'];
         $zona           = $dataArray['zona'];
         $frecuency      = $dataArray['frecuency'];
-        
-        if( is_null( $dataArray[ 'query' ] ) )
-        {
-            $result[ 'data' ] = [];
-        }
-        else
-        {
-            $evalQuery = $dataArray[ 'query' ];
-            $evalText       = '$query = ' . $evalQuery . ';';
-            eval( $evalText );
-            $result['data'] = DB::select( $query );
-        }
+        eval('$query    = '. $dataArray['query'] .';');
+        $result['data'] = DB::select( $query );
         return $result;
     }
 
@@ -464,14 +458,16 @@ class ReportController extends BaseController
         
         if ($validator->fails())
         {
-            return $this->warningException( $this->msgValidator( $validator ) , __FUNCTION__ , __LINE__ , __FILE__ );
+            $error            = $validator->messages();
+            $result['status'] = 'ERROR';
+            $result['data']   = $error;
         }
         else
         {
             $reportElement = TbReporte::find($configReport['reportId']);
             
             $intervalo     = json_decode($reportElement->formula);
-            $info = $this->processQuery( array(
+            $info = $this->processQuery(array(
                 'query'     => $reportElement->tbQuery->query,
                 'fromDate'  => $configReport['fromDate'],
                 'toDate'    => $configReport['toDate'],
@@ -492,18 +488,19 @@ class ReportController extends BaseController
                         'body' => $this->setBody($info)
                     );
 
-                $result[ status ]    = ok;
+                $result["status"]    = 'OK';
                 $result['analytics'] = array(
                         'inputs' => count($info)
                     );
             }
             else
             {
-                $result['reportName']  = $reportElement->descripcion;
-                $result['formula']     = DataGroup::arrayCastRecursive( ( array ) json_decode( $reportElement->formula ) );
-                $result[ status ]      = ok;
-                $result[ description ] = REPORT_DATA_NOT_FOUND;
-                $result['analytics']   = array('inputs' => count($info));
+                $result['reportName'] = $reportElement->descripcion;
+                $result['formula']    = DataGroup::arrayCastRecursive((array) json_decode($reportElement->formula));
+                
+                $result["status"]     = 'OK';
+                $result["message"]    = REPORT_DATA_NOT_FOUND;
+                $result['analytics']  = array('inputs' => count($info));
             }
             unset($reportElement, $info);
         }
@@ -615,26 +612,25 @@ class ReportController extends BaseController
     protected function listDatasetHandler()
     {
         set_time_limit(REPORT_TIME_LIMIT);
-        $result = [ status => ok ];
-        try 
-        {
+        $result = array(
+            'status' => 'OK'
+        );
+        try {
             $resultTbQuery = TbQuery::select('id', 'name')->get();
-            if($resultTbQuery==NULL)
-            {
-                $result = $this->warningException( REPORT_MESSAGE_DATASET_NOT_FOUND , __FUNCTION__ , __LINE__ , __FILE__ );
-            }
-            else
-            {
+            if($resultTbQuery==NULL){
+                $result["status"]  = 'ERROR';
+                $result["message"] = REPORT_MESSAGE_DATASET_NOT_FOUND;
+            }else{
                 $resultTbQuery->toJson();
                 $result['data'] = json_decode($resultTbQuery->toJson());
             }
         }
-        catch( Exception $e )
+        catch (Exception $e)
         {
-            $result = $this->internalException( $e , __FUNCTION__ );
+            $result["status"]  = 'ERROR';
+            $result["message"] = REPORT_MESSAGE_EXCEPTION;
         }
-        finally
-        {
+        finally{
             return $result;
         }
     }
@@ -643,21 +639,19 @@ class ReportController extends BaseController
     public function listColumnsDatasetHandler( $queryId )
     {
         set_time_limit(REPORT_TIME_LIMIT);
-        $result = [ status => ok ];
-        try 
-        {
+        $result = array('status' => 'OK');
+        try {
             $data = array('id' => $queryId);
-            
             $rules  = array(
                 'id' => 'required|integer',
             );
+
             $validator = Validator::make($data, $rules);
-            if ($validator->fails() )
-            {
-                return $this->warningException( $this->msgValidator( $validator ) , __FUNCTION__ , __LINE__ , __FILE__ );
-            }
-            else
-            {
+            if ($validator->fails()){
+                $error            = $validator->messages();
+                $result['status'] = 'ERROR';
+                $result['data']   = $error;
+            }else{
                 $resultQuery     = TbQuery::find($queryId);
                 $nowDate         = Carbon::now(); 
                 
@@ -674,22 +668,20 @@ class ReportController extends BaseController
                 
                 $resultQueryExec = $resultQueryExec['data'];
                     // dd($resultQueryExec);
-                if($resultQueryExec == NULL)
-                {
-                    $result = $this->warningException( REPORT_MESSAGE_DATASET_NOT_FOUND_DATA , __FUNCTION__ , __LINE__ , __FILE );
-                }
-                else
-                {
+                if($resultQueryExec == NULL){
+                    $result["status"]  = 'ERROR';
+                    $result["message"] = REPORT_MESSAGE_DATASET_NOT_FOUND_DATA;
+                }else{
                     $result['data'] = $this->setHead(head($resultQueryExec));
                 }
             }
         }
         catch (Exception $e)
         {
-            $result = $this->internalException( $e , __FUNCTION__ );
+            $result["status"]  = 'ERROR';
+            $result["message"] = REPORT_MESSAGE_EXCEPTION;
         }
-        finally
-        {
+        finally{
             return $result;
         }
     }
@@ -698,16 +690,14 @@ class ReportController extends BaseController
     protected function saveReportHandler()
     {
         set_time_limit(REPORT_TIME_LIMIT);
-        $result = array( status => ok );
-        try 
-        {
+        $result = array('status' => 'OK');
+        try {
             // $dataInput    = Input::instance()->getContent();
             // $dataInput = DataGroup::arrayCastRecursive((array) json_decode($dataInput));
             $inputAll = Input::all();
             $dataInput = $inputAll['data'];
 
-            if( count( $dataInput ) > 0 )
-            {
+            if(count($dataInput)>0){
                 DB::beginTransaction();
                 foreach ($dataInput as $key => $value) {
                     // dd($value);
@@ -718,12 +708,11 @@ class ReportController extends BaseController
                     );
 
                     $validator = Validator::make($value, $rules);
-                    if ($validator->fails())
-                    {
-                        return $this->warningException( $this->msgValidator( $validator ) , __FUNCTION__ , __LINE__ , __FILE__ );
-                    }
-                    else
-                    {
+                    if ($validator->fails()){
+                        $error            = $validator->messages();
+                        $result['status'] = 'ERROR';
+                        $result['data']   = $error;
+                    }else{
                         $reporte              = new TbReporte;
                         $reporte->id_reporte  = $reporte->nextId();
                         $reporte->descripcion = $value['descripcion'];
@@ -739,18 +728,18 @@ class ReportController extends BaseController
                 }
                 DB::commit();
             }
-            else
-            {
-                $reuslt = $this->warningException( 'No se encontro registro para el reporte' , __FUNCTION__ , __LINE__ , __FILE__ );
+            else{
+                $result["status"]  = 'ERROR';
+                $result["message"] = REPORT_MESSAGE_CREATE;
             }
         }
         catch (Exception $e)
         {
+            $result["status"]  = 'ERROR';
+            $result["message"] = REPORT_MESSAGE_EXCEPTION;
             DB::rollback();
-            $result = $this->internalException( $e , __FUNCTION__ );
         }
-        finally
-        {
+        finally{
             return $result;
         }
         
