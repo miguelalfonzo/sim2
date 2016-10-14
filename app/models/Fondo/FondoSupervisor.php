@@ -16,19 +16,6 @@ class FondoSupervisor extends Eloquent
 	protected $table      = TB_FONDO_SUPERVISOR;
 	protected $primaryKey = 'id';
 
-	public function nextId()
-	{
-		$register = FondoSupervisor::orderBy( 'id' , 'DESC' )->first();
-		if( is_null( $register ) )
-		{
-			return 1;
-		}
-		else
-		{
-			return $register->id + 1;
-		}
-	}
-
 	protected function getSaldoDisponibleAttribute()
 	{
 		return round( $this->saldo - $this->retencion , 2 , PHP_ROUND_HALF_DOWN );
@@ -51,17 +38,24 @@ class FondoSupervisor extends Eloquent
 
 	protected static function order()
 	{
-		return 
-			FondoSupervisor::select( [ 'id' , 'subcategoria_id' , 'marca_id' , 'supervisor_id' , 'saldo' , 'retencion' ] )
+		return FondoSupervisor::select( [ 'id' , 'subcategoria_id' , 'marca_id' , 'supervisor_id' , 'saldo' , 'retencion' ] )
 				->orderBy( 'updated_at' , 'desc' )->get();
 	}
 
 	protected static function orderWithTrashed()
 	{
 		$now = Carbon::now();
-		return FondoSupervisor::select( [ 'id' , 'subcategoria_id' , 'marca_id' , 'supervisor_id' , 'saldo' , 'retencion' ] )
+		$fundDataSql = FondoSupervisor::select( [ 'id' , 'subcategoria_id' , 'marca_id' , 'supervisor_id' , 'saldo' , 'retencion' ] )
 			->where( 'anio' , '=' , $now->format( 'Y' ) )
-			->orderBy( 'updated_at' , 'desc' )->withTrashed()->get();
+			->orderBy( 'updated_at' , 'desc' )->withTrashed();
+
+		if( ! in_array( Auth::user()->type , [ GER_PROM , GER_COM ] ) )
+		{
+			//OTROS USUARIOS ASIGNA UNA CATEGORIA INEXISTENTE
+			$fundDataSql->where( 'subcategoria_id' , 0 );
+		}
+
+		return $fundDataSql->get();
 	}	
 
 	protected function setSaldoAttribute( $value )
@@ -120,24 +114,5 @@ class FondoSupervisor extends Eloquent
 		
 		return $supFunds->get();
 	}
-
-	protected function getUnique( $year , $category , $userId , $familyId )
-	{
-		return FondoSupervisor::where( 'anio' , $year )
-			->where( 'subcategoria_id' , $category )
-			->where( 'supervisor_id' , $userId )
-			->where( 'marca_id' , $familyId )
-			->first();
-	}
-
-	protected function updateFundAmount( $fundId , $diffAmount )
-    {
-        if( ! is_numeric( $diffAmount ) )
-        {
-            return -1;
-        }
-        return FondoSupervisor::where( 'id' , $fundId )
-            ->update( [ 'saldo' => DB::raw( 'saldo + ' . $diffAmount ) ] ); 
-    }
 
 }

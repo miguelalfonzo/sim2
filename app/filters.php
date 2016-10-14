@@ -28,6 +28,8 @@ Route::filter('guest', function ()
 | integrates HTTP Basic authentication for quick, simple checking.
 |
 */
+Route::filter( 'maintenance_roles' , 'Filter\FilterController@maintenanceRoles' );
+
 Route::filter( 'rm_sup' , 'Filter\FilterController@rep_sup' );
 Route::filter( 'rm_sup_cont_tes' , 'Filter\FilterController@rep_sup_cont_tes' );
 Route::filter( 'rm_sup_gerprod_ager' , 'Filter\FilterController@rep_sup_gerProd_asisGer' ); 
@@ -46,7 +48,6 @@ Route::filter( 'gerprod_gerprom_gercom_gerger' , 'Filter\FilterController@gerent
 
 Route::filter( 'gercom' , 'Filter\FilterController@gerenteComercial' );
 Route::filter( 'gercom_cont' , 'Filter\FilterController@gerCom_cont' );
-Route::filter( 'gercom_cont_estudio' , 'Filter\FilterController@gerCom_cont_estudio' );
 
 Route::filter( 'ager' , 'Filter\FilterController@asistenteGerencia');
 

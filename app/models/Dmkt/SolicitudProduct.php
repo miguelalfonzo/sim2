@@ -26,7 +26,8 @@ class SolicitudProduct extends Eloquent
     public function getSubFondo( $userType , $solicitud , $productoId = null )
     {
         $id_producto = isset( $productoId ) ? $productoId : $this->id_producto;
-        $year        = $solicitud->created_at_year; 
+        $year = Carbon::now()->format( 'Y' );
+        
         if ( $userType == SUP )
         {
             $userId = $solicitud->personalTo->userSup();

@@ -10,17 +10,6 @@ class Solicitud extends Eloquent
     protected $table = TB_SOLICITUD;
     protected $primaryKey = 'id';
 
-    /*protected function getFecOriginAttribute()
-    {
-        return $this->created_at;
-    }
-    */
-    
-    protected function getCreatedAtYearAttribute()
-    {
-        return $this->created_at->format( 'Y' );
-    }
-
     protected function getCreatedAtDateAttribute()
     {
         return $this->created_at->format( 'd/m/Y' );

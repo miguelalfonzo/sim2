@@ -5,6 +5,7 @@ namespace Fondo;
 use \Carbon\Carbon;
 use \Eloquent;
 use \DB;
+use \Auth;
 use Illuminate\Database\Eloquent\SoftDeletingTrait;
 
 class FondoInstitucional extends Eloquent
@@ -44,10 +45,16 @@ class FondoInstitucional extends Eloquent
 	protected static function orderWithTrashed()
 	{
 		$now = Carbon::now();
-		return FondoInstitucional::select( [ 'id' , 'subcategoria_id' , 'saldo' , 'retencion' ] )
+		$fundDataSql = FondoInstitucional::select( [ 'id' , 'subcategoria_id' , 'saldo' , 'retencion' ] )
 			->where( 'anio' , '=' , $now->format( 'Y' ) )
-			->orderBy( 'updated_at' , 'DESC' )->withTrashed()
-			->get();
+			->orderBy( 'updated_at' , 'DESC' )
+			->withTrashed();
+
+		if( ! in_array( Auth::user()->type , [ GER_PROM , GER_COM ] ) )
+		{
+			$fundDataSql->where( 'subcategoria_id' , 0 );
+		}
+		return $fundDataSql->get();
 	}
 
 	protected function setSaldoAttribute( $value )

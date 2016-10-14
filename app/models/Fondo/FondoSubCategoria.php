@@ -113,4 +113,5 @@ class FondoSubCategoria extends Eloquent
 		}
 		//return $this->{ $this->relacion }->where( 'anio' , $year );
 	}
+	
 }
