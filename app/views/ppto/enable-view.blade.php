@@ -82,9 +82,8 @@
 					</button>
 				</div>
 
+				<div style="clear:both"></div>
 				<label>Nota: El campo de version no afecta la carga del presupuesto solo afecta a la busqueda del presupuesto</label>
-
-	
 
 			<table id="table-ppto-1" class="table table-striped table-hover table-bordered" cellspacing="0" width="100%">
 			</table>
@@ -146,8 +145,8 @@
 				</button>
 			</div>
 
+			<div style="clear:both"></div>
 			<label>Nota: El campo de version no afecta la carga del presupuesto solo afecta a la busqueda del presupuesto</label>
-
 
 			<table id="table-ppto-2" class="table table-striped table-hover table-bordered" cellspacing="0" width="100%" style="width:100%">
 			</table>
@@ -193,6 +192,10 @@
 					<span class="glyphicon glyphicon glyphicon-export"></span>
 				</button>
 			</div>
+			
+			<div style="clear:both"></div>
+			<label>Nota: El campo de version no afecta la carga del presupuesto solo afecta a la busqueda del presupuesto</label>
+			
 
 			<table id="table-ppto-3" class="table table-striped table-hover table-bordered" cellspacing="0" width="100%" style="width:100%">
 			</table>
@@ -398,7 +401,8 @@
 				spin.stop();
 				if( response.Status == ok )
 				{
-					loadPPTO( panel )
+					//loadPPTO( panel );
+					getVersions( panel );
 				}
 				bootboxMessage( response );
 			});
