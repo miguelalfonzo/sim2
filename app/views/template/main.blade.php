@@ -136,13 +136,13 @@
                                             <li><a data-toggle="modal" data-target="#modal-temporal-user">Derivación de Usuario</a></li>
                                         @endif
 
-                                        @if ( Auth::user()->type == GER_COM ) )
+                                        @if( Auth::user()->type == GER_COM )
                                             <li><a href="{{ URL::to('fondoHistorial') }}">Historial de Saldo de los Fondos</a></li>
                                             <li><a href="{{ URL::to('maintenance/view/Tipo_Inversion') }}">Mantenimiento de Inversion</a></li>
                                             <li><a href="{{ URL::to('maintenance/view/Tipo_Actividad') }}">Mantenimiento de Actividades</a></li>
                                             <li><a href="{{ URL::to('maintenance/view/Inversion_Actividad') }}">Mantenimiento de Inversion-Actividad</a></li>
                                             <li><a href="{{ URL::to('maintenance/view/Parametro') }}">Mantenimiento de Parametros</a></li>
-                                        @elseif( Auth::user()->type == CONT ) )
+                                        @elseif( Auth::user()->type == CONT )
                                             <li><a href="{{ URL::to('maintenance/finddocument') }}">Busqueda de Documentos Registrados</a></li>
                                             <li><a href="{{ URL::to('maintenance/documenttype') }}">Mantenimiento de Tipo de Documentos</a></li>
                                             <li><a href="{{ URL::to('maintenance/view/Fondo_Contable' ) }}">Mantenimiento de Fondo de Contabilidad</a></li>
