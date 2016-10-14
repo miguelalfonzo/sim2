@@ -84,7 +84,7 @@ class LoginController extends BaseController{
                 }
                 else
                 {
-                    return Redirect::to( 'login' )->with( [ 'message' , 'Usuario y/o contraseña incorrecto.' ] );
+                    return Redirect::to( 'login' )->with( [ 'message' => 'Usuario y/o contraseña incorrecto.' ] );
                 }
             }
             else
