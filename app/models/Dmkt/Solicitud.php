@@ -10,14 +10,14 @@ class Solicitud extends Eloquent
     protected $table = TB_SOLICITUD;
     protected $primaryKey = 'id';
 
-    protected function getFecOriginAttribute()
+    protected function getCreatedAtDateAttribute()
     {
-        return $this->attributes['created_at'];
+        return $this->created_at->format( 'd/m/Y' );
     }
 
-    protected function getCreatedAtAttribute( $attr )
+    protected function getCreatedAtParseAttribute( $attr )
     {
-        return \Carbon\Carbon::parse( $attr )->format('Y-m-d H:i');
+        return Carbon::parse( $attr )->format('Y-m-d H:i');
     }
 
     protected function getSolicitudCaptionAttribute()

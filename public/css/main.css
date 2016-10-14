@@ -384,4 +384,9 @@ input[type=text].date
 	cursor			 : pointer;
 }
 
+.has-success input[readonly=true]
+{
+	border-color : green;
+}
+
 

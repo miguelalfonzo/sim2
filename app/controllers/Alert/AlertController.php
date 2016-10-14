@@ -24,7 +24,7 @@ class AlertController extends BaseController
 
 	public function showAlerts()
 	{
-		return array('status' => 'OK', 'alerts' => $this->alertConsole2());
+		return array( status => ok, 'alerts' => $this->alertConsole2());
 	}
 
     public function alertConsole2()

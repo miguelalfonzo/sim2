@@ -45,4 +45,9 @@ class Activity extends Eloquent
     {
         return Activity::distinct()->select( 'id' )->where( 'tipo_cliente' , $clientType )->get();
     }
+
+    public function getAddData()
+    {
+        return $this->select( [ 'id' , 'nombre descripcion' ] )->get();
+    }
 }

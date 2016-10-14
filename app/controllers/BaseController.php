@@ -60,13 +60,15 @@ class BaseController extends Controller
 
     protected function getExpenseDate( $solicitud , $range = 0 )
     {
-        $now = Carbon::now();
-        $created = new Carbon( $solicitud->created_at );
-        if ( $solicitud->idtiposolicitud == 3)
-            $expenseDate = (new Carbon('first day of August 2015'));
-         else
-            $expenseDate = $now->subDays( 30 )->max( $created );
-        return array( 'startDate' => $expenseDate->subDays( $range )->format('d/m/Y') , 'endDate' => Carbon::now()->addDays( $range )->format('d/m/Y') );
+        if( $solicitud->idtiposolicitud == 3 )
+        {
+            $expenseDate = new Carbon( 'first day of August 2015' );
+        }
+        else
+        {
+            $expenseDate = Carbon::now()->subDays( 30 )->max( $solicitud->created_at );
+        }
+        return [ 'startDate' => $expenseDate->format( 'd/m/Y' ) , 'endDate' => Carbon::now()->format( 'd/m/Y' ) ];
     }
 
     protected function getDay( $type=1 )

@@ -4,12 +4,16 @@ namespace Fondo;
 
 use \BaseController;
 use \System\FondoMktHistory;
+use \PPTO\PPTOSupervisor;
+use \PPTO\PPTOGerente;
+use \PPTO\PPTOInstitucion;
+use \Expense\ChangeRate;
+use \Dmkt\Solicitud;
 use \Auth;
 use \View;
 use \Input;
-use \Expense\ChangeRate;
+use \Excel;
 use \Carbon\Carbon;
-use \Dmkt\Solicitud;
 
 class FondoMkt extends BaseController
 {
@@ -251,56 +255,108 @@ class FondoMkt extends BaseController
     {
         $inputs = Input::all();
         $start = $inputs[ 'start' ];
-        $end   = $inputs[ 'end' ];  
-        $subCategory           = FondoSubCategoria::find( $inputs[ 'id_subcategoria' ] );
-        $subCategoryType       = $subCategory->fondoMktType;
-        $fondoMktHistoriesData = FondoMktHistory::whereRaw( "created_at between to_date( '$start' , 'YYYY/MM/DD' ) and to_date( '$end' , 'YYYY/MM/DD' ) + 1" )
-                                ->where( 'id_tipo_to_fondo' , trim( $subCategory->tipo ) )
-                                ->whereHas( $subCategoryType->relacion , function( $query ) use ( $subCategory )
-                                {
-                                    $query->where( 'subcategoria_id' , $subCategory->id );
-                                })->get();
+        $end   = $inputs[ 'end' ]; 
 
-        
-        $fondoMktHistoriesTotalData = FondoMktHistory::whereRaw( "created_at between to_date( '$start' , 'YYYY/MM/DD' ) and sysdate + 1" )
-                                ->where( 'id_tipo_to_fondo' , trim( $subCategory->tipo ) )
-                                ->whereHas( $subCategoryType->relacion , function( $query ) use ( $subCategory )
-                                {
-                                    $query->where( 'subcategoria_id' , $subCategory->id );
-                                })->get();
+        if( substr( $start , 0 , 4) != substr( $end , 0 , 4 ) )
+        {
+            return $this->warningException( 'No se puede generar el reporte para años diferentes.' , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
 
-
-        $Fondos         = $subCategory->{ $subCategoryType->relacion };
-        $FondosTotal    = $Fondos->sum( 'saldo' );
-        $RetencionTotal = $Fondos->sum( 'retencion' );
-        
-        $totalNew      = $fondoMktHistoriesTotalData->sum( 'to_new_saldo' );
-        $totalOld      = $fondoMktHistoriesTotalData->sum( 'to_old_saldo' );
-        $totalOldRetencion = $fondoMktHistoriesTotalData->sum( 'old_retencion' );
-        $totalNewRetencion = $fondoMktHistoriesTotalData->sum( 'new_retencion' );
-        
-
-        $historyTotal  = $totalNew - $totalOld;
-        $historyTotalRetencion = $totalNewRetencion - $totalOldRetencion;
-        
-        $saldoAnterior = $FondosTotal - $historyTotal;
-        $retencionAnterior = $RetencionTotal - $historyTotalRetencion;
-
-        $periodTotal          = $fondoMktHistoriesData->sum( 'to_old_saldo' ) - $fondoMktHistoriesData->sum( 'to_new_saldo' );
-        $periodTotalRetencion = $fondoMktHistoriesData->sum( 'old_retencion' ) - $fondoMktHistoriesData->sum( 'new_retencion' );
-        
-        $saldoContable = $saldoAnterior - $periodTotal;
-        $saldoRetencion = $retencionAnterior - $periodTotalRetencion;
-        
-        $data = array( 
-            'FondoMktHistories' => $fondoMktHistoriesData ,
-            'saldo'             => $saldoAnterior ,
-            'saldoContable'     => $saldoContable ,
-            'saldoNeto'         => $saldoContable - $saldoRetencion
-            );
-        return $this->setRpta( array( 'View' => View::make( 'Tables.table_fondo_mkt_history' , $data )->render() ) );
+        $data = $this->getFondoHistoryData( $inputs[ 'start' ] , $inputs[ 'end' ] , $inputs[ 'id_subcategoria' ] );
+        return $this->setRpta( [ 'View' => View::make( 'Tables.table_fondo_mkt_history' , $data )->render() ] );
     }
 
+    public function exportFondoHistorial( $start , $end , $subCategoryId )
+    {
+        try
+        {
+            if( substr( $start , 0 , 4) != substr( $end , 0 , 4 ) )
+            {
+                return $this->warningException( 'No se puede generar el reporte para años diferentes.' , __FUNCTION__ , __LINE__ , __FILE__ );
+            }
+
+            $data = $this->getFondoHistoryData( $start , $end , $subCategoryId );
+
+            $subCategoryName = FondoSubCategoria::find( $subCategoryId )->descripcion;
+            $title = 'SIM ' . $subCategoryName . ' Movimiento ' . substr( $start , 0 , 6 ) . ' a ' . substr( $end , 0 , 6 );
+
+            return Excel::create( $title , function( $excel ) use ( $data )
+            {
+                $excel->setTitle( 'Historial del Presupuesto SIM' );
+                $excel->setCreator( 'Laboratorios Bago | Peru' )->setCompany( 'Laboratorios Bago | Peru' );
+                $excel->sheet( 'Historial del Fondo' , function( $sheet ) use ( $data )
+                {
+                    $sheet->loadView( 'Tables.export_fondo_mkt_history' , $data );
+                });
+            })->download( 'xlsx' );
+        }
+        catch( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
+    }
+
+    private function getFondoHistoryData( $start , $end , $subCategoryId )
+    {
+        $subCategory = FondoSubCategoria::find( $subCategoryId );
+        
+        $startPeriod                = substr( $start , 0 , 4 ) . substr( $start , 4 , 2 );
+        $fondoMktPeriodHistoryModel = new FondoMktPeriodHistory;
+        $lastPeriod                 = $fondoMktPeriodHistoryModel->maxFundPeriod( $subCategoryId , $startPeriod );
+        
+        if( is_null( $lastPeriod ) )
+        {
+            if( trim( $subCategory->tipo ) == SUP )
+            {
+                $pptoSupervisorModel = new PPTOSupervisor;
+                $saldo_inicial       = $pptoSupervisorModel->sumCategoryAmount( $subCategoryId , substr( $start , 0 , 4 ) ); 
+                $retencion_inicial   = 0;
+            }
+            else if( trim( $subCategory->tipo ) == GER_PROD || trim( $subCategory->tipo ) == GER_PROM )
+            {
+                $pptoGerenteModel  = new PPTOGerente;
+                $saldo_inicial     = $pptoGerenteModel->sumCategoryAmount( $subCategoryId , substr( $start , 0 , 4 ) ); 
+                $retencion_inicial = 0;
+            }
+            else if( trim( $subCategory->tipo ) == 'I' )
+            {
+                $pptoInsModel      = new PPTOInstitucion;
+                $saldo_inicial     = $pptoInsModel->sumCategoryAmount( $subCategoryId , substr( $start , 0 , 4 ) ); 
+                $retencion_inicial = 0;
+            }
+            else
+            {
+                $saldo_inicial     = 0;
+                $retencion_inicial = 0;
+            }
+        }
+        else
+        {
+            $fondoMktPeriodHistory            = new FondoMktPeriodHistory;
+            $fondoMktHistoriesStartPeriodData = $fondoMktPeriodHistory->getPeriodData( $subCategoryId , $lastPeriod );
+            $saldo_inicial                    = $fondoMktHistoriesStartPeriodData->saldo_final;
+            $retencion_inicial                = $fondoMktHistoriesStartPeriodData->retencion_final;
+        }
+
+        $subCategoryType        = $subCategory->fondoMktType;
+        $fundHistoryModel       = new FondoMktHistory;
+        $fundHistoryData        = $fundHistoryModel->getSubCategoryData( $subCategoryId , $subCategory->tipo , $subCategoryType->relacion , $start , $end );
+        $periodTotal            = $fundHistoryData->diff_saldo;
+        $periodTotalRetencion   = $fundHistoryData->diff_retencion;
+
+        $saldoContable  = $saldo_inicial     - $periodTotal;
+        $saldoRetencion = $retencion_inicial - $periodTotalRetencion;
+
+        $fundHistoryBalanceData = $fundHistoryModel->getSubCategoryBalanceData( $subCategoryId , $subCategory->tipo , $subCategoryType->relacion , $start , $end );
+        
+        return 
+        [ 
+            'FondoMktHistories' => $fundHistoryBalanceData ,
+            'saldo'             => $saldo_inicial ,
+            'saldoContable'     => $saldoContable ,
+            'saldoNeto'         => $saldoContable - $saldoRetencion
+        ];
+    }
 
     public function refund( $solicitud , $monto_renovado , $type )
     {

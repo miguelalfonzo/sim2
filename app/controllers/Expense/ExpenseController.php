@@ -52,7 +52,7 @@ class ExpenseController extends BaseController
     	$validator = Validator::make( $inputs , $rules , $messages );
         if ( $validator->fails() )
        	{ 
-            return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
+            return $this->warningException( $this->msgValidator( $validator ) , __FUNCTION__ , __LINE__ , __FILE__ );
     	}
     	return $this->setRpta();
     }
@@ -72,7 +72,7 @@ class ExpenseController extends BaseController
 
         $validator = Validator::make( $inputs , $rules , $messages );
         if ( $validator->fails() ) 
-            return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
+            return $this->warningException( $this->msgValidator( $validator ) , __FUNCTION__ , __LINE__ , __FILE__ );
         else
         {
         	$rules 		= array();
@@ -106,7 +106,7 @@ class ExpenseController extends BaseController
                 return $proofType->igv == 1 ;
             });
             if ( $validator->fails() ) 
-        	    return $this->warningException( substr( $this->msgValidator( $validator ) , 0 , -1 ) , __FUNCTION__ , __LINE__ , __FILE__ );
+        	    return $this->warningException( $this->msgValidator( $validator ) , __FUNCTION__ , __LINE__ , __FILE__ );
         	else
 	    	    return $this->setRpta();
         } 
@@ -118,6 +118,14 @@ class ExpenseController extends BaseController
 		{
 			DB::beginTransaction();
 			$inputs = Input::all();
+
+			$solicitud = Solicitud::findByToken( $inputs[ 'token' ] );
+
+			if( $solicitud->pendingRefund->count() != 0 )
+			{
+				return $this->warningException( 'No puede modificar documentos debido a que hay una devolucion pendiente' , __FUNCTION__ , __LINE__ , __FILE__ );
+			}
+
 			$middleRpta = $this->validateInputExpense( $inputs );
 			if ( $middleRpta[ status ] === ok )
 			{
@@ -150,7 +158,7 @@ class ExpenseController extends BaseController
 						$expense->id = $expense->lastId() + 1;
 			        }
 			        
-			        $solicitud 		  = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
+			        
 					$proof = ProofType::find( $inputs[ 'proof_type' ] );
 		    		
 				    if( $proof->code != 'N' && ! isset( $inputs[ 'idgasto' ] ) && ! is_null( $inputs[ 'ruc' ] ) && ! is_null( $inputs[ 'number_prefix' ] ) && ! is_null( $inputs[ 'number_serie' ] ) )
@@ -181,25 +189,29 @@ class ExpenseController extends BaseController
 			        $date 			  = $inputs['fecha_movimiento'];
 			        list($d, $m, $y)  = explode('/', $date);
 			        $d 				  = mktime(11, 14, 54, $m, $d, $y);
-					$inputs[ 'date' ] = date("Y/m/d", $d );
+					$inputs[ 'date' ] = date( "Y/m/d" , $d );
 					$inputs[ 'id_solicitud' ] = $solicitud->id;
 					$this->setExpense( $expense , $inputs );
 
 					//Detail Expense
 					ExpenseItem::where( 'id_gasto' , $expense->id )->delete();
-					if ( $proof->igv == 1 && array_sum( $inputs[ 'total_item' ] ) == ( $inputs[ 'total_expense' ] - $inputs[ 'imp_service' ] ) )
+					if( $proof->igv == 1 && $expense->igv != 0 && array_sum( $inputs[ 'total_item' ] ) == ( $inputs[ 'total_expense' ] - $inputs[ 'imp_service' ] ) )
+					{
 						$pIGV = 1 + ( Table::getIgv()->numero / 100 );
+					}
 					else
+					{
 						$pIGV = 1;
+					}
 					for( $i = 0 ; $i < count( $inputs[ 'quantity' ] ) ; $i++ )
 					{
-						$expense_detail = new ExpenseItem;
-						$expense_detail->id = $expense_detail->lastId() + 1 ;
-						$expense_detail->id_gasto = $expense->id;
-						$expense_detail->cantidad = $inputs['quantity'][$i];
+						$expense_detail              = new ExpenseItem;
+						$expense_detail->id          = $expense_detail->lastId() + 1 ;
+						$expense_detail->id_gasto    = $expense->id;
+						$expense_detail->cantidad    = $inputs['quantity'][$i];
 						$expense_detail->descripcion = $inputs['description'][$i];
-						$expense_detail->tipo_gasto = $inputs['tipo_gasto'][$i];
-						$expense_detail->importe = $inputs['total_item'][$i] / $pIGV ;
+						$expense_detail->tipo_gasto  = $inputs['tipo_gasto'][$i];
+						$expense_detail->importe     = $inputs['total_item'][$i] / $pIGV ;
 						$expense_detail->save();				
 					}
 					if ( Auth::user()->type === CONT )
@@ -288,7 +300,10 @@ class ExpenseController extends BaseController
 			$inputs 	  = Input::all();
 			$expense      = Expense::find( $inputs[ 'idgasto' ] );
 			if ( is_null( $expense ) )
+			{
 				return $this->warningException( 'No existe registro del gasto con Id: ' . $inputs[ 'idgasto' ] , __FUNCTION__ , __LINE__ , __FILE__ );
+			}
+
 			return $this->setRpta( array( 'expenseItems' => $expense->items , 'expense' => $expense ) );
 		}
 		catch ( Exception $e )
@@ -307,40 +322,7 @@ class ExpenseController extends BaseController
 	{
 		try
 		{
-			/*DB::beginTransaction();
 			$inputs 	= Input::all();
-			$solicitud  = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
-			
-			if( is_null( $solicitud ) )
-			{
-				return $this->warningException( 'No se encontro la solicitud con token: '.$inputs['token'] , __FUNCTION__ , __LINE__ , __FILE__ );
-			}
-
-			if( $solicitud->id_estado != GASTO_HABILITADO )
-			{
-				return $this->warningException( 'Ya finalizo el registro de documentos para esta solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
-			}
-
-			$oldIdEstado = $solicitud->id_estado;
-		
-			$middleRpta = $this->validateExpense( $solicitud , $inputs );
-			if ( $middleRpta[ status ] != ok )
-				return $middleRpta;
-
-			$toUser = $middleRpta[ data ];
-			$solicitud->id_estado = ENTREGADO;
-			$solicitud->save();
-
-			$middleRpta = $this->setStatus( $oldIdEstado , $solicitud->id_estado , Auth::user()->id, $toUser , $solicitud->id );
-			if ( $middleRpta[status] == ok )
-			{
-				Session::put( 'state' , R_GASTO );
-				DB::commit();
-			}
-			else
-				DB::rollback();
-			return $middleRpta;*/
-                        $inputs 	= Input::all();
 			$solicitud  = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
 			
 			if( is_null( $solicitud ) )
@@ -638,7 +620,7 @@ class ExpenseController extends BaseController
 				'clientes'     => $clientes,
 				'cmps'         => $cmps,
 				'getSpecialty' => $getSpecialty,
-				'date'         => array( 'toDay' => $solicitud->created_at , 'lastDay' => $jDetalle->fecha_entrega ),
+				'date'         => array( 'toDay' => $solicitud->created_at_parse , 'lastDay' => $jDetalle->fecha_entrega ),
 				'name'         => $name_aproved,
 				'dni'          => $dni,
 				'charge'       => $charge,

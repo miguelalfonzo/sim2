@@ -61,8 +61,6 @@
             </a>
         </header>
         <div class="container-fluid" style="max-height: 100vh; padding-left: 0; padding-right: 0;">
-            @if( Auth::user()->type != ESTUD )
-        
             <nav class="navbar navbar-bago navbar-static-top" role="navigation" style="/*margin-bottom: 0*/; z-index: 10;">
                 <div class="container-fluid">
                     <div class="navbar-header relative">
@@ -133,19 +131,18 @@
                                         <span class="caret"></span>
                                     </a>
                                     <ul class="dropdown-menu" role="menu">
+                                        
                                         @if ( in_array(Auth::user()->type, array( SUP , GER_PROD , GER_PROM , GER_COM ) ) )
                                             <li><a data-toggle="modal" data-target="#modal-temporal-user">Derivación de Usuario</a></li>
                                         @endif
-                                        @if ( in_array(Auth::user()->type, array(GER_COM)) )
+
+                                        @if ( Auth::user()->type == GER_COM ) )
                                             <li><a href="{{ URL::to('fondoHistorial') }}">Historial de Saldo de los Fondos</a></li>
                                             <li><a href="{{ URL::to('maintenance/view/Tipo_Inversion') }}">Mantenimiento de Inversion</a></li>
                                             <li><a href="{{ URL::to('maintenance/view/Tipo_Actividad') }}">Mantenimiento de Actividades</a></li>
                                             <li><a href="{{ URL::to('maintenance/view/Inversion_Actividad') }}">Mantenimiento de Inversion-Actividad</a></li>
                                             <li><a href="{{ URL::to('maintenance/view/Parametro') }}">Mantenimiento de Parametros</a></li>
-                                            <li><a href="{{ URL::to('maintenance/view/Fondo_Supervisor') }}">Mantenimiento de Fondos de Supervisor</a></li>
-                                            <li><a href="{{ URL::to('maintenance/view/Fondo_Gerente_Producto') }}">Mantenimiento de Fondos de G. Producto / G. Promocion</a></li>
-                                            <li><a href="{{ URL::to('maintenance/view/Fondo_Institucion') }}">Mantenimiento de Fondos Institucionales</a></li>
-                                        @elseif ( in_array(Auth::user()->type, array(CONT)) )
+                                        @elseif( Auth::user()->type == CONT ) )
                                             <li><a href="{{ URL::to('maintenance/finddocument') }}">Busqueda de Documentos Registrados</a></li>
                                             <li><a href="{{ URL::to('maintenance/documenttype') }}">Mantenimiento de Tipo de Documentos</a></li>
                                             <li><a href="{{ URL::to('maintenance/view/Fondo_Contable' ) }}">Mantenimiento de Fondo de Contabilidad</a></li>
@@ -154,22 +151,38 @@
                                             <li><a href="{{ URL::to( 'report/sup/view/Fondo_Supervisor' ) }}">Reporte de Fondos de Supervisor</a></li>
                                         @elseif( Auth::user()->type == ESTUD )
                                             <li><a href="{{ URL::to( 'view-sup-rep' ) }}">Syncronizacion</a></li>
+                                            <li><a href="{{ URL::to( 'view-ppto' ) }}">Presupuesto</a></li>
+                                            <li><a href="{{ URL::to('maintenance/view/Fondo_Subcategoria') }}">Mantenimiento de Categorías de Fondo</a></li> 
+                                        @endif
+
+                                        @if( in_array( Auth::user()->type , array( GER_PROM , GER_COM ) ) )
+                                            <li><a href="{{ URL::to('maintenance/view/Fondo_Supervisor') }}">Mantenimiento de Fondos de Supervisor</a></li>
+                                        @endif
+
+                                        @if( in_array( Auth::user()->type , array( GER_PROD , GER_PROM , GER_COM ) ) )
+                                            <li><a href="{{ URL::to('maintenance/view/Fondo_Gerente_Producto') }}">Mantenimiento de Fondos de G. Producto / G. Promocion</a></li>
+                                        @endif
+
+                                        @if( in_array( Auth::user()->type , array( GER_PROM , GER_COM ) ) )
+                                            <li><a href="{{ URL::to('maintenance/view/Fondo_Institucion') }}">Mantenimiento de Fondos Institucionales</a></li>
                                         @endif
                                     </ul>
                                 </li>
-                            @endif                    
-                            <li class="report_menubar_option btn_extra" style="display:none;">
-                                <a href="#" rel="export">
-                                    <span class="glyphicon glyphicon-save" aria-hidden="true"></span>
-                                    <span class="glyphicon-class">  Exportar</span>
-                                </a>
-                            </li>
-                            <li class="report_menubar_option btn_extra2" style="display:none;">
-                                <a href="#" rel="email">
-                                    <span class="glyphicon glyphicon-envelope" ></span>
-                                    <span class="glyphicon-class">  Enviar Correo</span>
-                                </a>
-                            </li>
+                            @endif      
+                            @if( ! in_array( Auth::user()->type , [ REP_MED , ESTUD ] ) )
+                                <li class="report_menubar_option btn_extra" style="display:none;">
+                                    <a href="#" rel="export">
+                                        <span class="glyphicon glyphicon-save" aria-hidden="true"></span>
+                                        <span class="glyphicon-class">  Exportar</span>
+                                    </a>
+                                </li>
+                                <li class="report_menubar_option btn_extra2" style="display:none;">
+                                    <a href="#" rel="email">
+                                        <span class="glyphicon glyphicon-envelope" ></span>
+                                        <span class="glyphicon-class">  Enviar Correo</span>
+                                    </a>
+                                </li>
+                             @endif
                         </ul>
                         <a class="btn btn-primary navbar-btn sim_alerta" href="{{ URL::to('alerts') }}" role="button">
                             Alertas 
@@ -185,8 +198,7 @@
                     </div>
                 </div>
             </nav>
-            @endif
-        
+            
             <div id="dataTable" class="container-fluid" style="font-size:10pt">
                 @yield('solicitude')
                 <br>
