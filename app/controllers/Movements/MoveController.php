@@ -162,55 +162,56 @@ class MoveController extends BaseController
             });
         });
         
-            if ( in_array( Auth::user()->type , array ( SUP ) ) )
+        if( Auth::user()->type == REP_MED )
+        {
+            $solicituds->where( 'id_user_assign' , Auth::user()->id );
+        }
+        elseif( in_array( Auth::user()->type , array ( SUP , GER_PROD , GER_PROM ) ) )
+        {
+            $solicituds->where( function ( $query )
             {
-                $solicituds->where( function ( $query )
+                $userIds = array( Auth::user()->id , Auth::user()->tempId() );
+                $query->whereHas( 'gerente' , function( $query ) use ( $userIds )
                 {
-                    $query->whereHas( 'gerente' , function( $query )
-                    {
-                        $query->whereIn( 'id_gerprod' , array( Auth::user()->id , Auth::user()->tempId() ) )->where( 'tipo_usuario' , SUP );
-                    })->orWhereIn( 'created_by' , array( Auth::user()->id , Auth::user()->tempId() ) )
-                    ->orWhereIn( 'id_user_assign' , array( Auth::user()->id , Auth::user()->tempId() ) )
-                    ->orWhereIn( 'created_by' , Auth::user()->personal->employees->lists( 'user_id' ) )
-                    ->orWhereIn( 'id_user_assign' , Auth::user()->personal->employees->lists( 'user_id' ) );
-                });
-            }
-            elseif( in_array( Auth::user()->type , array( REP_MED ) ) ) 
-            {
-                $solicituds->where( 'id_user_assign' , Auth::user()->id );
-            }
+                    $query->whereIn( 'id_gerprod' , $userIds )->where( 'tipo_usuario' , Auth::user()->type );
+                })->orWhereIn( 'created_by' , $userIds )
+                ->orWhereIn( 'id_user_assign' , $userIds )
+                ->orWhereIn( 'created_by' , Auth::user()->personal->employees->lists( 'user_id' ) )
+                ->orWhereIn( 'id_user_assign' , Auth::user()->personal->employees->lists( 'user_id' ) );
+            });
+        }
 
-            if ( $filter != 0 )
+        if ( $filter != 0 )
+        {
+            $solicituds->where( function ( $query ) use( $filter )
             {
-                $solicituds->where( function ( $query ) use( $filter )
+                $query->where( 'idtiposolicitud' , SOL_REP )->whereHas( 'products' , function( $query ) use( $filter )
                 {
-                    $query->where( 'idtiposolicitud' , SOL_REP )->whereHas( 'products' , function( $query ) use( $filter )
+                    $query->where( function( $query ) use( $filter )
                     {
-                        $query->where( function( $query ) use( $filter )
+                        $query->where( 'id_tipo_fondo_marketing' , SUP )->whereHas( 'fondoSup' , function( $query ) use( $filter )
                         {
-                            $query->where( 'id_tipo_fondo_marketing' , SUP )->whereHas( 'fondoSup' , function( $query ) use( $filter )
-                            {
-                                $query->where( 'subcategoria_id' , $filter );
-                            })->orWhere( function( $query ) use( $filter )
-                            {
-                                $query->where( 'id_tipo_fondo_marketing' , GER_PROD )->whereHas( 'fondoGerProd' , function( $query) use( $filter )
-                                {
-                                    $query->where( 'subcategoria_id' , $filter );
-                                });
-                            });
-                        });
-                    })->orWhere( function( $query ) use( $filter )
-                    {
-                        $query->where( 'idtiposolicitud' , SOL_INST )->whereHas( 'detalle' , function( $query ) use( $filter )
+                            $query->where( 'subcategoria_id' , $filter );
+                        })->orWhere( function( $query ) use( $filter )
                         {
-                            $query->whereHas( 'thisSubFondo' , function( $query ) use( $filter )
+                            $query->where( 'id_tipo_fondo_marketing' , GER_PROD )->whereHas( 'fondoGerProd' , function( $query) use( $filter )
                             {
                                 $query->where( 'subcategoria_id' , $filter );
                             });
                         });
                     });
+                })->orWhere( function( $query ) use( $filter )
+                {
+                    $query->where( 'idtiposolicitud' , SOL_INST )->whereHas( 'detalle' , function( $query ) use( $filter )
+                    {
+                        $query->whereHas( 'thisSubFondo' , function( $query ) use( $filter )
+                        {
+                            $query->where( 'subcategoria_id' , $filter );
+                        });
+                    });
                 });
-            }
+            });
+        }
         
         if( $estado != R_TODOS )
         {
@@ -223,6 +224,7 @@ class MoveController extends BaseController
             });
         }
         $solicituds->with( 'activity' );
+
         return $solicituds->orderBy('id', 'ASC')->get();
     }
 
