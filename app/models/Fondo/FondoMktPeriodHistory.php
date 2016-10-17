@@ -4,6 +4,7 @@ namespace Fondo;
 
 use \Eloquent;
 use \Carbon\Carbon;
+use \DB;
 
 class FondoMktPeriodHistory extends Eloquent
 {
@@ -34,5 +35,22 @@ class FondoMktPeriodHistory extends Eloquent
 		else
 			return $lastId->id + 1;
 	}
+
+	public function maxFundPeriod( $subCategoryId , $endPeriod )
+	{
+		$startPeriod = substr( $endPeriod , 0 , 4 ) . '00';
+		return $this->select( 'periodo' )
+			->where( 'subcategoria_id' , $subCategoryId )
+			->where( 'periodo' , '<' , $endPeriod )
+			->where( 'periodo' , '>' , $startPeriod )
+			->max( 'periodo' );
+	}
 	
+	public function getPeriodData( $subCategoryId , $period )
+	{
+		return $this->select( [ 'saldo_final' , 'retencion_final' ] )
+            ->where( 'periodo' , $period )
+            ->where( 'subcategoria_id' , $subCategoryId )
+            ->first();
+	}
 }

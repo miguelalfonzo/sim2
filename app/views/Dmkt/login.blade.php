@@ -24,15 +24,23 @@
         <meta name="msapplication-TileImage" content="{{ asset('ms-icon-144x144.png') }}">
         <meta name="theme-color" content="#ffffff">
         <meta name="author" content="Laboratorito Bagó | Perú">
-        <title>Sistema de Inversiones Marketing</title>
-
-       
-       
+        <title>Sistema de Inversiones Marketing</title>     
         {{ HTML::style('css/bootstrap.min.css') }}
         {{ HTML::style('css/stylos.css') }}
         {{ HTML::script('js/jquery_2.1.0.min.js') }}
     </head>
+
     <body style="background:url(img/logo-marcadeagua.png);">
+        @if ( $errors->has() )
+            <div class="alert alert-danger alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                @foreach ($errors->all() as $error)
+                    <strong>{{ $error }}</strong><br>        
+                @endforeach
+            </div>
+        @endif
         <div class="container">
             <div class="row">
                 <div class="col-md-4 col-md-offset-4">
@@ -62,12 +70,9 @@
                                         <a href="http://intra.bagoperu.com.pe/produccion/intranet.php" class="btn btn-danger btn-lg"  style="width: 33.33%; float: left !important; font-size: 12pt;">Regresar</a>
                                     </div>
                                 </div>
-                                @if(Session::has('error_login'))
-                                    <p style="color:red; text-align: center;"><strong>Usuario y/o contraseña incorrecto.</strong></p>
-                                @endif
-                                @if(isset($message))
-                                    <p style="color:red; text-align: center;"><strong>{{ $message }}</strong></p>
-                                @endif
+                                {{--@if( Session::has( 'message' ) )
+                                    <p style="color:red; text-align: center;"><strong>{{ Session::get( 'message' ) }}</strong></p>
+                                @endif --}}
                            {{ Form::close() }}
                         </div>
                     </div>
@@ -75,5 +80,14 @@
             </div>
         </div>
         {{ HTML::script('js/bootstrap.min.js') }}
+        {{ HTML::script('js/bootbox.min.js') }}
     </body>
 </html>
+<script>
+    $( document ).ready( function()
+    {
+        @if( Session::has( 'message' ) )
+            bootbox.alert( '<h4 class="text-warning">{{ Session::get( 'message' ) }}</h4>' );
+        @endif
+    });
+</script>

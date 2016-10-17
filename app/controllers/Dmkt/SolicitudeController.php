@@ -168,23 +168,20 @@ class SolicitudeController extends BaseController
 
     private function validateApprobationFamily( $inputs )
     {
-        $rules = array( 'solicitud_id' => 'required|numeric|min:1|exists:solicitud,id' );
+        $rules = 
+            [ 
+                'solicitud_id' => 'required|numeric|min:1|exists:solicitud,id' ,
+                'producto' => 'required|numeric|min:1'
+                
+            ];
+
         $validator = Validator::make( $inputs , $rules );
-        if ( $validator->fails() )
+
+        if( $validator->fails() )
         {
-            return $this->warningException($this->msgValidator( $validator ), __FUNCTION__, __LINE__, __FILE__);
+            return $this->warningException( $this->msgValidator( $validator ) , __FUNCTION__ , __LINE__ , __FILE__ );
         }
-        else
-        {
-            $rules = array( 
-                'producto' => 'required|numeric|min:1|');
-            $validator = Validator::make( $inputs , $rules );
-            if ( $validator->fails() )
-            {
-                return $this->warningException( $this->msgValidator( $validator ), __FUNCTION__, __LINE__, __FILE__);
-            }
-            return $this->setRpta();
-        }
+        return $this->setRpta();
     }
 
     public function addFamilyFundSolicitud()
@@ -193,21 +190,16 @@ class SolicitudeController extends BaseController
         {
             $inputs =   Input::all();
             $middleRpta = $this->validateApprobationFamily( $inputs );
-            if ( $middleRpta[ status ] === ok )
+            if( $middleRpta[ status ] == ok )
             {
-                
-                //$middleRpta = $this->setProducts( $inputs[ 'solicitud_id' ] , array( $inputs[ 'producto' ] ) );
-                //DB::beginTransaction();
-                //$solicitudProduct = SolicitudProduct::where( 'id_solicitud' , $inputs[ 'solicitud_id' ] )
-                //                    ->where( 'id_producto' , $inputs[ 'producto' ] )->first();
-                
-                $productoId=  $inputs['producto'];
-                $solicitudId =  $inputs['solicitud_id'];
-                $solicitudProduct = SolicitudProduct::where('id_solicitud', $solicitudId)->first();
-                $solicitud = Solicitud::where('id', $solicitudId)->first();
-                $politicType = $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario;
-                $fondo_product =  $solicitudProduct->getSubFondo( $politicType , $solicitud, $productoId );
-                return $this->setRpta(  array( 'Cond' => true , 'Fondo_product' => $fondo_product  ) );   
+                $productoId                           =  $inputs['producto'];
+                $solicitudId                          =  $inputs['solicitud_id'];
+                $solicitud                            = Solicitud::find( $solicitudId );
+                $politicType                          = $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario;
+                //$solicitudProduct                     = SolicitudProduct::where( 'id_solicitud', $solicitudId )->first();
+                $solicitudProduct                     = new SolicitudProduct;
+                $fondo_product                        = $solicitudProduct->getSubFondo( $politicType , $solicitud , $productoId );
+                return $this->setRpta( $fondo_product );   
             }
             return $middleRpta;
         }
@@ -927,7 +919,7 @@ class SolicitudeController extends BaseController
                     $solDetalle->save();
                 }
 
-                if ( $solicitud->id_estado != APROBADO ) 
+                if( $solicitud->id_estado != APROBADO ) 
                 {
                     $familiesId = $solicitud->products->lists( 'id_producto' );
                     

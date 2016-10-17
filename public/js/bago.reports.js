@@ -196,7 +196,10 @@
 			this.drpSpan.html(this.dateRangePickerStartDate.format('LL') + ' - ' + this.dateRangePickerEndDate.format('LL'));
 			this.drp.daterangepicker(this.dateRangePickerOption, this.dateRangePickerCallback);
 			// GBREPORTS.setAutoResize();
-			this.getReports();
+			if( $( ".report_menubar_option" ).length != 0 )
+			{
+				this.getReports();
+        	}
         },
         setMenuBarReports: function(reportsList) {
             this.reportsArray = reportsList;
@@ -216,63 +219,85 @@
         getReports: function(callbacks) {
 			var url = URL_BASE + "reports/getUserReports";
             var gbReportsObject = this;
-            $.ajax({
-				url        : url,
-				ContentType: gbReportsObject.contentTypeAjax,
-				cache      : false
-            }).done(function(dataResult) {
-				if(dataResult.status == 'OK'){
-					if(typeof(dataResult.data) != 'undefined'){
-						$(".report_menubar_option").not(".new").remove();
-						gbReportsObject.setMenuBarReports(dataResult.data);
+            $.ajax(
+            {
+				url         : url,
+				ContentType : gbReportsObject.contentTypeAjax,
+				cache       : false
+            }).done( function( response )
+            {
+				if( validateResponse( response ) )
+				{
+					if( typeof( response.data ) != 'undefined' )
+					{
+						$( ".report_menubar_option" ).not(".new").remove();
+						gbReportsObject.setMenuBarReports( response.data);
 					}
 				}
-				else{
-					bootbox.alert(dataResult.message);
+				else
+				{
+					bootboxMessage( response );
 				}
             });
         },
 		getAllDataSet: function(){
 			var url = URL_BASE + 'reports/getQuerys';
 			var gbReportsObject = this;
+			//$( "#loading" ).show( "slow" );
             $.ajax({
                 url: url,
                 ContentType: gbReportsObject.contentTypeAjax,
                 cache: false
-            }).done(function(dataResult) {
-				if(dataResult.status == 'OK'){
-					$("#containerDataSet").html("");
-					$(dataResult.data).each(function(i, temp){
-						var radioButtonElement = $('<div class="radio"><label><input type="radio" name="optionsRadios" value="'+ temp.id +'" checked>'+ temp.name +'</label></div>');
-						$("#containerDataSet").append(radioButtonElement);
+            }).done( function( response )
+            {
+				//$( "#loading" ).hide( "slow" );
+				if( validateResponse( response ) )
+				{
+					$( "#containerDataSet" ).html( "" );
+					$( response.Data ).each(function( i , temp )
+					{
+						var radioHtml = '<div class="radio">' +
+											'<label>' +
+												'<input type="radio" name="optionsRadios" value="'+ temp.id +'" checked>'+ temp.name + 
+											'</label>' +
+										'</div>';
+						var radioButtonElement = $( radioHtml );
+						$( "#containerDataSet" ).append( radioButtonElement );
 					});
-				}else{
-					alert(dataResult.message);
-					$("#loading").show("slow");
+				}
+				else
+				{
+					bootboxMessage( response );
 				}
             });
 		},
 		getDataHead: function(queryId){
 			var url = URL_BASE + 'reports/getColumnsDataSet/'+queryId;
 			var gbReportsObject = this;
-            $.ajax({
+            $.ajax(
+            {
                 url: url,
                 ContentType: gbReportsObject.contentTypeAjax,
                 cache: false,
 				async: false,
-            }).done(function(dataResult) {
-				if(dataResult.status == 'OK'){
-					$("#dataHeaders").html("");
-					$("#rows").html("");
-					$("#columns").html("");
-					$("#values").html("");
-					$(dataResult.data).each(function(i, temp){
-						var liElement = $('<li>'+temp+'</li>');
-						$("#dataHeaders").append(liElement);
+            }).done( function( response )
+            {
+				if( validateResponse( response ) )
+				{
+					$( "#dataHeaders" ).html( "" );
+					$( "#rows" ).html( "" );
+					$( "#columns" ).html( "" );
+					$( "#values" ).html( "" );
+					$( response.Data ).each( function( i , temp )
+					{
+						var liElement = $( '<li>' + temp + '</li>' );
+						$( "#dataHeaders" ).append( liElement );
 					});
 					gbReportsObject.activateDragAndDrop();
-				}else{
-					bootbox.alert(dataResult.message);
+				}
+				else
+				{
+					bootboxMessage( response );
 				}
             });
 		},
@@ -304,22 +329,29 @@
 		saveReport: function(report){
 			var url = URL_BASE + 'reports/save';
 			var gbReportsObject = this;
-			data={};
-			data._token = gbReportsObject.token;
+			data = 
+			{
+				_token : gbReportsObject.token
+			};
 			data.data = report;
-            $.ajax({
+            $.ajax(
+            {
                 url: url,
 				type: 'POST',
                 ContentType: gbReportsObject.contentTypeAjax,
                 cache: false,
 				data: data
-            }).done(function(dataResult) {
-				if(dataResult.status == 'OK'){
-					bootbox.alert('Reporte Guardado Satisfactoriamente.');
-					gbReportsObject.cleanWizard(true);
+            }).done( function( response )
+            {
+				if( validateResponse( response ) )
+				{
+					bootbox.alert( 'Reporte Guardado Satisfactoriamente.' );
+					gbReportsObject.cleanWizard( true );
 					gbReportsObject.getReports();
-				}else{
-					bootbox.alert(dataResult.message);
+				}
+				else
+				{
+					bootboxMessage( response );
 				}
 			});
 		},
@@ -347,9 +379,10 @@
                 cache: false,
             }).done(function(data) {
 				formula = JSON.parse(GBREPORTS.lastReport.formula);
-				if (data.status == 'OK' && typeof(data.tfootList) != 'undefined' && typeof(data.tbodyList) != 'undefined')
+				if( data.Status == ok && typeof(data.tfootList) != 'undefined' && typeof(data.tbodyList) != 'undefined')
 				{
-					if(typeof(data.message) == 'undefined'){
+					if( typeof data.message == 'undefined' )
+					{
 							GBREPORTS.valores = data.valores;
 							$("#dataTable").html('<table cellpadding="0" cellspacing="0" border="0" style="width:100%" id="dt_report" class="table table-striped table-hover table-bordered"></table>');
 
@@ -489,14 +522,16 @@
 							// $("#dt_report").css('margin-left', '19px');
 							gbReportsObject.changeDateRange(formula.frecuency);
 						}
-					}else
+					}
+					else
 					{
-						var msg = '';
+						/*var msg = '';
 						if(typeof(data.message) != 'undefined')
 							msg = data.message;
 						else
 							msg = 'Hubo un problema con la formula al generar el reporte';
-						bootbox.alert(msg);
+						bootbox.alert(msg);*/
+						bootboxMessage( data );
 						$("#dataTable").empty();
 						// bootbox.alert(data.Status + ': ' + data.message);
 						// gbReportsObject.changeDateRange(formula.frecuency);

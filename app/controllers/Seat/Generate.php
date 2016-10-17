@@ -30,7 +30,6 @@ class Generate extends BaseController
             $typeProof = ProofType::all();
             
             $resultSeats = $this->generateRegularizationSeatData( $solicitud ); 
-            $resultSeats = json_decode(json_encode( $resultSeats ) );
             
             $data = array(
                 'solicitud'   => $solicitud,
@@ -98,7 +97,7 @@ class Generate extends BaseController
 
             if( $solicitud->documentList->count() == 0 ) 
             {
-                return $seatList();
+                return $seatList;
             }
             else 
             {
@@ -401,27 +400,26 @@ class Generate extends BaseController
 
     private function createSeatElement( $cuentaMkt , $account_number , $cod_snt , $fecha_origen , $iva , $cod_prov , $nom_prov, $cod, $ruc, $prefijo, $numero, $dc, $monto, $marca, $descripcion, $tipo_responsable, $origin , $type)
     {
-        return 
-            array(
-                'cuentaMkt'        => $cuentaMkt,
-                'numero_cuenta'    => $account_number,
-                'codigo_sunat'     => $cod_snt,
-                'nro_origen'       => $origin,
-                'fec_origen'       => $fecha_origen,
-                'iva'              => $iva,
-                'cod_prov'         => $cod_prov,
-                'nombre_proveedor' => $nom_prov,
-                'cod'              => $cod,
-                'ruc'              => $ruc,
-                'prefijo'          => $prefijo,
-                'cbte_proveedor'   => $numero,
-                'dc'               => $dc,
-                'importe'          => $monto,
-                'leyenda'          => $marca,
-                'leyenda_variable' => $descripcion,
-                'tipo_responsable' => $tipo_responsable,
-                'type'             => $type
-            );
+        $seat                   = new StdClass;
+        $seat->cuentaMkt        = $cuentaMkt;
+        $seat->numero_cuenta    = $account_number;
+        $seat->codigo_sunat     = $cod_snt;
+        $seat->nro_origen       = $origin;
+        $seat->fec_origen       = $fecha_origen;
+        $seat->iva              = $iva;
+        $seat->cod_prov         = $cod_prov;
+        $seat->nombre_proveedor = $nom_prov;
+        $seat->cod              = $cod;
+        $seat->ruc              = $ruc;
+        $seat->prefijo          = $prefijo;
+        $seat->cbte_proveedor   = $numero;
+        $seat->dc               = $dc;
+        $seat->importe          = $monto;
+        $seat->leyenda          = $marca;
+        $seat->leyenda_variable = $descripcion;
+        $seat->tipo_responsable = $tipo_responsable;
+        $seat->type             = $type;
+        return $seat;
     }
 
 
@@ -447,7 +445,7 @@ class Generate extends BaseController
 
             if( empty( $entries ) )
             {
-                return $this->warningException( 'No se pudo generar la informacion de los asientos' , __FUNCTION__ , __LINE__ , __FILE__ );
+                return $this->warningException( 'No existe informacion para poder registrar el asiento' , __FUNCTION__ , __LINE__ , __FILE__ );
             }
 
             unset( $solicitud->documentList );

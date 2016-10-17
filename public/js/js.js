@@ -1130,10 +1130,6 @@ $(function()
         if( ! $.isNumeric( imp_serv ) ) imp_serv = 0 ;
         if( ! $.isNumeric( tot_item_expense ) ) tot_item_expense = 0 ;
         
-        console.log( deposit );
-        console.log( tot_expenses );
-        console.log( tot_item_expense );
-
         if(btn_save === "Registrar")
         {
             balance = deposit - tot_expenses - tot_item_expense;

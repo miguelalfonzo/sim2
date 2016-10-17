@@ -3,16 +3,41 @@
 namespace Fondo;
 
 use \Eloquent;
+use Illuminate\Database\Eloquent\SoftDeletingTrait;
+
+use \Fondo\FondoSupervisor;
+use \Fondo\FondoGerProd;
+use \Fondo\FondoInstitucional;
 
 class FondoSubCategoria extends Eloquent
 {
+
+	use SoftDeletingTrait;
+
 	protected $table      = TB_FONDO_CATEGORIA_SUB;
 	protected $primaryKey = 'id';
 	protected $fillable   = array('id','descripcion', 'fondos_categorias_id');
 
+	public function nextId()
+	{
+	    $nextId = $this->withTrashed()
+	    	->select( 'id' )
+	    	->orderBy( 'id' , 'desc' )
+	    	->first();
+        if ( is_null( $nextId ) )
+            return 1;
+        else
+            return $nextId->id + 1;
+    }
+
 	protected static function order()
 	{
 		return FondoSubCategoria::orderBy( 'descripcion' , 'ASC' )->get();
+	}
+
+	public function categoria()
+	{
+		return $this->belongsTo( 'Fondo\FondoCategoria' , 'id_fondo_categoria' );
 	}
 
 	protected function fondoMktType()
@@ -56,4 +81,37 @@ class FondoSubCategoria extends Eloquent
 		return FondoSubCategoria::where( 'trim( tipo )' , $typeCode )->get();
 	}
 
+	protected static function orderWithTrashed()
+	{
+		return FondoSubCategoria::withTrashed()
+			->where( 'trim( tipo )' , '<>' , 'O' )
+			->orderBy( 'id_fondo_categoria' , 'ASC' )
+			->orderBy( 'position' , 'ASC' )
+			->get();
+	}
+
+	public function getFondos( $year )
+	{
+		if( $this->tipo == 'S ' )
+		{
+			$data = FondoSupervisor::where( 'anio' , $year )->where( 'subcategoria_id' , $this->id )->get();
+			return $data;
+		} 
+		elseif( $this->tipo == 'P ' || $this->tipo == 'GP' )
+		{
+			$data = FondoGerProd::where( 'anio' , $year )->where( 'subcategoria_id' , $this->id )->get();
+			return $data;
+		}
+		elseif( $this->tipo == 'I ' )
+		{
+			$data = FondoInstitucional::where( 'anio' , $year )->where( 'subcategoria_id' , $this->id )->get();
+			return $data;
+		}
+		else
+		{
+			return null;
+		}
+		//return $this->{ $this->relacion }->where( 'anio' , $year );
+	}
+	
 }
