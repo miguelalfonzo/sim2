@@ -2,6 +2,7 @@
 @section( 'solicitude' )
 	<div class="container-fluid jumbotron">
 		<h3 style="margin-top:0px">Inhabilitacion del Proceso de Carga de Presupuesto</h3>
+		<h5><b>Nota: Si no se inhabilita el proceso los usuarios no podran ingresar al sistema</b></h5>
 		<button id="ppto-disable" type="button" class="btn btn-success">Confirmar</button>
 	</div>
 
@@ -26,52 +27,66 @@
 	<div class="tab-content">
 		<div class="tab-pane fade active in" id="tab-ppto-sup" data-type="1">
 
-			<div class="row">
+			
 				<div class="form-group col-md-12">
 					<h4><b>Carga de Presupuesto Supervisor</b></h4>
 				</div>
-			</div>
-			<div class="form-group col-lg-2">
-				<label>Año</label>
-				<select class="form-control ppto-year">
-					@foreach( $years as $year )
-						<option value="{{ $year }}">{{ $year }}</option>
-					@endforeach
-				</select>
-			</div>
-
-			<div class="form-group col-lg-2">
-				<label>Categoría</label>
-				<select class="form-control ppto-category">   
-					@foreach( $categories as $category )
-						@if( $category->tipo == SUP )
-							<option value="{{ $category->id }}">{{ $category->descripcion }}</option>
-						@endif
-					@endforeach
-				</select>
-			</div>
-
-			<div class="form-group col-lg-4">
-				<label>Excel</label>
-				<div class="input-group">
-					<span  class="input-group-addon btn glyphicon glyphicon-folder-open open-file" style="top:0"></span>
-					<input type="text" class="form-control filename" readonly="true">
+				
+				<div class="form-group col-lg-2">
+					<label>Año</label>
+					<select class="form-control ppto-year">
+						@foreach( $years as $year )
+							<option value="{{ $year }}">{{ $year }}</option>
+						@endforeach
+					</select>
 				</div>
-				<input type="file" class="file" accept=" application/vnd.ms-excel , application/vnd.openxmlformats-officedocument.spreadsheetml.sheet , application/vnd.ms-excel.sheet.macroEnabled.12 " style="display:none">	
-			</div>
 
-			<div class="form-group col-lg-1">
-				<button type="button" class="btn btn-primary load-ppto ladda-button" data-style="zoom-in" style="margin-top:24px" >Cargar</button>
-			</div>
+				<div class="form-group col-lg-2">
+					<label>Categoría</label>
+					<select class="form-control ppto-category">   
+						@foreach( $categories as $category )
+							@if( $category->tipo == SUP )
+								<option value="{{ $category->id }}">{{ $category->descripcion }}</option>
+							@endif
+						@endforeach
+					</select>
+				</div>
 
-			<div class="form-group col-lg-1">
-				<button type="button" class="btn btn-primary search-ppto ladda-button" data-style="zoom-in" style="margin-top:24px" >
-					<span class="glyphicon glyphicon-search"></span>
-				</button>
-			</div>
+				<div class="form-group col-lg-2">
+					<label>Version</label>
+					<select class="form-control ppto-version"></select>
+				</div>
 
-				<table id="table-ppto-1" class="table table-striped table-hover table-bordered" cellspacing="0" width="100%">
-				</table>
+				<div class="form-group col-lg-3">
+					<label>Excel</label>
+					<div class="input-group">
+						<span  class="input-group-addon btn glyphicon glyphicon-folder-open open-file" style="top:0"></span>
+						<input type="text" class="form-control filename" readonly="true">
+					</div>
+					<input type="file" class="file" accept=" application/vnd.ms-excel , application/vnd.openxmlformats-officedocument.spreadsheetml.sheet , application/vnd.ms-excel.sheet.macroEnabled.12 " style="display:none">	
+				</div>
+
+				<div class="form-group col-xs-4 col-lg-1">
+					<button type="button" class="btn btn-primary load-ppto ladda-button" data-style="zoom-in" style="margin-top:24px" >Cargar</button>
+				</div>
+
+				<div class="form-group col-xs-2 col-lg-1">
+					<button type="button" class="btn btn-primary search-ppto ladda-button" data-style="zoom-in" style="margin-top:24px" >
+						<span class="glyphicon glyphicon-search"></span>
+					</button>
+				</div>
+
+				<div class="form-group col-xs-6 col-lg-1 pull-right">
+					<button type="button" class="btn btn-primary export-ppto" style="margin-top:24px" >Exportar
+						<span class="glyphicon glyphicon glyphicon-export"></span>
+					</button>
+				</div>
+
+				<div style="clear:both"></div>
+				<label>Nota: El campo de version no afecta la carga del presupuesto solo afecta a la busqueda del presupuesto</label>
+
+			<table id="table-ppto-1" class="table table-striped table-hover table-bordered" cellspacing="0" width="100%">
+			</table>
 		</div>
 
 		<div class="tab-pane fade" id="tab-ppto-ger" data-type="2">
@@ -100,7 +115,12 @@
 				</select>
 			</div>
 
-			<div class="form-group col-lg-4">
+			<div class="form-group col-lg-2">
+				<label>Version</label>
+				<select class="form-control ppto-version"></select>
+			</div>
+
+			<div class="form-group col-lg-3">
 				<label>Excel</label>
 				<div class="input-group">
 					<span  class="input-group-addon btn glyphicon glyphicon-folder-open open-file" style="top:0"></span>
@@ -118,6 +138,15 @@
 					<span class="glyphicon glyphicon-search"></span>
 				</button>
 			</div>
+
+			<div class="form-group col-lg-1 pull-right">
+				<button type="button" class="btn btn-primary export-ppto" style="margin-top:24px" >Exportar
+					<span class="glyphicon glyphicon glyphicon-export"></span>
+				</button>
+			</div>
+
+			<div style="clear:both"></div>
+			<label>Nota: El campo de version no afecta la carga del presupuesto solo afecta a la busqueda del presupuesto</label>
 
 			<table id="table-ppto-2" class="table table-striped table-hover table-bordered" cellspacing="0" width="100%" style="width:100%">
 			</table>
@@ -139,6 +168,11 @@
 			</div>
 
 			<div class="form-group col-lg-2">
+				<label>Version</label>
+				<select class="form-control ppto-version"></select>
+			</div>
+
+			<div class="form-group col-lg-2">
 				<label>Monto</label>
 				<input id="ppto-amount" class="form-control">
 			</div>
@@ -153,6 +187,16 @@
 				</button>
 			</div>
 
+			<div class="form-group col-lg-1 pull-right">
+				<button type="button" class="btn btn-primary export-ppto" style="margin-top:24px" >Exportar
+					<span class="glyphicon glyphicon glyphicon-export"></span>
+				</button>
+			</div>
+			
+			<div style="clear:both"></div>
+			<label>Nota: El campo de version no afecta la carga del presupuesto solo afecta a la busqueda del presupuesto</label>
+			
+
 			<table id="table-ppto-3" class="table table-striped table-hover table-bordered" cellspacing="0" width="100%" style="width:100%">
 			</table>
 
@@ -166,14 +210,16 @@
 
 		function loadPPTO( tab )
 		{
-			var type = tab.attr( 'data-type' );
-			var year = tab.find( '.ppto-year' ).val();
+			var type    = tab.attr( 'data-type' );
+			var year    = tab.find( '.ppto-year' ).val();
+			var version = tab.find( '.ppto-version' ).val();
 			
 			var data =
 			{
-				_token : GBREPORTS.token,
-				type   : type,
-				year   : year	
+				_token  : GBREPORTS.token,
+				type    : type,
+				year    : year,
+				version : version	
 			};
 
 			if( type != 3 )
@@ -226,14 +272,6 @@
 	            });
 			});
 		}
-
-		$( document ).ready( function()
-		{
-			$( '#ppto-amount' ).numeric( { negative : false } );
-			loadPPTO( $( '#tab-ppto-sup' ) );
-			loadPPTO( $( '#tab-ppto-ger' ) );
-			loadPPTO( $( '#tab-ppto-ins' ) );
-    	});
 
     	$( 'a[data-toggle="tab"]').on( 'shown.bs.tab', function()
     	{
@@ -363,7 +401,8 @@
 				spin.stop();
 				if( response.Status == ok )
 				{
-					loadPPTO( panel )
+					//loadPPTO( panel );
+					getVersions( panel );
 				}
 				bootboxMessage( response );
 			});
@@ -385,9 +424,94 @@
 				else
 				{
 					bootboxMessage( response );
-				}
+				}	
 			});
 		};
+
+		function getVersions( tab )
+		{
+			var type 	 = tab.attr( 'data-type' );
+			var year 	 = tab.find( '.ppto-year' ).val();
+			
+			var data =
+			{
+				_token   : GBREPORTS.token,
+				type     : type,
+				year     : year
+			};
+
+			if( type != 3 )
+			{
+				data.category = tab.find( '.ppto-category' ).val();
+			}
+
+			$.ajax(
+			{
+				type : 'POST',
+				url  : 'ppto-versions',
+				data : data
+			}).fail( function( statusCode , errorThrown )
+			{
+				ajaxError( statusCode , errorThrown );
+			}).done( function( response )
+			{
+				if( validateResponse( response ) )
+				{
+					var html = '';
+					response.Data.forEach( function( value )
+					{
+						html += '<option value="' + value.version + '">' + value.version + '</option>';
+					});
+					tab.find( '.ppto-version' ).html( html );
+				}
+				else
+				{
+					bootboxMessage( response );
+				}
+			});
+		}
+
+		var selectsYear = $( '.ppto-year' );
+		selectsYear.change( function()
+		{
+			var tab = $( this ).closest( '.tab-pane' );
+			getVersions( tab );
+		});
+
+		var selectsCategory = $( '.ppto-category' );
+		selectsCategory.change( function()
+		{
+			var tab = $( this ).closest( '.tab-pane' );
+			getVersions( tab );
+		});
+
+		$( '.export-ppto' ).click( function()
+		{
+			var tab = $( this ).closest( '.tab-pane' );
+			var type = tab.attr( 'data-type' );
+			var year = tab.find( '.ppto-year' ).val();
+			var category = tab.find( '.ppto-category' ).val();
+			var version = tab.find( '.ppto-version' ).val();
+			var url = server + 'ppto-export' + '-' + type + '-' + year + '-' + category + '-' + version;
+			window.location.href = url;
+		});
+
+		$( document ).ready( function()
+		{
+			$( '#ppto-amount' ).numeric( { negative : false } );
+			var tabPPTOSup = $( '#tab-ppto-sup' );
+			var tabPPTOGer = $( '#tab-ppto-ger' );
+			var tabPPTOIns = $( '#tab-ppto-ins' );
+			loadPPTO( tabPPTOSup );
+			getVersions( tabPPTOSup );
+			
+			loadPPTO( tabPPTOGer );
+			getVersions( tabPPTOGer );
+			
+			loadPPTO( tabPPTOIns );
+    		getVersions( tabPPTOIns );
+			
+    	});
 
 	</script>
 @stop

@@ -41,7 +41,6 @@
         </table>
     </div>
     <script>
-        aaa = 1;
         function columnDataTable( element , data , columns ,  message )
         {
             if( $.fn.dataTable.isDataTable( element ) )
@@ -77,7 +76,6 @@
                 {
                     this.api().column( '.sum-saldo' , { search: 'applied' } ).every( function () 
                     {
-                        aaa = this;
                         if( this.data().length != 0 )
                         {
                             var sum  =  
@@ -92,7 +90,7 @@
 
                     this.api().column( '.sum-retencion' , { search: 'applied' } ).every( function () 
                     {
-                        if( this.data.length != 0 )
+                        if( this.data().length != 0 )
                         {
                             var sum  =  this.data().reduce( function ( a , b ) 
                                         {
@@ -104,7 +102,7 @@
 
                     this.api().column( '.sum-saldo-disponible' , { search: 'applied' } ).every( function () 
                     {
-                        if( this.data.length != 0 )
+                        if( this.data().length != 0 )
                         {
                             var sum  =  this.data().reduce( function ( a , b ) 
                                         {

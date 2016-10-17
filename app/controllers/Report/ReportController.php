@@ -626,7 +626,7 @@ class ReportController extends BaseController
             else
             {
                 $resultTbQuery->toJson();
-                $result['data'] = json_decode($resultTbQuery->toJson());
+                $result[ data ] = json_decode($resultTbQuery->toJson());
             }
         }
         catch( Exception $e )
@@ -672,15 +672,15 @@ class ReportController extends BaseController
                     'frecuency' => 'N'
                 ));
                 
-                $resultQueryExec = $resultQueryExec['data'];
+                $resultQueryExec = $resultQueryExec[ 'data' ];
                     // dd($resultQueryExec);
                 if($resultQueryExec == NULL)
                 {
-                    $result = $this->warningException( REPORT_MESSAGE_DATASET_NOT_FOUND_DATA , __FUNCTION__ , __LINE__ , __FILE );
+                    $result = $this->warningException( REPORT_MESSAGE_DATASET_NOT_FOUND_DATA , __FUNCTION__ , __LINE__ , __FILE__ );
                 }
                 else
                 {
-                    $result['data'] = $this->setHead(head($resultQueryExec));
+                    $result[ data ] = $this->setHead(head($resultQueryExec));
                 }
             }
         }

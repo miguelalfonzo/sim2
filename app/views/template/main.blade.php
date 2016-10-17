@@ -109,6 +109,14 @@
                                         <span class="caret"></span>
                                     </a>
                                     <ul id="menu-report" class="dropdown-menu" role="menu">
+                                        @if( Auth::user()->type == GER_PROM )
+                                            <li><a href="{{ URL::to('maintenance/view/Fondo_Supervisor') }}">Fondos de Supervisor</a></li>
+                                            <li><a href="{{ URL::to('maintenance/view/Fondo_Gerente_Producto') }}">Fondos de G. Promocion</a></li>
+                                            <li><a href="{{ URL::to('maintenance/view/Fondo_Institucion') }}">Fondos Institucionales</a></li>
+                                        @elseif( Auth::user()->type == GER_PROD )
+                                            <li><a href="{{ URL::to('maintenance/view/Fondo_Gerente_Producto') }}">Fondos de G. Producto</a></li>
+                                        @endif
+
                                         <li class="report_menubar_option new">
                                             <a href="#" rel="new" data-toggle="modal" data-target=".report_new">
                                                 <span class="glyphicon glyphicon-plus" aria-hidden="true" ></span>
@@ -131,10 +139,12 @@
                                         <span class="caret"></span>
                                     </a>
                                     <ul class="dropdown-menu" role="menu">
+                                        
                                         @if ( in_array(Auth::user()->type, array( SUP , GER_PROD , GER_PROM , GER_COM ) ) )
                                             <li><a data-toggle="modal" data-target="#modal-temporal-user">Derivación de Usuario</a></li>
                                         @endif
-                                        @if ( in_array(Auth::user()->type, array(GER_COM)) )
+
+                                        @if( Auth::user()->type == GER_COM )
                                             <li><a href="{{ URL::to('fondoHistorial') }}">Historial de Saldo de los Fondos</a></li>
                                             <li><a href="{{ URL::to('maintenance/view/Tipo_Inversion') }}">Mantenimiento de Inversion</a></li>
                                             <li><a href="{{ URL::to('maintenance/view/Tipo_Actividad') }}">Mantenimiento de Actividades</a></li>
@@ -143,7 +153,7 @@
                                             <li><a href="{{ URL::to('maintenance/view/Fondo_Supervisor') }}">Mantenimiento de Fondos de Supervisor</a></li>
                                             <li><a href="{{ URL::to('maintenance/view/Fondo_Gerente_Producto') }}">Mantenimiento de Fondos de G. Producto / G. Promocion</a></li>
                                             <li><a href="{{ URL::to('maintenance/view/Fondo_Institucion') }}">Mantenimiento de Fondos Institucionales</a></li>
-                                        @elseif ( in_array(Auth::user()->type, array(CONT)) )
+                                        @elseif( Auth::user()->type == CONT )
                                             <li><a href="{{ URL::to('maintenance/finddocument') }}">Busqueda de Documentos Registrados</a></li>
                                             <li><a href="{{ URL::to('maintenance/documenttype') }}">Mantenimiento de Tipo de Documentos</a></li>
                                             <li><a href="{{ URL::to('maintenance/view/Fondo_Contable' ) }}">Mantenimiento de Fondo de Contabilidad</a></li>

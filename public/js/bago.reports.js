@@ -243,44 +243,61 @@
 		getAllDataSet: function(){
 			var url = URL_BASE + 'reports/getQuerys';
 			var gbReportsObject = this;
+			//$( "#loading" ).show( "slow" );
             $.ajax({
                 url: url,
                 ContentType: gbReportsObject.contentTypeAjax,
                 cache: false
-            }).done(function(dataResult) {
-				if(dataResult.status == 'OK'){
-					$("#containerDataSet").html("");
-					$(dataResult.data).each(function(i, temp){
-						var radioButtonElement = $('<div class="radio"><label><input type="radio" name="optionsRadios" value="'+ temp.id +'" checked>'+ temp.name +'</label></div>');
-						$("#containerDataSet").append(radioButtonElement);
+            }).done( function( response )
+            {
+				//$( "#loading" ).hide( "slow" );
+				if( validateResponse( response ) )
+				{
+					$( "#containerDataSet" ).html( "" );
+					$( response.Data ).each(function( i , temp )
+					{
+						var radioHtml = '<div class="radio">' +
+											'<label>' +
+												'<input type="radio" name="optionsRadios" value="'+ temp.id +'" checked>'+ temp.name + 
+											'</label>' +
+										'</div>';
+						var radioButtonElement = $( radioHtml );
+						$( "#containerDataSet" ).append( radioButtonElement );
 					});
-				}else{
-					alert(dataResult.message);
-					$("#loading").show("slow");
+				}
+				else
+				{
+					bootboxMessage( response );
 				}
             });
 		},
 		getDataHead: function(queryId){
 			var url = URL_BASE + 'reports/getColumnsDataSet/'+queryId;
 			var gbReportsObject = this;
-            $.ajax({
+            $.ajax(
+            {
                 url: url,
                 ContentType: gbReportsObject.contentTypeAjax,
                 cache: false,
 				async: false,
-            }).done(function(dataResult) {
-				if(dataResult.status == 'OK'){
-					$("#dataHeaders").html("");
-					$("#rows").html("");
-					$("#columns").html("");
-					$("#values").html("");
-					$(dataResult.data).each(function(i, temp){
-						var liElement = $('<li>'+temp+'</li>');
-						$("#dataHeaders").append(liElement);
+            }).done( function( response )
+            {
+				if( validateResponse( response ) )
+				{
+					$( "#dataHeaders" ).html( "" );
+					$( "#rows" ).html( "" );
+					$( "#columns" ).html( "" );
+					$( "#values" ).html( "" );
+					$( response.Data ).each( function( i , temp )
+					{
+						var liElement = $( '<li>' + temp + '</li>' );
+						$( "#dataHeaders" ).append( liElement );
 					});
 					gbReportsObject.activateDragAndDrop();
-				}else{
-					bootbox.alert(dataResult.message);
+				}
+				else
+				{
+					bootboxMessage( response );
 				}
             });
 		},
@@ -312,22 +329,29 @@
 		saveReport: function(report){
 			var url = URL_BASE + 'reports/save';
 			var gbReportsObject = this;
-			data={};
-			data._token = gbReportsObject.token;
+			data = 
+			{
+				_token : gbReportsObject.token
+			};
 			data.data = report;
-            $.ajax({
+            $.ajax(
+            {
                 url: url,
 				type: 'POST',
                 ContentType: gbReportsObject.contentTypeAjax,
                 cache: false,
 				data: data
-            }).done(function(dataResult) {
-				if(dataResult.status == 'OK'){
-					bootbox.alert('Reporte Guardado Satisfactoriamente.');
-					gbReportsObject.cleanWizard(true);
+            }).done( function( response )
+            {
+				if( validateResponse( response ) )
+				{
+					bootbox.alert( 'Reporte Guardado Satisfactoriamente.' );
+					gbReportsObject.cleanWizard( true );
 					gbReportsObject.getReports();
-				}else{
-					bootbox.alert(dataResult.message);
+				}
+				else
+				{
+					bootboxMessage( response );
 				}
 			});
 		},

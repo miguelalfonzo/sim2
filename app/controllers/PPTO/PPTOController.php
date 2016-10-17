@@ -57,61 +57,30 @@ class PPTOController extends BaseController
 
     public function loadPPTO()
     {
-        $inputs = Input::all();
-        
-        $options = 
-            '<button type="button" class="btn btn-info btn-xs edit-ppto-row">' .
-                '<span class="glyphicon glyphicon-pencil"></span>' .
-            '</button>' .
-            '<button type="button" class="btn btn-success btn-xs save-ppto-row" style="display:none">' .
-                '<span class="glyphicon glyphicon-ok"></span>' .
-            '</button>' .
-            '<button type="button" class="btn btn-info btn-xs cancel-ppto-row" style="display:none">' .
-                '<span class="glyphicon glyphicon-share"></span>' .
-            '</button>';
-    
-        if( $inputs[ 'type' ] == Self::SupPPTOType )
+        try
         {
-            $PPTOSupModel = new PPTOSupervisor;
-            $data = $PPTOSupModel->getPPTO( $inputs[ 'year' ] , $inputs[ 'category' ] );
-            $columns =
-            [
-                [ 'title' => 'Categoría' , 'data' => 'sub_category.descripcion' , 'className' => 'text-center' ],
-                [ 'title' => 'Supervisor' , 'data' => 'personal.nombres' , 'className' => 'text-center' ],
-                [ 'title' => 'Familia' , 'data' => 'family.descripcion' , 'className' => 'text-center' ],
-                [ 'title' => 'Monto' , 'data' => 'monto' ,  'className' => 'text-center monto-cell' ],
-                [ 'title' => '' , 'defaultContent' => $options , 'className' => 'text-center option-cell' ],
-            ];
+            $inputs = Input::all();
+            
+            if( ! in_array( $inputs[ 'type' ] , [ Self::SupPPTOType , Self::GerPPTOType , Self::InsPPTOType ] ) )
+            {
+                return $this->warningException( 'Carga de listado del PPTO no implementado' , __FUNCTION__ , __LINE__ , __FILE__ );
+            }
+
+            if( $inputs[ 'type' ] == Self::InsPPTOType )
+            {
+                $inputs[ 'category' ] = 31;
+            }
+
+            $information = $this->getPPTODataInformation( $inputs[ 'type' ] , $inputs[ 'year' ] , $inputs[ 'category' ] , $inputs[ 'version' ] );         
+
+            $rpta = $this->setRpta( $information[ data ] );
+            $rpta[ 'columns' ] = $information[ 'columns' ];
+            return $rpta;
         }
-        elseif( $inputs[ 'type' ] == Self::GerPPTOType )
+        catch( Exception $e )
         {
-            $PPTOGenModel = new PPTOGerente;
-            $data = $PPTOGenModel->getPPTO( $inputs[ 'year' ] , $inputs[ 'category' ] );
-            $columns =
-            [
-                [ 'title' => 'Categoría' , 'data' => 'sub_category.descripcion' , 'className' => 'text-center' ],
-                [ 'title' => 'Familia' , 'data' => 'family.descripcion' , 'className' => 'text-center' ],
-                [ 'title' => 'Monto' , 'data' => 'monto' ,  'className' => 'text-center monto-cell' ],
-                [ 'title' => '' , 'defaultContent' => $options , 'className' => 'text-center option-cell' ],
-            ];
+            return $this->internalException( $e , __FUNCTION__ );
         }
-        elseif( $inputs[ 'type' ] == Self::InsPPTOType )
-        {
-            $PPTOInsModel = new PPTOInstitucion;
-            $data = $PPTOInsModel->getPPTO( $inputs[ 'year' ] );
-            $columns =
-            [
-                [ 'title' => 'Categoría' , 'data' => 'sub_category.descripcion' ,  'className' => 'text-center' ],
-                [ 'title' => 'Monto' , 'data' => 'monto' ,  'className' => 'text-center monto-cell' ],
-            ];
-        }
-        else
-        {
-            return $this->warningException( 'Carga de listado del PPTO no implementado' , __FUNCTION__ , __LINE__ , __FILE__ );
-        }
-        $rpta = $this->setRpta( $data );
-        $rpta[ 'columns' ] = $columns;
-        return $rpta;
     }
 
     public function update()
@@ -531,6 +500,37 @@ class PPTOController extends BaseController
         }
     }
 
+    public function getVersions()
+    {
+        try
+        {
+            $inputs = Input::all();
+            
+            switch( $inputs[ 'type' ] )
+            {
+                case Self::SupPPTOType:
+                    $supPPTOModel = new PPTOSupervisor;
+                    $data = $supPPTOModel->getVersions( $inputs[ 'year' ] , $inputs[ 'category' ] );
+                    break;
+                case Self::GerPPTOType:
+                    $gerPPTOModel = new PPTOGerente;
+                    $data = $gerPPTOModel->getVersions( $inputs[ 'year' ] , $inputs[ 'category' ] );
+                    break;
+                case Self::InsPPTOType:
+                    $insPPTOModel = new PPTOInstitucion;
+                    $data = $insPPTOModel->getVersions( $inputs[ 'year' ] , 31 );
+                    break;
+                default:
+                    return $this->warningException( 'No se pudo verificar la version, tipo de presupuesto no identificado' , __FUNCTION__ , __LINE__ , __FILE__ );
+            }
+            return $this->setRpta( $data );
+        }
+        catch( Exception $e )
+        {
+            return $this->internalException( $e , __FUNCTION__ );
+        }
+    }
+
     public function enable()
     {
         $pptoProcess = ProcessState::getPPTOStatusProcess();
@@ -559,6 +559,97 @@ class PPTOController extends BaseController
         {
             return $this->warningException( 'El proceso de carga del presupuesto ya se encuentra inhabilitado' , __FUNCTION__ , __LINE__ , __FILE__ );
         }
+    }
+
+    public function export( $type , $year , $category , $version )
+    {
+        if( ! in_array( $type , [ Self::SupPPTOType , Self::GerPPTOType , Self::InsPPTOType ] ) )
+        {
+            return $this->warningException( 'No se pudo obtener la informacion, tipo de presupuesto no identificado' , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
+
+        if( $type == Self::InsPPTOType )
+        {
+            $category = 31;
+            $view = 'ppto.export.institucional';
+        }
+        elseif( $type == Self::GerPPTOType )
+        {
+            $view = 'ppto.export.gerente';
+        }
+        elseif( $type == Self::SupPPTOType )
+        {
+            $view = 'ppto.export.supervisor';
+        }
+
+        $categoryName = FondoSubCategoria::find( $category )->descripcion;
+
+        $information = $this->getPPTODataInformation( $type , $year , $category , $version );
+        
+        $title = 'Presupuesto ' . $year . ' ' . $categoryName . ' v' . $version;
+
+        return Excel::create( $title , function($excel) use ( $information , $view )
+        {
+            $excel->setTitle( 'Presupuesto SIM' );
+            $excel->setCreator( 'Laboratorios Bago | Peru' )->setCompany( 'Laboratorios Bago | Peru' );
+            $excel->sheet( 'PPTO' , function( $sheet ) use ( $information , $view )
+            {
+                $sheet->freezeFirstRow();
+                $sheet->setAutoSize( true );
+                $sheet->loadView( $view , $information );
+            });
+        })->download( 'xlsx' );
+    }
+
+    private function getPPTODataInformation( $type , $year , $category , $version )
+    {
+        $options = 
+            '<button type="button" class="btn btn-info btn-xs edit-ppto-row">' .
+                '<span class="glyphicon glyphicon-pencil"></span>' .
+            '</button>' .
+            '<button type="button" class="btn btn-success btn-xs save-ppto-row" style="display:none">' .
+                '<span class="glyphicon glyphicon-ok"></span>' .
+            '</button>' .
+            '<button type="button" class="btn btn-info btn-xs cancel-ppto-row" style="display:none">' .
+                '<span class="glyphicon glyphicon-share"></span>' .
+            '</button>';
+    
+        switch( $type )
+        {
+            case Self::SupPPTOType:
+                $PPTOSupModel = new PPTOSupervisor;
+                $data = $PPTOSupModel->getPPTO( $year , $category , $version );
+                $columns =
+                [
+                    [ 'title' => 'Categoría' , 'data' => 'sub_category.descripcion' , 'className' => 'text-center' ],
+                    [ 'title' => 'Supervisor' , 'data' => 'personal.nombres' , 'className' => 'text-center' ],
+                    [ 'title' => 'Familia' , 'data' => 'family.descripcion' , 'className' => 'text-center' ],
+                    [ 'title' => 'Monto' , 'data' => 'monto' ,  'className' => 'text-center monto-cell' ],
+                    [ 'title' => '' , 'defaultContent' => $options , 'className' => 'text-center option-cell' ],
+                ];
+                break;
+            case Self::GerPPTOType:
+                $PPTOGenModel = new PPTOGerente;
+                $data = $PPTOGenModel->getPPTO( $year , $category , $version );
+                $columns =
+                [
+                    [ 'title' => 'Categoría' , 'data' => 'sub_category.descripcion' , 'className' => 'text-center' ],
+                    [ 'title' => 'Familia' , 'data' => 'family.descripcion' , 'className' => 'text-center' ],
+                    [ 'title' => 'Monto' , 'data' => 'monto' ,  'className' => 'text-center monto-cell' ],
+                    [ 'title' => '' , 'defaultContent' => $options , 'className' => 'text-center option-cell' ],
+                ];
+                break;
+            case Self::InsPPTOType:
+                $PPTOInsModel = new PPTOInstitucion;
+                $data = $PPTOInsModel->getPPTO( $year , $category , $version );
+                $columns =
+                [
+                    [ 'title' => 'Categoría' , 'data' => 'sub_category.descripcion' ,  'className' => 'text-center' ],
+                    [ 'title' => 'Monto' , 'data' => 'monto' ,  'className' => 'text-center monto-cell' ],
+                ];
+                break;
+        }
+        return [ data => $data , 'columns' => $columns ];
     }
 
 }
