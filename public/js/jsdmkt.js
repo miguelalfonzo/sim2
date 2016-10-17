@@ -337,12 +337,13 @@ function searchFondos( datefondo , aux )
 
 var calcDataTableHeight = function() 
 {
-    return $(window).height()*50/100;
+    return $( window ).height() * 50 / 100;
 };
 
 function listTable( type , date )
 {
     date = typeof date !== 'undefined' ? date : null;
+    $( '#loading' ).show( 'slow' );
     $.ajax(
     {
         url: server + 'list-table',
@@ -362,7 +363,8 @@ function listTable( type , date )
         ajaxError( statusCode , errorThrown );
     }).done(function ( response ) 
     {
-        if ( response.Status == 'Ok' )
+        $( '#loading' ).hide( 'slow' );
+        if ( validateResponse( response ) )
         {
             dataTable( type , response.Data.View , type );
             if ( response.Data.Total !== undefined )
@@ -373,7 +375,9 @@ function listTable( type , date )
             $('#export-fondo').attr('href', server + 'exportfondos/' + date);
         }
         else
-            bootbox.alert( '<h4 class="red">' + response.Status + ': ' + response.Description + '</h4>');
+        {
+            bootboxMessage( response );
+        }
     });
 }
 
