@@ -109,6 +109,14 @@
                                         <span class="caret"></span>
                                     </a>
                                     <ul id="menu-report" class="dropdown-menu" role="menu">
+                                        @if( Auth::user()->type == GER_PROM )
+                                            <li><a href="{{ URL::to('maintenance/view/Fondo_Supervisor') }}">Fondos de Supervisor</a></li>
+                                            <li><a href="{{ URL::to('maintenance/view/Fondo_Gerente_Producto') }}">Fondos de G. Promocion</a></li>
+                                            <li><a href="{{ URL::to('maintenance/view/Fondo_Institucion') }}">Fondos Institucionales</a></li>
+                                        @else( Auth::user()->type == GER_PROD )
+                                            <li><a href="{{ URL::to('maintenance/view/Fondo_Gerente_Producto') }}">Fondos de G. Producto</a></li>
+                                        @endif
+
                                         <li class="report_menubar_option new">
                                             <a href="#" rel="new" data-toggle="modal" data-target=".report_new">
                                                 <span class="glyphicon glyphicon-plus" aria-hidden="true" ></span>
@@ -142,6 +150,9 @@
                                             <li><a href="{{ URL::to('maintenance/view/Tipo_Actividad') }}">Mantenimiento de Actividades</a></li>
                                             <li><a href="{{ URL::to('maintenance/view/Inversion_Actividad') }}">Mantenimiento de Inversion-Actividad</a></li>
                                             <li><a href="{{ URL::to('maintenance/view/Parametro') }}">Mantenimiento de Parametros</a></li>
+                                            <li><a href="{{ URL::to('maintenance/view/Fondo_Supervisor') }}">Mantenimiento de Fondos de Supervisor</a></li>
+                                            <li><a href="{{ URL::to('maintenance/view/Fondo_Gerente_Producto') }}">Mantenimiento de Fondos de G. Producto / G. Promocion</a></li>
+                                            <li><a href="{{ URL::to('maintenance/view/Fondo_Institucion') }}">Mantenimiento de Fondos Institucionales</a></li>
                                         @elseif( Auth::user()->type == CONT )
                                             <li><a href="{{ URL::to('maintenance/finddocument') }}">Busqueda de Documentos Registrados</a></li>
                                             <li><a href="{{ URL::to('maintenance/documenttype') }}">Mantenimiento de Tipo de Documentos</a></li>
@@ -153,18 +164,6 @@
                                             <li><a href="{{ URL::to( 'view-sup-rep' ) }}">Syncronizacion</a></li>
                                             <li><a href="{{ URL::to( 'view-ppto' ) }}">Presupuesto</a></li>
                                             <li><a href="{{ URL::to('maintenance/view/Fondo_Subcategoria') }}">Mantenimiento de Categorías de Fondo</a></li> 
-                                        @endif
-
-                                        @if( in_array( Auth::user()->type , array( GER_PROM , GER_COM ) ) )
-                                            <li><a href="{{ URL::to('maintenance/view/Fondo_Supervisor') }}">Mantenimiento de Fondos de Supervisor</a></li>
-                                        @endif
-
-                                        @if( in_array( Auth::user()->type , array( GER_PROD , GER_PROM , GER_COM ) ) )
-                                            <li><a href="{{ URL::to('maintenance/view/Fondo_Gerente_Producto') }}">Mantenimiento de Fondos de G. Producto / G. Promocion</a></li>
-                                        @endif
-
-                                        @if( in_array( Auth::user()->type , array( GER_PROM , GER_COM ) ) )
-                                            <li><a href="{{ URL::to('maintenance/view/Fondo_Institucion') }}">Mantenimiento de Fondos Institucionales</a></li>
                                         @endif
                                     </ul>
                                 </li>
