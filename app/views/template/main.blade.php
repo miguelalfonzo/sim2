@@ -113,7 +113,7 @@
                                             <li><a href="{{ URL::to('maintenance/view/Fondo_Supervisor') }}">Fondos de Supervisor</a></li>
                                             <li><a href="{{ URL::to('maintenance/view/Fondo_Gerente_Producto') }}">Fondos de G. Promocion</a></li>
                                             <li><a href="{{ URL::to('maintenance/view/Fondo_Institucion') }}">Fondos Institucionales</a></li>
-                                        @else( Auth::user()->type == GER_PROD )
+                                        @elseif( Auth::user()->type == GER_PROD )
                                             <li><a href="{{ URL::to('maintenance/view/Fondo_Gerente_Producto') }}">Fondos de G. Producto</a></li>
                                         @endif
 
