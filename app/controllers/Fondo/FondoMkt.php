@@ -81,28 +81,54 @@ class FondoMkt extends BaseController
                 $tasaCompraAntigua   = ChangeRate::getLastDayDolar( $lastApprovedHistory->created_at );
             }
         }
-        $historiesFondoMkt = array();
+        else
+        {
+            return $this->warningException( 'Moneda no identificada. Moneda #' .$moneda , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
+
+        $historiesFondoMkt = [];
         foreach( $ids_fondo as $id_fondo )
         {
             if( ! is_null( $id_fondo[ 'old' ] ) )
             {
-                if ( $id_fondo[ 'oldUserType' ] == SUP )
-                    $fondoMkt = FondoSupervisor::find( $id_fondo[ 'old' ] );
-                else
-                    $fondoMkt = FondoGerProd::find( $id_fondo[ 'old' ] );
+                switch( $id_fondo[ 'oldUserType' ] )
+                {
+                    case SUP:
+                        $fondoMkt = FondoSupervisor::find( $id_fondo[ 'old' ] );
+                        break;
+                    case GER_PROD:
+                        $fondoMkt = FondoGerProd::find( $id_fondo[ 'old' ] );
+                        break;
+                    case FONDO_SUBCATEGORIA_INSTITUCION:
+                        $fondoMkt = FondoInstitucional::find( $id_fondo[ 'old' ] );
+                        break;
+                    default:
+                        return $this->warningException( 'No se pudo identificar el fondo para realizar el retorno de la retencion. Fondo #' . $id_fondo[ 'old' ] , __FUNCTION__ , __LINE__ , __FILE__ );            
+                }
                 $this->setHistoryData( $historiesFondoMkt , $fondoMkt , $tasaCompraAntigua , $id_fondo[ 'oldMonto'] , $id_fondo[ 'oldUserType' ] , FONDO_LIBERACION );
                 
             }
             if( ! is_null( $userType ) )
             {
-                if ( $userType == SUP )
-                    $fondoMkt = FondoSupervisor::find( $id_fondo[ 'new' ] );
-                else
-                    $fondoMkt = FondoGerProd::find( $id_fondo[ 'new' ] );
+                switch( $userType )
+                {
+                    case SUP:
+                        $fondoMkt = FondoSupervisor::find( $id_fondo[ 'new' ] );
+                        break;
+                    case GER_PROD:
+                        $fondoMkt = FondoGerProd::find( $id_fondo[ 'new' ] );
+                        break;
+                    case FONDO_SUBCATEGORIA_INSTITUCION:
+                        $fondoMkt = FondoInstitucional::find( $id_fondo[ 'new' ] );
+                        break;
+                    default:
+                        return $this->warningException( 'No se pudo identificar el fondo para realizar la retencion. Fondo #' . $id_fondo[ 'new' ] , __FUNCTION__ , __LINE__ , __FILE__ );
+                }
                 $this->setHistoryData( $historiesFondoMkt , $fondoMkt , $tasaCompra , $id_fondo[ 'newMonto' ] , $userType , FONDO_RETENCION );            
             }
         }
         $this->setFondoMktHistories( $historiesFondoMkt , $idSolicitud ); 
+        return $this->setRpta();
     }
 
     public function validateFondoSaldo( $fondosData , $fondoType , $msg , $tipo = '' )
