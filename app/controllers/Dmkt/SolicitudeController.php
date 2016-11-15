@@ -551,30 +551,37 @@ class SolicitudeController extends BaseController
     {
         try 
         {
-            DB::beginTransaction();
             $inputs = Input::all();
-            $rules = array(
+            $rules  = 
+            [
                 'idsolicitud' => 'required|numeric|min:1|exists:solicitud,id', 
-                'observacion' => 'required|string|min:10' );
-            
+                'observacion' => 'required|string|min:10' 
+            ];
+
             $validator = Validator::make( $inputs, $rules);
             if ( $validator->fails() )
+            {
                 return $this->warningException($this->msgValidator( $validator ), __FUNCTION__, __LINE__, __FILE__);
+            }
 
             $solicitud = Solicitud::find( $inputs[ 'idsolicitud' ] );
-            if ( $solicitud->idtiposolicitud == SOL_INST )
+            
+            if( $solicitud->idtiposolicitud == SOL_INST )
             {
-                $periodo = $solicitud->detalle->periodo;
-                if (  Auth::user()->id != $solicitud->created_by )
-                    return $this->warningException( 'No puede cancelar la solicitud si no ha sido registrada con su usuario' , __FUNCTION__ ,  __LINE__ , __FILE__ );
-                if ( $periodo->status == BLOCKED )
-                    return $this->warningException( 'No se puede eliminar las solicitudes del periodo: ' . $periodo->aniomes , __FUNCTION__, __LINE__, __FILE__ );
-                if ( count( Solicitud::solInst( $periodo->aniomes ) ) == 1 )
-                    Periodo::inhabilitar( $periodo->aniomes );
+                if( Auth::user()->type !== CONT )
+                {
+                    $periodo = $solicitud->detalle->periodo;
+                    if (  Auth::user()->id != $solicitud->created_by )
+                        return $this->warningException( 'No puede cancelar la solicitud si no ha sido registrada con su usuario' , __FUNCTION__ ,  __LINE__ , __FILE__ );
+                    if ( $periodo->status == BLOCKED )
+                        return $this->warningException( 'No se puede eliminar las solicitudes del periodo: ' . $periodo->aniomes , __FUNCTION__, __LINE__, __FILE__ );
+                    if ( count( Solicitud::solInst( $periodo->aniomes ) ) == 1 )
+                        Periodo::inhabilitar( $periodo->aniomes );
+                }
             }
-            elseif ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) )
+            elseif( in_array( $solicitud->idtiposolicitud , [ SOL_REP , REEMBOLSO ] ) )
             {
-                if ( ! in_array( $solicitud->id_estado , State::getCancelStates() ) )
+                if( ! in_array( $solicitud->id_estado , State::getCancelStates() ) )
                 {
                     if( ! ( $solicitud->idtiposolicitud == REEMBOLSO && $solicitud->id_estado == GASTO_HABILITADO ) )
                     {
@@ -595,25 +602,42 @@ class SolicitudeController extends BaseController
             }
             else
             {
-                return $this->warningException( 'Tipo de Solicitud: ' . $solicitud->idtiposolicitud . ' no registrado', __FUNCTION__, __LINE__, __FILE__);
+                return $this->warningException( 'Tipo de Solicitud: ' . $solicitud->idtiposolicitud . ' no registrado' , __FUNCTION__, __LINE__, __FILE__ );
+            }
+
+            if( is_null( $solicitud->detalle->deposito ) )
+            {
+                $middleRpta = $this->renovateBalance( $solicitud );        
+                if( $middleRpta[ status ] !== ok )
+                {
+                    DB::rollback();
+                    return $middleRpta;
+                }
+            }
+            else
+            {
+                return $this->warningException( 'No se puede rechazar solicitudes que cuentan con un deposito. Solicitud #' . $solicitud->id , __FUNCTION__ , __LINE__ , __FILE__ );
             }
 
             $oldIdEstado = $solicitud->id_estado;
-            if ( $oldIdEstado == PENDIENTE && Auth::user()->id == $solicitud->created_by ):
-                $solicitud->id_estado = CANCELADO;
-            elseif( $oldIdEstado != PENDIENTE || Auth::user()->id != $solicitud->created_by ):
-                $solicitud->id_estado = RECHAZADO;
-                $this->renovateBalance( $solicitud );
-            else:
-                return $this->warningException( 'No puede inhabilitar la solicitud , debido a que ha sido modificada ' . $solicitud->state->nombre , __FUNCTION__ , __LINE__ , __FILE__ );
-            endif;
+            switch( $oldIdEstado )
+            {
+                case PENDIENTE:
+                    $solicitud->id_estado = CANCELADO;
+                    break;
+                default:
+                    $solicitud->id_estado = RECHAZADO;
+                    break;
+            }
 
             $solicitud->observacion = $inputs['observacion'];
             $solicitud->status      = 1;
+
+            DB::beginTransaction();
             $solicitud->save();
 
             $rpta = $this->setStatus($oldIdEstado, $solicitud->id_estado, Auth::user()->id, $solicitud->created_by, $solicitud->id );
-            if ($rpta[status] === ok)
+            if( $rpta[status] === ok )
             {
                 DB::commit();
                 $rpta['Type'] = $solicitud->idtiposolicitud;
@@ -624,26 +648,68 @@ class SolicitudeController extends BaseController
             }
             DB::rollback();
             return $rpta;
-        } catch (Oci8Exception $e) {
+        } 
+        catch( Oci8Exception $e ) 
+        {
             DB::rollback();
-            return $this->internalException($e, __FUNCTION__, DB);
-        } catch (Exception $e) {
+            return $this->internalException( $e , __FUNCTION__ , DB );
+        } 
+        catch( Exception $e ) 
+        {
             DB::rollback();
-            return $this->internalException($e, __FUNCTION__);
+            return $this->internalException( $e , __FUNCTION__ );
         }
+    }
+
+    private function setDiscountFundData( $solicitudProducts )
+    {
+        $ids_fondo_mkt = [];
+        foreach ( $solicitudProducts as $solicitudProduct )
+        {
+            $ids_fondo_mkt[] = 
+            [
+                'old'         => $solicitudProduct->id_fondo_marketing,
+                'oldUserType' => $solicitudProduct->id_tipo_fondo_marketing,
+                'oldMonto'    => $solicitudProduct->monto_asignado
+            ];
+        }
+        return $ids_fondo_mkt;
     }
 
     public function renovateBalance( $solicitud )
     {
-        $fondoMktController = new FondoMkt;
-        $solicitudProducts = $solicitud->products;
-        $ids_fondo_mkt = array();
-        foreach ( $solicitudProducts as $solicitudProduct )
-            $ids_fondo_mkt[] = array(
-                'old'         => $solicitudProduct->id_fondo_marketing,
-                'oldUserType' => $solicitudProduct->id_tipo_fondo_marketing,
-                'oldMonto'    => $solicitudProduct->monto_asignado);
-        $fondoMktController->discountBalance( $ids_fondo_mkt , $solicitud->detalle->id_moneda , ChangeRate::getTc() , $solicitud->id );
+        if( $solicitud->id_estado != PENDIENTE )
+        {
+            switch( $solicitud->idtiposolicitud )
+            {
+                case SOL_INST:
+                    $ids_fondo_mkt      = [];
+                    $ids_fondo_mkt[] =
+                    [
+                        'old'         => $solicitud->detalle->id_fondo,
+                        'oldUserType' => FONDO_SUBCATEGORIA_INSTITUCION,
+                        'oldMonto'    => $solicitud->detalle->monto_aprobado
+                    ];
+                    break;
+                case SOL_REP:
+                    $solicitudProducts = $solicitud->products;
+                    $ids_fondo_mkt     = $this->setDiscountFundData( $solicitudProducts ); 
+                    break;
+                case REEMBOLSO:
+                    $solicitudProducts = $solicitud->products;
+                    $ids_fondo_mkt     = $this->setDiscountFundData( $solicitudProducts );
+                    break;
+                default:
+                    return $this->warningException( 'No se pudo identificar el tipo de solicitud. Solicitud #' . $solicitud->id , __FUNCTION__ , __LINE__ , __FILE__ );        
+            }
+         
+            $fondoMktController = new FondoMkt;
+            return $fondoMktController->discountBalance( $ids_fondo_mkt , $solicitud->detalle->id_moneda , ChangeRate::getTc() , $solicitud->id );
+        }
+        else
+        {
+            return $this->setRpta();
+        }
     }
 
     private function verifyPolicy( $solicitud , $monto )
