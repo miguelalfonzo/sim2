@@ -2509,7 +2509,7 @@ function processData( data , usuario )
                 }
                 break;
             case DEPOSITO_HABILITADO:
-                if( usuario.tipo == CONT && modelRegister.sol_tip_id == 1 )
+                if( usuario.tipo == CONT && ( modelRegister.sol_tip_id == 1 || modelRegister.sol_tip_id == 2 ) )
                 {
                     options +=  '<button type="button" class="btn btn-default cancel-solicitud" data-idsolicitud=' + modelRegister.id + '>' +
                                     '<span  class="glyphicon glyphicon-remove"></span>' +
