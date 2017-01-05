@@ -14,7 +14,7 @@ use \System\FondoMktHistory;
 use \Fondo\FondoSupervisor;
 use \PPTO\InsPPTOProcedure;
 use \PPTO\GerPPTOProcedure;
-use \PPTO\SupPPTOPRocedure;
+use \PPTO\SupPPTOProcedure;
 use \Process\ProcessState;
 use \Expense\Table;
 
@@ -284,8 +284,6 @@ class PPTOController extends BaseController
         //Listado de los codigos de las familias del maestro de bago
         $parametersModel = new Table;
         $familiesId = implode( $parametersModel->getFamilies() , ',' ); 
-        /*include( app_path() . '/models/Query/QueryProducts.php' );            
-        $familiesId = implode( $qryProducts->lists( 'id' ) , ',' );*/
 
         $uniqueArray = [];
         $warnings = [];
@@ -362,8 +360,6 @@ class PPTOController extends BaseController
         //Listado de los codigos de las familias del maestro de bago
         $parametersModel = new Table;
         $familiesId = implode( $parametersModel->getFamilies() , ',' ); 
-        /*include( app_path() . '/models/Query/QueryProducts.php' );            
-        $familiesId = implode( $qryProducts->lists( 'id' ) , ',' );*/
         
         $supIds = $this->getSupIds();
         $uniqueArray = [];
