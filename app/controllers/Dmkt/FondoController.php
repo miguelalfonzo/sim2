@@ -272,11 +272,11 @@ class FondoController extends BaseController
                 else
                 {
                     $solicitud               = new Solicitud;
-                    $solicitud->id           = $solicitud->lastId();
+                    $solicitud->id           = $solicitud->nextId();
                     $solicitud->token        = sha1( md5( uniqid( $solicitud->id , true ) ) );
                     $solicitud->id_inversion = $inputs[ 'inversion' ];
                     $detalle                 = new SolicitudDetalle;
-                    $detalle->id             = $detalle->lastId() + 1;
+                    $detalle->id             = $detalle->nextId;
                     $solicitud->id_detalle   = $detalle->id;
                 }
                 $inputs[ 'supervisor' ]     = $middleRpta[ data ][ 'sup' ];

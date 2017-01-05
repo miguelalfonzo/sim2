@@ -10,7 +10,7 @@ class Doctor extends Eloquent
 
     protected function getFullNameAttribute()
     {
-        return $this->attributes[ 'pefnrodoc1' ].'-'.$this->attributes[ 'pefnombres' ].' '.$this->attributes[ 'pefpaterno'].' '.$this->attributes[ 'pefmaterno' ];
+        return $this->attributes[ 'pefnrodoc1' ].'-'.$this->attributes[ 'pefnombres' ].' '.$this->attributes[ 'pefpaterno' ] .' '. $this->attributes[ 'pefmaterno' ];
     }
 
     protected function getEntryNameAttribute()
