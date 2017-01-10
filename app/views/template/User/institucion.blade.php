@@ -12,7 +12,7 @@
         <div id="collapseOne" class="panel-collapse collapse in">
    			<div class="panel-body">
                 <div>
-                    <input id="idsolicitud" name="idsolicitud" type="hidden">
+                    <input id="idsolicitud" name="idsolicitud" type="hidden" autocomplete="off">
                     <!-- PERIODO -->
                     <div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
                         <label class="control-label">Mes a Registrar</label>

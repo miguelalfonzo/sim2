@@ -1017,7 +1017,7 @@ function cleanFondoInstitucion()
     $( '.btn_cancel_fondo' ).hide();
     $( '.btn_edit_fondo' ).hide();
     $( '.register_fondo').show();
-
+    $( '#idsolicitud' ).val( '' );
 }
 
 function removeinput(data)
