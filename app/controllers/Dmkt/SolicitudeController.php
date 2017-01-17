@@ -314,7 +314,7 @@ class SolicitudeController extends BaseController
             'moneda'        => 'required|integer|min:1|exists:'.TB_TIPO_MONEDA.',id',
             'monto'         => 'required|numeric|min:1',
             'pago'          => 'required|integer|min:1|exists:'.TB_TIPO_PAGO.',id',
-            'fecha'         => 'required|date_format:"d/m/Y"|after:' . date("Y-m-d"),
+            'fecha'         => 'required|date_format:"d/m/Y"|after:' . date( 'Y-m-d' ) ,
             'productos'     => 'required|array|min:1|each:integer|each:min,1|each:exists,'.TB_MARCAS_BAGO.',id',
             'clientes'      => 'required|array|min:1|each:integer|each:min,1',
             'tipos_cliente' => 'required|array|min:1|each:integer|each:min,1|each:exists,tipo_cliente,id',
@@ -327,15 +327,21 @@ class SolicitudeController extends BaseController
         }
 
         $validator = Validator::make($inputs, $rules);
-        if ($validator->fails())
-            return $this->warningException($this->msgValidator( $validator ), __FUNCTION__, __LINE__, __FILE__);
-
-        $validator->sometimes('ruc', 'required|numeric|digits:11', function ($input) {
+        
+        if( $validator->fails() )
+        {
+            return $this->warningException( $this->msgValidator( $validator ) , __FUNCTION__ , __LINE__ , __FILE__ );
+        }
+        else
+        {
+            return $this->setRpta();
+        }
+        /*$validator->sometimes('ruc', 'required|numeric|digits:11', function ($input) {
             return $input->pago == PAGO_CHEQUE;
         });
         if ($validator->fails())
             return $this->warningException($this->msgValidator( $validator ), __FUNCTION__, __LINE__, __FILE__);
-        return $this->setRpta();
+        return $this->setRpta();*/
     }
 
     private function setPago( &$jDetalle , $paymentType , $ruc)
@@ -358,7 +364,7 @@ class SolicitudeController extends BaseController
                 $solClient->id_cliente = $client;
                 $solClient->id_tipo_cliente = $types[$key];
                 $solClient->save();
-                if ($solClient->id_tipo_cliente == MEDICO)
+                if ($solClient->id_tipo_cliente == CLT_MED )
                     $med++;
             }
             if ($clientType->num_medico > $med)
@@ -439,79 +445,172 @@ class SolicitudeController extends BaseController
                 'id_producto'  => $idProducto );
             $productController->newSolicitudProduct( $data );
         }
-        return $this->setRpta();
+        return $this->setRpta();//
     }
 
     private function unsetRelations($solicitud)
     {
-        $detalle = $solicitud->detalle;
+        //$detalle = $solicitud->detalle;
         $solicitud->products()->delete();
         $solicitud->clients()->delete();
         $solicitud->gerente()->delete();
-        $detalle->delete();
+        //$detalle->delete();
+        $solicitud->detalle()->delete();
     }
 
     public function registerSolicitud()
     {
         try 
         {
-            DB::beginTransaction();
             $inputs     = Input::all();
             $middleRpta = $this->validateInputSolRep($inputs);
-            if ( $middleRpta[ status ] == ok ) 
+            if ( $middleRpta[ status ] === ok ) 
             {
-                if ( isset( $inputs[ 'idsolicitud' ] ) )
+                if( isset( $inputs[ 'responsable' ] ) )
                 {
-                    $solicitud = Solicitud::find($inputs['idsolicitud']);
-                    $detalle   = $solicitud->detalle;
-                    $this->unsetRelations($solicitud);
-                } 
-                else 
-                {
-                    $solicitud     = new Solicitud;
-                    $solicitud->id = $solicitud->lastId();
+                    $responsible = $inputs[ 'responsable' ];
                 }
-
-                $detalle               = new SolicitudDetalle;
-                $detalle->id           = $detalle->lastId() + 1;
-                $solicitud->id_detalle = $detalle->id;
-                $solicitud->token      = sha1(md5(uniqid($solicitud->id, true)));
-                $this->setSolicitud( $solicitud, $inputs );
-                $solicitud->save();
-
-                $jDetalle         = new stdClass();
-                $this->setJsonDetalle( $jDetalle, $inputs );
-                $detalle->detalle = json_encode( $jDetalle );
-                $this->setDetalle( $detalle, $inputs );
-                $detalle->save();
-
-                $middleRpta = $this->setClients( $solicitud->id, $inputs['clientes'], $inputs['tipos_cliente'] );
-                if ( $middleRpta[status] == ok ):
-                    $middleRpta = $this->setProducts($solicitud->id, $inputs['productos']);
-                    if ( $middleRpta[status] == ok ):
-                        if ( ! isset( $inputs[ 'responsable' ] ) )
-                            $inputs[ 'responsable' ] = 0;
-                        $middleRpta = $this->toUser( $solicitud->investment->approvalInstance , $inputs['productos'] , 1 , $inputs['responsable'] );
-                        if ( $middleRpta[status] == ok ):
-                            $middleRpta = $this->setGerProd( $middleRpta[ data ][ 'iduser' ] , $solicitud->id, $middleRpta[ data ][ 'tipousuario' ]);
-                            if ( $middleRpta[status] == ok ):
-                                $middleRpta = $this->setStatus(0, PENDIENTE, Auth::user()->id, $middleRpta[data], $solicitud->id);
-                                if ( $middleRpta[status] == ok ):
-                                    Session::put('state', R_PENDIENTE);
-                                    DB::commit();
-                                    return $middleRpta;
-                                endif;
-                            endif;
-                        endif;
-                    endif;
-                endif;
+                else
+                {
+                    $responsible = Auth::user()->id;
+                }
+                $middleRpta = $this->validateMicroMkt( $inputs[ 'inversion' ] , $inputs[ 'tipos_cliente' ] , $inputs[ 'clientes' ] , $responsible );
+                if( $middleRpta[ status ] === ok )
+                {
+                    $middleRpta = $this->newSolicitudTransaction( $inputs );
+                }
             }
-            DB::rollback();
             return $middleRpta;
-        } catch (Oci8Exception $e) {
+        } 
+        catch( Exception $e ) 
+        {
+            return $this->internalException($e, __FUNCTION__);
+        }
+    }
+
+    private function validateMicroMkt( $inversion , array $clientsType , array $clientsCode , $responsible )
+    {
+        if( $inversion == INV_MICROMKT )
+        {
+            $uniqueClientsType = array_unique( $clientsType );
+            if( count( $uniqueClientsType ) === 1 && $uniqueClientsType[ 0 ] == CLT_MED )
+            {
+                $responsibleRegister = User::find( $responsible );
+                if( $responsibleRegister->type === REP_MED )
+                {
+                    $msg = '';
+                    foreach( $clientsCode as $clientCode )
+                    {
+                        //$cmp = \Client\Doctor::find( $clientCode )->pefnrodoc1;
+                        $validateMsg = DB::select( 'SELECT VERIFICAR_MICROMKT_FN( :medico_id , :responsable_id ) msg from DUAL' , [ 'medico_id' => $clientCode , 'responsable_id' => $responsible ] );
+                        if( $validateMsg[ 0 ]->msg !== 'Ok' )
+                        {
+                            $msg .= $validateMsg[ 0 ]->msg . '<br>';
+                        }
+                    }
+                    if( $msg === '' )
+                    {
+                        return $this->setRpta();
+                    }
+                    else
+                    {
+                        return $this->warningException( $msg , __FUNCTION__ , __LINE__ , __FILE__ );
+                    }
+                }
+                else
+                {
+                    return $this->warningException( 'Solo puede asignarse a un representante una solicitud de Micromarketing' , __FUNCTION__ , __LINE__ , __FILE__ );
+                }
+            }
+            else
+            {
+                return $this->warningException( 'Solo puede ingresar medicos para crear una solicitud de Micromarketing' , __FUNCTION__ , __LINE__ , __FILE__ );
+            }
+        }
+        else
+        {
+            return $this->setRpta();
+        }
+    }
+
+    private function newSolicitudTransaction( $inputs )
+    {
+        try
+        {
+            DB::beginTransaction();
+
+            if ( isset( $inputs[ 'idsolicitud' ] ) )
+            {
+                $solicitud = Solicitud::find( $inputs[ 'idsolicitud' ] );
+                $solicitudId = $solicitud->id;
+                //$detalle   = $solicitud->detalle;
+                $this->unsetRelations( $solicitud );
+
+            } 
+            else 
+            {
+                $solicitud     = new Solicitud;
+                $solicitudId = $solicitud->nextId();
+            }
+
+            if( Auth::user()->type === REP_MED )
+            {
+                $responsible = Auth::user()->id;
+            }
+            else
+            {
+                $responsible = $inputs[ 'responsable' ];
+            }
+    
+            $detalle               = new SolicitudDetalle;
+            $detalle->id           = $detalle->nextId();
+            
+            $solicitud->insert( $solicitudId , $detalle->id , $inputs[ 'titulo' ] , $inputs[ 'actividad' ] , $inputs[ 'inversion' ] , $inputs[ 'descripcion' ] , $inputs[ 'motivo' ] , $responsible );
+  
+            //$this->setSolicitud( $solicitud, $inputs );
+            
+            $jDetalle         = new stdClass();
+            $this->setJsonDetalle( $jDetalle, $inputs );
+            $detalle->detalle = json_encode( $jDetalle );
+            $this->setDetalle( $detalle, $inputs );
+            $detalle->save();
+
+            $middleRpta = $this->setClients( $solicitud->id , $inputs[ 'clientes' ] , $inputs[ 'tipos_cliente' ] );
+            if ( $middleRpta[ status ] === ok )
+            {
+                $middleRpta = $this->setProducts( $solicitud->id , $inputs[ 'productos' ] );
+                if ( $middleRpta[ status ] === ok )
+                {
+                    if ( ! isset( $inputs[ 'responsable' ] ) )
+                    {
+                        $inputs[ 'responsable' ] = 0;
+                    }
+
+                    $middleRpta = $this->toUser( $solicitud->investment->approvalInstance , $inputs['productos'] , 1 , $inputs['responsable'] );
+                    if ( $middleRpta[status] === ok )
+                    {
+                        $middleRpta = $this->setGerProd( $middleRpta[ data ][ 'iduser' ] , $solicitud->id, $middleRpta[ data ][ 'tipousuario' ]);
+                        if ( $middleRpta[status] === ok )
+                        {
+                            $middleRpta = $this->setStatus(0, PENDIENTE, Auth::user()->id, $middleRpta[data], $solicitud->id);
+                            if ( $middleRpta[status] === ok )
+                            {
+                                Session::put('state', R_PENDIENTE);
+                                DB::commit();
+                            }
+                        }
+                    }
+                }
+            }
+            return $middleRpta;
+        }
+        catch( Oci8Exception $e )
+        {
             DB::rollback();
-            return $this->internalException($e, __FUNCTION__, DB);
-        } catch (Exception $e) {
+            return $this->internalException( $e, __FUNCTION__ , DB );
+        } 
+        catch( Exception $e )
+        {
             DB::rollback();
             return $this->internalException($e, __FUNCTION__);
         }
@@ -522,23 +621,6 @@ class SolicitudeController extends BaseController
         $jDetalle->monto_solicitado = round($inputs['monto'], 2, PHP_ROUND_HALF_DOWN);
         $jDetalle->fecha_entrega = $inputs['fecha'];
         $this->setPago($jDetalle, $inputs['pago'], $inputs['ruc']);
-    }
-
-    private function setSolicitud($solicitud, $inputs)
-    {
-        $solicitud->titulo = $inputs['titulo'];
-        $solicitud->id_actividad = $inputs['actividad'];
-        $solicitud->id_inversion = $inputs['inversion'];
-        $solicitud->descripcion = $inputs['descripcion'];
-        $solicitud->id_estado = PENDIENTE;
-
-        $solicitud->idtiposolicitud = $inputs['motivo'];
-
-        $solicitud->status = ACTIVE;
-        if ( in_array( Auth::user()->type, array( SUP , GER_PROD , ASIS_GER ) ) )
-            $solicitud->id_user_assign = $inputs['responsable'];
-        elseif ( Auth::user()->type == REP_MED )
-            $solicitud->id_user_assign = Auth::user()->id;
     }
 
     private function setDetalle($detalle, $inputs)
