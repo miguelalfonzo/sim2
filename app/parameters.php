@@ -113,8 +113,11 @@ const GASTO                                   = 4;
 const SISTEMA_SIM      = 2;
 
 //TIPO DE CLIENTE
-const MEDICO           = 1;
-const INSTITUCION      = 3;
+const CLT_MED  = 1;
+const CLT_FAR  = 2;
+const CLT_INST = 3;
+const CLT_BOD  = 4;
+const CLT_DIST = 5;
 
 /*
 |--------------------------------------------------------------------------
@@ -397,3 +400,6 @@ const REGIMEN_DETRACCION = 2;
 //IDS TIPO DE DOCUMENTO
 const DOC_RECIBO_HONORARIO = 2;
 const DOC_NO_SUSTENTABLE = 7;
+
+//TIPOS DE INVERSIONES
+const INV_MICROMKT = 17;

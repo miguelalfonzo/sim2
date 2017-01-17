@@ -138,13 +138,13 @@ class SolicitudDetalle extends Eloquent
         }
     }
 
-    public function lastId()
+    public function nextId()
     {
         $lastId = SolicitudDetalle::orderBy('id', 'DESC')->first();
         if( is_null( $lastId ) )
-            return 0;
+            return 1;
         else
-        	return $lastId->id;
+        	return $lastId->id + 1;
     }
 
     public function periodo()

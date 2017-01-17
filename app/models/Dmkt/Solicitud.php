@@ -30,10 +30,10 @@ class Solicitud extends Eloquent
         return substr( $this->detalle->deposit->num_transferencia . ' ' . $this->assignedTo->personal->seat_name , 0 , 50 );
     }
 
-    public function lastId()
+    public function nextId()
     {
         $now = Carbon::now();
-        $lastId = Solicitud::orderBy('id', 'DESC')->first();
+        $lastId = Solicitud::orderBy( 'id' , 'DESC' )->first();
         if( is_null( $lastId ) )
         {
             return $now->format( 'Y' ) . '000001';
@@ -51,6 +51,23 @@ class Solicitud extends Eloquent
         }
     }
 
+    public function insert( $solicitudId , $detalleId , $title , $activity , $inversion , $description , $solicitudType , $responsible )
+    {
+        $this->id              = $solicitudId;
+        $this->id_detalle      = $detalleId;
+        $this->token           = sha1( md5( uniqid( $this->id, true ) ) );
+        $this->titulo          = $title;
+        $this->id_actividad    = $activity;
+        $this->id_inversion    = $inversion;
+        $this->descripcion     = $description;
+        $this->id_estado       = PENDIENTE;
+        $this->idtiposolicitud = $solicitudType;
+        $this->status          = ACTIVE;
+        $this->id_user_assign  = $responsible;
+        $this->save();
+    
+    }
+            
     protected static function solInst( $periodo )
     {
         return Solicitud::orderBy('id','desc')->whereHas('detalle' , function ( $q ) use ( $periodo )
