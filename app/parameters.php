@@ -113,8 +113,11 @@ const GASTO                                   = 4;
 const SISTEMA_SIM      = 2;
 
 //TIPO DE CLIENTE
-const MEDICO           = 1;
-const INSTITUCION      = 3;
+const CLT_MED  = 1;
+const CLT_FAR  = 2;
+const CLT_INST = 3;
+const CLT_BOD  = 4;
+const CLT_DIST = 5;
 
 /*
 |--------------------------------------------------------------------------
@@ -287,6 +290,7 @@ if ( App::environment( 'production' ) && PRODUCCION )
     define( 'TB_TIPO_PERSONAL'    , 'USR.TIPO_PERSONAL' );
     define( 'TB_BAGO_COD_ASIENTO' , 'B3O.CXP_CORREL_ASIENTOS' );
     define( 'TB_BAGO_ASIENTO'     , 'B3O.PENDIEN_DIARIO' );
+    define( 'TB_MARCAS_BAGO'      , 'TDP.MARCAS' );
 }
 else
 {
@@ -297,6 +301,8 @@ else
     define( 'TB_TIPO_PERSONAL'    , 'USRP.TIPO_PERSONAL' );
     define( 'TB_BAGO_COD_ASIENTO' , 'B3P.CXP_CORREL_ASIENTOS' );
     define( 'TB_BAGO_ASIENTO'     , 'B3P.PENDIEN_DIARIO' );
+    define( 'TB_MARCAS_BAGO'      , 'TDPP.MARCAS' );
+
 }
 
 const TB_USUARIO_BAGO                  = 'D1J.USUARIO';
@@ -317,7 +323,6 @@ const TB_TIPO_ACTIVIDAD                = 'TIPO_ACTIVIDAD';
 const TB_CUENTA_RM                     = 'VAR.BENEFICIARIOS_CTA_BANC';
 const TB_INVERSION_ACTIVIDAD           = 'INVERSION_ACTIVIDAD';
 const TB_TIPO_INVERSION                = 'TIPO_INVERSION';
-const TB_MARCAS_BAGO                   = 'OUTDVP.MARCAS';
 const TB_PERIODO                       = 'PERIODO';
 const TB_MOTIVO                        = 'MOTIVO';
 const TB_SOLICITUD                     = 'SOLICITUD';
@@ -397,3 +402,6 @@ const REGIMEN_DETRACCION = 2;
 //IDS TIPO DE DOCUMENTO
 const DOC_RECIBO_HONORARIO = 2;
 const DOC_NO_SUSTENTABLE = 7;
+
+//TIPOS DE INVERSIONES
+const INV_MICROMKT = 17;
