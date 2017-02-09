@@ -103,7 +103,6 @@
             Route::post( 'get-document-detail' , 'ExpenseController@getDocument');
             Route::post( 'update-document' , 'ExpenseController@updateDocument');
             Route::post( 'end-expense-record' , 'ExpenseController@endExpenseRecord' );
-            //Route::post( 'consultarRucCont', 'RucController@show');
         });
       
         Route::group( [ 'namespace' => 'Deposit' ] , function()

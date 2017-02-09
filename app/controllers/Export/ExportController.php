@@ -20,7 +20,7 @@ class ExportController extends BaseController
 	{
 		try
 		{
-			$data = array( 'solicituds' => Solicitud::getDepositSolicituds() );
+			$data = array( 'solicituds' => Solicitud::getDepositSolicituds( Carbon::now()->year ) );
 			$view = View::make( 'Dmkt.Cont.SolicitudsToDeposit.pdf' , $data )->render();
 			return PDF::load( $view , 'A4' , 'landscape' )->show();
 		}
@@ -34,7 +34,7 @@ class ExportController extends BaseController
 	{
 		try
 		{
-			$solicituds = Solicitud::getDepositSolicituds();
+			$solicituds = Solicitud::getDepositSolicituds( Carbon::now()->year );
 			$data = array( 'solicituds' => $solicituds );
 			Excel::create( 'Solicitudes a Depositar' , function( $excel ) use( $data )
 			{
