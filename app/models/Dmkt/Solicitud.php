@@ -287,10 +287,11 @@ class Solicitud extends Eloquent
             ->where( 'id_tipo_devolucion' , DEVOLUCION_PLANILLA );
     }
 
-    protected function getDepositSolicituds()
+    protected function getDepositSolicituds( $year )
     {
         return Solicitud::select( [ 'id' , 'token' , 'id_detalle' , 'id_user_assign' , 'titulo' , 'id_inversion' ] )
             ->where( 'id_estado' , DEPOSITO_HABILITADO )
+            ->where( 'extract( year from created_at )' , $year )
             ->with( [ 'detalle' , 'clients' , 'personalTo' ] )
             ->orderBy( 'id' , 'ASC' )->get();
     }
