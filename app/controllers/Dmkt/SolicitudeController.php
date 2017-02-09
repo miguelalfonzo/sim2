@@ -41,6 +41,7 @@ use \Fondo\FondoInstitucional;
 use \VisitZone\Zone;
 use \Seat\Generate;
 use \Redirect;
+use \Carbon\Carbon;
 
 class SolicitudeController extends BaseController
 {
@@ -90,7 +91,7 @@ class SolicitudeController extends BaseController
         {
             $data[ 'tc']          = ChangeRate::getTc();
             $data[ 'banks']       = Account::banks();
-            $data[ 'depositIds' ] = Solicitud::getDepositSolicituds();
+            $data[ 'depositIds' ] = Solicitud::getDepositSolicituds( Carbon::now()->year );
         }
         elseif ( $user->type == ASIS_GER)
         {
@@ -1309,7 +1310,7 @@ class SolicitudeController extends BaseController
     {
         try
         {
-            $data = array( 'solicituds' => Solicitud::getDepositSolicituds() );
+            $data = array( 'solicituds' => Solicitud::getDepositSolicituds( Carbon::now()->year ) );
             return View::make( 'Dmkt.Cont.SolicitudsToDeposit.show' , $data );
         }
         catch( Exception $e )
