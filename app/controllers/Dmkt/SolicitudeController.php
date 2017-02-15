@@ -87,13 +87,13 @@ class SolicitudeController extends BaseController
         $data = array( 'state' => $state, 'states' => StateRange::order(), 'warnings' => $mWarning );
         
         $user = Auth::user();
-        if( $user->type == TESORERIA)
+        if( $user->type == TESORERIA )
         {
             $data[ 'tc']          = ChangeRate::getTc();
             $data[ 'banks']       = Account::banks();
             $data[ 'depositIds' ] = Solicitud::getDepositSolicituds( Carbon::now()->year );
         }
-        elseif ( $user->type == ASIS_GER)
+        elseif ( $user->type == ASIS_GER )
         {
             $data[ 'activities'] = Activity::order();
         }
@@ -216,6 +216,7 @@ class SolicitudeController extends BaseController
         {
             $solicitud     = Solicitud::where('token', $token)->first();
             $politicStatus = FALSE;
+            $regularizationStatus = $this->validateRegularization( $solicitud->id_user_assign );
             $user          = Auth::user();
             if ( is_null( $solicitud ) )
             {
@@ -230,9 +231,10 @@ class SolicitudeController extends BaseController
             if ( $solicitud->idtiposolicitud != SOL_INST && in_array( $solicitud->id_estado, array( PENDIENTE , DERIVADO , ACEPTADO ) ) ) 
             {
                 $politicType = $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario;
-                if ( in_array( $politicType , array( Auth::user()->type , Auth::user()->tempType() ) )
-                    && ( array_intersect( array( Auth::user()->id, Auth::user()->tempId() ), $solicitud->managerEdit( $politicType )->lists( 'id_gerprod' ) ) ) ) 
+                if( in_array( $politicType , array( Auth::user()->type , Auth::user()->tempType() ) ) && 
+                    ( array_intersect( array( Auth::user()->id, Auth::user()->tempId() ), $solicitud->managerEdit( $politicType )->lists( 'id_gerprod' ) ) ) ) 
                 {
+
                     $politicStatus = TRUE;
                     $data[ 'payments' ] = TypePayment::all();
                     $data[ 'families' ] = $qryProducts->get();
@@ -273,6 +275,7 @@ class SolicitudeController extends BaseController
             }
             Session::put( 'state' , $data[ 'solicitud' ]->state->id_estado );
             $data[ 'politicStatus' ] = $politicStatus;
+            $data[ 'regularizationStatus' ] = $regularizationStatus;
             return View::make( 'Dmkt.Solicitud.view' , $data );
         } 
         catch (Exception $e) 
@@ -1571,6 +1574,28 @@ class SolicitudeController extends BaseController
             $responses[ $solicitud[ 'id' ] ] = $middleRpta;
         }
         return $responses;
+    }
+
+    private function validateRegularization( $user_id )
+    {
+        $response = DB::select( 'SELECT VERIFICAR_REGULARIZACION_FN( :user_id ) rpta from dual' , [ 'user_id' => $user_id ] )[ 0 ];
+        \Log::info( json_encode( $response ) );
+        if( $response->rpta === ok )
+        {
+            return $this->setRpta();
+        }
+        else
+        {
+            $rpta = explode( '|' , $response->rpta  );
+            if( $rpta[ 0 ] === warning )
+            {
+                return $this->warningException( $rpta[ 1 ] , __FUNCTION__ , __LINE__ , __FILE__ );
+            }
+            else
+            {
+                return $this->warningException( $rpta[ 1 ] , __FUNCTION__ , __LINE__ , __FILE__ , 1 );
+            }
+        }
     }
 
 }

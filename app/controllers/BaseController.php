@@ -115,16 +115,24 @@ class BaseController extends Controller
 		}
 	}
 
-    protected function warningException( $description , $function , $line , $file )
+    protected function warningException( $description , $function , $line , $file , $sendMail = 0 )
     {
         Log::error( $description );
-        /*Mail::send( 'soporte' , array( 'description' => $description , 'function' => $function , 'line' => $line , 'file' => $file ) , 
-        function( $message ) use( $function )
+        if( $sendMail === 1 )
         {
-            $message->to( array( SOPORTE_EMAIL_1 => POSTMAN_USER_NAME_1 , SOPORTE_EMAIL_2 => POSTMAN_USER_NAME_2 ) )
-            ->subject( warning.' - Function: '. $function );      
-        });*/
-        return array( status => warning , description => $description );
+            Mail::send( 'soporte' , array( 'description' => $description , 'function' => $function , 'line' => $line , 'file' => $file ) , 
+            function( $message ) use( $function )
+            {
+                $message->to( [ SOPORTE_EMAIL_1 => POSTMAN_USER_NAME_1 /*, SOPORTE_EMAIL_2 => POSTMAN_USER_NAME_2 */ ] )
+                ->subject( warning.' - Function: '. $function );      
+            });
+            return array( status => error , description => $description );
+        }
+        else
+        {
+            return array( status => warning , description => $description );
+        
+        }
     }
 
     public function internalException( $exception , $function , $type = 'System' )
