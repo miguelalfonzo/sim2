@@ -87,13 +87,13 @@ class SolicitudeController extends BaseController
         $data = array( 'state' => $state, 'states' => StateRange::order(), 'warnings' => $mWarning );
         
         $user = Auth::user();
-        if( $user->type == TESORERIA)
+        if( $user->type == TESORERIA )
         {
             $data[ 'tc']          = ChangeRate::getTc();
             $data[ 'banks']       = Account::banks();
             $data[ 'depositIds' ] = Solicitud::getDepositSolicituds( Carbon::now()->year );
         }
-        elseif ( $user->type == ASIS_GER)
+        elseif ( $user->type == ASIS_GER )
         {
             $data[ 'activities'] = Activity::order();
         }
@@ -216,6 +216,7 @@ class SolicitudeController extends BaseController
         {
             $solicitud     = Solicitud::where('token', $token)->first();
             $politicStatus = FALSE;
+            $regularizationStatus = $this->validateRegularization( $solicitud->id_user_assign );
             $user          = Auth::user();
             if ( is_null( $solicitud ) )
             {
@@ -230,9 +231,10 @@ class SolicitudeController extends BaseController
             if ( $solicitud->idtiposolicitud != SOL_INST && in_array( $solicitud->id_estado, array( PENDIENTE , DERIVADO , ACEPTADO ) ) ) 
             {
                 $politicType = $solicitud->investment->approvalInstance->approvalPolicyOrder( $solicitud->histories->count() )->tipo_usuario;
-                if ( in_array( $politicType , array( Auth::user()->type , Auth::user()->tempType() ) )
-                    && ( array_intersect( array( Auth::user()->id, Auth::user()->tempId() ), $solicitud->managerEdit( $politicType )->lists( 'id_gerprod' ) ) ) ) 
+                if( in_array( $politicType , array( Auth::user()->type , Auth::user()->tempType() ) ) && 
+                    ( array_intersect( array( Auth::user()->id, Auth::user()->tempId() ), $solicitud->managerEdit( $politicType )->lists( 'id_gerprod' ) ) ) ) 
                 {
+
                     $politicStatus = TRUE;
                     $data[ 'payments' ] = TypePayment::all();
                     $data[ 'families' ] = $qryProducts->get();
@@ -273,6 +275,7 @@ class SolicitudeController extends BaseController
             }
             Session::put( 'state' , $data[ 'solicitud' ]->state->id_estado );
             $data[ 'politicStatus' ] = $politicStatus;
+            $data[ 'regularizationStatus' ] = $regularizationStatus;
             return View::make( 'Dmkt.Solicitud.view' , $data );
         } 
         catch (Exception $e) 
@@ -967,7 +970,7 @@ class SolicitudeController extends BaseController
         try 
         {
             $inputs = Input::all();
-            return $this->acceptedSolicitudTransaction($inputs['idsolicitud'], $inputs);
+            return $this->acceptedSolicitudOperation( $inputs[ 'idsolicitud' ] , $inputs );
         } 
         catch (Exception $e) 
         {
@@ -975,136 +978,147 @@ class SolicitudeController extends BaseController
         }
     }
 
-    private function acceptedSolicitudTransaction( $idSolicitud , $inputs )
+    public function acceptedSolicitudOperation( $solicitudId , $inputs )
+    {
+        $middleRpta = $this->validateInputAcceptSolRep( $inputs );
+        if( $middleRpta[ status ] === ok )
+        {
+            $solicitud = Solicitud::find( $solicitudId );
+            $middleRpta = $this->verifyPolicy( $solicitud , $inputs[ 'monto' ] );
+            if( $middleRpta[ status ] === ok )
+            {
+                $state = $middleRpta[ data ];
+                $middleRpta = $this->validateRegularization( $solicitud->id_user_assign );
+                if( $middleRpta[ status ] === ok )
+                {
+                    $middleRpta = $this->acceptedSolicitudTransaction( $solicitudId , $state , $inputs );
+                }
+            }
+        }
+        return $middleRpta;
+    }
+
+    private function acceptedSolicitudTransaction( $solicitudId , $state , $inputs )
     {
         DB::beginTransaction();
-        $middleRpta = $this->validateInputAcceptSolRep( $inputs );
-        if ( $middleRpta[ status ] === ok ) 
+        $solicitud = Solicitud::find( $solicitudId );        
+        $oldIdEstado = $solicitud->id_estado;
+        if( $inputs[ 'derivacion'] && Auth::user()->type === SUP )
         {
-            $solicitud  = Solicitud::find( $idSolicitud );
-            $middleRpta = $this->verifyPolicy( $solicitud , $inputs[ 'monto' ] );
-            if ( $middleRpta[ status ] == ok )
+            $solicitud->id_estado = DERIVADO;
+        }
+        else
+        {
+            $solicitud->id_estado = $state;
+        }
+        $solicitud->status    = ACTIVE;
+        
+        if ( isset( $inputs[ 'anotacion' ] ) )
+        {
+            $solicitud->anotacion = $inputs[ 'anotacion' ];
+        }
+
+        if( isset( $inputs[ 'responsable' ] ) )
+        {
+            $solicitud->id_user_assign = $inputs['responsable'];
+        }
+        
+        $solicitud->save();
+
+        if( $solicitud->id_estado != DERIVADO )
+        {
+            $solDetalle = $solicitud->detalle;
+            $detalle    = json_decode( $solDetalle->detalle );                
+            $monto      = round( $inputs[ 'monto' ] , 2 , PHP_ROUND_HALF_DOWN );
+
+            if ( $solicitud->id_estado == ACEPTADO )
             {
-                $oldIdEstado          = $solicitud->id_estado;
-                if( $inputs[ 'derivacion'] && Auth::user()->type === SUP )
+                $detalle->monto_aceptado = $monto;
+            }
+            else if ( $solicitud->id_estado == APROBADO ) ;
+            {
+                $detalle->monto_aprobado = $monto;
+            }
+
+            if( isset( $inputs[ 'pago' ] ) )
+            {
+                $solDetalle->id_pago = $inputs[ 'pago' ];
+            }
+            if( isset( $inputs[ 'ruc' ] ) )
+            {
+                $detalle->num_ruc = $inputs[ 'ruc' ];
+            }
+
+            if( isset( $inputs[ 'fecha' ] ) )
+            {
+                $detalle->fecha_entrega = $inputs[ 'fecha' ];
+            }
+
+            //VALIDAR SI SE MODIFICARAN LOS CLIENTES
+            if ( $inputs[ 'modificacion_clientes' ] == 1 )
+            {
+                $solicitud->clients()->delete();
+                $middleRpta = $this->setClients( $solicitud->id, $inputs['clientes'], $inputs['tipos_cliente'] );
+            }
+            //VALIDAR SI SE MODIFICARAN LOS PRODUCTOS
+            if ( $inputs[ 'modificacion_productos' ] == 1 )
+            {
+                $productController = new ProductController;
+                $middleRpta        = $productController->unsetSolicitudProducts( $solicitud->id , $inputs[ 'producto' ] );
+                if ( $middleRpta[ status ] !== ok )
                 {
-                    $solicitud->id_estado = DERIVADO;
+                    DB::rollback();
+                    return $middleRpta;
+                }
+                $inputs[ 'producto' ] = $middleRpta[ data ];
+            }
+            
+            $middleRpta = $this->setProductsAmount( $inputs[ 'producto' ] , $inputs[ 'monto_producto' ] , $inputs[ 'fondo_producto' ] , $solDetalle );
+            
+            if ( $middleRpta[ status ] != ok )
+            {
+                DB::rollback();
+                return $middleRpta;
+            }
+
+            $solDetalle->detalle = json_encode( $detalle );
+            $solDetalle->save();
+        }
+
+        if( $solicitud->id_estado == APROBADO ) 
+        {
+            $toUser = USER_CONTABILIDAD;
+        } 
+        else
+        {
+            $familiesId = $solicitud->products->lists( 'id_producto' );
+            
+            $middleRpta = $this->toUser( $solicitud->investment->approvalInstance , $familiesId , $solicitud->histories->count() + 1 );
+            if ( $middleRpta[ status] != ok )
+            {
+                return $middleRpta;
+            }
+            else 
+            {
+                $middleRpta = $this->setGerProd( $middleRpta[data]['iduser'] , $solicitud->id , $middleRpta[ data ][ 'tipousuario' ] );
+                if ( $middleRpta[status] == ok )
+                {
+                    $toUser = $middleRpta[ data ];
                 }
                 else
                 {
-                    $solicitud->id_estado = $middleRpta[data];
-                }
-                $solicitud->status    = ACTIVE;
-                
-                if ( isset( $inputs[ 'anotacion' ] ) )
-                {
-                    $solicitud->anotacion = $inputs[ 'anotacion' ];
-                }
-
-                if( isset( $inputs[ 'responsable' ] ) )
-                {
-                    $solicitud->id_user_assign = $inputs['responsable'];
-                }
-                
-                $solicitud->save();
-
-                if( $solicitud->id_estado != DERIVADO )
-                {
-                    $solDetalle = $solicitud->detalle;
-                    $detalle    = json_decode( $solDetalle->detalle );                
-                    $monto      = round( $inputs[ 'monto' ] , 2 , PHP_ROUND_HALF_DOWN );
-
-                    if ( $solicitud->id_estado == ACEPTADO )
-                    {
-                        $detalle->monto_aceptado = $monto;
-                    }
-                    else if ( $solicitud->id_estado == APROBADO ) ;
-                    {
-                        $detalle->monto_aprobado = $monto;
-                    }
-
-                    if( isset( $inputs[ 'pago' ] ) )
-                    {
-                        $solDetalle->id_pago = $inputs[ 'pago' ];
-                    }
-                    if( isset( $inputs[ 'ruc' ] ) )
-                    {
-                        $detalle->num_ruc = $inputs[ 'ruc' ];
-                    }
-
-                    if( isset( $inputs[ 'fecha' ] ) )
-                    {
-                        $detalle->fecha_entrega = $inputs[ 'fecha' ];
-                    }
-
-                    //VALIDAR SI SE MODIFICARAN LOS CLIENTES
-                    if ( $inputs[ 'modificacion_clientes' ] == 1 )
-                    {
-                        $solicitud->clients()->delete();
-                        $middleRpta = $this->setClients( $solicitud->id, $inputs['clientes'], $inputs['tipos_cliente'] );
-                    }
-                    //VALIDAR SI SE MODIFICARAN LOS PRODUCTOS
-                    if ( $inputs[ 'modificacion_productos' ] == 1 )
-                    {
-                        $productController = new ProductController;
-                        $middleRpta        = $productController->unsetSolicitudProducts( $solicitud->id , $inputs[ 'producto' ] );
-                        if ( $middleRpta[ status ] !== ok )
-                        {
-                            DB::rollback();
-                            return $middleRpta;
-                        }
-                        $inputs[ 'producto' ] = $middleRpta[ data ];
-                    }
-                    
-                    $middleRpta = $this->setProductsAmount( $inputs[ 'producto' ] , $inputs[ 'monto_producto' ] , $inputs[ 'fondo_producto' ] , $solDetalle );
-                    
-                    if ( $middleRpta[ status ] != ok )
-                    {
-                        DB::rollback();
-                        return $middleRpta;
-                    }
-
-                    $solDetalle->detalle = json_encode( $detalle );
-                    $solDetalle->save();
-                }
-
-                if( $solicitud->id_estado != APROBADO ) 
-                {
-                    $familiesId = $solicitud->products->lists( 'id_producto' );
-                    
-                    $middleRpta = $this->toUser( $solicitud->investment->approvalInstance , $familiesId , $solicitud->histories->count() + 1 );
-                    if ( $middleRpta[ status] != ok )
-                    {
-                        return $middleRpta;
-                    }
-                    else 
-                    {
-                        $middleRpta = $this->setGerProd( $middleRpta[data]['iduser'] , $solicitud->id , $middleRpta[ data ][ 'tipousuario' ] );
-                        if ( $middleRpta[status] == ok )
-                        {
-                            $toUser = $middleRpta[ data ];
-                        }
-                        else
-                        {
-                            return $middleRpta;
-                        }
-                    }
-                } 
-                else
-                {
-                    $toUser = USER_CONTABILIDAD;
-                }
-
-                $middleRpta = $this->setStatus($oldIdEstado, $solicitud->id_estado, Auth::user()->id, $toUser, $solicitud->id);
-                if ( $middleRpta[status] == ok ) 
-                {
-                    Session::put( 'state' , $solicitud->state->rangeState->id );
-                    DB::commit();
                     return $middleRpta;
                 }
             }
         }
-        DB::rollback();
+
+        $middleRpta = $this->setStatus( $oldIdEstado, $solicitud->id_estado , Auth::user()->id , $toUser , $solicitud->id );
+        if ( $middleRpta[status] == ok ) 
+        {
+            Session::put( 'state' , $solicitud->state->rangeState->id );
+            DB::commit();
+            return $middleRpta;
+        }
         return $middleRpta;
     }
 
@@ -1363,7 +1377,7 @@ class SolicitudeController extends BaseController
                             $inputs['monto_producto'] = array_fill(0, count($solProducts->get()), $inputs['monto'] / count($solProducts->get()));
                         else
                             $inputs['monto_producto'] = $solProducts->lists('monto_asignado');
-                        $rpta = $this->acceptedSolicitudTransaction( $solicitud->id , $inputs );
+                        $rpta = $this->acceptedSolicitudOperation( $solicitud->id , $inputs );
                     }
                     elseif( Auth::user()->type == CONT )
                     {
@@ -1571,6 +1585,27 @@ class SolicitudeController extends BaseController
             $responses[ $solicitud[ 'id' ] ] = $middleRpta;
         }
         return $responses;
+    }
+
+    private function validateRegularization( $user_id )
+    {
+        $response = DB::select( 'SELECT VERIFICAR_REGULARIZACION_FN( :user_id ) rpta from dual' , [ 'user_id' => $user_id ] )[ 0 ];
+        if( $response->rpta === ok )
+        {
+            return $this->setRpta();
+        }
+        else
+        {
+            $rpta = explode( '|' , $response->rpta  );
+            if( $rpta[ 0 ] === warning )
+            {
+                return $this->warningException( $rpta[ 1 ] , __FUNCTION__ , __LINE__ , __FILE__ );
+            }
+            else
+            {
+                return $this->warningException( $rpta[ 1 ] , __FUNCTION__ , __LINE__ , __FILE__ , 1 );
+            }
+        }
     }
 
 }
