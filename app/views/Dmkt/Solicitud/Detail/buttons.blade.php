@@ -1,13 +1,15 @@
 <div class="form-group col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px">
     <div class="col-sm-12 col-md-12 col-lg-12" style="text-align: center">  
         @if ( $politicStatus ) 
-            <a id="search_responsable" class="btn btn-success ladda-button" data-style="slide-up">
-                Aceptar
-            </a>
-            @if ( $tipo_usuario === SUP )
-                <a id="derivar_solicitud" class="btn btn-warning ladda-button" data-style="slide-up">
-                    Derivar
+            @if( $regularizationStatus[ status ] === ok )
+                <a id="search_responsable" class="btn btn-success ladda-button" data-style="slide-up">
+                    Aceptar
                 </a>
+                @if ( $tipo_usuario === SUP )
+                    <a id="derivar_solicitud" class="btn btn-warning ladda-button" data-style="slide-up">
+                        Derivar
+                    </a>
+                @endif
             @endif
             <a id="deny_solicitude" class="btn btn-danger">
                 Rechazar
