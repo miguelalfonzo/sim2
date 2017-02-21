@@ -24,9 +24,23 @@
         @else
             <div class="tab-pane fade active in" id="solicitud" style="margin-top:20px">
         @endif
+
             @if ( $solicitud->status == BLOCKED )
                 <h4 style="color:darkred; padding-left:10px; margin-top:20px; margin-bottom:20px">LA SOLICITUD ESTA SIENDO EVALUADA</h4>
             @endif
+
+            @if( $politicStatus && $regularizationStatus[ status ] !== ok )
+
+                <div class="well well-sm">
+                    @if( $regularizationStatus[ status ] === warning )
+                        <h3 class="text-warning text-center"><b>No puede realizar la aprobacion de la solicitud</b></h3>
+                        <h5 class="text-warning text-center"><b>{{ $regularizationStatus[ description ] }}</b></h5>
+                    @else
+                        <h3 class="text-danger text-center"><b>Error de Sistema comunicarse con Informatica</b></h5>
+                    @endif
+                </div>
+            @endif
+
             <form id="form_make_activity" method="post">
                 {{Form::token()}}
                 <input name="idsolicitud" type="hidden" value="{{$solicitud->id}}">

@@ -33,6 +33,7 @@ use \System\FondoMktHistory;
 use \Policy\ApprovalInstanceType;
 use \Fondo\FondoMkt;
 use \Expense\BagoMarcaGasto;
+use \Parameter\SolicitudExclution;
 
 
 class TableController extends BaseController
@@ -71,6 +72,8 @@ class TableController extends BaseController
 				return array( 'model' => new FondoCategoria , 'key' => 'descripcion' );
 			case 'Fondo_Subcategoria_Tipo':
 				return array( 'model' => new FondoMktType , 'key' => 'descripcion' );
+			case 'Solicitud_Exclusion':
+				return array( 'model' => new SolicitudExclution , 'id' => 11 );
 		endswitch;
 	}
 

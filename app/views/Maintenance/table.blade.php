@@ -23,9 +23,11 @@
                 @endforeach
                 @if( $options )
                     <td editable=2 style="text-align:center">
-                        <button type="button" class="btn btn-info btn-xs maintenance-edit">
-                            <span class="glyphicon glyphicon-pencil"></span>
-                        </button>
+                        @if( $type !== 'Solicitud_Exclusion' )
+                            <button type="button" class="btn btn-info btn-xs maintenance-edit">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                            </button>
+                        @endif
                         @if( $disabled )
                             @if ( is_null( $record->deleted_at ) )
                                 <button type="button" class="btn btn-danger btn-xs maintenance-disable">
