@@ -35,6 +35,8 @@ use \Event\Event;
 use \Fondo\FondoSubCategoria;
 
 use \PPTO\PPTOSupervisor;
+
+use \Parameter\SolicitudExclution;
 	
 	//SAVE USER_ID FOR CREATED_BY & UPDATED_BY
 	Solicitud::observe(				new Transaction());
@@ -68,4 +70,5 @@ use \PPTO\PPTOSupervisor;
 	TemporalUser::observe(      	new SoftDelete());
 	InvestmentType::observe(    	new SoftDelete());
 	InvestmentActivity::observe(	new SoftDelete());
+	SolicitudExclution::observe(    new SoftDelete());
 	
