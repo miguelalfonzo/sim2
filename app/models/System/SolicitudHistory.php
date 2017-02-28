@@ -15,6 +15,11 @@ class SolicitudHistory extends Eloquent{
         return \Carbon\Carbon::parse( $attr )->format('Y-m-d H:i');
     }
 
+    protected function getSeatDateAttribute()
+    {
+        return \Carbon\Carbon::parse( $this->updated_at )->format( 'd/m/Y' );
+    }
+
 	public function lastId()
     {
 		$lastId = SolicitudHistory::orderBy('id','desc')->first();
