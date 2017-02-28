@@ -95,18 +95,23 @@ class Generate extends BaseController
                 }
             }
 
-            if( $solicitud->documentList->count() == 0 ) 
-            {
-                return $seatList;
-            }
-            else 
-            {
-                $total_percepciones = 0;
+            $total_percepciones = 0;
 
-                $userElement = $solicitud->assignedTo;
-                $tipo_responsable = $userElement->tipo_responsable;
-                $username = $userElement->personal->seat_name;
+            $userElement = $solicitud->assignedTo;
+            $tipo_responsable = $userElement->tipo_responsable;
+            $username = $userElement->personal->seat_name;
 
+
+            if( $solicitud->documentList->count() === 0 )
+            {
+                /*GASTOS IGUAL A 0 SI NO SE HA REGISTRADO DOCUMENTOS */
+                if( $solicitud->documentList->count() == 0 ) 
+                {
+                    $oldExpense = $solicitud->toAdvanceSeatHistory;
+                }
+            } 
+            else
+            {
                 $firstSolicitudClient = $solicitud->client;
                 $clientName           = $firstSolicitudClient->{ $firstSolicitudClient->clientType->relacion }->entry_name;                          
               
@@ -136,7 +141,7 @@ class Generate extends BaseController
                 }
 
                 $i = 1;
-
+                
                 foreach( $solicitud->documentList as $expense ) 
                 {
                     if( isset( $oldExpense ) )
@@ -341,46 +346,46 @@ class Generate extends BaseController
                         }
                     }
                 }
-
-                foreach( $solicitud->devolutions()->where( 'id_tipo_devolucion' , DEVOLUCION_INMEDIATA )->get() as $devolution )
-                {
-                    $tasaCompra      = $this->getExpenseChangeRate( $solicitud , $devolution->updated_at );
-                    $devolution_date = date( 'd/m/Y' , strtotime( $devolution->updated_at ) ); 
-                    $import_devolucion = round( $devolution->monto  * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN );
-                    $description_seat_devolucion = 'DEVOLUCION ' . $devolution->type->descripcion . ' - ' . $devolution->numero_operacion . ' - ' . strtoupper( $solicitud->assignedTo->personal->full_name );
-                    $seatList[] = $this->createSeatElement( $cuentaMkt , CUENTA_SOLES , '' , $devolution_date , '' , '' , '' , '' , '' , '' , '' , 
-                        ASIENTO_GASTO_BASE , $import_devolucion , '' , $description_seat_devolucion , '' , '' , 'DEVOLUCION' );
-                }
-
-                // CONTRAPARTE ASIENTO DE ANTICIPO
-                $nowChangeRate = $this->getExpenseChangeRate( $solicitud , $now );
-
-                $description_seat_back = strtoupper($username . ' ' . $solicitud->titulo);
-                $import_transf = round( ( $solicitud->detalle->monto_aprobado - $total_percepciones )  * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN );
-                if( $solicitud->idtiposolicitud == REEMBOLSO )
-                {
-                    $seatList[] = $this->createSeatElement( $cuentaMkt , CUENTA_HABER_REEMBOLSO , '' , $now->format( 'd/m/Y' ) , '', '', '', '', '', '', '', 
-                        ASIENTO_GASTO_DEPOSITO , $import_transf ,  '' , $description_seat_back, '', '' , 'CAN' );
-                }
-                else
-                {
-                    if( in_array( $solicitud->id_inversion , [ 36 , 38 ] ) )
-                    {
-                        if( $solicitud->detalle->deposit->account->idtipomoneda == SOLES )
-                        {
-                            $cuentaMkt = 1893000;
-                        }
-                        elseif( $solicitud->detalle->deposit->account->idtipomoneda == DOLARES )
-                        {
-                            $cuentaMkt = 1894000;
-                        }
-                    }
-                
-                    $seatList[] = $this->createSeatElement( $cuentaMkt , $cuentaMkt, '', $oldExpense->updated_at->format( 'd/m/Y' ) , '', '', '', '', '', '', '', 
-                        ASIENTO_GASTO_DEPOSITO , $import_transf , '' , $solicitud->solicitud_caption , '' , '' , 'CAN' );
-                }
-                return $seatList;
             }
+
+            foreach( $solicitud->devolutions()->where( 'id_tipo_devolucion' , DEVOLUCION_INMEDIATA )->get() as $devolution )
+            {
+                $tasaCompra      = $this->getExpenseChangeRate( $solicitud , $devolution->updated_at );
+                $devolution_date = date( 'd/m/Y' , strtotime( $devolution->updated_at ) ); 
+                $import_devolucion = round( $devolution->monto  * $tasaCompra , 2 , PHP_ROUND_HALF_DOWN );
+                $description_seat_devolucion = 'DEVOLUCION ' . $devolution->type->descripcion . ' - ' . $devolution->numero_operacion . ' - ' . strtoupper( $solicitud->assignedTo->personal->full_name );
+                $seatList[] = $this->createSeatElement( $cuentaMkt , CUENTA_SOLES , '' , $devolution_date , '' , '' , '' , '' , '' , '' , '' , 
+                    ASIENTO_GASTO_BASE , $import_devolucion , '' , $description_seat_devolucion , '' , '' , 'DEVOLUCION' );
+            }
+
+            // CONTRAPARTE ASIENTO DE ANTICIPO
+            $nowChangeRate = $this->getExpenseChangeRate( $solicitud , $now );
+
+            $description_seat_back = strtoupper($username . ' ' . $solicitud->titulo);
+            $import_transf = round( ( $solicitud->detalle->monto_aprobado - $total_percepciones ) * $nowChangeRate , 2 , PHP_ROUND_HALF_DOWN );
+            if( $solicitud->idtiposolicitud == REEMBOLSO )
+            {
+                $seatList[] = $this->createSeatElement( $cuentaMkt , CUENTA_HABER_REEMBOLSO , '' , $now->format( 'd/m/Y' ) , '', '', '', '', '', '', '', 
+                    ASIENTO_GASTO_DEPOSITO , $import_transf ,  '' , $description_seat_back, '', '' , 'CAN' );
+            }
+            else
+            {
+                if( in_array( $solicitud->id_inversion , [ 36 , 38 ] ) )
+                {
+                    if( $solicitud->detalle->deposit->account->idtipomoneda == SOLES )
+                    {
+                        $cuentaMkt = 1893000;
+                    }
+                    elseif( $solicitud->detalle->deposit->account->idtipomoneda == DOLARES )
+                    {
+                        $cuentaMkt = 1894000;
+                    }
+                }
+            
+                $seatList[] = $this->createSeatElement( $cuentaMkt , $cuentaMkt, '', $oldExpense->seat_date , '', '', '', '', '', '', '', 
+                    ASIENTO_GASTO_DEPOSITO , $import_transf , '' , $solicitud->solicitud_caption , '' , '' , 'CAN' );
+            }
+            return $seatList;
         }
         return $middleRpta;
     }

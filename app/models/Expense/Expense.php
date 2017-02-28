@@ -14,6 +14,11 @@ class Expense extends Eloquent {
         return \Carbon\Carbon::parse( $attr )->format('Y-m-d');
     }
 
+    protected function getSeatDateAttribute()
+    {
+        return $this->updated_at->format( 'd/m/Y' );
+    }
+
 	protected function proof()
 	{
 		return $this->hasOne('Expense\ProofType','id','idcomprobante');
