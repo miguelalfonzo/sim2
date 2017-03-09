@@ -2,6 +2,7 @@
     <thead>
         <tr>
             <th>#</th>
+            <th>N° Solicitud</th>
             <th>RUC</th>
             <th>Razón Social</th>
             <th>N°</th>
@@ -14,6 +15,7 @@
         @foreach ($proofs as $proof )
             <tr row-id="{{$proof->id}}">
                 <td class="pk" style="text-align:center">{{$proof->id}}</td>
+                <td class="ns" style="text-align:center">{{$proof->id_solicitud}}</td>
                 <td class="ruc" style="text-align:center">{{$proof->ruc}}</td>
                 <td class="razon" style="text-align:center">{{$proof->razon}}</td>
                 <td class="number" style="text-align:center">{{$proof->num_prefijo.'-'.$proof->num_serie}}</td>
