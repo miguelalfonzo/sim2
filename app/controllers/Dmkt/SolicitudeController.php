@@ -216,7 +216,15 @@ class SolicitudeController extends BaseController
         {
             $solicitud     = Solicitud::where('token', $token)->first();
             $politicStatus = FALSE;
-            $regularizationStatus = $this->validateRegularization( $solicitud->id_user_assign );
+            if( $solicitud->idtiposolicitud == REEMBOLSO )
+            {
+                $regularizationStatus = $this->setRpta();
+            }
+            else
+            {
+                $regularizationStatus = $this->validateRegularization( $solicitud->id_user_assign );
+            }
+
             $user          = Auth::user();
             if ( is_null( $solicitud ) )
             {
@@ -988,10 +996,17 @@ class SolicitudeController extends BaseController
             if( $middleRpta[ status ] === ok )
             {
                 $state = $middleRpta[ data ];
-                $middleRpta = $this->validateRegularization( $solicitud->id_user_assign );
-                if( $middleRpta[ status ] === ok )
+                if( $solicitud->idtiposolicitud == REEMBOLSO )
                 {
                     $middleRpta = $this->acceptedSolicitudTransaction( $solicitudId , $state , $inputs );
+                }
+                else
+                {
+                    $middleRpta = $this->validateRegularization( $solicitud->id_user_assign );
+                    if( $middleRpta[ status ] === ok )
+                    {
+                        $middleRpta = $this->acceptedSolicitudTransaction( $solicitudId , $state , $inputs );
+                    }
                 }
             }
         }
