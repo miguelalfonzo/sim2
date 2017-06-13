@@ -30,6 +30,11 @@ class Entry extends Eloquent
         return $this->hasOne( 'Dmkt\Account' , 'num_cuenta' , 'num_cuenta');
     }
 
+    protected function bagoAccount()
+    {
+        return $this->hasOne( 'Expense\PlanCta' , 'ctactaextern' , 'num_cuenta' );
+    }
+
     public function insertAdvanceEntry( stdClass $entry , $solicitud_id )
     {
         $this->id           = $this->nextId();

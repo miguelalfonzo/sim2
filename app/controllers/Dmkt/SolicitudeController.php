@@ -214,7 +214,12 @@ class SolicitudeController extends BaseController
     {
         try
         {
-            $solicitud     = Solicitud::where('token', $token)->first();
+            $solicitud     = Solicitud::where( 'token' , $token )->first();
+            if( is_null( $solicitud ) )
+            {
+                return $this->warningException( 'La solicitud no existe' , __FUNCTION__ , __LINE__ , __FILE__ );
+            }
+
             $politicStatus = FALSE;
             if( $solicitud->idtiposolicitud == REEMBOLSO )
             {
