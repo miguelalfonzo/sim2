@@ -18,6 +18,7 @@ use \Auth;
 use \stdClass;
 use \Expense\ChangeRate;
 use \Expense\PlanCta;
+use \Dmkt\SpecialAccount;
 
 class Generate extends BaseController
 {
@@ -112,6 +113,8 @@ class Generate extends BaseController
             } 
             else
             {
+                $CUENTA_HABER_REEMBOLSO = SpecialAccount::getRefund();
+                
                 $firstSolicitudClient = $solicitud->client;
                 $clientName           = $firstSolicitudClient->{ $firstSolicitudClient->clientType->relacion }->entry_name;                          
               
@@ -365,7 +368,7 @@ class Generate extends BaseController
             $import_transf = round( ( $solicitud->detalle->monto_aprobado - $total_percepciones ) * $nowChangeRate , 2 , PHP_ROUND_HALF_DOWN );
             if( $solicitud->idtiposolicitud == REEMBOLSO )
             {
-                $seatList[] = $this->createSeatElement( $cuentaMkt , CUENTA_HABER_REEMBOLSO , '' , $now->format( 'd/m/Y' ) , '', '', '', '', '', '', '', 
+                $seatList[] = $this->createSeatElement( $cuentaMkt , $CUENTA_HABER_REEMBOLSO , '' , $now->format( 'd/m/Y' ) , '', '', '', '', '', '', '', 
                     ASIENTO_GASTO_DEPOSITO , $import_transf ,  '' , $description_seat_back, '', '' , 'CAN' );
             }
             else
@@ -647,23 +650,34 @@ class Generate extends BaseController
         $entry->import         = $detail->soles_import;
         $entry->caption        = $solicitud->solicitud_caption;
 
-        if( in_array( $solicitud->id_inversion , [ 36 , 38 ] ) )
+        $CUENTA_HABER_REEMBOLSO = SpecialAccount::getRefund();
+
+        if( $solicitud->idtiposolicitud == REEMBOLSO )
         {
-            if( $solicitud->detalle->deposit->account->idtipomoneda == SOLES )
-            {
-                $num_cuenta = 1893000;
-            }
-            elseif( $solicitud->detalle->deposit->account->idtipomoneda == DOLARES )
-            {
-                $num_cuenta = 1894000;
-            }
+            $num_cuenta = $CUENTA_HABER_REEMBOLSO;
             $entry->account_name   = PlanCta::find( $num_cuenta )->ctanombrecta;
-            $entry->account_number = $num_cuenta;   
+            $entry->account_number = $num_cuenta; 
         }
         else
         {
-            $entry->account_name   = $account->nombre;
-            $entry->account_number = $account->num_cuenta;
+            if( in_array( $solicitud->id_inversion , [ 36 , 38 ] ) )
+            {
+                if( $solicitud->detalle->deposit->account->idtipomoneda == SOLES )
+                {
+                    $num_cuenta = 1893000;
+                }
+                elseif( $solicitud->detalle->deposit->account->idtipomoneda == DOLARES )
+                {
+                    $num_cuenta = 1894000;
+                }
+                $entry->account_name   = PlanCta::find( $num_cuenta )->ctanombrecta;
+                $entry->account_number = $num_cuenta;   
+            }
+            else
+            {
+                $entry->account_name   = $account->nombre;
+                $entry->account_number = $account->num_cuenta;
+            }
         }
 
         return $entry;
