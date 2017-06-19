@@ -159,6 +159,7 @@
                                             <li><a href="{{ URL::to('maintenance/view/Fondo_Contable' ) }}">Mantenimiento de Fondo de Contabilidad</a></li>
                                             <li><a href="{{ URL::to('maintenance/view/Cuenta_Gasto_Marca') }}">Mantenimiento de Cuentas - Marcas</a></li>
                                             <li><a href="{{ URL::to('maintenance/view/Solicitud_Exclusion') }}">Bloqueo de Solicitud</a></li>
+                                            <li><a href="{{ URL::to('maintenance/view/Cuenta_Especial') }}">Cambio de Cuenta de Reembolso</a></li>
                                         @elseif( Auth::user()->type == SUP )
                                             <li><a href="{{ URL::to( 'report/sup/view/Fondo_Supervisor' ) }}">Reporte de Fondos de Supervisor</a></li>
                                         @elseif( Auth::user()->type == ESTUD )

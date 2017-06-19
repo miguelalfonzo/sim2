@@ -33,6 +33,7 @@ use \Devolution\Devolution;
 use \Devolution\DevolutionHistory;
 use \Event\Event;
 use \Fondo\FondoSubCategoria;
+use \Dmkt\SpecialAccount;
 
 use \PPTO\PPTOSupervisor;
 
@@ -71,4 +72,5 @@ use \Parameter\SolicitudExclution;
 	InvestmentType::observe(    	new SoftDelete());
 	InvestmentActivity::observe(	new SoftDelete());
 	SolicitudExclution::observe(    new SoftDelete());
+	SpecialAccount::observe(        new SoftDelete());
 	
