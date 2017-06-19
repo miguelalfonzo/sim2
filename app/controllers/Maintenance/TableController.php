@@ -34,6 +34,7 @@ use \Policy\ApprovalInstanceType;
 use \Fondo\FondoMkt;
 use \Expense\BagoMarcaGasto;
 use \Parameter\SolicitudExclution;
+use \Dmkt\SpecialAccount;
 
 
 class TableController extends BaseController
@@ -74,6 +75,8 @@ class TableController extends BaseController
 				return array( 'model' => new FondoMktType , 'key' => 'descripcion' );
 			case 'Solicitud_Exclusion':
 				return array( 'model' => new SolicitudExclution , 'id' => 11 );
+			case 'Cuenta_Especial':
+				return array( 'model' => new SpecialAccount , 'id' => 12 );
 		endswitch;
 	}
 

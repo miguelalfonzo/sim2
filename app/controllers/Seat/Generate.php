@@ -18,7 +18,7 @@ use \Auth;
 use \stdClass;
 use \Expense\ChangeRate;
 use \Expense\PlanCta;
-use \Dmkt\AccountSpecial;
+use \Dmkt\SpecialAccount;
 
 class Generate extends BaseController
 {
@@ -113,7 +113,7 @@ class Generate extends BaseController
             } 
             else
             {
-                $CUENTA_HABER_REEMBOLSO = AccountSpecial::getRefund();
+                $CUENTA_HABER_REEMBOLSO = SpecialAccount::getRefund();
                 
                 $firstSolicitudClient = $solicitud->client;
                 $clientName           = $firstSolicitudClient->{ $firstSolicitudClient->clientType->relacion }->entry_name;                          
@@ -650,7 +650,7 @@ class Generate extends BaseController
         $entry->import         = $detail->soles_import;
         $entry->caption        = $solicitud->solicitud_caption;
 
-        $CUENTA_HABER_REEMBOLSO = AccountSpecial::getRefund();
+        $CUENTA_HABER_REEMBOLSO = SpecialAccount::getRefund();
 
         if( $solicitud->idtiposolicitud == REEMBOLSO )
         {
