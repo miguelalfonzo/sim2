@@ -15,7 +15,7 @@ class SolicitudExclution extends Eloquent
 
     protected static function order()
     {
-    	return SolicitudExclution::orderBy( 'updated_at' , '<DESC' )->get();
+    	return SolicitudExclution::orderBy( 'updated_at' , 'DESC' )->get();
     }
 
     protected static function orderWithTrashed()
