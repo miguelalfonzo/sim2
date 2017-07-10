@@ -424,9 +424,12 @@ class TableController extends BaseController
 	{
 		try
 		{
-			$inputs = Input::all();
-			$vData  = $this->getModel( $inputs[ 'type' ] );
-			$vData[ 'model' ]::withTrashed()->find( $inputs[ 'id' ] )->restore(); 
+			$inputs = Input::all(); //Input::all trae todos los inputs enviados en el post
+			$vData  = $this->getModel( $inputs[ 'type' ] ); //llama a la funcion get model de la clase 
+			$rowBDTable = $vData[ 'model' ]::withTrashed()->find( $inputs[ 'id' ] ); // obtiene todo el 
+			$rowBDTable->restore();// convierte el campo delete_at en null
+			$rowBDTable->deleted_by = null; // convierte el campo delete_by a null
+			$rowBDTable->save(); // guardar cambios...  el restore lo tiene incluido
 			return $this->setRpta();
 		}
 		catch( Exception $e )
