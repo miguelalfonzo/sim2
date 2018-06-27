@@ -13,61 +13,61 @@ use \Response;
 class Accounting extends BaseController
 {
 
-	public function show( $type )
-	{
-		$data = $this->getReportType( $type );
-		return View::make( $data[ 'View' ] , $data ); 
-	}
+  public function show( $type )
+  {
+    $data = $this->getReportType( $type );
+    return View::make( $data[ 'View' ] , $data );
+  }
 
-	private function getReportType( $type )
-	{
-		if( $type == 'cuenta' )
-		{
-			$data =
-			[
-				'View' => 'Report.account.view',
-				'type' => $type,
+  private function getReportType( $type )
+  {
+    if( $type == 'cuenta' )
+    {
+      $data =
+      [
+        'View' => 'Report.account.view',
+        'type' => $type,
                 'title' => 'Reporte de Estado de Cuenta'
-			];
-		}
-        elseif( $type == 'completo' )
+      ];
+    }
+    elseif( $type == 'completo' )
+    {
+        $data =
+        [
+            'View'  => 'Report.account.view',
+            'type'  => $type,
+            'title' => 'Reporte Completo'
+        ];
+    }
+    return $data;
+  }
+
+  public function source()
+  {
+    try
+    {
+        $inputs = Input::all();
+
+        $data = $this->getData( $inputs );
+
+        if( isset( $data[ status ] ) && $data[ status ] == error )
         {
-            $data =
-            [
-                'View'  => 'Report.account.view',
-                'type'  => $type,
-                'title' => 'Reporte Completo'
-            ];
+            return $data;
         }
-		return $data;
-	}
 
-	public function source()
-	{
-		try
-        {
-            $inputs = Input::all();
-    
-            $data = $this->getData( $inputs );
+        $format = $this->getFormat( $inputs[ 'type' ] );
 
-            if( isset( $data[ status ] ) && $data[ status ] == error )
-            {
-                return $data;
-            }
+        $rpta = $this->setRpta( $data );
 
-            $format = $this->getFormat( $inputs[ 'type' ] );
-            
-            $rpta = $this->setRpta( $data );
-            
-            $rpta = array_merge( $rpta , $format );
+        $rpta = array_merge( $rpta , $format );
 
-            return $rpta;
-        }
-        catch( Exception $e )
-        {
-            return $this->internalException( $e , __FUNCTION__ );
-        }
-	}
+        return $rpta;
+    }
+    catch( Exception $e )
+    {
+        return $this->internalException( $e , __FUNCTION__ );
+    }
+  }
 
     private function getData( $inputs )
     {
@@ -93,6 +93,8 @@ class Accounting extends BaseController
                 [
                     [ 'title' => '#' , 'data' => 'id' , 'className' => 'text-center' ],
                     [ 'title' => 'Colaborador' , 'data' => 'empl_nom' , 'className' => 'text-center' ],
+                    [ 'title' => 'Inversion' , 'data' => 'inversion' , 'className' => 'text-center' ],
+                    [ 'title' => 'Detalle' , 'data' => 'detalle' , 'className' => 'text-center' ],
                     [ 'title' => 'Cuenta' , 'data' => 'cuenta_num' , 'className' => 'text-center' ],
                     [ 'title' => 'Fecha Deposito' , 'data' => 'dep_fec' , 'className' => 'text-center' ],
                     [ 'title' => 'Monto Depositado' , 'data' => 'dep_mon' , 'className' => 'text-center' ],
@@ -107,6 +109,8 @@ class Accounting extends BaseController
                 [
                     [ 'title' => '#' , 'data' => 'id' , 'className' => 'text-center' ],
                     [ 'title' => 'Colaborador' , 'data' => 'resp_nom' , 'className' => 'text-center' ],
+                    [ 'title' => 'Inversion' , 'data' => 'inversion' , 'className' => 'text-center' ],
+                    [ 'title' => 'Detalle' , 'data' => 'detalle' , 'className' => 'text-center' ],
                     [ 'title' => 'Cuenta' , 'data' => 'cta' , 'className' => 'text-center' ],
                     [ 'title' => 'Fecha Deposito' , 'data' => 'dep_fec' , 'className' => 'text-center' ],
                     [ 'title' => 'Depositado' , 'data' => 'dep_mon' , 'className' => 'text-center' ],
@@ -136,14 +140,14 @@ class Accounting extends BaseController
         return [ 'columns' => $columns ];
     }
 
-	public function export()
-	{
+  public function export()
+  {
         try
         {
-    		$inputs = Input::all();
+        $inputs = Input::all();
             $dates  = [ 'start' => $inputs[ 'fecha_inicio' ] , 'end' => $inputs[ 'fecha_final' ] ];
             $data   = $this->getData( $inputs );
-            
+
             if( isset( $data[ status ] ) && $data[ status ] == error )
             {
                 return $data;
@@ -156,19 +160,19 @@ class Accounting extends BaseController
             $title = 'Rep-' . $now->format( 'YmdHi' );
             $directoryPath = 'files/reporte/contabilidad/' . $inputs[ 'type' ];
 
-    		Excel::create( $title , function( $excel ) use ( $data , $columns )
-            {  
+        Excel::create( $title , function( $excel ) use ( $data , $columns )
+            {
                 $excel->sheet( 'Data' , function( $sheet ) use ( $data , $columns )
                 {
                     $sheet->freezeFirstRow();
                     $sheet->loadView( 'Report.account.table' , [ 'data' => $data , 'columns' => $columns ] );
-                });  
+                });
             })->store( 'xls' , public_path( $directoryPath ) );
 
             $rpta = $this->setRpta();
             $rpta[ 'title' ] = $title;
             return $rpta;
-	    }
+      }
         catch( Exception $e )
         {
             return $this->internalException( $e , __FUNCTION__ );

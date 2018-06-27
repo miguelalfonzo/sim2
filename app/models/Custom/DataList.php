@@ -10,16 +10,16 @@ use \Log;
 class DataList
 {
 
-	public static function getSolicituds( array $dates , $state )
+  public static function getSolicituds( array $dates , $state )
     {
         try
         {
             DB::setDateFormat('DD/MM/YYYY');
-        	$user = Auth::user();
-        	$user_id = $user->id;
-        	$start = $dates[ 'start' ];
-        	$end   = $dates[ 'end' ];
-        	$data = DB::table( "TABLE( LISTADO_SOLICITUD_FN( $user_id , '$start' , '$end' , $state ) )" )->get();
+          $user = Auth::user();
+          $user_id = $user->id;
+          $start = $dates[ 'start' ];
+          $end   = $dates[ 'end' ];
+          $data = DB::table( "TABLE( LISTADO_SOLICITUD_FN( $user_id , '$start' , '$end' , $state ) )" )->get();
             return $data;
         }
         catch( Exception $e )
@@ -37,7 +37,7 @@ class DataList
             DB::setDateFormat('DD/MM/YYYY');
             $start = $dates[ 'start' ];
             $end   = $dates[ 'end' ];
-            $data = DB::table( "TABLE( REP_CONT_CUENTA_FN( $user_id , '$start' , '$end' , $num_account , $solicitud_id , $depurado ) )" )->get();
+            $data = DB::table( "TABLE( REP_CONT_CUENTA_V2_FN( $user_id , '$start' , '$end' , $num_account , $solicitud_id , $depurado ) )" )->get();
             return $data;
         }
         catch( Exception $e )
@@ -55,7 +55,7 @@ class DataList
             DB::setDateFormat('DD/MM/YYYY');
             $start = $dates[ 'start' ];
             $end   = $dates[ 'end' ];
-            $data = DB::table( "TABLE( REP_CONT_COMP_FN( $user_id , '$start' , '$end' , $num_account , $solicitud_id , $depurado ) )" )->get();
+            $data = DB::table( "TABLE( REP_CONT_COMP_V2_FN( $user_id , '$start' , '$end' , $num_account , $solicitud_id , $depurado ) )" )->get();
             return $data;
         }
         catch( Exception $e )
