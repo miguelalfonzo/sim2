@@ -94,7 +94,7 @@ class Seeker extends BaseController
     {
         try {
             $inputs = Input::all();
-            $json = '[{"name":"' . TB_VISITADOR . '","wheres":{"likes":["VISLEGAJO","(VISNOMBRE || \' \' || VISPATERNO || \' \' || VISMATERNO)"],"equal":{"VISACTIVO":"S","LENGTH(VISLEGAJO)":8}},"selects":["VISVISITADOR","(VISNOMBRE || \' \' || VISPATERNO || \' \' || VISMATERNO)" , "\'REP\'" ]}]';
+            $json = '[{"name":"' . TB_VISITADOR . '","wheres":{"likes":["VISLEGAJO","(VISNOMBRE || \' \' || VISPATERNO || \' \' || VISMATERNO)"],"equal":{"VISACTIVO":"S"},"in":{ "LENGTH(VISLEGAJO)": [ 8 , 9 ] } },"selects":["VISVISITADOR","(VISNOMBRE || \' \' || VISPATERNO || \' \' || VISMATERNO)" , "\'REP\'" ]}]';
             $cAlias = array('value', 'label', 'type');
             return $this->searchSeeker($inputs['sVal'], $json, $cAlias);
         } catch (Exception $e) {
@@ -104,7 +104,7 @@ class Seeker extends BaseController
 
     public function responsibleSource()
     {
-        try 
+        try
         {
             $inputs = Input::all();
             $data = Personal::getResponsibleUsers( $inputs[ 'sVal' ] );
@@ -147,15 +147,15 @@ class Seeker extends BaseController
             $person->value = $person->user_id;
             $person->type  = $person->user->userType->descripcion;
         }
-        return $this->setRpta( $personal->toArray() );    
+        return $this->setRpta( $personal->toArray() );
     }
 
     private function searchSeeker($inputs, $json, $cAlias, $type = 1)
     {
-        if ( ! empty( $inputs ) ) 
+        if ( ! empty( $inputs ) )
         {
             $json = json_decode($json);
-            if (json_last_error() == JSON_ERROR_NONE) 
+            if (json_last_error() == JSON_ERROR_NONE)
             {
                 $array = array();
                 foreach ($json as $table) {
@@ -169,9 +169,9 @@ class Seeker extends BaseController
                         }
                     }
 
-                    foreach ($table->wheres as $key => $where) 
+                    foreach ($table->wheres as $key => $where)
                     {
-                        if ($key == 'likes') 
+                        if ($key == 'likes')
                         {
                             $query->where( function( $query ) use( $where , $inputs )
                             {
@@ -180,18 +180,18 @@ class Seeker extends BaseController
                                     $query->orWhereRaw( "UPPER(" . $like . ") like q'[%" . mb_strtoupper( $inputs ) . "%]'" );
                                 }
                             });
-                        } 
-                        else if ($key == 'equal') 
+                        }
+                        else if ($key == 'equal')
                         {
                             foreach ($where as $key => $equal)
                                 $query->where($key, $equal);
-                        } 
-                        else if ($key == 'in') 
+                        }
+                        else if ($key == 'in')
                         {
                             foreach ($where as $key => $in)
                                 $query->whereIn($key, $in);
-                        } 
-                        else if ($key === 'notnull') 
+                        }
+                        else if ($key === 'notnull')
                         {
                             foreach ($where as $key => $field)
                                 $query->whereNotNull($field);
@@ -200,7 +200,7 @@ class Seeker extends BaseController
 
                     for( $i = 0 ; $i < count( $cAlias ) ; $i++ )
                         $select = $select . ' ' . $table->selects[$i] . ' as "' . $cAlias[$i] . '",';
-                    
+
                     $select = substr($select, 0, -1);
                     $query->select(DB::raw($select));
                     $query->take(50);
@@ -213,7 +213,7 @@ class Seeker extends BaseController
                 {
                     return $this->setRpta($array);
                 }
-                else 
+                else
                 {
                     $arrayfilter = array_filter($array, array($this, 'filterUserType'));
                     $rpta = array();
@@ -221,12 +221,12 @@ class Seeker extends BaseController
                         $rpta[] = $array;
                     return $this->setRpta($rpta);
                 }
-            } 
+            }
             else
             {
                 return $this->warningException('Json: Formato Incorrecto', __FUNCTION__, __LINE__, __FILE__);
             }
-        } 
+        }
         else
         {
             return $this->warningException('Input Vacio (Post: "Json" Vacio)', __FUNCTION__, __LINE__, __FILE__);
@@ -248,22 +248,22 @@ class Seeker extends BaseController
 
     public function getClientView()
     {
-        try 
+        try
         {
             $inputs    = Input::all();
-            
+
             $actModel = Activity::getClientActivities( $inputs[ 'data' ][ 'id_tipo_cliente' ] );
             $actIds   = $actModel->lists( 'id' );
             $invIds   = InvestmentActivity::getActivitiesInvestments( $actIds )->lists( 'id_inversion' );
-            
+
             return $this->setRpta(array(
                 'View' => View::make( 'Seeker.client' )->with( $inputs[ 'data' ] )->render(),
                 'id_actividad' => $actIds,
                 'id_inversion' => $invIds
             ));
 
-        } 
-        catch( Exception $e ) 
+        }
+        catch( Exception $e )
         {
             return $this->internalException( $e , __FUNCTION__ );
         }
