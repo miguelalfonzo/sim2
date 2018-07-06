@@ -11,10 +11,12 @@
         Route::get( 'entries' , 'MigrateSeatController@migrateEntries');
     });
 
-    Route::get( "logs", [ 
+    Route::get( "logs", [
         "before" => "developer",
         "uses" => "\Rap2hpoutre\LaravelLogViewer\LogViewerController@index"
     ]);
+
+    Route::post( 'solicitud-deposit-db' , 'Deposit\DepositController@adminSolicitudDeposit' );
 
     /*
     |--------------------------------------------------------------------------
@@ -33,7 +35,7 @@
     |--------------------------------------------------------------------------
     */
 
-    Route::group( array( 'before' => 'sup' ) , function() 
+    Route::group( array( 'before' => 'sup' ) , function()
     {
         Route::group( [ 'prefix' => 'report/sup' , 'namespace' => 'Report' ] , function()
         {
@@ -49,7 +51,7 @@
     |--------------------------------------------------------------------------
     */
 
-    Route::group( array( 'before' => 'gercom' ) , function() 
+    Route::group( array( 'before' => 'gercom' ) , function()
     {
         Route::get( 'fondoHistorial' , 'Fondo\FondoMkt@getFondoHistorial' );
         Route::post( 'fondo-subcategoria-history' , 'Fondo\FondoMkt@getFondoSubCategoryHistory' );
@@ -74,14 +76,14 @@
         {
             Route::get(  'maintenance/view/{type}'    , 'TableController@getView' );
             Route::get( 'maintenance-export/{type}'   , 'TableController@export' );
-            
+
             Route::post( 'get-cell-maintenance-info'  , 'TableController@getMaintenanceCellData' );
             Route::post( 'update-maintenance-info'    , 'TableController@updateMaintenanceData' );
             Route::post( 'save-maintenance-info'      , 'TableController@saveMaintenanceData' );
             Route::post( 'add-maintenance-info'       , 'TableController@addMaintenanceData' );
             Route::post( 'maintenance-enable'         , 'TableController@enableRecord');
             Route::post( 'maintenance-disable'        , 'TableController@disableRecord');
-        
+
         });
     });
 
@@ -90,10 +92,10 @@
     | CONTABILIDAD
     |--------------------------------------------------------------------------
     */
-    
-    Route::group( array( 'before' => 'cont' ), function () 
-    { 
-  
+
+    Route::group( array( 'before' => 'cont' ), function ()
+    {
+
         Route::post( 'list-documents', 'Movements\MoveController@searchDocs' );
         Route::post( 'search-responsibles' , 'Source\Seeker@responsibleSource' );
         Route::group( [ 'namespace' => 'Expense' ] , function()
@@ -104,7 +106,7 @@
             Route::post( 'update-document' , 'ExpenseController@updateDocument');
             Route::post( 'end-expense-record' , 'ExpenseController@endExpenseRecord' );
         });
-      
+
         Route::group( [ 'namespace' => 'Deposit' ] , function()
         {
             Route::post( 'modal-liquidation' , 'DepositController@modalLiquidation' );
@@ -124,8 +126,8 @@
 
         Route::group( [ 'namespace' => 'Seat' ] , function()
         {
-            Route::get( 'generar-asiento-gasto/{token}' , 'Generate@viewGenerateEntryExpense' ); 
-            Route::post( 'generar-asiento-anticipo' , 'Generate@generateAdvanceEntry' );  
+            Route::get( 'generar-asiento-gasto/{token}' , 'Generate@viewGenerateEntryExpense' );
+            Route::post( 'generar-asiento-anticipo' , 'Generate@generateAdvanceEntry' );
             Route::post( 'guardar-asiento-gasto', 'Generate@saveEntryExpense');
         });
 
@@ -133,7 +135,7 @@
         {
             Route::get( 'revision-export' , 'ExportController@revisionExport');
             Route::get( 'advance-entry-export' , 'ExportController@advanceEntryExport' );
-            Route::get( 'regularization-entry-export' , 'ExportController@regularizationEntryExport' );         
+            Route::get( 'regularization-entry-export' , 'ExportController@regularizationEntryExport' );
             Route::get( 'export/solicitudToDeposit-pdf' , 'ExportController@exportSolicitudToDepositPDF' );
             Route::get( 'export/solicitudToDeposit-excel' , 'ExportController@exportSolicitudToDepositExcel' );
         });
@@ -195,18 +197,18 @@
         Route::get( 'remove-temporal-user' , 'User\UserController@removeTemporalUser');
         Route::post('aceptar-solicitud', 'Dmkt\SolicitudeController@acceptedSolicitude');
         Route::post( 'agregar-familia-fondo', 'Dmkt\SolicitudeController@addFamilyFundSolicitud');
-    
+
     });
 
     /*
     |--------------------------------------------------------------------------
     | REPRESENTANTE , SUPERVISOR , GERENTE DE PRODUCTO - PROMOCION - COMERCIAL - GENERAL , CONTABILIDAD
     |--------------------------------------------------------------------------
-    */    
+    */
 
     Route::group( array( 'before' => 'rm_sup_gerprod_gerprom_gercom_gerger_cont' ) , function()
     {
-        Route::get('solicitude/statement', 'Movements\MoveController@getStatement');    
+        Route::get('solicitude/statement', 'Movements\MoveController@getStatement');
     });
 
     /*
@@ -235,7 +237,7 @@
 
     });
 
-    Route::group( array( 'before' => 'rm_sup_cont' ), function () 
+    Route::group( array( 'before' => 'rm_sup_cont' ), function ()
     {
         Route::post( 'get-expenses' , 'Expense\ExpenseController@getExpenses');
         Route::post( 'edit-expense', 'Expense\ExpenseController@editExpense');
@@ -246,14 +248,14 @@
     });
 
     Route::group( array( 'before' => 'rm_sup_gerprod_ager' ), function ()
-    {    
+    {
         Route::get( 'nueva-solicitud', 'Dmkt\SolicitudeController@newSolicitude');
         Route::get( 'get-investments-activities' , 'Dmkt\SolicitudeController@getInvestmentsActivities');
         Route::post( 'registrar-solicitud', 'Dmkt\SolicitudeController@registerSolicitud');
         Route::get( 'editar-solicitud/{id}', 'Dmkt\SolicitudeController@editSolicitud');
         Route::post( 'filtro_cliente' , 'Dmkt\Client@getInvestmentActivity');
-        Route::post( 'filtro-inversion' , 'Dmkt\Client@getActivities');  
-        
+        Route::post( 'filtro-inversion' , 'Dmkt\Client@getActivities');
+
     });
 
     Route::group( array( 'before' => 'rm_sup_gerprod_gerprom_gercom_gerger_ager_cont' ) , function()
@@ -317,9 +319,9 @@
         | TIME LINE
         |--------------------------------------------------------------------------
         */
-        
+
         Route::get( 'timeline-modal/{id}' , 'TimeLine\Controller@getTimeLine');
-        
+
         /*
         |--------------------------------------------------------------------------
         | Alert
@@ -327,7 +329,7 @@
         */
         Route::get( 'alerts' , 'Alert\AlertController@show' );
         Route::post( 'alerts' , 'Alert\AlertController@showAlerts' );
-    
+
         /*
         |--------------------------------------------------------------------------
         | idkc: REPORT
@@ -336,7 +338,7 @@
         // REPORT MAIN PAGE
         Route::get('reports', 'Report\ReportController@mainHandler');
         // GENERATE REPORT TABLE VIEW
-        Route::get('reports/generate_html/{id_reporte}/{fromDate}/{toDate}', 'Report\ReportController@reportViewHandler'); 
+        Route::get('reports/generate_html/{id_reporte}/{fromDate}/{toDate}', 'Report\ReportController@reportViewHandler');
         // CREATE EXCEL
         Route::post('reports/export/generate','Report\ReportController@reportExcelHandler');
         // LIST DATASET
@@ -361,7 +363,5 @@
         Route::get('eventos','Dmkt\SolicitudeController@album');
         Route::post('eventos/list','Dmkt\SolicitudeController@getEventList');
         Route::post('photos', 'Dmkt\SolicitudeController@photos');
-        
 
     });
-

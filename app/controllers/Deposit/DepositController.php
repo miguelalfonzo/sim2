@@ -36,7 +36,7 @@ class DepositController extends BaseController
     private function verifyMoneyType( $solIdMoneda , $bankIdMoneda , $monto , $tc , $jDetalle )
     {
         $jDetalle->tcc = $tc->compra;
-        $jDetalle->tcv = $tc->venta;    
+        $jDetalle->tcv = $tc->venta;
         if ( $solIdMoneda != $bankIdMoneda )
         {
             if ( $solIdMoneda == SOLES )
@@ -59,10 +59,10 @@ class DepositController extends BaseController
 
     private function validateInputsDeposit( $inputs )
     {
-        $rules = array( 
+        $rules = array(
                 'token'     => 'required|exists:solicitud,token,id_estado,' . DEPOSITO_HABILITADO ,
                 'cuenta'    => 'required|numeric|exists:'.TB_PLAN_CUENTA.',ctactaextern',
-                'operacion' => 'required|string|min:1' 
+                'operacion' => 'required|string|min:1'
             );
         $messages = array(
                 'token.exists' => 'La solicitud no se encuentra en la etapa de deposito'
@@ -83,7 +83,7 @@ class DepositController extends BaseController
             $responses = [];
             foreach( $inputs[ 'data' ] as $data )
             {
-                $inputs = 
+                $inputs =
                     [
                         'token'     => $data[ 'token' ],
                         'cuenta'    => $inputs[ 'cuenta' ],
@@ -140,12 +140,12 @@ class DepositController extends BaseController
     }
 
     public function depositOperation( $solicitudToken , $operationCode , $bankAccount )
-    {    
+    {
         try
         {
             $modelAccount    = PlanCta::find( $bankAccount );
             $modelSIMAccount = $modelAccount->account;
-            
+
             if ( $modelSIMAccount->idtipocuenta != BANCO )
             {
                 return $this->warningException( 'Cancelado - La cuenta N°: ' . $bankAccount . ' no ha sido registrada en el Sistema como Cuenta de Banco' , __FUNCTION__ , __LINE__ , __FILE__ );
@@ -167,7 +167,7 @@ class DepositController extends BaseController
         $tc         = ChangeRate::getTc();
         $middleRpta = $this->getBankAmount( $detalle , $modelSIMAccount , $tc );
         if ( $middleRpta[ status ] === ok )
-        {    
+        {
             $newDeposit                     = new Deposit;
             $newDeposit->id                 = $newDeposit->lastId() + 1;
             $newDeposit->num_transferencia  = $operationCode;
@@ -184,11 +184,11 @@ class DepositController extends BaseController
             $solicitud->save();
 
             $middleRpta = $this->discountFondoBalance( $solicitud );
-            
+
             if ( $middleRpta[ status ] == ok )
             {
                 $middleRpta = $this->setStatus( $oldIdestado, DEPOSITADO , Auth::user()->id , USER_CONTABILIDAD , $solicitud->id );
-                
+
                 if ( $middleRpta[status] == ok )
                 {
                     Session::put( 'state' , R_REVISADO );
@@ -206,11 +206,11 @@ class DepositController extends BaseController
         $fondoMktController = new FondoMkt;
         $fondoDataHistories = array();
         $fondosData         = array();
-        
+
         $tasaCompra           = $this->getExchangeRate( $solicitud );
         $tasaCompraAprobacion = $this->getApprovalExchangeRate( $solicitud );
         $msg                = ' el cual no es suficiente para completar el deposito , se requiere un saldo de S/.';
-        
+
         if ( in_array( $solicitud->idtiposolicitud , array( SOL_REP , REEMBOLSO ) ) )
         {
             $products = $solicitud->products;
@@ -227,24 +227,24 @@ class DepositController extends BaseController
                 else
                     $fondosData[ $fondo->id ] = $solicitudProduct->monto_asignado;
                 $data = array(
-                   'idFondo'      => $fondo->id , 
+                   'idFondo'      => $fondo->id ,
                    'idFondoTipo'  => $fondo_type ,
                    'oldSaldo'     => $oldSaldo ,
-                   'oldRetencion' => $oldRetencion , 
-                   'newSaldo'     => $fondo->saldo , 
+                   'oldRetencion' => $oldRetencion ,
+                   'newSaldo'     => $fondo->saldo ,
                    'newRetencion' => $fondo->retencion ,
                    'reason'       => FONDO_DEPOSITO );
                 $fondoDataHistories[] = $data;
                 $fondoMktController->setPeriodHistoryData( $fondo->subcategoria_id , $data );
                 $fondo->save();
-            }       
+            }
             // EL DEPOSITO SE REGISTRARA AUNQUE EL SALDO DEL FONDO QUEDE EN NEGATIVO SE COMENTA LA FUNCION DE VALIDACION DEL SALDO
             /* $middleRpta = $fondoMktController->validateFondoSaldo( $fondosData , $fondo_type , $msg );
             if ( $middleRpta[ status] != ok )
                 return $middleRpta; */
         }
         elseif ( $solicitud->idtiposolicitud == SOL_INST )
-        {    
+        {
             $detalle          = $solicitud->detalle;
             $fondo            = $detalle->thisSubFondo;
             $oldSaldo         = $fondo->saldo;
@@ -253,21 +253,21 @@ class DepositController extends BaseController
             $fondo->retencion -= $detalle->monto_aprobado * $tasaCompraAprobacion;
 
             if ( $fondo->saldo < 0 )
-                return $this->warningException( 'El Fondo ' . $fondo->full_name . ' solo cuenta con S/.' . ( $fondo->saldo + $fondoMonto ) . 
+                return $this->warningException( 'El Fondo ' . $fondo->full_name . ' solo cuenta con S/.' . ( $fondo->saldo + $fondoMonto ) .
                                                 $msg . $fondoMonto . ' en total' , __FUNCTION__ , __LINE__ , __FILE__ );
             $data = array(
-                'idFondo'      => $fondo->id , 
+                'idFondo'      => $fondo->id ,
                 'idFondoTipo'  => INVERSION_INSTITUCIONAL ,
-                'oldSaldo'     => $oldSaldo , 
-                'oldRetencion' => $oldRetencion , 
-                'newSaldo'     => $fondo->saldo , 
-                'newRetencion' => $fondo->retencion , 
+                'oldSaldo'     => $oldSaldo ,
+                'oldRetencion' => $oldRetencion ,
+                'newSaldo'     => $fondo->saldo ,
+                'newRetencion' => $fondo->retencion ,
                 'reason'       => FONDO_DEPOSITO );
             $fondoDataHistories[] = $data;
             $fondoMktController->setPeriodHistoryData( $fondo->subcategoria_id , $data );
             $fondo->save();
         }
-        $fondoMktController->setFondoMktHistories( $fondoDataHistories , $solicitud->id );  
+        $fondoMktController->setFondoMktHistories( $fondoDataHistories , $solicitud->id );
         return $this->setRpta();
     }
 
@@ -286,12 +286,12 @@ class DepositController extends BaseController
         $inputs    = Input::all();
         $rules     = array( 'numero_operacion' => 'required|min:1' );
         $validator = Validator::make( $inputs , $rules );
-        
+
         if ( $validator->fails() )
             return $this->warningException( $this->msgValidator( $validator ) , __FUNCTION__ , __LINE__ , __FILE__ );
-        
+
         $solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
-        
+
         if ( is_null( $solicitud ) )
             return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ ,  __LINE__ , __FILE__ );
         elseif( $solicitud->id_estado != DEPOSITADO )
@@ -319,7 +319,7 @@ class DepositController extends BaseController
     {
         try
         {
-            $inputs    = Input::all();      
+            $inputs    = Input::all();
             $solicitud = Solicitud::where( 'token' , $inputs[ 'token' ] )->first();
             $oldIdestado = $solicitud->id_estado;
 
@@ -327,14 +327,14 @@ class DepositController extends BaseController
             {
                 return $this->warningException( 'No se encontro la informacion de la solicitud' , __FUNCTION__ , __LINE__ , __FILE__ );
             }
-            elseif( ! in_array( $solicitud->id_estado, [DEPOSITADO, GASTO_HABILITADO] ) ) 
+            elseif( ! in_array( $solicitud->id_estado, [DEPOSITADO, GASTO_HABILITADO] ) )
             {
                 return $this->warningException( 'No se puede Cancelar por Liquidacion' , __FUNCTION__ , __LINE__ , __FILE__ );
             }
             else
             {
-                DB::beginTransaction(); 
-                
+                DB::beginTransaction();
+
                 //REGISTRO DE LA DEVOLUCION
                 $devolucion = new DevolutionController;
                 $periodo = Carbon::createFromFormat( 'm-Y' , $inputs[ 'periodo' ] )->format( 'Ym' );
@@ -343,7 +343,7 @@ class DepositController extends BaseController
                 //RETORNO DE SALDO AL FONDO
                 $fondo = new FondoMkt;
                 $fondo->refund( $solicitud , $solicitud->detalle->monto_aprobado , 8 );
-                
+
                 //ACTUALIZACION DEL ESTADO DE LA SOLICITUD
                 $solicitud->id_estado = 30;
                 $solicitud->save();
@@ -354,7 +354,7 @@ class DepositController extends BaseController
                 }
                 else
                 {
-                    $middleRpta = $this->setStatus( $oldIdestado , 30 , Auth::user()->id, $solicitud->created_by , $solicitud->id );    
+                    $middleRpta = $this->setStatus( $oldIdestado , 30 , Auth::user()->id, $solicitud->created_by , $solicitud->id );
                 }
 
                 if ( $middleRpta[ status ] == ok )
@@ -387,7 +387,7 @@ class DepositController extends BaseController
             $title = 'Detalle del Deposito-';
             $directoryPath  = 'files/depositos';
             $filePath = $directoryPath . '/' . $title . $date . '.xls';
-            
+
             $data = [];
             if( File::exists( public_path( $filePath ) ) )
             {
@@ -405,15 +405,15 @@ class DepositController extends BaseController
             {
                 return $this->warningException( 'No se pudo exportar el excel con las observaciones del deposito' , __FUNCTION__ , __LINE__ , __FILE__ );
             }
-            
+
             Excel::create( $title . $date , function( $excel ) use( $data )
             {
                 $excel->sheet( 'solicitudes' , function( $sheet ) use( $data )
                 {
                     $sheet->freezeFirstRow();
-                    $sheet->setStyle( 
+                    $sheet->setStyle(
                         array(
-                            'font' => 
+                            'font' =>
                                 array(
                                     'bold' => true
                                 )
@@ -428,5 +428,26 @@ class DepositController extends BaseController
         {
             return $this->internalException( $e , __FUNCTION__ );
         }
+    }
+
+    public function adminSolicitudDeposit()
+    {
+      try
+      {
+        $user = User::find(2);
+        Auth::login($user);
+        $inputs      = Input::all();
+        $middleRpta  = $this->validateInputsDeposit( $inputs );
+        if( $middleRpta[ status ] === ok )
+        {
+            return $this->depositOperation( $inputs[ 'token' ] , $inputs[ 'operacion' ] , $inputs[ 'cuenta' ] );
+        }
+        Auth::logout();
+        return $middleRpta;
+      }
+      catch( Exception $e )
+      {
+        return $this->internalException( $e , __FUNCTION__ , __LINE__ , __FILE__ );
+      }
     }
 }
