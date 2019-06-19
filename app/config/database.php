@@ -57,8 +57,7 @@ return array(
 			'password' => 'simp',
 			'charset' => 'utf8',
 			'prefix' => '',
-        ) ,
-
+        ),
 		'sqlite' => array(
 			'driver'   => 'sqlite',
 			'database' => __DIR__.'/../database/production.sqlite',

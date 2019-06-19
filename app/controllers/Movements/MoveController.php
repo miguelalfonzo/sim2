@@ -282,8 +282,8 @@ class MoveController extends BaseController
                     [ 'title' => 'Fecha de Aprobación' , 'data' => 'rev_fec' , 'width' => '5%' , 'className' => 'text-center' ],
                     [ 'title' => 'Monto' , 'data' => 'monto' , 'className' => 'text-center' , 'width' => '5%' ],
                     [ 'title' => 'Estado' , 'data' => 'estado' , 'className' => 'text-center' , 'width' => '5%'],
-                    [ 'title' => 'Tipo' , 'data' => 'sol_tip_nom' , 'className' => 'text-center' , 'width' => '5%'],
-                    [ 'title' => 'Edicion' , 'data' => 'opciones' , 'width' => '15%' , 'className' => 'text-center'  ],
+                    [ 'title' => 'Tipo' , 'data' => 'sol_tip_nom' , 'className' => 'text-center' , 'width' => '10%'],
+                    [ 'title' => 'Edición' , 'data' => 'opciones' , 'width' => '15%' , 'className' => 'text-center'  ],
                 ];
             $user = Auth::user();
             if( $user->type == GER_COM )

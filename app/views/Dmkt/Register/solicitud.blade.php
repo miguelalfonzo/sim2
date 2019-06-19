@@ -9,6 +9,7 @@
         <h3>Nueva Solicitud @if(isset($solicitude) && $solicitude->blocked == 1)<small>LA SOLICITUD ESTA SIENDO EVALUADA</small>@endif</h3>
         @endif
     </div>
-        @include('Dmkt.Register.detail')
+       {{--  @include('Dmkt.Register.detail') --}}
+       @include('Dmkt.Register.detailNew')
 </div>
 @stop

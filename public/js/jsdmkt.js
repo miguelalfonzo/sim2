@@ -64,6 +64,7 @@ var date_options2 =
     autoclose   : true
 };
 
+
 function validateResponse( response )
 {
     if( response.Status == ok )
@@ -2264,6 +2265,9 @@ $( '.editProduct' ).on( 'click' , function()
 
 $( document ).ready(function() 
 {
+
+    $(".chosen-select").chosen({disable_search_threshold: 10});
+
     $(".sim_alerta").hide();
     function getAlerts()
     {
@@ -2305,18 +2309,93 @@ $( document ).ready(function()
     {
         getAlerts();
     }
+
     seeker( $( '.cliente-seeker' ) , 'clients' , 'search-client' );
     seeker( $( '.institucion-seeker' ) , 'institutions' , 'search-institution' );
     seeker( $( '.rep-seeker' ) , 'reps' , 'search-rep' );
     seeker( $( '#user-seeker' ) , 'users' , 'search-users' );
     seeker( $( '#responsible-seeker' ) , 'responsibles' , 'search-responsibles' );
 
+    //cargaClientes();
+
     if ( $("#idState").length === 1 )
     {
         listSolicituds();
+        $("#idState").chosen({disable_search_threshold: 10});
     }
 
+    $( "#clientesFind" ).autocomplete({
+ 
+        source: function(request, response) {
+            $.ajax({
+                url: server+'buscar-clientes-autocomplete',
+                data: {
+                        term : request.term
+                 },
+                dataType: "json",
+                success: function(data){
+                   //console.log(data)
+                   response(data);
+                }
+            });
+        },
+        select: function (a, b) {
+            rowCliente = b.item.label.split(': ');
+            $("#ulClientes ul").append('<li class="list-group-item"><div class="row" style="margin:0"><b>'+rowCliente[1]+'</b><span class="pull-right"><span class="badge">'+rowCliente[0]+'</span><button type="button" class="btn btn-default btn-xs btn-delete-client"><i class="text-danger fas fa-trash-alt"></i></button></span></div><input type="hidden" name="clientes[]" value="{{ $value }}" ><input type="hidden" name="tipos_cliente[]" value="{{ $id_tipo_cliente }}"></li>');
+            $(this).val(''); return false;
+  
+        },
+        minLength:2,   
+        delay:500, 
+    });
+
     /** --------------------------------------------- CONTABILIDAD ------------------------------------------------- **/
+     $('#tags').select2({
+            placeholder: "Choose tags...",
+            minimumInputLength: 2,
+            ajax: {
+                url: server +'carga-Listado-Clientes',
+                dataType: 'json',
+                data: function (params) {
+                    return {
+                        q: $.trim(params.term)
+                    };
+                },
+                processResults: function (data) {
+                    console.log(data)
+                    return {
+                        results: data
+                    };
+                },
+                cache: true
+            }
+        });
+
+    function cargaClientes(){
+        $.ajax({
+            url: server +'carga-Listado-Clientes',
+            type: "get",
+            dataType: "json",
+            data :
+            {
+                _token             : GBREPORTS.token
+            },
+            beforeSend:function()
+            {
+                //responseUI('Cargando los datos de la Clínica.','blue');
+            },
+            success: function(data) {
+                console.log(data)
+                $("#divListadoClientes").html(data);
+                $("#clientes").chosen({disable_search_threshold: 10});
+            },
+            error: function() {
+                responseUI("No se puede acceder al servidor" ,"red");
+               // $(".message-expense").text('No se pueden recuperar los datos del servidor.').show();
+            }
+        })
+    }
+
 
     $(document).off('change','#idState')
     $(document).on('change','#idState',function()
@@ -2346,6 +2425,7 @@ function customAjax( type , url , data )
 
 function listSolicituds()
 {
+
     var data =
     {
         fecha_inicio : $('#drp_menubar').data('daterangepicker').startDate.format("L"),
@@ -2471,10 +2551,10 @@ function processData( data , usuario )
     function processDataStates( modelRegister , usuario )
     {
         var options =   '<a class="btn btn-default open-details" data-id="' + modelRegister.id + '">' +
-                            '<span class="glyphicon glyphicon-eye-open"></span>' +
+                            '<span class="text-warning glyphicon glyphicon-eye-open"></span>' +
                         '</a>' +
                         '<a class="btn btn-default timeLine" data-id="' + modelRegister.id + '">' +
-                            '<span class="glyphicon glyphicon-time"></span>' +
+                            '<span class="text-primary glyphicon glyphicon-time"></span>' +
                         '</a>';
         if( modelRegister.repor_usr )
         {
@@ -2490,10 +2570,10 @@ function processData( data , usuario )
                 if( modelRegister.crea_usr && modelRegister.sol_tip_id != 2 && modelRegister.stat == 1 )
                 {
                     options +=  '<a class="btn btn-default" href="editar-solicitud/' + modelRegister.tok + '">' +
-                                    '<span  class="glyphicon glyphicon-pencil"></span>' +
+                                    '<i class="text-success fas fa-edit"></i>' +
                                 '</a>' +
                                 '<button type="button" class="btn btn-default cancel-solicitud" data-idsolicitud=' + modelRegister.id + '>' +
-                                    '<span  class="glyphicon glyphicon-remove"></span>' +
+                                    '<i class="text-danger fas fa-trash-alt"></i>' +
                                 '</button>';
                 }
                 break;
@@ -2504,7 +2584,7 @@ function processData( data , usuario )
                                     '<span class="glyphicon glyphicon-edit"></span>' +
                                 '</a>' +
                                 '<button type="button" class="btn btn-default cancel-solicitud" data-idsolicitud=' + modelRegister.id + '>' +
-                                    '<span  class="glyphicon glyphicon-remove"></span>' +
+                                    '<i class="text-danger fas fa-trash-alt"></i>' +
                                 '</button>';
                 }
                 break;
@@ -2512,7 +2592,7 @@ function processData( data , usuario )
                 if( usuario.tipo == CONT && ( modelRegister.sol_tip_id == 1 || modelRegister.sol_tip_id == 2 ) )
                 {
                     options +=  '<button type="button" class="btn btn-default cancel-solicitud" data-idsolicitud=' + modelRegister.id + '>' +
-                                    '<span  class="glyphicon glyphicon-remove"></span>' +
+                                    '<i class="text-danger fas fa-trash-alt"></i>' +
                                 '</button>';
                 }
                 break;
@@ -2549,7 +2629,7 @@ function processData( data , usuario )
                     if( modelRegister.sol_tip_id == 3 )
                     {
                         options +=  '<button type="button" class="btn btn-default cancel-solicitud" data-idsolicitud=' + modelRegister.id + '>' +
-                                        '<span  class="glyphicon glyphicon-remove"></span>' +
+                                        '<i class="text-danger fas fa-trash-alt"></i>' +
                                     '</button>';
                     }
                     else
@@ -2611,4 +2691,6 @@ function processData( data , usuario )
         }
         return options;
     }
+
+
 }

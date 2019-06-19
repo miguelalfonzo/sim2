@@ -4,6 +4,7 @@ var pathnameArray= pathname.split("/public/");
 
 server =  pathnameArray.length >0 ? pathnameArray[0]+"/public/" : "";
 
+
 function loadingUI( message )
 {
     $.blockUI(

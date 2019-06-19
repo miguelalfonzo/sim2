@@ -1,7 +1,7 @@
 <?php
 
 namespace Source;
-
+use Illuminate\Http\Request;
 use Dmkt\Solicitud;
 use Users\Personal;
 use Users\Rm;
@@ -41,34 +41,102 @@ class Seeker extends BaseController
         }
     }
 
+        //     Route::get('tags', function (Illuminate\Http\Request  $request) {
+        //     $term = $request->term ?: '';
+        //     $tags = ClientType::where('DESCRIPCION', 'like', $term.'%')->lists('DESCRIPCION', 'ID');
+        //     $valid_tags = [];
+        //     foreach ($tags as $id => $tag) {
+        //         $valid_tags[] = ['id' => $id, 'text' => $tag];
+        //     }
+        //     return \Response::json($valid_tags);
+        // });
+
     public function clientSource()
     {
+        
         try {
+
             $inputs = Input::all();
-            $json = ' [{"name":"' . TB_DOCTOR . '", ' .
-                ' "wheres":{"likes":["PEFNRODOC1","(PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)"], ' .
-                ' "equal":{"PEFESTADO":1}},' .
-                ' "selects":["PEFCODPERS","( PEFNRODOC1 || \'-\' || PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)" , "\'DOCTOR\'" , 1 ]}, ' .
-                ' {"name":"' . TB_FARMACIA . '",' .
-                ' "wheres":{"likes":["PEJNRODOC","PEJRAZON"], ' .
-                ' "equal":{"PEJESTADO":1 , "PEJTIPPERJ":1 }}, ' .
-                ' "selects":["PEJCODPERS","( PEJNRODOC || \'-\' || PEJRAZON )" , "\'FARMACIA\'" , 2 ]}, ' .
-                ' {"name":"' . TB_INSTITUCIONES . '",' .
-                ' "wheres":{"likes":[ "PEJRAZON" ], ' .
-                ' "equal":{"PEJESTADO":1 , "PEJTIPPERJ":2 }}, ' .
-                ' "selects":["PEJCODPERS","PEJRAZON" , "\'INSTITUCION\'" , 3 ]}, ' .
-                ' {"name":"' . TB_DISTRIMED_CLIENTES . '",' .
-                ' "wheres":{"likes":[ "CLRUT" , "CLNOMBRE" ], ' .
-                ' "equal":{ "CLESTADO":1 }, ' .
-                ' "in":{ "CLCLASE": [ 1 , 6 ] } }, ' .
-                ' "selects":[ "CLCODIGO" , " ( CLRUT || \'-\' || CLNOMBRE ) " , "CASE WHEN CLCLASE = 1 THEN \'DISTRIBUIDOR\' WHEN CLCLASE = 6 THEN \'BODEGA\' END" , "CASE WHEN CLCLASE = 1 THEN 4 WHEN CLCLASE = 6 THEN 5 END" ]} ' .
-                ']';
-            $cAlias = array('value', 'label', 'type', 'id_tipo_cliente');
-            return Response::Json($this->searchSeeker($inputs['sVal'], $json, $cAlias));
+            $search =  strtoupper($inputs['term']);
+            
+            $row = \DB::transaction(function($conn) use ($search){
+            
+                $pdo = $conn->getPdo();
+                $stmt = $pdo->prepare('BEGIN SP_LISTAR_CLIENTES(:textFind,:data); END;');
+                $stmt->bindParam(':textFind', $search, \PDO::PARAM_STR);
+                $stmt->bindParam(':data', $lista, \PDO::PARAM_STMT);
+                $stmt->execute();       
+                oci_execute($lista, OCI_DEFAULT);
+                oci_fetch_all($lista, $array, 0, -1, OCI_FETCHSTATEMENT_BY_ROW + OCI_ASSOC );
+                oci_free_cursor($lista);
+                return $array;
+
+            });
+
+            $salida = '';
+            $fila = 0;
+            $result = array();
+            $i=0;
+            foreach ($row as $key => $value) {
+                $result[] = array("value"=>$value['ESTADO'],"label"=>$value['TIPO_CLIENTE'].': '.$value['DESCRIPCION']);
+            } 
+
+            return Response::Json($result);
+
         } catch (Exception $e) {
             return $this->internalException($e, __FUNCTION__);
         }
     }
+
+
+    // Función para llenar el select con los ListarPerfiles
+    public function LlenarClientes($data){
+       
+ 
+             echo('<select id="clientes" name="clientes" class="form-control">'.$this->LlenarClientes($array).'</select>');
+        //echo $sql;
+    #CODIGO DESCRIPCION  TIPO_CLIENTE   ESTADO        
+        $stmt = oci_parse($conn, $sql);     // Preparar la sentencia
+        $ok   = oci_execute( $stmt );           // Ejecutar la sentencia
+
+        while( $obj = oci_fetch_object($stmt) ) {
+            $salida .= "<option value='".$obj->ID."'>".$obj->TIPNOMBRE."</option>";
+        }
+
+        oci_free_statement($stmt);   
+        oci_close($conn);
+        return $salida;
+    }
+
+    // public function clientSource()
+    // {
+
+    //     try {
+    //         $inputs = Input::all();
+    //         $json = ' [{"name":"' . TB_DOCTOR . '", ' .
+    //             ' "wheres":{"likes":["PEFNRODOC1","(PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)"], ' .
+    //             ' "equal":{"PEFESTADO":1}},' .
+    //             ' "selects":["PEFCODPERS","( PEFNRODOC1 || \'-\' || PEFNOMBRES || \' \' || PEFPATERNO || \' \' || PEFMATERNO)" , "\'DOCTOR\'" , 1 ]}, ' .
+    //             ' {"name":"' . TB_FARMACIA . '",' .
+    //             ' "wheres":{"likes":["PEJNRODOC","PEJRAZON"], ' .
+    //             ' "equal":{"PEJESTADO":1 , "PEJTIPPERJ":1 }}, ' .
+    //             ' "selects":["PEJCODPERS","( PEJNRODOC || \'-\' || PEJRAZON )" , "\'FARMACIA\'" , 2 ]}, ' .
+    //             ' {"name":"' . TB_INSTITUCIONES . '",' .
+    //             ' "wheres":{"likes":[ "PEJRAZON" ], ' .
+    //             ' "equal":{"PEJESTADO":1 , "PEJTIPPERJ":2 }}, ' .
+    //             ' "selects":["PEJCODPERS","PEJRAZON" , "\'INSTITUCION\'" , 3 ]}, ' .
+    //             ' {"name":"' . TB_DISTRIMED_CLIENTES . '",' .
+    //             ' "wheres":{"likes":[ "CLRUT" , "CLNOMBRE" ], ' .
+    //             ' "equal":{ "CLESTADO":1 }, ' .
+    //             ' "in":{ "CLCLASE": [ 1 , 6 ] } }, ' .
+    //             ' "selects":[ "CLCODIGO" , " ( CLRUT || \'-\' || CLNOMBRE ) " , "CASE WHEN CLCLASE = 1 THEN \'DISTRIBUIDOR\' WHEN CLCLASE = 6 THEN \'BODEGA\' END" , "CASE WHEN CLCLASE = 1 THEN 4 WHEN CLCLASE = 6 THEN 5 END" ]} ' .
+    //             ']';
+    //         $cAlias = array('value', 'label', 'type', 'id_tipo_cliente');
+    //         return Response::Json($this->searchSeeker($inputs['sVal'], $json, $cAlias));
+    //     } catch (Exception $e) {
+    //         return $this->internalException($e, __FUNCTION__);
+    //     }
+    // }
 
     public function repInfo()
     {

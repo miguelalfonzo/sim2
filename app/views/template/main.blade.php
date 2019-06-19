@@ -44,7 +44,13 @@
         {{ HTML::style('css/bago.report.css') }}
         {{ HTML::style('css/gsdk-base.css') }}
         {{ HTML::style('css/timeline.css') }}
+        {{ HTML::style('css/chosen-bootstrap.css') }}
+        {{ HTML::style('css/chosen.css') }}
+        {{ HTML::style('css/select2.css') }}
+        {{ HTML::style('css/stylosAux.css') }}
         {{ HTML::script('js/jquery_2.1.0.min.js') }}
+        {{ HTML::script('https://kit.fontawesome.com/b5b3fa01a5.js') }}
+
 
     </head>
     <body>
@@ -230,6 +236,7 @@
         {{ HTML::script('js/locales/bootstrap-tagsinput.min.js') }}
         {{ HTML::script('js/moment.js') }}
         {{ HTML::script('js/moment.locale.es.js') }}
+        {{ HTML::script('js/select2.js') }}
 
         <script type="text/javascript">
             URL_BASE = '{{ asset( '/' ) }}';
@@ -246,6 +253,8 @@
                     END_DATE   = moment( "{{ $date[ "endDate" ] }}" , "DD/MM/YYYY" );
                 @endif
             @endif
+
+         
         </script>
 
 
@@ -254,5 +263,6 @@
         {{ HTML::script('js/bago.reports.js') }}
         {{ HTML::script('js/bago.reports.main.js') }}
         {{ HTML::script('js/wizard.js') }}
+        {{ HTML::script('js/chosen.jquery.js') }}
     </body>
 </html>

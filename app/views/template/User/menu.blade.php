@@ -1,6 +1,6 @@
 <div>   
     {{Form::token()}}
-    <div class="form-group col-xs-12 col-sm-3 col-md-2 col-lg-2">
+    <div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-3">
         <select id="idState" name="idstate" class="form-control selectestatesolicitude">
             @foreach( $states as $estado )
                 @if ( Auth::user()->type == TESORERIA )

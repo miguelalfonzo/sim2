@@ -20,6 +20,7 @@ class DataList
           $start = $dates[ 'start' ];
           $end   = $dates[ 'end' ];
           $data = DB::table( "TABLE( LISTADO_SOLICITUD_FN( $user_id , '$start' , '$end' , $state ) )" )->get();
+          #echo var_dump($data);
             return $data;
         }
         catch( Exception $e )

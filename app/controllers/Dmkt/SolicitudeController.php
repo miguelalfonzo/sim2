@@ -128,13 +128,15 @@ class SolicitudeController extends BaseController
         }
         else
         {
-            return View::make('template.User.show', $data);
+            return View::make('template.User.showNew', $data);
         }
     }
 
     public function newSolicitude()
     {
+
         include(app_path() . '/models/Query/QueryProducts.php');
+
         $data = array(
             'reasons'     => SolicitudType::getNormalTypes(),
             'activities'  => Activity::order(),
@@ -142,12 +144,37 @@ class SolicitudeController extends BaseController
             'currencies'  => TypeMoney::all(),
             'families'    => $qryProducts->get(),
             'investments' => InvestmentType::orderMkt());
+
         if ( Auth::user()->type != REP_MED )
         {
             $data[ 'reps' ] = Personal::getResponsible();
         }
+
+
         return View::make('Dmkt.Register.solicitud', $data);
     }
+
+    // public function newSolicitude()
+    // {
+
+    //     include(app_path() . '/models/Query/QueryProducts.php');
+        
+    //     $data = array(
+    //         'reasons'     => SolicitudType::getNormalTypes(),
+    //         'activities'  => Activity::order(),
+    //         'payments'    => TypePayment::all(),
+    //         'currencies'  => TypeMoney::all(),
+    //         'families'    => $qryProducts->get(),
+    //         'investments' => InvestmentType::orderMkt());
+
+    //     if ( Auth::user()->type != REP_MED )
+    //     {
+    //         $data[ 'reps' ] = Personal::getResponsible();
+    //     }
+
+
+    //     return View::make('Dmkt.Register.solicitud', $data);
+    // }
 
     public function editSolicitud($token)
     {

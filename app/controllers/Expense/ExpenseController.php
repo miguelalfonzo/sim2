@@ -530,6 +530,7 @@ class ExpenseController extends BaseController
 	}
 
 	public function getSpecialty($cmp = null){
+		$cmp = ($cmp !== null)? "'".$cmp."'": $cmp;
 		$result = null;
 		if(!is_null($cmp)){
 			$query = "SELECT " .

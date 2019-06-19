@@ -5,6 +5,7 @@
     | SYSTEM
     |--------------------------------------------------------------------------
     */
+    use \Client\ClientType;
 
     Route::group( array( 'before' => 'developer' , 'namespace' => 'Seat' , 'prefix' => 'migrate' ) , function()
     {
@@ -265,9 +266,12 @@
 
     Route::group( array( 'before' => 'rm_sup_gerprod_gerprom_gercom_gerger_ager' ) , function()
     {
+        #Route::post( 'carga-Listado-Clientes', 'Source\Seeker@clientSource');
         Route::post( 'search-client', 'Source\Seeker@clientSource');
         Route::post( 'get-client-view' , 'Source\Seeker@getClientView');
     });
+
+   Route::get('buscar-clientes-autocomplete', 'Source\Seeker@clientSource');
 
     Route::group( array( 'before' => 'estudio' ) , function()
     {
